@@ -11,7 +11,7 @@ metadata:
 
 Catch complexity gravity wells **before** they deepen. Every project accumulates decisions that were never made explicitly ("we'll figure out state ownership later"), or decisions that contradict each other silently (SCOPE says multi-agent topology; PLAN phase 4 binds roles per-request; code assumes one user). These are the traps that crushed BoletApp's Epic 14c (reverted after 3 days), kept Gastify's legacy refresh-never-fires bug open for months, and keep cross-role visibility vulnerabilities latent until the first auditor asks.
 
-This skill scans for them using **evidence-anchored patterns** (see `~/.claude/templates/gabe/debt-patterns/` — P1 through P11 distilled from actual Gastify + BoletApp incidents, not generic imagination), plus **project-local rules** if the project already captured lessons (Gastify `docs/rebuild/LESSONS.md`, BoletApp `docs/sprint-artifacts/**/*retro*.md`, `.kdbp/RULES.md`).
+This skill scans for them using **evidence-anchored patterns** (see `~/.claude/templates/gabe/debt-patterns/` — P1 through P11 distilled from actual Gastify + BoletApp incidents, not generic imagination), plus **project-local rules** if the project already captured lessons (Gastify `docs/rebuild/LESSONS.md`, BoletApp `docs/sprint-artifacts/**/*retro*.md`, `.kdbp/RULES.md`). Findings can also cite the advisory architecture principles (AP1-AP13) from `architecture-principles.md` when the finding evidence directly touches one of those principles.
 
 Every finding carries: severity (tier-adjusted), confidence (triangulated across docs/code/commits), blast radius (phases + REQs + files affected), and status (missing / implicit / contradictory / violating-existing-rule). Triage promotes each finding to the appropriate target:
 
@@ -112,6 +112,20 @@ See `~/.claude/templates/gabe/debt-patterns/README.md` for the pattern file form
 
 Parsing a pattern file: sections are fixed headings (`## Evidence source`, `## Red-line questions`, `## Detection — doc pass`, `## Detection — code pass`, `## Detection — commit pass`, `## Tier impact`, `## Severity default`, `## ADR stub template`, `## Open Question template`, `## Rule template`). Missing section → use defaults. Unknown heading → pass-through (project may add custom sections).
 
+## Architecture Principle Catalog
+
+The AP catalog is loaded from the first available path:
+
+1. `templates/architecture-principles.md` (project-local Gabe Suite source)
+2. `~/.claude/templates/gabe/architecture-principles.md`
+3. `~/.agents/templates/gabe/architecture-principles.md`
+
+AP principles are explanatory citations, not independent debt patterns. Do not
+emit a debt finding because "AP6 coupling might apply" in the abstract. First
+find concrete debt through a pattern, rule, doc contradiction, code hit, or
+commit hit; then attach AP IDs whose advisory tests are evidenced by that same
+finding.
+
 ---
 
 ## Process Steps
@@ -128,7 +142,8 @@ Parsing a pattern file: sections are fixed headings (`## Evidence source`, `## R
    - `.kdbp/debt-ignore.md` — parse dismissal list (created on first `(s)` during triage; see Step 5)
 4. **Resolve active phase.** Parse `.kdbp/PLAN.md` `<!-- status: active -->` frontmatter. Record phase number, `types: []` list (binds to tier-sections).
 5. **Load pattern catalog.** Read project-local `.kdbp/debt-patterns/*.md` first, then layer global `~/.claude/templates/gabe/debt-patterns/*.md`. Project-local overrides by ID.
-6. **If mode=`extract-rules`:** skip to Step 8. If mode=`audit-rules`: skip the catalog-scan parts of Step 2, only check existing rules.
+6. **Load architecture principles.** Read the AP catalog from the first available architecture-principles path. If missing, continue without AP citations and note the missing catalog in the summary.
+7. **If mode=`extract-rules`:** skip to Step 8. If mode=`audit-rules`: skip the catalog-scan parts of Step 2, only check existing rules.
 
 ### Step 1 — Load project-local rules
 
@@ -206,6 +221,12 @@ Weak-signal findings are included in output but demoted one severity level and l
 - `contradictory` — multiple conflicting signals
 - `violating-existing-rule` — code/scope violates a known R-rule
 
+**Architecture principle citations** (advisory, optional):
+- Match AP IDs from the catalog against the finding's existing evidence only.
+- Attach at most three AP citations to avoid noise, ordered by evidence strength.
+- AP citations do not change severity, confidence, status, or tier filtering.
+- Output format: `Architecture principles: AP6 coupling, AP12 documented decisions`.
+
 ### Step 4 — Tier filter
 
 Drop findings below the tier threshold (see table under Required Inputs §3). Always keep `violating-existing-rule` findings regardless of tier.
@@ -224,6 +245,9 @@ Present each finding one at a time:
   Evidence:
     - <source>: <content>
     - <source>: <content>
+
+  Architecture principles:
+    - <APn handle> — <why the cited evidence touches it>
 
   Consequence: <pattern's what-we-lose statement, customized to this project>
 

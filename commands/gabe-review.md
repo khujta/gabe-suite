@@ -2,6 +2,8 @@ Load and follow the skill at `skills/gabe-review/SKILL.md` (project-local) or `~
 
 Review code changes with risk pricing, confidence scoring, and interactive triage.
 
+Load the advisory architecture-principles catalog from `templates/architecture-principles.md`, `~/.claude/templates/gabe/architecture-principles.md`, or `~/.agents/templates/gabe/architecture-principles.md`. Review findings may cite AP IDs when their existing diff/file evidence directly touches a principle. AP citations are explanatory only; they do not create findings or change severity.
+
 Arguments:
 - No args: infer target from `.kdbp/PLAN.md` (first row with `Review=⬜` AND `Exec` ∈ {`✅`, `🔄`}) + `.kdbp/LEDGER.md` (files referenced in that phase's exec entries). Falls back to `git diff HEAD` when no KDBP context. Writes/resumes the singleton `.kdbp/REVIEW.md` and enters triage.
 - `brief`: findings table + confidence score + verdict only, no triage and no REVIEW.md write

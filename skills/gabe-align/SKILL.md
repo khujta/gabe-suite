@@ -25,8 +25,8 @@ Two responsibilities:
 | Mode | Alias | Values Checked | Output | Use Case |
 |------|-------|---------------|--------|----------|
 | **shallow** | `sf`, `bf` | Core only (A1-A3) + project values | 3-5 lines inline | Quick sanity check, auto-trigger in gabe-roast |
-| **standard** | (default) | All Standard (A1-A7+) + project values | Full alignment document | Before design, implementation, or non-trivial tasks |
-| **deep** | `dp` | All + brief | Alignment document + alignment brief | Greenfield projects, new architectures, major decisions |
+| **standard** | (default) | All Standard (A1-A7+) + project values + advisory AP checks | Full alignment document | Before design, implementation, or non-trivial tasks |
+| **deep** | `dp` | All values + advisory AP checks + brief | Alignment document + alignment brief | Greenfield projects, new architectures, major decisions |
 
 ### Automatic Checkpoint
 
@@ -82,6 +82,21 @@ skills/gabe-align/VALUES.md — A1-A7 alignment values
 
 Used in standard and deep modes. These are universal structural guards (user cognition, alternatives, validation before scale, etc.).
 
+### Architecture Principles (installed template)
+
+```
+templates/architecture-principles.md
+~/.claude/templates/gabe/architecture-principles.md
+~/.agents/templates/gabe/architecture-principles.md
+```
+
+Used in standard and deep modes as advisory AP checks. AP checks are separate
+from values: they produce CONCERN context and action items, but they do not count
+as value failures and do not block commit/PR checkpoints unless a project value
+or project-local rule independently makes the issue blocking. Load the first
+available catalog path in the order above. If none exists, note that AP checks
+were skipped because the catalog is missing.
+
 ### User-Level Values (always loaded)
 
 ```
@@ -114,8 +129,8 @@ Created by `/gabe-align init`. Only loaded when working in that project. Example
 
 All loaded values are evaluated:
 - Shallow: project (V*) + user (U*) values only
-- Standard: project (V*) + user (U*) + structural (A1-A7)
-- Deep: all + alignment brief
+- Standard: project (V*) + user (U*) + structural (A1-A7) + advisory AP checks
+- Deep: all + advisory AP checks + alignment brief
 - Automatic checkpoint: project (V*) + user (U*) + scenario check
 
 ---
@@ -127,10 +142,11 @@ All loaded values are evaluated:
 1. Read `skills/gabe-align/VALUES.md` fully (structural A1-A7)
 2. Read `~/.kdbp/VALUES.md` if exists (user values)
 3. Read `.kdbp/VALUES.md` if exists (project values)
-4. Identify mode from invocation (shallow / standard / deep)
-5. Identify target and context type
-6. If existing artifact: locate and read ALL referenced files
-7. If available, load cognitive profile from `~/.claude/gabe-lens-profile.md`. If the file does not exist and mode is **deep**, note it for the alignment brief (see Deep Mode below).
+4. For standard/deep only, read the architecture-principles catalog from the first available path: project-local `templates/architecture-principles.md`, then `~/.claude/templates/gabe/architecture-principles.md`, then `~/.agents/templates/gabe/architecture-principles.md`
+5. Identify mode from invocation (shallow / standard / deep)
+6. Identify target and context type
+7. If existing artifact: locate and read ALL referenced files
+8. If available, load cognitive profile from `~/.claude/gabe-lens-profile.md`. If the file does not exist and mode is **deep**, note it for the alignment brief (see Deep Mode below).
 
 ### During Checking
 
@@ -142,10 +158,16 @@ All loaded values are evaluated:
 9. Check each value independently — don't let other results influence assessment
 10. Be specific. "Violates A4" is not enough. State what's misaligned concretely.
 11. Don't pad. If all values pass, say so. A forced CONCERN is worse than an honest PASS.
+12. In standard/deep only, run advisory AP checks after values:
+   a. Evaluate only AP principles that the target evidence touches.
+   b. Mark AP results as PASS, CONCERN, or NOT APPLICABLE.
+   c. Do not fabricate AP concerns from generic preference; cite concrete target evidence.
+   d. Keep AP results in a separate "ARCHITECTURE PRINCIPLES (advisory)" section.
+   e. AP concerns may add action items, but they do not change the value PASS/CONCERN/FAIL counts.
 
 ### Rule-violation check (via `/gabe-debt`)
 
-11a. If `.kdbp/RULES.md` exists (or `docs/rebuild/LESSONS.md` with R-rules), before producing the final verdict, run an implicit `audit-rules` pass against the target:
+12a. If `.kdbp/RULES.md` exists (or `docs/rebuild/LESSONS.md` with R-rules), before producing the final verdict, run an implicit `audit-rules` pass against the target:
    - Load the rule index (R-NN entries + their `Detection` signatures).
    - Scan the target (file / folder / intent / diff) for rule violations.
    - Surface each violating rule as an additional CONCERN (standard mode) or contributing FAIL in strict-gate mode (e.g. pre-commit alignment checkpoint).
@@ -155,11 +177,12 @@ All loaded values are evaluated:
 
 ### After Checking
 
-12. Produce the output format for the selected mode
-13. If any value FAILs in standard or deep mode: list specific action items
-14. If the check reveals a gap no existing value covers: propose a new value
-15. If deep mode: produce the alignment brief
-16. The alignment result IS the deliverable. Do not proceed to the task itself.
+13. Produce the output format for the selected mode
+14. If any value FAILs in standard or deep mode: list specific action items
+15. If AP advisory checks have CONCERNs: list specific action items, labelled with AP IDs
+16. If the check reveals a gap no existing value or AP principle covers: propose a new value
+17. If deep mode: produce the alignment brief
+18. The alignment result IS the deliverable. Do not proceed to the task itself.
 
 ---
 
@@ -188,6 +211,10 @@ V2 ⚠ CONCERN — [explanation + what to do about it]
 A1 ✓ PASS — [one-line explanation]
 A2 ✗ FAIL — [explanation + what the alternative looks like]
 ...
+
+ARCHITECTURE PRINCIPLES (advisory):
+AP8 explicit state ⚠ CONCERN — [evidence-backed concern; does not change value counts]
+AP12 documented decisions ✓ PASS — [evidence-backed pass, if applicable]
 
 ACTION ITEMS:
 1. [specific action for each concern/failure]
@@ -304,10 +331,10 @@ Not all values need to be in context at all times. Load by tier to avoid context
 | Tier | What | When loaded | Cost |
 |------|------|-------------|------|
 | **Hot** | User values (U*) + project values (V*) | SessionStart hook — always | ~500 bytes |
-| **Warm** | Structural values (A1-A7) | On `/gabe-align standard` or `deep` invocation | ~2KB |
+| **Warm** | Structural values (A1-A7) + architecture principles (AP1-AP13) | On `/gabe-align standard` or `deep` invocation | ~6KB |
 | **Cold** | Ledger history, evolution data | Only by `/gabe-align evolve` | Variable |
 
-The automatic checkpoint at commit/PR only uses **Hot** tier values. Structural values (A1-A7) are design-level guards — they're checked when you deliberately run `/gabe-align standard`, not on every commit.
+The automatic checkpoint at commit/PR only uses **Hot** tier values. Structural values (A1-A7) and architecture principles (AP1-AP13) are design-level guards — they're checked when you deliberately run `/gabe-align standard`, not on every commit.
 
 ---
 

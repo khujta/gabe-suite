@@ -1,6 +1,6 @@
 ---
 name: gabe-mockup
-description: "Playbook for /gabe-mockup execute phases — legacy HTML mockup-project recipes (tokens → atoms → molecules → flows+INDEX → screens → handoff) plus React + Storybook mode for React-first apps. Documents tokens.css discipline, Storybook discipline, traceable component stories, Tweaks panel, state-tabs, frame rules, HANDOFF.json, and optional ui-ux-pro-max enrichment. Consumed by /gabe-mockup Step 3."
+description: "Playbook for /gabe-mockup execute phases — legacy HTML mockup-project recipes (tokens → atoms → molecules → flows+INDEX → screens → handoff) plus React + Storybook and design-ref modes for React-first apps. Documents tokens.css discipline, Storybook discipline, traceable component stories, design references, Tweaks panel, state-tabs, frame rules, HANDOFF.json, and optional ui-ux-pro-max enrichment. Consumed by /gabe-mockup Step 3."
 ---
 
 # Gabe Mockup — Playbook
@@ -54,14 +54,15 @@ Rules for React + Storybook projects:
 
 1. **No new static HTML mockups.** Existing `docs/mockups/**` files are visual references only. Do not create new `docs/mockups/**/*.html` in this mode.
 2. **Real frontend first.** Implement production UI in the app's real React tree. When `docs/rebuild/ux/STORYBOOK-STRUCTURE.md` exists, read it and follow its physical taxonomy before creating files. The current preferred shape is `apps/web/src/design-system/{atoms,molecules,organisms}` for shared UI and `apps/web/src/features/<area>/{components,screens,model,spikes}` for feature UI.
-3. **Stories are the inspection and correspondence surface.** Every new screen/component batch gets colocated `*.stories.tsx` coverage for mobile, tablet, desktop, and relevant states (default, loading, error, empty, first-time, disabled when applicable). Component stories expose the parts; composed screen stories show the assembled product surface. A single responsive screen implementation with curated platform/state story snapshots is preferred over separate mobile/tablet/desktop screen components.
-4. **Tokens flow through Tailwind.** Styling uses Tailwind classes backed by `shared/design-tokens.ts`; do not introduce ad hoc hex colors in React components.
-5. **Visual grouping rule.** Do not add an outer bordered grouping container around controls unless it is a real product card. Layout-only wrappers are fine; visible borders/backgrounds/shadows must belong to meaningful product surfaces.
-6. **Reference, not DOM contract.** Existing HTML mockups are visual references and state inventories; React component naming, data flow, and accessibility can be idiomatic React/Tailwind.
-7. **Storybook taxonomy.** Story titles should mirror the physical taxonomy: `Design System/{Atoms,Molecules,Organisms}`, `Features/<Area>/Components`, `Features/<Area>/Screens`, and `Features/<Area>/Spikes` for active playgrounds. Use `Flows/` only after a real multi-screen journey story exists. Prefer direct aliases such as `@app/*`, `@design-system/*`, `@features/*`, `@lib/*`, and `@shared/*` when the project defines them.
-8. **Option exploration stays in stories first.** When the user asks to compare, decide, or see alternatives, create story-only variants or spike stories first. Keep production screen defaults unchanged until the user chooses or explicitly asks to apply the preferred option.
-9. **Component-first spikes are allowed inside a screen batch.** For uncertain areas, build isolated component stories, add a composed spike story that assembles them, browser-check it, then wire the approved/recommended version into the real screen only when requested.
-10. **Verification gate.** A batch is not complete until these commands pass from `apps/web`: `npm run typecheck`, `npm run build`, `npm run build-storybook`, and `npm run test-storybook`. If the project provides a Storybook navigation/browser smoke script, run it too. Run the deterministic Storybook correspondence report from this skill, report any findings, and offer operator options instead of treating findings as a hard failure by default. Confirm `git diff -- docs/mockups` does not contain new static HTML mockups.
+3. **Design reference guard.** If `docs/rebuild/ux/DESIGN.md` exists, read it before React visual/layout work and treat it as the local design grammar for taste, token semantics, layout, feature screen conventions, and agent do/don't rules. If it is missing, warn with `Run /gabe-mockup design-ref to generate docs/rebuild/ux/DESIGN.md` and continue only if the user still wants to proceed; do not auto-generate it during `react-story`.
+4. **Stories are the inspection and correspondence surface.** Every new screen/component batch gets colocated `*.stories.tsx` coverage for mobile, tablet, desktop, and relevant states (default, loading, error, empty, first-time, disabled when applicable). Component stories expose the parts; composed screen stories show the assembled product surface. A single responsive screen implementation with curated platform/state story snapshots is preferred over separate mobile/tablet/desktop screen components.
+5. **Tokens flow through Tailwind.** Styling uses Tailwind classes backed by `shared/design-tokens.ts`; do not introduce ad hoc hex colors in React components.
+6. **Visual grouping rule.** Do not add an outer bordered grouping container around controls unless it is a real product card. Layout-only wrappers are fine; visible borders/backgrounds/shadows must belong to meaningful product surfaces.
+7. **Reference, not DOM contract.** Existing HTML mockups are visual references and state inventories; React component naming, data flow, and accessibility can be idiomatic React/Tailwind.
+8. **Storybook taxonomy.** Story titles should mirror the physical taxonomy: `Design System/{Atoms,Molecules,Organisms}`, `Features/<Area>/Components`, `Features/<Area>/Screens`, and `Features/<Area>/Spikes` for active playgrounds. Use `Flows/` only after a real multi-screen journey story exists. Prefer direct aliases such as `@app/*`, `@design-system/*`, `@features/*`, `@lib/*`, and `@shared/*` when the project defines them.
+9. **Option exploration stays in stories first.** When the user asks to compare, decide, or see alternatives, create story-only variants or spike stories first. Keep production screen defaults unchanged until the user chooses or explicitly asks to apply the preferred option.
+10. **Component-first spikes are allowed inside a screen batch.** For uncertain areas, build isolated component stories, add a composed spike story that assembles them, browser-check it, then wire the approved/recommended version into the real screen only when requested.
+11. **Verification gate.** A batch is not complete until these commands pass from `apps/web`: `npm run typecheck`, `npm run build`, `npm run build-storybook`, and `npm run test-storybook`. If the project provides a Storybook navigation/browser smoke script, run it too. Run the deterministic Storybook correspondence report from this skill, report any findings, and offer operator options instead of treating findings as a hard failure by default. Confirm `git diff -- docs/mockups` does not contain new static HTML mockups.
 
 Backward-compatible dispatch:
 
@@ -211,8 +212,93 @@ Frame rules above are honored either by **discipline** (author writes within the
 |---|---|---|
 | (default) | `/gabe-mockup` | Advance the phase ladder per PLAN.md |
 | `react-story` | `/gabe-mockup react-story <screen-or-batch>` | Generate production React + Storybook mockups for React-first projects |
+| `design-ref` | `/gabe-mockup design-ref [--refresh\|--force]` | Generate or refresh `docs/rebuild/ux/DESIGN.md` for React-first Storybook projects |
 | `spike` | `/gabe-mockup spike <component>` | Translate one live mockup into a working React component |
 | `validate` | `/gabe-mockup validate [<screen>\|--all]` | Run layout sanity checks (C1-C4) over screens × phone/tablet/desktop viewports |
+
+### Mode: `design-ref`
+
+**Purpose.** Generate or refresh a React-first project's repo-owned design reference at `docs/rebuild/ux/DESIGN.md`. This mode encodes the project's design grammar in the Refero-style file shape: taste thesis, source map, token semantics, layout grammar, component grammar, feature screen conventions, Storybook encoding, and agent do/don't rules. It is a documentation/standards mode, not a UI implementation mode.
+
+**Invocation:**
+```
+/gabe-mockup design-ref
+/gabe-mockup design-ref --refresh
+/gabe-mockup design-ref --force
+```
+
+**Pre-conditions.**
+- `docs/rebuild/ux/REACT-STORYBOOK-WORKFLOW.md` exists.
+- `apps/web/package.json` exists.
+- `shared/design-tokens.ts` exists.
+- `apps/web/tailwind.config.ts` exists.
+- If `docs/rebuild/ux/STORYBOOK-STRUCTURE.md` exists, it has been read and treated as the Storybook taxonomy contract.
+- Existing `docs/mockups/**` files are reference-only; this mode must not create static HTML mockups.
+
+**Inputs to inspect.**
+- `shared/design-tokens.ts` for palette, semantic colors, typography, spacing, radius, borders, shadows, and motion.
+- `apps/web/tailwind.config.ts` for the executable Tailwind token mapping.
+- `docs/rebuild/ux/REACT-STORYBOOK-WORKFLOW.md` and `docs/rebuild/ux/STORYBOOK-STRUCTURE.md` for workflow and taxonomy rules.
+- Active handoff/status/KDBP docs when present, especially current screen state and verification guidance.
+- `apps/web/src/design-system/**` for shared primitives, molecules, organisms, app shell, and asset catalogs.
+- `apps/web/src/features/**` for feature-owned components, screens, state models, and spikes.
+- `apps/web/src/flows/**` for real multi-screen journey stories.
+- Optional external/user-provided style references. Refero-style sources are used only for document structure; never copy another product's visual identity.
+
+**Outputs.**
+- `docs/rebuild/ux/DESIGN.md`
+- Link from `docs/rebuild/ux/REACT-STORYBOOK-WORKFLOW.md` to `DESIGN.md` when missing.
+- Link from `docs/rebuild/ux/STORYBOOK-STRUCTURE.md` to `DESIGN.md` when missing.
+- Optional short handoff/status/KDBP note when the repo already tracks active UX resume docs.
+- No production component changes.
+- No new `docs/mockups/**/*.html` files.
+
+**Standard `DESIGN.md` sections.**
+1. `Purpose`
+2. `Refero Pattern Extracted` or `Style File Pattern`
+3. `Style Thesis`
+4. `Source Map`
+5. `Tokens`
+6. `Layout Grammar`
+7. `Component Grammar`
+8. `Feature Screen Grammar`
+9. `Storybook Encoding`
+10. `Agent Rules`
+11. `Maintenance`
+
+**Recipe steps.**
+
+1. **D1 — Detect React-first workflow.** Confirm the pre-conditions above. If any required React-first marker is missing, follow Error recovery below.
+2. **D2 — Read current project grammar.** Inspect tokens, Tailwind mapping, Storybook taxonomy, current screen/component trees, and active handoff/status docs. Extract what exists; do not invent a new visual identity.
+3. **D3 — Extract style-file shape.** Use Refero-style structure as the documentation model: short thesis, semantic token tables/rules, layout grammar, component recipes, feature conventions, and do/don't rules. Cite any external references briefly if they were used.
+4. **D4 — Generate or update `DESIGN.md`.**
+   - If missing, create the full standard file.
+   - If present and no flag is passed, leave the file in place unless required links are missing; print that `--refresh` or `--force` is needed to change content.
+   - With `--refresh`, replace the standard sections listed above and preserve any top-level project-specific sections not in the standard list.
+   - With `--force`, rewrite the entire file from the current project grammar.
+5. **D5 — Cross-link docs.** Ensure workflow and Storybook structure docs point to `docs/rebuild/ux/DESIGN.md`. Keep the links short; do not duplicate the design reference content in those docs.
+6. **D6 — Bookkeeping.** If the repo has active handoff/status/KDBP docs, add a short dated note that `DESIGN.md` is now the design-reference surface and name the verification performed.
+7. **D7 — Verify.** Run the design-reference verification gate below. If this mode only touches docs, do not run the full app build unless Storybook taxonomy, story files, or app code changed.
+
+**Verification gate.**
+- `git diff --check` passes.
+- `find docs/mockups -type f -name '*.html' -newer docs/rebuild/ux/DESIGN.md` prints no output when `DESIGN.md` was created or refreshed.
+- `rg -n "docs/rebuild/ux/DESIGN.md" docs/rebuild/ux/REACT-STORYBOOK-WORKFLOW.md docs/rebuild/ux/STORYBOOK-STRUCTURE.md` finds links when those files exist.
+- If Storybook taxonomy or story references changed, run `npm run build-storybook` from `apps/web`, then run `check-storybook-correspondence.mjs --web-dir apps/web`.
+
+**Idempotency rules.**
+- Default run is create-if-missing plus link repair only.
+- `--refresh` updates standard sections and preserves extra top-level sections.
+- `--force` rewrites `DESIGN.md` from current repo sources.
+- Never create or modify `docs/mockups/**/*.html`.
+- Never change production React components from this mode.
+
+**Error recovery.**
+- **React marker missing** -> exit with `⚠ design-ref requires docs/rebuild/ux/REACT-STORYBOOK-WORKFLOW.md. Use legacy handoff docs or adopt React Storybook workflow first.`
+- **`apps/web/package.json` missing** -> exit with `⚠ design-ref requires apps/web/package.json.`
+- **`shared/design-tokens.ts` missing** -> exit with `⚠ design-ref requires shared/design-tokens.ts. Run token extraction first.`
+- **`apps/web/tailwind.config.ts` missing** -> exit with `⚠ design-ref requires apps/web/tailwind.config.ts.`
+- **Existing `DESIGN.md` has unclear custom structure and `--refresh` cannot merge safely** -> stop, summarize the ambiguity, and ask whether to use `--force` or preserve the file.
 
 ### Mode: `react-story`
 
@@ -232,6 +318,7 @@ Frame rules above are honored either by **discipline** (author writes within the
 - `shared/design-tokens.ts` exists and is importable by `apps/web/tailwind.config.ts`.
 - Storybook exists at `apps/web/.storybook/` OR this mode is allowed to scaffold it.
 - If `docs/rebuild/ux/STORYBOOK-STRUCTURE.md` exists, it has been read and treated as the taxonomy contract.
+- If `docs/rebuild/ux/DESIGN.md` exists, it has been read and treated as the local design grammar; if missing, warn `Run /gabe-mockup design-ref to generate docs/rebuild/ux/DESIGN.md` but do not auto-generate it.
 - Existing visual references live in `docs/mockups/**` or the user supplies a spec path.
 
 **Outputs.**
@@ -247,7 +334,7 @@ Frame rules above are honored either by **discipline** (author writes within the
 
 **Recipe steps.**
 
-1. **R1 — Detect workflow and taxonomy.** Confirm marker file `docs/rebuild/ux/REACT-STORYBOOK-WORKFLOW.md`, `apps/web/package.json`, and `shared/design-tokens.ts`. If `docs/rebuild/ux/STORYBOOK-STRUCTURE.md` exists, read it and follow it as the local taxonomy contract. If required workflow markers are missing, follow Error recovery below.
+1. **R1 — Detect workflow, design reference, and taxonomy.** Confirm marker file `docs/rebuild/ux/REACT-STORYBOOK-WORKFLOW.md`, `apps/web/package.json`, and `shared/design-tokens.ts`. If `docs/rebuild/ux/DESIGN.md` exists, read it before visual/layout work and follow it as the local design grammar. If it is missing, print `⚠ Design reference missing. Run /gabe-mockup design-ref to generate docs/rebuild/ux/DESIGN.md.` and continue only if the user still wants this batch without the reference. If `docs/rebuild/ux/STORYBOOK-STRUCTURE.md` exists, read it and follow it as the local taxonomy contract. If required workflow markers are missing, follow Error recovery below.
 2. **R2 — Ensure Storybook harness.** If `apps/web/.storybook/` is absent, install/configure Storybook with `@storybook/react-vite` and the Storybook Vitest addon, using the project's current package version constraints. Add scripts: `storybook`, `build-storybook`, `test-storybook`. Keep existing app scripts intact.
 3. **R3 — Read reference.** Open the reference HTML/spec for the screen/batch. Extract visual intent, state names, platform variants, data assumptions, and safety-critical copy. Treat the HTML as a visual/state reference, not a DOM contract.
 4. **R4 — Classify user intent.** Decide whether the request is an implementation batch, an option-exploration batch, a component-first spike, or shared chrome/component extraction. If the user asked to compare or decide, keep production defaults unchanged and put alternatives in Storybook first.
@@ -602,6 +689,7 @@ After every M5–M12 phase emits its last screen (before the user's next `/gabe-
 - Does NOT validate a11y contrast automatically during M2-M12 — that's M13's job (explicit audit phase).
 - Does NOT auto-generate screens from flows — flow → wireframe → hi-fi is user-gated at each step.
 - Does NOT port pixel-perfect screens from Figma — screens are HTML-first reference, not Figma parity.
+- **`design-ref` mode does NOT replace M13 handoff.** It writes React-first design grammar at `docs/rebuild/ux/DESIGN.md`; `HANDOFF.json`, `SCREEN-SPECS.md`, and audit closure remain M13 outputs.
 - **Legacy phase recipes (M0-M13) do NOT couple to any specific framework** — output is vanilla HTML + CSS vars + minimal vanilla JS (tweaks.js only). React-first projects use the `react-story` mode instead, and one-off component ports can still use `spike`.
 - Does NOT couple to any specific tokens filename — tweaks.js detects themes from whichever stylesheet exposes `[data-theme="X"]` selectors. Greenfield projects use `assets/css/tokens.css`; legacy ports may retain their existing shell filename.
 - **`validate` mode does NOT block phase advancement** — the inline gate at M5–M12 exit is *review-or-defer*. Findings stay pending in `.kdbp/MOCKUP-VALIDATION.md` until triaged; passing `--skip-validation` to the next `/gabe-mockup` call advances the ladder regardless. Conscious choice: prevent gate friction from grinding iterative screen work to a halt.
