@@ -2,6 +2,8 @@ Load and follow the skill at `skills/gabe-debt/SKILL.md` (project-local) or `~/.
 
 Architectural decision-debt scanner. Finds decisions that were never made explicitly or that silently contradict other decisions — the gravity wells of complexity that crush applications later (Gastify legacy, BoletApp Epic 14c).
 
+Load the advisory architecture-principles catalog from `templates/architecture-principles.md`, `~/.claude/templates/gabe/architecture-principles.md`, or `~/.agents/templates/gabe/architecture-principles.md`. Debt findings may cite AP IDs when their existing evidence directly touches a principle, but AP principles do not create findings or hard gates by themselves.
+
 Arguments:
 - No args: full scan (all 11 patterns) + interactive triage → writes to 4 KDBP targets.
 - `brief`: findings table + severity + counts; no writes, no triage.
@@ -23,6 +25,8 @@ Modes compose: `brief pattern=P3`, `dry-run since=HEAD~20 pattern=P6`, etc.
 
 Every write is tagged with a stable hash-based ID so re-running the scan updates in place instead of duplicating. Every session that writes appends a `debt-scan` entry to `SCOPE.md §15` Change Log.
 
+**Architecture principle citations:** findings can include `Architecture principles: AP6 coupling, AP12 documented decisions` when backed by the finding's evidence. These citations are advisory and do not alter severity or tier filtering.
+
 **Pattern catalog (v1, evidence-anchored to Gastify + BoletApp):**
 | ID | Pattern | Source |
 |---|---|---|
@@ -43,6 +47,7 @@ Custom project patterns: drop `P<n>-<handle>.md` into `.kdbp/debt-patterns/` to 
 **Relation to other gabe-* commands:**
 - `gabe-review` reads RULES.md for severity escalation (rule-violating code auto-escalates to CRITICAL with citation).
 - `gabe-align` reads RULES.md at alignment checkpoints.
+- `gabe-align` also reads `architecture-principles.md` in standard/deep modes for advisory AP checks.
 - `gabe-roast` can cite R-rules when adopting a perspective.
 - `gabe-teach`'s gravity wells (KNOWLEDGE.md, Miller's-7 architectural sections) are the *domains*; gabe-debt finds the *debt accumulating in each*. Different vocabularies, complementary scopes.
 

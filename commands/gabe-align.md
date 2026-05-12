@@ -9,7 +9,7 @@ Alignment guardian. Manual pre-flight checks + automatic checkpoint at commit/PR
 
 ## Before Anything Else
 
-Read the full skill definition from the gabe-align skill (`SKILL.md`) and the values from `VALUES.md`. Both are required. Also read `~/.kdbp/VALUES.md` (user-level) and `.kdbp/VALUES.md` (project-level) if they exist.
+Read the full skill definition from the gabe-align skill (`SKILL.md`) and the values from `VALUES.md`. Both are required. Also read `~/.kdbp/VALUES.md` (user-level) and `.kdbp/VALUES.md` (project-level) if they exist. In standard/deep modes, also load the architecture-principles catalog from `templates/architecture-principles.md`, `~/.claude/templates/gabe/architecture-principles.md`, or `~/.agents/templates/gabe/architecture-principles.md`.
 
 ## Modes
 
@@ -17,7 +17,7 @@ Read the full skill definition from the gabe-align skill (`SKILL.md`) and the va
 
 **Usage:** `/gabe-align [target]`
 
-Full alignment check against all loaded values (structural A1-A7 + user U* + project V*).
+Full alignment check against all loaded values (structural A1-A7 + user U* + project V*) plus advisory architecture-principle checks (AP1-AP13). AP concerns are evidence-backed context, not hard gates.
 
 ### Mode 2: Shallow (`shallow` | `sf` | `bf`)
 
@@ -29,7 +29,7 @@ Core values + project values only. 3-5 line output. Quick sanity check.
 
 **Usage:** `/gabe-align deep [target]`
 
-Full check plus alignment brief with intent, risks, recommended approach, and open questions.
+Full check plus advisory architecture-principle checks and an alignment brief with intent, risks, recommended approach, and open questions.
 
 ## Subcommands
 

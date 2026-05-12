@@ -142,6 +142,8 @@ For each changed file, check these dimensions:
 
 **Rule-violation escalation (via `/gabe-debt`):** If `.kdbp/RULES.md` exists (or `docs/rebuild/LESSONS.md` with R-rules is present), load the rule index before dimension scoring. For every finding, check if the affected file/line/pattern matches any rule's `Detection` signature. If yes, auto-elevate the finding's severity by one level (HIGH → CRITICAL, MEDIUM → HIGH) AND append a citation to the finding: `(violates R<n> from RULES.md — "<rule handle>")`. Load-bearing rules (tagged as such in the rule's `Status` field or explicit in source LESSONS) elevate straight to CRITICAL. Do not escalate if the user has already dismissed the match via `.kdbp/debt-ignore.md`.
 
+**Architecture principle citations (advisory):** Load the AP catalog from the first available path: project-local `templates/architecture-principles.md`, `~/.claude/templates/gabe/architecture-principles.md`, then `~/.agents/templates/gabe/architecture-principles.md`. For each review finding, attach AP IDs only when the finding's existing file/line/diff evidence directly touches a principle. AP citations explain the design force, but they do not create findings, change severity, or override the >80% confidence gate. Output format: `Architecture principles: AP8 explicit state, AP11 testability`.
+
 ### Step 3: Branch-Test Gap Detection
 
 For each modified source file:

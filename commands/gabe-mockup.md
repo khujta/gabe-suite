@@ -1,6 +1,6 @@
 ---
 name: gabe-mockup
-description: "Mockup/UX workflow command — peer to /gabe-execute, handles legacy HTML mockup phases and React + Storybook mockup work for React-first apps. On empty project: dispatches to /gabe-plan --preset=mockup-project. On active mockup plan: executes current phase via gabe-mockup skill playbook. Mutually redirects with /gabe-execute for wrong plan type. Usage: /gabe-mockup [goal|react-story <screen-or-batch>] [--reconfigure] [--dry-run] [--platforms=web,mobile-web,native-mobile] [--themes=N]"
+description: "Mockup/UX workflow command — peer to /gabe-execute, handles legacy HTML mockup phases and React + Storybook mockup work for React-first apps. On empty project: dispatches to /gabe-plan --preset=mockup-project. On active mockup plan: executes current phase via gabe-mockup skill playbook. Mutually redirects with /gabe-execute for wrong plan type. Usage: /gabe-mockup [goal|react-story <screen-or-batch>|design-ref] [--reconfigure] [--dry-run] [--platforms=web,mobile-web,native-mobile] [--themes=N]"
 ---
 
 # Gabe Mockup
@@ -24,6 +24,7 @@ Parse `$ARGUMENTS`:
 | `--platforms=web,mobile-web,native-mobile` | Platform variants to produce per screen. Default `web,mobile-web`. Used by `--preset=mockup-project` emission |
 | `--themes=N` | Number of candidate themes in M1. Default 3. Used by preset emission |
 | `react-story <screen-or-batch>` | Implement a React-first screen or batch in `apps/web` with Storybook stories instead of new static HTML |
+| `design-ref [--refresh\|--force]` | Generate or refresh `docs/rebuild/ux/DESIGN.md` for a React-first Storybook project |
 
 **Preconditions:**
 
@@ -72,24 +73,28 @@ Mockup-tag set: `{design-system, ui-kit, mockup-flows, mockup-index, mockup-docs
 If `docs/rebuild/ux/REACT-STORYBOOK-WORKFLOW.md` and `apps/web/package.json` both exist, default new screen and batch work to the skill playbook's `react-story` mode unless the user explicitly requests legacy HTML. In this mode:
 
 1. Do not create new `docs/mockups/**/*.html` files. Existing HTML is read-only visual reference/archive.
-2. Read `docs/rebuild/ux/STORYBOOK-STRUCTURE.md` when present and treat it as the local taxonomy contract.
-3. Implement production React/Tailwind UI in the physical taxonomy when adopted: shared pieces under `apps/web/src/design-system/{atoms,molecules,organisms}`, feature pieces under `apps/web/src/features/<area>/{components,screens,model,spikes}`, and stories beside the implementation.
-4. Use `shared/design-tokens.ts` as the token source and extend `apps/web/tailwind.config.ts` from it.
-5. Use Storybook as the mockup viewer and source-code correspondence map. Shared primitives and app chrome live under `Design System/`; product-specific pieces live under `Features/<Area>/Components`; composed screens live under `Features/<Area>/Screens`; active playgrounds live under `Features/<Area>/Spikes`; `Flows/` is only for real multi-screen journey stories.
-6. Prefer one responsive screen implementation with curated mobile/tablet/desktop story snapshots and controls instead of separate per-platform screen implementations.
-7. Use direct aliases such as `@app/*`, `@design-system/*`, `@features/*`, `@lib/*`, and `@shared/*` when the project defines them.
-8. When the user asks to compare layouts or decide between approaches, create story-only options first and keep current production defaults unchanged until the user chooses.
-9. When a screen area is uncertain, allow component-first spikes: isolated component stories, then a composed spike story, then wire the approved/recommended version into the real screen only when requested.
-10. For shared chrome/component extraction, expose the contract in component stories before broadly rewriting screens.
-11. Run the app verification gate from `apps/web`: `npm run typecheck`, `npm run build`, `npm run build-storybook`, and `npm run test-storybook`. If present, also run a Storybook navigation/browser smoke script such as `npm run test:storybook-navigation`. After `build-storybook`, run the bundled deterministic correspondence report, for example `node ~/.agents/skills/gabe-mockup/scripts/check-storybook-correspondence.mjs --web-dir apps/web`; report `PASS` or `REVIEW` findings with operator options instead of failing by default. Save screenshot evidence for visual changes, options, or spikes.
+2. Read `docs/rebuild/ux/DESIGN.md` when present and treat it as the local design grammar. If it is missing during `react-story`, warn `Run /gabe-mockup design-ref to generate docs/rebuild/ux/DESIGN.md`; do not auto-generate it.
+3. Read `docs/rebuild/ux/STORYBOOK-STRUCTURE.md` when present and treat it as the local taxonomy contract.
+4. Implement production React/Tailwind UI in the physical taxonomy when adopted: shared pieces under `apps/web/src/design-system/{atoms,molecules,organisms}`, feature pieces under `apps/web/src/features/<area>/{components,screens,model,spikes}`, and stories beside the implementation.
+5. Use `shared/design-tokens.ts` as the token source and extend `apps/web/tailwind.config.ts` from it.
+6. Use Storybook as the mockup viewer and source-code correspondence map. Shared primitives and app chrome live under `Design System/`; product-specific pieces live under `Features/<Area>/Components`; composed screens live under `Features/<Area>/Screens`; active playgrounds live under `Features/<Area>/Spikes`; `Flows/` is only for real multi-screen journey stories.
+7. Prefer one responsive screen implementation with curated mobile/tablet/desktop story snapshots and controls instead of separate per-platform screen implementations.
+8. Use direct aliases such as `@app/*`, `@design-system/*`, `@features/*`, `@lib/*`, and `@shared/*` when the project defines them.
+9. When the user asks to compare layouts or decide between approaches, create story-only options first and keep current production defaults unchanged until the user chooses.
+10. When a screen area is uncertain, allow component-first spikes: isolated component stories, then a composed spike story, then wire the approved/recommended version into the real screen only when requested.
+11. For shared chrome/component extraction, expose the contract in component stories before broadly rewriting screens.
+12. Run the app verification gate from `apps/web`: `npm run typecheck`, `npm run build`, `npm run build-storybook`, and `npm run test-storybook`. If present, also run a Storybook navigation/browser smoke script such as `npm run test:storybook-navigation`. After `build-storybook`, run the bundled deterministic correspondence report, for example `node ~/.agents/skills/gabe-mockup/scripts/check-storybook-correspondence.mjs --web-dir apps/web`; report `PASS` or `REVIEW` findings with operator options instead of failing by default. Save screenshot evidence for visual changes, options, or spikes.
 
 ### Step 3: Dispatch to phase recipe
 
 The skill playbook defines recipes keyed by phase `types`. Dispatch table:
 
+Named modes such as `react-story`, `design-ref`, `spike`, and `validate` bypass the legacy phase ladder after context loading and use the matching mode recipe in `gabe-mockup/SKILL.md`.
+
 | Phase types contain | Recipe | Output location |
 |---------------------|--------|-----------------|
 | React-first workflow marker + `apps/web/package.json` | React + Storybook recipe (`react-story`) | `apps/web/src/design-system/**`, `apps/web/src/features/**`, `*.stories.tsx`, Storybook config/scripts, browser-check evidence |
+| First positional arg `design-ref` | React-first design reference recipe (`design-ref`) | `docs/rebuild/ux/DESIGN.md` plus short workflow/Storybook doc links |
 | `design-system` (M1) | Tokens + stress-test matrix recipe | `docs/mockups/{tokens.css, explorations/, stress-*.html}` |
 | `design-system` + `ui-kit` (M2/M3) | Atoms / molecules recipe | `docs/mockups/{atoms,molecules}/` |
 | `mockup-flows` + `mockup-index` (M4) | Flows + INDEX seed recipe | `docs/mockups/{flows/, INDEX.md}` + populate ENTITIES.md CRUD |
@@ -160,12 +165,14 @@ No file writes. No state changes. Purely informational.
 - Unknown phase type tag (outside mockup-tag-set AND outside `/gabe-execute` tag universe) → print `⚠ Phase N types [...] not recognized. Add trigger-tag mapping in ~/.claude/templates/gabe/tier-sections/tier-section-index.md` and exit.
 - Missing `gabe-mockup/SKILL.md` playbook → print `⚠ Skill playbook missing. Reinstall gabe_lens or restore from git.` and exit.
 - React-first marker present but `apps/web/package.json` missing → print `⚠ React Storybook mode requires apps/web/package.json. Use legacy HTML mode or scaffold the web app first.` and exit.
+- `design-ref` requested without React-first marker, `apps/web/package.json`, `shared/design-tokens.ts`, or `apps/web/tailwind.config.ts` → print the missing precondition and exit without writing files.
 - React-first visual batch completes app checks but lacks browser evidence → print `⚠ React Storybook visual work requires mobile/tablet/desktop browser checks before marking the batch complete.` and leave Exec state incomplete.
 
 ## Non-goals
 
 - Does NOT run linters, contrast checkers, or a11y validators directly — those belong to `/gabe-review` and `/gabe-commit` CHECK 7 Layer 4.
 - Does NOT emit HANDOFF.json outside M13 phase — handoff is a dedicated phase, not a side effect of every phase.
+- Does NOT treat `design-ref` as M13 handoff generation. `docs/rebuild/ux/DESIGN.md` is a React-first design grammar reference; `HANDOFF.json`, `SCREEN-SPECS.md`, and audit closure remain M13 outputs.
 - Does NOT auto-commit per artifact — same per-phase commit cadence as `/gabe-execute` (D2 default).
 - Does NOT replace `/gabe-plan`, `/gabe-review`, `/gabe-commit`, `/gabe-push` — only the Exec step.
 
