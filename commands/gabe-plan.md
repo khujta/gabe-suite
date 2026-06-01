@@ -1,11 +1,11 @@
 ---
 name: gabe-plan
-description: "KDBP-aware planning with lifecycle management + tier decision per phase (MVP/enterprise/scale). Creates plans in .kdbp/PLAN.md, detects active plans, archives completed/deferred/cancelled plans. Usage: /gabe-plan [goal] [--full-catalog]"
+description: "KDBP-aware planning with lifecycle management + tier decision per phase (MVP/enterprise/scale) and optional HTML review artifacts for complex decisions. Usage: /gabe-plan [goal] [--full-catalog] [--html-artifact|--no-html-artifact]"
 ---
 
 # Gabe Plan
 
-KDBP-aware planner. Same planning logic as `/plan`, but persists to `.kdbp/PLAN.md` with lifecycle management + per-phase tier decision (MVP / Enterprise / Scale) with trade-off matrix.
+KDBP-aware planner. Same planning logic as `/plan`, but persists to `.kdbp/PLAN.md` with lifecycle management + per-phase tier decision (MVP / Enterprise / Scale) with trade-off matrix. For complex plans, it also creates a self-contained HTML review artifact as the human-facing entrypoint while keeping KDBP Markdown canonical.
 
 > **Rendering note.** Output templates in this spec wrapped in bare triple-backtick fences are spec-meta delimiters — render their contents as plain markdown at runtime. Tagged fences (```yaml, ```json, ```bash) stay fenced. See `gabe-docs/SKILL.md` § "Runtime output rendering convention".
 
@@ -21,6 +21,9 @@ KDBP-aware planner. Same planning logic as `/plan`, but persists to `.kdbp/PLAN.
 | `--preset=mockup-project` | Emit the canonical 13-phase mockup template (tokens → atoms → molecules → flows+INDEX → screens by section → handoff). Writes `<!-- project_type: mockup -->` to PLAN.md frontmatter. Invoked by `/gabe-mockup` when no active plan exists. |
 | `--platforms=<list>` | Comma-separated platforms (`web,mobile-web,native-mobile`). Used by `--preset=mockup-project`. Default: `web,mobile-web`. |
 | `--themes=<N>` | Number of theme candidates for M1 stress matrix. Used by `--preset=mockup-project`. Default: 3. |
+| `--html-artifact` | Force creation or refresh of the HTML review artifact for this plan. |
+| `--no-html-artifact` | Disable HTML artifact creation for this plan, even when complexity heuristics match. |
+| `--html-path=<path>` | Write the HTML artifact to an explicit project-local path. Default: `docs/gabe/plans/YYYY-MM-DD-<slug>/index.html`. |
 
 ## Procedure
 
@@ -45,7 +48,14 @@ Only `check` is a new subcommand. All others fall through to existing behavior.
 
 ### Step 0.5: Preset dispatch (before free-form planning)
 
-Parse flags. If `--preset=mockup-project` present:
+Parse flags. Record these values for later steps:
+
+- `html_mode`: `force` when `--html-artifact`, `disabled` when `--no-html-artifact`, otherwise `auto`.
+- `html_path`: value from `--html-path=<path>`, otherwise blank until Step 3.75 computes the default.
+- Reject any `--html-path` under `docs/mockups/` with:
+  `⛔ Gabe Plan HTML artifacts must not be written under docs/mockups/**/*.html. Use docs/gabe/plans/... or a project-specific docs path.`
+
+If `--preset=mockup-project` present:
 
 1. Skip Step 3 free-form planning flow.
 2. Emit the canonical 13-phase mockup template (see Step 3.PRESET below). Parameters:
@@ -122,6 +132,7 @@ Execute the standard planning process:
    - Key files likely affected
    - Estimated complexity: low / medium / high
    - **Types** — phase type tags (drives Step 3.5 section assembly). Examples: `[ai-agent, integration]`, `[data-migration, multi-tenant]`, `[user-facing, client-state]`. See `~/.claude/templates/gabe/tier-sections/tier-section-index.md` for canonical tag list.
+   - **Runtime journey evidence** — for phases tagged `{user-facing, native-mobile, mobile-web, web, upload, realtime, streaming, file-media, auth, session, notifications}`, include a concrete verification checkpoint that exercises the changed path on the target runtime and captures artifacts. Unit/static checks are not enough for these phase types.
 3. **Identify dependencies** between phases.
 4. **Assess risks** — Flag anything that could block progress.
 5. **Present the plan** and WAIT for user confirmation.
@@ -359,6 +370,39 @@ dim_overrides: [...]
 - **See `DECISIONS.md` D5 for accepted trade-offs.**
 ```
 
+### Step 3.75: Decide HTML review artifact
+
+After tier decisions are complete and before writing `PLAN.md`, decide whether the plan gets a human-facing HTML artifact.
+
+**Canonical source rule:** `.kdbp/PLAN.md`, `.kdbp/DECISIONS.md`, and `.kdbp/LEDGER.md` remain the automation source of truth. HTML is a review artifact for humans, not the authoritative plan state.
+
+Create or refresh the HTML artifact when any of these are true:
+
+- `--html-artifact` was passed.
+- The user explicitly asks for an HTML, visual, graphical, dashboard, artifact, or human-readable planning document.
+- The plan has 4+ phases.
+- Any phase type includes `data`, `architecture`, `integration`, `multi-tenant`, `ai-agent`, `mockup-flows`, `mockup-docs`, `analytics`, `notifications`, or `user-facing` with multiple connected workflows.
+- The plan is a product/domain modeling, workflow trace, schema planning, migration planning, or phase-readiness effort.
+
+Do not create the HTML artifact when `--no-html-artifact` was passed or when the plan is a small routine change with no complex decision surface.
+
+**Path selection:**
+
+- If `--html-path=<path>` is present, use that path.
+- Otherwise compute: `docs/gabe/plans/YYYY-MM-DD-<slug>/index.html`.
+- Reject paths under `docs/mockups/` for Gabe Plan artifacts. `docs/mockups/**/*.html` is owned by mockup workflows and archive/reference policy, not planning.
+
+**HTML artifact contract:**
+
+- Single self-contained `.html` file with inline CSS and inline SVG/HTML diagrams; no external network dependencies.
+- Uniform visual scale: consistent cards, diagrams, spacing, side navigation, tables, section widths, and typography rhythm.
+- Top banner text must include exactly: `HTML review artifact; .kdbp/PLAN.md and .kdbp/DECISIONS.md remain canonical.`
+- Include provenance: generated date, command (`/gabe-plan`), source plan path, decision entry range, ledger entry title, and links/paths to canonical Markdown.
+- Recommended sections: summary, phase map, ownership/data-flow diagram where relevant, tier decision digest, risks/bottlenecks, verification checklist, and Phase 3/open questions.
+- Prefer inline SVG for domain maps and state/data-flow diagrams when Mermaid would require a runtime dependency. Mermaid fences may appear only as static source examples, not as required rendering dependencies.
+
+The HTML should be reviewable in a browser by opening the file directly. It must not require a dev server.
+
 ### Step 4: Write plan to `.kdbp/PLAN.md`
 
 Only after user confirms. Write with this structure:
@@ -392,6 +436,7 @@ Only after user confirms. Write with this structure:
 <!-- A phase is complete when all four status columns are ✅ -->
 <!-- /gabe-next routes to the next command based on column state (Exec → Review → Commit → Push → advance phase) -->
 <!-- Tier column values: mvp | ent | scale. Read by /gabe-execute (tier-cap) and /gabe-review (TIER_DRIFT finding). -->
+<!-- User-facing/runtime phase types require journey evidence artifacts before Exec can be ✅. -->
 <!-- Manual override is fine — edit cells by hand any time -->
 <!-- Legacy plans with a single Status column still work; auto-tick is a silent no-op -->
 <!-- Legacy plans without Tier column: /gabe-execute reads tier=mvp default; /gabe-review skips TIER_DRIFT silently -->
@@ -427,6 +472,15 @@ Phase 1: [name]
 ## Notes
 
 [Any additional context from the planning conversation]
+
+## Review Artifacts
+
+- HTML review artifact: [path, or "none — simple plan / disabled by --no-html-artifact"]
+- Canonical source: `.kdbp/PLAN.md`, `.kdbp/DECISIONS.md`, `.kdbp/LEDGER.md`
+
+## Runtime Evidence Checkpoints
+
+- For each user-facing/runtime phase, name the required journey command(s), target device/browser, and artifact directory before `/gabe-execute` starts.
 ```
 
 ### Step 5: Log to LEDGER.md
@@ -438,6 +492,7 @@ Append to `.kdbp/LEDGER.md`:
 PHASES: [N] | COMPLEXITY: [overall] | MATURITY: [project-level from BEHAVIOR.md]
 TIERS: mvp × [n], ent × [n], scale × [n] | PROTOTYPES: [n]
 DECISIONS: D[first] → D[last] ([N] phase tier decisions logged)
+HTML_ARTIFACT: [path, or "none"]
 ```
 
 Tier distribution gives a quick read on "how much we're trying to do." A plan of 6 phases with 5 scale + 1 ent is a warning sign — over-scoping detectable at plan creation, before code hits.
@@ -501,6 +556,7 @@ PHASES: [N] phases | Current: Phase 1 — [name] (tier: [mvp/ent/scale])
 TRACKERS: Exec ⬜ | Review ⬜ | Commit ⬜ | Push ⬜ (auto-ticked as phases advance)
 TIERS: mvp × [n], ent × [n], scale × [n] | PROTOTYPES: [n]
 DECISIONS: D[first] → D[last] logged (per-phase tier trade-offs)
+HTML_ARTIFACT: [path, or none]
 LEDGER: ✅ logged
 
 Next steps:
@@ -545,6 +601,8 @@ For each phase row in the Phases table, evaluate:
 | C7 | Phase Tier cell format matches either bare tier or compact override notation `<tier> (<dim>→<tier>[, ...])` | v7.1 | Cell uses legacy format `tier-deferred` or prose |
 | C8 | If phase prose mentions a dim override (e.g., "Observability at scale") but YAML `dim_overrides:` is `[]` → flagged as **prose-only override** (common on plans that predate v7.1) | v7.1 | Heuristic: prose-match |
 | C9 | DECISIONS.md has a `D[N]` entry for each phase with `Phase: [N]` frontmatter OR a `## D[N] — Phase [N] tier:` heading | v2.10 | Phase row has no matching DECISION |
+| C10 | `## Review Artifacts` exists and any listed HTML artifact path exists | v7.2 | Section missing, path missing, or path under `docs/mockups/` |
+| C11 | Listed HTML artifact contains `HTML review artifact; .kdbp/PLAN.md and .kdbp/DECISIONS.md remain canonical.` | v7.2 | Missing canonical-source banner |
 
 Collect results per phase. Aggregate into a single compliance matrix.
 
@@ -554,11 +612,11 @@ Render as a markdown table (plain markdown, per `gabe-docs/SKILL.md` rendering c
 
 **PLAN compliance report — `<N>` phases checked**
 
-| Phase | # | Name | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | C9 | Verdict |
-|-------|---|------|----|----|----|----|----|----|----|----|----|---------|
-| 1 | Scaffold + DB | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ⚠ prose-only | — | ✅ | **RETROFIT** |
-| 2 | Money + FX + i18n | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | — | — | ✅ | **RETROFIT** |
-| 5 | Observability | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ⚠ prose-only | YAML absent | ✅ | **RETROFIT** |
+| Phase | # | Name | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | C9 | C10 | C11 | Verdict |
+|-------|---|------|----|----|----|----|----|----|----|----|----|-----|-----|---------|
+| 1 | Scaffold + DB | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ⚠ prose-only | — | ✅ | ❌ | ❌ | **RETROFIT** |
+| 2 | Money + FX + i18n | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | — | — | ✅ | ✅ | ✅ | **RETROFIT** |
+| 5 | Observability | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ⚠ prose-only | YAML absent | ✅ | ✅ | ✅ | **RETROFIT** |
 
 Legend:
 
@@ -583,6 +641,7 @@ When ≥1 phase has a non-compliant verdict, offer a retrofit menu. Bulk options
 - `[yaml]` — generate `## Phase Details` YAML block for all phases missing one, seeded from existing prose
 - `[overrides]` — for each phase with prose-only override signals (C8), run LLM to extract `dim_overrides` list into YAML with reason; confirm per-phase before writing
 - `[decisions]` — backfill missing `DECISIONS.md D[N]` entries (skip silently if already present)
+- `[html]` — create or refresh the HTML review artifact per Step 3.75, then add/update `## Review Artifacts` and the `LEDGER.md` `HTML_ARTIFACT` line
 - `[N]` — pick a single phase number to retrofit (runs all applicable gaps for that phase)
 - `[report-only]` — keep report, write nothing, exit
 - `[abort]` — exit without writing
@@ -601,6 +660,7 @@ For each accepted gap:
 3. **Tier cell format (C7).** Normalize to bare tier or compact override notation based on YAML `dim_overrides`.
 4. **Prose-only overrides (C8).** Invoke Haiku LLM per phase with the prose Phase Details + section tier-cap files → extract structured `dim_overrides` list with reasons → ADD to YAML block. Never infer overrides from silence — only from explicit prose mentions. Present each extraction for per-phase approval before writing.
 5. **DECISIONS backfill (C9).** Append a minimal `D[N]` row per missing phase with a note: `Backfilled via /gabe-plan check on <date>. Tier chosen: <from PLAN tier cell>. Reason: auto-backfill (no original decision recorded; review at next update).` Status stays `accepted` but flagged for review.
+6. **HTML artifact (C10-C11).** Generate or refresh the artifact using the current `PLAN.md` and `DECISIONS.md`. Add `## Review Artifacts` if absent. Reject `docs/mockups/**/*.html` and require the canonical-source banner.
 
 Each write is path-scoped. No `git add -A`. On completion, stage the touched files and print a single `[commit]` prompt: `Retrofit complete. Stage and /gabe-commit "chore(kdbp): retrofit PLAN to spec v<ver>"? [y/N]`.
 
@@ -628,7 +688,9 @@ If the user runs `/gabe-plan update` or `/gabe-plan status`:
   ```
   ## [date] [time] — PLAN UPDATED: [goal]
   CHANGE: [brief description of what changed]
+  HTML_ARTIFACT: [refreshed path, existing path, or none]
   ```
+  If `## Review Artifacts` lists an HTML artifact, refresh it from the updated plan. If no artifact exists but the updated plan now matches Step 3.75 complexity heuristics, offer to create one unless `--no-html-artifact` is present.
 
 - **`status`**: Read `.kdbp/PLAN.md`, show current state:
   ```
@@ -637,6 +699,7 @@ If the user runs `/gabe-plan update` or `/gabe-plan status`:
   Completed: [list]
   Remaining: [list]
   Last Updated: [date] ([N days ago])
+  HTML Artifact: [path, missing, or none]
   ```
   If last updated >14 days ago, add: "⚠ Plan may be stale. Run `/gabe-plan update` to refresh."
 

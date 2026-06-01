@@ -17,6 +17,8 @@ Executes phase tasks from `.kdbp/PLAN.md`. Complements `/gabe-plan` (write plan)
 
 `**Gabe-Lens block**` is an output-only command-time explanation. It is never written to `.kdbp/PLAN.md`, `.kdbp/REVIEW.md`, `.kdbp/LEDGER.md`, `.kdbp/PENDING.md`, commits, or docs unless another command already owns that write. These blocks help the user understand the current command result; `/gabe-teach` remains the durable knowledge consolidation path.
 
+`**Gabe-Lens brief — Platform progress**` follows the same output-only rule. It is the plain-language capability delta for `/gabe-execute`: what changed in the platform, what is newly possible now, and what remains blocked or deferred.
+
 ## Procedure
 
 ### Step 0: Parse args + validate
@@ -62,6 +64,11 @@ Parse `$ARGUMENTS`:
 3. Read `.kdbp/KNOWLEDGE.md` Gravity Wells table — determine which well(s) this phase touches (informational, appears in commit body).
 4. Read `.kdbp/PENDING.md` — surface any open items whose `File` matches target phase's Scope files (informational prompt before starting).
 5. **Load tier cap heuristics** from `.kdbp/DECISIONS.md` (find the phase's D-id entry) OR from `~/.claude/templates/gabe/tier-sections/*.md` `## Tier-cap enforcement` blocks. Used by Step 4.1 escalation gate.
+6. **Classify runtime journey evidence requirement.** If the phase `types` include any of `{user-facing, native-mobile, mobile-web, web, upload, realtime, streaming, file-media, auth, session, notifications, DB}` OR the phase changes UI/API behavior that a user directly exercises, mark `runtime_journey_required=true`. If the project `.kdbp/BEHAVIOR.md` contains a runtime staging proof rule, or the phase touches auth/session/DB/upload/realtime/native-mobile/notifications/file-media/web/user-facing deployed behavior, also mark `staging_proof_required=true`. Determine the target runtime:
+   - `native-mobile` / native dependency / permissions → physical device or named emulator/simulator; fresh build/install required when native modules changed.
+   - `web` / `mobile-web` / browser UI → Playwright or equivalent browser run with screenshots.
+   - `upload`, `realtime`, `streaming`, `file-media`, `auth`, `session`, `notifications` → journey test must exercise the real transport/runtime boundary, not only mocked unit paths.
+   - `staging_proof_required=true` → candidate code must be committed and either pushed to the configured staging branch/environment or explicitly deployed with the project's staging CLI fallback before runtime evidence can close Exec.
 
 ### Step 2: Decompose phase into tasks
 
@@ -81,6 +88,14 @@ A phase row in PLAN.md is one-line per step. Real execution needs finer granular
 - Output: numbered list of tasks
 
 **Tier-cap filter:** Before presenting tasks, prune any task that introduces a pattern above the **effective tier** for that task's section + dim, unless the task description explicitly justifies the escalation. Tier cap heuristics come from each matched section's `## Tier-cap enforcement` block (loaded Step 1.5).
+
+**Runtime journey evidence task:** If Step 1 classified `runtime_journey_required=true`, add an explicit final task:
+
+`T[K]. Capture runtime journey evidence for the changed user path on the target runtime`
+
+This task is not optional and is not satisfied by lint, typecheck, unit tests, API-contract tests, or mocked component tests. It must name the concrete artifact path(s) expected in LEDGER.
+
+If `staging_proof_required=true`, this task must also name the staging branch or deployment path and the deployed service URL. Localhost, `127.0.0.1`, SQLite, mock-only, or local-stub artifacts can support implementation but cannot close this task.
 
 **Effective tier resolution (respects per-dim overrides from Step 1 dim_overrides list):**
 
@@ -151,7 +166,15 @@ For each task T_i in order:
    - Lint the changed files (project tool from BEHAVIOR.md: ruff / biome / etc)
    - Types on changed files
    - Unit tests that exercise changed code (scoped, not full suite)
+   - For the runtime journey evidence task, run the target-runtime journey:
+     - Mobile native: install or confirm the fresh dev/release build, run on the declared physical device/emulator, exercise the changed path through the UI, and capture screenshots/report/logs.
+     - Web: run the browser-level E2E path with screenshot/video/report artifacts.
+   - Upload/realtime/auth/session paths: prove the real transport/auth/runtime boundary, including terminal success and at least one relevant edge case when the phase adds error/recovery behavior.
+     - If `staging_proof_required=true`: commit the candidate through `/gabe-commit`, push it to the configured staging branch or deploy it through the project's Railway CLI fallback, wait for staging readiness, then run the journey against the deployed staging URL.
+   - Write the exact commands, target device/browser, build id when applicable, and artifact paths to `.kdbp/LEDGER.md`.
    - If verification fails → fix in-loop, retry up to 2 times, then halt with `[retry] / [skip-task] / [abort]`
+
+   If runtime journey evidence is required but cannot be run, halt with Exec left `🔄`. Log the blocker and missing artifacts in LEDGER. Do not mark Exec `✅`.
 
 4. **Checkpoint (D2 decision):**
    - Default (interactive, no `--auto-commit`):
@@ -342,7 +365,13 @@ No prompt. Continue execution.
 
 When last task T_K commits successfully:
 
-1. **Invariant: Commit column must be `✅`.** Re-read `.kdbp/PLAN.md` Phases table row for current phase N. If `Commit` is still `⬜` despite all K tasks having committed, halt:
+1. **Invariant: runtime journey evidence must be present when required.** If Step 1 classified `runtime_journey_required=true`, re-read `.kdbp/LEDGER.md` for this phase and verify it names target-runtime evidence: command(s), target device/browser, build id when applicable, and artifact path(s). If `staging_proof_required=true`, also verify the evidence names the candidate branch/commit, staging service/API URL, readiness or deployment result, and excludes localhost/`127.0.0.1`/SQLite/mock-only as the closing runtime. If evidence is absent or only local/unit/static tests are listed, halt:
+   ```
+   ⚠ PHASE COMPLETE BLOCKED — runtime journey evidence missing for Phase N
+   This phase changes a user-facing/runtime path, so lint/typecheck/unit tests are not enough.
+   Exec remains 🔄 until the journey is run on the deployed staging target and artifacts are logged.
+   ```
+2. **Invariant: Commit column must be `✅`.** Re-read `.kdbp/PLAN.md` Phases table row for current phase N. If `Commit` is still `⬜` despite all K tasks having committed, halt:
    ```
    ⚠ PHASE COMPLETE BLOCKED — Commit column still ⬜ for Phase N
    Root cause: one or more tasks bypassed /gabe-commit (raw git commit used instead).
@@ -353,27 +382,45 @@ When last task T_K commits successfully:
      3. Re-run /gabe-execute once Commit = ✅.
    ```
    Do not tick Exec `✅` until the Commit invariant holds. This prevents the cascade failure where Exec advances past a phase that skipped `/gabe-commit`.
-2. Tick Exec cell: 🔄 → ✅ via shared auto-tick (target state = `complete`)
-3. Bump Last Updated
-4. Append to `.kdbp/LEDGER.md`:
+3. Tick Exec cell: 🔄 → ✅ via shared auto-tick (target state = `complete`)
+4. Bump Last Updated
+5. Append to `.kdbp/LEDGER.md`:
    ```
    ## [YYYY-MM-DD HH:MM] — PHASE EXEC COMPLETE: Phase N — [name]
    TIER: [mvp|ent|scale] (escalated from [original]) if escalation happened, else "TIER: [tier]"
    TASKS: [K] tasks, [K] commits
    DEVIATIONS: [N structural, M minor] (see DEVIATIONS.md if any)
    ```
-5. Print phase-complete summary:
+6. Print phase-complete summary:
    ```
    ✅ GABE EXECUTE — Phase N complete
    EXEC: ✅  REVIEW: ⬜  COMMIT: ✅  PUSH: ⬜
    ```
-6. **Print the Gabe-Lens block (output only).** Runs after the normal phase-complete summary and before final teach/routing notes.
+7. **Print the Gabe-Lens platform-progress brief (output only).** Runs immediately after the normal phase-complete summary and before the full Gabe-Lens block.
+   - Header line: `**Gabe-Lens brief — Platform progress**`
+   - Use active `gabe-lens` brief mode: concise constraint box plus one-line handle.
+   - Format:
+     ```
+     PLATFORM PROGRESS
+       BUILT: [one sentence: the concrete capability added or unlocked]
+       NOW POSSIBLE:
+         - [new user/system action that was impossible or unproven before]
+         - [new runtime/proof/operational capability, if any]
+       STILL NOT POSSIBLE:
+         - [next-phase gap, deferred platform, missing UI, or remaining proof boundary]
+       HANDLE: "[5-10 word gabe-lens handle]"
+     ```
+   - Keep it capability-first: prefer "users/operators can now..." over file lists.
+   - If the phase was purely internal or mechanical, state the internal capability honestly (for example, "review can now trust X invariant") instead of inventing user-facing progress.
+   - Base it only on the completed phase, current PLAN state, runtime artifacts, and explicit deferrals. Do not speculate about future phases as completed.
+   - Keep the brief output-only per the Gabe-Lens Output Rule. Do not append it to PLAN, LEDGER, PENDING, REVIEW, commits, or docs.
+8. **Print the Gabe-Lens block (output only).** Runs after the platform-progress brief and before final teach/routing notes.
    - Header line: `**Gabe-Lens block**`
    - Use the active `gabe-lens` cognitive suit and the full Gabe Block format: THE PROBLEM or WHAT IT ENABLES, THE ANALOGY, HOW IT MAPS, THE MAP, CONSTRAINT BOX, EASY TO CONFUSE WITH when helpful, ONE-LINE HANDLE, ANALOGY LIMITS, SIGNAL.
    - Explain what was implemented in the phase, how the changed pieces now connect, and why the next route is review.
    - Base the block only on the completed phase, task/commit summary, changed-file categories, verification outcomes, deviations, and current PLAN state.
    - Keep the block output-only per the Gabe-Lens Output Rule. Do not append it to PLAN, LEDGER, PENDING, REVIEW, commits, or docs.
-7. **Teach nudge (phase-level).** Deterministic heuristic, zero LLM cost. Suggest `/gabe-teach topics` before `/gabe-next` if ANY of:
+9. **Teach nudge (phase-level).** Deterministic heuristic, zero LLM cost. Suggest `/gabe-teach topics` before `/gabe-next` if ANY of:
    - Phase added ≥2 new files in a new folder (matches `/gabe-commit` Step 6.5 trigger at phase scope)
    - Phase introduced new top-level imports in changed files (e.g. `pydantic-ai`, `langchain`, `ai-sdk`, auth libs — any dep not present before the phase)
    - Phase modified `.kdbp/DECISIONS.md`
@@ -384,7 +431,7 @@ When last task T_K commits successfully:
    ℹ Phase N introduced new architectural concepts. Run /gabe-teach topics before /gabe-next to consolidate them into KNOWLEDGE.md.
    ```
    This is a redundant safety net — per-commit `/gabe-commit` Step 6.5 already suggests teach, but scroll-loss in bulk commits can lose it.
-8. If scope arg was `all` → advance Current Phase to N+1 and re-enter Step 1. Else → print final route and exit:
+10. If scope arg was `all` → advance Current Phase to N+1 and re-enter Step 1. Else → print final route and exit:
    ```
    Next: /gabe-review (unreviewed code) or /gabe-next to route automatically.
    ```

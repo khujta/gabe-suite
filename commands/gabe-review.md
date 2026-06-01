@@ -1,20 +1,27 @@
-Load and follow the skill at `skills/gabe-review/SKILL.md` (project-local) or `~/.claude/skills/gabe-review/SKILL.md` (global).
+Load and follow the skill at `skills/gabe-review/SKILL.md` (project-local), `~/.claude/skills/gabe-review/SKILL.md` (Claude Code global), or `~/.agents/skills/gabe-review/SKILL.md` (Codex global).
 
 Review code changes with risk pricing, confidence scoring, and interactive triage.
 
 Load the advisory architecture-principles catalog from `templates/architecture-principles.md`, `~/.claude/templates/gabe/architecture-principles.md`, or `~/.agents/templates/gabe/architecture-principles.md`. Review findings may cite AP IDs when their existing diff/file evidence directly touches a principle. AP citations are explanatory only; they do not create findings or change severity.
 
 Arguments:
-- No args: infer target from `.kdbp/PLAN.md` (first row with `Review=⬜` AND `Exec` ∈ {`✅`, `🔄`}) + `.kdbp/LEDGER.md` (files referenced in that phase's exec entries). Falls back to `git diff HEAD` when no KDBP context. Writes/resumes the singleton `.kdbp/REVIEW.md` and enters triage.
+- No args: infer target from `.kdbp/PLAN.md` (first row with `Review=⬜` AND `Exec` ∈ {`✅`, `🔄`}) + `.kdbp/LEDGER.md` (files referenced in that phase's exec entries). For runtime-gated phases, `Exec=🔄` means staging proof is still in progress, so print the staging-proof blocker and exit instead of reviewing. Falls back to `git diff HEAD` when no KDBP context. Writes/resumes the singleton `.kdbp/REVIEW.md` and enters triage.
+- Runtime evidence check: when the inferred phase has user-facing/runtime types (`user-facing`, `native-mobile`, `web`, `upload`, `realtime`, `streaming`, `file-media`, `auth`, `session`, `notifications`, `DB`), flag missing target-runtime artifact evidence as a review finding. If the project has a staging-proof policy, local-only or `127.0.0.1` artifacts are blockers, not warnings. Lint/typecheck/unit tests alone do not prove the changed journey.
 - `brief`: findings table + confidence score + verdict only, no triage and no REVIEW.md write
 - `fix`: skip to triage, auto-fix all findings (writes REVIEW.md en route)
 - `deferred`: show deferred items dashboard with triage option (read-only of PENDING.md; does not touch REVIEW.md)
 - `post-review`: parse an external code review (CE:review, BMad, ECC) and ingest its findings into `.kdbp/REVIEW.md`. If no external source and an active REVIEW.md already exists, behaves as Resume.
-- `inbox`: produce the live `.kdbp/REVIEW.md` and stop — no triage, no writes to PENDING/LEDGER/PLAN. Intended for Codex CLI ("analysis only" policy). Claude picks up via the Resume prompt.
+- `inbox`: produce the live `.kdbp/REVIEW.md` and stop — no triage, no writes to PENDING/LEDGER/PLAN. This is an explicit cross-CLI handoff mode, not the Codex default.
 - `resume`: explicitly resume triage on the active `.kdbp/REVIEW.md` (same as the `(r)` option in the collision prompt).
 - `close`: archive active REVIEW.md as resolved + write LEDGER/tick PLAN (for when triage was informal).
 - `discard`: archive active REVIEW.md as cancelled, skip LEDGER write.
 - `[file or folder]`: review specific target (writes REVIEW.md as usual).
+- End-of-review action menu: normal triage-producing reviews in both Claude Code
+  and Codex must finish by showing the shared next-action menu from
+  `skills/gabe-review/SKILL.md`: `Fix only`, `MVP`, `Fix also Enterprise`,
+  `Scale`, `High + Critical`, `Everything`, `Defer`, and `Something else`.
+  Codex must render this as plain text and wait for the user's selection when it
+  cannot show an interactive picker.
 
 Gabe-Lens output block:
 
@@ -32,7 +39,7 @@ All write-producing invocations (default, `fix`, `post-review`, `inbox`, `[file/
 - **Existing REVIEW.md, DIFFERENT CLI** → **merge mode**: strict auto-match on file+line+severity, fuzzy candidates flagged for user y/n, then a consolidation strategy prompt — `(u)nion | (i)ntersection | (m)anual | (a)rchive prior as stale | (c)ancel`. Consolidated file uses schema 1.1 with per-finding `Sources` attribution.
 
 **Two-pass cross-agent review workflow:**
-1. Pass 1 (either CLI) — invoke with `inbox` to produce REVIEW.md and stop (Codex's default; explicit in Claude).
+1. Pass 1 (either CLI) — invoke with `inbox` to produce REVIEW.md and stop.
 2. Pass 2 (the OTHER CLI) — invoke normally; analysis runs blind, then auto-enters merge mode because a different-CLI review already exists.
 
 This triangulates two independent perspectives into a single consolidated REVIEW.md. Findings flagged by BOTH agents are higher-confidence signal.

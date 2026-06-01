@@ -422,7 +422,8 @@ Silent no-op on any mismatch. Only runs when ALL of the following are true:
 
 1. Push succeeded (Step 4 reached without failure)
 2. CI passed green (Step 6 ended with "All checks passed" — or CI provider is `none` and user confirmed)
-3. Branch promotion reached the final link per PUSH.md, OR the PR was merged before running push
+3. The resolved env is the configured default/final environment (normally `production`). Non-default envs such as `staging` are integration gates and must not tick final `Push`.
+4. Branch promotion reached the final link per PUSH.md, OR the PR was merged before running push
 
 If any of those is false, skip this step. The Push column should only tick when the work is actually live on the target branch.
 

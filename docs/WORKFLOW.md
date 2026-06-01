@@ -17,6 +17,8 @@ Three layers:
 
 The suite is **serial** by design (post-rollback): one active plan at a time, phases run in order, no parallel lanes. The primary router is `/gabe-next` — it reads `.kdbp/PLAN.md` state and dispatches to the next command.
 
+For complex planning work, `/gabe-plan` can create a self-contained HTML review artifact as the human entrypoint. The artifact is useful for phase maps, ownership diagrams, workflow traces, and risk summaries, but it is not canonical state: `.kdbp/PLAN.md`, `.kdbp/DECISIONS.md`, and `.kdbp/LEDGER.md` remain the source of truth.
+
 ---
 
 ## Project-start modes
@@ -134,7 +136,7 @@ Direct entry points: you can call `/gabe-scope-addition` or `/gabe-scope-pivot` 
 |---------|------|-------|--------|------|
 | `/gabe-init [name]` | project setup (once) | project dir | `.kdbp/` + `CLAUDE.md` + hooks | yes (interview) |
 | `/gabe-scope` | after init, before plan | existing refs | `SCOPE.md`, `ROADMAP.md`, `scope-references.yaml`, tombstones | yes |
-| `/gabe-plan [goal]` | after scope | `SCOPE.md`, `ROADMAP.md`, `VALUES.md` | `PLAN.md`, `DECISIONS.md` | yes |
+| `/gabe-plan [goal]` | after scope | `SCOPE.md`, `ROADMAP.md`, `VALUES.md` | `PLAN.md`, `DECISIONS.md`, optional HTML review artifact | yes |
 | `/gabe-next` | every phase step | `PLAN.md` | `PLAN.md` (Current Phase advance only) | **no** |
 | `/gabe-execute` | phase has Exec=⬜/🔄 | `PLAN.md`, `STRUCTURE.md` | code + `PLAN.md` Exec col + `PENDING.md` (maybe) | yes |
 | `/gabe-review` | phase has Exec=✅, Review=⬜ | git diff, `PLAN.md`, `VALUES.md`, tier sections | `PLAN.md` Review col + `PENDING.md` (maybe) | yes |
@@ -153,7 +155,7 @@ Direct entry points: you can call `/gabe-scope-addition` or `/gabe-scope-pivot` 
 
 | Command | When | Writes |
 |---------|------|--------|
-| `/gabe-plan` | after scope (creates plan) | `PLAN.md`, `DECISIONS.md` |
+| `/gabe-plan` | after scope (creates plan) | `PLAN.md`, `DECISIONS.md`, optional `docs/gabe/plans/.../index.html` |
 | `/gabe-plan check` | existing plan predates spec change | `PLAN.md` retrofit, `DECISIONS.md` backfill |
 | `/gabe-plan complete` | all phases ✅ (called by `/gabe-next`) | archives `PLAN.md` → `.kdbp/archive/completed_*.md` |
 

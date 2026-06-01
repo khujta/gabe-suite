@@ -41,6 +41,11 @@ Skills, commands, and hooks for understanding, reviewing, deciding, and shipping
 
 The installed command surface includes direct skill commands plus the full KDBP lifecycle from project init through ship:
 
+Both Claude Code and Codex install five thin lifecycle command-wrapper skills
+(`gabe-next`, `gabe-plan`, `gabe-execute`, `gabe-commit`, `gabe-push`). Claude
+Code also has native slash commands; the wrappers preserve skill-style handoff
+parity and load the same command specs mirrored under each local home.
+
 | Command | What it does |
 |---|---|
 | `/gabe-align` | Alignment guardian — shallow, standard, and deep checks; standard/deep include AP1-AP13 advisory checks |
@@ -54,7 +59,7 @@ The installed command surface includes direct skill commands plus the full KDBP 
 | `/gabe-lens` | Cognitive translation — analogies, constraint boxes, Gabe Blocks |
 | `/gabe-mockup` | Mockup/UX workflow — legacy static mockups plus React-first Storybook and `design-ref` |
 | `/gabe-next` | Zero-logic router — reads PLAN.md and dispatches to the next gabe command |
-| `/gabe-plan` | KDBP-aware planning + per-phase tier decision (MVP / Enterprise / Scale) with trade-off matrix |
+| `/gabe-plan` | KDBP-aware planning + per-phase tier decision with optional HTML review artifact for complex decisions |
 | `/gabe-push` | Push, create PR, watch CI, promote branches — post-commit shipping workflow |
 | `/gabe-review` | Code review — risk pricing, confidence scoring, interactive triage, deferred items |
 | `/gabe-roast` | Adversarial gap review — stress-tests from a required perspective |
@@ -82,6 +87,8 @@ The Knowledge, Decisions, Behavior, and Pending system tracks project state acro
 ```
 
 User-level values at `~/.kdbp/VALUES.md` apply across all projects.
+
+For complex plans, `/gabe-plan` may also create a self-contained HTML review artifact under `docs/gabe/plans/...`. That HTML is the human-facing entrypoint for dense decisions, diagrams, phase maps, and bottleneck summaries; `.kdbp/PLAN.md`, `.kdbp/DECISIONS.md`, and `.kdbp/LEDGER.md` remain canonical for automation and lifecycle state.
 
 ### Hooks (6, installed to `~/.claude/settings.json`)
 

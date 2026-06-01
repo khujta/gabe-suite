@@ -25,7 +25,8 @@ The source tree currently exposes:
 Installed into Claude Code:
 
 - `~/.claude/commands/gabe-*.md`
-- `~/.claude/skills/gabe-*`
+- core Gabe skills under `~/.claude/skills/gabe-*`
+- `~/.claude/skills/gabe-{next,plan,execute,commit,push}` as thin lifecycle command-wrapper skills
 - `~/.claude/templates/gabe/**`
 - `~/.claude/prompts/gabe-scope/*.md`
 - `~/.claude/schemas/gabe-scope/**`
@@ -34,11 +35,15 @@ Installed into Claude Code:
 Installed into Codex:
 
 - `~/.agents/commands/gabe-*.md` as command-reference docs
-- `~/.agents/skills/gabe-*`
+- core Gabe skills under `~/.agents/skills/gabe-*`
+- `~/.agents/skills/gabe-{next,plan,execute,commit,push}` as thin lifecycle command-wrapper skills
 - `~/.agents/templates/gabe/**`
 - `~/.agents/docs/gabe-suite/**`
 
-Codex-visible behavior still comes from installed skills under `~/.agents/skills`. The command files under `~/.agents/commands` are a reference mirror.
+Codex-visible behavior still comes from installed skills under `~/.agents/skills`.
+Claude Code can use native slash commands or the same skill-style lifecycle
+wrappers. The command files under each local `commands/` directory are the
+reference mirror used by the wrapper skills.
 
 ## Architecture Principles Status
 

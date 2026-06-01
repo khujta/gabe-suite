@@ -49,7 +49,7 @@ Apply this decision table, top-to-bottom. First match wins.
 |-----------|--------------|-----|
 | Target row's `Exec` = ⬜ | `EXEC_CMD` | Tasks not yet implemented |
 | Target row's `Exec` = 🔄 | `EXEC_CMD` | Phase exec in progress (resume) |
-| Target row's `Review` = ⬜ | `/gabe-review` | Code written, not reviewed |
+| Target row's `Review` = ⬜ | `/gabe-review` | Code written and Exec gate complete; runtime-gated phases should only reach this after staging proof |
 | Target row's `Commit` = ⬜ | `/gabe-commit` | Reviewed, not committed |
 | Target row's `Push` = ⬜ | `/gabe-push` | Committed, not pushed |
 | All 4 = ✅ on target row AND more phases below | Advance `Current Phase` to `N+1`, re-run Step 2 | Phase done, move on |

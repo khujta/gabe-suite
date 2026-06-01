@@ -5,7 +5,7 @@
 # Usage:
 #   ./install.sh                 # Install to ~/.claude (Claude Code) AND ~/.agents (Codex CLI)
 #   ./install.sh --claude-only   # Install only to ~/.claude
-#   ./install.sh --codex-only    # Install only to ~/.agents (skills + templates + command reference docs)
+#   ./install.sh --codex-only    # Install only to ~/.agents (skills + command wrappers + templates + command reference docs)
 #   ./install.sh --dry-run       # Show what would be done
 #   ./install.sh --uninstall     # Remove gabe-* skills, command files, templates, and installed docs
 
@@ -33,7 +33,8 @@ run() {
     fi
 }
 
-SKILLS=(gabe-align gabe-arch gabe-assess gabe-debt gabe-docs gabe-health gabe-help gabe-lens gabe-mockup gabe-review gabe-roast)
+CORE_SKILLS=(gabe-align gabe-arch gabe-assess gabe-debt gabe-docs gabe-health gabe-help gabe-lens gabe-mockup gabe-review gabe-roast)
+COMMAND_WRAPPER_SKILLS=(gabe-next gabe-plan gabe-execute gabe-commit gabe-push)
 COMMANDS=()
 if [ -d "$SCRIPT_DIR/commands" ]; then
     for command_path in "$SCRIPT_DIR"/commands/gabe-*.md; do
@@ -45,7 +46,15 @@ fi
 
 if $UNINSTALL; then
     echo "=== Uninstall Gabe Suite ==="
-    for skill in "${SKILLS[@]}"; do
+    for skill in "${CORE_SKILLS[@]}"; do
+        if $INSTALL_CLAUDE; then
+            run "rm -rf ~/.claude/skills/$skill"
+        fi
+        if $INSTALL_AGENTS; then
+            run "rm -rf ~/.agents/skills/$skill"
+        fi
+    done
+    for skill in "${COMMAND_WRAPPER_SKILLS[@]}"; do
         if $INSTALL_CLAUDE; then
             run "rm -rf ~/.claude/skills/$skill"
         fi
@@ -89,7 +98,7 @@ $INSTALL_CLAUDE && run "mkdir -p ~/.claude/commands"
 $INSTALL_AGENTS && run "mkdir -p ~/.agents/commands"
 
 INSTALLED=0
-for skill in "${SKILLS[@]}"; do
+for skill in "${CORE_SKILLS[@]}"; do
     if [ ! -d "$SCRIPT_DIR/skills/$skill" ]; then
         echo "  SKIP: skills/$skill/ not found"
         continue
@@ -106,8 +115,35 @@ for skill in "${SKILLS[@]}"; do
     INSTALLED=$((INSTALLED + 1))
 done
 
+# Lifecycle command-wrapper skills. Claude Code has native slash commands, but
+# installing these to both homes gives skill-style handoff parity; Codex uses
+# them as the primary picker surface while deferring behavior to the mirrored
+# command reference files.
+for skill in "${COMMAND_WRAPPER_SKILLS[@]}"; do
+    if [ ! -d "$SCRIPT_DIR/skills/$skill" ]; then
+        echo "  SKIP: skills/$skill/ not found"
+        continue
+    fi
+    if $INSTALL_CLAUDE; then
+        run "mkdir -p ~/.claude/skills/$skill"
+        run "cp -r \"$SCRIPT_DIR/skills/$skill/\"* ~/.claude/skills/$skill/"
+    fi
+    if $INSTALL_AGENTS; then
+        run "mkdir -p ~/.agents/skills/$skill"
+        run "cp -r \"$SCRIPT_DIR/skills/$skill/\"* ~/.agents/skills/$skill/"
+    fi
+    if $INSTALL_CLAUDE && $INSTALL_AGENTS; then
+        echo "  OK: $skill (command wrapper: Claude + Codex)"
+    elif $INSTALL_CLAUDE; then
+        echo "  OK: $skill (command wrapper: Claude)"
+    else
+        echo "  OK: $skill (command wrapper: Codex)"
+    fi
+    INSTALLED=$((INSTALLED + 1))
+done
+
 # Command files. Claude Code consumes these as slash commands. Codex keeps the
-# same files as local command references; command behavior still comes from skills.
+# same files as local command references used by the lifecycle wrapper skills.
 for cmd in "${COMMANDS[@]}"; do
     if [ -f "$SCRIPT_DIR/commands/$cmd.md" ]; then
         if $INSTALL_CLAUDE; then
@@ -230,4 +266,8 @@ if $INSTALL_CLAUDE && [ -d "$SCRIPT_DIR/schemas" ]; then
 fi
 
 echo ""
-echo "Installed $INSTALLED/$((${#SKILLS[@]} + ${#COMMANDS[@]})) components."
+TOTAL_COMPONENTS=$((${#CORE_SKILLS[@]} + ${#COMMANDS[@]}))
+if $INSTALL_CLAUDE || $INSTALL_AGENTS; then
+    TOTAL_COMPONENTS=$((TOTAL_COMPONENTS + ${#COMMAND_WRAPPER_SKILLS[@]}))
+fi
+echo "Installed $INSTALLED/$TOTAL_COMPONENTS components."

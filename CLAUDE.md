@@ -24,6 +24,8 @@ gabe-suite/                   # current local folder: gabe_lens/ (rename deferre
     gabe-mockup/              # Mockup, React Storybook, and design-ref workflow
     gabe-review/              # Code review with risk pricing
     gabe-roast/               # Adversarial gap review
+    gabe-{next,plan,execute,commit,push}/
+                               # lifecycle command-wrapper skills that load commands/
   commands/
     gabe-align.md, gabe-assess.md, gabe-commit.md, gabe-debt.md
     gabe-execute.md, gabe-health.md, gabe-help.md, gabe-init.md
@@ -79,6 +81,11 @@ gabe-suite/                   # current local folder: gabe_lens/ (rename deferre
 | **gabe-mockup** | 1.0.0 | Legacy mockups plus React Storybook and design-ref workflows |
 | **gabe-review** | 1.4.x | Code review — risk pricing, confidence scoring, plan/AP drift, triage |
 | **gabe-roast** | 1.0.0 | Adversarial gap review from a required perspective |
+
+Claude Code and Codex both install five thin lifecycle command-wrapper skills
+(`gabe-next`, `gabe-plan`, `gabe-execute`, `gabe-commit`, `gabe-push`). Claude
+Code also has native slash commands; the wrappers preserve skill-style handoff
+parity and load the same lifecycle command specs from the active local home.
 
 ## Command Wrappers (20)
 

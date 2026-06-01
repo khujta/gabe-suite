@@ -7,6 +7,17 @@ metadata:
 
 # Gabe Review — Code Review with Risk Pricing
 
+## Codex Command Bridge
+
+When Codex invokes this skill as the `Gabe Review` command surface, first read
+the active command wrapper from `.agents/commands/gabe-review.md`,
+`~/.agents/commands/gabe-review.md`, or
+`~/projects/gabe_lens/commands/gabe-review.md`, then preserve that command's
+argument routing and visible output contract. This `SKILL.md` is the review
+engine referenced by the command file; if there is any conflict, the command
+file controls command-time behavior such as `Gabe-Lens block` rendering,
+singleton `REVIEW.md` reconciliation, and mode-specific skips.
+
 ## Purpose
 
 Review code changes and price every finding — what it costs to fix now, what it costs to ignore, and what you're betting by deferring. Track deferred items across reviews and escalate when the same gap gets kicked down the road.
@@ -77,10 +88,11 @@ This step only fires when `/gabe-review` is invoked with no arguments — no exp
 **Procedure (zero-LLM, deterministic — mirrors `/gabe-next`'s PLAN-parse approach):**
 
 1. **Check KDBP presence.** If `.kdbp/PLAN.md` is missing, or lacks `<!-- status: active -->` → jump to "Fallback" below.
-2. **Parse PLAN.md.** Find the `## Phases` table. Scan rows top-to-bottom for the first row where `Review` column = `⬜` AND `Exec` column ∈ {`✅`, `🔄`}. Record phase number N and phase name.
+2. **Parse PLAN.md.** Find the `## Phases` table. Scan rows top-to-bottom for the first row where `Review` column = `⬜` AND `Exec` column ∈ {`✅`, `🔄`}. Record phase number N, phase name, Exec state, and phase `Types` cell when available.
 3. **Handle no-match cases:**
    - No row satisfies the Review=⬜ condition (all reviewed) → print `ℹ No phase pending review. Pass an explicit target to review something else.` and exit 0.
    - Target row has `Exec=⬜` (Review pending but work not started) → print `⚠ Phase N Exec not complete — run /gabe-next to finish Exec before reviewing.` and exit 0.
+   - Target row has `Exec=🔄` and phase types include any runtime-gated type (`user-facing`, `native-mobile`, `web`, `upload`, `realtime`, `streaming`, `file-media`, `auth`, `session`, `notifications`, `DB`) OR `.kdbp/BEHAVIOR.md` contains a runtime staging proof rule → print `⚠ Phase N staging proof still pending — run /gabe-next to finish /gabe-execute before reviewing.` and exit 0.
 4. **Collect scope from LEDGER.md.** Read `.kdbp/LEDGER.md`. Find entries that reference phase N. Accept any of these patterns (case-insensitive):
    - `phase-N-exec`, `phase N exec`, `Phase N —`, `phase: N`, `Phase N:`.
 
@@ -131,6 +143,7 @@ For each changed file, check these dimensions:
 | **Data integrity** | Data loss, corruption, race conditions, missing validation | CRITICAL |
 | **Error handling** | Unhandled exceptions, fail-open without test, swallowed errors | HIGH |
 | **Test coverage** | New branches without corresponding test changes | HIGH |
+| **Runtime evidence** | User-facing/runtime phase marked complete without device/browser journey artifacts | HIGH |
 | **Logic** | Off-by-one, null handling, wrong condition, unreachable code | HIGH |
 | **Tier drift** | Code patterns above phase's declared Tier (MVP/Enterprise/Scale) | HIGH |
 | **Performance** | N+1 queries, unbounded loops, missing indexes, memory leaks | MEDIUM |
@@ -157,8 +170,29 @@ For each modified source file:
 
 ```
 ⚠️ TEST GAP: [file] adds [branch type] at L[line] — no test exercises this path.
-   Defer Risk: UNTESTED PRODUCTION PATH — P(high), Impact(high)
+        Defer Risk: UNTESTED PRODUCTION PATH — P(high), Impact(high)
 ```
+
+### Step 3.2: Runtime Journey Evidence Gap Detection
+
+When reviewing a KDBP phase, inspect `.kdbp/PLAN.md` and `.kdbp/LEDGER.md` before pricing findings:
+
+1. Parse the target phase `types`.
+2. If types include any of `{user-facing, native-mobile, mobile-web, web, upload, realtime, streaming, file-media, auth, session, notifications}`, require LEDGER evidence for the changed journey.
+3. Evidence must include:
+   - Exact command(s) run.
+   - Target runtime: physical device/emulator/simulator or browser.
+   - Build id/version when native mobile or installed app behavior changed.
+   - Artifact path(s): screenshots, report, video, logs, or trace.
+   - At least one relevant edge-case artifact when the phase added error/recovery behavior.
+4. If the phase has `Exec=✅` or is being reviewed with `Exec=🔄` and only static/unit/API checks are logged, emit a HIGH finding:
+
+```
+⚠️ RUNTIME EVIDENCE GAP: Phase N changes [type list] but LEDGER lacks target-runtime journey artifacts.
+   Defer Risk: BUILT BUT NOT PROVEN ON USER RUNTIME — P(high), Impact(high)
+```
+
+Do not accept "tests pass" as a substitute for this check. Unit tests can satisfy branch coverage; they cannot satisfy runtime journey evidence.
 
 ### Step 3.5: Churn Annotation
 
@@ -574,13 +608,15 @@ Persistence rule: this block is output-only. Do not write it to `.kdbp/REVIEW.md
 
 ### Step 5: Triage
 
-After the verdict and session estimate, present the triage prompt. This closes the gap between "here's what's wrong" and "let's fix it."
+After the verdict and session estimate, present the triage prompt for normal triage-producing modes (default/no-arg, explicit targets, `post-review`, and `resume`). This closes the gap between "here's what's wrong" and "let's fix it." Skip this menu for `brief`, `inbox`, `deferred`, `close`, and `discard`; `fix` bypasses the menu and applies the "Everything" route.
 
 **REVIEW.md is the triage workspace.** Before the first bulk/per-finding prompt, reconcile with `.kdbp/REVIEW.md` — see "Live Review Document" for the full blind-first flow (no-file / same-source collision / cross-agent merge). After reconcile, either a fresh or consolidated REVIEW.md exists on disk. As each finding is acted on during triage, mutate its `Status` column in place (`pending` → `fixed | deferred | dismissed`) so an interrupted triage is safely resumable by the next `/gabe-review` call.
 
-#### Entry Point — Bulk Matrix Menu
+#### Entry Point — Shared Next-Action Menu
 
-Replaces the old binary "Enter triage? [Y/n]" with a severity × scale matrix plus seven clearly-bounded options. Every option is explicit about **both** the fix set and the remainder behavior, so the user is never surprised by what happened to findings they didn't explicitly address.
+Replaces the old binary "Enter triage? [Y/n]" with a severity x maturity matrix plus a shared menu used by both Claude Code and Codex. Every option is explicit about **both** the fix set and the remainder behavior, so the user is never surprised by what happened to findings they didn't explicitly address.
+
+For Codex, this is a visible output contract: if the runtime cannot render an interactive picker, print the menu as plain text at the end of the review and wait for the user's selection. Do not end a normal Codex `/gabe-review` with only findings and a summary.
 
 **Matrix display:**
 
@@ -601,68 +637,89 @@ Project maturity: [MVP|Enterprise|Scale] (from .kdbp/BEHAVIOR.md)
 
 Counts come deterministically from the Findings table already produced in Step 4. No recomputation.
 
-**Seven options, each with explicit fix set AND remainder behavior:**
+**Shared options, each with explicit fix set AND remainder behavior:**
 
 ```
-Bulk options:
+What do you want to fix next?
 
-  [1] Fix MVP items only
+  [1] Fix only
+      Fix:          minimum blocking set for the active maturity gate
+                    (MVP: CRITICAL; Enterprise: CRITICAL + HIGH;
+                    Scale: CRITICAL + HIGH + MEDIUM)
+      Defer:        everything else -> PENDING.md
+      Use when:     you want the review unblocked without adjacent cleanup
+
+  [2] MVP
       Fix:          [n_mvp] findings (MVP gate, any severity)
-      Defer:        [n_ent+n_scale] findings (Enterprise + Scale) → PENDING.md
+      Defer:        [n_ent+n_scale] findings (Enterprise + Scale) -> PENDING.md
       Confidence:   [current] → [projected] (+[delta])
 
-  [2] Fix MVP + Enterprise items
+  [3] Fix also Enterprise
       Fix:          [n_mvp+n_ent] findings (MVP + Enterprise gates)
-      Defer:        [n_scale] findings (Scale gate) → PENDING.md
+      Defer:        [n_scale] findings (Scale gate) -> PENDING.md
       Confidence:   [current] → [projected] (+[delta])
 
-  [3] Fix all including Scale
-      Fix:          [total] findings (everything)
-      Defer:        none
+  [4] Scale
+      Fix:          [n_mvp+n_ent+n_scale] current review findings
+      Defer:        unrelated/open backlog not directly raised by this review
       Confidence:   [current] → [projected] (+[delta])
 
-  [4] Fix CRITICAL + HIGH only (severity-based, ignores gate)
+  [5] High + Critical
       Fix:          [n_crit+n_high] findings (CRITICAL + HIGH, any gate)
-      Defer:        [n_med+n_low] findings (MEDIUM + LOW) → PENDING.md
+      Defer:        [n_med+n_low] findings (MEDIUM + LOW) -> PENDING.md
       Confidence:   [current] → [projected] (+[delta])
 
-  [5] Defer Scale, triage the rest one-by-one
-      Defer now:    [n_scale] findings (Scale gate) → PENDING.md
-      Then enter:   one-by-one for remaining [total-n_scale] (MVP + Enterprise)
+  [6] Everything
+      Fix:          every current review finding and directly related open
+                    deferred item surfaced by this review
+      Defer:        none from the current review
 
-  [6] One-by-one (per-finding prompt)
-      Enter:        per-finding loop for all [total] findings
-      Each gets:    f / d / x / s / a / e decision
-
-  [7] Skip triage
-      Defer:        all [total] findings → PENDING.md
+  [7] Defer
+      Defer:        all non-CRITICAL findings -> PENDING.md
       Fix:          none
+
+  [8] Something else
+      Enter:        custom expression or plain-language instruction
+      Examples:     "fix 1-3, defer 4-6", "one-by-one", "fix auth only"
 
 ★ Recommended for [project maturity]: [default option]
 
-Pick [1-7] or type `custom` for a mixed expression (e.g. "fix 1-3, defer 4-6, dismiss 7"):
+Pick [1-8], type the label, or type `custom` for a mixed expression:
 ```
 
 **Starred default (by project maturity, not by project name):**
 
 | Project maturity | Recommended option |
 |------------------|--------------------|
-| MVP | [1] Fix MVP items only |
-| Enterprise | [2] Fix MVP + Enterprise items |
-| Scale | [3] Fix all including Scale |
+| MVP | [2] MVP |
+| Enterprise | [3] Fix also Enterprise |
+| Scale | [4] Scale |
 
 If no `.kdbp/BEHAVIOR.md` exists or maturity is unset, star [1] as the conservative default.
 
+Accept case-insensitive text labels and common aliases:
+
+| User input | Route |
+|------------|-------|
+| `fix only`, `minimum`, `blocking` | [1] Fix only |
+| `mvp`, `mbp` | [2] MVP |
+| `enterprise`, `fix also enterprise` | [3] Fix also Enterprise |
+| `scale` | [4] Scale |
+| `high critical`, `critical high`, `high + critical` | [5] High + Critical |
+| `everything`, `all` | [6] Everything |
+| `defer`, `skip` | [7] Defer |
+| `something else`, `custom`, any unmatched prose | [8] Something else |
+
 #### Bulk Option Guardrails
 
-Before executing any bulk option, apply these two guardrails:
+Before executing any bulk option, apply these guardrails:
 
-**1. CRITICAL findings are always in the fix set.**
+**1. CRITICAL findings are always in the fix set for options [1]-[6].**
 
 If the chosen option would leave a CRITICAL unresolved (e.g., user picks [1] but a CRITICAL has Enterprise gate), show this warning and adjust:
 
 ```
-⚠ Option [1] would defer [N] CRITICAL finding(s). CRITICALs cannot be deferred.
+⚠ Option [1] would defer [N] CRITICAL finding(s). CRITICALs cannot be silently deferred.
   Adjusted fix set:  [N+n_mvp] findings ([n_mvp] MVP + [N] CRITICAL forced)
   Adjusted defer:    [rest]
   Proceed? [Y/n]
@@ -670,18 +727,32 @@ If the chosen option would leave a CRITICAL unresolved (e.g., user picks [1] but
 
 If the user confirms, execute with the adjusted sets. If they decline, return to the menu.
 
-**2. Dismiss is never a bulk action.**
+**2. Option [7] Defer cannot silently defer CRITICAL findings.**
 
-All remainders from bulk options go to **defer** (PENDING.md, re-surfaces on next review). Dismiss is session-only and requires per-finding justification — only available in per-finding mode (options [5], [6], custom).
+If the user picks [7] while CRITICAL findings exist:
+
+```
+⚠ Defer would leave [N] CRITICAL finding(s) unresolved.
+  CRITICAL findings require either a fix or an explicit dismiss/force-defer
+  justification.
+  Choose: [1] Fix only, [8] Something else, or type "force-defer critical: <reason>".
+```
+
+`force-defer critical` writes the item to PENDING.md with the justification and keeps the Final Verdict at BLOCK.
+
+**3. Dismiss is never a bulk action.**
+
+All remainders from bulk options go to **defer** (PENDING.md, re-surfaces on next review). Dismiss is session-only and requires per-finding justification — only available through [8] Something else / custom or the one-by-one loop.
 
 #### Custom Expression
 
-User types a mixed expression:
+User picks [8] or types a mixed expression:
 
 ```
 fix 1-3, defer 4-6, dismiss 7
 fix 1,3,5 defer 2,4
 fix all-critical, defer all-scale, one-by-one rest
+one-by-one
 ```
 
 Parse rules:
@@ -690,12 +761,12 @@ Parse rules:
 - `dismiss N` — requires asking for justification per item
 - `skip N` — leave un-triaged (prompted at end)
 - `one-by-one N` or `one-by-one rest` — route specific items (or everything else) to the per-finding loop
-- Shortcuts: `all-critical`, `all-high`, `all-mvp`, `all-enterprise`, `all-scale`, `rest`
+- Shortcuts: `all-critical`, `all-high`, `all-mvp`, `all-enterprise`, `all-scale`, `blocking`, `rest`
 - Unresolved items at the end of the expression → auto-defer with a confirmation prompt
 
-Apply the same two guardrails (CRITICAL-always-fixed, dismiss-needs-justification).
+Apply the same guardrails (CRITICAL handling, force-defer justification, dismiss-needs-justification).
 
-#### One-by-one Loop (options [5] remainder, [6], or custom `one-by-one`)
+#### One-by-one Loop ([8] Something else with `one-by-one`)
 
 Present findings **grouped by file** (not by severity), because fixes in the same file batch naturally. Within each file group, order by severity (CRITICAL first).
 
@@ -712,7 +783,7 @@ For each finding, show a compact card:
 
 | Action | What happens |
 |--------|-------------|
-| **f — Fix now** | Claude applies the fix immediately. For code changes: edit the file, show the diff. For test gaps: write the test. For doc issues: update the doc. After fix, re-validate and mark resolved. |
+| **f — Fix now** | The active CLI (Claude Code or Codex) applies the fix immediately. For code changes: edit the file, show the diff. For test gaps: write the test. For doc issues: update the doc. After fix, re-validate and mark resolved. |
 | **d — Defer** | Ask for optional justification. Write to `.kdbp/PENDING.md` (or `deferred-cr.md` if PENDING.md doesn't exist) with current date, finding details, source=`gabe-review`, and Times Deferred = 1 (or increment if recurring). Move to next finding. |
 | **x — Dismiss** | Ask for one-line reason. Record dismissal in the review output (not in deferred backlog). Move to next finding. Dismissals don't persist across reviews — they're session-only decisions. |
 | **s — Skip** | Leave in the findings table without deciding. At end of triage, un-skipped items get a final "defer or dismiss?" prompt. |
@@ -762,7 +833,7 @@ Keep analogies concrete. Avoid "this is like a house" handwaving — use the spe
 
 #### Fix Behavior
 
-When the user picks **Fix now**, Claude should:
+When the user picks **Fix now**, the active CLI should:
 
 1. **Read the file** at the finding's location (if not already in context)
 2. **Apply the minimal fix** — same constraints as normal editing (no scope creep, no bonus refactoring)
@@ -779,7 +850,7 @@ Suggested approach: [one-liner]
 
 #### Fix All Behavior
 
-When the user picks **(a) Fix all remaining**, Claude:
+When the user picks **(a) Fix all remaining**, the active CLI:
 
 1. Groups remaining findings by file (reduces file re-reads)
 2. Applies fixes in severity order within each file (CRITICAL first)
@@ -822,7 +893,7 @@ The post-triage score recalculates: **fixed** findings are fully removed from th
 
 #### CRITICAL Finding Constraint
 
-CRITICAL findings during triage **cannot be deferred**. The `(d)` option is disabled:
+CRITICAL findings during one-by-one triage **cannot be silently deferred**. The `(d)` option is disabled unless the user explicitly uses `force-defer critical: <reason>` from the shared action menu or custom expression:
 
 ```
 [2/5] CRITICAL — SQL injection via unsanitized input | api.ts:44 | Fix: S (<30m)
@@ -839,7 +910,7 @@ CRITICAL findings during triage **cannot be deferred**. The `(d)` option is disa
 | User exits mid-triage (Ctrl+C, context limit) | Persist any already-deferred items. Un-triaged findings are NOT auto-deferred — they remain in the session output only. |
 | Fix introduces a new issue | Don't re-review during triage. The fix-then-review loop is for the next `/gabe-review` run. |
 | Finding references a file not in the workspace | Can't auto-fix. Offer defer/dismiss only. |
-| Skipped CRITICAL at end of triage | CRITICALs cannot be deferred. At the final sweep, present only **(f) Fix now** or **(x) Dismiss (requires justification)**. If the user skips again, auto-classify as Dismissed with note: "No resolution chosen — treated as acknowledged risk." |
+| Skipped CRITICAL at end of triage | CRITICALs cannot be silently deferred. At the final sweep, present only **(f) Fix now**, **(x) Dismiss (requires justification)**, or `force-defer critical: <reason>`. If the user skips again, auto-classify as Dismissed with note: "No resolution chosen — treated as acknowledged risk." |
 
 ### Step 6: Archive REVIEW.md + auto-tick PLAN.md + LEDGER trace
 
@@ -1014,7 +1085,7 @@ If yes, enter the same triage loop with (f)/(d)/(x)/(s) options.
    - **None exists** → write fresh REVIEW.md (single-source), proceed.
    - **Exists, SAME source** (same CLI as this run) → collision prompt (resume/stale/replace/cancel).
    - **Exists, DIFFERENT source** (different CLI, e.g. existing from Codex while this run is Claude, or vice versa) → **merge mode**: gap analysis + consolidation.
-3. **Live.** Claude Code's triage loop reads the consolidated (or fresh) file, mutates per-finding `Status` as the user picks `(f)ix`, `(d)efer`, `(x)ismiss`, or `(s)kip`. The file is the single source of truth during the session; if Claude is interrupted, it's safely resumable.
+3. **Live.** The active CLI's triage loop reads the consolidated (or fresh) file, mutates per-finding `Status` as the user picks `(f)ix`, `(d)efer`, `(x)ismiss`, or `(s)kip`. The file is the single source of truth during the session; if the CLI is interrupted, it's safely resumable.
 4. **Resolve.** When every finding has a non-pending status AND the triage loop exits cleanly, flip `status: active` → `status: resolved` and move the file to `.kdbp/reviews-archive/REVIEW_<YYYY-MM-DD-HHMMSS>_resolved.md`. Then run Step 6 (auto-tick + LEDGER write).
 5. **Discard / stale / supersede.** User can explicitly `discard` (no LEDGER write), or the collision prompt may archive as `stale` or `superseded` — filename suffix reflects the reason.
 
@@ -1072,7 +1143,7 @@ Cross-agent review detected — consolidating.
     (c) Cancel — abort this pass; leave existing REVIEW.md untouched.
 ```
 
-**Consolidated file output.** On (u)/(i)/(m), write the consolidated `.kdbp/REVIEW.md` with schema 1.1 — the `sources` array grows by one entry for the current run, a `consolidated_at` timestamp and `consolidation` strategy are recorded, and the findings table gains a `Sources` column listing attribution for each row (`codex`, `claude`, or `codex, claude` for strict/fuzzy-confirmed overlaps). Triage then proceeds (in Claude Code) against the consolidated findings; the triage user sees the attribution and can use it as confidence signal ("both agents flagged this — probably real").
+**Consolidated file output.** On (u)/(i)/(m), write the consolidated `.kdbp/REVIEW.md` with schema 1.1 — the `sources` array grows by one entry for the current run, a `consolidated_at` timestamp and `consolidation` strategy are recorded, and the findings table gains a `Sources` column listing attribution for each row (`codex`, `claude`, or `codex, claude` for strict/fuzzy-confirmed overlaps). Triage then proceeds in the active CLI against the consolidated findings; the triage user sees the attribution and can use it as confidence signal ("both agents flagged this — probably real").
 
 **Format of `.kdbp/REVIEW.md` (schema 1.1).**
 
@@ -1133,7 +1204,7 @@ Sources values: comma-separated CLIs that surfaced the finding. Multiple sources
 <per-finding recommendation: (f)ix / (d)efer / (x)ismiss with one-line rationale — advisory; actor-CLI decides>
 
 ---
-_Active review. Triage in Claude Code with `/gabe-review` (resumes) or `/gabe-review close` (finalize)._
+_Active review. Triage with `/gabe-review` (resumes) or `/gabe-review close` (finalize)._
 ```
 
 **Backwards compatibility.** Schema 1.0 (single-source `source: ...` flat field) is readable — on first merge, it's upgraded in place to schema 1.1 by converting the flat source into a single-element `sources:` array. No migration tool needed; the upgrade is automatic the first time a cross-agent pass triggers merge mode.
@@ -1141,9 +1212,9 @@ _Active review. Triage in Claude Code with `/gabe-review` (resumes) or `/gabe-re
 **Two-pass workflow (user discipline).** To trigger merge mode intentionally:
 
 1. **Pass 1** (any CLI) — invoke with `inbox` to produce REVIEW.md without triage:
-   - In Codex: `$gabe-review inbox` (also the default; Codex policy is analysis-only).
-   - In Claude: `/gabe-review inbox` — explicit opt-in to stop after producing.
-2. **Pass 2** (the OTHER CLI) — invoke normally (`/gabe-review` or `$gabe-review`). The skill runs blind analysis, detects the prior pass, triggers merge mode, consolidates, and (in Claude) proceeds to triage.
+   - In Codex: `$gabe-review inbox`.
+   - In Claude: `/gabe-review inbox`.
+2. **Pass 2** (the OTHER CLI) — invoke normally (`/gabe-review` or `$gabe-review`). The skill runs blind analysis, detects the prior pass, triggers merge mode, consolidates, and proceeds to triage in the active CLI.
 
 Same-CLI re-runs (Codex→Codex or Claude→Claude) don't go into merge mode — they hit the collision prompt. Cross-CLI is the trigger.
 
@@ -1162,7 +1233,7 @@ Parse an external code review (CE:review, BMad, ECC, manual) and ingest its find
 
 Add Defer Risk + Maturity Gate + Confidence Score columns to each parsed finding, then write the standard `.kdbp/REVIEW.md` live document (subject to the collision prompt above). After the file is written, follow the full mode flow (confidence score with projections, provisional verdict, session estimate, triage, archive-on-resolve).
 
-**Resume semantics.** If `post-review` is invoked without an explicit external source and an active `.kdbp/REVIEW.md` already exists, this is equivalent to `/gabe-review` with the (r) Resume option — Claude picks up whatever is in REVIEW.md (including artifacts produced earlier by Codex) and runs triage.
+**Resume semantics.** If `post-review` is invoked without an explicit external source and an active `.kdbp/REVIEW.md` already exists, this is equivalent to `/gabe-review` with the (r) Resume option — the active CLI picks up whatever is in REVIEW.md (including artifacts produced earlier by the other CLI) and runs triage.
 
 ---
 

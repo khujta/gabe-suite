@@ -48,6 +48,22 @@ Commands/skills that produce user-facing triage tables (`/gabe-commit`, `/gabe-c
 2. **No time estimates.** Never write "30 min", "2-4 hours", "reading time: 5min" unless the user explicitly asks. Time varies per project/team; estimates rot.
 3. **Analogy first, then the thing.** Every well doc opens with the quoted one-liner from `KNOWLEDGE.md`. Every architectural explanation leads with the mental model, then the mechanism.
 
+## HTML review artifacts for complex plans
+
+Markdown and KDBP files remain canonical. HTML review artifacts are allowed when a Gabe command explicitly owns them, currently `/gabe-plan` for complex planning and phase-modeling work. The HTML file is the human-facing entrypoint for dense decisions; `.kdbp/PLAN.md`, `.kdbp/DECISIONS.md`, and `.kdbp/LEDGER.md` remain the automation source of truth.
+
+Required standard:
+
+- Write a single self-contained `.html` file with inline CSS and inline SVG/HTML diagrams.
+- Use no network dependencies, no remote fonts, no remote scripts, and no dev server requirement.
+- Keep visual scale consistent: cards, tables, diagrams, side navigation, section widths, and spacing should feel like one document system.
+- Include this banner text exactly: `HTML review artifact; .kdbp/PLAN.md and .kdbp/DECISIONS.md remain canonical.`
+- Include provenance: generated date, command name, canonical Markdown paths, decision range, and ledger entry.
+- Prefer inline SVG for diagrams that must render directly from disk. Mermaid may be included as source text only when the document also provides a rendered/static equivalent.
+- Do not write Gabe Plan HTML artifacts under `docs/mockups/**/*.html`; that path belongs to mockup/reference workflows.
+
+Use HTML artifacts for complex phase plans, domain/data modeling, workflow traces, architecture decisions, migration plans, and user-requested visual planning summaries. Do not create them for routine one-file or low-context tasks unless the user explicitly asks.
+
 ## CommonMark essentials
 
 - **Headers:** ATX only (`#`, `##`, `###`). Single space after `#`. No trailing `#`. Never skip levels.
