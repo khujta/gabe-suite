@@ -33,7 +33,7 @@ run() {
     fi
 }
 
-CORE_SKILLS=(gabe-align gabe-arch gabe-assess gabe-debt gabe-docs gabe-health gabe-help gabe-lens gabe-mockup gabe-myopic gabe-review gabe-roast)
+CORE_SKILLS=(gabe-align gabe-arch gabe-assess gabe-debt gabe-docs gabe-docsite gabe-health gabe-help gabe-lens gabe-mockup gabe-myopic gabe-review gabe-roast)
 COMMAND_WRAPPER_SKILLS=(gabe-next gabe-plan gabe-execute gabe-commit gabe-push)
 COMMANDS=()
 if [ -d "$SCRIPT_DIR/commands" ]; then

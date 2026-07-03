@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Gabe suite — What KDBP is</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <a class="top-brand" href="index.html">🔧 GABE<span class="dot">.</span>docs <span class="sub">the KDBP development suite</span></a>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Hub</a> <span class="crumb-sep">›</span> <span class="crumb-here">What KDBP is</span></nav>
+  <button class="adhd-toggle" id="adhd-toggle" type="button" aria-pressed="false" aria-label="Toggle bionic reading" title="Bionic reading"><span class="adhd-dot"></span></button>
+</header>
+<aside class="sidebar" id="sidebar">
+  <button class="side-collapse" id="side-collapse" type="button" aria-pressed="false" aria-label="Collapse navigation" title="Collapse navigation"><span class="side-collapse-glyph">«</span></button>
+  <nav class="sidenav">
+    <a class="side-link side-hub" href="index.html"><span class="sw" style="background:#6e6757"></span><span class="side-label">Hub</span></a>
+    <details class="side-group" open>
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 1 · Foundations <span class="chip basic">basic</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link active" href="kdbp.html" title="What KDBP is"><span class="sw" style="background:#3a6b3a"></span><span class="side-label">What KDBP is</span></a>
+        <a class="side-link" href="the-loop.html" title="The development loop"><span class="sw" style="background:#3a6b7a"></span><span class="side-label">The development loop</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 2 · Contract &amp; Commands <span class="chip core">core</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="contract.html" title="The E1–E7 contract"><span class="sw" style="background:#b65a2b"></span><span class="side-label">The E1–E7 contract</span></a>
+        <a class="side-link" href="commands.html" title="Command reference"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">Command reference</span></a>
+        <a class="side-link" href="satellites.html" title="Analysis satellites"><span class="sw" style="background:#7a5a8a"></span><span class="side-label">Analysis satellites</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 3 · The Hardening <span class="chip advanced">advanced</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="mechanisms.html" title="The mechanism catalog"><span class="sw" style="background:#a04030"></span><span class="side-label">The mechanism catalog</span></a>
+        <a class="side-link" href="drift.html" title="Why weak models drift"><span class="sw" style="background:#d97a3d"></span><span class="side-label">Why weak models drift</span></a>
+        <a class="side-link" href="reference.html" title="Per-skill reference"><span class="sw" style="background:#6e6757"></span><span class="side-label">Per-skill reference</span></a>
+      </div>
+    </details>
+  </nav>
+</aside>
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<div class="wrap"><main>
+  <header class="masthead">
+    <div class="kicker">Tier 1 · Concept</div>
+    <h1>What KDBP is</h1>
+    <p class="lede">The core idea: a project's memory lives in .kdbp/ files that every session reads — and what each file is for.</p>
+  </header>
+<p>KDBP stands for <strong>Khujta Deep Behavioural Protocol</strong>. It is not a database and it is not a framework — it is a folder <em>and a discipline</em>. A project's plan, decisions, values, knowledge, and deferred work live in plain files under <code>.kdbp/</code>, and every agent session reads them at startup before doing anything else. The <em>protocol</em> part is what those files are for: they give an agent the context and the standing values it needs to align with the <strong>intent</strong> behind a prompt — what should happen in this codebase, and how it should behave while doing it — not just the literal words. Carrying that alignment in files instead of in the model's head is the whole idea.</p>
+<h2 id="the-one-idea"><span class="num">01</span>The one idea</h2>
+<p>An AI coding agent has no memory of its own between sessions. Close the chat, hit a context limit, or swap from one model to another, and whatever the agent "knew" about your project — the plan, the reasoning behind a tricky decision, the bug that's known-but-deferred — is gone unless it was written down somewhere the next session will actually look.</p>
+<p>KDBP's answer is simple: put that memory in files, not in the model. The agent that shows up for today's session is a <strong>stateless visitor</strong> — it arrives empty-handed, reads <code>.kdbp/</code> to find out what's going on, does some work, and writes its findings back before it leaves. The <strong>files hold the state</strong>. The agent is replaceable; the folder is not.</p>
+<div class="note"><span class="lbl">Why this matters in practice</span><p>A session can crash mid-task. You can switch from one model to a cheaper or newer one halfway through a project. A different person on your team can pick up the work tomorrow. In every one of those cases, the next agent opens <code>.kdbp/</code>, reads what's there, and resumes — because the plan, the open questions, and the reasoning were never trapped inside a conversation that's now gone.</p></div>
+<h2 id="the-memory-loop-visually"><span class="num">02</span>The memory loop, visually</h2>
+<p>Every command in the suite (scoping, planning, executing, reviewing, committing) follows the same shape: read the relevant <code>.kdbp/</code> files first, do the work, then write the outcome back. Nothing is held only "in mind" across that boundary.</p>
+<figure class="mermaid-fig"><pre class="mermaid">flowchart TD
+  A["🤖 Agent session&lt;br&gt;(stateless visitor)"] --&gt;|"reads at startup"| K
+  subgraph K["🗄️ .kdbp/ — the memory store"]
+    direction LR
+    P["PLAN.md&lt;br&gt;what + phase state"]
+    D["DECISIONS.md&lt;br&gt;why"]
+    N["PENDING.md&lt;br&gt;priced debt"]
+    L["LEDGER.md&lt;br&gt;history + proof"]
+  end
+  A --&gt;|"does the work"| W["Session work&lt;br&gt;(code, review, commit)"]
+  W --&gt;|"writes outcome back"| K
+  K --&gt;|"next session reads fresh state"| A2["🤖 Next agent session&lt;br&gt;(same project, new visitor —&lt;br&gt;could be a different model)"]</pre></figure>
+<h2 id="what-each-file-is-for"><span class="num">03</span>What each file is for</h2>
+<p>Different kinds of memory change at different speeds, so KDBP splits them into separate files instead of one giant notebook. Some files change every phase; some change only when a real decision is made; some almost never change at all.</p>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Holds</th><th>Changes</th></tr></thead><tbody><tr><td><code>PLAN.md</code></td><td>The active goal and a phase table (what's being built, and its Exec/Review/Commit/Push state per phase).</td><td>Every phase</td></tr><tr><td><code>DECISIONS.md</code></td><td>Ratified forks in the road — the option chosen, the rationale, the alternatives considered, and the trigger that would reopen the question.</td><td>On each real decision</td></tr><tr><td><code>PENDING.md</code></td><td>Priced technical debt — a 10-column table (id, date, source, finding, file, scale tier, priority, impact, times-deferred, status) so deferred work doesn't vanish into vague TODOs.</td><td>On each deferral or resolution</td></tr><tr><td><code>LEDGER.md</code></td><td>Append-only session history — what shipped, what was reviewed, gate results, with proof (command output, file:line, artifact path) attached to every claim.</td><td>Every session, append-only</td></tr><tr><td><code>KNOWLEDGE.md</code></td><td>What the human has verifiably come to understand — topics taught and confirmed, so the suite stops re-explaining things already learned.</td><td>As understanding is verified</td></tr><tr><td><code>SCOPE.md</code></td><td>The stable premise — who this is for, what it does, the hard constraints. High-inertia; edited only through an explicit scope-change process.</td><td>Rarely — only on a real pivot</td></tr><tr><td><code>ROADMAP.md</code></td><td>The phase plan derived from SCOPE — medium-inertia, updated as phases complete, split, or get added.</td><td>Occasionally, on scope change or phase completion</td></tr><tr><td><code>VALUES.md</code> / <code>STRUCTURE.md</code> / <code>BEHAVIOR.md</code></td><td>Standing constraints — project values, allowed file locations, behavior rules — that outrank the model's own defaults.</td><td>Rarely — standing law for the project</td></tr></tbody></table></div>
+<div class="note"><span class="lbl">Not a filing cabinet</span><p>The split isn't bureaucracy for its own sake — it's what lets an agent (or a human) find the right kind of memory fast. "What are we building right now?" is a <code>PLAN.md</code> question. "Why did we choose Postgres over SQLite here?" is a <code>DECISIONS.md</code> question. Separating them means a session doesn't have to re-read a novel of history just to find today's task.</p></div>
+<h2 id="why-this-beats-keeping-state-in-the-models-head"><span class="num">04</span>Why this beats keeping state in the model's head</h2>
+<p>The alternative — relying on a long chat history, or on the model "remembering" a project across sessions — has three problems that KDBP is built to avoid:</p>
+<ul><li><strong>It doesn't survive a restart.</strong> Context windows fill up, sessions get compacted or closed, and anything not written down is paraphrased from memory at best, invented at worst.</li><li><strong>It doesn't survive a model swap.</strong> If the state lives only in a conversation with one model, moving to a stronger or cheaper model means starting the project's judgment over from scratch. If the state lives in files, any model can read them and continue.</li><li><strong>It can't be audited.</strong> A decision buried in a chat transcript is hard to find and easy to silently contradict later. A decision in <code>DECISIONS.md</code>, with its rationale and its review trigger written down, is something a future session — or a human — can check against before doing something that conflicts with it.</li></ul>
+<p>Files are slower to update than a thought, but they are the only kind of memory that outlives the session that had the thought. That trade is the whole bet KDBP makes.</p>
+</main></div>
+
+<footer class="stamp">
+  <b>GABE</b> · the KDBP development suite · documentation<br>
+  Source of truth: <b>docs/src/*.md</b> + <b>docs/docsite.config.py</b> · generated — do not edit the HTML by hand<br>
+  Visual system: Cifra · Chile editorial palette
+</footer>
+
+<script src="assets/site.js"></script>
+<script src="assets/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad: true, theme: "base", themeVariables: {background: "#ece6d8", primaryColor: "#f5f0e2", primaryBorderColor: "#b65a2b", primaryTextColor: "#1b1a17", secondaryColor: "#e6dec8", tertiaryColor: "#ece6d8", lineColor: "#6e6757", fontFamily: "Space Grotesk, system-ui, sans-serif", fontSize: "13px"}, flowchart: {curve: "basis", htmlLabels: true, useMaxWidth: true}});</script>
+</body>
+</html>

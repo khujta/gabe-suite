@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Gabe suite — Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <a class="top-brand" href="index.html">🔧 GABE<span class="dot">.</span>docs <span class="sub">the KDBP development suite</span></a>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Hub</a></nav>
+  <button class="adhd-toggle" id="adhd-toggle" type="button" aria-pressed="false" aria-label="Toggle bionic reading" title="Bionic reading"><span class="adhd-dot"></span></button>
+</header>
+<aside class="sidebar" id="sidebar">
+  <button class="side-collapse" id="side-collapse" type="button" aria-pressed="false" aria-label="Collapse navigation" title="Collapse navigation"><span class="side-collapse-glyph">«</span></button>
+  <nav class="sidenav">
+    <a class="side-link side-hub active" href="index.html"><span class="sw" style="background:#6e6757"></span><span class="side-label">Hub</span></a>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 1 · Foundations <span class="chip basic">basic</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="kdbp.html" title="What KDBP is"><span class="sw" style="background:#3a6b3a"></span><span class="side-label">What KDBP is</span></a>
+        <a class="side-link" href="the-loop.html" title="The development loop"><span class="sw" style="background:#3a6b7a"></span><span class="side-label">The development loop</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 2 · Contract &amp; Commands <span class="chip core">core</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="contract.html" title="The E1–E7 contract"><span class="sw" style="background:#b65a2b"></span><span class="side-label">The E1–E7 contract</span></a>
+        <a class="side-link" href="commands.html" title="Command reference"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">Command reference</span></a>
+        <a class="side-link" href="satellites.html" title="Analysis satellites"><span class="sw" style="background:#7a5a8a"></span><span class="side-label">Analysis satellites</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 3 · The Hardening <span class="chip advanced">advanced</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="mechanisms.html" title="The mechanism catalog"><span class="sw" style="background:#a04030"></span><span class="side-label">The mechanism catalog</span></a>
+        <a class="side-link" href="drift.html" title="Why weak models drift"><span class="sw" style="background:#d97a3d"></span><span class="side-label">Why weak models drift</span></a>
+        <a class="side-link" href="reference.html" title="Per-skill reference"><span class="sw" style="background:#6e6757"></span><span class="side-label">Per-skill reference</span></a>
+      </div>
+    </details>
+  </nav>
+</aside>
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<div class="wrap"><main>
+  <header class="masthead">
+    <div class="kicker">The KDBP Development Suite · Khujta AI</div>
+    <h1>The Gabe suite</h1>
+    <p class="lede">A file-based development discipline for building software with AI coding agents. Its one idea: <strong>judgment should live in files, not in the model</strong>. The plan, the decisions, the deferred debt, and the proof of every step are written down in a project's <code>.kdbp/</code> folder, so any agent — strong or weak, this session or the next — picks up exactly where the last one left off. This site documents the suite and the 2026-07 hardening that made its discipline mechanical rather than model-dependent.</p>
+  </header>
+<h2 id="the-system-at-a-glance"><span class="num">01</span>The system at a glance</h2>
+<p>The human sits <em>outside</em> the loop — driving it and deciding on what it surfaces, not typing. A shared execution contract (E1–E7) wraps every command so nothing claims "done" without evidence. The commands grind ideas into evidence-backed commits; the <code>.kdbp/</code> files are the memory the agents read and write; the analysis satellites bring back findings worth deciding on.</p>
+<figure class="mermaid-fig"><pre class="mermaid">flowchart TD
+  H["👤 HUMAN — decides · accepts side-by-sides · triages findings"]
+  subgraph LOOP["The develop loop · every step wrapped by the E1–E7 contract"]
+    direction LR
+    SC["scope"] --&gt; PL["plan"] --&gt; NX["next"] --&gt; EX["execute"] --&gt; RV["review"] --&gt; CM["commit"] --&gt; PU["push"]
+  end
+  KDBP["🗄️ .kdbp/ — the memory · agents are stateless visitors&lt;br&gt;PLAN · DECISIONS · PENDING · LEDGER · KNOWLEDGE · VALUES/STRUCTURE"]
+  SAT["🛰️ Analysis satellites · on demand, adversarially verified&lt;br&gt;myopic · roast · health · debt · assess · align"]
+  H ==&gt;|checkpoints · decisions| LOOP
+  LOOP ==&gt;|reads state · writes results| KDBP
+  SAT --&gt;|findings → decisions · phases · pending rows| KDBP
+  KDBP -.-&gt;|surfaces work worth deciding on| H</pre></figure>
+<div class="note"><span class="lbl">The three load-bearing ideas</span><p><strong>(1) The model is the replaceable part</strong> — state lives in files, so a session can die or a model can be swapped mid-project and the next visitor resumes from disk. <strong>(2) Every arrow carries evidence, not claims</strong> — the contract makes "done" unprintable without a command output, a <code>file:line</code>, or an artifact path. <strong>(3) The human is the decision layer</strong> — <code>DECISIONS.md</code> is the interface; the loop makes those decisions irreversible-in-the-good-way.</p></div>
+  <h3>Tier 1 · Foundations <span class="chip basic">basic</span></h3>
+  <div class="cards">
+    <a class="card" href="kdbp.html"><span class="tag">Tier 1 · Concept</span><h3>What KDBP is</h3><p>The core idea: a project's memory lives in .kdbp/ files that every session reads — and what each file is for.</p></a>
+    <a class="card" href="the-loop.html"><span class="tag">Tier 1 · Workflow</span><h3>The development loop</h3><p>The cycle from idea to shipped commit: scope → plan → next → execute → review → commit → push, and what each step reads and writes.</p></a>
+  </div>
+  <h3>Tier 2 · Contract &amp; Commands <span class="chip core">core</span></h3>
+  <div class="cards">
+    <a class="card" href="contract.html"><span class="tag">Tier 2 · The contract</span><h3>The E1–E7 execution contract</h3><p>Seven floors under every command — each with the exact failure it prevents.</p></a>
+    <a class="card" href="commands.html"><span class="tag">Tier 2 · Reference</span><h3>Command reference</h3><p>Every gabe command — what it does, the gate it enforces, and where its state lands.</p></a>
+    <a class="card" href="satellites.html"><span class="tag">Tier 2 · Analysis</span><h3>Analysis satellites</h3><p>The on-demand adversarial tools — myopic, roast, health, debt, assess, align — that feed findings back into the plan.</p></a>
+  </div>
+  <h3>Tier 3 · The Hardening <span class="chip advanced">advanced</span></h3>
+  <div class="cards">
+    <a class="card" href="mechanisms.html"><span class="tag">Tier 3 · Catalog</span><h3>The mechanism catalog</h3><p>The generic mechanisms that encode strong-model judgment — and the skills that carry each.</p></a>
+    <a class="card" href="drift.html"><span class="tag">Tier 3 · Rationale</span><h3>Why weak models drift</h3><p>The failure modes the hardening targets, grounded in real session incidents — and how each mechanism catches them.</p></a>
+    <a class="card" href="reference.html"><span class="tag">Tier 3 · Change log</span><h3>Per-skill hardening reference</h3><p>What changed in each skill during the 2026-07 hardening: the 47 edits, the shared preamble, the rollback runbook.</p></a>
+  </div>
+</main></div>
+
+<footer class="stamp">
+  <b>GABE</b> · the KDBP development suite · documentation<br>
+  Source of truth: <b>docs/src/*.md</b> + <b>docs/docsite.config.py</b> · generated — do not edit the HTML by hand<br>
+  Visual system: Cifra · Chile editorial palette
+</footer>
+
+<script src="assets/site.js"></script>
+<script src="assets/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad: true, theme: "base", themeVariables: {background: "#ece6d8", primaryColor: "#f5f0e2", primaryBorderColor: "#b65a2b", primaryTextColor: "#1b1a17", secondaryColor: "#e6dec8", tertiaryColor: "#ece6d8", lineColor: "#6e6757", fontFamily: "Space Grotesk, system-ui, sans-serif", fontSize: "13px"}, flowchart: {curve: "basis", htmlLabels: true, useMaxWidth: true}});</script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 
 ## KDBP Active
 
-This project uses **KDBP (Khujta Database Protocol)** — structured project memory under `.kdbp/` that every Claude Code session reads. KDBP gives context, plans, values, knowledge, decisions, and quality gates a durable home outside the session window.
+This project uses **KDBP (Khujta Deep Behavioural Protocol)** — structured project memory under `.kdbp/` that every Claude Code session reads. KDBP gives context, plans, values, knowledge, decisions, and quality gates a durable home outside the session window.
 
 Maturity: **{MATURITY}** · Stack: {TECH}
 

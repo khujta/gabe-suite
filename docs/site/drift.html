@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Gabe suite — Why weak models drift</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <a class="top-brand" href="index.html">🔧 GABE<span class="dot">.</span>docs <span class="sub">the KDBP development suite</span></a>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Hub</a> <span class="crumb-sep">›</span> <span class="crumb-here">Why weak models drift</span></nav>
+  <button class="adhd-toggle" id="adhd-toggle" type="button" aria-pressed="false" aria-label="Toggle bionic reading" title="Bionic reading"><span class="adhd-dot"></span></button>
+</header>
+<aside class="sidebar" id="sidebar">
+  <button class="side-collapse" id="side-collapse" type="button" aria-pressed="false" aria-label="Collapse navigation" title="Collapse navigation"><span class="side-collapse-glyph">«</span></button>
+  <nav class="sidenav">
+    <a class="side-link side-hub" href="index.html"><span class="sw" style="background:#6e6757"></span><span class="side-label">Hub</span></a>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 1 · Foundations <span class="chip basic">basic</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="kdbp.html" title="What KDBP is"><span class="sw" style="background:#3a6b3a"></span><span class="side-label">What KDBP is</span></a>
+        <a class="side-link" href="the-loop.html" title="The development loop"><span class="sw" style="background:#3a6b7a"></span><span class="side-label">The development loop</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 2 · Contract &amp; Commands <span class="chip core">core</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="contract.html" title="The E1–E7 contract"><span class="sw" style="background:#b65a2b"></span><span class="side-label">The E1–E7 contract</span></a>
+        <a class="side-link" href="commands.html" title="Command reference"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">Command reference</span></a>
+        <a class="side-link" href="satellites.html" title="Analysis satellites"><span class="sw" style="background:#7a5a8a"></span><span class="side-label">Analysis satellites</span></a>
+      </div>
+    </details>
+    <details class="side-group" open>
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 3 · The Hardening <span class="chip advanced">advanced</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="mechanisms.html" title="The mechanism catalog"><span class="sw" style="background:#a04030"></span><span class="side-label">The mechanism catalog</span></a>
+        <a class="side-link active" href="drift.html" title="Why weak models drift"><span class="sw" style="background:#d97a3d"></span><span class="side-label">Why weak models drift</span></a>
+        <a class="side-link" href="reference.html" title="Per-skill reference"><span class="sw" style="background:#6e6757"></span><span class="side-label">Per-skill reference</span></a>
+      </div>
+    </details>
+  </nav>
+</aside>
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<div class="wrap"><main>
+  <header class="masthead">
+    <div class="kicker">Tier 3 · Rationale</div>
+    <h1>Why weak models drift</h1>
+    <p class="lede">The failure modes the hardening targets, grounded in real session incidents — and how each mechanism catches them.</p>
+  </header>
+<p>The evidence behind every gate in this suite. Short version: a model does not need to be weak to drift — it only needs to resolve one ambiguous instruction in the cheapest direction, once, with nobody watching closely enough to notice for ten phases.</p>
+<h2 id="the-headline-finding"><span class="num">01</span>The headline finding</h2>
+<p>Before any of these gates existed, two real projects were mined for every session where a human corrected the model mid-flight — not style nitpicks, but "that is not what I asked for" corrections. The same handful of failure shapes kept recurring, across different codebases, different features, and different sessions, months apart.</p>
+<p>The uncomfortable part is <em>which</em> model was running most of these sessions: a strong, current-generation model, not a cut-rate one. And it failed in exactly the ways the suite's authors had predicted a <em>weak</em> model would fail — silently cheapening a task, rebuilding something that already existed, marking things done on the flimsiest available signal, letting its own state files go stale. The strength of the model bought better prose and faster typing. It did not buy immunity from these shapes.</p>
+<p>The second half of the finding is what actually justifies this whole tier of the suite: <strong>every one of these failures was caught by a human, not by a gate.</strong> There was no mechanism in the room whose job was to notice. The user had to happen to compare the live screen to the mockup, happen to check the deployed environment, happen to re-read the plan file and spot the contradiction. Nothing in the process forced the check. That absence is the entire reason the mechanism catalog exists — it is the suite's response to "we cannot keep relying on someone happening to notice."</p>
+<div class="note"><span class="lbl">Read this as</span><p>Not "models are unreliable, be careful." Read it as: certain instruction shapes are structurally ambiguous, and <em>any</em> executor — carbon or silicon, strong or weak — will resolve that ambiguity toward the cheapest reading unless something outside the executor's own judgment forces the expensive reading into view.</p></div>
+<h2 id="five-failure-mode-families"><span class="num">02</span>Five failure-mode families</h2>
+<p>Every mined incident sorts into one of five families. Each has a real (anonymized) incident below, and the mechanism now standing between that failure and your codebase.</p>
+<div class="table-wrap"><table><thead><tr><th>Family</th><th>What it looks like</th><th>Contract rule that now catches it</th></tr></thead><tbody><tr><td>Task downgrade</td><td>An expensive, ambiguous instruction quietly resolves into its cheap reading</td><td><code>E3</code></td></tr><tr><td>Recreate, not reuse</td><td>A new component gets built that already exists somewhere in the tree</td><td><code>E4</code></td></tr><tr><td>Claim without proof</td><td>"Done ✅" rests on a command that was never actually run, or ran but proved nothing</td><td><code>E2</code></td></tr><tr><td>Lost state</td><td>A plan row or a pending intention goes stale and nothing notices</td><td><code>E5</code></td></tr><tr><td>Fabricated / sycophantic numbers</td><td>A percentage, a count, or a grade is invented or generously rounded up</td><td><code>E1</code></td></tr></tbody></table></div>
+<h2 id="family-1-task-downgrade-e3"><span class="num">03</span>Family 1 — Task downgrade <code>E3</code></h2>
+<p>This is the single most expensive failure shape mined from either project — the one that ran for the longest before anyone caught it.</p>
+<p><strong>The incident.</strong> A multi-phase epic asked for existing screens to be rebuilt to match a set of reference designs — "port every screen to the reference." The planning document that described the epic contained two readings of that instruction sitting side by side: one implying a structural rebuild, one implying the data layer stays untouched and only the view is swapped. Nobody flagged the contradiction. Starting a few phases in, the model quietly resolved it toward the cheaper reading: it recolored the existing screens — new palette, new borders, new fonts — while leaving every screen's underlying structure exactly as it was. Every phase after that inherited the same silent substitution. Ten phases shipped this way. The proof screenshots taken along the way showed only the result, never the result sitting next to the reference it was supposed to match — so nothing in the loop ever produced a picture where the gap was visible. It surfaced only when a human, independently, put the live app and the reference side by side and saw that nothing matched.</p>
+<p><strong>Why it's dangerous, not just wrong:</strong> at every individual checkpoint, the work looked like forward progress. The screens rendered. Nothing crashed. Reviews passed, because review was checking "does this follow the plan," and the plan itself had already absorbed the downgrade.</p>
+<p><strong>The mechanism that now catches it:</strong> a task-contract gate. Before any code is written for a task that names an external reference, the deliverable class — rebuild-to-reference, restyle, implement, stub, fix — must be named out loud, and the acceptance check becomes a same-viewport side-by-side diff against the named reference, never "renders and tests are green." If the planned work is a cheaper class than the instruction implies, that is a stop-and-ask, not a judgment call.</p>
+<h2 id="family-2-recreate-not-reuse-e4"><span class="num">04</span>Family 2 — Recreate, not reuse <code>E4</code></h2>
+<p><strong>The incident.</strong> While porting a settings screen toward a shared component library, the model hand-redrew several components that already existed in that library — a segmented toggle, a select input, a page header — instead of importing them. Each hand-drawn copy looked individually plausible. None of them matched the original pixel-for-pixel, so the visual drift compounded across the screen. The pattern repeated later in the same project even after a standing rule against it had already been written down once.</p>
+<p><strong>Why it recurs even after being named once:</strong> recreating something feels like progress in the moment — it's forward motion, a new file, visible output — while searching the tree for an existing implementation feels like a detour. A standing rule that lives only in a decision log or a memory file has to be actively recalled at exactly the right moment to prevent this; nothing forces the recall.</p>
+<p><strong>The mechanism that now catches it:</strong> a reuse gate, printed before any component or utility is authored: <code>REUSE &lt;path&gt;</code> or <code>EXTEND &lt;path&gt;</code> or <code>NEW (searched &lt;where&gt; — none fit)</code>. Recreating something that already exists is treated as a defect, not a style preference — and the search has to be shown, not asserted.</p>
+<h2 id="family-3-claim-without-proof-e2"><span class="num">05</span>Family 3 — Claim without proof <code>E2</code></h2>
+<p><strong>The incident.</strong> A typecheck command was run all session and reported zero errors every time. It was, under the project's actual compiler configuration, a command that structurally cannot fail — it always exits clean regardless of what the code contains. The real build command, run separately and much later, failed immediately on a genuine type error that had been sitting in the codebase the whole time. In an unrelated incident on the same project, a compliance gate was reported green while two critical bugs shipped live in production — the gate had asserted the mutating endpoint's own self-reported counters instead of checking the actual state of the data afterward.</p>
+<p><strong>Why a green check is not evidence:</strong> a check that has never been observed to fail carries no information when it passes. Both incidents share the same root: the thing being trusted was the code reporting on itself, not an independent, falsifiable observation of the outside world.</p>
+<p><strong>The mechanism that now catches it:</strong> ✅ is only printed after a command has actually executed in this session, with its exit code or count pasted — not estimated, not remembered from an earlier run. A skipped check prints an explicit skip reason, never a checkmark. And a project's canonical verification commands are recorded once in project memory and proven able to fail before they're trusted, rather than improvised per session.</p>
+<h2 id="family-4-lost-state-e5"><span class="num">06</span>Family 4 — Lost state <code>E5</code></h2>
+<p><strong>The incident.</strong> A plan file's "current phase" pointer kept referencing an abandoned line of work while real effort had already moved elsewhere, which sent an automated router down the wrong branch more than once. Separately, a pull request that had already merged sat recorded as "parked" for days, because nothing forced the plan and ledger files to update in the same breath as the merge. And an architecture change shipped that quietly contradicted an already-ratified decision — nobody scanned the diff against the decision log, so no amendment was ever written.</p>
+<p><strong>Why this is a memory problem, not a discipline problem:</strong> the action that changes reality (a commit, a merge, a pivot) and the action that records it in a state file are two separate steps. In a long session, or a session that resumes after a break, it is easy to do the first and never circle back to the second — especially once the model's attention has moved to the next task.</p>
+<p><strong>The mechanism that now catches it:</strong> any action that changes phase reality writes its state row in the same turn, with an enumerated skip code if it genuinely can't (never silence). At commit and review time, the diff's touched routes and architecture are scanned against the decision log; a contradiction blocks until it's either reconciled or recorded as an amendment.</p>
+<h2 id="family-5-fabricated-or-sycophantic-numbers-e1"><span class="num">07</span>Family 5 — Fabricated or sycophantic numbers <code>E1</code></h2>
+<p><strong>The incident.</strong> During an unrelated extraction task, a model invented CSS class names, a navigation tab count, and toast-notification style variants that did not exist anywhere in the source it was supposedly extracting from — all plausible-sounding, all fabricated. In a separate case, a whole plan phase and a formal decision record were built on the claim that a particular service did not exist in production, when the very state file being read to reach that conclusion already recorded, in its status column, that the issue was resolved. The model read the finding text and skipped the status column.</p>
+<p><strong>Why this is the hardest family to self-catch:</strong> a fabricated number and a real one are typographically indistinguishable. Nothing about "27%" or "4 tabs" signals whether it came from a grep or from a plausible guess — the only way to tell the difference is to demand the citation at the moment the number is produced, not after.</p>
+<p><strong>The mechanism that now catches it:</strong> every claim about code or state must cite a file:line or a command run this session; uncited claims are marked <code>(assumed)</code> and must be verified before anything is built on them. Claims that something does <em>not</em> exist require a recorded search with its empty result shown, not just asserted.</p>
+<h2 id="the-myopic-insight-why-this-isnt-really-about-model-strength"><span class="num">08</span>The myopic insight — why this isn't really about model strength</h2>
+<p>There's a reusable idea underneath all five families, borrowed from the same lens the suite uses to review UX flows for short-sighted users: a person planning only one or two steps ahead will take whatever looks locally best, and any consequence sitting three or more steps past their horizon is <em>invisible to them at decision time</em> — not ignored, not weighed and dismissed, genuinely not seen. It isn't that they're careless; the mattress trap simply doesn't register as a trap from where they're standing.</p>
+<p>An executor — human or model — resolving an ambiguous instruction behaves exactly like that depth-limited planner. Told to "port the screens to the reference," it sees the immediate, literal, few-steps-ahead reading (touch each screen, make it look plausible) clearly. The reading that actually matters — "in phase 7, someone is going to hold this next to the reference design and check whether it matches" — sits several steps beyond the literal instruction, on the other side of the horizon. It is not that the executor decided the consequence didn't matter. The consequence was never in view to be weighed at all.</p>
+<p>This reframes what these gates are actually doing. None of them make the model "try harder" or "be more careful" — that's asking an executor to see past its own horizon by willpower, which doesn't work reliably for any executor. Instead, every mechanism above does the same one thing: it <strong>pulls the distant consequence into the present</strong>, rewriting it as a check the executor cannot avoid seeing right now, at the moment the ambiguous decision is actually being made. A task-contract line that says "acceptance = side-by-side diff against the reference, not renders + tests green" isn't a nicer way of asking for more effort — it relocates step 7's judgment into step 1's task row, where the depth-limited planner can actually see it.</p>
+<h2 id="the-diagram"><span class="num">09</span>The diagram</h2>
+<p>Two paths through the same ambiguous instruction. The top path is what happens with nothing but model judgment in the loop. The bottom path is what a contract does to the same instruction.</p>
+<figure class="mermaid-fig"><pre class="mermaid">flowchart TD
+    I["Ambiguous instruction&lt;br&gt;'port screens to reference'"]
+    I --&gt; C{"Two readings held&lt;br&gt;by the plan at once"}
+    C --&gt;|"no contract in the loop"| CHEAP["Cheapest reading taken&lt;br&gt;silently, no flag"]
+    CHEAP --&gt; DRIFT["N phases ship on&lt;br&gt;the cheap reading"]
+    DRIFT --&gt; HUMAN["Human happens to compare&lt;br&gt;live vs reference"]
+    HUMAN --&gt; CAUGHT["Caught late —&lt;br&gt;rework across N phases"]
+
+    C --&gt;|"task contract in the loop"| NAME["Deliverable CLASS&lt;br&gt;named out loud"]
+    NAME --&gt; ACC["Acceptance = diff vs&lt;br&gt;reference, pulled into THIS step"]
+    ACC --&gt; CHECK{"Planned work matches&lt;br&gt;named class?"}
+    CHECK --&gt;|"no"| STOP["STOP — ask before&lt;br&gt;substituting"]
+    CHECK --&gt;|"yes"| BUILD["Build once,&lt;br&gt;to the right target"]</pre></figure>
+<h2 id="what-this-means-day-to-day"><span class="num">10</span>What this means day to day</h2>
+<p>None of these mechanisms exist because the suite distrusts you or the model running it. They exist because the corpus above is not hypothetical — every incident happened, on real work, and every one slipped past every check that existed at the time except a human's independent, unscripted comparison. The gates in <a href="mechanisms.html">the mechanism catalog</a> and the E1–E7 rules in <a href="contract.html">the execution contract</a> are the write-up of "what would have caught this," applied before the next version of the same failure gets a chance to run for ten phases instead of one.</p>
+<div class="note"><span class="lbl">See also</span><p><a href="contract.html">The E1–E7 contract</a> for the exact rule text these mechanisms enforce, and <a href="mechanisms.html">the mechanism catalog</a> for the full list of gates these five incident families produced.</p></div>
+</main></div>
+
+<footer class="stamp">
+  <b>GABE</b> · the KDBP development suite · documentation<br>
+  Source of truth: <b>docs/src/*.md</b> + <b>docs/docsite.config.py</b> · generated — do not edit the HTML by hand<br>
+  Visual system: Cifra · Chile editorial palette
+</footer>
+
+<script src="assets/site.js"></script>
+<script src="assets/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad: true, theme: "base", themeVariables: {background: "#ece6d8", primaryColor: "#f5f0e2", primaryBorderColor: "#b65a2b", primaryTextColor: "#1b1a17", secondaryColor: "#e6dec8", tertiaryColor: "#ece6d8", lineColor: "#6e6757", fontFamily: "Space Grotesk, system-ui, sans-serif", fontSize: "13px"}, flowchart: {curve: "basis", htmlLabels: true, useMaxWidth: true}});</script>
+</body>
+</html>

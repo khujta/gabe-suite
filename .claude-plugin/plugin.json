@@ -1,7 +1,7 @@
 {
   "name": "gabe-suite",
-  "version": "2.3.0",
-  "description": "Development suite for Claude Code. Skills, commands, and hooks for understanding, reviewing, deciding, and shipping — with a knowledge system (KDBP) that tracks values, decisions, and deferred work across sessions. Contains the /gabe-lens cognitive-translation skill plus /gabe-roast, /gabe-myopic, /gabe-review, /gabe-align, /gabe-assess, /gabe-health, /gabe-help, /gabe-docs, /gabe-plan, /gabe-execute, /gabe-commit, /gabe-push, /gabe-teach, /gabe-scope.",
+  "version": "2.4.0",
+  "description": "Development suite for Claude Code. Skills, commands, and hooks for understanding, reviewing, deciding, and shipping — with a knowledge system (KDBP, the Khujta Deep Behavioural Protocol) that tracks values, decisions, and deferred work across sessions. Contains the /gabe-lens cognitive-translation skill plus /gabe-roast, /gabe-myopic, /gabe-review, /gabe-align, /gabe-assess, /gabe-health, /gabe-help, /gabe-docs, /gabe-docsite, /gabe-plan, /gabe-execute, /gabe-commit, /gabe-push, /gabe-teach, /gabe-scope.",
   "author": {
     "name": "Gabe (khujta)",
     "url": "https://github.com/khujta"
@@ -11,7 +11,8 @@
   "license": "MIT",
   "skills": [
     "./skills/gabe-lens",
-    "./skills/gabe-roast"
+    "./skills/gabe-roast",
+    "./skills/gabe-docsite"
   ],
   "commands": ["./commands/"],
   "keywords": [

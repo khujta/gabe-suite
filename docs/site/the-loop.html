@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Gabe suite — The development loop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <a class="top-brand" href="index.html">🔧 GABE<span class="dot">.</span>docs <span class="sub">the KDBP development suite</span></a>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Hub</a> <span class="crumb-sep">›</span> <span class="crumb-here">The development loop</span></nav>
+  <button class="adhd-toggle" id="adhd-toggle" type="button" aria-pressed="false" aria-label="Toggle bionic reading" title="Bionic reading"><span class="adhd-dot"></span></button>
+</header>
+<aside class="sidebar" id="sidebar">
+  <button class="side-collapse" id="side-collapse" type="button" aria-pressed="false" aria-label="Collapse navigation" title="Collapse navigation"><span class="side-collapse-glyph">«</span></button>
+  <nav class="sidenav">
+    <a class="side-link side-hub" href="index.html"><span class="sw" style="background:#6e6757"></span><span class="side-label">Hub</span></a>
+    <details class="side-group" open>
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 1 · Foundations <span class="chip basic">basic</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="kdbp.html" title="What KDBP is"><span class="sw" style="background:#3a6b3a"></span><span class="side-label">What KDBP is</span></a>
+        <a class="side-link active" href="the-loop.html" title="The development loop"><span class="sw" style="background:#3a6b7a"></span><span class="side-label">The development loop</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 2 · Contract &amp; Commands <span class="chip core">core</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="contract.html" title="The E1–E7 contract"><span class="sw" style="background:#b65a2b"></span><span class="side-label">The E1–E7 contract</span></a>
+        <a class="side-link" href="commands.html" title="Command reference"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">Command reference</span></a>
+        <a class="side-link" href="satellites.html" title="Analysis satellites"><span class="sw" style="background:#7a5a8a"></span><span class="side-label">Analysis satellites</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 3 · The Hardening <span class="chip advanced">advanced</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="mechanisms.html" title="The mechanism catalog"><span class="sw" style="background:#a04030"></span><span class="side-label">The mechanism catalog</span></a>
+        <a class="side-link" href="drift.html" title="Why weak models drift"><span class="sw" style="background:#d97a3d"></span><span class="side-label">Why weak models drift</span></a>
+        <a class="side-link" href="reference.html" title="Per-skill reference"><span class="sw" style="background:#6e6757"></span><span class="side-label">Per-skill reference</span></a>
+      </div>
+    </details>
+  </nav>
+</aside>
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<div class="wrap"><main>
+  <header class="masthead">
+    <div class="kicker">Tier 1 · Workflow</div>
+    <h1>The development loop</h1>
+    <p class="lede">The cycle from idea to shipped commit: scope → plan → next → execute → review → commit → push, and what each step reads and writes.</p>
+  </header>
+<p>Seven commands take an idea from "we should build X" to a shipped, verified commit: <code>/gabe-scope</code> → <code>/gabe-plan</code> → <code>/gabe-next</code> → <code>/gabe-execute</code> → <code>/gabe-review</code> → <code>/gabe-commit</code> → <code>/gabe-push</code>. Each one reads a bit of <code>.kdbp/</code> state, does one job, and writes the next command's inputs back to disk. Nobody has to remember what happened three sessions ago — the files remember for you.</p>
+<h2 id="the-idea-in-one-paragraph"><span class="num">01</span>The idea in one paragraph</h2>
+<p>Think of the loop as a relay race where the baton is a folder, not a runner's memory. <code>/gabe-scope</code> writes down the premise once. <code>/gabe-plan</code> turns a slice of that premise into phases with a size decision attached to each one. <code>/gabe-next</code> looks at a small state table and says, mechanically, "you're here, go there" — it does not think, it just routes. <code>/gabe-execute</code> is where code actually gets written, one task at a time, committing as it goes. <code>/gabe-review</code> prices the risk in what changed. <code>/gabe-commit</code> is the one gate everything must pass through before a commit exists. <code>/gabe-push</code> gets it into the world and proves it's actually live. If a session ends mid-phase, the state table remembers exactly where it stopped — the next session (or the next model) picks the baton up without a hand-off conversation.</p>
+<div class="note"><span class="lbl">Why a router instead of "just remembering"</span><p>Models don't reliably remember what happened last session, and even within a session they can lose the thread under load. <code>/gabe-next</code> replaces "what should I do now?" — a question an LLM might answer differently each time — with a lookup against four state columns in a markdown table. Same input, same output, every time, for free.</p></div>
+<h2 id="the-loop-step-by-step"><span class="num">02</span>The loop, step by step</h2>
+<p>Read this table left to right: each step's whole job, what it needs to already be true on disk before it can run, and what it leaves behind for the next step to find.</p>
+<div class="table-wrap"><table><thead><tr><th>Step</th><th>What it does</th><th>Reads</th><th>Writes</th></tr></thead><tbody><tr><td><code>/gabe-scope</code></td><td>Turns a raw idea into a stable premise: problem, users, success criteria, requirements, constraints. Runs once per project (or once per pivot) with a checkpoint after every step — nothing here ships without your explicit sign-off.</td><td>Your answers to its intake questions; existing docs it finds as reference material</td><td><code>SCOPE.md</code> (the premise) + <code>ROADMAP.md</code> (the phase-level plan derived from it)</td></tr><tr><td><code>/gabe-plan</code></td><td>Breaks a goal (often one ROADMAP phase) into concrete phases, and for each phase runs a short "how much rigor does this deserve?" decision — MVP, Enterprise, or Scale — so nobody quietly over- or under-builds.</td><td><code>BEHAVIOR.md</code> (project maturity/tech), <code>SCOPE.md</code>/<code>ROADMAP.md</code> if present, <code>PENDING.md</code> for related open items</td><td><code>PLAN.md</code> (phases table + per-phase tier/scope/acceptance), a tier-decision entry in <code>DECISIONS.md</code> per phase, a line in <code>LEDGER.md</code></td></tr><tr><td><code>/gabe-next</code></td><td>Zero-reasoning router. Looks at the current phase's four status cells and dispatches to whichever command owns the first unfinished one. Never writes code, never judges quality — it's a lookup table with a phase pointer.</td><td><code>PLAN.md</code> (Current Phase pointer + the Exec/Review/Commit/Push cells)</td><td>Nothing of its own — advances the Current Phase pointer in <code>PLAN.md</code> only when a phase's four cells are already all ✅</td></tr><tr><td><code>/gabe-execute</code></td><td>Implements the current phase's tasks one at a time, under a strict task contract (quote the task text, reuse before creating, commit at boundaries), checkpointing after each one rather than dumping the whole phase as one uninspectable diff.</td><td><code>PLAN.md</code> (phase Description/Scope/References/Acceptance)</td><td>Ticks Exec to 🔄 then ✅ in <code>PLAN.md</code>, a task checklist under Phase Details, proof lines + token cost in <code>LEDGER.md</code> — and invokes <code>/gabe-commit</code> at each checkpoint rather than raw <code>git commit</code></td></tr><tr><td><code>/gabe-review</code></td><td>Reviews the diff for the phase and prices each finding by risk — what it costs if you ship it anyway, not just "this is bad." Ends in an interactive triage so you decide what gets fixed now versus deferred.</td><td><code>PLAN.md</code> (which phase needs review), <code>LEDGER.md</code> (files touched), the actual diff</td><td><code>REVIEW.md</code> (findings + triage record), ticks Review to ✅ in <code>PLAN.md</code> when triage completes</td></tr><tr><td><code>/gabe-commit</code></td><td>The one door every commit walks through. Runs the deterministic checks (lint, types, tests, deferred-item scan, doc-drift, structure) and will not let a commit through with unresolved CRITICAL findings. <strong>Never bypass this with raw <code>git commit</code>.</strong></td><td><code>REVIEW.md</code> if present, <code>STRUCTURE.md</code>, <code>DOCS.md</code>, <code>PENDING.md</code></td><td>The actual commit, an entry in <code>LEDGER.md</code>, updates to <code>PENDING.md</code> for deferred items, ticks Commit to ✅ in <code>PLAN.md</code></td></tr><tr><td><code>/gabe-push</code></td><td>Pushes the branch, opens or updates the PR, watches CI, and then checks that the deployed target is actually healthy — CI green is not treated as proof by itself; a live probe is.</td><td><code>PUSH.md</code> (env definitions), current branch/commit state</td><td><code>DEPLOYMENTS.md</code> (deploy event record), <code>LEDGER.md</code> entry, ticks Push to ✅ in <code>PLAN.md</code> only if CI passed and deploy-verify succeeded</td></tr></tbody></table></div>
+<h2 id="the-loop-as-a-diagram"><span class="num">03</span>The loop as a diagram</h2>
+<p>Every arrow below is one command call; the label under each node is the state file it touches. The human sits above the loop — approving scope, picking a tier, triaging findings — rather than typing every step by hand.</p>
+<figure class="mermaid-fig"><pre class="mermaid">flowchart TD
+  SC["/gabe-scope&lt;br&gt;writes SCOPE.md + ROADMAP.md"]
+  PL["/gabe-plan&lt;br&gt;writes PLAN.md + DECISIONS.md"]
+  NX["/gabe-next&lt;br&gt;reads PLAN.md — the 4 status columns"]
+  EX["/gabe-execute&lt;br&gt;ticks Exec · writes LEDGER.md"]
+  RV["/gabe-review&lt;br&gt;writes findings · ticks Review"]
+  CM["/gabe-commit&lt;br&gt;the commit + LEDGER.md · ticks Commit"]
+  PU["/gabe-push&lt;br&gt;CI + DEPLOYMENTS.md · ticks Push"]
+  H["👤 Human&lt;br&gt;approves · picks tier · triages"]
+
+  SC --&gt; PL --&gt; NX --&gt; EX --&gt; RV --&gt; CM --&gt; PU
+  PU -.-&gt;|next phase| NX
+  H -.-&gt;|checkpoints| SC
+  H -.-&gt;|picks tier| PL
+  H -.-&gt;|triages findings| RV</pre></figure>
+<h2 id="the-router-in-practice"><span class="num">04</span>The router in practice</h2>
+<p><code>/gabe-next</code> is the piece that makes the loop feel automatic instead of like a checklist you have to remember. It reads exactly one thing — the current phase's row in the Phases table — and applies a fixed rule, top to bottom: if Exec isn't done, run execute; if Review isn't done, run review; if Commit isn't done, run commit; if Push isn't done, run push; if all four are done and there's another phase, advance the pointer and check again; if there's no phase left, offer to close the plan out. No judgment calls, no LLM cost, no way for two runs on the same state to disagree.</p>
+<div class="table-wrap"><table><thead><tr><th>Exec</th><th>Review</th><th>Commit</th><th>Push</th><th>/gabe-next routes to</th></tr></thead><tbody><tr><td>⬜</td><td>⬜</td><td>⬜</td><td>⬜</td><td><code>/gabe-execute</code> — nothing built yet</td></tr><tr><td>🔄</td><td>⬜</td><td>⬜</td><td>⬜</td><td><code>/gabe-execute</code> — resume, in progress</td></tr><tr><td>✅</td><td>⬜</td><td>⬜</td><td>⬜</td><td><code>/gabe-review</code> — built, not yet reviewed</td></tr><tr><td>✅</td><td>✅</td><td>⬜</td><td>⬜</td><td><code>/gabe-commit</code> — reviewed, not yet committed</td></tr><tr><td>✅</td><td>✅</td><td>✅</td><td>⬜</td><td><code>/gabe-push</code> — committed, not yet shipped</td></tr><tr><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>advance to next phase, or offer to close the plan</td></tr></tbody></table></div>
+<p>Because the rule reads column state rather than session memory, an interrupted session is cheap to resume: <code>/gabe-execute</code> finds Exec sitting at 🔄, reads the ticked task rows to know exactly what's already committed, and picks up at the next task — it never silently re-does finished work, and it never claims a task is done just because the conversation "remembers" doing it.</p>
+<h2 id="the-cadence-rule-one-phase-per-session"><span class="num">05</span>The cadence rule: one phase per session</h2>
+<div class="note"><span class="lbl">Close it or checkpoint it</span><p>A session should finish one phase, or leave it in a state the next session can resume cleanly. That means: don't stop mid-task with uncommitted work and no note about what's left; don't let Exec sit at 🔄 with a stale task list nobody will recognize a week from now. Every phase transition is a natural place to end a session — the four-column tick is already the checkpoint, so honoring it costs nothing extra.</p></div>
+<p>This rule exists because sessions <em>will</em> get interrupted — context runs out, the human has to leave, a different task takes priority. The loop is built so that's fine as long as the interruption happens at a clean boundary: a ticked task, a committed change, a phase pointer that still points somewhere real. What breaks the loop is stopping <em>without</em> writing that state down — code sitting in a stash, a task claimed "basically done" in conversation but never ticked. The next session (possibly a different model entirely) trusts the files, not the transcript.</p>
+<h2 id="where-the-human-checkpoints-sit"><span class="num">06</span>Where the human checkpoints sit</h2>
+<p>The loop automates the mechanical parts — routing, ticking, checking — and deliberately leaves the judgment calls to you. Three points always stop and wait:</p>
+<ul><li><strong>Plan · tier pick — MVP, Enterprise, or Scale.</strong> <code>/gabe-plan</code> shows the trade-off matrix for each phase and waits for you to pick a tier. Escalating past MVP requires a one-sentence reason, logged to <code>DECISIONS.md</code> — de-escalating to MVP needs no justification at all.</li><li><strong>Review · triage — Fix, defer, or accept each finding.</strong> <code>/gabe-review</code> never silently fixes or silently ignores. Every finding gets a decision from you, and the ones you defer land visibly in <code>PENDING.md</code> instead of disappearing.</li><li><strong>Commit · gate — Nothing critical slips through.</strong> <code>/gabe-commit</code> blocks on unresolved CRITICAL findings. You can force a commit through with an explicit written justification, but you can't do it by accident.</li></ul>
+<h2 id="where-to-go-next"><span class="num">07</span>Where to go next</h2>
+<p>This page showed the shape of the loop. The next layer down is the contract every one of these seven commands shares — the rules that make "done" mean something specific instead of whatever a model felt like claiming.</p>
+<ul><li><strong>Tier 2 · The contract — <a href="contract.html">The E1–E7 execution contract</a>.</strong> Seven floors under every command — evidence, run-before-✅, no silent downgrade, reuse-first, state-sync, missing-anchor-stop, report-where.</li><li><strong>Tier 2 · Reference — <a href="commands.html">Command reference</a>.</strong> Every gabe command in full detail — flags, gates enforced, exact state file locations.</li><li><strong>Tier 1 · Concept — <a href="kdbp.html">What KDBP is</a>.</strong> If you haven't read this yet: the core idea behind every file this page named — why state lives in <code>.kdbp/</code> instead of in a model's memory.</li></ul>
+</main></div>
+
+<footer class="stamp">
+  <b>GABE</b> · the KDBP development suite · documentation<br>
+  Source of truth: <b>docs/src/*.md</b> + <b>docs/docsite.config.py</b> · generated — do not edit the HTML by hand<br>
+  Visual system: Cifra · Chile editorial palette
+</footer>
+
+<script src="assets/site.js"></script>
+<script src="assets/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad: true, theme: "base", themeVariables: {background: "#ece6d8", primaryColor: "#f5f0e2", primaryBorderColor: "#b65a2b", primaryTextColor: "#1b1a17", secondaryColor: "#e6dec8", tertiaryColor: "#ece6d8", lineColor: "#6e6757", fontFamily: "Space Grotesk, system-ui, sans-serif", fontSize: "13px"}, flowchart: {curve: "basis", htmlLabels: true, useMaxWidth: true}});</script>
+</body>
+</html>

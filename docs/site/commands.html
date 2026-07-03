@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Gabe suite — Command reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <a class="top-brand" href="index.html">🔧 GABE<span class="dot">.</span>docs <span class="sub">the KDBP development suite</span></a>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Hub</a> <span class="crumb-sep">›</span> <span class="crumb-here">Command reference</span></nav>
+  <button class="adhd-toggle" id="adhd-toggle" type="button" aria-pressed="false" aria-label="Toggle bionic reading" title="Bionic reading"><span class="adhd-dot"></span></button>
+</header>
+<aside class="sidebar" id="sidebar">
+  <button class="side-collapse" id="side-collapse" type="button" aria-pressed="false" aria-label="Collapse navigation" title="Collapse navigation"><span class="side-collapse-glyph">«</span></button>
+  <nav class="sidenav">
+    <a class="side-link side-hub" href="index.html"><span class="sw" style="background:#6e6757"></span><span class="side-label">Hub</span></a>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 1 · Foundations <span class="chip basic">basic</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="kdbp.html" title="What KDBP is"><span class="sw" style="background:#3a6b3a"></span><span class="side-label">What KDBP is</span></a>
+        <a class="side-link" href="the-loop.html" title="The development loop"><span class="sw" style="background:#3a6b7a"></span><span class="side-label">The development loop</span></a>
+      </div>
+    </details>
+    <details class="side-group" open>
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 2 · Contract &amp; Commands <span class="chip core">core</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="contract.html" title="The E1–E7 contract"><span class="sw" style="background:#b65a2b"></span><span class="side-label">The E1–E7 contract</span></a>
+        <a class="side-link active" href="commands.html" title="Command reference"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">Command reference</span></a>
+        <a class="side-link" href="satellites.html" title="Analysis satellites"><span class="sw" style="background:#7a5a8a"></span><span class="side-label">Analysis satellites</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Tier 3 · The Hardening <span class="chip advanced">advanced</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="mechanisms.html" title="The mechanism catalog"><span class="sw" style="background:#a04030"></span><span class="side-label">The mechanism catalog</span></a>
+        <a class="side-link" href="drift.html" title="Why weak models drift"><span class="sw" style="background:#d97a3d"></span><span class="side-label">Why weak models drift</span></a>
+        <a class="side-link" href="reference.html" title="Per-skill reference"><span class="sw" style="background:#6e6757"></span><span class="side-label">Per-skill reference</span></a>
+      </div>
+    </details>
+  </nav>
+</aside>
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<div class="wrap"><main>
+  <header class="masthead">
+    <div class="kicker">Tier 2 · Reference</div>
+    <h1>Command reference</h1>
+    <p class="lede">Every gabe command — what it does, the gate it enforces, and where its state lands.</p>
+  </header>
+<h2 id="how-they-fit-together"><span class="num">01</span>How they fit together</h2>
+<p>Nine commands, three groups. The <strong>core loop</strong> (scope → plan → next → execute → review → commit → push) is the spine a project rides from first idea to shipped commit — <code>/gabe-next</code> is a pure router that reads <code>.kdbp/PLAN.md</code> and tells you which of the others to run next, so in practice you rarely choose manually. <strong>Setup</strong> is <code>/gabe-init</code>, run once per project to lay down <code>.kdbp/</code> and the hooks that make the rest of the suite legible. <strong>Learning</strong> is <code>/gabe-teach</code>, run after commits to turn the diff into understanding the human can actually recall later, rather than a blob of code they approved and forgot. Every command in all three groups sits under the same E1–E7 execution contract (see <a href="contract.html">The E1–E7 contract</a>) — the gates below are each command's specific tightening of that shared floor.</p>
+<div class="note"><span class="lbl">How to read "key gate"</span><p>These are not the only things each command does — they're the specific mechanism the hardening added or hardened, the one that turns a claim ("tests pass," "reviewed," "reused") into something that has to be demonstrated on screen before the command can proceed.</p></div>
+<h2 id="the-core-loop-scope-plan-next-execute-review-commit-push"><span class="num">02</span>The core loop — scope → plan → next → execute → review → commit → push</h2>
+<p>This is the path every unit of work travels. Each step reads state the previous step wrote and writes state the next step will read — the chain is what makes <code>.kdbp/</code> a reliable memory instead of a pile of notes.</p>
+<div class="table-wrap"><table><thead><tr><th>Command</th><th>Purpose</th><th>Key gate it enforces</th></tr></thead><tbody><tr><td><code>/gabe-scope</code></td><td>Authors <code>SCOPE.md</code> (the stable premise) and <code>ROADMAP.md</code> (the phase plan) for a new project or a scope change, one checkpoint-gated step at a time.</td><td>Strict checkpoint gating — every major step needs explicit user approval before the next runs, and final assembly reads the <em>current on-disk</em> files first: anything the human edited outside a <code>[PENDING APPROVAL]</code> marker is treated as final and diffed before any overwrite, so a session can never silently clobber a human edit.</td></tr><tr><td><code>/gabe-plan</code></td><td>Creates or updates the phase plan in <code>.kdbp/PLAN.md</code> — the row-per-task table every other command reads.</td><td>Per-phase template discipline: Types column plus Scope / References / Acceptance / Checkpoint fields, so <code>/gabe-execute</code>'s reads always find the same field names. Auto-tick cross-checks the phase footer and uses enumerated skip codes instead of silently ticking the wrong row.</td></tr><tr><td><code>/gabe-next</code></td><td>Zero-logic router — reads <code>.kdbp/PLAN.md</code> state and dispatches to whichever command comes next. No judgment, no side effects beyond the command it routes to.</td><td>Prior-row sweep: always prints any owed Review/Push debt from earlier phases before advancing — so incomplete prior work stays visible at every routing decision instead of getting buried under the current phase.</td></tr><tr><td><code>/gabe-execute</code></td><td>Implements the current phase's tasks from <code>.kdbp/PLAN.md</code>, checkpointing at commits.</td><td>TASK CONTRACT + REUSE LEDGER gate — quote the task text verbatim, classify it, and print a reuse verdict <em>before</em> any Write or Edit. Pairs with a persistent per-task checklist in <code>PLAN.md</code> (state survives a session dying) and a T[i] VERIFY evidence block, so "verification ✅" is unprintable without an executed command in front of it.</td></tr><tr><td><code>/gabe-review</code></td><td>Risk-priced code review with interactive triage, confidence scoring, and plan-alignment checking.</td><td>Mandatory verify/kill pass (Step 4.4) with a per-finding Evidence line — an absence claim ("no tests for X") needs search proof, not confidence talk. Closes both triage bypasses (a skipped CRITICAL, a mid-triage exit) so either path auto-defers instead of vanishing.</td></tr><tr><td><code>/gabe-commit</code></td><td>The commit quality gate — CHECK 1–9, deferred scan, doc drift — that stands between a diff and <code>git commit</code>. Never use raw <code>git commit</code>.</td><td>Executed-evidence CHECK gates: every check resolves a real command, shows the evidence row and a 3-state glyph (✅ / ❌ / ⤫ skipped-with-reason), and a hardcoded "tests pass" claim with no command run behind it is exactly the failure this closes. A skip-to-pending path keeps the commit BLOCKED unless force-commit is explicit and logged.</td></tr><tr><td><code>/gabe-push</code></td><td>Push, PR, CI watch, and environment promotion — env-aware via <code>.kdbp/PUSH.md</code>.</td><td>Pasted CI output required (a pending ⏳ run is never treated as a ✅ pass) plus a Step 6.7 deploy-verify smoke probe against the live target — CI can go green while the deployed app is dead, and this step is the check that would have caught it.</td></tr></tbody></table></div>
+<h2 id="setup-run-once-per-project"><span class="num">03</span>Setup — run once per project</h2>
+<div class="table-wrap"><table><thead><tr><th>Command</th><th>Purpose</th><th>Key gate it enforces</th></tr></thead><tbody><tr><td><code>/gabe-init</code></td><td>Initializes a project with the KDBP stack — creates <code>.kdbp/</code>, installs hooks, configures by project type.</td><td>Missing-anchor STOP for hook JSON: hook objects are read verbatim from <code>~/.claude/templates/gabe/hooks.json</code>; if that template is absent, init stops hook installation and reports it rather than composing hook JSON from memory — the worst-case failure mode being a hallucinated, destructive write to a project's <code>settings.json</code>.</td></tr></tbody></table></div>
+<h2 id="learning-run-after-commits"><span class="num">04</span>Learning — run after commits</h2>
+<div class="table-wrap"><table><thead><tr><th>Command</th><th>Purpose</th><th>Key gate it enforces</th></tr></thead><tbody><tr><td><code>/gabe-teach</code></td><td>Consolidates the human's architect-level understanding of recent changes — organizes topics under gravity wells, explains with analogies, verifies with Socratic questions, tracks status in <code>.kdbp/KNOWLEDGE.md</code>.</td><td>Answer-key grading gate: each Q1/Q2 pair is generated alongside a hidden expected-answer key; the human's answer is scored against that key, not against plausibility, and an uncertain call always rounds the score <em>down</em> (never up) — because an inflated "verified" row poisons <code>KNOWLEDGE.md</code> for every future session that trusts it.</td></tr></tbody></table></div>
+<div class="note"><span class="lbl">Where this comes from</span><p>Each gate above is one of the 47 revisions ratified in the 2026-07 hardening pass (42 KEEP, 5 REVISE, 0 KILL) — see <a href="reference.html">Per-skill hardening reference</a> for the full change log and <a href="drift.html">Why weak models drift</a> for the incidents that motivated each one.</p></div>
+</main></div>
+
+<footer class="stamp">
+  <b>GABE</b> · the KDBP development suite · documentation<br>
+  Source of truth: <b>docs/src/*.md</b> + <b>docs/docsite.config.py</b> · generated — do not edit the HTML by hand<br>
+  Visual system: Cifra · Chile editorial palette
+</footer>
+
+<script src="assets/site.js"></script>
+</body>
+</html>
