@@ -179,7 +179,7 @@ Reference: `docs/workflows/brownfield.md`.
 6. **Show the full suite on request.** If the user asks "what tools are available?" or similar, show the complete list:
 
 ```
-The Gabe Suite — 21 command wrappers, 12 skills:
+The Gabe Suite — 22 command wrappers, 12 skills:
 
 | Tool | Command | What it does |
 |------|---------|-------------|
@@ -189,6 +189,7 @@ The Gabe Suite — 21 command wrappers, 12 skills:
 | gabe-commit | /gabe-commit [msg] | Commit quality gate — deterministic checks, triage |
 | gabe-debt | /gabe-debt [brief\|dry-run\|target] | Architecture decision-debt scan with AP evidence citations |
 | gabe-execute | /gabe-execute | Execute the current PLAN.md phase |
+| gabe-handoff | /gabe-handoff [--dry-run\|--no-sync\|note] | Session handoff — resume prompt + evidence-gated KDBP state sync |
 | gabe-health | /gabe-health [focus] | Codebase structural health — gods, churn, coupling, bugs |
 | gabe-init | /gabe-init [name] | Project setup — .kdbp/, hooks, project type, maturity |
 | gabe-lens | /gabe-lens [concept] | Cognitive translation — analogies, maps, constraint boxes |

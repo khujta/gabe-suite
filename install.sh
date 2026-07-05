@@ -34,7 +34,7 @@ run() {
 }
 
 CORE_SKILLS=(gabe-align gabe-arch gabe-assess gabe-debt gabe-docs gabe-docsite gabe-health gabe-help gabe-lens gabe-mockup gabe-myopic gabe-review gabe-roast)
-COMMAND_WRAPPER_SKILLS=(gabe-next gabe-plan gabe-execute gabe-commit gabe-push)
+COMMAND_WRAPPER_SKILLS=(gabe-next gabe-plan gabe-execute gabe-commit gabe-push gabe-handoff)
 COMMANDS=()
 if [ -d "$SCRIPT_DIR/commands" ]; then
     for command_path in "$SCRIPT_DIR"/commands/gabe-*.md; do

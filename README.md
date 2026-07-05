@@ -38,12 +38,12 @@ Skills, commands, and hooks for understanding, reviewing, deciding, and shipping
 | **Gabe Docs** | _(consulted)_ | Documentation house style — CommonMark, Mermaid library, per-well diagram recommendations (used by `/gabe-teach`, `/gabe-init`, `/gabe-commit`) |
 | **Gabe Arch** | _(consulted)_ | Architecture curriculum — concept library organized by tier × specialization (used by `/gabe-teach`) |
 
-### Command Wrappers (21)
+### Command Wrappers (22)
 
 The installed command surface includes direct skill commands plus the full KDBP lifecycle from project init through ship:
 
-Both Claude Code and Codex install five thin lifecycle command-wrapper skills
-(`gabe-next`, `gabe-plan`, `gabe-execute`, `gabe-commit`, `gabe-push`). Claude
+Both Claude Code and Codex install six thin lifecycle command-wrapper skills
+(`gabe-next`, `gabe-plan`, `gabe-execute`, `gabe-commit`, `gabe-push`, `gabe-handoff`). Claude
 Code also has native slash commands; the wrappers preserve skill-style handoff
 parity and load the same command specs mirrored under each local home.
 
@@ -54,6 +54,7 @@ parity and load the same command specs mirrored under each local home.
 | `/gabe-commit` | Commit quality gate — deterministic checks, interactive triage, defer/accept/fix |
 | `/gabe-debt` | Architecture decision-debt scanner — decisions, rules, open questions, AP citations |
 | `/gabe-execute` | Phase execution — tier-cap task breakdown, mid-phase escalation gate |
+| `/gabe-handoff` | Session handoff — paste-able next-session resume prompt + evidence-gated KDBP state sync (PLAN/LEDGER/PENDING) into `.kdbp/HANDOFF.md` |
 | `/gabe-health` | Codebase structural health — god files, churn hotspots, coupling, bugs |
 | `/gabe-help` | Context-aware guide — scans environment and suggests the right workflow |
 | `/gabe-init` | Project setup — creates `.kdbp/`, installs hooks, selects project type + maturity |
