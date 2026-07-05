@@ -22,6 +22,7 @@
   {"id":"cmd-push","out":"cmd-push.png","prompt":"rocket launching upward with flame, flat pixel art icon","width":64,"height":64},
   {"id":"cmd-init","out":"cmd-init.png","prompt":"stacked foundation stone blocks, flat pixel art icon","width":64,"height":64},
   {"id":"cmd-teach","out":"cmd-teach.png","prompt":"black graduation mortarboard cap, flat pixel art icon","width":64,"height":64},
+  {"id":"cmd-handoff","out":"cmd-handoff.png","prompt":"a relay race baton passed between two hands, flat pixel art icon","width":64,"height":64},
 
   {"id":"tier-fast","out":"tier-fast.png","prompt":"circular refresh arrow, flat pixel art icon","width":64,"height":64},
   {"id":"tier-slow","out":"tier-slow.png","prompt":"green tortoise walking, flat pixel art icon","width":64,"height":64},

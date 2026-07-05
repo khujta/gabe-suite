@@ -1,6 +1,6 @@
 ## How they fit together
 
-Nine commands, three groups. The **core loop** (scope → plan → next → execute → review → commit → push) is the spine a project rides from first idea to shipped commit — `/gabe-next` is a pure router that reads `.kdbp/PLAN.md` and tells you which of the others to run next, so in practice you rarely choose manually. **Setup** is `/gabe-init`, run once per project to lay down `.kdbp/` and the hooks that make the rest of the suite legible. **Learning** is `/gabe-teach`, run after commits to turn the diff into understanding the human can actually recall later, rather than a blob of code they approved and forgot. Every command in all three groups sits under the same E1–E7 execution contract (see [The E1–E7 contract](contract.html)) — the gates below are each command's specific tightening of that shared floor.
+Ten commands, four groups. The **core loop** (scope → plan → next → execute → review → commit → push) is the spine a project rides from first idea to shipped commit — `/gabe-next` is a pure router that reads `.kdbp/PLAN.md` and tells you which of the others to run next, so in practice you rarely choose manually. **Setup** is `/gabe-init`, run once per project to lay down `.kdbp/` and the hooks that make the rest of the suite legible. **Learning** is `/gabe-teach`, run after commits to turn the diff into understanding the human can actually recall later, rather than a blob of code they approved and forgot. **Session continuity** is `/gabe-handoff`, run when a session ends or context fills up — it writes the next-session resume prompt and syncs `.kdbp/` so the work picks up mid-phase without loss. Every command in all four groups sits under the same E1–E7 execution contract (see [The E1–E7 contract](contract.html)) — the gates below are each command's specific tightening of that shared floor.
 
 ```mermaid
 flowchart TD
@@ -13,6 +13,7 @@ flowchart TD
     Commit --> Push["/gabe-push"]
     Push -.loops back.-> Next
     Commit --> Teach["🎓 /gabe-teach<br>learning"]
+    Next -.wrap up / resume.-> Handoff["📤 /gabe-handoff<br>session continuity"]
 ```
 
 :::note How to read "key gate"
@@ -51,4 +52,16 @@ This is the path every unit of work travels. Each step reads state the previous 
 
 :::note Where this comes from
 Each gate above is one of the 47 revisions ratified in the 2026-07 hardening pass (42 KEEP, 5 REVISE, 0 KILL) — see [Per-skill hardening reference](reference.html) for the full change log and [Why weak models drift](drift.html) for the incidents that motivated each one.
+:::
+
+## Session continuity — run when wrapping up
+
+Added after the 2026-07 hardening pass, `/gabe-handoff` is the deliberate counterpart to the automatic session summary. When a session is ending — or context is filling up toward a compaction — it captures what the mechanical transcript scrape can't: intent, the decisions made, and the exact next move.
+
+| Command | Purpose | Key gate it enforces |
+| --- | --- | --- |
+| `/gabe-handoff` | Ends a session cleanly: emits a paste-able next-session **resume prompt** (inline plus a singleton `.kdbp/HANDOFF.md`) and syncs durable `.kdbp/` state — a `HANDOFF` entry in `LEDGER.md`, in-flight items into `PENDING.md`, and the `PLAN.md` phase cells — so a fresh session, or a different model, resumes mid-phase without a hand-off conversation. | ![gabe-handoff](assets/icons/cmd-handoff.png) Sync-to-observed-reality with per-cell evidence gates — it only ticks a `PLAN.md` cell backed by a cited command, commit sha, or `git` fact, never fabricates a ✅, and never runs the commit/push gates (it records reality, it doesn't create it). The counterweight to the lossy automatic summary that would otherwise tell the next session to redo finished work. |
+
+:::note Why it's separate from the loop
+The loop's four-column tick is already a checkpoint (see [The development loop](the-loop.html) § the cadence rule). `/gabe-handoff` is for the messier reality — a session ending mid-task, with intent and half-finished work the tick alone doesn't capture. It writes the resume prompt so the *next* session starts from an accurate plan, not a lossy summary.
 :::
