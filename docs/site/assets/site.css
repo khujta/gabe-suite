@@ -423,6 +423,36 @@ h1 .chip, h2 .chip, h3 .chip { position: relative; top: -1px; }
   background: var(--card); color: var(--ink);
   border: 1px solid var(--faint); box-shadow: 0 1px 0 var(--faint2);
 }
+/* KDBP state files — each memory file gets its OWN soft pill (background +
+   colour) so a reader can tell at a glance WHICH file a passage reads or writes.
+   The base below is a neutral pill; the per-file .kf-* modifiers tint it. Inline
+   code only — fenced <pre> blocks keep their dark styling via the reset. */
+code.kdbp-file {
+  font-family: var(--font-mono); font-size: 0.86em; font-weight: 600;
+  border-radius: 999px; padding: 1.5px 9px; white-space: nowrap;
+  background: var(--card-deep); color: var(--ink2); border: 1px solid var(--faint);
+}
+pre code.kdbp-file { background: none; border: none; padding: 0; border-radius: 0; color: inherit; }
+
+/* Per-file tints — soft background + a readable same-hue text colour. */
+code.kf-plan        { background: rgba(31, 58, 107, 0.12);  color: #26467e; border-color: rgba(31, 58, 107, 0.32); }
+code.kf-roadmap     { background: rgba(31, 107, 99, 0.13);  color: #1c6058; border-color: rgba(31, 107, 99, 0.32); }
+code.kf-scope       { background: rgba(75, 63, 143, 0.12);  color: #4b3f8f; border-color: rgba(75, 63, 143, 0.32); }
+code.kf-decisions   { background: rgba(122, 90, 138, 0.15); color: #6f4f80; border-color: rgba(122, 90, 138, 0.34); }
+code.kf-ledger      { background: rgba(122, 82, 48, 0.13);  color: #7a5230; border-color: rgba(122, 82, 48, 0.32); }
+code.kf-pending     { background: rgba(176, 106, 31, 0.15); color: #9a5c14; border-color: rgba(176, 106, 31, 0.34); }
+code.kf-knowledge   { background: rgba(58, 107, 58, 0.13);  color: #35633a; border-color: rgba(58, 107, 58, 0.32); }
+code.kf-structure   { background: rgba(74, 85, 104, 0.14);  color: #45526a; border-color: rgba(74, 85, 104, 0.32); }
+code.kf-docs        { background: rgba(31, 107, 122, 0.13); color: #1c6070; border-color: rgba(31, 107, 122, 0.32); }
+code.kf-behavior    { background: rgba(154, 58, 107, 0.13); color: #90396a; border-color: rgba(154, 58, 107, 0.32); }
+code.kf-values      { background: rgba(138, 109, 31, 0.15); color: #7d6218; border-color: rgba(138, 109, 31, 0.34); }
+code.kf-push        { background: rgba(176, 67, 43, 0.13);  color: #a8412b; border-color: rgba(176, 67, 43, 0.32); }
+code.kf-deployments { background: rgba(160, 48, 74, 0.13);  color: #9a3049; border-color: rgba(160, 48, 74, 0.32); }
+code.kf-handoff     { background: rgba(182, 90, 43, 0.14);  color: #a9531f; border-color: rgba(182, 90, 43, 0.34); }
+code.kf-review      { background: rgba(168, 74, 106, 0.13); color: #9c476a; border-color: rgba(168, 74, 106, 0.32); }
+code.kf-maintenance { background: rgba(107, 107, 47, 0.14); color: #66662a; border-color: rgba(107, 107, 47, 0.32); }
+code.kf-rules       { background: rgba(122, 58, 58, 0.13);  color: #7a3a3a; border-color: rgba(122, 58, 58, 0.32); }
+code.kf-dir         { background: rgba(27, 26, 23, 0.07);   color: var(--ink2); border-color: var(--faint); }
 
 /* ── Pre-rendered diagram figures (inline SVG baked by tools/render-diagrams.mjs) ── */
 .mermaid-fig {

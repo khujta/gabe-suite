@@ -31,6 +31,36 @@ _IMG_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 _LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 _HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 
+# KDBP state files — rendered as a soft-tinted pill (code.kdbp-file) so a reader
+# can spot at a glance which .kdbp/ memory file a passage reads or writes.
+# Matches the .kdbp/ root (or anything under it) plus the canonical file names
+# bare (PLAN.md, SCOPE.md, ROADMAP.md, …). Inline code spans only.
+_KDBP_NAMES = (
+    r"BEHAVIOR|DECISIONS|DEPLOYMENTS|DEVIATIONS|DOCS|ENTITIES|KNOWLEDGE|LEDGER"
+    r"|MAINTENANCE|PENDING|PLAN-MOCKUPS|PLAN|PUSH|REVIEW|ROADMAP|SCOPE|STRUCTURE"
+    r"|VALUES|HANDOFF|MOCKUP-VALIDATION"
+)
+# A code span whose whole content is a KDBP file (bare or .kdbp/-prefixed) or the
+# .kdbp/ root — rendered as a pill by _stash_code.
+_KDBP_FILE_RE = re.compile(r"^(?:\.kdbp/\S*|(?:%s)\.md)$" % _KDBP_NAMES)
+# A bare KDBP filename sitting in prose (not backticked, not part of a longer
+# path). Word-boundaried so `commands/gabe-execute.md` and `SKILL.md` never match.
+# Runs on already-escaped inline text; mermaid diagrams and fenced blocks never
+# reach render_inline, so diagram node labels like `PLAN.md` are untouched.
+_KDBP_PROSE_RE = re.compile(r"(?<![\w/`.])((?:%s)\.md)(?![\w.])" % _KDBP_NAMES)
+
+
+def _kdbp_class(content: str) -> str | None:
+    """Class for a KDBP file/dir reference, or None if it isn't one. Each file
+    gets its own ``kf-<name>`` modifier (e.g. ``kf-plan``) so the stylesheet can
+    tint each memory file distinctly; the ``.kdbp/`` root maps to ``kf-dir``."""
+    c = content.strip()
+    if not _KDBP_FILE_RE.match(c):
+        return None
+    base = c.rsplit("/", 1)[-1]  # strip any ".kdbp/" prefix
+    slug = base[:-3].lower() if base.endswith(".md") else "dir"
+    return "kdbp-file kf-%s" % slug
+
 
 def esc(text: str) -> str:
     return _html.escape(text, quote=False)
@@ -46,7 +76,10 @@ def render_inline(text: str) -> str:
         return "\x00%d\x00" % (len(placeholders) - 1)
 
     def _stash_code(match: re.Match[str]) -> str:
-        return _stash("<code>" + esc(match.group(1)) + "</code>")
+        content = match.group(1)
+        cls = _kdbp_class(content)
+        tag = '<code class="%s">' % cls if cls else "<code>"
+        return _stash(tag + esc(content) + "</code>")
 
     text = re.sub(r"`([^`]+)`", _stash_code, text)
     text = esc(text)
@@ -62,6 +95,12 @@ def render_inline(text: str) -> str:
     )
     text = _BOLD_RE.sub(r"<strong>\1</strong>", text)
     text = _EM_RE.sub(r"<em>\1</em>", text)
+    # Pill bare KDBP filenames left in prose (backticked ones are already stashed
+    # above; links resolve to .html so hrefs never collide with a .md match).
+    text = _KDBP_PROSE_RE.sub(
+        lambda m: '<code class="%s">%s</code>' % (_kdbp_class(m.group(1)), m.group(1)),
+        text,
+    )
     for i, frag in enumerate(placeholders):
         text = text.replace("\x00%d\x00" % i, frag)
     return text

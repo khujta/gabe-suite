@@ -2,6 +2,8 @@
 
 Ten commands, four groups. The **core loop** (scope → plan → next → execute → review → commit → push) is the spine a project rides from first idea to shipped commit — `/gabe-next` is a pure router that reads `.kdbp/PLAN.md` and tells you which of the others to run next, so in practice you rarely choose manually. **Setup** is `/gabe-init`, run once per project to lay down `.kdbp/` and the hooks that make the rest of the suite legible. **Learning** is `/gabe-teach`, run after commits to turn the diff into understanding the human can actually recall later, rather than a blob of code they approved and forgot. **Session continuity** is `/gabe-handoff`, run when a session ends or context fills up — it writes the next-session resume prompt and syncs `.kdbp/` so the work picks up mid-phase without loss. Every command in all four groups sits under the same E1–E7 execution contract (see [The E1–E7 contract](contract.html)) — the gates below are each command's specific tightening of that shared floor.
 
+The deep-dives below cover these workflow commands. The suite's other half — the on-demand **analysis satellites** (roast, health, debt, assess, align, myopic) — has its own page, [Analysis satellites](satellites.html), because those tools run *outside* the loop rather than as steps in it. A complete index of **all 22 commands** (workflow, satellites, scope authoring, and utilities) closes this page.
+
 ```mermaid
 flowchart TD
     Init["🛠️ /gabe-init<br>one-time setup"] --> Next
@@ -65,3 +67,32 @@ Added after the 2026-07 hardening pass, `/gabe-handoff` is the deliberate counte
 :::note Why it's separate from the loop
 The loop's four-column tick is already a checkpoint (see [The development loop](the-loop.html) § the cadence rule). `/gabe-handoff` is for the messier reality — a session ending mid-task, with intent and half-finished work the tick alone doesn't capture. It writes the resume prompt so the *next* session starts from an accurate plan, not a lossy summary.
 :::
+
+## Every command at a glance
+
+The full surface — all 22 commands, grouped. The **core loop**, **setup**, **learning**, and **session-continuity** commands are detailed above; the **analysis satellites** have their own [page](satellites.html); the **scope-evolution** and **utility** rows are documented by this index line (their full specs live in the command files themselves).
+
+| Command | Group | What it does | Full write-up |
+| --- | --- | --- | --- |
+| `/gabe-scope` | Core loop | Authors `SCOPE.md` + `ROADMAP.md` — the stable premise and the phase plan | above |
+| `/gabe-plan` | Core loop | Breaks a goal into phases, each with a tier decision, into `PLAN.md` | above |
+| `/gabe-next` | Core loop | Zero-logic router over the `PLAN.md` status cells | above |
+| `/gabe-execute` | Core loop | Implements the phase's tasks under the task + reuse contract | above |
+| `/gabe-review` | Core loop | Risk-priced review with interactive triage | above |
+| `/gabe-commit` | Core loop | The commit quality gate — CHECK 1–9 | above |
+| `/gabe-push` | Core loop | Push, PR, CI watch, deploy-verify | above |
+| `/gabe-init` | Setup | Lays down `.kdbp/` + the hooks, by project type | above |
+| `/gabe-teach` | Learning | Consolidates understanding into `KNOWLEDGE.md` | above |
+| `/gabe-handoff` | Session continuity | Resume prompt + evidence-gated `.kdbp/` sync | above |
+| `/gabe-roast` | Analysis satellite | Adversarial gap review from a chosen perspective | [satellites](satellites.html) |
+| `/gabe-myopic` | Analysis satellite | Short-sighted-user walkthrough — foresight traps, overwhelm, recall, no-undo | [satellites](satellites.html) |
+| `/gabe-health` | Analysis satellite | Structural health — god files, churn, coupling, bugs | [satellites](satellites.html) |
+| `/gabe-debt` | Analysis satellite | Architecture decision-debt scan with AP citations | [satellites](satellites.html) |
+| `/gabe-assess` | Analysis satellite | Change impact — blast radius, maturity scope, prerequisites | [satellites](satellites.html) |
+| `/gabe-align` | Analysis satellite | Values guardian — pre-flight checks + auto-checkpoint | [satellites](satellites.html) |
+| `/gabe-scope-change` | Scope evolution | Router — classifies a scope change → addition or pivot | this index |
+| `/gabe-scope-addition` | Scope evolution | Additive scope — new REQs / phases / refs, same premise | this index |
+| `/gabe-scope-pivot` | Scope evolution | Direction change — archives `SCOPE.md` v{N}, opens v{N+1} | this index |
+| `/gabe-help` | Utility | Context-aware guide — scans state, suggests the next command | this index |
+| `/gabe-lens` | Utility | Cognitive translation — analogies, maps, constraint boxes | this index |
+| `/gabe-mockup` | Utility | Mockup / UX workflow — static, React Storybook, and design-ref modes | this index |
