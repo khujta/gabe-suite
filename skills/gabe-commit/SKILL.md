@@ -36,6 +36,13 @@ Deterministic commit quality gate. Runs checks (lint, types, tests, coverage, sh
 - Alongside the gate's deterministic checks, run `scripts/size-budget.sh` (this skill): WARN when a touched file is, or newly crosses, >800 first-party lines; generated files (by header) exempt; recorded split seams from `.kdbp/RULES.md`/`.kdbp/PENDING.md` printed with the WARN. Exit 2 = warnings present. A WARN never blocks the commit by itself — it enters triage like any other finding.
 - When the check WARNs, when the phase touched a known monolith, or on request: OFFER the quality-only simplify pass per `references/simplify-pass.md` (reuse · simplification · efficiency — never bug-hunting).
 
+## Evidence + docs discipline (runs with the gate, WARN-and-LOG stage)
+
+- `scripts/evidence-freshness.sh` (this skill): when the current phase carries a non-null `proof` (PLAN.json), the newest artifact under the manifest's `proof_root` must be at least as new as the newest staged source change — stale/missing evidence WARNs and appends one line to `.kdbp/archive/evidence-bypass.log`. Never blocks; promotion to blocking is a Wave-2 decision made from that log. Convention: `../gabe-docs/references/evidence-doctrine.md`.
+- `scripts/docs-budget.sh` (this skill): WARN on staged NEW `.md` files outside the allowed homes (`.kdbp/**`, files registered in `.kdbp/DOCS.md`) and on any new dated-name md (no dated throwaways — augment the living doc in place). Never blocks. Both WARNs enter triage like any other finding.
+
 ## Output contract (summary)
 
 Present findings grouped by severity with a clear per-finding action prompt (defer/accept/fix); never silently skip a check — a skipped check prints an enumerated reason, not silence. On commit, write the LEDGER.md thin-index row and any PLAN auto-tick (with its PLAN.json mirror) in the same turn (E5). Emit the visible `**Gabe-Lens brief**` (commit-shaped, output-only — never written to PLAN.md/REVIEW.md/LEDGER.md/PENDING.md/docs, except when the commit-message generator already owns that body). Docs-audit mode is read-only for git and leaves any proposed file changes unstaged for the human to commit normally. The full output contract in the spec is binding.
+
+End every normal-flow run with a single deterministic `NEXT: /gabe-push` line — the routing contract; no other suggestions.

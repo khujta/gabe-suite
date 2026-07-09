@@ -39,6 +39,8 @@ If `.kdbp/PLAN.md` exists and contains `status: active`:
 
 Run these scripts. No LLM. No token cost. Target: 2-10 seconds total.
 
+Alongside CHECK 1-9, run the three skill-local scripts (each exit 2 = WARN finding, never a block): `scripts/size-budget.sh` (>800-line budget), `scripts/evidence-freshness.sh` (Evidence Doctrine §4 — a proof-carrying phase must have proof_root artifacts at least as new as the staged source; WARNs append to `.kdbp/archive/evidence-bypass.log`), and `scripts/docs-budget.sh` (documentation diet — new md outside allowed homes / dated-name md). Convention text: `../../gabe-docs/references/evidence-doctrine.md`.
+
 A check may be marked ✅ ONLY if its command executed via the Bash tool this session. Before the CHECKS summary line, print one evidence row per check:
 
 <check>: `<cmd>` → exit <code>, "<copied count>"
@@ -261,7 +263,7 @@ After all actions resolved:
 2. Commit: `git commit -m "[message]"`
 3. Log to `.kdbp/LEDGER.md` — one thin-index row:
 ```
-| [YYYY-MM-DD] | COMMIT | [commit subject, ≤8 words] | [short hash] | findings [raw]→[survived] · deferred [n] · size-budget [ok/warn] |
+| [YYYY-MM-DD] | COMMIT | [commit subject, ≤8 words] | [short hash] | findings [raw]→[survived] · deferred [n] · size-budget [ok/warn] · evidence [ok/warn/—] · docs-budget [ok/warn] |
 ```
 If the commit went through `force-commit: <reason>` (Blocked-commit rule above), append `· FORCED: [reason]` to this row's Gates column.
 

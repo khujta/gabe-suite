@@ -171,6 +171,8 @@ Do not accept "tests pass" as a substitute for this check. Unit tests can satisf
 PASS: `proof: "npx playwright test scan.spec --project=mobile → chromium mobile-390 → e2e/proof/scan-mobile.png"` (ls → exists)
 FAIL: `proof: ":<port> desktop+mobile proof"` — a claim with no artifact path.
 
+**Fresh-context evaluation (visual/journey proof — the verifier is not the author).** When the proof entry is visual or journey-shaped (screenshots/video/side-by-side artifacts), do not grade the artifacts inline: dispatch ONE read-only evaluator agent (Explore — no Write/Edit) with exactly (a) the phase's acceptance criteria (Phase Details `Acceptance:` / Runtime Evidence Checkpoints line) and (b) the proof folder path. It returns `PASS` or `NEEDS_WORK: <artifact> — <what fails>`. Plausibility is not correctness — a reasonable diff plus a broken screenshot is NEEDS_WORK, and NEEDS_WORK converts to a HIGH finding priced like the evidence gap above. The executing session never grades its own screenshots. Convention: `../../gabe-docs/references/evidence-doctrine.md` §5.
+
 ### Step 3.5: Churn Annotation
 
 For each file in the diff, check its recent churn:
