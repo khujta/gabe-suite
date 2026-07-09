@@ -4,11 +4,14 @@ Read this file when: running under Codex.
 
 ## Codex Command Bridge
 
-When Codex invokes this skill as the `Gabe Review` command surface, first read
-the active command wrapper from `.agents/commands/gabe-review.md`,
-`~/.agents/commands/gabe-review.md`, or
-`~/projects/gabe_lens/commands/gabe-review.md`, then preserve that command's
-argument routing and visible output contract. This `SKILL.md` is the review
-engine referenced by the command file; if there is any conflict, the command
-file controls command-time behavior such as `Gabe-Lens block` rendering,
-singleton `REVIEW.md` reconciliation, and mode-specific skips.
+When Codex invokes `Gabe Review` by any phrasing (slash-style `/gabe-review`,
+"review this", or a picker selection), this skill is the complete contract:
+follow `SKILL.md` (argument routing, modes) and its binding spec
+`references/review-spec.md` (process, output contracts) exactly — including
+command-time output behavior such as `Gabe-Lens block` rendering, singleton
+`REVIEW.md` reconciliation, and mode-specific skips.
+
+Do not go looking for a separate command wrapper; the skill directory is the
+single source of truth in every host. If a legacy `gabe-review.md` command
+file is still present from an older install, it is a frozen mirror — this
+skill controls.

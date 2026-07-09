@@ -5,7 +5,7 @@
 
 ## Runtime output rendering convention
 
-Gabe Suite spec files (`commands/gabe-*.md` + `skills/gabe-*/SKILL.md`) document intended output using triple-backtick fences as **visual delimiters for the spec reader**. At runtime these fences are **spec-meta** — do NOT echo them to the user.
+Gabe Suite spec files (`skills/gabe-*/SKILL.md` + `skills/gabe-*/references/*.md`) document intended output using triple-backtick fences as **visual delimiters for the spec reader**. At runtime these fences are **spec-meta** — do NOT echo them to the user.
 
 When a spec shows a block like:
 

@@ -84,7 +84,7 @@ Apply this decision table, top-to-bottom. First match wins.
 **Downstream command contract.**
 
 1. Prefer the host's native slash-command invocation for the chosen command, e.g. run `/gabe-commit` as a command when that is available.
-2. If the host cannot directly invoke nested slash commands, load the chosen command spec from the active install (`~/.claude/commands/<command>.md` in Claude Code, `~/.agents/commands/<command>.md` in Codex, or this repository's `commands/<command>.md` as a source fallback) and follow its Procedure exactly.
+2. If the host cannot directly invoke nested slash commands, load the chosen capability's skill from the active install (`~/.claude/skills/<command>/SKILL.md` in Claude Code, `~/.agents/skills/<command>/SKILL.md` in Codex) and follow it — including its instruction to read the binding spec under that skill's `references/`.
 3. Do not replace the chosen command with a hand-rolled equivalent. In particular, when `NEXT` is `/gabe-commit`, do not stop after running raw `git commit`; the `/gabe-commit` normal-flow output contract must still be satisfied, including the visible `**Gabe-Lens brief**`, `/gabe-teach` suggestion, PLAN auto-tick output, and existing LEDGER behavior.
 4. `/gabe-next` owns only routing and phase advancement. Commit message generation, verification, ledger writes, briefs, pushes, and other side effects belong to the downstream command.
 
@@ -155,4 +155,4 @@ REASON: Tasks not yet implemented (mockup dispatch via project_type)
 
 $ARGUMENTS
 
-> Post-A2 hardening (planned): this prose state-machine becomes `scripts/next.mjs` reading `PLAN.json` — deterministic and zero-token, honoring this command's own no-LLM intent. Until then, this file is the 1:1 re-home of `commands/gabe-next.md`.
+> Post-A2 hardening (planned): this prose state-machine becomes `scripts/next.mjs` reading `PLAN.json` — deterministic and zero-token, honoring this command's own no-LLM intent.

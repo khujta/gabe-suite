@@ -74,7 +74,7 @@ created: [today's date]
 
 **Mandatory inventory before any proposal:**
 1. Read existing project state: `.kdbp/PLAN.md`, `.kdbp/SCOPE.md`, `.kdbp/STRUCTURE.md`, `.kdbp/ROADMAP.md`, `.kdbp/AUDIT.md` (if present)
-2. Read suite command(s) being extended: `~/.claude/commands/gabe-*.md`
+2. Read suite skill(s) being extended: `~/.claude/skills/gabe-*/SKILL.md`
 3. Read relevant catalog: `~/.claude/templates/gabe/tier-sections/*.md`
 4. If proposing external dep: clone repo, verify license + actual surface (not just README)
 5. List what already exists for this question before proposing what's missing

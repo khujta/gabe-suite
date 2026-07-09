@@ -14,7 +14,7 @@ This skill runs under the suite execution contract — E1 EVIDENCE · E2 RUN-BEF
 
 ## Codex Command Bridge
 
-Running under Codex → read `references/codex-bridge.md` now — it points to the active command wrapper (`.agents/commands/gabe-review.md`) and clarifies that the command file controls command-time output contracts (Gabe-Lens block rendering, REVIEW.md reconciliation, mode-specific skips) if there's ever a conflict with this SKILL.md.
+Running under Codex → read `references/codex-bridge.md` now — it confirms this skill directory is the complete contract in every host (no separate command wrapper) and that command-time output contracts (Gabe-Lens block rendering, REVIEW.md reconciliation, mode-specific skips) live in `references/review-spec.md`.
 
 ## What this does
 
