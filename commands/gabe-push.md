@@ -5,6 +5,18 @@ description: "Push, create PR, watch CI, promote — env-aware shipping workflow
 
 # Gabe Push
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 Env-aware shipping. One command pushes local work to the configured target env, or promotes what's already on a pre-prod env (e.g., `staging`) up to the next env (e.g., `main` / `production`). Config lives in `.kdbp/PUSH.md`. First run interviews for envs; subsequent runs honor the config until `/gabe-push --reconfigure`.
 
 > **Rendering note.** Output templates in this spec wrapped in bare triple-backtick fences are spec-meta delimiters — render their contents as plain markdown at runtime. Tagged fences (```bash, ```json, ```diff) stay fenced. See `gabe-docs/SKILL.md` § "Runtime output rendering convention".
@@ -17,6 +29,22 @@ Env-aware shipping. One command pushes local work to the configured target env, 
 2. Verify auth: `gh auth status 2>/dev/null`. If not authenticated: "Run `gh auth login` first" — stop.
 3. Verify git repo with remote: `git remote -v`. If no remote: "No remote configured. Run `git remote add origin <url>` first" — stop.
 4. Read `.kdbp/PUSH.md`. If it exists, skip to Step 2.5. If not, continue to Step 2.
+
+### Non-interactive defaults
+
+If no human answer is available for a prompt, take the table default and print `(defaulted: <choice>)`:
+
+| Prompt | Safe default |
+|--------|--------------|
+| Step 2.7 remote-drift actions | ignore-once |
+| Step 3.2 promote vs push-local | promote (ship what was tested) |
+| Step 3.3 direct-push-to-target warning | abort |
+| Step 3.4 uncommitted changes | abort |
+| Step 6.5 CI failure actions | stop with status report — NEVER ignore |
+| Step 7.5b candidate action | defer (already specified) |
+| Step 10.5 branch cleanup | keep |
+
+Safety rows never default to proceed.
 
 ### Step 2: First-run setup (creates `.kdbp/PUSH.md`)
 
@@ -162,7 +190,7 @@ Skipped when `push_source = HEAD` AND `current_branch = env.target_branch` (dire
    ```
    CI: ⏳ build (running)  ✅ lint (pass)  ⏳ test (running)
    ```
-4. All checks pass: "CI: All checks passed." — continue to Step 7.5.
+4. All checks pass: before any pass/fail claim, paste the final raw `gh pr checks` output verbatim. `⏳` is not ✅ — on timeout report `CI: ⏳ still running` and Step 10 MUST NOT tick. Then "CI: All checks passed." — continue to Step 7.5.
 5. Any check fails:
    ```
    CI: ✅ lint (pass)  ❌ test (fail)  ✅ build (pass)
@@ -175,6 +203,15 @@ Skipped when `push_source = HEAD` AND `current_branch = env.target_branch` (dire
    - `[assess]` — suggest `/gabe-assess [failure context]` for complex failures
    - `[ignore]` — continue without fixing
 6. Timeout (75s): "CI still running. Check later: `gh pr checks`."
+
+### Step 6.7: Deploy verify
+
+Runs when the target env deploys an artifact — deploy provider configured in PUSH.md, or the env is `production`. Otherwise skip.
+
+1. Deploy status = SUCCESS at the NEW commit — paste the provider status line.
+2. SMOKE: fetch the app root / health endpoint; assert non-blank, no fatal error. Record `DEPLOY-VERIFY: <url> → <observed title/first line>`.
+3. Jobs with 0 tests or `continue-on-error` are NON-EVIDENCE. CI green + container healthy is never the final evidence — the live-target probe is.
+4. If the pushed range adds a build-time env var: confirm it is declared in the build file (Dockerfile ARG / build config), not only the service dashboard.
 
 ### Step 7: Final summary
 
@@ -369,9 +406,9 @@ This step commits those writes automatically and returns the working tree to a c
    git add <each path in the set>
    ```
 
-4. **Detect no-op.** Run `git diff --cached --quiet`. Exit code 0 → nothing to commit, skip to step 7. Otherwise continue.
+3. **Detect no-op.** Run `git diff --cached --quiet`. Exit code 0 → nothing to commit, skip to substep 8.5.6 (Report). Otherwise continue.
 
-5. **Commit through the normal git hook chain** with a canonical message. No hook bypass — the user's policy disallows it, and the bookkeeping file set is path-scoped audit writes that every CHECK in the pre-commit suite will pass through cleanly:
+4. **Commit through the normal git hook chain** with a canonical message. No hook bypass — the user's policy disallows it, and the bookkeeping file set is path-scoped audit writes that every CHECK in the pre-commit suite will pass through cleanly:
 
    - CHECK 1-3 (lint / types / tests): target source files; `.md` bookkeeping paths are skipped.
    - CHECK 4-5 (coverage / shape): code-file-scoped per the earlier patch.
@@ -398,12 +435,12 @@ This step commits those writes automatically and returns the working tree to a c
 
    If any pre-commit hook blocks (rare; would indicate a real finding the user should know about), surface the hook output, leave the files staged, and report `Bookkeeping: ⚠ hook blocked — resolve and rerun /gabe-push` in the final dashboard. Do NOT retry with a hook bypass.
 
-6. **Do NOT push the bookkeeping commit.** The user ran `/gabe-push` once; running a second push for audit rows is wasteful. The bookkeeping commit is local, arrives on origin during the next real push, and never blocks downstream work.
+5. **Do NOT push the bookkeeping commit.** The user ran `/gabe-push` once; running a second push for audit rows is wasteful. The bookkeeping commit is local, arrives on origin during the next real push, and never blocks downstream work.
 
-7. **Report.** Include a row in the final GABE PUSH COMPLETE output:
+6. **Report.** Include a row in the final GABE PUSH COMPLETE output:
 
    - `Bookkeeping: ✅ committed locally (3 files, not pushed)` — when commit happened
-   - `Bookkeeping: — no changes` — when Step 4 detect-no-op fired
+   - `Bookkeeping: — no changes` — when substep 8.5.3 (detect-no-op) fired
    - `Bookkeeping: ⚠ skipped (cwd on lane branch; shared files deferred to main)` — when main-only rule dropped DECISIONS.md
 
 **What this replaces:** the previous behavior left these files dirty and the user had to remember to run `/gabe-commit` again for audit bookkeeping. This step removes that requirement entirely. `/gabe-push` finishes with a clean working tree.
@@ -418,7 +455,7 @@ Non-blocking suggestion only. Push is already complete.
 
 ### Step 10: Auto-tick Push column in PLAN.md
 
-Silent no-op on any mismatch. Only runs when ALL of the following are true:
+Before ticking or skipping, print the decision record: `push ✓|✗ · CI ✓(n/n)|✗ · env=<name> ✓|✗ · promotion-final ✓|✗ → TICK | skip(<first failing row>)`. Ticking without this record is a defect. Only runs when ALL of the following are true:
 
 1. Push succeeded (Step 4 reached without failure)
 2. CI passed green (Step 6 ended with "All checks passed" — or CI provider is `none` and user confirmed)

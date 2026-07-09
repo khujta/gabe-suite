@@ -7,6 +7,18 @@ metadata:
 
 # Gabe Debt — Architectural Decision-Debt Scanner
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 ## Purpose
 
 Catch complexity gravity wells **before** they deepen. Every project accumulates decisions that were never made explicitly ("we'll figure out state ownership later"), or decisions that contradict each other silently (SCOPE says multi-agent topology; PLAN phase 4 binds roles per-request; code assumes one user). These are the traps that crushed BoletApp's Epic 14c (reverted after 3 days), kept Gastify's legacy refresh-never-fires bug open for months, and keep cross-role visibility vulnerabilities latent until the first auditor asks.
@@ -141,7 +153,7 @@ finding.
    - `.kdbp/PENDING.md` — parse existing deferred entries to avoid re-raising
    - `.kdbp/debt-ignore.md` — parse dismissal list (created on first `(s)` during triage; see Step 5)
 4. **Resolve active phase.** Parse `.kdbp/PLAN.md` `<!-- status: active -->` frontmatter. Record phase number, `types: []` list (binds to tier-sections).
-5. **Load pattern catalog.** Read project-local `.kdbp/debt-patterns/*.md` first, then layer global `~/.claude/templates/gabe/debt-patterns/*.md`. Project-local overrides by ID.
+5. **Load pattern catalog.** Read project-local `.kdbp/debt-patterns/*.md` first, then layer global `~/.claude/templates/gabe/debt-patterns/*.md`. Project-local overrides by ID. If ZERO pattern files load: print `⛔ Pattern catalog missing (searched .kdbp/debt-patterns/, ~/.claude/templates/gabe/debt-patterns/, ~/.agents/templates/gabe/debt-patterns/) — running Step 1 + Step 2.4 rule cross-check only.` Run only those steps, note the missing catalog in the summary, and NEVER synthesize pattern IDs or detection heuristics from memory.
 6. **Load architecture principles.** Read the AP catalog from the first available architecture-principles path. If missing, continue without AP citations and note the missing catalog in the summary.
 7. **If mode=`extract-rules`:** skip to Step 8. If mode=`audit-rules`: skip the catalog-scan parts of Step 2, only check existing rules.
 
@@ -220,6 +232,8 @@ Weak-signal findings are included in output but demoted one severity level and l
 - `implicit` — decision inferable but not formalized
 - `contradictory` — multiple conflicting signals
 - `violating-existing-rule` — code/scope violates a known R-rule
+
+**Evidence floor:** every finding carries ≥1 evidence line. For status=`missing`, evidence = the sources searched + the red-line question (e.g. `searched SCOPE §10, DECISIONS D1–D14, PLAN phase 5 — no signal for RLQ-2`). Zero evidence lines → the finding is DROPPED before output, not demoted.
 
 **Architecture principle citations** (advisory, optional):
 - Match AP IDs from the catalog against the finding's existing evidence only.

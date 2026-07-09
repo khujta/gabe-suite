@@ -5,6 +5,18 @@ description: "Zero-logic router — reads .kdbp/PLAN.md and dispatches to the ne
 
 # Gabe Next
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 Thin router. Reads `.kdbp/PLAN.md`, finds the next unticked cell in the phase table, and dispatches to the matching `gabe-*` command. Zero LLM cost. No state writes of its own.
 
 **Design principle.** This command does not execute tasks, reason about them, or modify files. It answers one question: "Given PLAN state, what's the next gabe command to run?" Then it runs that command (or prints it on `--dry-run`).
@@ -21,7 +33,7 @@ Thin router. Reads `.kdbp/PLAN.md`, finds the next unticked cell in the phase ta
 Read `.kdbp/PLAN.md`. Extract:
 
 1. **Current Phase pointer.** Line matching `## Current Phase` → next non-blank line → leading integer `N` from `Phase N: ...`. If missing or unparseable → print `⚠ PLAN.md: Current Phase section missing or malformed.` and exit.
-2. **Phases table columns.** Detect column names from header row. Expected: `# | Phase | Description | Complexity | Exec | Review | Commit | Push`. Legacy plans may lack `Exec` — treat missing column as always-✅ (skip that step).
+2. **Phases table columns.** Detect column names from header row. Expected: `# | Phase | Description | Types | Tier | Complexity | Exec | Review | Commit | Push`. Legacy plans may lack `Exec` — treat missing column as always-✅ (skip that step).
 3. **Target row.** Row where first data column equals `N`.
 4. **Project type.** Parse top-of-file HTML comment `<!-- project_type: code | mockup | hybrid -->`. If absent → default `code`. Used by Step 1.5 Exec dispatch.
 5. **Target row types.** Parse `Types` column (or `## Phase Details → Phase N → types:` YAML) for target row. List like `[design-system, ui-kit]`. Empty → `[]`. Used by Step 1.5 hybrid dispatch.
@@ -41,6 +53,11 @@ Determines which command handles the Exec step for the target phase. Pure lookup
 
 Store the resolved command as `EXEC_CMD` for Step 2 use. Review / Commit / Push commands are unchanged regardless of project type.
 
+### Step 1.7: Prior-row sweep (always print, never block)
+
+Scan Phases rows `1..N-1`. If any Exec/Review/Commit/Push cell ≠ ✅, print before the routing decision:
+`⚠ INCOMPLETE PRIOR PHASES: [12: Review ⬜, Push ⬜] — routing continues on Phase N; clear the debt with /gabe-review or /gabe-push on the listed phases.`
+
 ### Step 2: Decide next action (zero LLM)
 
 Apply this decision table, top-to-bottom. First match wins.
@@ -55,7 +72,7 @@ Apply this decision table, top-to-bottom. First match wins.
 | All 4 = ✅ on target row AND more phases below | Advance `Current Phase` to `N+1`, re-run Step 2 | Phase done, move on |
 | All 4 = ✅ on target row AND no phases below | `/gabe-plan complete` | Plan complete — prompt archive |
 
-**Advance mechanics.** When advancing Current Phase, do NOT write any other file. Only rewrite the `## Current Phase` section to point to `N+1` and bump `Last Updated` in Context to today's date.
+**Advance mechanics.** When advancing Current Phase, do NOT write any other file. Only rewrite the `## Current Phase` section to point to `N+1` and bump `Last Updated` in Context to today's date. Advancing past a non-✅ prior row is allowed but MUST re-print the Step 1.7 sweep warning — never advance silently over owed Review/Push work.
 
 ### Step 3: Dispatch
 

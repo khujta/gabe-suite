@@ -5,6 +5,18 @@ description: "KDBP-aware planning with lifecycle management + tier decision per 
 
 # Gabe Plan
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 KDBP-aware planner. Same planning logic as `/plan`, but persists to `.kdbp/PLAN.md` with lifecycle management + per-phase tier decision (MVP / Enterprise / Scale) with trade-off matrix. For complex plans, it also creates a self-contained HTML review artifact as the human-facing entrypoint while keeping KDBP Markdown canonical.
 
 > **Rendering note.** Output templates in this spec wrapped in bare triple-backtick fences are spec-meta delimiters — render their contents as plain markdown at runtime. Tagged fences (```yaml, ```json, ```bash) stay fenced. See `gabe-docs/SKILL.md` § "Runtime output rendering convention".
@@ -131,7 +143,7 @@ Execute the standard planning process:
    - Description (one sentence)
    - Key files likely affected
    - Estimated complexity: low / medium / high
-   - **Types** — phase type tags (drives Step 3.5 section assembly). Examples: `[ai-agent, integration]`, `[data-migration, multi-tenant]`, `[user-facing, client-state]`. See `~/.claude/templates/gabe/tier-sections/tier-section-index.md` for canonical tag list.
+   - **Types** — phase type tags (drives Step 3.5 section assembly). Examples: `[ai-agent, integration]`, `[data-migration, multi-tenant]`, `[user-facing, client-state]`. Tags MUST come from the canonical closed list (mirrors `tier-section-index.md` so it survives a missing index): `{data-migration, persistence, multi-tenant, org-scoped, ai-agent, llm, user-facing, external-api, perf-sensitive, client-state, spa, pwa, auth, session, async-worker, queue, realtime, streaming, sse, migration, rollout, upload, storage, cdn, email, push, sms, design-system, ui-kit, mockup-flows, mockup-index, mockup-docs, mockup-validation}`. Freeform tags (`frontend`, `ui-screens`) silently disable `/gabe-next` hybrid dispatch and `/gabe-execute` evidence classification — reject them and re-ask. See `~/.claude/templates/gabe/tier-sections/tier-section-index.md` for the full section mapping.
    - **Runtime journey evidence** — for phases tagged `{user-facing, native-mobile, mobile-web, web, upload, realtime, streaming, file-media, auth, session, notifications}`, include a concrete verification checkpoint that exercises the changed path on the target runtime and captures artifacts. Unit/static checks are not enough for these phase types.
 3. **Identify dependencies** between phases.
 4. **Assess risks** — Flag anything that could block progress.
@@ -153,6 +165,7 @@ For each phase:
 2. **Load section files:**
    - Always: `~/.claude/templates/gabe/tier-sections/core.md`
    - For each matched tag, load the corresponding section file per `tier-section-index.md` mapping.
+   - If `tier-section-index.md` or any matched section file cannot be read: STOP with `⛔ tier-sections templates missing at <searched paths> — reinstall the suite.` Never render a tier matrix from memory; a fabricated matrix makes the tier decision theater.
 3. **Layer 2 — Dimension filter (skip if `--full-catalog` flag set):**
    - LLM (Haiku, cheap per U6) reads phase Description + types + typical code signals → picks relevant dimensions per non-Core section.
    - **Core always renders all 4 dimensions unfiltered.** Layer 3 rule.
@@ -426,11 +439,11 @@ Only after user confirms. Write with this structure:
 
 ## Phases
 
-| # | Phase | Description | Tier | Complexity | Exec | Review | Commit | Push |
-|---|-------|-------------|------|------------|------|--------|--------|------|
-| 1 | [name] | [description] | mvp | low/med/high | ⬜ | ⬜ | ⬜ | ⬜ |
-| 2 | [name] | [description] | ent | low/med/high | ⬜ | ⬜ | ⬜ | ⬜ |
-| 3 | [name] | [description] | scale | low/med/high | ⬜ | ⬜ | ⬜ | ⬜ |
+| # | Phase | Description | Types | Tier | Complexity | Exec | Review | Commit | Push |
+|---|-------|-------------|-------|------|------------|------|--------|--------|------|
+| 1 | [name] | [description] | [user-facing, web] | mvp | low/med/high | ⬜ | ⬜ | ⬜ | ⬜ |
+| 2 | [name] | [description] | [ai-agent, integration] | ent | low/med/high | ⬜ | ⬜ | ⬜ | ⬜ |
+| 3 | [name] | [description] | [data-migration, multi-tenant] | scale | low/med/high | ⬜ | ⬜ | ⬜ | ⬜ |
 
 <!-- Exec is written by /gabe-execute: ⬜ not started, 🔄 in progress, ✅ complete -->
 <!-- Review/Commit/Push auto-ticked by /gabe-review, /gabe-commit, /gabe-push -->
@@ -448,9 +461,15 @@ Only after user confirms. Write with this structure:
 - **Types:** [tag list, e.g. `ai-agent, integration`]
 - **Tier:** [mvp | ent | scale]
 - **Prototype:** [yes | no]
+- **Scope:** <files/globs this phase may touch — e.g. web/src/routes/items.tsx, api/routers/items.py>
+- **References:** <existing modules/patterns/docs to reuse — e.g. src/components/ListView, docs/api-conventions.md>
+- **Acceptance:** <observable signal — e.g. "GET /api/items renders seeded rows in the browser">
+- **Checkpoint:** <verification command(s) — e.g. npm run build && npx playwright test items>
 - **Sections considered:** Core, [matched sections]
 - **Suppressed dimensions:** [count, or "none" if --full-catalog was used]
 - **Trade-offs accepted:** See DECISIONS.md [D-id]
+
+<!-- #### Phase N Tasks block is written by /gabe-execute Step 3 and ticked per task at Step 4.5 — do not author it here -->
 
 ### Phase 2 — [name]
 ...
@@ -686,7 +705,14 @@ After write (or report-only), show:
 
 If the user runs `/gabe-plan update` or `/gabe-plan status`:
 
-- **`update`**: Read `.kdbp/PLAN.md`, ask what changed, update the plan in-place, bump `Last Updated` date, log to LEDGER:
+- **`update`**: Scope fence (check before ANY edit):
+  ```
+  1. NEVER edit Exec/Review/Commit/Push cells — those belong to their commands.
+  2. NEVER renumber existing phases — append, or use decimal IDs (N.5); renumbering orphans the Current Phase pointer and DECISIONS D-links.
+  3. NEVER delete DECISIONS.md references.
+  Allowed edits menu: [add-phase] [edit-description] [edit-scope/acceptance] [re-tier via 3.5] [move-pointer] [edit-risks].
+  ```
+  Read `.kdbp/PLAN.md`, ask what changed, update the plan in-place, bump `Last Updated` date, log to LEDGER:
   ```
   ## [date] [time] — PLAN UPDATED: [goal]
   CHANGE: [brief description of what changed]
@@ -709,11 +735,11 @@ If the user runs `/gabe-plan update` or `/gabe-plan status`:
 
 ## Shared: auto-tick phase column (used by /gabe-execute, /gabe-review, /gabe-commit, /gabe-push)
 
-This logic is invoked by the four trigger commands to update the Phases table in `.kdbp/PLAN.md` when a phase gate passes. Idempotent and silent on mismatch.
+This logic is invoked by the four trigger commands to update the Phases table in `.kdbp/PLAN.md` when a phase gate passes. Idempotent; never silent on mismatch (see step 6).
 
 ### Procedure
 
-1. **Preconditions (all must hold; otherwise exit silently, no error):**
+1. **Preconditions (all must hold; on failure, print the step 6 skip code and exit — no tick):**
    - `.kdbp/PLAN.md` exists
    - File contains `<!-- status: active -->`
    - File contains a `## Current Phase` section
@@ -731,7 +757,11 @@ This logic is invoked by the four trigger commands to update the Phases table in
 4. **Bump Last Updated:**
    - In the Context section, replace the `- **Last Updated:** ...` line with today's date (`YYYY-MM-DD`)
 
-5. **Exit. Do NOT:**
+5. **Cross-check the phase footer.** If the triggering commit message carries a `Phase: M` footer and M ≠ N (Current Phase): do NOT tick. Print `⚠ Phase footer M ≠ Current Phase N — fix the pointer or the footer before ticking.` (one deterministic string compare; /gabe-execute Step 5 already generates the footer).
+
+6. **Skip codes.** On any precondition failure or footer mismatch, print exactly one line: `ℹ PLAN: <col> tick skipped (no-plan | not-active | phase-not-found | column-missing | legacy-format | footer-mismatch)`. Callers surface this line verbatim in their output.
+
+7. **Exit. Do NOT:**
    - Advance the Current Phase (manual via `/gabe-plan update` or automatic via `/gabe-next`)
    - Log to LEDGER.md from this helper (callers already log their primary action)
    - Modify any other column or row
@@ -747,6 +777,7 @@ Keep this logic local to each command (short awk/sed block ~15 lines). Duplicati
 When reading PLAN.md at Step 1, also check `Last Updated`:
 - >14 days: show `⚠ Plan last updated [N] days ago`
 - >30 days: show `⚠ STALE PLAN — last updated [N] days ago. Consider: [complete] [defer] [cancel] [update]`
+- Row-state consistency: any row < Current Phase N with a non-✅ cell → `⚠ INCOMPLETE PRIOR PHASES: [<phase>: <columns>]` (always print, never block).
 
 ### Scope integration (if SCOPE.md + ROADMAP.md exist)
 

@@ -9,6 +9,18 @@ metadata:
 
 # Gabe Myopic — the short-sighted user, simulated
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 ## Purpose
 
 Real people do not plan far ahead. They run a **greedy, depth-limited search**: they
@@ -148,6 +160,7 @@ silently invent a flow.
 # Myopic Walk: {target}
 > Simulated short-sighted users. Findings are hypotheses to validate with real people,
 > not proof — LLM synthetic users approximate the distribution, not the individual.
+> Verify pass: raw {N} → killed {X} → downgraded {Y} → survived {Z}
 
 ## Panel result
 | User  | Fatal step | What breaks them |
@@ -167,11 +180,23 @@ silently invent a flow.
 - **What the myopic user does:** {first-person narrative of them walking into it}
 - **Why it's beyond horizon:** {the consequence lands N steps later, unseen at step X}
 - **Who it catches:** @1 ✓  @1.5 ✓  @2 ✓
+- **Evidence:** {per the format table below — empty ⇒ finding deleted}
 - **Fix:** {the horizon-collapsing change}
 
 ## The handle
 "{one-line chess/mattress phrasing of the worst trap}"
 ```
+
+### Evidence line (required per finding)
+| Input walked | Evidence format |
+|---|---|
+| UI code/routes | `path:line` — "quoted rendered string/snippet (≤2 lines)" |
+| spec/PRD | §section — "quoted sentence" |
+| screenshots/mockup | screen id + quoted visible text |
+| described flow | the quoted step from the description |
+
+Cite only sources opened THIS session. A finding whose Evidence line is empty or unquoted is
+DELETED before output — never shown, never merely downgraded.
 
 ## Guardrails (this is where the skill lives or dies)
 
@@ -190,6 +215,9 @@ silently invent a flow.
   population *distributions*, not specific individuals.)
 - **Panel, not solo.** Always run all three horizons — the value is showing *which* user each
   friction point costs you, and *which step* is fatal for whom.
+- **Absence claims need a search proof.** A 🚪 / "nothing handles X" flag requires the exact
+  search recorded in its Evidence line (e.g. `grep -rn useBlocker src/ → 0 hits`). No recorded
+  search → no absence flag.
 
 ## References (read on demand)
 - `method.md` — the 8-question per-step battery, how to run the panel, severity scoring, and how

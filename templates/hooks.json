@@ -1,0 +1,95 @@
+{
+  "_source": "Extracted verbatim from an installed ~/.claude/settings.json (2026-07-03). Each key is the marker string gabe-init Step 2 greps for. Each value is the exact hook-array entry to append under the matching settings.json event array (SessionStart / PreToolUse / PostToolUse / Stop). Never edit the command strings by hand — reinstall via the suite if a hook needs to change.",
+  "KDBP Active": {
+    "event": "SessionStart",
+    "entry": {
+      "matcher": "*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash \"$ECC_ROOT/scripts/hooks/kdbp/session-kdbp-active.sh\"",
+          "timeout": 5
+        }
+      ]
+    }
+  },
+  "ACTIVE PLAN": {
+    "event": "SessionStart",
+    "entry": {
+      "matcher": "*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash \"$ECC_ROOT/scripts/hooks/kdbp/session-plan-awareness.sh\"",
+          "timeout": 5
+        }
+      ]
+    }
+  },
+  "KNOWLEDGE:": {
+    "event": "SessionStart",
+    "entry": {
+      "matcher": "*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash \"$ECC_ROOT/scripts/hooks/kdbp/session-knowledge-awareness.sh\"",
+          "timeout": 5
+        }
+      ]
+    }
+  },
+  "KDBP CHECKPOINT": {
+    "event": "PreToolUse",
+    "entry": {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash \"$ECC_ROOT/scripts/hooks/kdbp/pre-checkpoint.sh\"",
+          "timeout": 5
+        }
+      ]
+    }
+  },
+  "LEDGER.md": {
+    "event": "PostToolUse",
+    "entry": {
+      "matcher": "Edit|Write|MultiEdit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash \"$ECC_ROOT/scripts/hooks/kdbp/post-ledger-writer.sh\"",
+          "timeout": 5,
+          "async": true
+        }
+      ]
+    }
+  },
+  "STRUCTURE:": {
+    "event": "PostToolUse",
+    "entry": {
+      "matcher": "Write",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash \"$ECC_ROOT/scripts/hooks/kdbp/post-structure-warning.sh\"",
+          "timeout": 5
+        }
+      ]
+    }
+  },
+  "SESSION-END REMINDER": {
+    "event": "Stop",
+    "entry": {
+      "matcher": "*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash \"$ECC_ROOT/scripts/hooks/kdbp/stop-session-reminder.sh\"",
+          "timeout": 10
+        }
+      ]
+    }
+  }
+}

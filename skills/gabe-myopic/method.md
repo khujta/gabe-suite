@@ -23,6 +23,10 @@ Then **state the assumed sequence** at the top of the walk. A step is one *user 
 — keep granularity at the level where the user must choose or act. If the order is genuinely
 ambiguous, ask; otherwise state your assumption and proceed.
 
+For code input, the information state at step K = the LITERAL strings the code renders — read the
+component AND its i18n/string source, and quote ≥1 on-screen string per step in the Step ledger. If
+you cannot quote what the screen says, you have not reconstructed the step.
+
 Also fix the **goal**: what is the user actually here to accomplish? Every step is judged against
 whether it moves a horizon-N user toward that goal *using only what they can see and hold*.
 
@@ -107,3 +111,17 @@ synthetic usability testing is explicit that they're good for **early concept sc
 substitute for real testing. So: every finding is a **hypothesis to validate**, phrased as "a
 short-sighted user would likely…", and the report header says so. Do not launder simulation into
 certainty.
+
+## Verify pass (mandatory — after drafting ALL findings, before output)
+
+For EACH drafted finding answer three kill questions:
+  K1 — Beyond-horizon: is the consequence really ≥2 steps after the choice? Re-check the cited
+       steps in the ledger.
+  K2 — Evidence: does the cited source actually say this? Re-open the file/quote.
+  K3 — Guard: does a "What NOT to flag" guard, or an existing undo/warning in the flow, already
+       cover it?
+
+Stamp each: CONFIRMED | DOWNGRADED(<reason>) | KILLED(K1|K2|K3). "Plausible but unverified" =
+KILLED. Subagent mode: one verifier per flow gets ONLY the findings + cited paths, instructed to
+kill. Solo mode: finish ALL drafts first, then re-open every cited source. The report header MUST
+print: raw N → killed X → downgraded Y → survived Z.

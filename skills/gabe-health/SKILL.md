@@ -7,6 +7,18 @@ metadata:
 
 # Gabe Health — Codebase Health Analysis
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 ## Purpose
 
 Surface structural fragility in a codebase before it becomes an incident. Find the files that break every sprint, the modules that always change together, and the gaps between what was planned and what was actually touched.
@@ -67,13 +79,13 @@ git log --since=N.days --oneline | wc -l
 **Output:**
 ```
 God Files (touched in >25% of commits, last 60 days):
-  🔴 functions/src/rateLimiter.ts — 15/40 commits (37%)
+  🔴 <path> — <X>/<Y> commits (<Z>%)
      Suggest: Extract responsibilities. Consider /gabe-roast architect on this file.
-  🔴 src/services/recipes.ts — 12/40 commits (30%)
-     Suggest: May be doing too much. Check if it mixes data access + business logic.
-  ⚠️ src/stores/recipeStore.ts — 10/40 commits (25%)
+  ⚠️ <path> — <X>/<Y> commits (<Z>%)
      Borderline. Monitor.
 ```
+
+Examples are FORMAT ONLY — never reuse their names or numbers.
 
 ### 2. Churn Hotspots
 
@@ -88,11 +100,11 @@ git log --since=N.days --numstat --format="" | awk '{files[$3]+=$1+$2} END {for(
 **Output:**
 ```
 Churn Hotspots (most modifications, last 60 days):
-  🔴 functions/src/rateLimiter.ts — 450 lines churned across 15 commits
-  🔴 src/pages/RecipeDetailPage.tsx — 380 lines churned across 8 commits
-  ⚠️ src/services/pantry.ts — 120 lines churned across 6 commits
-  ✅ src/types/*.ts — stable (< 30 lines churned)
+  🔴 <path> — <N> lines churned across <M> commits
+  ⚠️ <path> — <N> lines churned across <M> commits
 ```
+
+Examples are FORMAT ONLY — never reuse their names or numbers.
 
 ### 3. Coupling Clusters
 
@@ -100,23 +112,30 @@ Files that always change together. If A and B are co-modified in >60% of commits
 
 **Detection:**
 ```bash
-# For each pair of frequently modified files, count co-occurrence
-# in commits vs individual occurrence
-git log --since=N.days --name-only --format="---" | [compute co-change frequency]
+git log --since=N.days --name-only --format=--- | python3 -c '
+import sys, itertools, collections
+commits=[set(filter(None,c.strip().split("\n"))) for c in sys.stdin.read().split("---") if c.strip()]
+pair=collections.Counter(); tot=collections.Counter()
+for c in commits:
+    for f in c: tot[f]+=1
+    for a,b in itertools.combinations(sorted(c),2): pair[(a,b)]+=1
+for (a,b),n in pair.most_common(20):
+    d=min(tot[a],tot[b]); print(f"{n}/{d} ({100*n//d}%)  {a} <-> {b}")'
 ```
+
+Report a pair ONLY with counts copied from this run's output. If the command did not execute this run, print `coupling analysis skipped` — never estimate or reuse the example percentages below.
 
 **Output:**
 ```
 Coupling Clusters (>60% co-change rate):
-  rateLimiter.ts ↔ suggestRecipes.ts — co-changed in 10/12 commits (83%)
+  <fileA> ↔ <fileB> — co-changed in <N>/<M> commits (<Z>%)
     Risk: Change one, must test both. Missing test in either = hidden breakage.
-  
-  pantry.ts ↔ mappingStore.ts — co-changed in 6/8 commits (75%)
-    Risk: Store and service are entangled. Consider if store should own the logic.
-  
-  RecipeCard.tsx ↔ recipeStore.ts — co-changed in 5/9 commits (55%)
+
+  <fileC> ↔ <fileD> — co-changed in <N>/<M> commits (<Z>%)
     Below threshold but close. Watch.
 ```
+
+Examples are FORMAT ONLY — never reuse their names or numbers.
 
 ### 4. Bug-Fix Concentration
 
@@ -131,23 +150,22 @@ git log --since=N.days --oneline --grep="fix" --grep="bug" --name-only --format=
 **Output:**
 ```
 Bug-Fix Concentration (where fixes cluster, last 60 days):
-  🔴 functions/src/ — 8 of 13 fix commits (62%)
-     Top files: rateLimiter.ts (4), suggestRecipes.ts (3), validateRequest.ts (1)
-     Pattern: Rate limiting + suggestion pipeline is the fragile core.
-  
-  ⚠️ src/services/ — 3 of 13 fix commits (23%)
-     Top files: pantry.ts (2), recipes.ts (1)
-  
-  ✅ src/pages/ — 1 of 13 fix commits (8%) — stable
-  ✅ src/components/ — 0 fix commits — solid
+  🔴 <dir>/ — <N> of <M> fix commits (<Z>%)
+     Top files: <path> (<n>), <path> (<n>)
+     Pattern: [one-sentence summary of the fragile core]
+
+  ⚠️ <dir>/ — <N> of <M> fix commits (<Z>%)
+     Top files: <path> (<n>)
 ```
+
+Examples are FORMAT ONLY — never reuse their names or numbers.
 
 ### 5. Scope Creep (Plan vs Actual)
 
 Compare what was planned (from GSD phase plan or CE brainstorm) against what files were actually changed. Surfaces unplanned work and missed scope.
 
 **Detection:**
-- Read `.planning/phases/*/PLAN.md` or `docs/plans/*.md` or `docs/brainstorms/*-requirements.md`
+- Read the plan, first match wins: `.kdbp/PLAN.md` (active phase block — extract file references from Scope/Description) → `.planning/phases/*/PLAN.md` → `docs/plans/*.md` → `docs/brainstorms/*-requirements.md`. Print the source used in the section header (`Scope Creep — Phase 3 (source: .kdbp/PLAN.md)`); if none found: `no plan found (searched 4 paths) — skipping scope analysis`.
 - Extract file references from the plan
 - Run `git diff --stat [base-branch]..HEAD` to get actual changed files
 - Compare: planned vs touched, unplanned touches, planned but untouched
@@ -204,6 +222,11 @@ Maintenance — .kdbp/MAINTENANCE.md:
 ---
 
 ## Output Format
+
+### Severity legend + evidence gate
+
+- Churn: 🔴 >300 lines or top-10% · ⚠️ >100 · ✅ below. Fix concentration: 🔴 ≥50% of fix commits in one dir · ⚠️ ≥20%. God files: 🔴 >25% of commits · ⚠️ ≥20%. Coupling: 🔴 >60% co-change.
+- Every number in the report is copy-pasted from command output produced THIS run. The header `Commits: [total]` from `git log --since=N.days --oneline | wc -l` is the checksum — if you cannot produce it, the analysis did not run; print `<analysis> skipped`, never an estimate.
 
 ### Full Mode (default)
 

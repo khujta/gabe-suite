@@ -5,6 +5,18 @@ description: "Commit quality gate — deterministic checks, interactive triage, 
 
 # Gabe Commit
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 Deterministic commit quality gate. Runs checks, shows findings, lets you act on each one. Most actions cost zero tokens — LLM involvement is explicit and opt-in.
 
 > **Rendering note.** Output templates in this spec wrapped in bare triple-backtick fences (without a language tag) are **spec-meta delimiters**, not runtime code blocks. Render their contents as plain markdown at runtime — markdown tables render as tables, not as monospace code. Tagged fences (```bash, ```json, etc.) and ```mermaid fences ARE runtime code blocks, keep them fenced. See `gabe-docs/SKILL.md` § "Runtime output rendering convention" for the decision rule.
@@ -41,20 +53,27 @@ If `.kdbp/PLAN.md` exists and contains `status: active`:
 
 Run these scripts. No LLM. No token cost. Target: 2-10 seconds total.
 
-**CHECK 1 — Lint**
-- Python: `ruff check app/ --output-format=json 2>/dev/null`
-- TypeScript: `bunx biome check src/ --reporter=json 2>/dev/null`
-- Skip if tool not found
+A check may be marked ✅ ONLY if its command executed via the Bash tool this session. Before the CHECKS summary line, print one evidence row per check:
 
-**CHECK 2 — Types**
-- Python: `mypy app/ --no-error-summary 2>/dev/null`
-- TypeScript: `tsc --noEmit 2>/dev/null` or `bunx tsc --noEmit 2>/dev/null`
-- Skip if tool not found
+<check>: `<cmd>` → exit <code>, "<copied count>"
 
-**CHECK 3 — Tests**
-- Python: `pytest tests/ -x --tb=line -q 2>/dev/null`
-- TypeScript: `bun test 2>/dev/null`
-- Skip if no test directory found
+Every printed number is copy-pasted from this run's output — never composed. Status glyphs are 3-state: ✅ / ❌ / ⤫ skipped(<reason>) — rendering a skip as ✅ is a defect.
+
+**Step 2.0 — Resolve commands (never guess).** Bind lint/types/tests in order:
+
+- (a) `## Verify Commands` section of `.kdbp/BEHAVIOR.md`
+- (b) package.json scripts / pyproject / Makefile / CI job definitions
+- (c) the per-language fallbacks below, only if (a)-(b) yield nothing
+
+A checker that cannot fail (exit-0 no-op, 0 tests collected, continue-on-error) is NON-EVIDENCE → report `⤫ skipped(non-evidence: <reason>)`. When resolved via (b), offer to write the binding into BEHAVIOR.md `## Verify Commands` so it is never re-derived.
+
+**CHECK 1 — Lint · CHECK 2 — Types · CHECK 3 — Tests** — fallback commands, used only via Step 2.0 (c):
+
+| Check | Python fallback | TypeScript fallback | Skip when |
+|-------|-----------------|---------------------|-----------|
+| 1 Lint | `ruff check app/ --output-format=json` | `bunx biome check src/ --reporter=json` | tool not found |
+| 2 Types | `mypy app/ --no-error-summary` | `tsc --noEmit` or `bunx tsc --noEmit` | tool not found |
+| 3 Tests | `pytest tests/ -x --tb=line -q` | `bun test` | no test directory found |
 
 **CHECK 4 — Coverage** (enterprise + scale maturity only)
 - On changed source files only, threshold 80%
@@ -67,9 +86,9 @@ Run these scripts. No LLM. No token cost. Target: 2-10 seconds total.
 - Skip below activation threshold
 
 **CHECK 6 — Deferred**
-- Read `.kdbp/PENDING.md`
-- Flag open items whose `File` column matches any changed file
-- Use item's existing priority
+- Read `.kdbp/PENDING.md` (fallback: `.kdbp/deferred-cr.md`)
+- Match: take each open row's File cell → strip backticks → split on `,` → glob each token against `git diff --staged --name-only`. Non-path prose cells match nothing.
+- ALWAYS print, even when empty: `DEFERRED SCAN: <N> open checked, <M> matched, <K> at Times Deferred ≥3` — an absent line means the check didn't run.
 
 **CHECK 7 — Doc Drift** (requires `.kdbp/` directory)
 
@@ -172,7 +191,11 @@ Deterministic thresholds, not LLM judgment:
 
 > **GABE COMMIT: feat: update triage prompt**
 >
-> CHECKS: ✅ lint  ✅ types  ✅ tests (84/84)  ✅ coverage  ✅ shape  ✅ docs
+> lint: `ruff check app/ --output-format=json` → exit 0, "0 errors"
+> types: `mypy app/ --no-error-summary` → exit 0, "Success: no issues found"
+> tests: `pytest tests/ -x --tb=line -q` → exit 0, "84 passed"
+>
+> CHECKS: ✅ lint  ✅ types  ✅ tests (84/84)  ⤫ coverage (mvp)  ⤫ shape (below threshold)  ✅ docs
 >
 > No findings. Committing...
 >
@@ -242,6 +265,8 @@ Actions prompt (prose): `Actions? (e.g., "1:defer 2:keep 3:skip") or "all:commit
 | | `accept` | Appends to Exceptions Log, commits | No | 0 |
 | | `defer` | Adds to PENDING.md | No | 0 |
 
+**Blocked-commit rule:** `skip-to-pending` on a test failure records the item but the commit REMAINS BLOCKED unless the user types `force-commit: <one-line justification>`; the justification is appended to the LEDGER entry as `FORCED: <reason>`. (Mirrors review's force-defer-critical.)
+
 ### Step 6: Commit + record
 
 After all actions resolved:
@@ -259,7 +284,8 @@ DEFERRED: +D8 (coverage classify.py)
 4. If any items deferred, update `.kdbp/PENDING.md`:
    - Add new row with date, source=`gabe-commit`, finding, file, scale (from BEHAVIOR.md maturity), priority, impact, times_deferred=1, status=open
    - If item already exists in PENDING.md, increment `Times Deferred`
-   - If `Times Deferred` reaches 3, auto-escalate priority one level
+   - `Times Deferred` ≥ 3 → no further silent deferral: force a user decision `fix-now | accept-close (rationale recorded in the row) | drop`
+   - Each deferred row carries a short class tag as a prefix inside its Finding cell (e.g. `[reference-fidelity] …`, `[test-gap] …`, `[doc-drift] …`) — never a new column. When ≥2 OPEN rows share a class, print `⚠ repeated class <tag>: N items — possible systemic drift from intent; confirm direction before deferring again.`
 
 5. **Print the Gabe-Lens brief (output only).** Runs for every normal `/gabe-commit` after the commit and audit writes succeed; skipped for `docs-audit`.
    - Render as plain markdown:
@@ -278,11 +304,11 @@ DEFERRED: +D8 (coverage classify.py)
    - Otherwise: skip suggestion
    - Message: `ℹ New topics likely introduced. Run /gabe-teach topics to consolidate understanding.`
 
-7. **Auto-tick Commit column in PLAN.md** (silent no-op on any mismatch). Only runs when the `git commit` in step 6.2 returned 0.
-   - Follow the shared procedure documented in `/gabe-plan` under "Shared: auto-tick phase column"
+7. **Auto-tick Commit column in PLAN.md** (never silent: on mismatch print `ℹ PLAN: commit tick skipped (no-plan | phase-not-found | legacy-format | column-missing | footer-mismatch)` — one line, non-blocking). Only runs when the `git commit` in step 6.2 returned 0.
+   - Follow the shared procedure documented in `/gabe-plan` under "Shared: auto-tick phase column" — including its precondition 5 (footer cross-check)
    - Target column: `Commit`
    - Preconditions: `.kdbp/PLAN.md` exists, contains `status: active`, has a `## Current Phase` section, and Phases table includes a `Commit` column
-   - On mismatch or legacy Status-column format: exit silently
+   - On mismatch or legacy Status-column format: print the skip line above with the matching enum code
    - On success, display: `✅ PLAN: Phase [N] commit ticked` (one line, non-blocking)
 
 ### Maturity-Driven Check Selection

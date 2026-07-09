@@ -5,6 +5,18 @@ description: "Initialize a project with KDBP stack — creates .kdbp/, installs 
 
 # Gabe Init
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 One-command project setup. Wraps three operations into a single flow.
 
 ## Procedure
@@ -18,9 +30,13 @@ Run the equivalent of `/gabe-align init [project-name]`:
    - **update** — keep existing files, add missing KDBP files/directories from the current template set, verify and install missing hooks. Non-destructive. No existing files modified.
    - **skip** — do nothing (exit init)
 
-   If user picks **update**, run Step 1.5 (Update Mode) and then skip to Step 2 (hook check).
-   If user picks **reset**, continue to step 2 below (full init).
-   If user picks **skip**, exit.
+   **Mode routing (execute EXACTLY this sequence — step bodies below appear out of order):**
+   | Mode | Sequence |
+   |------|----------|
+   | reset | 1 (full) → 1.7 → 1.8 → 2 → 3 → 4 |
+   | update | 1.5 → 1.6 → 1.7 → 1.8 → 2 → Update Report (SKIP 3–4) |
+   | skip | exit — run nothing |
+   | fresh project (no .kdbp/) | same as reset |
 
 2. If no project name in $ARGUMENTS, ask: "Project name?"
 3. Ask: "What does this project do?" (one sentence for BEHAVIOR.md `domain`)
@@ -221,7 +237,7 @@ Non-destructive top-up of an existing `.kdbp/` directory. Never overwrites, neve
 
 5. **After file top-up, run Step 1.6 (schema migration) before Step 2.**
 
-6. **After Step 2, skip Steps 3-4** (project type + readiness report). Instead show a condensed Update Report:
+6. **Per the mode routing table** (Step 1, item 1), show a condensed Update Report instead of Steps 3-4:
    ```
    UPDATE COMPLETE
      Files added:      [list]
@@ -297,9 +313,9 @@ Check `~/.claude/settings.json` for these hooks:
 - Stop session-end reminder (contains `SESSION-END REMINDER`)
 
 For each missing hook:
-- Show what will be added
-- Ask: "Install? [Y/n]"
-- If yes: read settings.json, parse JSON, append hook to the appropriate array, write back
+- Read the hook object VERBATIM from `~/.claude/templates/gabe/hooks.json` (one object per hook, keyed by the marker string above — e.g. `"KDBP CHECKPOINT"`).
+- If that file is missing or a key is absent: STOP hook installation and print `⛔ hook template missing at ~/.claude/templates/gabe/hooks.json — reinstall the suite. Not composing hook JSON from memory.` Continue init WITHOUT touching settings.json (degraded mode: report `Hooks installed: skipped (template missing)` in Step 4).
+- Otherwise show the exact JSON, ask `Install? [Y/n]`, and on yes append it to the appropriate array (never overwrite existing entries).
 
 If all hooks present: "All 7 KDBP hooks installed."
 

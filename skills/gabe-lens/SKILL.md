@@ -7,6 +7,18 @@ metadata:
 
 # Gabe Lens — Cognitive Translation Skill
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 ## Purpose
 
 Transform complex technical concepts into a format that matches how the user actually thinks. This skill teaches any agent HOW to explain things so the user absorbs and retains them. It does not change WHAT is communicated — only the format.
@@ -271,6 +283,12 @@ When a concept is complex or critical, produce a **Gabe Block**:
 - **Quick check ✓** — The concept is straightforward. First instinct is probably right. Don't overthink. Only use when the simple answer IS correct — if a common misconception looks simple, use Deeper question instead.
 - **Deeper question ◆ (~5 min focus)** — There are real layers, but focused attention will get you there. Sit with the analogy.
 - **Deeper question ◆ (rethink your model)** — This will change how you think about the topic. The surface answer is wrong or incomplete. Take your time.
+
+### Pre-emit self-check (run before emitting any block)
+1. Every noun used in THE ANALOGY appears on a HOW-IT-MAPS left-hand side.
+2. Every HOW-IT-MAPS right-hand side is a concrete code/system term.
+3. ONE-LINE HANDLE is ≤10 words.
+If (1)/(2) cannot be met, cut the analogy per the ANALOGY rule ('No clean physical analogy — here's the mechanism directly') rather than emitting a decorative one. Fix before emitting; never present a block that fails the check.
 
 ---
 

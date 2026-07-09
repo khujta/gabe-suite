@@ -7,6 +7,18 @@ metadata:
 
 # Gabe Roast — Adversarial Gap Review Skill
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 ## Purpose
 
 Stress-test a target (file, folder, plan, architecture, or concept) from a specific perspective to surface gaps, risks, and missing pieces — classified by software maturity level and importance, with actionable output that drives decisions.
@@ -86,6 +98,7 @@ Within the same maturity + importance bucket, order gaps by **impact** — the m
 | **One-liner** | Yes | A Gabe Lens handle — a memorable phrase (5-12 words) that captures the essence of THIS gap. Must survive fatigue and re-anchor the issue without re-reading the description. Concrete, not abstract. |
 | **Effort** | Yes | T-shirt size (S / M / L / XL) with confidence: `M (confident)` or `L (uncertain — depends on existing auth layer)`. Never false-precision story points without codebase knowledge. |
 | **What we lose** | Yes | The specific consequence of inaction. Not generic ("tech debt") — concrete ("first user with two accounts overwrites their own data"). |
+| **Evidence** | Yes | Proof the gap is real, from files opened this roast. Code: `path:line` + ≤2-line quote. ABSENCE claims ("no rate limiting", "nothing validates X"): the search executed + empty result (`grep -rn "rateLimit" src/ → 0 hits`). Docs: §section + quoted sentence. |
 | **Suggested fix** | Optional | A concrete recommendation. 1-3 sentences. Include file/component references when the target is code. Skip only when the fix is obvious from the gap description. |
 
 ### One-Liner Rules
@@ -105,6 +118,7 @@ The one-liner follows Gabe Lens format:
 ```
 GABE ROAST: [Target Name]
 Perspective: [Perspective]
+Read: [ledger]
 
 ═══ MVP ════════════════════════════════════════════════
 
@@ -115,6 +129,7 @@ CRITICAL
   **One-liner:** "[memorable handle]"
   **Effort:** [size] ([confidence])
   **Lose:** [specific consequence of inaction]
+  **Evidence:** [citation or search→0 hits]
   **Fix:** [concrete recommendation — optional]
 
   M2
@@ -122,6 +137,7 @@ CRITICAL
   **One-liner:** "[handle]"
   **Effort:** [size] ([confidence])
   **Lose:** [consequence]
+  **Evidence:** [citation or search→0 hits]
 
 HIGH
 
@@ -130,6 +146,7 @@ HIGH
   **One-liner:** "[handle]"
   **Effort:** [size] ([confidence])
   **Lose:** [consequence]
+  **Evidence:** [citation or search→0 hits]
   **Fix:** [suggestion]
 
 MEDIUM
@@ -167,7 +184,6 @@ Effort estimate: [range] ([overall confidence note])
 - Suppress empty maturity levels entirely (no empty headers)
 - Suppress empty importance levels within a maturity level
 - Each gap is separated by a blank line for readability
-- Gap descriptions reference specific files, lines, or components when the target is code
 - The summary line at the bottom gives totals and aggregate effort
 
 ---
@@ -194,6 +210,7 @@ TOTAL: [X] gaps — [Y] critical, [Z] high
 - Table sorted by: Maturity (MVP first) then Importance (Critical first) then Impact
 - Gap description truncated to ~15 words max
 - "What we lose" and "Suggested fix" omitted
+- Evidence text is omitted in brief, but the kill-gate (rule 12) still runs first — unevidenced gaps never reach the table.
 - Use when scanning or comparing, not when deciding
 
 ---
@@ -203,7 +220,11 @@ TOTAL: [X] gaps — [Y] critical, [Z] high
 ### Before Roasting
 1. Confirm both inputs are present (target + perspective). If either is missing, ask.
 2. **Pre-roast gate:** Run `/gabe-align shallow` on the target (core values A1-A3 + project values). If all PASS: proceed. If CONCERN: print warning, proceed. If FAIL: print warning + "Foundational alignment issue. Consider `/gabe-align standard`. Proceed? [y/n]". Skip this gate if no `.kdbp/VALUES.md` or `~/.kdbp/VALUES.md` exists.
-3. Read the target fully. For files, read every line. For folders, read entry points and core logic.
+3. Read before attacking — measurable, not vibes:
+   (a) list the folder tree first; (b) open every entry point + config;
+   (c) never cite or roast a file you did not open this session;
+   (d) print a read ledger in the output header, directly under Perspective:
+       `Read: 14/38 files — skipped: tests/, assets/`.
 4. If the target references other files (imports, links, config), read those too — gaps often hide at boundaries.
 
 ### During the Roast
@@ -216,13 +237,13 @@ TOTAL: [X] gaps — [Y] critical, [Z] high
 ### After the Roast
 10. The summary line is mandatory. It gives the reader a pulse check without re-reading.
 11. If zero gaps are found (rare), say so explicitly: "No gaps found from [perspective] perspective at any maturity level." Don't manufacture findings.
+12. **Kill-gate (mandatory before printing).** Re-verify every gap against its Evidence; for absence claims run the targeted search NOW if not yet recorded. A gap with an empty Evidence field is DELETED, not demoted to LOW. Print above TOTAL: `drafted N → killed X → reported Y`.
 
 ### Sequential Roasting
 
 The most effective pattern is roasting the same target from multiple perspectives in sequence (e.g., architect → UX designer → domain expert). When performing a follow-up roast on the same target:
 
-- Acknowledge prior roast findings — don't re-discover gaps already reported
-- If a gap from a previous perspective also applies to the current one, reference it: "Covered by M1 in architect roast" rather than re-reporting
+- Before a follow-up roast, LOCATE the previous roast output (file or earlier message) and re-read it — list its gap IDs + one-liners first, then tag every new gap `NEW` or `covered by <ID>`. If the prior output cannot be located, say so in the header and roast fresh — never dedup from memory.
 - Each perspective produces its own numbered gaps (M1/E1/S1 restart per roast)
 - After multiple passes, the combined gap list gives a 360-degree view of the target
 

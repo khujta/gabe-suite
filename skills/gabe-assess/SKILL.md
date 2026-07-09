@@ -7,6 +7,18 @@ metadata:
 
 # Gabe Assess — Change Impact Assessment Skill
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 ## Purpose
 
 Pause before an "obvious yes" and take a photograph of what it actually means. When someone proposes a fix, a change, a detour, or a scope addition that seems straightforward, this skill surfaces what you'd want to know BEFORE agreeing — blast radius, maturity-appropriate scope, prerequisites, and alternatives.
@@ -84,6 +96,8 @@ Is this the right level of fix for where we are?
 
 The skill identifies which level the CURRENT project/situation is at, and flags when a proposed fix is over-engineered or under-engineered for that level.
 
+Current level := the `maturity:` frontmatter field of `.kdbp/BEHAVIOR.md` (same source /gabe-debt Step 0 uses). If the file/field is absent, print `maturity unknown — assuming MVP` in D2 output — never guess from vibes.
+
 ### D3: Prerequisites
 
 What must be true or verified before this change is safe?
@@ -141,6 +155,7 @@ GABE ASSESS: [change description]
 Context: [mid-task / planning / post-review / blocker]
 
 D1 BLAST RADIUS: [Contained / Local / Cross-cutting / External]
+   Checked: [files/configs opened this assessment | none — description-only]
    [1-2 sentences: what specifically is touched and what could ripple]
 
 D2 MATURITY SCOPE: [MVP / Enterprise / Scale]
@@ -207,6 +222,7 @@ Use when the assessment should feel like a colleague's aside, not a document.
 ### During Assessment
 
 4. Be concrete. "Cross-cutting" alone is not enough. State what crosses what.
+4b. D1 verdicts need receipts: claim Contained/Local only after opening the files/configs the change names. With `Checked: none — description-only`, append `(unverified)` to the D1 classification and name what to open to confirm it.
 5. Don't inflate. A contained change is contained. Don't manufacture risk.
 6. Don't deflate. If a "quick fix" touches production config, say so.
 7. Alternatives must be real options, not straw men. "Do nothing" should state the actual consequence, which might be "nothing bad happens."

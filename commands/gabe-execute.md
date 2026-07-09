@@ -5,6 +5,18 @@ description: "Execute the Current Phase of .kdbp/PLAN.md — implement tasks, ch
 
 # Gabe Execute
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 Executes phase tasks from `.kdbp/PLAN.md`. Complements `/gabe-plan` (write plan) and `/gabe-commit` (quality gate). This command owns the **implementation** step — reading the plan, writing code, checkpointing at commit boundaries, and advancing Exec state.
 
 **Design principle — auto-run with commit checkpoints.** Between `/gabe-plan` and `/gabe-commit`, there's a gap: someone has to write the code. Before `/gabe-execute`, that someone was the human orchestrating raw prompts. Now the command reads Current Phase, runs all tasks in it, and checkpoints only at commit boundaries (per D2 decision — user-gated by default, `--auto-commit` batches).
@@ -64,7 +76,7 @@ Parse `$ARGUMENTS`:
 3. Read `.kdbp/KNOWLEDGE.md` Gravity Wells table — determine which well(s) this phase touches (informational, appears in commit body).
 4. Read `.kdbp/PENDING.md` — surface any open items whose `File` matches target phase's Scope files (informational prompt before starting).
 5. **Load tier cap heuristics** from `.kdbp/DECISIONS.md` (find the phase's D-id entry) OR from `~/.claude/templates/gabe/tier-sections/*.md` `## Tier-cap enforcement` blocks. Used by Step 4.1 escalation gate.
-6. **Classify runtime journey evidence requirement.** If the phase `types` include any of `{user-facing, native-mobile, mobile-web, web, upload, realtime, streaming, file-media, auth, session, notifications, DB}` OR the phase changes UI/API behavior that a user directly exercises, mark `runtime_journey_required=true`. If the project `.kdbp/BEHAVIOR.md` contains a runtime staging proof rule, or the phase touches auth/session/DB/upload/realtime/native-mobile/notifications/file-media/web/user-facing deployed behavior, also mark `staging_proof_required=true`. Determine the target runtime:
+6. **Classify runtime journey evidence requirement.** If the phase `types` include any of `{user-facing, native-mobile, mobile-web, web, upload, realtime, streaming, file-media, auth, session, notifications, DB}`, mark `runtime_journey_required=true`. If the phase has no `types` (legacy plan / template gap), `runtime_journey_required` defaults to **true** whenever any Scope or changed-file path matches `**/routes/**, **/components/**, **/screens/**, **/pages/**, **/views/**, **/api/**, **/ui/**`. Only an explicit `runtime-evidence: none` line in the phase's Phase Details may set it false. Never resolve this by judgment. If the project `.kdbp/BEHAVIOR.md` contains a runtime staging proof rule, or the phase touches auth/session/DB/upload/realtime/native-mobile/notifications/file-media/web/user-facing deployed behavior, also mark `staging_proof_required=true`. Determine the target runtime:
    - `native-mobile` / native dependency / permissions → physical device or named emulator/simulator; fresh build/install required when native modules changed.
    - `web` / `mobile-web` / browser UI → Playwright or equivalent browser run with screenshots.
    - `upload`, `realtime`, `streaming`, `file-media`, `auth`, `session`, `notifications` → journey test must exercise the real transport/runtime boundary, not only mocked unit paths.
@@ -148,6 +160,15 @@ Proceed? [go] / [edit-tasks] / [escalate] / [abort]
 
 Before writing any code, update PLAN.md Exec cell to `🔄` for the target row. Use shared auto-tick procedure from `/gabe-plan` with target state = `start`. Bump Last Updated.
 
+Also write the task checklist into PLAN.md under `## Phase Details → ### Phase N`:
+
+```
+#### Phase N Tasks
+- [ ] T1 — <desc>
+```
+
+(one line per task from Step 2). If the block already exists (resume), READ it instead of rewriting.
+
 ### Step 4: Execute tasks
 
 For each task T_i in order:
@@ -157,12 +178,22 @@ For each task T_i in order:
    ▶ T[i]/[K]: [description]
    ```
 
-2. **Implement:**
-   - Write/edit files per task scope
-   - Follow project conventions (read CLAUDE.md, existing patterns)
+2. **TASK CONTRACT (print before any Write/Edit — implementation may not start until this block is printed):**
+   ```
+   TASK CONTRACT — T[i]
+   QUOTED: "<phase Description + this task's text, VERBATIM from PLAN.md>"
+   ACCEPTANCE: <1-3 verifiable signals — "done when <observable check>">
+   CLASS: rebuild-to-reference | restyle | implement | stub | fix | wire
+   REUSE: REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)
+          Searched: <globs/greps/stories checked>
+   ```
+   Rules: (a) if the intended CLASS is cheaper than the quoted text implies (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask — substitution requires an explicit user decision line; (b) if the task names a reference (mockup/story/spec/legacy screen), CLASS must be rebuild-to-reference and ACCEPTANCE must name the reference; (c) an empty Searched line invalidates the REUSE verdict — re-authoring a lookalike of an existing artifact is a DEFECT, not a style choice.
+
+3. **Implement:**
+   - Write/edit files per task scope; follow project conventions (CLAUDE.md, existing patterns)
    - Respect Scope section — only modify listed files unless deviation flagged (Step 6)
 
-3. **Run task-local verification:**
+4. **Run task-local verification:**
    - Lint the changed files (project tool from BEHAVIOR.md: ruff / biome / etc)
    - Types on changed files
    - Unit tests that exercise changed code (scoped, not full suite)
@@ -171,12 +202,23 @@ For each task T_i in order:
      - Web: run the browser-level E2E path with screenshot/video/report artifacts.
    - Upload/realtime/auth/session paths: prove the real transport/auth/runtime boundary, including terminal success and at least one relevant edge case when the phase adds error/recovery behavior.
      - If `staging_proof_required=true`: commit the candidate through `/gabe-commit`, push it to the configured staging branch or deploy it through the project's Railway CLI fallback, wait for staging readiness, then run the journey against the deployed staging URL.
-   - Write the exact commands, target device/browser, build id when applicable, and artifact paths to `.kdbp/LEDGER.md`.
+   - Write the exact commands, target device/browser, build id when applicable, and artifact paths to `.kdbp/LEDGER.md` as: `PROOF: <exact command> → <runtime/device/browser> → <repo-relative artifact path>` — one line per platform in the declared matrix (e.g. mobile-390 | desktop-1280); a missing cell = task not done.
    - If verification fails → fix in-loop, retry up to 2 times, then halt with `[retry] / [skip-task] / [abort]`
 
    If runtime journey evidence is required but cannot be run, halt with Exec left `🔄`. Log the blocker and missing artifacts in LEDGER. Do not mark Exec `✅`.
 
-4. **Checkpoint (D2 decision):**
+   Before printing `T[i] verification ✅`, print one evidence row per check, populated ONLY from commands executed via the Bash tool this session:
+   ```
+   T[i] VERIFY
+   lint: `<cmd>` → exit <code>, "<copied count>"
+   types: `<cmd>` → exit <code>, "<copied count>"
+   tests: `<cmd>` → exit <code>, "<copied count>"
+   journey: `<cmd>` → <artifact path>   (when required)
+   ```
+   Rules: a line may be printed only after its command ran; a missing tool prints `lint: none configured (BEHAVIOR.md)` — never omit the line; a skipped check renders `⤫ skipped(<reason>)`, never ✅; every number is copy-pasted from this run's output, never estimated.
+
+5. **Checkpoint (D2 decision):**
+   - At every checkpoint, run `git diff --name-only` and compare against the phase Scope list. Any file outside Scope forces a classification NOW: structural → Step 6 halt menu; minor → write the DEVIATIONS.md row immediately, pre-filled with the file names (`| <date> | N | T[i] | extra-file | <path> — <1-line note> |`). If no Scope list exists, print `Scope unfenced — deviation check skipped` so the omission is visible. Staging at Step 4.5 is an explicit path list — never `git add -A` when status shows out-of-scope files; print `excluded (other-track): <files>`.
    - Default (interactive, no `--auto-commit`):
      ```
      T[i] verification ✅
@@ -263,6 +305,7 @@ Not supported mid-phase. Orphaned higher-tier patterns would require manual clea
       Fix PLAN.md before continuing.
       ```
       Do not silently continue to T[i+1].
+   5. **Tick the task row in PLAN.md in the SAME turn as the commit:** `- [x] T[i] (commit <short-hash>)`. If the block is missing, print `ℹ PLAN: task tick skipped (tasks-block-missing)` — never silent.
 
    Do NOT duplicate CHECK 6/7/8 logic inside `/gabe-execute`. Single source of truth = `/gabe-commit`.
 
@@ -371,6 +414,7 @@ When last task T_K commits successfully:
    This phase changes a user-facing/runtime path, so lint/typecheck/unit tests are not enough.
    Exec remains 🔄 until the journey is run on the deployed staging target and artifacts are logged.
    ```
+   Then run `ls <each artifact path>` via Bash — a non-existent path means evidence is ABSENT: halt with the block message above. Prose claims (e.g. ":<port> desktop+mobile proof") without a path fail this check by definition.
 2. **Invariant: Commit column must be `✅`.** Re-read `.kdbp/PLAN.md` Phases table row for current phase N. If `Commit` is still `⬜` despite all K tasks having committed, halt:
    ```
    ⚠ PHASE COMPLETE BLOCKED — Commit column still ⬜ for Phase N
@@ -449,6 +493,8 @@ If user aborts mid-phase (`stop`, `abort`, or Ctrl+C):
   Remaining: T3, T4, T5
   Resume? [resume] / [restart-phase] / [abort]
   ```
+
+Completed/Remaining lists are read from the `#### Phase N Tasks` block in PLAN.md — NEVER from session memory. A task with no ticked row is NOT complete regardless of what the session remembers. Claiming a task complete with no ticked row is a defect.
 
 Never silently re-run completed tasks.
 

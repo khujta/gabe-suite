@@ -5,6 +5,18 @@ description: "Consolidate the human's architect-level understanding of recent ch
 
 # Gabe Teach
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 Countermeasure for "the human can't keep up with AI-paced changes." Keeps the human at architect-level understanding: WHY decisions were made, WHEN patterns apply, WHERE files belong. Topics are anchored to **gravity wells** (architectural sections of the app) so the human builds a map before individual details.
 
 **Design principle — teach-first, config-last.** Every bare-ish invocation renders a lesson or narrative, never a dashboard. Dashboards, catalog browsing, wells editing, and history browsing all live behind explicit subcommands (`status`, `arch browse`, `wells`, `history`, `arch dashboard`). When the user invokes `/gabe-teach` with no clear configuration intent, pick the most relevant teaching surface and render it immediately. Ask the same four verbs everywhere so nothing has to be memorized: `[explain]` / `[next]` / `[test]` / `[skip]` — see the **Universal Action Menu** section below.
@@ -91,6 +103,8 @@ Every teach-mode lesson (project topic, arch concept, retro lesson, tour stop) e
 - **[next]** — Answer Q1/Q2 now → classify (2/2 = verified, 1/2 = verified weak, 0/2 = pending) → **write-back immediately** (KNOWLEDGE.md, STATE.md, HISTORY.md, Sessions log as applicable per mode) → auto-advance to the next lesson (same mode's next pick) or announce done.
 - **[test]** — Skip the lesson body; jump straight to Q1/Q2 only. For humans who claim prior knowledge — this is the "sanity-check shortcut." 2/2 → `already-known (sanity-checked)` or `verified (verify-quick)` depending on mode. Write-back happens on the same path as `[next]`.
 - **[skip]** — Mark skipped (session-only for arch mode, persistent for project topics) with a one-line write-back, then pick the next lesson. After 3 skips in one session, fall through to `status`.
+
+**Grading gate (every classify).** When generating Q1/Q2, also write a one-line EXPECTED-ANSWER KEY per question, anchored to a lesson section (not shown to the user). At classify, quote the key next to the human's answer and score against the KEY, not against plausibility: 2/2 requires the answer to state the key's load-bearing idea. Uncertain → score the LOWER band (1/2 not 2/2; 0/2 not 1/2) — never round up. Inflated `verified` rows poison KNOWLEDGE.md and global `~/.claude/gabe-arch/STATE.md` picks. Applies to Step 4d item 4 and every mode routed through the Universal Action Menu.
 
 **Session-loop semantics (D1=C — multi-lesson loop with per-lesson write-back):**
 
@@ -478,7 +492,7 @@ This is the existing flow, with three changes: wells-aware extraction, wells-gro
 
 **Step 4a — Foundation gate** (Step 0.5 above). Block or fall through to Step 4b.
 
-**Step 4b — Extract candidate topics.** Same deterministic signals as before (LEDGER commits, commit message prefixes, new files, DECISIONS changes). Each candidate carries a structured record used later by Step 4d.
+**Step 4b — Extract candidate topics.** Deterministic signals: LEDGER commits, commit message prefixes, new files, DECISIONS changes. **Range (exact):** commits with author-date AFTER the newest Sessions-log timestamp in KNOWLEDGE.md; if no Sessions log exists, the last 10 commits. Echo the resolved range in the output header — `Commits covered: N since <date>` — mandatory in the fast path too, not just the menu. Each candidate carries a structured record used later by Step 4d.
 
 **DECISIONS.md filter (Loop L6, Phase 3/6 of doc-lifecycle work):** when scanning `.kdbp/DECISIONS.md` changes as a topic source, skip rows whose `Status` column contains the `operational` tag (format: `active,operational` or `operational`). These operational decisions are written by `/gabe-push` Phase 5/6 of the doc-lifecycle work and describe infra/deploy choices (blue/green cutover, env var added, CI workflow change) that aren't load-bearing product understanding. The human can still force-surface them via interactive topic selection, but they're not auto-proposed. Rationale: teach is about "why the product works the way it works"; operational decisions are about "how it gets shipped", a different knowledge domain.
 

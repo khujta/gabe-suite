@@ -7,6 +7,18 @@ metadata:
 
 # Gabe Align — Alignment Guardian
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 ## Purpose
 
 Two responsibilities:
@@ -153,7 +165,7 @@ All loaded values are evaluated:
 8. For each applicable value (based on mode tier):
    a. State the value handle
    b. Apply the test question to the target
-   c. Produce verdict: PASS, CONCERN, or FAIL
+   c. Produce verdict: PASS, CONCERN, or FAIL. PASS lines must name what was inspected: `U1 ✓ PASS — checked src/routes/scan.tsx:120-141 (diff hunk)`. A PASS with no inspected anchor is recorded as `⚠ CONCERN (uninspected)`.
    d. If CONCERN or FAIL: explain WHAT specifically is misaligned and WHY
 9. Check each value independently — don't let other results influence assessment
 10. Be specific. "Violates A4" is not enough. State what's misaligned concretely.
@@ -222,6 +234,8 @@ ACTION ITEMS:
 ALIGNMENT: PROCEED | PROCEED WITH CONCERNS | DO NOT PROCEED
 ```
 
+**Verdict map (deterministic):** any FAIL → DO NOT PROCEED; else any CONCERN → PROCEED WITH CONCERNS; else PROCEED. The Status line is computed from the counts, never narrated.
+
 ### Deep Mode
 
 Same as Standard, plus:
@@ -281,13 +295,13 @@ U1:PASS U2:CONCERN V1:PASS V2:PASS | Scenarios: 4/6 covered | Committed: pending
 
 ### Checkpoint ❌ → Deferred Item Handoff
 
-If the user proceeds with a commit despite ❌ untested scenarios, write those scenarios to `.kdbp/deferred-cr.md` as new deferred items:
+If the user proceeds with a commit despite ❌ untested scenarios, write those scenarios to `.kdbp/PENDING.md` when it exists, using the canonical 10-column schema (see gabe-review "Deferred Item Persistence"):
 
 ```markdown
-| D3 | 2026-04-05 | checkpoint | Empty pantry scenario untested | suggestRecipes.ts | UNTESTED PATH — P(high), I(high) | 1 | Deferred |
+| P4 | 2026-04-05 | checkpoint | Empty pantry scenario untested | suggestRecipes.ts | mvp | high | high | 1 | open |
 ```
 
-Source is "checkpoint" (not a review name). This ensures that when `/gabe-review` runs next, it finds these items in the deferred backlog. If the same gap appears in the review's branch-test detection, `Times Deferred` increments to 2 → ⚠️ ESCALATED. This closes the loop between the automatic checkpoint and the manual review.
+`.kdbp/deferred-cr.md` is a legacy fallback only when PENDING.md is absent. Source is "checkpoint" (not a review name). This ensures that when `/gabe-review` runs next, it finds these items in the deferred backlog. If the same gap appears in the review's branch-test detection, `Times Deferred` increments to 2 → ⚠️ ESCALATED. This closes the loop between the automatic checkpoint and the manual review.
 
 ---
 
@@ -298,7 +312,7 @@ At commit/PR boundaries, after evaluating values, Claude reads the modified sour
 **For each feature or behavior added/changed in the diff:**
 1. Name 3 realistic scenarios a user would hit (including error states, empty data, edge conditions)
 2. Check if each scenario has a corresponding test
-3. Report COVERED or NOT COVERED per scenario
+3. Report COVERED or NOT COVERED per scenario. COVERED must cite the exact test: `✅ COVERED — tests/suggestRecipes.test.ts::returns empty-state message for empty pantry`. No citation → NOT COVERED by definition (do not open-ended "probably covered").
 
 **What counts as a "realistic scenario":**
 - NOT contrived inputs or theoretical edge cases
@@ -345,7 +359,8 @@ The automatic checkpoint at commit/PR only uses **Hot** tier values. Structural 
 ├── BEHAVIOR.md     # Project name, domain, maturity, active focus (~500 words)
 ├── VALUES.md       # Project-specific value handles (3-7 values)
 ├── LEDGER.md       # Checkpoint history (auto-appended, one line per checkpoint)
-└── deferred-cr.md  # Shared with gabe-review (created on first deferral)
+├── PENDING.md      # Deferred items, canonical 10-column schema — shared with gabe-review (primary)
+└── deferred-cr.md  # Legacy fallback, only used when PENDING.md is absent
 ```
 
 User-level:

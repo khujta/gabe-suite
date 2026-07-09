@@ -5,6 +5,18 @@ description: "Backbone authoring command for the Gabe Suite. Produces SCOPE.md (
 
 # Gabe Scope
 
+## Gabe execution contract (E1–E7)
+
+These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+
+- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
+- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
+- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
+- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
+- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
+- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
+- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+
 The backbone authoring command. Produces two linked artifacts for a new project:
 
 1. **`.kdbp/SCOPE.md`** — high-inertia premise. Problem, users, success criteria, requirements, constraints, posture. Changes only through `/gabe-scope-change`.
@@ -355,6 +367,8 @@ Marker `[PENDING APPROVAL — step-7.4]`.
 
 **Output:** `{scope_md, roadmap_md, scope_frontmatter, roadmap_frontmatter, validation}`.
 
+Assembly input = the CURRENT on-disk `.kdbp/SCOPE.md` / `ROADMAP.md` — Read both files NOW, immediately before assembly: the user may have edited content outside `[PENDING APPROVAL]` markers, and anything outside markers is FINAL (see marker convention below). Session drafts are fallback only for sections still inside pending markers. Before (b) writes, show the on-disk → assembled diff and get approval (reuse the 8(f) `[s]how diff` affordance) — never overwrite user edits sight-unseen.
+
 **Validation gate:** the `validation` object must show:
 - `sc_anchors_present: true`
 - `req_anchors_present: true`
@@ -486,11 +500,7 @@ On checkpoint approval, the command removes BOTH markers via Edit tool match-and
 
 ### LLM call accounting
 
-After every LLM call, update `session.json.cost_estimate`:
-- `tokens_used` += input + output
-- `estimated_usd` += per-model cost (Opus input ~$15/Mtok, output ~$75/Mtok; Sonnet input ~$3/Mtok, output ~$15/Mtok)
-
-Surface running total after each checkpoint: "Step 3 complete. Session cost so far: $0.34 (12,400 tokens)."
+Accounting is observable-only: after every LLM call, count it (`llm_calls += 1`) and record model names in `session.json.cost_estimate`. Token/US$ figures are estimates the session cannot verify — if token counts are not observable in this harness, write `cost: untracked (N calls)` in session.json and surface "Step 3 complete. LLM calls so far: 7." Never print an invented dollar figure.
 
 ### Error handling
 
