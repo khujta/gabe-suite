@@ -53,6 +53,17 @@ check_home() { # home label
     [ -e "$f" ] || continue
     report "$label" "retired surface still installed (commands are gone — remove): $f"
   done
+  # kdbp session hooks (repo scripts/hooks/kdbp/* → <home>/scripts/hooks/kdbp/*, both directions)
+  while IFS= read -r f; do
+    rel="${f#"$REPO"/scripts/hooks/kdbp/}"
+    check_pair "$f" "$home/scripts/hooks/kdbp/$rel" "$label"
+  done < <(find "$REPO/scripts/hooks/kdbp" -type f 2>/dev/null)
+  if [ -d "$home/scripts/hooks/kdbp" ]; then
+    while IFS= read -r f; do
+      rel="${f#"$home"/scripts/hooks/kdbp/}"
+      [ -f "$REPO/scripts/hooks/kdbp/$rel" ] || report "$label" "retired hook still installed (A2 KDBP-lite — remove): $f"
+    done < <(find "$home/scripts/hooks/kdbp" -type f)
+  fi
   # templates (repo templates/* → <home>/templates/gabe/*, both directions)
   while IFS= read -r f; do
     rel="${f#"$REPO"/templates/}"

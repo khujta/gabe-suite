@@ -1,5 +1,5 @@
 {
-  "_source": "Extracted verbatim from an installed ~/.claude/settings.json (2026-07-03). Each key is the marker string gabe-init Step 2 greps for. Each value is the exact hook-array entry to append under the matching settings.json event array (SessionStart / PreToolUse / PostToolUse / Stop). Never edit the command strings by hand — reinstall via the suite if a hook needs to change.",
+  "_source": "Each key is the marker string gabe-init Step 2 greps for. Each value is the exact hook-array entry to append under the matching settings.json event array (SessionStart / PreToolUse / PostToolUse / Stop). Hook scripts ship from the suite repo (scripts/hooks/kdbp/) via install.sh. Never edit the command strings by hand \u2014 reinstall via the suite if a hook needs to change. Retired in A2 KDBP-lite: the LEDGER.md per-tool-call writer and the KNOWLEDGE session-awareness hook.",
   "KDBP Active": {
     "event": "SessionStart",
     "entry": {
@@ -26,19 +26,6 @@
       ]
     }
   },
-  "KNOWLEDGE:": {
-    "event": "SessionStart",
-    "entry": {
-      "matcher": "*",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "bash \"$ECC_ROOT/scripts/hooks/kdbp/session-knowledge-awareness.sh\"",
-          "timeout": 5
-        }
-      ]
-    }
-  },
   "KDBP CHECKPOINT": {
     "event": "PreToolUse",
     "entry": {
@@ -48,20 +35,6 @@
           "type": "command",
           "command": "bash \"$ECC_ROOT/scripts/hooks/kdbp/pre-checkpoint.sh\"",
           "timeout": 5
-        }
-      ]
-    }
-  },
-  "LEDGER.md": {
-    "event": "PostToolUse",
-    "entry": {
-      "matcher": "Edit|Write|MultiEdit",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "bash \"$ECC_ROOT/scripts/hooks/kdbp/post-ledger-writer.sh\"",
-          "timeout": 5,
-          "async": true
         }
       ]
     }

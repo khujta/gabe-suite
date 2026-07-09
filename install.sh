@@ -43,6 +43,7 @@ if $UNINSTALL; then
     done
     # Retired surface — clean up any straggler command mirrors from older installs
     run "rm -f ~/.claude/commands/gabe-*.md"
+    run "rm -rf ~/.claude/scripts/hooks/kdbp"
     run "rm -rf ~/.claude/templates/gabe"
     run "rm -rf ~/.claude/prompts/gabe-scope"
     run "rm -rf ~/.claude/schemas/gabe-scope"
@@ -98,6 +99,16 @@ if [ -d "$SCRIPT_DIR/templates" ]; then
         DP_COUNT=$(ls -1 "$SCRIPT_DIR/templates/debt-patterns/"*.md 2>/dev/null | wc -l)
         echo "  OK: $DP_COUNT debt-pattern files → ~/.claude/templates/gabe/debt-patterns/"
     fi
+fi
+
+# Session hooks — kdbp hook scripts referenced by settings.json entries (templates/hooks.json markers).
+if [ -d "$SCRIPT_DIR/scripts/hooks/kdbp" ]; then
+    run "mkdir -p ~/.claude/scripts/hooks/kdbp"
+    run "cp \"$SCRIPT_DIR/scripts/hooks/kdbp/\"*.sh ~/.claude/scripts/hooks/kdbp/"
+    # Retired hooks (A2 KDBP-lite): per-tool-call ledger writer + knowledge awareness
+    run "rm -f ~/.claude/scripts/hooks/kdbp/post-ledger-writer.sh ~/.claude/scripts/hooks/kdbp/session-knowledge-awareness.sh"
+    HOOK_COUNT=$(ls -1 "$SCRIPT_DIR/scripts/hooks/kdbp/"*.sh 2>/dev/null | wc -l)
+    echo "  OK: $HOOK_COUNT kdbp hook scripts → ~/.claude/scripts/hooks/kdbp/"
 fi
 
 # Curated docs — installed as local reference material.
