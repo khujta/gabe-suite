@@ -37,3 +37,5 @@ Executes phase tasks from `.kdbp/PLAN.md`. Complements `/gabe-plan` (write plan)
 ## Output contract (summary)
 
 Report per-task progress (files changed, verification result, commit hash) and end each phase with the Phases-table state line (`EXEC: … REVIEW: … COMMIT: … PUSH: …`) plus a `Next:` pointer (typically `/gabe-review` or `/gabe-next`). Emit the output-only `**Gabe-Lens block**` and `**Gabe-Lens brief — Platform progress**` — never written to PLAN.md/REVIEW.md/LEDGER.md/PENDING.md/commits/docs unless another command already owns that write. All state writes (Exec ticks, DECISIONS.md escalations, PLAN.json proof mirrors, LEDGER.md thin-index rows) happen in the same turn as the action they record (E5); a skipped write prints an enumerated skip code, never silence. The full output contract in the spec is binding.
+
+End every completed-phase run with a single deterministic `NEXT: /gabe-review` line (checkpoint commits run inline via /gabe-commit) — the routing contract; no other suggestions.

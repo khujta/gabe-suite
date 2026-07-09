@@ -50,3 +50,5 @@ Full mode renders, in order: Findings table → Risk Dashboard → Coverage Conf
 Verdict floors: BLOCK on any CRITICAL, 2+ escalated deferrals, VERY LOW coverage, a maturity-gate overrun, or confidence < 50. WARNING on HIGH findings within tolerance, LOW coverage, or confidence 50-69. APPROVE requires zero CRITICAL, no above-gate escalated deferrals, coverage ≥ MEDIUM, and confidence ≥ 70.
 
 The full output contract in the spec is binding.
+
+End every run with a single deterministic `NEXT:` line per the PLAN row — `/gabe-commit` when Commit is ⬜, else `/gabe-push` — the routing contract; no other suggestions.

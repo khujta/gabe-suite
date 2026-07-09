@@ -45,3 +45,5 @@ For long CI runs after push, a mechanical watch loop may babysit the pipeline in
 ## Output contract (summary)
 
 End with the `GABE PUSH COMPLETE` summary block (env, source, target, PR url or `—`, CI status) and a `Bookkeeping:` line reporting whether the bookkeeping commit happened. All state writes (PUSH.md, DEPLOYMENTS.md row, LEDGER.md entry, PLAN.md Push tick, PENDING.md/DECISIONS.md from the operational classifier) land in the same turn as the action they record (E5); a skipped Push tick prints the full decision record, never a silent skip. Safety-row prompts never silently default to proceed. The full output contract in the spec is binding.
+
+End every run with a single deterministic `NEXT: /gabe-next` line (phase advance / next phase), or `plan complete — /gabe-plan complete` on the last phase — the routing contract; no other suggestions.

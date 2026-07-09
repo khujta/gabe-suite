@@ -98,7 +98,7 @@ For complex plans, `/gabe-plan` may also create a self-contained HTML review art
 | ACTIVE PLAN | SessionStart | Surfaces current phase + state cells — reads `.kdbp/PLAN.json` first, falls back to `PLAN.md` |
 | KDBP CHECKPOINT | PreToolUse (Bash) | Warns on raw `git commit`, points to `/gabe-commit` |
 | STRUCTURE: warning | PostToolUse (Write) | Warns when a new file doesn't match a pattern in `.kdbp/STRUCTURE.md` |
-| SESSION-END REMINDER | Stop | Reminds about deferred items, `/gabe-teach`, and uncommitted changes |
+| SESSION-END REMINDER | Stop | NEXT-pointer (0.3b): fires only when the tree is dirty AND no commit landed this session — prints `next: /gabe-commit` once |
 
 ### Workflows
 
