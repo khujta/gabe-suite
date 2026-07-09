@@ -762,7 +762,7 @@ This logic is invoked by the four trigger commands to update the Phases table in
    - The Phases table header includes the target column name (`Exec`, `Review`, `Commit`, or `Push`) — **detection is by column name, not position**. If the plan uses the legacy `Status` column, this logic no-ops so old plans keep working. If the `Exec` column is missing on a pre-v2.9 plan, `/gabe-execute` auto-tick is a silent no-op.
 
 2. **Find the target row:**
-   - Parse `## Current Phase` — extract the leading integer N from a line like `Phase 3: [name]`
+   - Parse `## Current Phase` — extract the leading phase-ID token N (integer, decimal, or alphanumeric — `3`, `2.1`, `H6`) from a line like `Phase 3: [name]` or a bolded `**H6 — [name]**` opener
    - In the Phases table, locate the row where the first data column equals N
 
 3. **Tick the cell:**

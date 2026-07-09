@@ -408,7 +408,7 @@ When last task T_K commits successfully:
    ```
    | [YYYY-MM-DD] | EXEC | Phase [N] [name] — tasks [K]/[K] | [checkpoint shas] | tests [result] · deviations [S]str/[m]min · proof → PLAN.json |
    ```
-   Fold the per-phase TOKENS line (U8 "Measure the Machine", see Model + cost section below) into this same row's Gates column as `· tokens [in]+[out] ($[cost])` — not a separate LEDGER append.
+   Fold the per-phase TOKENS line (U8 "Measure the Machine", see Model + cost section below) into this same row's Gates column as `· tokens [in]+[out] ($[cost])` — not a separate LEDGER append; include only when the harness exposes real counts (never fabricate — E1).
 6. Print phase-complete summary:
    ```
    ✅ GABE EXECUTE — Phase N complete
@@ -484,7 +484,7 @@ Per U6 (Route by Task, Not by User):
 | Commit message — conceptual changes | Sonnet | Gabe-lens brief + before/after analogy |
 | Deviation severity classification | Haiku | Structural vs minor is a simple decision tree |
 
-Per U8 (Measure the Machine): folded into the Step 7 phase-completion LEDGER thin-index row's Gates column as `· tokens [in]+[out] ($[cost])` — not a separate LEDGER append. Skip in dry-run.
+Per U8 (Measure the Machine): folded into the Step 7 phase-completion LEDGER thin-index row's Gates column as `· tokens [in]+[out] ($[cost])` — not a separate LEDGER append. Include only when the harness exposes real counts (never fabricate — E1). Skip in dry-run.
 
 ## Non-goals
 

@@ -391,6 +391,7 @@ This step commits those writes automatically and returns the working tree to a c
    - `.kdbp/LEDGER.md` (always, since Step 8 appended)
    - `.kdbp/DECISIONS.md` (only when Step 7.5b action was `accept`)
    - `.kdbp/PENDING.md` (only when Step 7.5b action was `defer` OR when re-surfaced PENDING rows were resolved)
+   - `.kdbp/PLAN.md` + `.kdbp/PLAN.json` (when dirty from this cycle's auto-ticks — the tick helpers have no commit point of their own; leaving them out contradicts this step's clean-tree goal)
 
 2. **Stage explicitly — path-scoped, never `git add -A`:**
 
