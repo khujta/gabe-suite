@@ -44,7 +44,6 @@ Used in standard and deep modes. These are universal structural guards (user cog
 ```
 templates/architecture-principles.md
 ~/.claude/templates/gabe/architecture-principles.md
-~/.agents/templates/gabe/architecture-principles.md
 ```
 
 Used in standard and deep modes as advisory AP checks. AP checks are separate
@@ -99,7 +98,7 @@ All loaded values are evaluated:
 1. Read `skills/gabe-align/VALUES.md` fully (structural A1-A7)
 2. Read `~/.kdbp/VALUES.md` if exists (user values)
 3. Read `.kdbp/VALUES.md` if exists (project values)
-4. For standard/deep only, read the architecture-principles catalog from the first available path: project-local `templates/architecture-principles.md`, then `~/.claude/templates/gabe/architecture-principles.md`, then `~/.agents/templates/gabe/architecture-principles.md`
+4. For standard/deep only, read the architecture-principles catalog from the first available path: project-local `templates/architecture-principles.md`, then `~/.claude/templates/gabe/architecture-principles.md`
 5. Identify mode from invocation (shallow / standard / deep)
 6. Identify target and context type
 7. If existing artifact: locate and read ALL referenced files

@@ -12,10 +12,6 @@ metadata:
 
 This skill runs under the suite execution contract — E1 EVIDENCE · E2 RUN-BEFORE-✅ · E3 NO SILENT DOWNGRADE · E4 REUSE FIRST · E5 STATE SYNC · E6 MISSING ANCHOR = STOP · E7 REPORT WHERE — floors, not ceilings; a skill's own gate may be stricter, never looser. Full text: `../gabe-docs/references/execution-contract.md` (if that file is missing, E6 applies — STOP).
 
-## Codex Command Bridge
-
-Running under Codex → read `references/codex-bridge.md` now — it confirms this skill directory is the complete contract in every host (no separate command wrapper) and that command-time output contracts (Gabe-Lens block rendering, REVIEW.md reconciliation, mode-specific skips) live in `references/review-spec.md`.
-
 ## What this does
 
 Review code changes and price every finding — what it costs to fix now, what it costs to ignore, and what you're betting by deferring. Track deferred items across reviews and escalate when the same gap gets kicked down the road.
@@ -32,7 +28,7 @@ This is NOT a generic checklist review. Every finding gets a **Defer Risk** (con
 | `brief` | same resolution | Findings + score + verdict only (final, no triage) |
 | `fix` | same resolution | Full review, then triage with "Fix all" pre-selected |
 | `deferred` | none | Deferred-item dashboard (Risk Dashboard) + triage |
-| `inbox` | same resolution | Writes live `.kdbp/REVIEW.md` only, no triage — for cross-CLI handoff |
+| `inbox` | same resolution | Writes live `.kdbp/REVIEW.md` only, no triage — for handoff to a later session |
 | `post-review` | external review output | Ingests CE:review / BMad / ECC findings — see `references/post-review.md` |
 | `<file>` / `<folder>` | explicit path | Reviews that scope directly, bypassing target resolution |
 
@@ -45,8 +41,7 @@ This is NOT a generic checklist review. Every finding gets a **Defer Risk** (con
 3. Resolve target (KDBP-plan-first, git-diff fallback) and maturity, then score the diff across review dimensions (security, data integrity, error handling, test coverage, runtime evidence, logic, tier drift, performance, style), pricing each finding with Fix Cost + Defer Risk + Maturity Gate + churn annotation.
 4. Compute the Review Confidence Score (0-100) with fix-tier projections. When a KDBP plan is active, render the Plan Alignment sub-checks (phase compliance, stale verified topics, architectural-decision candidates, tier drift), then render the output-only Gabe-Lens block.
 5. Offer Triage (severity × maturity matrix, shared next-action menu, custom expressions, one-by-one loop) — skipped in `brief`/`inbox`/`deferred`/`close`/`discard` modes. Persist deferred items to `.kdbp/PENDING.md`; archive `.kdbp/REVIEW.md` and always append a LEDGER trace on completion.
-6. Cross-agent collision: an existing `.kdbp/REVIEW.md` from a DIFFERENT CLI than the current run → read `references/merge-mode.md` now (blind-first triangulation — never a silent overwrite).
-7. `post-review` arg → read `references/post-review.md` now.
+6. `post-review` arg → read `references/post-review.md` now.
 
 ## Output contract (summary)
 

@@ -73,7 +73,6 @@ Modes compose: `brief pattern=P3`, `dry-run since=HEAD~20`, etc.
 Patterns are data files at:
 1. `.kdbp/debt-patterns/P<n>-<handle>.md` (project-local, highest priority; overrides global)
 2. `~/.claude/templates/gabe/debt-patterns/P<n>-<handle>.md` (global, shipped with this skill)
-3. `~/.agents/templates/gabe/debt-patterns/` (Codex home equivalent)
 
 See `~/.claude/templates/gabe/debt-patterns/README.md` for the pattern file format. v1 ships 11 patterns:
 
@@ -99,7 +98,6 @@ The AP catalog is loaded from the first available path:
 
 1. `templates/architecture-principles.md` (project-local Gabe Suite source)
 2. `~/.claude/templates/gabe/architecture-principles.md`
-3. `~/.agents/templates/gabe/architecture-principles.md`
 
 AP principles are explanatory citations, not independent debt patterns. Do not
 emit a debt finding because "AP6 coupling might apply" in the abstract. First
@@ -122,7 +120,7 @@ finding.
    - `.kdbp/PENDING.md` — parse existing deferred entries to avoid re-raising
    - `.kdbp/debt-ignore.md` — parse dismissal list (created on first `(s)` during triage; see Step 5)
 4. **Resolve active phase.** Parse `.kdbp/PLAN.md` `<!-- status: active -->` frontmatter. Record phase number, `types: []` list (binds to tier-sections).
-5. **Load pattern catalog.** Read project-local `.kdbp/debt-patterns/*.md` first, then layer global `~/.claude/templates/gabe/debt-patterns/*.md`. Project-local overrides by ID. If ZERO pattern files load: print `⛔ Pattern catalog missing (searched .kdbp/debt-patterns/, ~/.claude/templates/gabe/debt-patterns/, ~/.agents/templates/gabe/debt-patterns/) — running Step 1 + Step 2.4 rule cross-check only.` Run only those steps, note the missing catalog in the summary, and NEVER synthesize pattern IDs or detection heuristics from memory.
+5. **Load pattern catalog.** Read project-local `.kdbp/debt-patterns/*.md` first, then layer global `~/.claude/templates/gabe/debt-patterns/*.md`. Project-local overrides by ID. If ZERO pattern files load: print `⛔ Pattern catalog missing (searched .kdbp/debt-patterns/, ~/.claude/templates/gabe/debt-patterns/) — running Step 1 + Step 2.4 rule cross-check only.` Run only those steps, note the missing catalog in the summary, and NEVER synthesize pattern IDs or detection heuristics from memory.
 6. **Load architecture principles.** Read the AP catalog from the first available architecture-principles path. If missing, continue without AP citations and note the missing catalog in the summary.
 7. **If mode=`extract-rules`:** skip to Step 8. If mode=`audit-rules`: skip the catalog-scan parts of Step 2, only check existing rules.
 

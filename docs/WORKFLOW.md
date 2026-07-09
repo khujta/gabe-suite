@@ -3,7 +3,7 @@
 **Audience:** anyone using the Gabe Suite to build a project.
 **Purpose:** single source of truth for how the commands connect, what state they read/write, and when to run each one.
 
-This doc is the map. For depth on any single piece, follow the links to `architecture/`, to the command's own spec under `commands/`, or to the skill spec under `skills/`. For project starts, use [workflows/greenfield.md](workflows/greenfield.md) for new apps and [workflows/brownfield.md](workflows/brownfield.md) for existing codebases.
+This doc is the map. For depth on any single piece, follow the links to `architecture/` or to the skill's own spec under `skills/<name>/` (core in SKILL.md, binding spec in `references/`). For project starts, use [workflows/greenfield.md](workflows/greenfield.md) for new apps and [workflows/brownfield.md](workflows/brownfield.md) for existing codebases.
 
 ---
 
@@ -324,5 +324,5 @@ Not natively supported at time of writing. See [GAPS.md](GAPS.md) gap W4 for opt
 - **[architecture/diagram-standards.md](architecture/diagram-standards.md)** — diagram conventions for docs in this repo
 - **[architecture/requirements.md](architecture/requirements.md)** — suite-level design requirements + non-goals
 - **[archive/](archive/)** — retired dogfood + historical design docs
-- Runtime specs: `commands/gabe-*.md`, `skills/gabe-*/SKILL.md`
+- Runtime specs: `skills/gabe-*/SKILL.md` + `skills/gabe-*/references/*.md`
 - Templates: `templates/`

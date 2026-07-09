@@ -1,7 +1,7 @@
 # Gabe Suite State Audit
 
 **Date:** 2026-05-12
-**Updated:** 2026-07-05 — added `gabe-handoff` (session handoff: resume prompt + evidence-gated KDBP state sync); counts now 22 command wrappers / 12 skills. (2026-07-01 — added `gabe-myopic`.)
+**Updated:** 2026-07-09 — B2 skills-only migration landed: `commands/` retired (specs re-homed into `skills/<name>/references/`), 25 skills, Codex support dropped (Claude Code only — `~/.agents` is no longer an install target). Counts and surfaces below predate this and are historical. Prior: 2026-07-05 — added `gabe-handoff` (session handoff: resume prompt + evidence-gated KDBP state sync); counts now 22 command wrappers / 12 skills. (2026-07-01 — added `gabe-myopic`.)
 **Purpose:** Snapshot the current Gabe Suite surface so workflow docs and local installs can be checked against reality.
 
 ## Current Runtime Surface

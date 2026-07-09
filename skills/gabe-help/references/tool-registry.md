@@ -9,8 +9,8 @@
 
 | Tool | Where | Use for |
 |---|---|---|
-| install.sh | repo root | install/uninstall the suite to `~/.claude` + `~/.agents`; `--dry-run` |
-| suite-doctor | `scripts/suite-doctor.sh` | 3-way drift check (repo vs both installs); run after every install |
+| install.sh | repo root | install/uninstall the suite to `~/.claude`; `--dry-run` |
+| suite-doctor | `scripts/suite-doctor.sh` | drift check (repo vs ~/.claude); run after every install |
 | Docsite generator | `skills/gabe-docsite/generator/` | building/refreshing HTML doc sites — never rebuild one from scratch |
 | Diagram compliance | `skills/gabe-docsite/tools/diagram-compliance.mjs` | validating Mermaid diagrams on generated pages |
 | Icon factory | `skills/gabe-docsite/tools/icon_factory.py` | docsite icons/memes |

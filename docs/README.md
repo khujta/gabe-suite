@@ -35,7 +35,7 @@ Start here.
 
 Command and skill specs live outside `docs/` (they are runtime artifacts, not documentation):
 
-- `commands/gabe-*.md` — one file per command
+- `skills/gabe-*/SKILL.md` — one skill per capability (binding specs under each skill's `references/`)
 - `skills/gabe-*/SKILL.md` — one dir per skill
 - `templates/` — files copied into `.kdbp/` at init
 - `prompts/` — `/gabe-scope` prompt library
@@ -46,6 +46,5 @@ Command and skill specs live outside `docs/` (they are runtime artifacts, not do
 `install.sh` mirrors this curated docs set to:
 
 - `~/.claude/docs/gabe-suite/`
-- `~/.agents/docs/gabe-suite/`
 
 The archive folder is intentionally not installed.

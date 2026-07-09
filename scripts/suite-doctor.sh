@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# suite-doctor — three-way drift check: repo vs ~/.claude vs ~/.agents.
+# suite-doctor — drift check: repo vs ~/.claude (Claude Code is the only harness).
 #
 # The standing rule this enforces (investigation 2026-07, plan step 0.1):
 #   suite changes land in the REPO first; installs are regenerated via
@@ -48,13 +48,10 @@ check_home() { # home label
       done < <(find "$home/skills/$name" -type f ! -path '*__pycache__*')
     fi
   done
-  # commands (both directions — in-place patching of commands was the original disease)
-  for f in "$REPO"/commands/gabe-*.md; do
-    check_pair "$f" "$home/commands/$(basename "$f")" "$label"
-  done
+  # commands retired (B2 skills-only migration) — any surviving gabe command file is a straggler
   for f in "$home"/commands/gabe-*.md; do
     [ -e "$f" ] || continue
-    [ -f "$REPO/commands/$(basename "$f")" ] || report "$label" "exists only in install (never committed): $f"
+    report "$label" "retired surface still installed (commands are gone — remove): $f"
   done
   # templates (repo templates/* → <home>/templates/gabe/*, both directions)
   while IFS= read -r f; do
@@ -70,10 +67,9 @@ check_home() { # home label
 }
 
 check_home "$HOME/.claude" "claude"
-check_home "$HOME/.agents" "agents"
 
 if [ "$drift" -eq 0 ]; then
-  [ "$QUIET" = "--quiet" ] || echo "suite-doctor: CLEAN — repo, ~/.claude and ~/.agents are in sync."
+  [ "$QUIET" = "--quiet" ] || echo "suite-doctor: CLEAN — repo and ~/.claude are in sync."
   exit 0
 else
   echo "suite-doctor: DRIFT FOUND — reconcile via the repo (commit repo-ward captures, then ./install.sh). Never patch installs in place."

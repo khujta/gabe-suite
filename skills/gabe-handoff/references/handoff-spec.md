@@ -20,7 +20,7 @@ This is the deliberate, high-fidelity counterpart to the automatic `session-end.
 
 - Context is filling up (you're near the auto-compact threshold) and you want a clean cut, not a lossy summarization.
 - You're ending a work session and the task is mid-flight.
-- You're switching machines / hosts (Claude Code ⇄ Codex) and need the state to travel.
+- You're switching machines and need the state to travel.
 - You finished a chunk and want the next session to start from an accurate PLAN + a crisp prompt.
 
 Don't use when the session accomplished nothing to carry (nothing to hand off), or when you're about to `/gabe-commit` + `/gabe-push` and stop cleanly — those already write durable state. Handoff is for *mid-flight* continuity and for capturing intent the commit trail doesn't hold.
@@ -201,7 +201,7 @@ Print, in order:
 |------|---------|-------------------|
 | Heavy context / near compaction | User runs `/gabe-handoff` | Clean cut with a fidelity-preserving prompt instead of lossy auto-summarization |
 | End of a mid-flight session | User wraps up | Durable PLAN/LEDGER/PENDING sync + resume prompt |
-| Host switch (Claude ⇄ Codex) | Cross-CLI continuity | `.kdbp/HANDOFF.md` travels with the repo; the prompt is host-agnostic |
+| Machine switch | Continuity | `.kdbp/HANDOFF.md` travels with the repo; the prompt is host-agnostic |
 | Next session start | Fresh session | Reads `.kdbp/HANDOFF.md` (surfaced by CLAUDE.md's KDBP table) + the pasted prompt |
 
 **Optional wiring (not done by this command; documented for the suite maintainer):**

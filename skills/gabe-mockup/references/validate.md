@@ -9,8 +9,6 @@ After `npm run build-storybook`, run the bundled report script from the active h
 # Claude Code
 node ~/.claude/skills/gabe-mockup/scripts/check-storybook-correspondence.mjs --web-dir apps/web
 
-# Codex
-node ~/.agents/skills/gabe-mockup/scripts/check-storybook-correspondence.mjs --web-dir apps/web
 ```
 
 The report compares `apps/web/src/**/*.stories.*` with `apps/web/storybook-static/index.json` and checks that story titles match the physical taxonomy (`Design System/*`, `Features/*/Components`, `Features/*/Screens`, `Features/*/Spikes`).

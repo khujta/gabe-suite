@@ -4,9 +4,9 @@
 
 # Gabe Suite
 
-**Development suite for Claude Code and Codex**
+**Development suite for Claude Code**
 
-Skills, commands, and hooks for understanding, reviewing, deciding, and shipping — with a knowledge system (KDBP) that tracks values, decisions, and deferred work across sessions.
+Skills and hooks for understanding, reviewing, deciding, and shipping — with a knowledge system (KDBP) that tracks values, decisions, and deferred work across sessions.
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude_Code-Plugin-blueviolet.svg?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyTDIgN2wxMCA1IDEwLTUtMTAtNXoiLz48cGF0aCBkPSJNMiAxN2wxMCA1IDEwLTUiLz48cGF0aCBkPSJNMiAxMmwxMCA1IDEwLTUiLz48L3N2Zz4=)](https://github.com/khujta/gabe-suite)
@@ -38,14 +38,12 @@ Skills, commands, and hooks for understanding, reviewing, deciding, and shipping
 | **Gabe Docs** | _(consulted)_ | Documentation house style — CommonMark, Mermaid library, per-well diagram recommendations (used by `/gabe-teach`, `/gabe-init`, `/gabe-commit`) |
 | **Gabe Arch** | _(consulted)_ | Architecture curriculum — concept library organized by tier × specialization (used by `/gabe-teach`) |
 
-### Command Wrappers (22)
+### Command Surface (25 skills)
 
-The installed command surface includes direct skill commands plus the full KDBP lifecycle from project init through ship:
-
-Both Claude Code and Codex install six thin lifecycle command-wrapper skills
-(`gabe-next`, `gabe-plan`, `gabe-execute`, `gabe-commit`, `gabe-push`, `gabe-handoff`). Claude
-Code also has native slash commands; the wrappers preserve skill-style handoff
-parity and load the same command specs mirrored under each local home.
+Every capability is one skill under `skills/<name>/` — the skill name gives the slash
+invocation (`skills/gabe-plan/` ⇒ `/gabe-plan`). Each SKILL.md is a lean core that loads
+its binding spec from the skill's `references/` directory on demand. The command surface
+covers the full KDBP lifecycle from project init through ship:
 
 | Command | What it does |
 |---|---|

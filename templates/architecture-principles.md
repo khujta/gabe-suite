@@ -8,8 +8,7 @@ diff, decision, or finding has concrete evidence that touches the principle.
 
 - Load this catalog for architecture-aware commands from the first available path:
   `templates/architecture-principles.md`,
-  `~/.claude/templates/gabe/architecture-principles.md`,
-  `~/.agents/templates/gabe/architecture-principles.md`.
+  `~/.claude/templates/gabe/architecture-principles.md`.
 - Treat AP checks as advisory. They produce CONCERN context, review citations, or
   debt annotations; they do not block commits or PRs unless a project-local rule
   or value separately makes the issue blocking.
