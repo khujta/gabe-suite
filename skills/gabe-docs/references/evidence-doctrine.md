@@ -87,3 +87,21 @@ screenshots.
   ships: Playwright video + ffmpeg. Polished candidate: **pagecast** (headless, WSL-safe, GIF/MP4
   with cursor/zoom) — a per-project choice, never a suite dependency. Evaluate it during a project's
   migration/freeze window, not in the suite.
+- **Capture mode, not a separate workflow.** The journey specs already perform the real actions;
+  capture is a flag on the same run (e.g. `CAPTURE=1`), never a hand-made recording. In capture
+  mode the runner (a) injects the cursor-overlay init script — a fixed-position dot tracking
+  `mousemove`, shrink-on-press, click ripple — so headless recordings show visible navigation,
+  (b) enables Playwright `recordVideo`, and (c) post-renders per this contract. CI runs stay
+  capture-off. Proven recipe (working example): the owning project's capture tool dir
+  (reference implementation: gustify `.gabe-dogfood/tools/cursor-record.mjs`).
+- **Render rules (the color lesson):** MP4/H.264 (`yuv420p`, faststart) is the primary output —
+  full color, ~10× smaller than GIF. GIF only where a platform demands it, and then ALWAYS
+  full-palette: `palettegen=stats_mode=diff` + `paletteuse=dither=sierra2_4a` — never a reduced
+  `max_colors` palette on UI screenshots (visible banding). Slideshow GIFs from step screenshots
+  follow the same palette rule.
+- **Who triggers a capture:** (1) a `proof: journey` phase's evidence task, when the journey is
+  authored or refreshed — the demo regenerates with the proof; (2) docs publication (gabe-docsite
+  embedding a feature page) when the existing video is staler than the journey's artifacts;
+  (3) an explicit ask ("regenerate the <feature> demo") — routed to the project's journey
+  runner/skill, which reads this contract via the manifest. No dedicated suite skill: capture is a
+  mode of the journey run, owned per-project.
