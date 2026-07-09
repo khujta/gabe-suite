@@ -343,6 +343,9 @@ Procedure (deterministic):
    - Files named in Scope (exact paths)
    - Files matching globs mentioned in Description (keyword extraction — folder names, file suffixes, component names)
 5. Compare against `git diff --name-only HEAD`:
+   - FIRST exclude `.kdbp/**` paths from the changed set — those are command-owned state
+     writes (PLAN ticks, LEDGER/DEPLOYMENTS entries) that ride every properly-run phase
+     checkpoint; counting them as drift would flag every correct checkpoint as MISALIGNED.
    - On-scope files changed: count + list
    - Off-scope files changed: count + list (cap at 5)
    - Scope files NOT touched: count + list (cap at 5)

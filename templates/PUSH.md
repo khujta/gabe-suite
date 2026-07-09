@@ -22,7 +22,7 @@ Edit values directly or rerun `/gabe-push --reconfigure` to redo the interview.
 |---------|-------|
 | target_branch | main |
 | promote_from | — |
-| ci | github-actions |
+| ci | none |
 | branch_cleanup | ask |
 
 <!--
@@ -42,7 +42,7 @@ branch_cleanup:  ask | always | never   (applies to source branch after successf
 |---------|-------|
 | target_branch | staging |
 | promote_from | — |
-| ci | github-actions |
+| ci | none |
 | branch_cleanup | ask |
 -->
 
