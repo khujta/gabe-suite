@@ -18,7 +18,7 @@
 ```
 1. /gabe-align deep "<idea>" — Stress the idea against values, scenarios, and AP1-AP13
 2. /gabe-init [name]         — Create .kdbp/, hooks, behavior, values, and maturity baseline
-3. /gabe-scope               — Turn the idea into SCOPE.md + ROADMAP.md
+3. /gabe-scope               — Turn the idea into SCOPE.md (premise + `## Phases` plan)
 4. /gabe-plan "first slice"  — Write the first phase plan with explicit decisions
 5. /gabe-next                — Start the phase loop
 ```
@@ -119,7 +119,7 @@ The Gabe Suite — 22 command wrappers, 12 skills:
 | gabe-push | /gabe-push | Push, create PR, watch CI, branch promotion |
 | gabe-review | /gabe-review [target] | Code review with risk pricing + confidence score + triage |
 | gabe-roast | /gabe-roast [perspective] [target] | Adversarial gap review from a specific viewpoint |
-| gabe-scope | /gabe-scope | Scope authoring into SCOPE.md + ROADMAP.md |
+| gabe-scope | /gabe-scope | Scope authoring into SCOPE.md (premise + `## Phases` plan) |
 | gabe-scope-addition | /gabe-scope-addition | Additive scope evolution |
 | gabe-scope-change | /gabe-scope-change | Route a scope change to addition or pivot |
 | gabe-scope-pivot | /gabe-scope-pivot | Direction-changing scope rewrite |

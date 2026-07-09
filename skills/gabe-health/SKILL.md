@@ -5,7 +5,7 @@ when_to_use: "How healthy is the codebase, are we accumulating mess — god file
 context: fork
 agent: Explore
 metadata:
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # Gabe Health — Codebase Health Analysis
@@ -33,7 +33,7 @@ Surfaces structural fragility in a codebase before it becomes an incident — th
 
 Optional flags: `--days N` (lookback window, default 60 days), `--threshold N` (minimum commits to flag, default 5).
 
-The six analyses: (1) God Files — touched in >25% of commits, (2) Churn Hotspots — most lines modified, (3) Coupling Clusters — files that always change together (>60% co-change), (4) Bug-Fix Concentration — where `fix:`/`bug` commits cluster, (5) Scope Creep — planned vs actually-touched files, (6) Deferred Items & Maintenance Staleness — `.kdbp/PENDING.md` and `.kdbp/MAINTENANCE.md` health.
+The six analyses: (1) God Files — touched in >25% of commits, (2) Churn Hotspots — most lines modified, (3) Coupling Clusters — files that always change together (>60% co-change), (4) Bug-Fix Concentration — where `fix:`/`bug` commits cluster, (5) Scope Creep — planned vs actually-touched files, (6) Deferred Items & Maintenance Staleness — `.kdbp/PENDING.md` health plus `.kdbp/MAINTENANCE.md` if a legacy copy is present (retired from the default KDBP inventory in A2).
 
 ## Procedure
 
@@ -42,7 +42,7 @@ The six analyses: (1) God Files — touched in >25% of commits, (2) Churn Hotspo
 3. Resolve the lookback window (`--days`, default 60) and threshold (`--threshold`, default 5).
 4. Run every git-log detection command needed for the requested analysis (or all six for full mode) — every number in the report must come from a command executed THIS run.
 5. For Scope Creep, resolve the plan source in priority order (`.kdbp/PLAN.md` active phase → `.planning/phases/*/PLAN.md` → `docs/plans/*.md` → `docs/brainstorms/*-requirements.md`) and diff against `git diff --stat`.
-6. For Deferred Items, read `.kdbp/PENDING.md` and `.kdbp/MAINTENANCE.md` if `.kdbp/` exists; skip silently otherwise.
+6. For Deferred Items, read `.kdbp/PENDING.md` if `.kdbp/` exists; skip silently otherwise. Also read `.kdbp/MAINTENANCE.md` if a legacy copy is present (retired from the default KDBP inventory in A2) — skip that sub-check silently when absent.
 7. Apply the severity legend (🔴/⚠️/✅ thresholds per analysis) and render the requested mode: full report (all applicable analyses + summary) or single-analysis mode (just the requested check).
 
 ## Output contract (summary)

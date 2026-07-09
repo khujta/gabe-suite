@@ -154,11 +154,11 @@ Scope Creep — Phase 3 (Recipe Detail View):
 
 ### 6. Deferred Items & Maintenance Staleness
 
-Track the health of deferred technical decisions and maintenance obligations.
+Track the health of deferred technical decisions and, for legacy projects, maintenance obligations.
 
 **Detection:**
 - Read `.kdbp/PENDING.md` — count open items by priority
-- Read `.kdbp/MAINTENANCE.md` — check "Last completed" date against today
+- `.kdbp/MAINTENANCE.md` is retired from the default KDBP inventory (A2) — most projects won't have one. If a legacy copy exists (current `.kdbp/` or `.kdbp/archive/retired/`), read it and check "Last completed" date against today; otherwise skip this sub-check silently.
 - Flag items approaching escalation (Times Deferred >= 2)
 
 **Output:**
@@ -168,13 +168,13 @@ Deferred Items — .kdbp/PENDING.md:
   ⚠️ D2 approaching escalation (deferred 2x, next defer → priority bump)
   Oldest open: D1 (45 days) — coverage gap in classify.py
 
-Maintenance — .kdbp/MAINTENANCE.md:
+Maintenance — .kdbp/MAINTENANCE.md (legacy, only if present):
   Last completed: 2025-10-01 (198 days ago)
   ⚠️ Overdue — quarterly checklist not completed in 180+ days
   Suggest: Review MAINTENANCE.md checklist items
 ```
 
-**Skip if:** `.kdbp/` directory doesn't exist.
+**Skip if:** `.kdbp/` directory doesn't exist. The Maintenance sub-block renders only when a legacy `.kdbp/MAINTENANCE.md` is present — omit it entirely otherwise, never report it as "missing".
 
 ---
 

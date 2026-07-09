@@ -10,7 +10,7 @@ Per-phase recipes for `/gabe-mockup` execute step. Covers the canonical 13-phase
 ### Tokens CSS discipline
 
 - **Canonical install path (greenfield):** `docs/mockups/assets/css/tokens.css`. Lives under `assets/` alongside fonts/, icons/, tokens/ (taxonomy data).
-- **Legacy port:** projects may already have a locked canonical shell (e.g., gastify has `docs/mockups/assets/css/desktop-shell.css` as P1 exit artifact). Keep it; don't rename. tweaks.js detects themes from any loaded stylesheet containing `[data-theme="X"]` selectors — no filename coupling.
+- **Legacy port:** projects may already have a locked canonical shell (e.g., a `desktop-shell.css` as the P1 exit artifact). Keep it; don't rename. tweaks.js detects themes from any loaded stylesheet containing `[data-theme="X"]` selectors — no filename coupling.
 - Runtime selectors: `[data-theme="<name>"][data-mode="light|dark"]` for theme + mode, `[data-font="<family>"]` for font swap, `[data-density="compact|regular|comfy"]` for spacing scale, `[data-radius="tight|medium|loose"]` for radii. Set by tweaks.js on `<body>`.
 - **Every screen, atom, molecule, wireframe** imports the canonical CSS via `<link rel="stylesheet" href="../assets/css/<name>.css">` (path depth relative from `screens/<x>.html` etc. — all canonical content dirs are 1 level deep, so `../assets/css/...` works uniformly).
 - **Forbidden patterns:** hex/RGB literals in screen HTML, per-screen `:root { --bg: ... }` blocks, theme-specific CSS files scattered outside `assets/css/`.
@@ -42,13 +42,11 @@ Per-phase recipes for `/gabe-mockup` execute step. Covers the canonical 13-phase
 - **Static server:** Playwright config uses `http-server docs/mockups -p 4173`. Avoids `file://` protocol issues with `cssRules` introspection + `@import` resolution.
 - **Run:** `npm install && npm test` (after `npx playwright install chromium` once).
 
-> Project bindings — scheduled to move to the owning project's RULES.md/DESIGN.md in migration phase A2. The state-tabs origin note below names a specific prior project (gastify).
-
 ### State-tabs component (multi-state screens)
 
-- Promoted from `gastify-single-scan-states.html` pattern to suite standard.
+- Suite standard.
 - Multi-state screens MUST use one shared phone frame (mobile) / one edge-to-edge surface (desktop) + a state-tabs row that toggles `.state-content.active` class via JS.
-- **Forbidden pattern:** stacking multiple phone frames vertically, one per state/variant. Creates visual inconsistency (gastify `login.html` drift).
+- **Forbidden pattern:** stacking multiple phone frames vertically, one per state/variant. Creates visual inconsistency.
 - State-tabs live at `docs/mockups/molecules/state-tabs.html` (produced in M3).
 - DOM flexibility: tweaks.js state-tabs driver accepts both ARIA (`[role="tablist"] > [role="tab"]`) and legacy (`.state-tabs > .state-tab[data-state]`) shapes. Authors pick whichever reads cleaner.
 
@@ -136,7 +134,7 @@ The `react-story`/`design-ref`/`spike`/`validate`/`refine` mode recipes now live
 3. **Author `STRESS-TEST-SPEC.md`** at `docs/mockups/STRESS-TEST-SPEC.md`:
    - 4 canonical screens × N platforms (from PLAN `--platforms`) × 2 modes (light/dark) matrix
    - Minimum viable subset: Dashboard × N platforms × themes — confirms token discipline before full matrix
-4. **Render stress matrix.** For each theme × screen × platform × mode, emit HTML at `docs/mockups/explorations/<theme>-<screen>-<platform>.html`. Use `frontend-design` skill OR project-specific design skill (e.g., `gastify-design`).
+4. **Render stress matrix.** For each theme × screen × platform × mode, emit HTML at `docs/mockups/explorations/<theme>-<screen>-<platform>.html`. Use `frontend-design` skill OR a project-specific design skill if the project has one.
 5. **User reviews candidates.** Pick subset to ship as runtime multi-theme set.
 6. **Write tokens CSS:**
    - **Greenfield:** copy `~/.claude/templates/gabe/mockup/tokens.css` to `docs/mockups/assets/css/tokens.css`; extend with all picked themes' vars.
@@ -190,16 +188,16 @@ The `react-story`/`design-ref`/`spike`/`validate`/`refine` mode recipes now live
 
 ### M4 — Flows + INDEX + CRUD×entity (`mockup-flows, mockup-index`)
 
-**Goal:** Seed `docs/mockups/INDEX.md` (4 tables) + populate ENTITIES.md CRUD columns + enumerate flows.
+**Goal:** Seed `docs/mockups/INDEX.md` (4 tables) + populate its CRUD × entity table + enumerate flows.
 
 **Steps:**
 
-1. **Read `.kdbp/ENTITIES.md`** — entity list (created at `/gabe-init` for mockup/hybrid projects). If missing, create from template + seed from SCOPE.md REQs.
+1. **Assemble the entity list** — from `SCOPE.md` REQs / the project's data model (legacy projects may still carry an archived `.kdbp/archive/retired/ENTITIES.md`; read it if present, never recreate it).
 2. **Write `docs/mockups/INDEX.md`** from `templates/mockup/INDEX.md`:
    - §1 Decisions log — port from `.kdbp/DECISIONS.md` D-entries
    - §2 Workflows — list flows F1..Fn with REQ mappings
    - §3 Screens by section — seed with desktop+mobile columns (empty rows for P5-P12 to fill)
-   - §4 CRUD × entity — for each entity in ENTITIES.md, 4 columns (Create / View / Update / Delete), cells filled with screen names as P5-P12 lands
+   - §4 CRUD × entity — for each entity in the assembled list, 4 columns (Create / View / Update / Delete), cells filled with screen names as P5-P12 lands
    - §5 Component usage — seed (filled in P5-P12)
    - §6 Coverage gaps — initial baseline from AUDIT (if exists)
 3. **Enumerate flows.** For each flow, emit `docs/mockups/flows/flow-<N>-<name>.html` walkthrough skeleton (happy path only at MVP tier).
@@ -227,7 +225,7 @@ The `react-story`/`design-ref`/`spike`/`validate`/`refine` mode recipes now live
    e. **Update INDEX.md §4 CRUD row(s)** for any entity this screen touches.
    f. **Update INDEX.md §5** component usage per screen.
 3. **Mid-phase commit-gate.** After every 3-5 screens, `/gabe-commit` chain fires — CHECK 7 Layer 4 surfaces INDEX.md sync warning if missed.
-4. **Phase-exit validation gate.** After the last screen lands, dispatcher auto-runs `node tests/mockups/validate/runner.mjs --screens=<phase-screens>` to populate `.kdbp/MOCKUP-VALIDATION.md` with C1–C4 findings. User triages inline (f/d/x/s/e/q action keys per finding) OR passes `--skip-validation` to the next `/gabe-mockup` invocation to defer. Gate is *review-or-defer*, not *must-fix-to-proceed*. See Shared conventions → Validation gates — screen-level (`references/validate.md`), and Modes → `validate` (`references/validate.md`).
+4. **Phase-exit validation gate.** After the last screen lands, dispatcher auto-runs `node tests/mockups/validate/runner.mjs --screens=<phase-screens>` to populate `docs/mockups/MOCKUP-VALIDATION.md` with C1–C4 findings. User triages inline (f/d/x/s/e/q action keys per finding) OR passes `--skip-validation` to the next `/gabe-mockup` invocation to defer. Gate is *review-or-defer*, not *must-fix-to-proceed*. See Shared conventions → Validation gates — screen-level (`references/validate.md`), and Modes → `validate` (`references/validate.md`).
 
 **Frame rules:** See Shared conventions → Per-platform frame rules above. No stacked frames. State-tabs for multi-state.
 
@@ -261,7 +259,7 @@ The `react-story`/`design-ref`/`spike`/`validate`/`refine` mode recipes now live
 - **Missing canonical tokens CSS** during M2+ phase → recipe aborts with `⚠ M1 not complete — no stylesheet in docs/mockups/assets/css/ defines [data-theme="X"] selectors. Run /gabe-mockup M1 first or --reconfigure.`
 - **Atom referenced in molecule but not in atoms/** → recipe surfaces which atom missing + asks to back-port.
 - **Screen references molecule not in molecules/** → same surfacing, back-port pattern.
-- **ENTITIES.md absent at M4** → recipe creates from template, prompts user to review entity list before populating CRUD.
+- **No entity source at M4** → assemble the list from SCOPE.md REQs and prompt the user to review it before populating CRUD.
 - **Tier-cap violation** (e.g., MVP-tier phase tries to land multi-theme runtime) → recipe flags + offers escalation prompt (same mechanic as `/gabe-execute` Step 4.1).
 
 ## Non-goals
@@ -272,7 +270,7 @@ The `react-story`/`design-ref`/`spike`/`validate`/`refine` mode recipes now live
 - **`design-ref` mode does NOT replace M13 handoff.** It writes React-first design grammar at `docs/rebuild/ux/DESIGN.md`; `HANDOFF.json`, `SCREEN-SPECS.md`, and audit closure remain M13 outputs.
 - **Legacy phase recipes (M0-M13) do NOT couple to any specific framework** — output is vanilla HTML + CSS vars + minimal vanilla JS (tweaks.js only). React-first projects use the `react-story` mode instead, and one-off component ports can still use `spike`.
 - Does NOT couple to any specific tokens filename — tweaks.js detects themes from whichever stylesheet exposes `[data-theme="X"]` selectors. Greenfield projects use `assets/css/tokens.css`; legacy ports may retain their existing shell filename.
-- **`validate` mode does NOT block phase advancement** — the inline gate at M5–M12 exit is *review-or-defer*. Findings stay pending in `.kdbp/MOCKUP-VALIDATION.md` until triaged; passing `--skip-validation` to the next `/gabe-mockup` call advances the ladder regardless. Conscious choice: prevent gate friction from grinding iterative screen work to a halt.
+- **`validate` mode does NOT block phase advancement** — the inline gate at M5–M12 exit is *review-or-defer*. Findings stay pending in `docs/mockups/MOCKUP-VALIDATION.md` until triaged; passing `--skip-validation` to the next `/gabe-mockup` call advances the ladder regardless. Conscious choice: prevent gate friction from grinding iterative screen work to a halt.
 - **`validate` mode does NOT do pixel-level visual diffing.** That's a separate `visual-diff` mode for a future pass. C1–C4 are layout-sanity heuristics (overflow, narrow columns, empty content, KDBP rule binding), not screenshot comparison.
 
 ---
@@ -316,16 +314,9 @@ grep 'data-section="atoms" data-status="live"' docs/mockups/index.html
 npm test  # expect: atoms sub-hub spec passes, atoms smoke spec passes
 ```
 
-> Project bindings — scheduled to move to the owning project's RULES.md/DESIGN.md in migration phase A2. The regression guard below hardcodes a path into a sibling project (gastify) that is not part of this suite.
-
-**Regression guard against gastify** (the Layer A reference implementation):
-
-```bash
-cd /home/khujta/projects/apps/gastify
-npm test  # must still show all green; if not, the template extraction over-generalized
-```
+**Regression guard (reference project):** if these templates were extracted from a reference project, re-run that project's mockup test suite after template changes — the reference project is named in the manifest's `reference_projects`; a red run there means the extraction over-generalized.
 
 Failure modes to budget for:
 - Sanitization regex misses a project-specific reference → bench scaffold inherits original branding. Fix: re-grep for the source project name after each template write.
-- `D6` tweaks spec generalization breaks the visible-effect assertion → re-verify by running gastify's `tests/mockups/tweaks.spec.ts` after the template extraction.
+- `D6` tweaks spec generalization breaks the visible-effect assertion → re-verify by running the reference project's `tests/mockups/tweaks.spec.ts` after the template extraction.
 - M0 idempotency bug — running `/gabe-mockup` twice clobbers user edits. Fix: every copy step does an `if exists, skip` check.

@@ -120,7 +120,7 @@ D5 Structural Fit:
 
 This catches drift at the cheapest moment — before any code is written. Hook + commit-time CHECK 8 remain as safety nets for changes that skip assess.
 
-**Source-of-truth note:** `STRUCTURE.md` Allowed Patterns are the authoritative source for "where files belong" in this project. The `Paths` column in KNOWLEDGE.md Gravity Wells is a **derived** view — it maps architectural sections to path globs for activity signals in `/gabe-teach brief`. When STRUCTURE patterns and wells Paths diverge, **STRUCTURE wins**. `/gabe-teach wells → [paths N]` will warn when a user-entered path is absent from STRUCTURE.md Allowed Patterns and suggest adding it there first.
+**Source-of-truth note:** `STRUCTURE.md` Allowed Patterns are the authoritative source for "where files belong" in this project. The `Paths` column in KNOWLEDGE.md Gravity Wells (legacy — only present on projects that still carry a `.kdbp/KNOWLEDGE.md`) is a **derived** view — it maps architectural sections to path globs for activity signals in `/gabe-teach brief`. When STRUCTURE patterns and wells Paths diverge, **STRUCTURE wins**. `/gabe-teach wells → [paths N]` will warn when a user-entered path is absent from STRUCTURE.md Allowed Patterns and suggest adding it there first.
 
 ---
 

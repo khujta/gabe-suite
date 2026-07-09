@@ -5,7 +5,7 @@ when_to_use: "Scan for architecture decision-debt — decisions never made expli
 context: fork
 agent: Explore
 metadata:
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # Gabe Debt — Architectural Decision-Debt Scanner

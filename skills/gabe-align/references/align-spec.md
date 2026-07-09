@@ -231,10 +231,9 @@ Action: 2 untested scenarios + 1 value concern.
   Fix now, or commit and track as deferred: /gabe-review deferred
 ```
 
-After displaying, append to `.kdbp/LEDGER.md`:
+After displaying, append one thin-index row to `.kdbp/LEDGER.md` (per the house format in `gabe-plan/references/plan-spec.md` § "Shared: LEDGER.md thin session index"). Keep the per-value PASS/CONCERN tokens in the Gates/results cell — `/gabe-align evolve` parses them:
 ```
-## 2026-04-05 14:30 — Checkpoint (pre-commit)
-U1:PASS U2:CONCERN V1:PASS V2:PASS | Scenarios: 4/6 covered | Committed: pending
+| 2026-04-05 | ALIGN | pre-commit checkpoint | — | U1:PASS U2:CONCERN V1:PASS V2:PASS · scenarios 4/6 covered |
 ```
 
 ### Checkpoint ❌ → Deferred Item Handoff
@@ -269,14 +268,13 @@ At commit/PR boundaries, after evaluating values, Claude reads the modified sour
 
 ### Checkpoint Logging
 
-After the checkpoint runs (values + scenarios), append a one-line summary to `.kdbp/LEDGER.md`:
+After the checkpoint runs (values + scenarios), append one thin-index row to `.kdbp/LEDGER.md` (per the house format in `gabe-plan/references/plan-spec.md` § "Shared: LEDGER.md thin session index"). Keep the per-value PASS/CONCERN tokens in the Gates/results cell — `/gabe-align evolve` parses them:
 
 ```
-## 2026-04-05 14:30 — Checkpoint (pre-commit)
-U1:PASS U2:CONCERN V1:PASS V2:PASS | Scenarios: 2/3 covered | Committed: yes
+| 2026-04-05 | ALIGN | pre-commit checkpoint | — | U1:PASS U2:CONCERN V1:PASS V2:PASS · scenarios 2/3 covered · committed: yes |
 ```
 
-The `Committed` field is set at write time: `yes` if the checkpoint fires during a commit that proceeds, `no` if the user aborts after seeing concerns. Since the hook fires via `PreToolUse` (before the commit executes), always write `Committed: yes` — if the user cancels the commit after seeing the checkpoint, the next session's checkpoint will detect the same issues and overwrite. Do not attempt to update the field retroactively.
+The `committed` field in the Gates/results cell is set at write time: `yes` if the checkpoint fires during a commit that proceeds, `no` if the user aborts after seeing concerns. Since the hook fires via `PreToolUse` (before the commit executes), always write `committed: yes` — if the user cancels the commit after seeing the checkpoint, the next session's checkpoint will detect the same issues and overwrite. Do not attempt to update the field retroactively.
 
 This gives `/gabe-align evolve` data to analyze. The ledger is append-only — never read during normal checkpoint flow, only by `evolve`.
 
@@ -438,7 +436,7 @@ Reads old `_kdbp/behaviors/*/VALUES.md` and `BEHAVIOR.md`. Copies values and beh
 Reviews checkpoint history from `.kdbp/LEDGER.md`. Counts per-value PASS/CONCERN frequency across recent entries.
 
 **Process:**
-1. Read `.kdbp/LEDGER.md` — parse the one-line checkpoint entries
+1. Read `.kdbp/LEDGER.md` — filter rows where `Entry` = `ALIGN`, parse the per-value PASS/CONCERN tokens from each row's Gates/results cell
 2. Count per-value: how many PASS, how many CONCERN, across last 10-20 entries
 3. Surface patterns:
 

@@ -34,7 +34,7 @@ Frame rules (see `references/legacy-html-phases.md` → Per-platform frame rules
 - **When the gate fires:**
   1. **On-demand:** `/gabe-mockup validate` (full sweep or filtered subset).
   2. **Inline at phase exit:** every M5–M12 phase ends by running validate over the screens it emitted, unless the next `/gabe-mockup` invocation passes `--skip-validation`. Gate is *review-or-defer*, not *must-fix-to-proceed* — friction-aware, not blocking.
-- **Architecture awareness:** validator detects `dynamic` (single file + tweaks.js viewport switcher, e.g., gastify) vs `per-device` (`*-mobile.html` / `*-tablet.html` / `*-desktop.html`, e.g., gustify) and dispatches accordingly. Override via `.kdbp/BEHAVIOR.md` field `mockup_architecture: dynamic|per-device` for mid-migration projects.
+- **Architecture awareness:** validator detects `dynamic` (single file + tweaks.js viewport switcher) vs `per-device` (`*-mobile.html` / `*-tablet.html` / `*-desktop.html`) and dispatches accordingly. Override via `.kdbp/BEHAVIOR.md` field `mockup_architecture: dynamic|per-device` for mid-migration projects.
 
 ### Mode: `validate`
 
@@ -62,9 +62,9 @@ Frame rules (see `references/legacy-html-phases.md` → Per-platform frame rules
 
 **Outputs (idempotent — re-running preserves user-set Status values):**
 - Validator harness (only if missing): `tests/mockups/validate/{runner.mjs, screen-validator.spec.ts, rules.json}`.
-- Live findings document: `.kdbp/MOCKUP-VALIDATION.md` (rewritten per run; preserves Status of matching stable-IDs).
+- Live findings document: `docs/mockups/MOCKUP-VALIDATION.md` (rewritten per run; preserves Status of matching stable-IDs).
 - Recipe doc (only if missing — augmented thereafter): `docs/mockups/VALIDATE-MODE-RECIPE.md`.
-- Bookkeeping: append `Spike P15.<N>` row to `.kdbp/PLAN.md`; append a dated entry to `.kdbp/LEDGER.md`; append `tests/mockups/validate/.cache/` to `.gitignore` (idempotent grep-then-append).
+- Bookkeeping: append `Spike P15.<N>` row to `.kdbp/PLAN.md`; append one thin-index row to `.kdbp/LEDGER.md`: `| [YYYY-MM-DD] | MOCKUP | validate: [N] findings ([sev totals]) | — | [screens covered] |`; append `tests/mockups/validate/.cache/` to `.gitignore` (idempotent grep-then-append).
 
 **Recipe steps.**
 
@@ -81,7 +81,7 @@ Frame rules (see `references/legacy-html-phases.md` → Per-platform frame rules
    - `{{SCREENS_INDEX_PATH}}` ← `docs/mockups/INDEX.md`
 2. **S2 — Walk screens index.** Parse `docs/mockups/INDEX.md` §3 (Screens by section) to enumerate target screens. Apply `--screens` / `--phase` filters. Skip screens matching `rules.json` `skip_screens_pattern` (default: `-empty|-zero|-first-time|-loading|-error|deprecated`).
 3. **S3 — Run validator.** `node tests/mockups/validate/runner.mjs` (with passed flags). Runner writes `.cache/screens.json` manifest, invokes `npx playwright test tests/mockups/validate/screen-validator.spec.ts` — Playwright runs each (screen × viewport) test in parallel, writing per-test findings JSON into `.cache/findings/`. Runner aggregates.
-4. **S4 — Aggregate + dedupe.** Stamp stable-IDs (`sha1(screen+viewport+ruleId+selector)` truncated to 10 chars). Merge with existing `.kdbp/MOCKUP-VALIDATION.md`: preserve user-set Status values for matching IDs; new findings come in as `pending`.
+4. **S4 — Aggregate + dedupe.** Stamp stable-IDs (`sha1(screen+viewport+ruleId+selector)` truncated to 10 chars). Merge with existing `docs/mockups/MOCKUP-VALIDATION.md`: preserve user-set Status values for matching IDs; new findings come in as `pending`.
 5. **S5 — Write MOCKUP-VALIDATION.md.** Sections: header (architecture, run timestamp, severity totals), Findings (grouped by screen, status checkbox), Triage Backlog (deferred), Dismissed. Idempotent re-write — same input ⇒ same output (modulo timestamp).
 6. **S6 — Triage loop (interactive).** Per pending finding, offer f / d / x / s / e / q action keys (full reference: `~/.claude/templates/gabe/mockup/validate/validate-checklist.md`). Mutate Status column in place. Resumable — file is the source of truth; pick up where you left off next session.
 
@@ -102,12 +102,12 @@ Frame rules (see `references/legacy-html-phases.md` → Per-platform frame rules
 - **Architecture detection returns `unknown`** → exit with `⚠ Cannot detect mockup architecture. Set 'mockup_architecture: dynamic|per-device' in .kdbp/BEHAVIOR.md.`
 - **`docs/mockups/screens/` missing** → exit with `⚠ No screens directory. Run M5+ phase recipes first to emit screens.`
 - **`playwright.config.ts` missing** → emit one from `templates/mockup/playwright.config.ts` (substituting project-specific port, mockup root) before continuing S3.
-- **Playwright crash (worker error, browser launch failure)** → propagate runner exit code 2; don't write a partial MOCKUP-VALIDATION.md (last-good remains intact).
+- **Playwright crash (worker error, browser launch failure)** → propagate runner exit code 2; don't write a partial `docs/mockups/MOCKUP-VALIDATION.md` (last-good remains intact).
 - **`--phase=M<N>` passed but PLAN.md doesn't enumerate screens by phase** → fall back to `--all` with a console warning.
 
 **Inline gate at M5–M12 phase exit.**
 
-After every M5–M12 phase emits its last screen (before the user's next `/gabe-mockup` invocation), the dispatcher auto-runs `runner.mjs` over the screens emitted in that phase (filtered via `--screens=<phase-screens>`). Findings populate `.kdbp/MOCKUP-VALIDATION.md` as new `pending` entries. The user can then:
+After every M5–M12 phase emits its last screen (before the user's next `/gabe-mockup` invocation), the dispatcher auto-runs `runner.mjs` over the screens emitted in that phase (filtered via `--screens=<phase-screens>`). Findings populate `docs/mockups/MOCKUP-VALIDATION.md` as new `pending` entries. The user can then:
 
 - **Triage** any subset (f / d / x).
 - **Defer the entire batch** by passing `--skip-validation` to the next `/gabe-mockup` invocation — phase ladder advances; findings stay pending.

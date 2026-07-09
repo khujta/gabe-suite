@@ -4,7 +4,7 @@ description: "Architecture curriculum layer for the Gabe Suite. Holds concept fi
 when_to_use: "Background curriculum consulted by /gabe-teach — architecture concept files by tier × specialization. Not a user-facing command."
 user-invocable: false
 metadata:
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # Gabe Arch — Architecture Curriculum
@@ -17,9 +17,9 @@ A cross-project library of architecture concepts that accumulates as the human v
 
 ## How it fits the suite
 
-- **Topics** (from `/gabe-teach topics`) live in per-project `.kdbp/KNOWLEDGE.md`, driven by commits.
+- **Topics** (from `/gabe-teach topics`) live in per-project `.kdbp/KNOWLEDGE.md` (legacy — retired from the default KDBP inventory in A2; `/gabe-teach` runs stateless without it), driven by commits.
 - **Concepts** (this skill) live in `skills/gabe-arch/concepts/`, driven by the catalog below.
-- A single topic can be tagged with 0-N concepts (via the `ArchConcepts` column in `.kdbp/KNOWLEDGE.md`'s Topics table).
+- A single topic can be tagged with 0-N concepts (via the `ArchConcepts` column in `.kdbp/KNOWLEDGE.md`'s Topics table, when a legacy KNOWLEDGE.md is present).
 - A verified topic increments the tagged concepts' status in `~/.claude/gabe-arch/STATE.md` — the global, cross-project source of truth.
 - `/gabe-teach arch` enters dedicated architecture mode: browse, teach, verify, or let the system pick the next concept via progressive pressure.
 
@@ -140,7 +140,7 @@ The commands treat the `concepts/` directory as a queryable dataset. Expected qu
 
 Three-tier fallthrough, first match wins:
 
-1. **Project-driven** — any unverified concept tagged on a `pending` or `skipped` topic in the current project's `.kdbp/KNOWLEDGE.md`.
+1. **Project-driven** — any unverified concept tagged on a `pending` or `skipped` topic in the current project's `.kdbp/KNOWLEDGE.md`, when a legacy KNOWLEDGE.md is present (no-op — falls through to tier 2 — on projects without one).
 2. **Adjacency** — any unverified concept whose `prerequisites` are all `verified` in `~/.claude/gabe-arch/STATE.md`, preferring concepts in specializations where the human already has momentum (≥1 verified concept in that spec).
 3. **Foundation gap** — any `intermediate`/`advanced` concept the human has verified without its foundational prerequisites. Surface the gap before proposing new ground.
 

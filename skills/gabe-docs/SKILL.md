@@ -4,7 +4,7 @@ description: "Documentation standards for gabe-generated docs. CommonMark compli
 when_to_use: "Background standards consulted by other gabe skills — doc structure standards, Mermaid diagram selection, and the suite execution contract (references/execution-contract.md). Not a user-facing command."
 user-invocable: false
 metadata:
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # Gabe Docs — Documentation Standards

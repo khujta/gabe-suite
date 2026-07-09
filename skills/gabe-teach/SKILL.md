@@ -3,7 +3,7 @@ name: gabe-teach
 description: "Consolidate the human's architect-level understanding of recent changes — renders lessons from commits under gravity wells (architectural sections), with analogies, Socratic verification, and .kdbp/KNOWLEDGE.md tracking. Usage: /gabe-teach [brief|topics|status|wells|init-wells|history|story|arch|retro|tour|free]"
 when_to_use: "Teach me, explain what changed, consolidate my understanding of recent work — renders a lesson from commits. Rarely needed (2 observed uses in the corpus); invoke on explicit human request to learn, never proactively."
 metadata:
-  version: 2.0.0
+  version: 2.0.1
 ---
 
 # Gabe Teach — human knowledge consolidation
@@ -33,6 +33,8 @@ Countermeasure for "the human can't keep up with AI-paced changes." Teach-first,
 | `free [concept]` | teach | Raw analogy generation (invokes the `gabe-lens` skill) |
 
 **Inputs:** git history (`git log`, commit ranges scoped by well paths), `.kdbp/KNOWLEDGE.md` (Gravity Wells + Topics tables), architecture concepts from the `gabe-arch` skill, and the `gabe-docs` diagrams library (per-well diagram-type recommendations).
+
+**KNOWLEDGE.md status (A2).** `KNOWLEDGE.md` is retired from the default KDBP inventory. `/gabe-teach` runs stateless — it renders lessons without persistent topic tracking — unless a legacy `.kdbp/KNOWLEDGE.md` exists, in which case the tracking behaviors described in `references/teach-engine.md` still apply to it. Never create a new KNOWLEDGE.md.
 
 ## Procedure
 

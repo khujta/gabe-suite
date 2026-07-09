@@ -3,7 +3,7 @@ name: gabe-assess
 description: "Rapid decision-context assessment for changes that feel obvious but carry hidden weight. Surfaces blast radius, maturity-appropriate scope, and prerequisites before committing. Usage: /gabe-assess [change description or 'this']"
 when_to_use: "Before committing to an 'obvious' change — what's the blast radius of changing X, is this bigger than it looks, what must exist first; rapid impact assessment, cheaper than a full plan."
 metadata:
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # Gabe Assess — Change Impact Assessment Skill

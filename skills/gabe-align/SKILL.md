@@ -3,7 +3,7 @@ name: gabe-align
 description: "Alignment guardian — manual pre-flight checks (shallow/standard/deep) plus automatic values + scenario checks at commit/PR boundaries. Usage: /gabe-align [mode] [target] or /gabe-align init [project]"
 when_to_use: "Are we still aligned, pre-flight check before a risky or irreversible change, values + AP advisory check at commit/PR boundaries — shallow for quick sanity, standard for phase boundaries, deep for direction changes."
 metadata:
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # Gabe Align — Alignment Guardian
@@ -52,8 +52,8 @@ Fires at `git commit` / `gh pr create` via hook: values evaluation (session+stor
 5. For each applicable value: state handle, apply the test question, produce PASS/CONCERN/FAIL with cited evidence; in standard/deep run advisory AP checks separately.
 6. If `.kdbp/RULES.md` exists, run an implicit rule-violation cross-check against the target.
 7. Produce the mode's output format; list action items for CONCERN/FAIL; propose new values for uncovered gaps; deep mode also produces the alignment brief.
-8. Automatic checkpoint (commit/PR hook): evaluate Hot-tier values + scenario coverage, append a summary line to `.kdbp/LEDGER.md`, and route untested ❌ scenarios to `.kdbp/PENDING.md`.
+8. Automatic checkpoint (commit/PR hook): evaluate Hot-tier values + scenario coverage, append one thin-index row (tag `ALIGN`) to `.kdbp/LEDGER.md`, and route untested ❌ scenarios to `.kdbp/PENDING.md`.
 
 ## Output contract (summary)
 
-Shallow: inline 3-5 line verdict. Standard/deep: full alignment document with PASS/CONCERN/FAIL counts, an advisory AP section, action items, and a deterministic verdict (any FAIL → DO NOT PROCEED; else any CONCERN → PROCEED WITH CONCERNS; else PROCEED). Deep mode appends an alignment brief. Automatic checkpoint always appends one line to `.kdbp/LEDGER.md` and, on user-proceeded ❌ scenarios, writes deferred rows to `.kdbp/PENDING.md`. The full output contract in the spec is binding.
+Shallow: inline 3-5 line verdict. Standard/deep: full alignment document with PASS/CONCERN/FAIL counts, an advisory AP section, action items, and a deterministic verdict (any FAIL → DO NOT PROCEED; else any CONCERN → PROCEED WITH CONCERNS; else PROCEED). Deep mode appends an alignment brief. Automatic checkpoint always appends one thin-index row to `.kdbp/LEDGER.md` and, on user-proceeded ❌ scenarios, writes deferred rows to `.kdbp/PENDING.md`. The full output contract in the spec is binding.

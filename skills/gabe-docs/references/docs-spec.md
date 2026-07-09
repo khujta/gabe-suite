@@ -42,7 +42,7 @@ Commands/skills that produce user-facing triage tables (`/gabe-commit`, `/gabe-c
 
 1. **CommonMark strict.** No Setext, no ambiguous indented code blocks, no mixed list markers.
 2. **No time estimates.** Never write "30 min", "2-4 hours", "reading time: 5min" unless the user explicitly asks. Time varies per project/team; estimates rot.
-3. **Analogy first, then the thing.** Every well doc opens with the quoted one-liner from `KNOWLEDGE.md`. Every architectural explanation leads with the mental model, then the mechanism.
+3. **Analogy first, then the thing.** Every well doc (legacy — see below) opens with the quoted one-liner from `KNOWLEDGE.md`. Every architectural explanation leads with the mental model, then the mechanism.
 
 ## HTML review artifacts for complex plans
 
@@ -206,6 +206,8 @@ Matching heuristic (case-insensitive substring match on the well name or descrip
 - default → flowchart
 
 ## Analogy-first opener convention (gabe-lens specific)
+
+> Applies to **well docs** — scaffolded only on projects that still carry a legacy `.kdbp/KNOWLEDGE.md` Gravity Wells table (retired from the default KDBP inventory in A2; see gabe-teach's KNOWLEDGE.md status note). Projects without one skip well-doc scaffolding entirely; the rest of this section, the well doc template, and the diagram-upgrade rules below only apply when a well doc exists.
 
 Every well doc opens with three lines, in this exact order:
 

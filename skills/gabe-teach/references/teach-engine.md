@@ -9,6 +9,8 @@ Countermeasure for "the human can't keep up with AI-paced changes." Keeps the hu
 
 > **Rendering note.** Output templates in this spec wrapped in bare triple-backtick fences are spec-meta delimiters — render contents as plain markdown at runtime. Lesson bodies, well dashboards, topic tables, and prompts render as markdown, not monospace code. Tagged fences (```python, ```mermaid, etc.) stay fenced. See `gabe-docs/SKILL.md` § "Runtime output rendering convention".
 
+> **KNOWLEDGE.md status (A2).** `KNOWLEDGE.md` is retired from the default KDBP inventory. `/gabe-teach` runs stateless by default — it renders lessons without persistent topic tracking. Every KNOWLEDGE.md read/write described below still applies verbatim whenever a legacy `.kdbp/KNOWLEDGE.md` exists (current project or an adopted-in-place file); this skill never creates a new one.
+
 ## Procedure
 
 ### Step 0: Detect mode
@@ -37,7 +39,7 @@ Parse `$ARGUMENTS`:
 | `learning` | admin | View and adjust `~/.claude/gabe-lens-learning.md` — current patterns, active tailorings, review cadence. Supports `learning reset` (clear all tailoring), `learning pattern <id>` (inspect a specific pattern) |
 | `history` | admin | Full timeline — plans, phases, commits, sessions, topics |
 | `history full` | admin | Unbounded history (default shows last 10 sessions + last 5 plans) |
-| `scope` | teach | Teach WHY sections of your own SCOPE.md + per-phase Why paragraphs from ROADMAP.md. Only available when both files exist. Renders premise + primary user JTBD + current phase Why as a lesson. Requires foundation: SCOPE.md § anchors (`{#sc-NN}`, `{#req-NN}`, `{#phase-N}`). |
+| `scope` | teach | Teach WHY sections of your own SCOPE.md, including per-phase Why paragraphs from the `## Phases` section (pre-A2 projects may carry these in a separate `.kdbp/ROADMAP.md` or its archived copy under `.kdbp/archive/retired/` instead — read the same fields there). Renders premise + primary user JTBD + current phase Why as a lesson. Requires foundation: SCOPE.md § anchors (`{#sc-NN}`, `{#req-NN}`, `{#phase-N}`). |
 | `scope <anchor>` | teach | Teach one specific anchor, e.g. `scope sc-01`, `scope req-02`, `scope phase-3`. Deep-link lesson. |
 
 **Routing rules:**
@@ -319,10 +321,9 @@ If KNOWLEDGE.md already has topic rows (e.g., user ran `/gabe-teach` before defi
 
 **Step 2d — Write to KNOWLEDGE.md.**
 
-Replace the `Status: uninitialized.` placeholder with the populated Gravity Wells table, including the `Analogy`, `Paths`, and `Docs` columns. Update topic rows with their assigned wells. Log to LEDGER.md:
+Replace the `Status: uninitialized.` placeholder with the populated Gravity Wells table, including the `Analogy`, `Paths`, and `Docs` columns. Update topic rows with their assigned wells. Log one thin-index row to LEDGER.md (per the house format in `gabe-plan/references/plan-spec.md` § "Shared: LEDGER.md thin session index"):
 ```
-## [YYYY-MM-DD HH:MM] — /gabe-teach init-wells
-WELLS: [N] defined | RETAGGED: [M] topics
+| [YYYY-MM-DD] | TEACH | init-wells: [N] defined, [M] retagged | — | — |
 ```
 
 **Step 2e — Scaffold doc stubs (always prompt).**
@@ -1162,11 +1163,9 @@ Count `N_verified` = number of `### T[N] —` headings under `## Topics (auto-ap
 - Arch state updates: 2 new verified, 1 reinforcement  (counts from Step 4d.3; omitted if zero)
 ```
 
-**Step 4g — Log to LEDGER.md** (unchanged except includes wells count):
+**Step 4g — Log one thin-index row to LEDGER.md** (per the house format in `gabe-plan/references/plan-spec.md` § "Shared: LEDGER.md thin session index"):
 ```
-## [YYYY-MM-DD HH:MM] — /gabe-teach
-TOPICS: presented N, verified M, skipped K, already-known J
-WELLS: [N] | PENDING: [count after this session]
+| [YYYY-MM-DD] | TEACH | topics: presented N, verified M, skipped K, already-known J | — | wells: [N] |
 ```
 
 ### Step 5: History mode
@@ -1250,7 +1249,7 @@ Read-only orientation snapshot. A newcomer (dev who knows the language/stack but
 1. `.kdbp/BEHAVIOR.md` frontmatter → `domain:` (one-liner), `maturity:`, `tech:`
 2. `.kdbp/KNOWLEDGE.md` → Gravity Wells table (Name + Description + Analogy + Paths + Docs), Topics table (Well + Class + Topic + Status + Last Touched), Storyline section (if present)
 3. `.kdbp/PLAN.md` → active plan goal + current phase (N of M) + Review/Commit/Push tick states, if `status: active`
-4. `.kdbp/LEDGER.md` → last 5 entries (dated section headers + first line of each)
+4. `.kdbp/LEDGER.md` → last 5 rows (thin-index table, newest first — see `gabe-plan/references/plan-spec.md` § "Shared: LEDGER.md thin session index"; git commits/`git show` hold the detail)
 5. `.kdbp/PENDING.md` → open items with status=open, their priority, file, and finding summary
 6. `.kdbp/DECISIONS.md` → last 3 decision entries (date + one-line title)
 7. `git log --since="14 days ago" --oneline` → project-wide commit count
@@ -1355,8 +1354,8 @@ RECENT PROJECT ACTIVITY (last 14 days)
 
   [N] commits | [M] teach sessions | [K] plan phases shipped
 
-  From LEDGER.md:
-    - [date] [first line of entry]
+  From LEDGER.md (thin-index rows, newest first):
+    - [date] [Entry tag]: [Theme/scope cell]
     - ... (up to 5)
 
 COMMANDS

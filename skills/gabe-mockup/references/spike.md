@@ -35,7 +35,7 @@ When `/gabe-mockup spike <component>` translates a static mockup into a working 
 - System layer (only with `--system`): `frontend/src/components/<Component>/{<Component>Provider.tsx, <Component>Container.tsx, use<Component>.ts}`.
 - Demo: `frontend/src/demo/<Component>Demo.tsx`.
 - Recipe doc (only if missing — augmented thereafter): `docs/mockups/REACT-PORT-RECIPE.md`.
-- Bookkeeping: append `Spike P14.<N>` row to `.kdbp/PLAN.md`; append a dated entry to `.kdbp/LEDGER.md`; append `frontend/node_modules/`, `frontend/dist/` to `.gitignore` (idempotent grep-then-append).
+- Bookkeeping: append `Spike P14.<N>` row to `.kdbp/PLAN.md`; append one thin-index row to `.kdbp/LEDGER.md`: `| [YYYY-MM-DD] | MOCKUP | spike: <component> ported (--system: <yes|no>) | — | <verification result> |`; append `frontend/node_modules/`, `frontend/dist/` to `.gitignore` (idempotent grep-then-append).
 
 **Recipe steps.**
 
@@ -57,7 +57,7 @@ When `/gabe-mockup spike <component>` translates a static mockup into a working 
 5. **S5 — Demo page.** Copy `templates/mockup/react/src/demo/ComponentDemo.tsx.tmpl` → `frontend/src/demo/<Component>Demo.tsx`. Substitute `{{VARIANT_TUPLE}}` (e.g. `["success", "info", "warning", "error"]`), `{{THEME_OPTIONS}}` (rendered `<option>` tags from canonical CSS theme list), `{{HOOK_NAME_FILE}}` (e.g. `useToast`). For leaf-only spikes, the recipe strips `// SYSTEM:` lines and the entire `{/* SYSTEM-START */} ... {/* SYSTEM-END */}` block.
 6. **S6 — Visual diff.** `cd frontend && npm install && npm run dev` (port 5173). In a second tab, `npx http-server docs/mockups -p 4173`. Compare each variant in light + dark mode. Acceptable drift: subpixel font rendering, animation timing. Unacceptable: any token-derived value (color, spacing, radius, shadow) — those mean the import chain is broken.
 7. **S7 — Recipe doc.** If `docs/mockups/REACT-PORT-RECIPE.md` doesn't exist, copy from `templates/mockup/react/recipe/REACT-PORT-RECIPE.md.tmpl` with substitutions. Always append a row to the "Components ported" table (date, component name, --system flag, notes).
-8. **S8 — Bookkeeping.** Append `Spike P14.<N>` row to `.kdbp/PLAN.md` (use the next available `P14.N` index). Append a `## YYYY-MM-DD — SPIKE P14.<N> EXECUTED` block to `.kdbp/LEDGER.md` documenting files emitted + verification result.
+8. **S8 — Bookkeeping.** Append `Spike P14.<N>` row to `.kdbp/PLAN.md` (use the next available `P14.N` index). Append one thin-index row to `.kdbp/LEDGER.md`: `| [YYYY-MM-DD] | MOCKUP | spike: <component> ported (--system: <yes|no>) | — | <verification result> |`.
 
 **Verification gate (all must pass before S8 marks complete):**
 - `npm run dev` boots without errors at localhost:5173.

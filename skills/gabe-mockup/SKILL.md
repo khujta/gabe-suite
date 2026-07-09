@@ -9,7 +9,7 @@ paths:
   - "**/design-lab/**"
   - "docs/mockups/**"
 metadata:
-  version: 2.0.0
+  version: 2.1.0
 ---
 
 # Gabe Mockup — the lift SOP
@@ -38,6 +38,9 @@ Read the `mockup:` block from `.kdbp/BEHAVIOR.md` (fallback: `.kdbp/MOCKUP.md`).
 - `spikes_root` — where exploratory spike stories live.
 - `verify_commands` — the L4 gate command list (typecheck, build, build-storybook, test-storybook, token-class check, …).
 - `capture` — screenshot/video tool + breakpoints for render-gate evidence.
+- `proof_root` — committed runtime-evidence folder (the un-ignored carve-out, e.g. `tests/web-e2e/proof`).
+- `journey_specs` — where journey specs live (one spec per feature, augmented in place).
+- `critical_paths` — glob list; ad-hoc work touching these inherits `proof: test`.
 - `reference_projects` — sibling projects this one inherits patterns from.
 - `legacy_reference` — a prior codebase to read before building equivalents.
 
