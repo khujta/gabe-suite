@@ -499,6 +499,7 @@ Schema (v1):
 {
   "version": 1,
   "status": "active",
+  "project_type": "code",
   "goal": "<one-line goal>",
   "maturity": "<from Context>",
   "created": "YYYY-MM-DD",
@@ -520,7 +521,7 @@ Schema (v1):
 
 Rules:
 
-- `status` mirrors the `<!-- status: ... -->` comment: `active | none | completed | defer | cancelled`.
+- `status` mirrors the `<!-- status: ... -->` comment: `active | none | completed | defer | cancelled`. `project_type` mirrors the `<!-- project_type: ... -->` comment (`code | mockup | hybrid`); readers default a missing field to `code`.
 - Cell tokens mirror the table glyphs 1:1: ⬜ `todo` · 🔄 `in_progress` · ✅ `done` · ⏸ `deferred` · ⚰️ `obsolete`.
 - `proof` is the per-phase runtime-evidence field (Evidence Doctrine): at plan time, the required journey command / spec path / artifact dir from `## Runtime Evidence Checkpoints` (or `null` for phases with no runtime requirement); `/gabe-execute` overwrites it with the actual evidence line (command → runtime → artifact paths) when the evidence lands.
 - On archive (Step 6b), after resetting PLAN.md to the empty template, write `{"version": 1, "status": "none", "phases": []}`. The archived `.md` copy is the durable record; the mirror is regenerable, so it is not archived.

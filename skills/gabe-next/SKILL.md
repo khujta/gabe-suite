@@ -1,9 +1,9 @@
 ---
 name: gabe-next
-description: "Zero-logic router — reads .kdbp/PLAN.md and dispatches to the next gabe command (review/commit/push/execute/plan). Pure state-machine, no LLM decisions, no side effects beyond the command it routes to. Usage: /gabe-next [--dry-run]"
+description: "Zero-logic router — deterministic scripts/next.mjs over .kdbp/PLAN.json (prose PLAN.md fallback) dispatches to the next gabe command (review/commit/push/execute/plan). No LLM decisions, no side effects beyond the command it routes to. Usage: /gabe-next [--dry-run]"
 when_to_use: "What's next, where were we, continue the lifecycle — route to the next gabe step from PLAN.md state without re-deciding anything."
 metadata:
-  version: 2.0.0
+  version: 2.1.0
 ---
 
 # Gabe Next — zero-logic lifecycle router
@@ -12,7 +12,7 @@ metadata:
 
 This skill runs under the suite execution contract — E1 EVIDENCE · E2 RUN-BEFORE-✅ · E3 NO SILENT DOWNGRADE · E4 REUSE FIRST · E5 STATE SYNC · E6 MISSING ANCHOR = STOP · E7 REPORT WHERE — floors, not ceilings; a skill's own gate may be stricter, never looser. Full text: `../gabe-docs/references/execution-contract.md` (if that file is missing, E6 applies — STOP).
 
-Thin router. Reads `.kdbp/PLAN.md`, finds the next unticked cell in the phase table, and dispatches to the matching `gabe-*` command. Zero LLM cost. No state writes of its own.
+Thin router. Reads plan state, finds the next unticked cell, and dispatches to the matching `gabe-*` command. Zero LLM cost. No state writes of its own (except the Current Phase advance defined below).
 
 **Design principle.** This command does not execute tasks, reason about them, or modify files. It answers one question: "Given PLAN state, what's the next gabe command to run?" Then it runs that command (or prints it on `--dry-run`).
 
@@ -23,7 +23,15 @@ Thin router. Reads `.kdbp/PLAN.md`, finds the next unticked cell in the phase ta
 1. `.kdbp/` exists → else print `⚠ No KDBP. Run /gabe-init first.` and exit.
 2. `.kdbp/PLAN.md` exists and contains `<!-- status: active -->` → else print `ℹ No active plan. Run /gabe-plan [goal] to create one.` and exit.
 
-### Step 1: Parse PLAN.md
+### Step 0.5: Deterministic route via `scripts/next.mjs` (preferred path)
+
+Run `node <this skill dir>/scripts/next.mjs` (add `--json` for machine output). It reads `.kdbp/PLAN.json` and prints the full decision — prior-row sweep warnings, any advance instruction, PHASE/STATE/NEXT/REASON — implementing Steps 1–2 below deterministically (cell tokens `deferred`/`obsolete` count as settled rows and are skipped/advanced over with a printed notice).
+
+- Exit 0 → take its decision verbatim: perform any `advance Current Phase to <id>` instruction it printed (rewrite `## Current Phase` + bump `Last Updated` in PLAN.md AND mirror `current_phase`/`last_updated` into PLAN.json — same turn, E5), then go to Step 3 (dispatch).
+- Exit 1 → it printed the terminal message (no active plan / plan complete); surface it and stop.
+- Exit 2 → PLAN.json missing or unusable: print its notice, then fall back to the prose routing below (Steps 1–2) over PLAN.md. Never block on the mirror.
+
+### Step 1: Parse PLAN.md (prose fallback — only when next.mjs exited 2)
 
 Read `.kdbp/PLAN.md`. Extract:
 
@@ -154,5 +162,3 @@ REASON: Tasks not yet implemented (mockup dispatch via project_type)
 - Does NOT call LLMs under any circumstance
 
 $ARGUMENTS
-
-> Post-A2 hardening (planned): this prose state-machine becomes `scripts/next.mjs` reading `PLAN.json` — deterministic and zero-token, honoring this command's own no-LLM intent.

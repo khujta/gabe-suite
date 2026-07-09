@@ -39,3 +39,5 @@ KDBP-aware planner. Same planning logic as `/plan`, but persists to `.kdbp/PLAN.
 ## Output contract (summary)
 
 Write `.kdbp/PLAN.md` with the full section set (Goal/Context/Phases/Phase Details/Current Phase/Dependencies/Risks/Notes/Review Artifacts/Runtime Evidence Checkpoints), the `.kdbp/PLAN.json` machine mirror, and the corresponding LEDGER.md thin-index row in the same turn (E5). Tier decisions, per-dim overrides, and suppressed dimensions get a DECISIONS.md entry with a stated reason. Emit the output-only `**Gabe-Lens block**` — never written to PLAN.md/REVIEW.md/LEDGER.md/PENDING.md/commits/docs unless another command already owns that write. When an HTML review artifact is created or refreshed, report its path. The full output contract in the spec is binding.
+
+End every run with a single deterministic `NEXT: /gabe-execute` line (the phase's Exec command) — the routing contract; no other suggestions.
