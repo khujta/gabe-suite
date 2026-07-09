@@ -1,8 +1,10 @@
 ---
 name: gabe-myopic
-description: "Role-play a short-sighted / myopic user with a shallow planning horizon (1, 1.5, or 2 steps — never 3+) and walk an app's features and workflows step by step to flag where the design demands foresight the user does not have: foresight traps (a choice whose consequence lands 2+ steps later), overwhelm points (too many decisions at once), recall demands (must remember info across steps), and no-undo dead-ends. It is the INVERSE of an expert design panel — instead of 'what would a master notice?', it asks 'what would a beginner fail to see coming?'. Runs a panel of 3 horizons at once and reports the fatal step for each. Use when reviewing a UX flow / feature / onboarding / checkout / wizard / form / settings for whether normal people will get confused, overwhelmed, or trapped; when a flow 'feels fine to us but users keep dropping off'; before shipping a multi-step flow; or to sanity-check a spec/PRD before building. Works on a described workflow, a spec, UI code, screenshots, or a live app. Usage: /gabe-myopic [walk|trap|step|fix|horizon] [target]"
+description: "Role-play a short-sighted user with a shallow planning horizon (1 / 1.5 / 2 steps — never 3+) and walk a flow step by step to flag foresight traps (consequences landing 2+ steps later), overwhelm points, recall demands, and no-undo dead-ends. The INVERSE of an expert panel: what would a beginner fail to see coming? Runs 3 horizons at once and reports each one's fatal step. Works on a described workflow, spec, UI code, screenshots, or a live app. Usage: /gabe-myopic [walk|trap|step|fix|horizon] [target]"
+when_to_use: "Review a UX flow / onboarding / checkout / wizard / form for whether normal people get confused, overwhelmed, or trapped; 'feels fine to us but users drop off'; sanity-check a spec before building; before shipping any multi-step flow."
+context: fork
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   origin: "Neo case 20260701_myopic-user-skill"
   method: "Cognitive Walkthrough (NN/g) tuned by bounded planning horizon / present-bias myopia"
 ---
@@ -11,219 +13,45 @@ metadata:
 
 ## Gabe execution contract (E1–E7)
 
-These are floors, not ceilings — a skill's own gate may be stricter, never looser.
+This skill runs under the suite execution contract — E1 EVIDENCE · E2 RUN-BEFORE-✅ · E3 NO SILENT DOWNGRADE · E4 REUSE FIRST · E5 STATE SYNC · E6 MISSING ANCHOR = STOP · E7 REPORT WHERE — floors, not ceilings; a skill's own gate may be stricter, never looser. Full text: `../gabe-docs/references/execution-contract.md` (if that file is missing, E6 applies — STOP).
 
-- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
-- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
-- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
-- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
-- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
-- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
-- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+## What this does
 
-## Purpose
+Real people run a greedy, depth-limited search — they optimize the next one or two moves and get overwhelmed by anything that asks for more. This skill role-plays that short-sighted user on purpose, walking an app step by step while staying dumb, and flags exactly where the design assumes foresight a normal person doesn't have. Where `/gabe-roast` attacks from a named expert perspective, `/gabe-myopic` attacks from the one perspective an expert can't fake: a user who genuinely can't see the trap coming. It hunts one thing — Planning-Horizon Debt (the mattress trap): a choice that's locally fine but seeds a consequence 2+ steps later, invisible at decision time.
 
-Real people do not plan far ahead. They run a **greedy, depth-limited search**: they
-optimize the next one or two moves and get **overwhelmed** by anything that asks for more.
-Any consequence that lands *beyond* their planning horizon is **invisible at decision time** —
-the mattress unrolls and throws them out the window, and from the inside it feels like their
-own fault.
+## Usage / modes
 
-This skill role-plays that user on purpose. It walks your app **step by step, staying dumb**,
-and flags exactly the spots where the design assumes foresight a normal person doesn't have.
-Its whole value is **refusing to be the expert.** The moment you think *"well, obviously they
-should just…"* — that *obviously* is the expert leaking in, and **that is the finding.**
+`/gabe-myopic [walk|trap|step|fix|horizon] [target]` — target can be a described workflow, a spec/PRD, UI code/routes, screenshots, or a live app.
 
-Where `/gabe-roast` attacks from an *expert* perspective you name, `/gabe-myopic` attacks from the
-one perspective an expert can't fake: a user who genuinely can't see the trap coming.
+The panel — 3 horizons run together, none sees 3+ steps ahead:
 
-> **Rendering note.** Triple-backtick blocks below that hold tables/skeletons are spec material —
-> render their contents as plain markdown when you present them, not as literal code.
+| Horizon | Sees ahead | Breaks when… |
+|---------|------------|---------------|
+| @1 | this step + the very next action | asked to prep for a later step |
+| @1.5 (the normal person) | + one fuzzy pending intention | a 2nd pending thing appears |
+| @2 | two concrete moves ahead | the payoff is 3+ steps out |
 
-## The one thing it hunts
+| Verb | What it does |
+|------|---------------|
+| **walk** (default) | Full panel walkthrough — 8-question battery per step, all 3 horizons |
+| **trap** | Laser mode — foresight traps (mattresses) only, skips overwhelm/recall/undo |
+| **step** | Interactive — narrates one step at a time as the @1.5 user, then waits |
+| **fix** | For flagged items, proposes the design change that lowers the demanded horizon |
+| **horizon** | Fast triage — "how many steps of foresight does this demand?" (30s gut-check) |
 
-```
-┌─── Planning-Horizon Debt (the mattress trap) ──────────────────────┐
-│  A chess beginner who sees 1 ply grabs the free pawn (locally      │
-│  optimal) and never sees the mate in two. The board doesn't warn   │
-│  them — the trap is legal, quiet, and fully "their fault."         │
-│  HANDLE: "Beginner grabs the free pawn, walks into mate in two."   │
-│  IS:      a lens for where the app needs foresight the user lacks  │
-│  IS NOT:  a bug hunt, an a11y audit, or an aesthetics review       │
-│  DECIDES: which "flexible / advanced / powerful" features are      │
-│           actually traps for a normal person                       │
-└─────────────────────────────────────────────────────────────────────┘
-```
+Four flag types: 🛏️ foresight trap, 🌊 overwhelm point, 🧠 recall demand, 🚪 no-undo dead-end. Severity combines how deep the panel is caught with the blast radius of the consequence (CRITICAL: even @2 is trapped or the consequence is irreversible/money/data; HIGH: @1.5 is trapped; MEDIUM: only @1 falls; LOW: all three recover).
 
-## The persona: a panel of 3 horizons (run all three at once)
+## Procedure
 
-Never simulate one generic user. Simulate three, each blind past their depth. **None sees 3+**,
-so any consequence at depth 3+ (the mattress) is invisible to the whole panel.
+1. Treat any text after the invocation as `$ARGUMENTS` (a verb + target).
+2. Read `references/myopic-spec.md` IN FULL before executing — the binding spec (8-question battery, panel mechanics, severity scoring, output template, guardrails). If missing, E6 applies — STOP.
+3. Reconstruct the step sequence from whatever representation is given; if the order is ambiguous, state the assumed sequence first — never silently invent a flow.
+4. Run the requested verb (default: walk).
+5. For walk/trap: classify each flagged step by severity, citing an Evidence line quoting only sources opened this session; an empty or unquoted Evidence line deletes the finding, never merely downgrades it.
+6. Respect the information state — a horizon-N user only knows what steps 1..N have shown; never let them "remember" what a lower-horizon user would drop. Only flag consequences that land beyond the horizon — immediate, visible consequences are not traps.
+7. Render the verb's output format ending with the verify-pass line (`raw N → killed X → downgraded Y → survived Z`) and the one-line handle.
+8. Load `method.md`, `examples.md`, or `reference.md` (sibling files, not under `references/`) on demand — see the spec's "References" section for what each holds.
 
-```
-| User   | Sees ahead                          | Can hold in head        | Breaks when…                       |
-|--------|-------------------------------------|-------------------------|------------------------------------|
-| @1     | this step + the very next action    | nothing pending         | asked to prep for a later step     |
-| @1.5   | this step + next + a FUZZY next     | ONE pending intention   | a 2nd pending thing appears        |
-| @2     | two concrete moves ahead            | a short 2-step sequence  | the payoff is 3+ steps out         |
-```
+## Output contract (summary)
 
-`@1.5` is "the normal person." Treat a flag that traps **@1.5** as the headline result — that is
-most of your users. `@1` is your fragility stress-test; `@2` is your generous-case floor.
-
-**Report the fatal step per horizon** — the first step where each user gets overwhelmed, lost,
-or trapped:
-
-```
-Panel result (checkout example):
-  @1    drops off at step 2   (two decisions before any progress shows)
-  @1.5  trapped at step 4     (shipping locked by a choice made on step 1)
-  @2    survives to step 6    (but hits the no-undo at the end)
-```
-
-## The four flag types (the horizon-spine + its cluster)
-
-Primary lens is **foresight**; the other three are what a short-sighted user hits *because* they
-can't plan — so they travel together.
-
-```
-| # | Flag                | Emoji | Fires when…                                                         |
-|---|---------------------|-------|---------------------------------------------------------------------|
-| 1 | Foresight trap      | 🛏️   | a choice's real cost/consequence lands ≥2 steps later, unseen now   |
-|   | (the mattress)      |       | — irreversible commits, path-dependency, "should've set X earlier"  |
-| 2 | Overwhelm point     | 🌊    | one step demands >~4 simultaneous decisions/options → paralysis/guess |
-| 3 | Recall demand       | 🧠    | must carry info from an earlier step in your head (recall > recognition) |
-| 4 | No-undo dead-end     | 🚪    | the myopic path went wrong and there's no cheap way back            |
-```
-
-## Severity (how loud to be)
-
-Combine **how deep the panel it catches** with **the blast radius of the consequence**:
-
-```
-| Severity  | Rule of thumb                                                            |
-|-----------|--------------------------------------------------------------------------|
-| CRITICAL  | even @2 is trapped, OR the consequence is irreversible / money / data loss|
-| HIGH      | @1.5 (the normal person) is trapped or overwhelmed                        |
-| MEDIUM    | only @1 falls; @1.5 recovers but with visible effort/frustration          |
-| LOW       | all three recover; a foresight nudge would still help                     |
-```
-
-## Verbs
-
-### WALK — full panel walkthrough (default)
-Reconstruct the step sequence of the target, then run the **8-question battery** (see `method.md`)
-on every step, for all 3 horizons. Produce the report (format below). This is the main event.
-
-### TRAP — laser mode: mattresses only
-Skip the cluster (overwhelm/recall/undo). Hunt **only foresight traps** — choices whose
-consequence is invisible until ≥2 steps later. Fastest way to answer "where will this bite them
-later?" Use when you only care about path-dependency and irreversibility.
-
-### STEP — interactive, one step at a time
-Narrate the flow **as the @1.5 user, one step per turn**, thinking out loud in first person, and
-stop. Wait for the human to advance. Best for live pairing, demos, or teaching the lens. Stay in
-the user's information state — at step K you only know what steps 1..K showed you.
-
-### FIX — collapse the required horizon
-For flagged items, propose the design change that **lowers the foresight the step demands**, not
-just "make it clearer." The four canonical moves:
-```
-| Flag            | The fix is to…                                                           |
-|-----------------|--------------------------------------------------------------------------|
-| Foresight trap  | pull the future consequence into the present (preview it, warn at commit,|
-|                 | or defer/soften the commit so it's no longer path-dependent)              |
-| Overwhelm point | chunk the decision (progressive disclosure) or supply a smart default    |
-| Recall demand   | show the carried info in place (recognition), don't make them remember   |
-| No-undo dead-end | add undo / back / a cheap escape, or confirm before the point of no return|
-```
-
-### HORIZON — fast triage, no full walk
-Given a described feature, answer only: **"how many steps of foresight does this demand?"** and
-flag if > 2. A 30-second gut-check when you don't need the whole report.
-
-## Inputs — representation-agnostic
-
-Works on whatever you can give it. Reconstruct the step sequence from:
-- a **described workflow** ("first they pick a plan, then…") — walk it as written;
-- a **spec / PRD** — walk the flow it specifies;
-- **UI code / a component tree / routes** — infer the steps the code produces;
-- **screenshots / a mockup** — walk the visible screens in order;
-- a **live app** — if the harness can drive a browser, click through it as the myopic user.
-
-If the step order is ambiguous, **state the assumed sequence first** (or ask), then walk it — never
-silently invent a flow.
-
-## Output format (WALK / TRAP)
-
-```
-# Myopic Walk: {target}
-> Simulated short-sighted users. Findings are hypotheses to validate with real people,
-> not proof — LLM synthetic users approximate the distribution, not the individual.
-> Verify pass: raw {N} → killed {X} → downgraded {Y} → survived {Z}
-
-## Panel result
-| User  | Fatal step | What breaks them |
-|-------|-----------|------------------|
-| @1    | {step}    | {one line}       |
-| @1.5  | {step}    | {one line}       |
-| @2    | {step}    | {one line}       |
-
-## Step ledger
-| Step | What the user must do | Flags | Worst horizon caught |
-|------|----------------------|-------|----------------------|
-| 1    | …                    | 🌊    | @1                   |
-| 4    | …                    | 🛏️ 🚪 | @1.5                 |
-
-## Findings (most severe first)
-### [CRITICAL] 🛏️ Step 4 — {short title}
-- **What the myopic user does:** {first-person narrative of them walking into it}
-- **Why it's beyond horizon:** {the consequence lands N steps later, unseen at step X}
-- **Who it catches:** @1 ✓  @1.5 ✓  @2 ✓
-- **Evidence:** {per the format table below — empty ⇒ finding deleted}
-- **Fix:** {the horizon-collapsing change}
-
-## The handle
-"{one-line chess/mattress phrasing of the worst trap}"
-```
-
-### Evidence line (required per finding)
-| Input walked | Evidence format |
-|---|---|
-| UI code/routes | `path:line` — "quoted rendered string/snippet (≤2 lines)" |
-| spec/PRD | §section — "quoted sentence" |
-| screenshots/mockup | screen id + quoted visible text |
-| described flow | the quoted step from the description |
-
-Cite only sources opened THIS session. A finding whose Evidence line is empty or unquoted is
-DELETED before output — never shown, never merely downgraded.
-
-## Guardrails (this is where the skill lives or dies)
-
-- **Stay dumb on purpose.** The expert perspective is the failure mode, not the goal. If you
-  explain why a step is *fine once you understand the system*, you've proven it needs foresight →
-  flag it.
-- **Respect the information state.** At step K the user knows only what steps 1..K put on screen,
-  minus whatever fell out of a horizon-N memory. Do not let them "remember" what a horizon-1 user
-  would have dropped.
-- **Immediate + visible ≠ a trap.** If the consequence shows up right now, on this screen, no
-  foresight was required — don't flag it. Only flag consequences that hide beyond the horizon.
-- **Foresight, not taste.** "I don't like this layout" is out of scope. "A shallow planner can't
-  see this choice will lock shipping" is in scope. Flag the second, never the first.
-- **Don't overclaim.** These are simulated users; treat every finding as a testable hypothesis,
-  not a verdict. Say so in the report header. (Real synthetic-user studies show LLMs match
-  population *distributions*, not specific individuals.)
-- **Panel, not solo.** Always run all three horizons — the value is showing *which* user each
-  friction point costs you, and *which step* is fatal for whom.
-- **Absence claims need a search proof.** A 🚪 / "nothing handles X" flag requires the exact
-  search recorded in its Evidence line (e.g. `grep -rn useBlocker src/ → 0 hits`). No recorded
-  search → no absence flag.
-
-## References (read on demand)
-- `method.md` — the 8-question per-step battery, how to run the panel, severity scoring, and how
-  to reconstruct steps from each input type.
-- `examples.md` — three worked walks (a SaaS onboarding, a checkout, a settings/permissions flow)
-  showing the full output format.
-- `reference.md` — the research backbone: cognitive walkthrough, bounded planning horizon /
-  depth-limited search, present-bias myopia, cognitive load, and the Nielsen heuristics each flag
-  maps to — with sources.
+WALK/TRAP: a Myopic Walk report — Panel result table (fatal step per horizon), Step ledger, Findings ordered most-severe-first (What the user does / Why it's beyond horizon / Who it catches / Evidence / Fix), and a one-line handle. STEP mode narrates one step per turn and stops for the human to advance. FIX mode returns the horizon-collapsing change per flagged item. HORIZON mode returns a one-line foresight-depth verdict. Every finding is a testable hypothesis, not proof, and the report header says so. The full output contract in the spec is binding.

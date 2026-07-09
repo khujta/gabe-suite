@@ -1,6 +1,7 @@
 ---
 name: gabe-docsite
 description: "Publish documentation onto a self-contained, browsable HTML docs site — decide the right SECTION and disclosure level, wire it into the nav, and render it in the Cifra-styled shell with working diagrams. It PLACES and RENDERS; it does not fact-check the doc against the codebase (that is /gabe-docs, reviews, and the source-of-truth skills). Markdown is the source of truth; the HTML is generated. Usage: /gabe-docsite <what to document, or 'add the doc I wrote at docs/src/X.md'>"
+when_to_use: "Publish or update a page on the generated HTML docs site — place a doc in the right section, wire the nav, render with working diagrams. Markdown stays the source of truth."
 metadata:
   version: 1.0.0
   status: suite skill (generic, project-agnostic)
@@ -8,6 +9,10 @@ metadata:
 ---
 
 # gabe-docsite — publish a doc into a browsable HTML site
+
+## Gabe execution contract (E1–E7)
+
+This skill runs under the suite execution contract — E1 EVIDENCE · E2 RUN-BEFORE-✅ · E3 NO SILENT DOWNGRADE · E4 REUSE FIRST · E5 STATE SYNC · E6 MISSING ANCHOR = STOP · E7 REPORT WHERE — floors, not ceilings; a skill's own gate may be stricter, never looser. Full text: `../gabe-docs/references/execution-contract.md` (if that file is missing, E6 applies — STOP).
 
 > **One line:** take a document (one you wrote, or one to author) and put it on the project's **HTML docs site** in the *right place* — the correct section, at the correct disclosure level — then render it so it displays anywhere, including straight off disk (`file://`). It is **not** responsible for whether the doc matches the code; accuracy/drift is owned elsewhere (`/gabe-docs`, reviews). Here we care about: *where does this belong, how is it structured, and does it render.*
 

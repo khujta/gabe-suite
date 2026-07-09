@@ -1,21 +1,17 @@
 ---
 name: gabe-arch
 description: "Architecture curriculum layer for the Gabe Suite. Holds concept files (one per idea: retry-with-backoff, idempotency-keys, circuit-breaker, …) organized by tier × specialization. Consulted by /gabe-teach for inline Architecture-link rendering in lessons, by /gabe-teach arch mode for dedicated architecture study, and by /gabe-teach for tagging topics with concepts they touch."
+when_to_use: "Background curriculum consulted by /gabe-teach — architecture concept files by tier × specialization. Not a user-facing command."
+user-invocable: false
+metadata:
+  version: 1.1.0
 ---
 
 # Gabe Arch — Architecture Curriculum
 
 ## Gabe execution contract (E1–E7)
 
-These are floors, not ceilings — a skill's own gate may be stricter, never looser.
-
-- **E1 EVIDENCE** — every claim about code/state cites file:line or a command run THIS session; no citation → mark it `(assumed)` and verify before building on it. Absence claims ("no X exists") require a recorded search → 0 hits.
-- **E2 RUN-BEFORE-✅** — ✅ only after the command executed here (paste cmd + exit/count). Skipped = `⤫ skipped(<reason>)`, never ✅. Every printed number is copied from this run's output — never estimated.
-- **E3 NO SILENT DOWNGRADE** — quote the task text verbatim before implementing; if your plan delivers a cheaper class (restyle≠rebuild, stub≠implement, recreate≠reuse), STOP and ask. Substitution requires an explicit user decision line.
-- **E4 REUSE FIRST** — before creating anything, print: `REUSE <path> | EXTEND <path> | NEW (searched <where> — none fit)`. Recreating an existing artifact is a defect.
-- **E5 STATE SYNC** — actions that change reality (commit/merge/defer/pivot) write their state row in the SAME turn; a skipped write prints an enumerated skip code, never silence.
-- **E6 MISSING ANCHOR = STOP** — referenced template/spec/catalog absent → print ⛔ and stop; never reconstruct it from memory.
-- **E7 REPORT WHERE** — end user-visible work with: exact URL/screen · env (local :port vs deployed) · what to look at · absolute artifact paths.
+This skill runs under the suite execution contract — E1 EVIDENCE · E2 RUN-BEFORE-✅ · E3 NO SILENT DOWNGRADE · E4 REUSE FIRST · E5 STATE SYNC · E6 MISSING ANCHOR = STOP · E7 REPORT WHERE — floors, not ceilings; a skill's own gate may be stricter, never looser. Full text: `../gabe-docs/references/execution-contract.md` (if that file is missing, E6 applies — STOP).
 
 A cross-project library of architecture concepts that accumulates as the human verifies them during project-driven `/gabe-teach` sessions. The goal is not to teach architecture in the abstract — it is to **reinforce universal architecture concepts while developing real apps**, so the human gradually becomes architect-minded (tradeoffs, scalability, reliability) without ever sitting through a disconnected lecture.
 
