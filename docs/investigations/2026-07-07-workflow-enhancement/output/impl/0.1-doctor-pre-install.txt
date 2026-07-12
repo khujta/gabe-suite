@@ -1,0 +1,66 @@
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/assets/site.css
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/assets/site.js
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/assets/mermaid.min.js
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/SKILL.md
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/generator/build_docsite.py
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/generator/_markdown.py
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/generator/BUILD-SPEC.md
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/generator/_shell.py
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/generator/docsite.config.example.py
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/tools/diagram-compliance.mjs
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/tools/icon_factory.py
+DRIFT  claude  missing from install: /home/khujta/.claude/skills/gabe-docsite/tools/_playwright.mjs
+DRIFT  claude  differs: /home/khujta/.claude/templates/gabe/CLAUDE.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-align/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-arch/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-assess/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-commit/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-debt/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-docs/SKILL.md
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/assets/site.css
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/assets/site.js
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/assets/mermaid.min.js
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/SKILL.md
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/generator/build_docsite.py
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/generator/_markdown.py
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/generator/BUILD-SPEC.md
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/generator/_shell.py
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/generator/docsite.config.example.py
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/tools/diagram-compliance.mjs
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/tools/icon_factory.py
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-docsite/tools/_playwright.mjs
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-execute/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-health/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-help/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-lens/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-mockup/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-myopic/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-myopic/method.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-next/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-plan/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-push/SKILL.md
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-review/references/post-review.md
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-review/references/merge-mode.md
+DRIFT  agents  missing from install: /home/khujta/.agents/skills/gabe-review/references/codex-bridge.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-review/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/skills/gabe-roast/SKILL.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-align.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-assess.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-commit.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-execute.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-init.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-lens.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-mockup.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-myopic.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-next.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-plan.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-push.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-roast.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-scope-addition.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-scope-change.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-scope-pivot.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-scope.md
+DRIFT  agents  differs: /home/khujta/.agents/commands/gabe-teach.md
+DRIFT  agents  missing from install: /home/khujta/.agents/templates/gabe/hooks.json
+DRIFT  agents  differs: /home/khujta/.agents/templates/gabe/CLAUDE.md
+suite-doctor: DRIFT FOUND — reconcile via the repo (commit repo-ward captures, then ./install.sh). Never patch installs in place.

@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workflow investigation — findings &amp; the plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+/* Specimen classes for the future docsite convention (see convention.html §02) —
+   candidates to graduate into site.css if the convention is adopted. */
+.provenance{border:1px solid #cfc6b0;background:#f5f0e2;border-radius:8px;padding:.65rem .9rem;margin:0 0 1.4rem;font-size:.82rem;color:#4a463c}
+.provenance b{color:#1b1a17}
+.provenance .pv-row{display:block;margin:.15rem 0}
+.provenance .ok{color:#3a6b3a;font-weight:600}
+.receipt{font-family:"JetBrains Mono",monospace;font-size:.78em;color:#6e6757;background:#e6dec8;border-radius:4px;padding:.05em .4em;white-space:nowrap}
+.mode-chip{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#f5f0e2;background:#7a5a8a;border-radius:4px;padding:.15em .55em;vertical-align:middle;margin-left:.5em}
+.toc-inline ul{margin:.3rem 0 0;padding-left:1.2rem}
+.toc-inline li{margin:.15rem 0}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <a class="top-brand" href="index.html">🔎 GABE<span class="dot">.</span>investigation <span class="sub">workflow enhancement · 2026-07</span></a>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Findings</a> <span class="crumb-sep">›</span> <span class="crumb-here">Findings &amp; the plan</span></nav>
+  <button class="adhd-toggle" id="adhd-toggle" type="button" aria-pressed="false" aria-label="Toggle bionic reading" title="Bionic reading"><span class="adhd-dot"></span></button>
+</header>
+<aside class="sidebar" id="sidebar">
+  <button class="side-collapse" id="side-collapse" type="button" aria-pressed="false" aria-label="Collapse navigation" title="Collapse navigation"><span class="side-collapse-glyph">«</span></button>
+  <nav class="sidenav">
+    <a class="side-link side-hub active" href="index.html"><span class="sw" style="background:#b65a2b"></span><span class="side-label">Findings &amp; the plan</span></a>
+    <details class="side-group" open>
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">This investigation <span class="chip core">core</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="values.html" title="The values behind the plan"><span class="sw" style="background:#3a6b3a"></span><span class="side-label">Values → changes</span></a>
+        <a class="side-link" href="convention.html" title="The docsite convention this site demonstrates"><span class="sw" style="background:#7a5a8a"></span><span class="side-label">Docsite convention (specimen)</span></a>
+        <a class="side-link" href="alternatives.html"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">Structural alternatives</span></a>
+        <a class="side-link" href="target.html"><span class="sw" style="background:#a04030"></span><span class="side-label">Target state (after)</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Deliverables (markdown) <span class="chip advanced">source</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="../FINDINGS.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">FINDINGS.md</span></a>
+        <a class="side-link" href="../01-reinstruction-pattern-catalog.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">1 · Pattern catalog</span></a>
+        <a class="side-link" href="../02-command-altitude-table.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">2 · Command altitude</span></a>
+        <a class="side-link" href="../03-storybook-react-reuse-sop.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">3 · Lift SOP</span></a>
+        <a class="side-link" href="../04-evidence-doctrine-operationalized.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">4 · Evidence Doctrine</span></a>
+        <a class="side-link" href="../05-thread-ranking.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">5 · Thread ranking</span></a>
+        <a class="side-link" href="../06-sequenced-change-plan.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">6 · Change plan</span></a>
+        <a class="side-link" href="../07-twin-divergence-report.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">7 · Twin divergences</span></a>
+        <a class="side-link" href="../08-structural-alternatives.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">8 · Structural alternatives</span></a>
+        <a class="side-link" href="../09-fork-migration-plan.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">9 · Fork migration plan</span></a>
+        <a class="side-link" href="../10-code-audit-simplify-verdict.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">10 · Code audit + simplify verdict</span></a>
+      </div>
+    </details>
+    <a class="side-link" href="../../../../site/index.html"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">↩ GABE.docs (main suite site)</span></a>
+  </nav>
+</aside>
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<div class="wrap"><main data-verify-page="investigation-findings" data-verify-claims="12">
+  <header class="masthead">
+    <div class="kicker">Investigation · 2026-07-08 <span class="mode-chip">explanation</span></div>
+    <h1>Why we keep re-instructing the AI — findings &amp; the plan</h1>
+    <p class="lede">Every session transcript from Gustify and Gastify, mined for the moments a human had to say something <em>again</em> — then clustered, attacked by skeptics, and turned into a smallest-first change plan.</p>
+  </header>
+
+  <div class="provenance" data-verify-block="provenance">
+    <span class="pv-row"><b>Source of truth:</b> <code>output/FINDINGS.md</code> + deliverables 1–10 (this page is a rendering, not the record)</span>
+    <span class="pv-row"><b>Evidence behind it:</b> 36 mined sessions → 248 incidents · <code>output/raw/incidents.json</code>, <code>raw/thread4.json</code>, 4 repo/suite scans</span>
+    <span class="pv-row"><b>Generated:</b> 2026-07-08 by the Fable analysis run · <b>verified against:</b> transcripts + repos as of that date · <span class="ok">✓ claims carry receipts</span></span>
+  </div>
+
+  <div class="note toc-inline"><span class="lbl">On this page</span>
+    <ul>
+      <li><a href="#one-paragraph">01 · The investigation in one paragraph</a></li>
+      <li><a href="#what-we-measured">02 · What we measured</a></li>
+      <li><a href="#three-problems">03 · The three structural problems</a></li>
+      <li><a href="#pattern-catalog">04 · The pattern catalog at a glance</a></li>
+      <li><a href="#thread-ranking">05 · Thread ranking</a></li>
+      <li><a href="#lift-sop">06 · Thread 4 — the lift operation</a></li>
+      <li><a href="#evidence-doctrine">07 · Thread 3 — the Evidence Doctrine, made real</a></li>
+      <li><a href="#the-plan">08 · The plan — three waves</a></li>
+      <li><a href="#not-doing">09 · What we are deliberately NOT doing</a></li>
+      <li><a href="#anthropic-gap">10 · The suite vs. Anthropic's own conventions</a></li>
+      <li><a href="#review-round">11 · Operator review round — the docs diet &amp; the code question</a></li>
+      <li><a href="#where">12 · Where everything lives</a></li>
+    </ul>
+  </div>
+
+  <h2 id="one-paragraph"><span class="num">01</span>The investigation in one paragraph</h2>
+  <p>We audited the house the way a plumber audits a leak: not by asking where it <em>feels</em> wet, but by metering every drip. Every usable session transcript from both apps — 36 sessions, 2.5&nbsp;GB — was digested and read end to end by a 56-agent workflow, which extracted <strong data-verify-claim="C1" data-verify-receipt="raw/incidents.json">248 re-instruction incidents</strong>: each one a moment where the human had to correct, re-explain, re-route, re-paste, or demand proof. Fable clustered them into 16 patterns, decided the right home for each (skill · command · hook · manifest · <em>deliberately-left-as-judgment</em>), and put the top eight recommendations in front of hostile skeptic agents. Seven survived with modifications. One died. The result is a plan whose first wave is four small steps — and whose first step is protecting work you already paid for.</p>
+
+  <h2 id="what-we-measured"><span class="num">02</span>What we measured</h2>
+  <p>The drip meter, in numbers. Every count below is reproducible from <span class="receipt">output/raw/incidents.json</span>.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Incident type</th><th>Count</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>correction</td><td><b>123</b></td><td>AI did it; human said "no, do it this way"</td></tr>
+      <tr><td>re-specification</td><td><b>33</b></td><td>human re-explained a procedure the AI never retained</td></tr>
+      <tr><td>proof-reminder</td><td><b>32</b></td><td>human had to demand tests / screenshots / verification</td></tr>
+      <tr><td>manual-routing</td><td><b>27</b></td><td>human told the AI which step comes next (a router's job)</td></tr>
+      <tr><td>reconstruction</td><td><b>24</b></td><td>AI rebuilt something that already existed</td></tr>
+      <tr><td>context-reload</td><td><b>9</b></td><td>human re-pasted context a session should have loaded</td></tr>
+    </tbody>
+  </table></div>
+  <figure class="mermaid-fig"><pre class="mermaid">pie showData title 248 incidents by type
+  "correction" : 123
+  "re-specification" : 33
+  "proof-reminder" : 32
+  "manual-routing" : 27
+  "reconstruction" : 24
+  "context-reload" : 9</pre></figure>
+  <div class="note"><span class="lbl">The most telling usage number</span><p>The suite is invoked through skill loads, and the load counts expose its real backbone: <code>gabe-commit</code> 60× · <code>gabe-push</code> 43× · <code>gabe-plan</code> 15× — versus <code>gabe-mockup</code> <b>7×</b> against ~50 UI work episodes, and <code>gabe-next</code> (the router) <b>once</b> against 27 manual-routing incidents. <span class="receipt">skill-load tally, all digests</span></p></div>
+
+  <h2 id="three-problems"><span class="num">03</span>The three structural problems</h2>
+  <p>The suite does not have a knowledge problem. The two biggest incident clusters were <em>already written down</em> when they kept happening. What it has is:</p>
+
+  <h3>1 · Prose doesn't enforce</h3>
+  <p data-verify-claim="C2" data-verify-receipt="gast 44afa232 post-hardening">The E1–E7 execution contract was installed into all 38 command/skill files on 2026-07-02/03 — and the largest cluster (~32 "declared done without looking" incidents) continued after it. In one gastify session the operator had to say <em>"I need you to look for yourself"</em> three separate times. A rule the model must remember is a rule the model will eventually skip; a gate the harness runs is not.</p>
+  <p><img class="doc-meme" src="assets/memes/claim-without-proof.png" alt="Drake meme: rejecting 'Read the file before you claim it works', preferring 'Sounds right… mark it done.'"></p>
+
+  <h3>2 · Skills don't fire on ad-hoc asks</h3>
+  <p data-verify-claim="C3" data-verify-receipt="gast 88332774">The reuse rules live inside <code>gabe-mockup</code> — which loaded 7 times in 5 months. Casual asks ("make a spike for X", "build the reports screen") never route through the skill that contains the rules, so the rules might as well not exist for that work. The operator caught this live: <em>"Use the Gabe mockup skill. We ready-tuned that skill a lot."</em> Dispatch is a first-class fix, not a nice-to-have.</p>
+
+  <h3>3 · Three divergent suites run under one name</h3>
+  <p data-verify-claim="C4" data-verify-receipt="raw/scan-installed-state-0.md">A self-documented "hardening pass" patched 38 files <b>directly in <code>~/.claude</code></b> (ledger: <span class="receipt">~/.claude/gabe-hardening/APPLY-STATUS.md</span>). It never reached the repo — whose docs site <em>narrates</em> the change its own source lacks — and never reached <code>~/.agents</code>, which is frozen at the 2026-07-01 install. This is the "endless patching" feeling, mechanized: the patches were fine; the surface was wrong.</p>
+  <figure class="mermaid-fig"><pre class="mermaid">flowchart LR
+  REPO["gabe_lens repo&lt;br&gt;source of truth (stale for behavior)"]
+  CC["~/.claude&lt;br&gt;hardened in place 07-02/03&lt;br&gt;E1–E7 + 47 edits"]
+  AG["~/.agents (Codex)&lt;br&gt;frozen at 07-01 install"]
+  HP(["hardening pass&lt;br&gt;2026-07-02/03"])
+  REPO --&gt;|install.sh 07-01| CC
+  REPO --&gt;|install.sh 07-01| AG
+  HP ==&gt;|patched directly| CC
+  HP -.-&gt;|never committed ✗| REPO
+  HP -.-&gt;|never applied ✗| AG
+  style HP fill:#b65a2b,color:#f5f0e2
+  style CC fill:#e6dec8
+  style REPO fill:#f5f0e2
+  style AG fill:#f5f0e2</pre></figure>
+  <div class="note"><span class="lbl">⚠ Time-sensitive</span><p>A naive <code>./install.sh</code> re-run today would <b>overwrite the hardened <code>~/.claude</code> copies with the un-hardened repo versions</b> — destroying paid-for work. Reconciling this is step 0.1 of the plan, before anything else.</p></div>
+  <p><img class="doc-meme" src="assets/memes/task-downgrade.png" alt="Roll Safe meme: 'You can't ship the wrong screen if you recolor the old one and call it a rebuild.'"></p>
+
+  <h2 id="pattern-catalog"><span class="num">04</span>The pattern catalog at a glance</h2>
+  <p>Sixteen patterns, each with its measured frequency and its decided home. Full table with example sessions and anti-goal notes: <a href="../01-reinstruction-pattern-catalog.md">deliverable 1</a>.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Pattern</th><th>Freq</th><th>Home</th></tr></thead>
+    <tbody>
+      <tr><td>P1 · Unverified completion claims ("look for yourself")</td><td>~32</td><td><b>hook + skill step</b> (render gate)</td></tr>
+      <tr><td>P2 · e2e / edge cases missing after ship</td><td>~10</td><td>manifest + command</td></tr>
+      <tr><td>P3 · Green gates ≠ visible correctness</td><td>~7</td><td>manifest (project checks slot)</td></tr>
+      <tr><td>P4 · Storybook reuse-not-recreate (Thread 4)</td><td>~22</td><td><b>skill shape + manifest bindings + dispatch</b></td></tr>
+      <tr><td>P5 · Check legacy (BoletApp) before building</td><td>8</td><td>gastify manifest rule</td></tr>
+      <tr><td>P6 · Match sibling-app conventions</td><td>~8</td><td>manifest <code>reference_projects</code></td></tr>
+      <tr><td>P7 · Human as lifecycle router</td><td>~17</td><td>output contract + one Stop hook</td></tr>
+      <tr><td>P8 · Session continuity / interruptions</td><td>~12</td><td>gabe-handoff (exists) + session-start echo</td></tr>
+      <tr><td>P9 · Background-work status opacity</td><td>~6</td><td>hooks / harness config</td></tr>
+      <tr><td>P10 · Parallel-session collisions</td><td>~6</td><td><b>judgment</b> + files-in-flight line</td></tr>
+      <tr><td>P11 · Project visual-spec re-statement</td><td>~25</td><td>project RULES.md rows w/ detection cmds</td></tr>
+      <tr><td>P12 · Doc/docsite convention drift</td><td>~13</td><td>skill checklist (→ <a href="convention.html">specimen</a>)</td></tr>
+      <tr><td>P13 · Env/infra topology re-taught</td><td>~6</td><td>manifest (PUSH.md env section)</td></tr>
+      <tr><td>P14 · Hand-rolling tools that exist elsewhere</td><td>~8</td><td>cross-project registry in gabe-help</td></tr>
+      <tr><td>P15 · Model-routing meta-instructions</td><td>~4</td><td>reference global rule (below threshold)</td></tr>
+      <tr><td>P16 · Design-taste corrections</td><td>~40</td><td><b>judgment</b>, with a detectability graduation rule</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="thread-ranking"><span class="num">05</span>Thread ranking (evidence-weighted)</h2>
+  <p>The five threads were co-equal by mandate; the incidents ordered them. Full reasoning: <a href="../05-thread-ranking.md">deliverable 5</a>.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Thread</th><th>Why here</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><b>Evidence / proof per change type</b></td><td>~55 incidents, both projects, every work type, <em>no improvement trend</em> — and it kept happening after the prose contract shipped</td></tr>
+      <tr><td>2</td><td><b>Storybook → React reuse gap</b></td><td>~35–40 incidents but the costliest per incident (five spike rounds discarded; an 11-phase migration re-opened). Already self-correcting where the manifest layer landed (gustify); gastify re-paid the lessons in July</td></tr>
+      <tr><td>3</td><td><b>Re-instruction mechanisms</b></td><td>the root causes: drift (three suites) + dispatch (skills don't fire). Its pain is mostly borne through threads 1–2</td></tr>
+      <tr><td>4</td><td><b>Altitude / generalize-vs-specialize</b></td><td>chronic, not acute: gustify grammar inside the global skill, ~10 zero-use commands, 5,075 chars of always-loaded descriptions (21% in one skill)</td></tr>
+      <tr><td>5</td><td><b>Reference intake</b></td><td>input thread, fully consumed — every lead verified against transcripts before use</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="lift-sop"><span class="num">06</span>Thread 4 — the lift operation (spike → production, never from scratch)</h2>
+  <p data-verify-claim="C5" data-verify-receipt="gust 96070dd4 06-30 02:27">The signature failure, in the operator's own words: <em>"Why are we trying to recreate everything in the storybook? We already have the layout in the storybook somewhere."</em> Across three arcs (gustify June 6–7, gustify June 27–30, gastify July 1–8) the same loop repeated: build a stand-in instead of the real component → human catches it → the lesson gets encoded → <em>the twin pays for it again</em>, because the lesson landed in project-local files only one twin has.</p>
+  <p><img class="doc-meme" src="assets/memes/recreate-not-reuse.png" alt="Two-buttons meme: a sweating figure choosing between 'Reuse what already exists' and 'Rebuild it from scratch' — labelled 'the model, every single time.'"></p>
+  <p>The fix is one operation with a mechanical pre-flight — <b>shape suite-global, every concrete value from the project's manifest</b>:</p>
+  <figure class="mermaid-fig"><pre class="mermaid">flowchart TD
+  L0["L0 · RESOLVE&lt;br&gt;screen map → canonical reference&lt;br&gt;unmapped → declare NEW + append"]
+  L1["L1 · INVENTORY&lt;br&gt;reference's real components&lt;br&gt;→ REUSE LEDGER"]
+  L2["L2 · SPIKE (if exploring)&lt;br&gt;compose real components&lt;br&gt;stand-in shell = defect"]
+  L3["L3 · LIFT&lt;br&gt;render the showcase itself&lt;br&gt;additive live-mode props (D86)"]
+  L4["L4 · WIRE + VERIFY&lt;br&gt;real data · verify commands&lt;br&gt;side-by-side: reference vs LIVE render"]
+  L0 --&gt; L1 --&gt; L2 --&gt; L3 --&gt; L4
+  L1 -.-&gt;|no exploration needed| L3
+  L4 -.-&gt;|defect found| L3
+  style L0 fill:#b65a2b,color:#f5f0e2
+  style L4 fill:#3a6b3a,color:#f5f0e2
+  style L1 fill:#f5f0e2
+  style L2 fill:#f5f0e2
+  style L3 fill:#e6dec8</pre></figure>
+  <div class="note"><span class="lbl">Why content alone won't fix it (the skeptic's point)</span><p>The hardened skill <em>already contains</em> a reuse ledger and inventory step — and gastify's July incidents happened anyway, because the skill wasn't loaded. So the SOP ships <b>with its dispatch layer</b>: a widened trigger description, a one-line hard rule in each project's CLAUDE.md (the one layer with a measured effect — gustify's P4 incidents stop after that rule landed on 2026-06-30), and optionally a manifest-scoped warn-hook. <span class="receipt">deliverable 3 §5</span></p></div>
+
+  <h2 id="evidence-doctrine"><span class="num">07</span>Thread 3 — the Evidence Doctrine, made real</h2>
+  <p>Your locked doctrine — proof scoped by importance, proof form per change type, one living set per feature, evidence doubling as docs — is <b data-verify-claim="C6" data-verify-receipt="deliverable 4">already 60% built</b>: <code>gabe-execute</code> classifies runtime-journey evidence, gustify has the recorded 3-viewport layout harness, gastify already commits feature-named proof (248 screenshots). What's missing, per the skeptic-corrected design:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Piece</th><th>Design (skeptic-corrected)</th></tr></thead>
+    <tbody>
+      <tr><td>Importance filter</td><td>declared <b>once, at plan time, by the human</b> — a <code>proof: none|test|visual|journey</code> field per phase. Never judged at gate time by the executing AI (it would classify down)</td></tr>
+      <tr><td>Proof forms</td><td>backend → failing-then-passing test · frontend → <b>side-by-side reference-vs-live</b> · e2e feature → recorded flow (screenshots/GIF; capture tool is a manifest field — pagecast candidate, Playwright+ffmpeg baseline)</td></tr>
+      <tr><td>Living set</td><td>ONE feature-named folder: <code>proof/&lt;feature&gt;/manifest.json + NN-step.png</code>. Manifests <b>always committed</b>; curated screenshot subset committed via a <code>.gitignore</code> carve-out; dated run-folders terminated as a convention</td></tr>
+      <tr><td>Enforcement</td><td>staged: a deterministic <b>freshness check</b> at the gabe-commit chokepoint (artifact mtime &gt; newest staged change) — WARN-and-LOG for 2–4 weeks, promoted to blocking only where the log shows ignored warnings</td></tr>
+      <tr><td>Second opinion</td><td>a fresh-context evaluator (read-only agent) grades the evidence for <code>proof: visual|journey</code> phases — "plausibility is not correctness"</td></tr>
+      <tr><td>Evidence → docs</td><td>doc pages and demos embed <code>proof/&lt;feature&gt;/</code> artifacts directly — the living-docs principle. <b>This page practices it</b> (see the provenance box up top)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="the-plan"><span class="num">08</span>The plan — three waves, smallest first</h2>
+  <p>Wave 0 step 0.1 and forks B2 + A2 (gustify) — plus the Wave-1 remainder, suite-side — are now executed (receipts in the note below); gastify's pass and the remaining Wave-0 hygiene items await their end-of-development freeze windows. Every other step stays operator-approved-then-implemented. Full detail: <a href="../06-sequenced-change-plan.md">deliverable 6</a>.</p>
+  <figure class="mermaid-fig"><pre class="mermaid">flowchart LR
+  subgraph W0["Wave 0 · immediate (≤1h each)"]
+    A["0.1 Reconcile the 3 suites&lt;br&gt;commit hardening → repo&lt;br&gt;+ suite-doctor drift check"]
+    B["0.2 gastify manifest layer&lt;br&gt;RULES.md · screen map&lt;br&gt;CLAUDE.md preamble"]
+    C["0.3 NEXT pointer&lt;br&gt;as output contract&lt;br&gt;+ one Stop hook"]
+    D["0.4 hygiene batch&lt;br&gt;description compression&lt;br&gt;R4 sweep · ports"]
+  end
+  subgraph W1["Wave 1 · design-gated"]
+    E["1.1 mockup manifest&lt;br&gt;split by KIND"]
+    F["1.2 lift SOP&lt;br&gt;+ dispatch"]
+    G["1.3 Evidence Doctrine&lt;br>proof field · living set&lt;br&gt;WARN hooks · evaluator"]
+    H["1.4 de-dup via&lt;br&gt;suite-owned conventions"]
+  end
+  subgraph W2["Wave 2 · re-measure"]
+    I["shelf-ware calls&lt;br&gt;promote/retire hooks&lt;br&gt;re-run the mining"]
+  end
+  A --&gt; W1
+  W0 --&gt; W1 --&gt; W2
+  style A fill:#b65a2b,color:#f5f0e2
+  style W0 fill:#f5f0e2
+  style W1 fill:#ece6d8
+  style W2 fill:#ece6d8</pre></figure>
+    <div class="note"><span class="lbl">✔ Fork decisions taken AND EXECUTED (2026-07-09)</span><p>The operator took all three <a href="alternatives.html">structural-fork</a> recommendations — <b>A2 KDBP-lite</b> · <b>B2 skills-only</b> · <b>C orchestration</b> — and the suite-side sequence ran the same day: <b>0.1 reconcile ✅</b> (<a href="../impl/0.1-reconcile-log.md">log</a>) → <b>B2 skills-only ✅</b> (<a href="../impl/B2-migration-log.md">log</a>) → <b>A2 KDBP-lite ✅ for gustify</b>, gastify DEFERRED to its freeze window (<a href="../impl/A2-migration-log.md">log</a>) → <b>Wave-1 remainder ✅ suite-side</b> (<a href="../impl/W1-remainder-log.md">log</a>). All merged to <code>main</code> and pushed to both remotes, refs verified at <code>35af9ac</code>. gustify and gastify are HANDS-OFF until the end-of-suite-development freeze windows (operator directive) — see <a href="target.html">target state</a> for the full breakdown. Implementation-ready map: <a href="../09-fork-migration-plan.md">deliverable 9</a>.</p></div>
+  <div class="note"><span class="lbl">Adversarial verification — what the skeptics changed</span><p>Eight hostile Fable agents each argued the <em>opposite</em> of a top recommendation. Seven survived with modifications now baked into the plan (plan-time importance, freshness-not-access, WARN-before-block, bindings-vs-lessons manifest split, output-contract routing, suite-owned de-dup target, detectability-first taste graduation). One died outright — see below. <span class="receipt">FINDINGS.md §adversarial</span></p></div>
+
+  <h2 id="not-doing"><span class="num">09</span>What we are deliberately NOT doing</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Rejected</th><th>Why</th><th>Re-open trigger</th></tr></thead>
+    <tbody>
+      <tr><td><b><code>/gabe-simplify</code> standalone wrapper</b></td><td data-verify-claim="C7" data-verify-receipt="skeptic R-D + 0.5a audit verdict, deliverable 10"><b>RESOLVED by the 0.5a audit (2026-07-09):</b> the capability <b>goes as a tiered gate inside gabe-commit</b> — size-budget WARN + evidence-triggered simplify pass (gustify measured <em>material</em>: 4 true-monoliths, 72 commits into one 2,881-line file). The standalone always-loaded wrapper stays dead (demand still zero; gastify moderate)</td><td>Wave-2: promote to its own lane only if the tier fires constantly</td></tr>
+      <tr><td>Full auto-routing / growing <code>/gabe-next</code></td><td>~50% of real work is ad-hoc; a rigid router = anti-goal B</td><td>NEXT-line adoption fails</td></tr>
+      <tr><td>Encoding taste below the detectability line (P16)</td><td>the variation is per-instance reasoning; encode at n=1 <em>only</em> when statable as a runnable Detection command</td><td>the graduation rule handles it</td></tr>
+      <tr><td>Parallel-session locking machinery</td><td>n=6; worktrees exist; one files-in-flight line in HANDOFF.md suffices</td><td>collisions grow</td></tr>
+      <tr><td>Manifest as validated schema</td><td>n=2 projects — schema-hood is over-generalizing</td><td>a third project onboards</td></tr>
+      <tr><td>Unifying the twins' repo layouts</td><td>high cost, zero payoff once manifests declare the difference</td><td>operator product decision</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="anthropic-gap"><span class="num">10</span>The suite vs. Anthropic's own conventions</h2>
+  <p>Baseline: the references this investigation already studied — the <code>anthropics/skills</code> spec (canonical SKILL.md structure), <code>anthropics/cwc-long-running-agents</code> (the harness Anthropic ships for exactly our problem), and the four talks in <span class="receipt">refs/</span> (Daisy, Sid, Boris×Jarred, Ara). The question: where are we off-convention, where are we overfitting, where do we orchestrate too much?</p>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Anthropic convention</th><th>The suite today</th><th>Verdict → plan step</th></tr></thead>
+    <tbody>
+      <tr><td><b>The description is the dispatch surface</b> — always loaded, so it must say <em>when to fire</em>, leanly (Daisy: don't bloat the always-loaded surface)</td><td>Descriptions describe <em>what the skill is</em>, not when to trigger — gabe-mockup's never claims ad-hoc UI asks (7 loads / ~50 episodes); gabe-myopic spends 1,060 chars (21% of the suite's whole description surface)</td><td><b>GAP</b> → rewrite descriptions as triggers (1.2) + compress (0.4)</td></tr>
+      <tr><td><b>Progressive disclosure</b> — lean SKILL.md, detail split into <code>references/</code> loaded on demand (anthropics/skills template)</td><td>Monoliths: gabe-review 1,294 lines, gabe-mockup 802+ in one file. The hardening pass invented <code>gabe-review/references/</code> — the right move — but it lives only in the install, never committed</td><td><b>GAP, half-fixed</b> → comes home with 0.1; extend in 1.1</td></tr>
+      <tr><td><b>A shared contract is stated once</b> — cwc puts its whole execution contract in ONE CLAUDE.md; skills point at it</td><td>E1–E7 pasted verbatim into <b>38 files</b> by the hardening pass — the exact per-plugin duplication the convention warns against</td><td><b>GAP</b> → one suite-owned contract file + pointers (1.4)</td></tr>
+      <tr><td><b>Hooks are hard gates on evidence</b> — cwc's verify-gate <em>blocks</em> the write until evidence was actually opened; Daisy: hooks are the "red squiggly" outside the context window</td><td data-verify-claim="C8" data-verify-receipt="~/.claude/settings.json + templates/gabe/hooks.json">The environment runs <b>~38 hooks</b> — but nearly all are awareness/reminder/log (session-start context, ledger append, structure warn). Hard gates: exactly one (<code>block-no-verify</code>). Zero hooks gate an unverified "done"</td><td><b>THE gap</b> — wrong species of hook, not too few → 1.3c</td></tr>
+      <tr><td><b>Deterministic logic lives in scripts</b>, not in prose a model re-interprets</td><td><code>/gabe-next</code> is spec'd as a "zero-LLM state machine"… executed <em>by an LLM reading markdown</em>. Every run pays tokens and can drift — the intent says script, the implementation says prose</td><td><b>GAP</b> → ship real scripts where determinism is the point (0.1 suite-doctor, 1.3 freshness check); router fix stays 0.3</td></tr>
+      <tr><td><b>Commands = user shortcuts · skills = model-discovered capabilities</b></td><td>Doubled surface: 22 commands + 6 wrapper-skills whose only job is loading command files (Codex parity). The operator invokes by natural language anyway — which <em>is</em> the intended skill path</td><td><b>PARTIAL</b> — accepted trade-off; declare the commands-as-specs convention explicitly (Deliverable 2 §cross-cutting)</td></tr>
+      <tr><td><b>Tests-required gate</b> — Boris/Jarred: a fix merges only if its test fails on base and passes on the fix</td><td>gabe-commit runs test <em>suites</em> but nothing demands the failing-then-passing discipline per change</td><td><b>GAP</b> → folded into the proof-form map (1.3 / Deliverable 4 §2)</td></tr>
+      <tr><td><b>Skills are self-contained and portable</b></td><td>Personal machine facts inside global files: <code>refrepos/</code> path in gabe-scope, gustify bindings in gabe-mockup, absolute <code>~/.claude</code> paths in wrappers</td><td><b>GAP</b> → bindings to manifests (1.1); already priced in Deliverable 2</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Are we orchestrating too much?</h3>
+  <p data-verify-claim="C9" data-verify-receipt="incidents #43, #138, #151, #156 · 155 workflow scripts censused">Measured honestly: both. The transcripts hold <b>155 multi-agent workflow runs</b> across the twins, and the pattern splits clean: orchestration <em>earns its cost for verification</em> — adversarial review passes caught real defects the builder missed — and <em>loses it for taste generation</em>. The receipts: five spike rounds "via delegated agents/workflows" that kept hand-building stand-ins (#138); a design panel + adversarial review that produced an over-engineered multi-state banner when the operator wanted the minimal version (#151); a workflow that shipped 30–55&nbsp;KB of its own internal critique logs as deliverables (#156); an abstract 4-option mock board no human could judge (#43). Agents multiply a premise; they don't challenge it. The convention answer (Anthropic's own guidance: the simplest thing that works, add agents only where they demonstrably win) becomes plan step <b>0.5c</b>: <em>before any multi-agent design fan-out, one cheap single-agent spike past the human first — orchestrate to verify, not to generate taste.</em></p>
+
+  <div class="note"><span class="lbl">Where the suite is AHEAD of the convention</span><p data-verify-claim="C10" data-verify-receipt="cwc PROGRESS.md vs .kdbp/ inventory · gabe-handoff three-way sync">Fairness cut: cwc's durable state is one PROGRESS.md; the suite's <code>.kdbp/</code> layer (PLAN/LEDGER/DECISIONS/PENDING/RULES/DEPLOYMENTS…) is a far richer implementation of the same principle, and <code>gabe-handoff</code> already <em>is</em> the "agent-maintained handoff" the cwc repo demonstrates. Risk-priced review and the tier system go beyond anything in the reference material. The imbalance is directional, not absolute: <b>over-invested in instruction surface, under-invested in enforcement surface</b> — which is exactly what Waves 0–1 rebalance.</p></div>
+
+  <h2 id="review-round"><span class="num">11</span>Operator review round — the docs diet &amp; the code question</h2>
+  <p>Two concerns raised on review (2026-07-08), both now measured and folded into the plan as steps <b>0.5a</b> and <b>0.5b</b>.</p>
+
+  <h3>The docs are out of hand — measured</h3>
+  <p data-verify-claim="C11" data-verify-receipt="find/git-log measurements 2026-07-08 · FINDINGS F11">The twins hold <b>247 markdown docs</b> under <code>docs/</code> (gustify 132, gastify 115) plus <b>144 <code>.kdbp</code> md files</b> — and <b>80 new md files were created in the last 30 days alone</b>, against a human reading budget of "a couple of documents." The instinct behind this very site is the fix, stated as a convention (plan 0.5b, the <em>documentation diet</em>):</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Rule</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><b>Markdown = the agent-facing record</b></td><td>few, living files, augmented in place. A new md file only for a genuinely NEW topic — never for a new change, iteration, or date (the no-dated-throwaways rule, extended to docs)</td></tr>
+      <tr><td><b>HTML = the human-facing layer</b></td><td>diagrams, memes, visual structure per the <a href="convention.html">docsite convention</a> — human reading context is the scarce resource, so the human never has to read the raw record</td></tr>
+      <tr><td><b>One hub per project tracks the inventory</b></td><td>every human-facing doc registered with its source md (the C9 completeness ledger at project level); orphans flagged; the hub is the only required entry point</td></tr>
+      <tr><td><b>Enforced, not remembered</b></td><td><code>gabe-commit docs-audit</code> gains a deterministic warn: new md file outside the allowed homes → "augment the existing topic doc instead." WARN-first, same staging as the evidence hooks</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note"><span class="lbl">✔ Plan step 0.5b — EXECUTED 2026-07-09 (suite-side)</span><p>The docs-audit warn shipped: <code>gabe-commit/scripts/docs-budget.sh</code> WARNs on staged new markdown outside the allowed homes (<code>.kdbp/**</code>, files registered in DOCS.md) and on dated-throwaway filenames — WARN-and-LOG, never blocking. Per-project doc-hub adoption rides each project's freeze window. <span class="receipt"><a href="../impl/W1-remainder-log.md">W1-remainder-log.md</a></span></p></div>
+
+  <h3>The code question — never audited, now scheduled (and it decides <code>/gabe-simplify</code>)</h3>
+  <p data-verify-claim="C12" data-verify-receipt="wc -l first-party sweep 2026-07-08 · gustify CLAUDE.md 500/800 rule">This investigation mined <em>conversations</em>, not code. Seed measurements taken now say the supply-side question is live: gustify's own CLAUDE.md declares a 500-line-soft / 800-line-hard file discipline, yet <code>ProfileScreens.tsx</code> is <b>3,805 lines</b>, <code>RecipeFilterPanel.tsx</code> 2,881, <code>RecipeDetailScreen.tsx</code> 2,534, <code>CookingScreenModel.ts</code> 2,460; gastify's <code>prompt_lab/statement/report.py</code> is 3,214 (generated api-types files excluded). Change-locality — Anthropic's "all the modifiable code for a feature in one place" — measures <b>median 7 files per feature commit</b> (of which 2–4 are <code>.kdbp</code> bookkeeping, a suite overhead worth pricing), with a wide tail (p90 16–18), identical across the twins.</p>
+  <div class="note"><span class="lbl">✔ Plan step 0.5a — EXECUTED 2026-07-09</span><p>The audit ran (deterministic census + one read-only auditor per twin; <a href="../10-code-audit-simplify-verdict.md">deliverable 10</a>). Verdicts: <b>gustify material</b> (4 true-monoliths — ProfileScreens holds four unrelated screens; the filter panel took 72 commits in 90 days at 2,881 lines — plus 3 byte-verified duplicated helpers and ~9.9K dead archived lines), <b>gastify moderate-localized</b> (2 true-monoliths; the rest generated, dead-tree, or honestly cohesive). <b>Verdict: the simplify capability goes</b> — as a tiered gate inside gabe-commit (size-budget WARN + triggered quality-only pass, zero new always-loaded surface); the standalone wrapper stays dead. Cleanup backlog → PENDING.md at implementation time.</p></div>
+
+  <h2 id="where"><span class="num">12</span>Where everything lives (report-where)</h2>
+  <ul>
+    <li><b>This site:</b> <code>docs/investigations/2026-07-07-workflow-enhancement/output/site/</code> — open <code>index.html</code> via <code>file://</code>, no server needed.</li>
+    <li><b>The record:</b> <code>output/FINDINGS.md</code> + deliverables <code>01…07</code> (markdown, linked in the sidebar).</li>
+    <li><b>The raw layer:</b> <code>output/raw/</code> — <code>incidents.json</code> (248), <code>thread4.json</code> (279 episodes), <code>proof_practices.json</code> (339), <code>session_summaries.json</code>, 4 scan reports.</li>
+    <li><b>Next step:</b> Wave 0 step 0.1, fork B2, fork A2 (gustify), and the Wave-1 remainder are done (<a href="../impl/0.1-reconcile-log.md">log</a> · <a href="../impl/B2-migration-log.md">log</a> · <a href="../impl/A2-migration-log.md">log</a> · <a href="../impl/W1-remainder-log.md">log</a>). gastify's pass and the remaining Wave-0 hygiene items wait for their end-of-development freeze windows (operator directive); Wave 2 re-measures after ~6 weeks. See <a href="target.html">the target-state page</a> for the full breakdown, and <a href="values.html">the values page</a> for what each change is <em>for</em>.</li>
+  </ul>
+
+  <script type="application/json" id="gabe-page-manifest">
+  {
+    "page": "index.html",
+    "mode": "explanation",
+    "generated": "2026-07-08",
+    "source_of_truth": ["../FINDINGS.md", "../01-reinstruction-pattern-catalog.md", "../05-thread-ranking.md", "../06-sequenced-change-plan.md"],
+    "evidence": ["../raw/incidents.json", "../raw/thread4.json", "../raw/scan-installed-state-0.md", "../raw/scan-suite-inventory-2.md", "../impl/0.1-reconcile-log.md", "../impl/B2-migration-log.md", "../impl/A2-migration-log.md", "../impl/W1-remainder-log.md"],
+    "verified_against": "session transcripts + repos as of 2026-07-08",
+    "status": "Wave-0 step 0.1, fork B2, fork A2 (gustify), and the Wave-1 remainder (suite-side) EXECUTED 2026-07-09, merged to main and pushed to both remotes at 35af9ac; gastify + remaining Wave-0 hygiene (0.2/0.4) DEFERRED to the end-of-development freeze windows (operator directive)",
+    "claims": [
+      {"id": "C1", "text": "248 re-instruction incidents extracted from 36 sessions", "receipt": "../raw/incidents.json"},
+      {"id": "C2", "text": "largest incident cluster continued after the E1-E7 prose rollout", "receipt": "gastify sessions 54614bed / 44afa232, timestamps post 2026-07-03"},
+      {"id": "C3", "text": "gabe-mockup loaded 7x in 5 months vs ~50 UI episodes", "receipt": "skill-load tally over all digests"},
+      {"id": "C4", "text": "three divergent suite copies; hardening pass never committed", "receipt": "../raw/scan-installed-state-0.md"},
+      {"id": "C5", "text": "reuse failure recurred in the twin after the lesson was encoded", "receipt": "../raw/thread4.json arcs 1-3"},
+      {"id": "C6", "text": "Evidence Doctrine is ~60% already built across both projects", "receipt": "../04-evidence-doctrine-operationalized.md"},
+      {"id": "C7", "text": "zero measured incidents support a /gabe-simplify wrapper", "receipt": "skeptic verdict R-D, FINDINGS.md"},
+      {"id": "C8", "text": "~38 live hooks are awareness/log; zero hard evidence gates (one blocking hook: block-no-verify)", "receipt": "~/.claude/settings.json + ~/.claude/templates/gabe/hooks.json inspection, FINDINGS.md F10"},
+      {"id": "C9", "text": "155 workflow runs: orchestration earns its cost for verification, loses it for taste generation", "receipt": "../raw/incidents.json #43 #138 #151 #156; workflow-script census"},
+      {"id": "C10", "text": "suite is ahead of convention on durable state (.kdbp vs cwc PROGRESS.md) and handoff", "receipt": "../raw/scan-gustify-repo-1.md §2, ../raw/scan-gastify-repo-3.md §2, FINDINGS.md F10"},
+      {"id": "C11", "text": "247 md docs + 144 kdbp files across twins; 80 new md files in 30 days", "receipt": "find/git-log measurements 2026-07-08; FINDINGS.md F11"},
+      {"id": "C12", "text": "first-party god files 3-7x over the projects' own 800-line cap; feat-commit locality median 7 files (2-4 kdbp bookkeeping)", "receipt": "wc -l first-party sweep + git shortstat 2026-07-08; FINDINGS.md F11"}
+    ]
+  }
+  </script>
+</main></div>
+
+<footer class="stamp">
+  <b>GABE</b> · workflow investigation 2026-07 · findings &amp; plan<br>
+  Source of truth: <b>output/FINDINGS.md + deliverables 1–7</b> · hand-authored specimen of the <a href="convention.html">v-next docsite convention</a> (not build_docsite output)<br>
+  Visual system: Cifra · Chile editorial palette
+</footer>
+
+<script src="assets/site.js"></script>
+<script src="assets/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad: true, theme: "base", themeVariables: {background: "#ece6d8", primaryColor: "#f5f0e2", primaryBorderColor: "#b65a2b", primaryTextColor: "#1b1a17", secondaryColor: "#e6dec8", tertiaryColor: "#ece6d8", lineColor: "#6e6757", fontFamily: "Space Grotesk, system-ui, sans-serif", fontSize: "13px"}, flowchart: {curve: "basis", htmlLabels: true, useMaxWidth: true}, pie: {useMaxWidth: true}});</script>
+</body>
+</html>

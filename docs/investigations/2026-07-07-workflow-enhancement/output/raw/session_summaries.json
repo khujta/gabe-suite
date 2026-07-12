@@ -1,0 +1,262 @@
+[
+ {
+  "session": "54614bed",
+  "project": "gastify",
+  "summary": "Continuation of the Design Fidelity DF2 epic on branch feat/df2-inline-reskins: the Historial hub's Reportes/Transacciones embeds, the Groups screen re-skin, and the Trends/Gastos re-skin were ported to the design-lab Storybook reference, each gated by build/lint/vitest/token-guard and Playwright proof, then committed via the /gabe-commit gate. Midway, the user pushed for an explicit Storybook-vs-live side-by-side visual validation process, which surfaced real fidelity gaps (icons, English-vs-Spanish labels, layout) and a deeper correction that the AI was hand-reconstructing components instead of porting the real design-lab assets/components (categoryTokens, DonutLegend, IconTile, toggles) \u2014 leading to a new project-level design-fidelity-check skill. The session also built the new /gabe-handoff command end-to-end (spec, wrapper, suite-doc wiring, dry-run) and closed with gabe-suite docsite fixes (complete 22-command index, KDBP-file color pills) after the user caught the published command-reference page was incomplete."
+ },
+ {
+  "session": "44afa232",
+  "project": "gastify",
+  "summary": "A long (2-day, human_turns=55) gastify session that pushed and shipped CA6/CA3/CA1(reverted)/CA4 phases of the Counter & Archive IA epic, then did a full report-surface rebuild ('/reports' \u2192 design-lab ReportViewer 'Resumen' port), a Reports+History consolidation, a /transactions legacy-route consolidation, and finally a multi-round Treemap/Sankey fidelity rebuild against the design-lab Storybook reference (categoryGrouping, IconNodeOverlay port). Most of the session is highly autonomous KDBP-gate-driven work (pre-push gate, /gabe-commit, /gabe-push equivalents via Skill loads, adversarial background review workflows, Railway deploy verification via bundle-string grep) with very few raw slash commands. The recurring friction is around visual/storybook fidelity: the AI shipped a labeled switcher and a heavily-reshaped /reports page and repeatedly asserted 'structural match' or completeness without actually rendering/comparing screenshots, requiring the human to intervene at least three times ('look for yourself', E1-E7 proof demand, 'still need to compare side by side') before real D100 side-by-side evidence was produced; a spike was also built as an HTML artifact before the human corrected that spikes belong in Storybook."
+ },
+ {
+  "session": "54614bed",
+  "project": "gastify",
+  "summary": "A multi-day session (06-25 to 06-30) that first executed the full 11-phase 'Web Migration' epic (W1-Wf) porting the Playful Geometric design-lab mockup system into the live gastify web app, driven end-to-end via the gabe suite (/gabe-plan, /gabe-execute, /gabe-review, /gabe-commit, /gabe-push) with Playwright proof against seeded production data for every phase. After all 11 phases shipped, the user discovered the port had only recolored existing screens rather than rebuilding them to match the actual design-lab Storybook layouts, triggering a new 'Design Fidelity' epic (D100-D102) that surfaced repeated component-recreation-instead-of-reuse drift and a multi-hour CSS debugging rabbit hole (an un-layered preflight reset silently collapsing all gt-padding utilities app-wide) before settings-screen fidelity was finally achieved subview-by-subview."
+ },
+ {
+  "session": "54614bed",
+  "project": "gastify",
+  "summary": "A marathon gastify session that built the receipt Scan Intelligence feature end-to-end (location extraction, a curated 49-country/city dataset, 4-case reconciliation, a locale-generalized v3 prompt validated through the prompt-lab, currency/date wiring) and shipped it to production, then pivoted into the settings design-fidelity epic (7 subviews rebuilt to design-lab reference, Cards full-config, Apply/Discard staging, Modal backdrop fixes) and finally the DF2 screen-rebuild track (Dashboard, then Items/History) with heavy use of parallel adversarial-review and audit workflows before each commit/ship."
+ },
+ {
+  "session": "5dd2ff51",
+  "project": "gastify",
+  "summary": "Long, mostly-autonomous session (13 human turns, ~4 hours) covering three linked tasks: (1) auditing and cutting Railway spend by tearing down the staging + staging-e2e environments (with a documented, reversible runbook), (2) building a flag-gated email/password test-login path for production, and (3) shipping it through gabe-commit -> gabe-push -> PR -> CI fix-up -> merge -> live production verification via Playwright. A mid-session policy pivot ('production is now our source of truth for testing') was captured into docs, DECISIONS.md, and memory before committing. CI round-tripped three times (pre-existing backend test time-bomb, SCA advisories, mobile audit/jest breakage from an overly broad `npm audit fix`) before going fully green; the AI diagnosed and fixed each without needing human correction. The session ended with genuine production verification: a Playwright login proof and screenshots, after one real user-facing snag (a Firebase API-key referrer restriction the user had to locate in Google Cloud Console with the AI's second-attempt directions)."
+ },
+ {
+  "session": "734a025f",
+  "project": "gastify",
+  "summary": "Long multi-day session spanning gastify IA/duplication analysis, a gabe-myopic UX walk on gastify (61 verified findings), a full Gabe-suite hardening pass (E1-E7 execution contract embedded in 38 files) done because the user's \"Fable\" model was about to be paywalled, syncing gastify's PLAN/ROADMAP, and then building/consolidating a new `gabe-docsite` skill (ported from gustify's existing docsite generator) used to publish a fully-illustrated Gabe-suite docs site and a 110-page gastify docs site with mermaid diagrams, PixelLab icons, and chiless-style memes, all verified with Playwright over file:// and a purpose-built diagram-compliance gate. A late-session correction fixed KDBP's canonical expansion (\"Khujta Deep Behavioural Protocol\") across all 7 repos where it had silently drifted to \"Database Protocol.\""
+ },
+ {
+  "session": "8610c1e0",
+  "project": "gastify",
+  "summary": "Continuation of a long gastify dev session: closes out a 'deck-clearing' bug-fix plan (P84 ledger-edit, P68 leave-group dialog e2e, selector sweep across specs), pushes to staging/main with CI-watch and prod verification, then runs a deep two-user (A+B) hardening pass on shared groups (finds and fixes 4 real bugs: void notice, manual-entry guard, D94 ownership transfer, D95 tombstone FK cascade), followed by a full 5-phase rate-limiting implementation (limiter infra, tier/credit quotas D96, ENT-HIGH and ENT-MED limits, 429 UX toast on web+mobile) each phase gated by tests/CI/promote/prod-verify. Session ends with drafting docs/rebuild/ux/OVERHAUL-ASSEMBLY-GUIDE.md bridging the parallel design-lab (Storybook/Playful-Geometric) visual system to the working web/mobile apps, and a cut-off correction about a design-lab component regression (squares vs circles) that exposed lane-boundary confusion between this dev session and a parallel mockup session."
+ },
+ {
+  "session": "77e637c1",
+  "project": "gastify",
+  "summary": "A ~2.5-day marathon session building production-grade React + Storybook mockups in gastify's design-lab/ workspace (KDBP PLAN-MOCKUPS Phases 9-10). The AI shipped dozens of features from scratch (Settings subviews, transaction detail, Groups feature, Auth/landing, Notifications inbox, category drill-down) via a tight build->screenshot->adversarial-review->gate->commit->LEDGER loop, then ran two full gap-analyses against the real backend/mobile/web apps and a style/token/story consistency audit, closing with Phase-10 automated gates (check:token-classes, check:story-baseline) and a web-migration kickoff doc. Almost every commit was independently verified with tsc, Storybook tests, and Playwright screenshots, and adversarial multi-agent reviews caught several real a11y/consent/contrast defects before commit."
+ },
+ {
+  "session": "8610c1e0",
+  "project": "gastify",
+  "summary": "test"
+ },
+ {
+  "session": "88332774",
+  "project": "gastify",
+  "summary": "A ~2-week, 239-human-turn session building the gastify (Chilean expense tracker) Storybook mockup suite in a new `design-lab/` workspace, explicitly modeled on the sibling Gustify project's React+Storybook mockup workflow via the gabe-mockup skill (invoked once via the Skill tool at the very start; no /gabe-* slash commands were used anywhere in this chunk \u2014 only /model). Work proceeded through the full atoms\u2192molecules\u2192organisms\u2192screens pipeline using a self-adopted 'spike-first' convention (A/B/C/D variation spikes decided before folding into production, recorded as DM-1..DM-22 in .kdbp/PLAN-MOCKUPS.md), plus a full PixelLab icon-family regeneration (bypassing a broken MCP wrapper via the raw SDK) and a deep, multi-diagram rebuild (treemap, donut, sankey) faithfully reverse-engineered from the legacy BoletApp codebase and ECharts internals."
+ },
+ {
+  "session": "9009ae22",
+  "project": "gastify",
+  "summary": "Very short (2 human turns) troubleshooting session: the user wanted to expose the gastify design-lab Storybook (Storybook 10, port 6008, mislabeled 'ladle' in the stack list) to the internet so they could browse it from their phone while away, explicitly as a temporary/non-durable exposure rather than a permanent public deployment. AI investigated the project's package.json and proposed two options (VS Code port forwarding via Dev Tunnels, and a tunneling tool like cloudflared/ngrok); the user tried option A (VS Code port forwarding) but couldn't find the expected 'visibility' setting, prompting the AI to check installed tunneling tools and inspect a screenshot of the WSL Ports panel to diagnose that WSL\u2192Windows localhost forwarding never reaches the public internet."
+ },
+ {
+  "session": "88332774",
+  "project": "gastify",
+  "summary": "Long design-lab/Storybook mockup session for gastify (Chilean expense tracker), building React+Storybook mockups: finishing the Sankey diagram (icon-nodes, level-range peel), building the Trend diagram, building the multi-timeframe Reports diagram, building nav/header chrome organisms, then Roadmap-B browse screens (Compras/Gastos) with filters, item-linking flow, a profile menu, and the start of the scan-capture flow. Work followed a repeating per-item pattern: study legacy BoletApp source + Gustify's already-built app -> build -> spike A/B/C/D -> user picks -> propagate -> archive spike -> record decision in .kdbp/PLAN-MOCKUPS.md. Heavy Playwright-driven visual verification and typecheck/build/build-storybook/test-storybook gates were run after nearly every change."
+ },
+ {
+  "session": "88332774",
+  "project": "gastify",
+  "summary": "This chunk covers a long design-lab (React + Storybook mockup) session for gastify: finishing Sankey/treemap/donut chart polish (borders, animations, an unselect bug fix), the first-ever commit of the entire untracked design-lab workspace, a large Storybook dead-code cleanup, promoting the Tendencias spike into production, a major IA re-architecture (Profile becomes an avatar dropdown, Historial replaces the Perfil tab, diagram switcher moves to header icons), and then building out the full Settings/Ajustes hub and its subviews in verified batches (Switch atom, Select atom, PixelLab icon generation/spikes, an English-only-code-identifiers rename) with tsc/build/Playwright verification at nearly every step, ending mid-recovery from a wave of API server errors during a large parallel Batch-3 build."
+ },
+ {
+  "session": "b8d4f660",
+  "project": "gastify",
+  "summary": "Human ran /gabe-teach against gastify's docs/wells/ folder to refresh 7 stale gravity-well architecture docs (file inventories, purposes, codependency diagrams) and sync .kdbp/KNOWLEDGE.md's Paths column to match the current backend/web/mobile codebase. After a context-exhaustion auto-continuation, the human asked for the G1-G7 gravity-well shorthand to be defined in the docs themselves, so the AI added a new docs/wells/README.md index plus a cross-reference note and first-mention links in all 7 well docs. Session closed with the human re-invoking /gabe-teach to see the mode menu (topics/arch/retro/tour/story/brief/learning)."
+ },
+ {
+  "session": "88332774",
+  "project": "gastify",
+  "summary": "This chunk (part 3 of the session) spans roughly June 16-22, 2026 of an extended design-lab/Storybook mockup build for gastify (a Chilean smart-expense-tracker rebuild). Work covers the full single-receipt scan flow (capture/processing/review/edit-in-place), a complete credit-card-statement flow (upload/processing/reconcile/confirm/success) built via the gabe-mockup skill, an AppScaffold shell + navigation, Inicio/Compras/Gastos screens, and a set of analytics diagrams (donut/treemap/Sankey), all grounded in Gustify and legacy BoletApp references. The user repeatedly had to redirect the AI back to legacy mockups and existing Storybook components instead of reinventing UI, culminating in an explicit, pointed complaint that the AI had 'forgotten' already-refined work and was reinventing components it had already built."
+ },
+ {
+  "session": "990a6f7e",
+  "project": "gastify",
+  "summary": "A single continuous session finishing the DF2 Gastos fidelity epic on gastify: ported PeriodControl from design-lab, fixed and hardened the donut chart's two-axis level/drill navigation and a category-label resolution bug, built an icon\u2192category-detail overlay, wired treemap per-cell drill sharing the donut's nav, and implemented+deployed the CA6 backend category_key filter culminating in a merged/deployed PR #17. The human caught two real functional bugs that the AI's green automated gates had missed (untested donut interactions, duplicate category labels), and after CI caught partial-local-check gaps on push, asked the AI to codify a durable scripts/pre-push.sh gate mirroring CI exactly. Session closed with a manually-requested /gabe-handoff."
+ },
+ {
+  "session": "d51fedbb",
+  "project": "gastify",
+  "summary": "Continuing CA6 (count-pill\u2192history + period-URL promotion) on gastify's web app: URL-driven period state, a donut-legend count-pill that drills into filtered transaction/product history, and a category-detail 'Ver todos' link, all verified end-to-end against live prod data via Playwright plus an adversarial multi-dimension code review. After the initial implementation landed, the user drove five successive rounds of UI-fidelity corrections against the design-lab mockups/references \u2014 missing back button, 'Compras' vs 'Historial' naming/duplication (surfacing decision D106), header layout (title size/filter position), a full FilterSheet port from design-lab with a leftover mobile-bezel frame to remove, and swapping a flat L1 category facet for the app's existing 4-level LevelToggle navigator \u2014 culminating in an IA consolidation (Compras absorbs both transaction+product history, Historial becomes reports-only) and a /gabe-commit + /gabe-handoff close-out."
+ },
+ {
+  "session": "f1c84b22",
+  "project": "gastify",
+  "summary": "This chunk covers roughly June 15-24 of a long React+Storybook mockup-building session for gastify's design-lab, working through the last two of five analytics diagrams (Trend, Reports) via the established legacy-study -> build -> A/B/C/D spike -> user-pick -> propagate -> archive loop, then building navigation/header chrome (first from legacy BoletApp, then re-skinned to match sibling app Gustify's actual conventions), running a gabe-mockup consolidation audit, building the first Roadmap-B browse screens (Compras/Gastos), and finally a multi-round PixelLab icon regeneration saga (three full 284-icon generation rounds at wrong resolution/style before the pixellab-icons skill and Gustify reference were properly consulted, followed by a rendering-bug root-cause chase and a custom click-to-select persistence UI for finalizing 144 icon picks)."
+ },
+ {
+  "session": "289ba0e4",
+  "project": "gustify",
+  "summary": "Marathon session (2026-07-07 23:08 to 2026-07-08 22:17, ~27 human turns) that finished the Recipe-Flow Clarity U4 workstream (planned-recipes home + 'Quitar del plan' unplan flow) on gustify staging, then executed a founder-approved 6-item 'Hardening & Debt Payback' plan (H1 CI eslint+vitest gates, H2 E2E match-modes journey, H3 staging mock-auth boot guard, H4 dead allergen-check removal, H5 equipment-availability feature backend + Storybook spikes, H6 deferred mix-feature removal) formalized via /gabe-plan and driven by a repeated recon-workflow -> build -> adversarial-verify-workflow -> scoped-commit -> CI-watch loop. The adversarial-verify workflow caught a real deploy-breaking bug (migration written to the wrong alembic directory). PixelLab was used to generate 7 equipment icons and a subagent built a design-lab spike comparing summary-representation candidates. Two separate power outages interrupted the session, each requiring a manual human 'resume' prompt and AI-side state reconstruction from git/CI."
+ },
+ {
+  "session": "f1c84b22",
+  "project": "gastify",
+  "summary": "A two-week-spanning (06-10 to 06-15) React + Storybook mockup session for gastify's expense-tracker UI, run in a brand-new parallel `design-lab/` workspace built explicitly to replicate the sibling Gustify project's Storybook structure and polish while faithfully porting legacy BoletApp UI structures (transaction rows, treemap, donut, sankey). The AI established a standing 'spike-first' iteration convention (every component tier gets A/B/C/D variation spikes with interactive option+platform controls before being folded into production), ran multiple parallel-agent extraction workflows against the legacy codebase and Gustify's design-system for faithful geometry/pattern reuse, bypassed a broken PixelLab MCP server via direct SDK calls to regenerate 153 icons, and did a large mechanical spacing-token migration. No gabe-suite slash commands were invoked at any point (only /model); the gabe-mockup skill fired once automatically at the very start and its emergent process (spike-first mode, Gustify-structure replication, interactive controls) was captured only in this project's PLAN-MOCKUPS.md decision log (DM-1 through DM-22+), not folded back into the reusable skill."
+ },
+ {
+  "session": "3de7aa00",
+  "project": "gustify",
+  "summary": "Human investigated why the GitHub Actions CI/CD quota (2,000 min/mo) was exhausted on the gustify repo, asked the AI to quantify per-run cost and check whether the repo could go public again. The AI diagnosed the cost driver (a 7-min Postgres parity suite running on every staging push), the human upgraded to GitHub Pro mid-session, then asked whether staging-testing could be trimmed or done locally; the AI found 3 of 5 staging CI jobs were already duplicated by local pre-commit hooks. The human picked two cost-cutting levers (drop pre-commit-duplicated CI jobs from staging, add per-app path filtering), the AI rewrote the workflow file, validated YAML, committed/pushed to staging, and confirmed the new gating behaved correctly via live CI run inspection \u2014 including detecting and explaining a benign concurrency-cancellation caused by a second, parallel Claude session pushing to the same branch."
+ },
+ {
+  "session": "4ac69d8c",
+  "project": "gustify",
+  "summary": "Session merges the dietary/allergen/restriction data model into a two-section (Alergias/Dieta) model (decision D108), adds a 5-then-4-slot ingredient include/exclude filter with real backend SQL filtering, reworks the selection-flash animation, then iterates through several rounds of staging fixes the human found by actually looking at the deployed UI (duplicate \"Restricciones\" facet, slot spacing, exclude-red not rendering, shortened labels), drops the deprecated `diet` column (including an OpenAPI freeze-contract re-generation forced by CI), and promotes staging to production with heavy CI/deploy/migration/E2E verification at each step."
+ },
+ {
+  "session": "501dcd46",
+  "project": "gustify",
+  "summary": "A long design-lab session (30 human turns, 06-30 to 07-01) iterating on the Gustify recipe card's 'match badge' via Storybook spikes: replacing it with a flavor octagon, then a sensory medallion, then a sensory-dish layout, before reverting to the original match % and instead moving flavor/texture/temperature into the existing signal deck. Later work built a mode-aware match-score exploration (coverage/filter/skill/gem factors across 6 explore modes) and a redesigned search/mode toolbar using real components and pixellab-generated icons, ending with the card-anatomy doc site refreshed to reflect all landed decisions and two HANDOFF.md files written for a separate implementing session."
+ },
+ {
+  "session": "519cc314",
+  "project": "gustify",
+  "summary": "Long gustify session (06-30 through 07-01) spanning the CARD-ANATOMY docsite rebuild and heavy Storybook spike work on the recipe card: restructured the docsite into nested sections, then ran a full spike-first redesign of the card's decorative 'tone wash' (random hash -> complexity x availability encoding, iterating through ramp options to a chosen WoW loot-rarity ramp) that was wired into a new production model and promoted to prod. Also documented card status overlays with PixelLab-generated pixel icons and a new pending/live tag system, explored/curated the signal-deck chip ordering, and built a title-pills feature (language pills) through several correction rounds before promoting it out of the spike into production and sweeping all Storybook usages for consistency. Work happened on a shared git working tree with a concurrent parallel session, requiring constant scoped-commit discipline."
+ },
+ {
+  "session": "7cff892b",
+  "project": "gustify",
+  "summary": "Single-turn session (human_turns=1): user asked Claude to scan the Storybook icon catalog and consolidate what looked like repeated icons and inaccurate counters. Claude investigated autonomously (hashing files, diffing two divergent icon trees \u2014 a stale docs/mockups tree the Storybook catalog globbed vs. the canonical apps/web/public tree), used AskUserQuestion to get a decision on repointing the catalog, then rewrote generatedIconCatalog.ts and IconAssetCatalog.stories.tsx to glob the canonical tree, verified via tsc typecheck and a full Storybook build, and determined that no actual duplicate icons should be deleted (versioned variants and byte-identical pairs were all found to be intentional/referenced) and that the stale docs tree could not simply be deleted since HTML mockups still depend on 24 icons unique to it."
+ },
+ {
+  "session": "519cc314",
+  "project": "gustify",
+  "summary": "A week-long Gustify session (2026-06-25 to 2026-06-30) that deferred the heavy VAR-lineage feature after an architect roast, then shipped a large batch of frontend/backend work through the full Gabe cadence (plan \u2192 execute \u2192 adversarial review \u2192 gabe-commit \u2192 gabe-push staging \u2192 e2e-validate \u2192 promote) across five promotions to prod: a unified ConfirmDialog/useConfirm system, pantry edit-parity, a recipe-filter bundle (cooked/time/complexity range), saved-modes UX fixes, a to-try/favorites split, and explore-tuning relocation. The back half of the session pivoted into iterative design-spike exploration in Storybook's 'Lab' (time-effort/discovery dimension v1-v2, card-info-density v3-v4) followed by a Lab cleanup and a docsite documentation page (CARD-ANATOMY.md) built from real-component Storybook screenshots with annotation overlays. Recurring friction centered on visual/layout regressions that no automated gate (tsc/unit/storybook/build) could catch \u2014 scrim positioning, dropdown layout, and a dead-on-arrival portal bug all required either the founder's screenshots or the adversarial-review workflow to surface, and one AI-authored verification probe itself gave a false-positive 'fixed' signal that the founder had to contradict by hand."
+ },
+ {
+  "session": "706f0486",
+  "project": "gustify",
+  "summary": "Human asked for a non-coding, report-only analysis of Gustify across architecture, development, testing, and entrepreneurship/business dimensions, explicitly barring any code edits in this (costly 'fabled') model session. Claude launched a large background Workflow (6 parallel dimension analysts, an adversarial verifier pass on critical/high claims, a feature-disconnect mapper, and a completeness critic \u2014 ~36 agents total) that spanned two sessions, resuming from cached state after the prior process exited mid-run and again after hitting the monthly spend limit. The session ended with a delivered report, docs/rebuild/PRODUCT-STATE-ANALYSIS-2026-07-01.md, left uncommitted for human review, covering findings like the dead-but-complete AI recipe pipeline, the stubbed Gastify receipt-to-pantry bridge, and an unwired shopping-list/meal-plan backend."
+ },
+ {
+  "session": "8ba8ac50",
+  "project": "gustify",
+  "summary": "Extremely short, failed session: the user described a Storybook UI change (restoring 5 selectable intensity bars for flavor variations, with range-select behavior \u2014 selecting bar 2 and 4 auto-fills 3, pressing an already-implied bar is a no-op, pressing an endpoint contracts the range) but every attempt hit a Claude API server error (500 then two 529 Overloaded) before any assistant work could happen. No code was written, no tools were called, and no task was actually completed in this chunk."
+ },
+ {
+  "session": "80fe1f87",
+  "project": "gustify",
+  "summary": "User explicitly forbade any coding this session and instead asked for a full state-of-the-app report (architecture, development, testing, product/UX gaps, entrepreneurship/business readiness) to prep Gustify for productization, calling out the unconnected recipe-selection-to-shopping-list gap as an example. Claude ran a 36-agent background Workflow (six dimension analysts, 24 adversarial verifiers, a disconnect mapper, a completeness critic) that spanned two sessions \u2014 it had to be resumed once because the prior session exited mid-run with no completion record, and again after hitting the account's monthly spend limit partway through the critic follow-ups. The workflow finished and produced docs/rebuild/PRODUCT-STATE-ANALYSIS-2026-07-01.md, left uncommitted for the user to review; the session ended with the user just checking whether it was still running."
+ },
+ {
+  "session": "6490478c",
+  "project": "gustify",
+  "summary": "A multi-day session (07-01 to 07-05) resumed a background dynamic-workflow investigation (cold-start cookability \u00a710 + a gabe-myopic 3-horizon UX scan of 8 web flows), surviving two monthly-spend-limit cutoffs via resumable workflow caching. The findings were written up as two reports and wired into the project's generated docsite (nav, cross-links, severity pills, an interactive inline-SVG dashboard). A large arc then covered adding memes and diagrams to the findings \u2014 the AI first built its own ad hoc emoji-memes/CDN-Mermaid approach despite being told to mirror a sibling app (chiless/Cifra Chile), was explicitly corrected to actually study and replicate chiless's memegen.link meme pipeline and build-time Mermaid-to-SVG rendering, then batch-applied memes+diagrams to all 11 CRITICAL findings. The session closed by authoring a vitest regression-test register for those findings, with the user making a deliberate 'plain red tests' (Style B) call over a context-carrying alternative (Style A) after an AskUserQuestion pause."
+ },
+ {
+  "session": "8f58c911",
+  "project": "gustify",
+  "summary": "A long two-day Gustify session that (1) wired PostHog product analytics end-to-end mirroring the existing Sentry pattern, ran an adversarial PII review, and shipped+verified it on staging; then (2) pivoted to a founder-driven UX audit of the recipe discover\u2192mark\u2192buy\u2192cook flow using gabe-myopic + an 11-lens workflow (81 findings), turned it into a KDBP workstream (U1-U5), and iteratively built/spiked/shipped U1 (readable steps), U2 (outcome-framed mark overlay), a favorite-consistency pass, and a partial U5 (card/detail dimension alignment) through several rounds of founder visual feedback in Storybook, ending with a staging deploy and a /gabe-handoff sync."
+ },
+ {
+  "session": "925511fd",
+  "project": "gustify",
+  "summary": "A long, highly autonomous KDBP session: the AI first discovered Phase 63i was already shipped (contradicting the initial task premise) and reconciled stale PLAN bookkeeping, then drove Phases 67-72 (recipe unit/serving localization, D115 prepared-dish-storage foundation, storage-method hints, expiry/best-by banners, batch-compatible filter, ambient-storage caveat) end-to-end through roast/execute/review/commit/push gates with staging-e2e runtime proof and Railway-verified prod deploys for each. It also fixed a production bug (P90: diet filter hiding users' own recipes), built and debugged a new seeded staging 'sandbox' test user, backed up credentials to Google Drive, flipped the repo to private, and trimmed the CI workflow's billed minutes \u2014 almost entirely from terse human directives ('kick off phase N', 'resume', 'yes') with very little correction needed."
+ },
+ {
+  "session": "96070dd4",
+  "project": "gustify",
+  "summary": "A ~255-turn, multi-day Gustify session covering: deferring the VAR-lineage feature chain, shipping N1 (cancel-confirm unification + two-step completion gate) and V5 (create/edit field parity) to prod, then a long batch of recipe-filter/favorites features (F1-F5) and N2 (explore-tuning relocation) with full plan\u2192build\u2192adversarial-review\u2192gate\u2192commit\u2192push-staging\u2192e2e-validate\u2192promote-prod cadence via the Gabe suite (invoked as Skill(gabe-plan/commit/push/roast), not slash commands). The back half of the session shifts into a multi-day design-exploration arc in Storybook ('the Lab') around a new time/effort dimension and richer recipe cards, producing 5 rounds of spikes (v1-v5) built largely from scratch by delegated agents, which the human eventually confronted directly for recreating existing UI instead of reusing it, leading to a gabe-mockup skill rewrite enforcing scan-first/reuse-first as a hard gate."
+ },
+ {
+  "session": "96070dd4",
+  "project": "gustify",
+  "summary": "This chunk (part 2) covers a very long, mostly-continuous Gustify session (06-30 through 07-03) building a 'time-effort' recipe-card feature via a chain of Storybook spikes that reuse the real ExploreSuggestionCard (testing the gabe-mockup skill's newly-added R0 mandatory reuse-scan gate), then productionizing it: backend migrations for active/total minutes and per-step technique taxonomy, Atenci\u00f3n/Dedicaci\u00f3n range filters with 12 PixelLab-generated icons, retiring the old Tiempo filter, a curated-only recipe-creation policy, a staging DB reseed + credential rotation, and finally adopting two handoff documents from a concurrently-running parallel Claude Code session (a Signal-Deck/footer 'graduation' from spike to production, and a mode-aware match-scoring backend port) into the same shared working tree and staging branch. The overwhelming majority of turns are AI self-directed (Workflow/Agent delegation, TodoWrite tracking, screenshot-verify-before-commit discipline, careful git-diff scoping to avoid leaking a parallel session's uncommitted work); the human mostly gives design feedback/approvals rather than re-explaining procedures. Session context ran out and auto-continued at least 3 times within this single chunk without the suite's own /gabe-handoff skill being invoked."
+ },
+ {
+  "session": "9aad4c13",
+  "project": "gustify",
+  "summary": "Continuation of the Recipe-Flow Clarity (UX) workstream on gustify's staging branch: built U5 (detail-screen effort meter, pantry-availability summary, and flavor 0-5 intensity block, reusing real card components), iterated through founder-reviewed spike layouts via Storybook + headless Playwright screenshots, added a backend contract change to expose the new fields on the detail endpoint (with OpenAPI/api-types regen), reseeded the staging DB for real minute values, then built a second feature (drop card-level manage-mode long-press operations, add Archivar/Restaurar to the enter-recipe popup) including a large mechanical removal delegated to a subagent, and closed with a /gabe-handoff KDBP sync for the next session's U4 work."
+ },
+ {
+  "session": "96070dd4",
+  "project": "gustify",
+  "summary": "A very long (07-03 through 07-06), highly autonomous continuation session that landed the founder-approved match-scoring/lens feature (backend scorer + Storybook-graduated ExpandingModeSelector + live browse wiring), fixed a CRITICAL fish-allergen R8 leak with a systemic deploy-time catalog-reconcile mechanism, wired Sentry error monitoring end-to-end (including a Sentry org/project/DSN setup walkthrough), and shipped a cold-start pantry-staples onboarding checklist plus a plan-to-buy loop with a spiked/adversarially-reviewed 'add all' shopping affordance. The AI operated with unusually heavy self-directed verification (ruff/pyright/pytest/tsc/vitest/build gates on every change, `gh run watch` to CI-green before promoting, headless Playwright sampling of Storybook animations, live staging sandbox-account round-trips to prove fixes) and repeatedly promoted staging to prod only after explicit AskUserQuestion confirmation. Correction/re-instruction moments were rare and mostly small design-taste iterations; the more structurally interesting gaps were the AI's own icon-completeness check being too weak (human caught it) and one instance where the AI forgot to volunteer a Storybook review URL it had reliably supplied earlier in the same session."
+ },
+ {
+  "session": "9db487f7",
+  "project": "gustify",
+  "summary": "A long, highly autonomous session (2026-06-25) shipping three cooking-domain migrations end to end: Saved Modes (localStorage->server), Mix-tray (new backend table+routes plus frontend rewire), and a concurrent-cook session cap. For each, the AI scouted existing patterns/contracts, implemented, ran background adversarial multi-dimension reviews that surfaced real HIGH/CRITICAL issues (a TanStack Query race clobbering optimistic rows, and a dietary-data leak to the server), fixed and re-verified them, then ran the full gate (typecheck/unit/storybook/build/ruff/pyright), committed via /gabe-commit, pushed via /gabe-push, watched CI to green, and promoted to prod with live smoke tests. The session closed with a reconciliation of what shipped and two handoff prompts for parallel doc/e2e sessions."
+ },
+ {
+  "session": "9ad1fc28",
+  "project": "gustify",
+  "summary": "A week-long (06-15 to 06-21), 202-turn design-then-build session for Gustify. It starts as a pure documentation exploration \u2014 a multi-agent-generated 'Scope Atlas' of five future features (taste/texture/temperature, recipe variations/forks, progression overhaul, ingredient safety, recipe mixing) rendered as hand-styled standalone HTML docs with inline-SVG diagrams, trade-off tables, and gabe-lens blocks \u2014 then, once the founder resolved all ~24 open decisions, converts into an active KDBP `.kdbp/PLAN.md` that the AI drives semi-autonomously (migrations, model changes, filter logic, allergen data) with held-not-pushed commits, checked repeatedly against a second parallel session that kept shipping to the same codebase underneath it."
+ },
+ {
+  "session": "9ad1fc28",
+  "project": "gustify",
+  "summary": "This chunk covers a very long, high-velocity Claude Code session driving Gustify, a live production cooking app. It finishes and ships the SAFE food-safety-warnings feature (fish allergen, curated ingredient warnings with two-tier provenance) through multiple adversarial-review gates and three staging promotion rounds before going to prod; diagnoses and fixes a broken ingredient-filter caused by a Spanish-slug-vs-canonical-code mismatch; builds a sensory taxonomy (taste/texture/temperature) and backfills 539 recipes via 27 parallel Claude sub-agents with a 'C\u00f3mo sabe' flavor note; implements Phase 6 sensory browse facets end-to-end; and closes with a multi-round icon-generation saga (style drift, three spike iterations, a Bold-outline decision, then a Storybook-wide cleanup) that the founder explicitly flags as a recurring mistake across sessions."
+ },
+ {
+  "session": "9ad1fc28",
+  "project": "gustify",
+  "summary": "This was one very long (~06-22 20:25 to 06-23 21:23) Claude Code session on the Gustify cooking app's recipe-filter UI, driven almost entirely via raw git/Storybook/Playwright with zero use of the repo's own /gabe-* command suite (only /model was invoked). The founder iteratively redesigned the flavor-intensity control through many rounds of feedback and dedicated Storybook 'Lab' spikes (bar styles, colors, chip colors, a 6-version slider saga that regressed and triggered a founder-mandated Playwright safeguard, circle selectors, and finally 5-segment pill-bars matching the live mobile styling), while also shipping Saved Modes, Phase 13 Avoid/Exclude, filter grouping/coloring, and a PROG-engine backend spine \u2014 each promoted to production with live bundle/API verification and adversarial multi-lens reviews that caught several real HIGH-severity bugs. The session ended with the founder asking for a continuation prompt, and the AI hand-wrote a bespoke handoff markdown file instead of using the suite's existing /gabe-handoff command."
+ },
+ {
+  "session": "b00a1aa3",
+  "project": "gustify",
+  "summary": "A week-long parallel workstream (2026-06-24 to 06-30) building a static-HTML documentation site for Gustify's E2E test coverage: an e2e index, per-journey walkthrough pages (screenshots/carousels/Mermaid diagrams/CRUD indicators), and a screen-coverage 'MISBEHAVES' atlas, all styled on the existing CifraChile-derived shell. The work proceeded as a spike-then-consolidate loop \u2014 trial pages first, dozens of Workflow-driven design-panel + implementation-subagent rounds, live Playwright runs against staging-e2e to prove features and capture real screenshots \u2014 culminating in extracting a project-scoped `gabe-e2e` skill (with a 'Definition of Done' added after a stub page was caught) and a sibling `docsite` skill for appending arbitrary docs to the HTML site."
+ },
+ {
+  "session": "c0caef68",
+  "project": "gustify",
+  "summary": "A ~2-week, 432-turn session building the Gustify React web client (#21) via the Gabe-Suite lifecycle (/gabe-plan, /gabe-roast, Workflow multi-agent builds, /gabe-review, /gabe-commit, /gabe-push), wiring an existing ~64-component Storybook design system to the live FastAPI backend across Phases 37-41c: foundation/CI, Railway deploy, auth/setup, home/pantry, and recipe browse/classification. The dominant recurring failure mode was the AI treating Storybook showcase components as disposable references and either rebuilding them simpler or half-wiring them (leaving mockup-only chrome, mock data, or Storybook-only verification in place), which the user caught repeatedly by comparing the deployed app pixel-for-pixel against the Storybook reference. This drove three durable artifacts created mid-session specifically to stop re-explaining the same fix loop: docs/rebuild/WEB-SCREEN-MAP.md (canonical route-to-mockup map, D89), docs/rebuild/WEB-LAYOUT-POLICY.md + a Playwright layout-policy E2E harness (after ad hoc verification scripts kept missing real regressions), and a new `/gabe-mockup refine` skill mode packaging the analyze-test-verify-vs-mockup-fix loop, extended twice more as new failure patterns (full-surface sheets, showcase-vs-live verification) surfaced.</session_summary>\n</invoke>\n"
+ },
+ {
+  "session": "c0caef68",
+  "project": "gustify",
+  "summary": "A marathon multi-day session driving the Gustify web client from Phase 41b (AI recipe generation over SSE) through Phase 53 (pantry item-detail + location persistence), including repointing the deployed web from a mocked staging-e2e API to real staging/Gemini, seeding real Chilean/Peruvian recipe data with PixelLab-generated icons, wiring the full cooking loop/shopping/profile/settings, building an AI credit system (D95), a massive catalog expansion (D96: 69 countries, 500+ recipes, 800+ generated icons), a Chilean supermarket ingredient pass (D97, 275 ingredients), and a full production go-live. Almost all implementation work ran through multi-agent Workflow tool runs (recon -> build -> verify) gated by typecheck/build/unit/Storybook/Playwright-journey suites and independent-review agents, with the human mostly approving one-word ('go') continuations and periodically correcting misdirected environment assumptions, a layout-decision reversal, PixelLab troubleshooting drift, and an overstepped production action on the user's own account. A separate multi-hour saga chased PixelLab API reliability (WSL2 NAT idle-drop, orphan-job/429 deadlock) which ended with the operational fix being written into a new durable skill (pixellab-icons)."
+ },
+ {
+  "session": "c0caef68",
+  "project": "gustify",
+  "summary": "Long multi-phase Gustify rebuild session (Phases 53-58+) covering: pantry item-detail editor reuse of add-flow controls, a ported HTML docs-site generator (Khujta-Eyes style), a security-reviewed TanStack Query client-cache persistence layer (per-user IndexedDB), a profile/nav proficiency-rank icon fix, the major Batch Pantry Add feature (Storybook mockup approved by user, then wired to a new deterministic fuzzy-matcher backend), a cross-feature add-button/FAB unification pass, and a round of post-ship bug fixes (button placement, missing candidate icons, collapsible batch-row controls, PixelLab icon generation for 20 missing ingredients, and a 'frequently added' quick-pick strip). Heavy KDBP discipline throughout: gabe-commit/gabe-push gates, CI watched via background Monitor tasks, Railway GraphQL deploy verification, and DECISIONS/PENDING/LEDGER/DEPLOYMENTS bookkeeping on nearly every turn."
+ },
+ {
+  "session": "dc58b25c",
+  "project": "gustify",
+  "summary": "Very short session (human_turns=3, ~7 minutes). After /model and /effort config commands, the user gave a single first-time instruction: run a no-code, multi-lens gap analysis of the gustify app (architecture, development, testing, entrepreneurship/product-market angle) explicitly forbidding any coding in this session, citing a policy that this 'fabled' (premium/preview) model should not be used for coding work \u2014 save it for architecture/analysis and defer implementation to cheaper models later. The AI scoped the repo (find + read .kdbp/STRUCTURE.md and .kdbp/PLAN.md) and launched a background multi-agent workflow (6 parallel analysts + verification + synthesis pass) to produce the report; the chunk ends with the workflow still running in the background, no results yet."
+ },
+ {
+  "session": "c0caef68",
+  "project": "gustify",
+  "summary": "A very long, multi-day Gustify session covering: shipping the batch-add 'frequent ingredients' quick-pick strip (Phase 59) with a staging DB seed script, a Gemini cold-start novelty grace fix (#72d), and then a sprawling Storybook-spike arc for a new 'Exploration Preferences' feature \u2014 setup/settings placement, a Profile screens redesign with three new tab sections (Explorar/Progreso/Estad\u00edsticas), a feature-directory split of settings from profile, an app-wide 12-item pagination rollout, and iterative PixelLab icon generation for the new Profile tabs. Nearly every unit of work went through gabe-commit/gabe-push gates (tsc/pytest/ruff/pyright/Storybook test-runner) with CI-watch-then-deploy-verify loops, and staging\u2192production promotions were run twice."
+ },
+ {
+  "session": "c0caef68",
+  "project": "gustify",
+  "summary": "This chunk covers roughly 13:07 on 06-18 through 03:08 on 06-20 \u2014 a very long, multi-compaction Gustify session spanning the tail of P88 (recipe-language property), icon/UX polish, and the full Phase 64 (option-model consolidation: unifying diet/allergen/technique vocabulary and slot counts across Settings, Setup, and recipe Filters) plus Phase 66 (Technique filter wiring) and Phase 67 (recipe quantity localization, started). Work was executed heavily through Ultracode-style parallel Workflows (audits, roasts, R8 safety reviews) and the gabe-review/gabe-commit/gabe-push/gabe-plan command chain, with three staging->production promotions (P89-P93) each gated by CI + Railway deploy verification. Recurring friction centered on PixelLab icon generation drifting from the app's canonical style spec (a problem the user says has recurred 'several times'), a facet silently dropped from the live recipe filter that the user caught only by screenshot right before a promotion, and residual Settings-vs-Search option/icon divergence surviving the very consolidation phase meant to eliminate it."
+ },
+ {
+  "session": "c0caef68",
+  "project": "gustify",
+  "summary": "A ~2-day gustify session (06-16 to 06-18) that iteratively designed Profile-screen sections as Storybook 'spikes' (General/Estadisticas -> Logros achievements board), graduated the chosen layouts into production code via a Workflow agent, then deleted the spikes. It continued into Phase 63 (Exploration Preferences) backend+frontend, escalated into a full bilingual (en+es) i18n sweep across ~60 web files (Phase 63i), staged deploys to staging then production (catching a real Alembic revision-id-length CI bug), and ended in a multi-round bug hunt after the shipped language-switch feature turned out broken for the human in production despite repeated AI claims of being fully verified (root cause: a stale-session 401 silently degrading Settings), followed by an English-coverage completion pass (P84/P85) and a new recipe-language property feature (P88)."
+ },
+ {
+  "session": "df378fd1",
+  "project": "gustify",
+  "summary": "Continuation of a long-running Gustify session that autonomously shipped a large chain of roadmap phases (PROG-engine read-cutover/trees/flavor, SCHEMA-ENRICH equipment, MIXING combined-cook, SENS-surface soft-bias, AVOID-EXCLUDE reconciliation) end-to-end to production via a self-driven 'understand \u2192 plan \u2192 delegate to sub-agent \u2192 adversarial review \u2192 deploy staging \u2192 Playwright-verify \u2192 promote prod' cadence. The founder was mostly away and pre-authorized best-guess UI/design calls, checking in periodically ('how's it going?') and occasionally spot-testing the live app, which surfaced a broken cancel-cook button and a mismatched mixing-mode layout requiring a full rebuild. A 3-lens adversarial-review workflow caught one CRITICAL cross-user IDOR vulnerability in the new combined-cook backend before it shipped."
+ },
+ {
+  "session": "ef595a24",
+  "project": "gustify",
+  "summary": "A multi-day (June 26-30) Gustify session spanning two phases: first, shipping and design-exploring the filter/favorites feature stack plus founder bug fixes, then a long Storybook 'Lab' spike sequence (time-effort v1/v2, card-info-density v3/v4, tone-wash) culminating in a full production promotion (P121) of a new complexity\u00d7availability 'tone wash' encoding for recipe cards. The second half of the session pivots to authoring a comprehensive docsite page (CARD-ANATOMY.md \u2192 card-anatomy.html) documenting the recipe card's anatomy, iterated repeatedly based on founder feedback (screenshots, TOC navigation, section hierarchy, numbered callouts, pixel-art status-overlay icons via PixelLab, and signal-deck ordering), all while operating on a working tree shared with a concurrent parallel Claude session."
+ },
+ {
+  "session": "df378fd1",
+  "project": "gustify",
+  "summary": "This chunk covers the founder testing the just-shipped Gustify mixing-mode v2 UI on staging and reporting a rapid stream of UX and functional bugs, one of which (active cooks not appearing in \\\"Cocinando ahora\\\") turned out to be a foundational architecture problem requiring a full cook-loop rework (client-only vs server-backed cooking state), caught and hardened via an adversarial review that found a critical zombie-session race. That work triggered a founder-requested request to persist step-completion progress, which was first shipped as a localStorage v1, then -- after the founder demanded an architecture sanity check given the data's cross-session/delicate/user-only nature -- re-architected to be server-backed, followed by an app-wide audit for the same anti-pattern, a new docs-site analysis page, a docs-site nav/diagram redesign, and a matching backend migration of \\\"Saved Recipe Modes\\\" to server storage (frontend half deferred to a fresh session)."
+ },
+ {
+  "session": "1b718d93",
+  "project": "suite",
+  "summary": "A meta/prep session (spanning 07-07 to 07-08, across a power-outage interruption) in which the operator worked with the AI not to build features but to construct a self-contained investigation brief for a future 'Fable' (more powerful model) session to audit the Gabe Suite for exactly the 'we keep patching skills/commands and re-instructing the AI' problem. Work included: verifying the repo/remote setup, capturing five friction threads (hand-holding audit, cross-project over-standardization risk, per-change-type proof/evidence practices, YouTube source research, and the recurring Storybook/HTML-mockup rebuild-from-scratch problem), resolving nine 'tension points' via AskUserQuestion into a locked Evidence Doctrine, researching external reference skills (caveman, ponytail, anthropics/cwc-long-running-agents, pagecast, HADS docs), reorganizing scattered output into a dated docs/investigations/2026-07-07-workflow-enhancement/ folder, and finishing with a KICKSTART.md hand-off prompt (with model-routing guidance) for the actual Fable analysis run."
+ }
+]

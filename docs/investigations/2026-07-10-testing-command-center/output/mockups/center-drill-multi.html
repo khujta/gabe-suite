@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Center · DRILL — safety × recipes — all skins</title>
+<link rel="stylesheet" href="center-skins.css">
+</head>
+<body>
+<script src="center-skins.js"></script>
+<div class="topbar"><img src="../assets/icons/kind-integration.png" alt="">
+  <span class="t-sys">GUSTIFY::KITCHEN-CONSOLE</span><span class="t-crumb">center › hub › safety × recipes</span>
+  <span class="t-clock" style="margin-right:230px">2026-07-10 21:04 · HEAD 956c992d</span></div>
+<div class="nav-strip">
+  <a href="center-hub-multi.html">HUB</a>
+  <a href="center-board-multi.html">BOARD</a>
+  <a href="center-tests-multi.html">TESTS</a>
+  <a class="on" href="center-drill-multi.html">DRILL (safety × recipes)</a>
+</div>
+<main>
+  <p class="crumbbar"><a href="center-hub-multi.html">hub</a> › risk board › <b>T1 SAFETY × recipes/browse</b></p>
+  <h1>Allergen &amp; exclusion correctness</h1>
+  <p class="lede">the cell, opened — one promise ("a restricted user never sees a recipe that could hurt them") tasted at four stations, with the evidence on the table.</p>
+
+  <div class="stat-row">
+    <div class="stat"><b>130</b><span>unit filters · pass</span></div>
+    <div class="stat"><b>4</b><span>SAFE journey · pass</span></div>
+    <div class="stat"><b>6</b><span>deployed replay · on-demand</span></div>
+    <div class="stat"><b>T−2h</b><span>freshest green</span></div>
+    <div class="stat"><b style="color:var(--stale)">T−6d</b><span>stalest green</span></div>
+  </div>
+
+  <h2><img src="../assets/icons/kind-gate.png" alt=""> the four stations <em>— every level of the same promise, freshest first</em></h2>
+  <div class="panel">
+    <div class="suite"><img src="../assets/icons/kind-unit.png" alt=""><div class="n"><b>pytest exclusion suite — 130 tests</b><small>test_recipes · test_postgres_parity · exact-token jsonb containment · NULL-guards (unrestricted recipes never vanish) · proven on SQLite AND real Postgres 16</small></div><span class="chip ok">130 PASS</span><span class="fresh">T−2h</span></div>
+    <div class="suite"><img src="../assets/icons/kind-journey.png" alt=""><div class="n"><b>SAFE journey [R8] — 4 scenarios</b><small>fish-allergic test user signs in · "Avisos de seguridad" fires · fish-bearing recipe absent from the live UI · PLAN.json phase 1's declared proof</small></div><span class="chip ok">4 PASS</span><span class="fresh">T−1d</span></div>
+    <div class="suite"><img src="../assets/icons/kind-deployed.png" alt=""><div class="n"><b>api-loop R8 replay — deployed</b><small>milk-exclusion asserted against staging-e2e over real network, real auth, real Postgres · run: [e2e:api-loop] push token</small></div><span class="chip stale">ON-DMD</span><span class="fresh">T−6d</span></div>
+    <div class="suite"><img src="../assets/icons/kind-gate.png" alt=""><div class="n"><b>OpenAPI freeze — contract gate</b><small>restriction_codes cannot be renamed or removed; additive-only, checked offline at every commit</small></div><span class="chip ok">GATE</span><span class="fresh">each commit</span></div>
+  </div>
+
+  <h2><img src="../assets/icons/kind-journey.png" alt=""> the evidence table <em>— living proof set (images resolve at view time; placeholders until a run — the doctrine)</em></h2>
+  <div class="gallery">
+    <div class="thumb"><b>01</b>login — R8 user<span>placeholder · resolves live</span></div>
+    <div class="thumb"><b>02</b>warning visible<span>"Avisos de seguridad"</span></div>
+    <div class="thumb"><b>03</b>recipe excluded<span>list without the fish dish</span></div>
+    <div class="thumb"><b>04</b>filter panel state<span>restriction chip active</span></div>
+    <div class="thumb"><b>05</b>API cross-check<span>exclusion in the response</span></div>
+    <div class="thumb"><b>▶</b>flow capture<span>MP4 — cursor visible</span></div>
+  </div>
+
+  <h2><img src="../assets/icons/kind-unit.png" alt=""> history <em>— this cell, last 12 regenerations (from run-history.jsonl)</em></h2>
+  <div class="panel">
+    <div class="spark">
+      <i style="height:14px"></i><i style="height:14px"></i><i style="height:15px"></i><i class="f" style="height:8px"></i>
+      <i style="height:15px"></i><i style="height:16px"></i><i style="height:16px"></i><i style="height:16px"></i>
+      <i class="s" style="height:12px"></i><i style="height:17px"></i><i style="height:17px"></i><i style="height:18px"></i>
+    </div>
+    <p class="lens-note">one bar per regeneration — height = tests in the cell, red = a failing run (2026-07-02: the D108 facet regression, caught by match-modes), amber = stale sources at regen time.</p>
+  </div>
+
+  <h2><img src="../assets/icons/kind-deployed.png" alt=""> go deeper <em>— leaf reports, linked never rebuilt</em></h2>
+  <div class="leafbtns">
+    <a href="#">coverage: services/recipes.py — line anchors ↗</a>
+    <a href="#">playwright report — last api-loop run ↗</a>
+    <a href="#">spec source: web-journey-*.spec.ts ↗</a>
+    <a href="#">proof manifest.json ↗</a>
+  </div>
+
+  <div class="ticker"><b>ticker:</b> <span class="ok">✓</span> promise held at 3 of 4 stations today · ⚠ deployed replay 6 days old — run <b>[e2e:api-loop]</b> to refresh</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Center · HUB — all skins</title>
+<link rel="stylesheet" href="center-skins.css">
+</head>
+<body>
+<script src="center-skins.js"></script>
+<div class="topbar"><img src="../assets/icons/kind-integration.png" alt="">
+  <span class="t-sys">GUSTIFY::KITCHEN-CONSOLE</span><span class="t-crumb">center › hub</span>
+  <span class="t-clock" style="margin-right:230px">2026-07-10 21:04 · HEAD 956c992d</span></div>
+<div class="nav-strip">
+  <a class="on" href="center-hub-multi.html">HUB</a>
+  <a href="center-board-multi.html">BOARD</a>
+  <a href="center-tests-multi.html">TESTS</a>
+  <a href="center-drill-multi.html">DRILL (safety × recipes)</a>
+</div>
+<main>
+  <h1>The kitchen, mission-controlled</h1>
+  <p class="lede">everything the kitchen tests, one counter — three lenses over the same estate: what's at risk, how deep the tasting goes, how fresh each green is.</p>
+
+  <div class="stat-row">
+    <div class="stat"><b>1,095</b><span>backend checks</span><div class="leds"><i></i><i></i><i></i><i></i><i></i></div></div>
+    <div class="stat"><b>408</b><span>web checks</span><div class="leds"><i></i><i></i><i></i><i></i><i></i></div></div>
+    <div class="stat"><b>86</b><span>dress rehearsals ×8</span><div class="leds"><i></i><i></i><i></i><i></i><i class="warn"></i></div></div>
+    <div class="stat"><b>107</b><span>plating · local</span><div class="leds"><i class="warn"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i></div></div>
+    <div class="stat"><b>—%</b><span>coverage · arrives A6</span><div class="leds"><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i></div></div>
+  </div>
+
+  <div class="lens-wrap">
+    <input type="radio" name="lens" id="lensA" checked>
+    <input type="radio" name="lens" id="lensB">
+    <input type="radio" name="lens" id="lensC">
+    <div class="lens-tabs">
+      <label for="lensA">★ risk — criticality × area</label>
+      <label for="lensB">levels — the pyramid</label>
+      <label for="lensC">recency — how fresh is each green</label>
+    </div>
+
+    <div class="lens-view view-a">
+      <table class="cgrid">
+        <tr><th></th><th>recipes</th><th>cooking</th><th>pantry</th><th>ai pipeline</th><th>platform</th><th>ui/i18n</th></tr>
+        <tr class="t1"><td class="tier"><b>T1 SAFETY</b><small>someone gets hurt</small></td>
+          <td><a class="cell ok" href="center-drill-multi.html"><b>130</b><small>filters</small></a></td>
+          <td><span class="cell ok"><b>4</b><small>safe jrny</small></span></td>
+          <td><span class="cell ok"><b>10</b><small>expiry</small></span></td>
+          <td><span class="cell stale"><b>pivot</b><small>in-house</small></span></td>
+          <td><span class="cell void">—</span></td><td><span class="cell void">—</span></td></tr>
+        <tr><td class="tier"><b>T2 DATA</b><small>nothing lost</small></td>
+          <td><span class="cell ok"><b>60</b></span></td><td><span class="cell ok"><b>40</b></span></td>
+          <td><span class="cell ok"><b>35</b></span></td><td><span class="cell ok"><b>15</b></span></td>
+          <td><span class="cell ok"><b>26</b><small>migr ↑↓</small></span></td><td><span class="cell void">—</span></td></tr>
+        <tr><td class="tier"><b>T3 MONEY</b><small>cost + abuse</small></td>
+          <td><span class="cell void">—</span></td><td><span class="cell void">—</span></td><td><span class="cell void">—</span></td>
+          <td><span class="cell ok"><b>50</b></span></td><td><span class="cell ok"><b>60</b></span></td><td><span class="cell void">—</span></td></tr>
+        <tr><td class="tier"><b>T4 CORE</b><small>dinner ships</small></td>
+          <td><span class="cell ok"><b>80</b></span></td><td><span class="cell stale"><b>17</b><small>on-demand</small></span></td>
+          <td><span class="cell ok"><b>45</b></span></td><td><span class="cell stale"><b>6</b></span></td>
+          <td><span class="cell ok"><b>30</b></span></td><td><span class="cell void">—</span></td></tr>
+        <tr><td class="tier"><b>T5 POLISH</b><small>tastes right</small></td>
+          <td><span class="cell ok"><b>50</b></span></td><td><span class="cell void">—</span></td><td><span class="cell void">—</span></td>
+          <td><span class="cell void">—</span></td><td><span class="cell void">—</span></td>
+          <td><span class="cell stale"><b>180</b><small>local only</small></span></td></tr>
+      </table>
+      <p class="lens-note">the safety row is always first and heaviest — click any cell to drill (T1 × recipes is wired in this mockup).</p>
+    </div>
+
+    <div class="lens-view view-b">
+      <div class="pyr">
+        <a href="center-tests-multi.html" style="width:24%"><b>9</b> deployed + docker-smoke</a>
+        <a href="center-tests-multi.html" style="width:40%"><b>86</b> journeys — real browser, real services</a>
+        <a href="center-tests-multi.html" style="width:58%"><b>~400</b> integration — route-level pytest</a>
+        <a href="center-tests-multi.html" style="width:76%"><b>~1,100</b> unit — pytest services/models + vitest</a>
+        <a href="center-tests-multi.html" style="width:94%"><b>12+</b> gates — deterministic checks, every commit</a>
+      </div>
+      <p class="lens-note">how much of the world each test touches — healthy pyramid: many cheap tests, few expensive ones. each layer links to its suites.</p>
+    </div>
+
+    <div class="lens-view view-c">
+      <table class="ftable">
+        <tr><th>freshness band</th><th>what lives there</th><th>staleness risk</th></tr>
+        <tr><td>every commit</td><td>ruff · gitleaks · legacy-imports (pre-commit)<small>deterministic, can't rot</small></td><td><span class="chip ok">NONE</span></td></tr>
+        <tr><td>every push</td><td>pytest (SQLite) · vitest unit · docker-smoke · eslint/tsc</td><td><span class="chip ok">HOURS</span></td></tr>
+        <tr><td>main gate</td><td>full pytest on Postgres 16 · secret-scan · legacy full-tree</td><td><span class="chip ok">DAYS</span></td></tr>
+        <tr><td>on-demand</td><td>7 of 8 journey groups · api-loop<small>[e2e:group] token or dispatch</small></td><td><span class="chip stale">WEEKS IF NOBODY ASKS</span></td></tr>
+        <tr><td>hand-run</td><td>storybook (107) · mockups (58) · layout ×3 · audits<small>A9 gives these last-run dates</small></td><td><span class="chip stale">UNKNOWN TODAY</span></td></tr>
+      </table>
+      <p class="lens-note">a green from three weeks ago is not the same color as a green from this morning — recency is a first-class dimension.</p>
+    </div>
+  </div>
+
+  <h2><img src="../assets/icons/kind-unit.png" alt=""> on the pass <em>— safety × recipes (drill preview; full page: DRILL in the nav)</em></h2>
+  <div class="panel">
+    <h3>allergen &amp; exclusion correctness</h3>
+    <p class="why">// one promise, four stations: prep → dress rehearsal → phone order → door inspection</p>
+    <div class="suite"><img src="../assets/icons/kind-unit.png" alt=""><div class="n"><b>pytest exclusion suite</b><small>exact-token jsonb · null-guards · sqlite + real postgres</small></div><span class="chip ok">130 PASS</span><span class="fresh">T−2h</span></div>
+    <div class="suite"><img src="../assets/icons/kind-journey.png" alt=""><div class="n"><b>SAFE journey [R8]</b><small>fish-allergic user · warning fires · recipe off the shelf</small></div><span class="chip ok">4 PASS</span><span class="fresh">T−1d</span></div>
+    <div class="suite"><img src="../assets/icons/kind-deployed.png" alt=""><div class="n"><b>api-loop R8 replay</b><small>milk-exclusion vs the deployed kitchen</small></div><span class="chip stale">ON-DMD</span><span class="fresh">T−6d</span></div>
+  </div>
+
+  <div class="ticker"><b>ticker:</b> <span class="ok">✓</span> 21:04 regen ok · <span class="ok">✓</span> cooking 15/15 w/ capture · ⚠ evidence WARN accepted · <span class="ok">✓</span> CI 29128453353 GREEN</div>
+</main>
+</body>
+</html>

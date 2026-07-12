@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Command Center — six frontend directions</title>
+<style>
+  :root{--page:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+    --grid:#e1e0d9;--ring:rgba(11,11,11,.10);--blue:#2a78d6;
+    --good:#0ca30c;--good-t:rgba(12,163,12,.12);--blue-t:rgba(42,120,214,.10)}
+  :root[data-theme="dark"]{--page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;
+    --grid:#2c2c2a;--ring:rgba(255,255,255,.10);--blue:#3987e5;--blue-t:rgba(57,135,229,.16)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);color:var(--ink);font:16px/1.55 system-ui,-apple-system,'Segoe UI',sans-serif}
+  main{max-width:1100px;margin:0 auto;padding:24px 20px 80px}
+  .kicker{color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-size:.75rem;font-weight:600}
+  h1{font-size:1.8rem;margin:.2em 0 .1em}
+  .lede{font-size:1.05rem;color:var(--ink2);max-width:66ch}
+  h2{font-size:1.3rem;margin:2em 0 .5em;padding-top:.6em;border-top:1px solid var(--grid)}
+  p{color:var(--ink2)} strong{color:var(--ink)} a{color:var(--blue)}
+  .dirs{display:grid;grid-template-columns:repeat(auto-fit,minmax(440px,1fr));gap:20px;margin:20px 0}
+  .dir{background:var(--surface);border:1px solid var(--ring);border-radius:14px;overflow:hidden}
+  .dir .shot{display:block;border-bottom:1px solid var(--grid);background:var(--grid)}
+  .dir .shot img{width:100%;display:block;max-height:430px;object-fit:cover;object-position:top}
+  .dir .body{padding:14px 18px 16px}
+  .dir h3{margin:.1em 0 .25em;font-size:1.15rem}
+  .dir .tag{font-size:.72rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.1em}
+  .dir p{font-size:.9rem;margin:.4em 0}
+  .dir .traits{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+  .trait{font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid var(--ring);color:var(--ink2)}
+  .open{display:inline-block;margin-top:6px;font-weight:700;font-size:.88rem}
+  .tw{overflow-x:auto;margin:14px 0;border:1px solid var(--ring);border-radius:10px}
+  table{border-collapse:collapse;width:100%;background:var(--surface);font-size:.87rem}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--grid)}
+  th{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  tr:last-child td{border-bottom:none}
+  .note{background:var(--blue-t);border-radius:10px;padding:12px 16px;font-size:.92rem;margin:16px 0}
+  .footer{margin-top:50px;padding-top:14px;border-top:1px solid var(--grid);font-size:.78rem;color:var(--muted)}
+
+  .theme-btn{position:fixed;top:10px;right:12px;z-index:99;width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(128,128,128,.4);background:var(--surface);color:var(--ink);cursor:pointer;
+    font-size:1.05rem;line-height:1;display:flex;align-items:center;justify-content:center}
+  .theme-btn:hover{transform:scale(1.08)}
+</style>
+</head>
+<body>
+<button id="themeBtn" class="theme-btn" aria-label="Toggle light/dark theme">◐</button>
+<script>
+(function(){
+  var r=document.documentElement,b=document.getElementById('themeBtn'),saved=null;
+  try{saved=localStorage.getItem('center-theme')}catch(e){}
+  function set(x){r.setAttribute('data-theme',x);b.textContent=x==='dark'?'☀':'☾';
+    try{localStorage.setItem('center-theme',x)}catch(e){}}
+  set(saved||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+  b.onclick=function(){set(r.getAttribute('data-theme')==='dark'?'light':'dark')};
+})();
+</script>
+
+<main>
+<p class="kicker">Investigation · 2026-07-10 · frontend direction — operator picks</p>
+<h1>Six skins, one command center <span style="font-size:.9rem;vertical-align:middle;font-weight:700;padding:4px 14px;border-radius:999px;background:var(--good-t);color:var(--good)">✓ FINAL (round 11): J · Station Card, light-only</span></h1>
+<p class="note" style="border-left:4px solid var(--good)"><strong>FINAL (2026-07-10, round 11): "Use J".</strong> The center wears <a href="mockups/center-hub-multi.html"><strong>J · Station Card</strong></a>, light-only (Claude-designed, round 10: state left-rails, tab-chip headers, two-voice type; spec: <a href="05-skin-spec.md">05-skin-spec.md</a>). The round-5 pick below stays as the decision record: the center originally chose
+<a href="mockups/hub-g-pixel-console.html"><strong>G · Pixel Console</strong></a> with the <strong>light theme as default</strong>
+(dark stays one ◐ away). Porting spec for the build: <a href="05-skin-spec.md">05-skin-spec.md</a>. Everything below stays as the decision record.</p>
+<p class="note"><strong>Round 8 — the full layout set, every skin:</strong> all four center layouts are now navigable with a
+top-right skin switcher (A–G, persisted as you move between pages), so the final skin call can be pressure-tested on real
+layouts, not just the hub: <a href="mockups/center-hub-multi.html"><strong>HUB</strong></a> (now with the three lenses:
+risk · levels · recency) · <a href="mockups/center-board-multi.html"><strong>BOARD</strong></a> ·
+<a href="mockups/center-tests-multi.html"><strong>TESTS</strong></a> ·
+<a href="mockups/center-drill-multi.html"><strong>DRILL</strong></a> (new: a cell opened — four stations, evidence table,
+history sparkline, leaf links). G stays the provisional pick (★) until the operator re-confirms after touring these.</p>
+<p class="note"><strong>Round 9 — skin set reworked (operator):</strong> A (Cifra) and D (Editorial) are
+<strong>discarded</strong>; B now renders its <strong>light console</strong> theme; two new skins take their slots, sourced
+from the operator's reference sites: <strong>H · Swiss Studio</strong> (designprompts' International-style canon: white,
+black rules, one red accent, zero ornament) and <strong>I · Gallery Hall</strong> (TheGallery's extracted system: warm-black
+<code>#0E0D0B</code>, bone ink <code>#EAE4D8</code>, Bricolage-style display, five-color bar accents). Current set on the
+switcher: <strong>B·light C E F G★ H I</strong> — tour via <a href="mockups/center-hub-multi.html">the multi pages</a>.
+The A–G cards below remain as the historical decision record.</p>
+<p class="note"><strong>Round 10:</strong> H, I, C discarded. <strong>G's legibility fixed</strong> — the mono-everywhere font
+was the "too spread out" culprit; G now reads in sans (titles/prose) with mono reserved for telemetry (spec rule 1 rewritten).
+<strong>New: J · Station Card</strong> — Claude's own design on request: the laminated line-cook checklist genre, state-colored
+left rails (thickest red on the safety row), dark tab-chip headers, big tabular numerals. Switcher now:
+<strong>B·light E F G★ J</strong> — <a href="mockups/center-hub-multi.html">tour</a>.</p>
+<p class="lede">Every mockup below is the <strong>same hub page with the same real data</strong> — the stat tiles, the
+criticality × area risk board, and one drilled cell (Safety × Recipes) — wearing four different personalities.
+The approved semantics never change between them (color = state · icon = kind · size/border = criticality ·
+opacity/date = freshness · your PixelLab icons throughout). Only the look and feel moves.
+<strong>Click any screenshot to open the live mockup</strong> — each is a self-contained page that opens from disk,
+and every one now carries a <strong>◐ theme toggle in the top-right corner</strong>: flip light/dark manually, and your
+choice persists across all the mockup pages (it overrides the system preference that was locking you into dark).</p>
+
+<div class="dirs">
+  <div class="dir">
+    <a class="shot" href="mockups/hub-a-cifra.html"><img src="assets/shots/dir-a-cifra.png" alt="Direction A — Cifra Shell"></a>
+    <div class="body"><span class="tag">Direction A</span><h3>Cifra Shell — it belongs to the family</h3>
+      <p>The docs-site's sibling: warm paper, serif headings, quiet chips. The center reads like another room of the
+      documentation house you already have — zero visual context-switch from journey pages and ADRs.</p>
+      <div class="traits"><span class="trait">density: medium</span><span class="trait">light-first</span><span class="trait">family fit: highest</span><span class="trait">build cost: lowest (shell exists)</span></div>
+      <a class="open" href="mockups/hub-a-cifra.html">Open mockup →</a></div>
+  </div>
+  <div class="dir">
+    <a class="shot" href="mockups/hub-b-console.html"><img src="assets/shots/dir-b-console.png" alt="Direction B — Mission Console"></a>
+    <div class="body"><span class="tag">Direction B</span><h3>Mission Console — the ops room</h3>
+      <p>Dark-native, monospace, maximum density: LED sparklines, phosphor statuses, an event log at the bottom.
+      Feels like monitoring a launch — everything on one screen, zero scrolling at desktop size. The strongest
+      "command" energy of the four.</p>
+      <div class="traits"><span class="trait">density: highest</span><span class="trait">dark-native</span><span class="trait">family fit: low (deliberate contrast)</span><span class="trait">most info per pixel</span></div>
+      <a class="open" href="mockups/hub-b-console.html">Open mockup →</a></div>
+  </div>
+  <div class="dir">
+    <a class="shot" href="mockups/hub-c-pixel.html"><img src="assets/shots/dir-c-pixel.png" alt="Direction C — Pixel Kitchen"></a>
+    <div class="body"><span class="tag">Direction C</span><h3>Pixel Kitchen — the game HUD</h3>
+      <p>Chunky borders, hard drop-shadows, LED strips on the tiles, your PixelLab icons at full size — testing as a
+      cooking game's status screen. The most FUN of the four, and the closest to gustify's own playful-geometric
+      mockup heritage; the kitchen analogies live in the UI itself.</p>
+      <div class="traits"><span class="trait">density: medium</span><span class="trait">light-first</span><span class="trait">personality: loudest</span><span class="trait">icons carry the interface</span></div>
+      <a class="open" href="mockups/hub-c-pixel.html">Open mockup →</a></div>
+  </div>
+  <div class="dir">
+    <a class="shot" href="mockups/hub-d-editorial.html"><img src="assets/shots/dir-d-editorial.png" alt="Direction D — Editorial Broadsheet"></a>
+    <div class="body"><span class="tag">Direction D</span><h3>Editorial Broadsheet — the morning paper</h3>
+      <p>Double rules, big serif figures, the drill rendered as front-page stories with headlines and deks. The
+      calmest read — trends and risk as prose you'd read with coffee, not a wall of widgets. Lowest density, highest
+      dignity; closest to TheGallery's editorial rooms.</p>
+      <div class="traits"><span class="trait">density: lowest</span><span class="trait">light-first</span><span class="trait">calmest read</span><span class="trait">best for the daily 2-minute glance</span></div>
+      <a class="open" href="mockups/hub-d-editorial.html">Open mockup →</a></div>
+  </div>
+  <div class="dir">
+    <a class="shot" href="mockups/hub-e-glass.html"><img src="assets/shots/dir-e-glass.png" alt="Direction E — Bento Glass"></a>
+    <div class="body"><span class="tag">Direction E · new</span><h3>Bento Glass — the modern SaaS</h3>
+      <p>Frosted translucent cards floating over soft gradient light, a pill nav, progress rings, rounded-everything.
+      The contemporary Linear/Vercel-era dashboard look — friendly, airy, and instantly familiar to anyone who lives
+      in modern dev tools. Dark mode turns the glass luminous.</p>
+      <div class="traits"><span class="trait">density: medium</span><span class="trait">both modes shine</span><span class="trait">most "product-like"</span><span class="trait">gradient + blur identity</span></div>
+      <a class="open" href="mockups/hub-e-glass.html">Open mockup →</a></div>
+  </div>
+  <div class="dir">
+    <a class="shot" href="mockups/hub-f-blueprint.html"><img src="assets/shots/dir-f-blueprint.png" alt="Direction F — Blueprint"></a>
+    <div class="body"><span class="tag">Direction F · new</span><h3>Blueprint — the engineer's drawing</h3>
+      <p>Grid paper, corner ticks, FIG. labels, a title block — the estate rendered as a technical schematic you could
+      audit with a ruler. Dark mode is a classic cyan-on-navy blueprint; light mode is blue ink on drafting paper.
+      The most "this is an engineering document" of the six.</p>
+      <div class="traits"><span class="trait">density: medium-high</span><span class="trait">dark = classic blueprint</span><span class="trait">strongest audit energy</span><span class="trait">mono labels + figures</span></div>
+      <a class="open" href="mockups/hub-f-blueprint.html">Open mockup →</a></div>
+  </div>
+</div>
+
+<h2>Side by side</h2>
+<div class="tw"><table>
+  <tr><th></th><th>A · Cifra Shell</th><th>B · Mission Console</th><th>C · Pixel Kitchen</th><th>D · Editorial</th><th>E · Bento Glass</th><th>F · Blueprint</th></tr>
+  <tr><td><strong>One-line feel</strong></td><td>another room of the docs house</td><td>launch control</td><td>cooking-game HUD</td><td>the morning paper</td><td>modern SaaS dashboard</td><td>engineer’s schematic</td></tr>
+  <tr><td><strong>Information density</strong></td><td>medium</td><td>highest</td><td>medium</td><td>lowest</td><td>medium</td><td>medium-high</td></tr>
+  <tr><td><strong>Default mode</strong></td><td>light-leaning</td><td>dark-native (+ real light)</td><td>light-leaning</td><td>light-leaning</td><td>both equally</td><td>dark = classic blueprint</td></tr>
+  <tr><td><strong>Fit with existing docs/site</strong></td><td>seamless</td><td>deliberate contrast</td><td>cousin (mockup heritage)</td><td>different register</td><td>different register</td><td>deliberate contrast</td></tr>
+  <tr><td><strong>How criticality shows</strong></td><td>red border weight</td><td>red tier label + glow border</td><td>red drop-shadow on tiles</td><td>red-wash row + bigger serif</td><td>red ring + soft glow</td><td>red outline + crosshair mark</td></tr>
+  <tr><td><strong>Where it shines</strong></td><td>living beside journey pages</td><td>deep work sessions, wall-screen</td><td>making testing feel rewarding</td><td>the daily glance, sharing a report</td><td>feeling like a real product</td><td>audits, deep inspection, printing</td></tr>
+  <tr><td><strong>Watch out for</strong></td><td>can feel "just more docs"</td><td>small text; alien next to Cifra pages</td><td>charm can cost gravitas at 300 specs</td><td>low density = more clicking to depth</td><td>blur costs perf on huge pages; trend-dated risk</td><td>ornament (ticks/figs) must not crowd data</td></tr>
+</table></div>
+
+<p class="note"><strong>Mixing is allowed and cheap.</strong> These are skins over one semantic system, so hybrids are
+one CSS layer away — e.g. <em>A's chrome with B's risk matrix</em> ("family shell, console density"), or <em>D as the hub
+with B as the drill pages</em> ("calm at L0, dense at L2"). If one direction wins but you'd steal a piece of another,
+say which pieces — that's exactly how the final skin gets specified.</p>
+
+
+<h2>The B × C question (round 4) — resolved by round 5: G won, light default</h2>
+<p class="lede"><strong>Honest assessment:</strong> at the component level, B and C are opposites in five of six visual
+channels — border weight (hairline vs chunky), corner radius (sharp vs round), typography (mono vs heavy sans),
+temperature (cool cyan vs warm cream), density (max vs medium). A naive 50/50 blend produces mud. <strong>But this
+specific pair shares a root the other pairs don't: retro computing.</strong> A terminal and a pixel-art game are the
+same era of machine — so a deliberate fusion has a real anchor. Three honest ways to have both, priced:</p>
+<div class="tw"><table>
+  <tr><th>Path</th><th>What you get</th><th>Honest cost</th></tr>
+  <tr><td><strong>G · the fusion</strong> (built below — judge it yourself)</td><td>ONE skin: B's structure, density, monospace and event ticker + C's chunky borders, hard shadows, LED blocks, warm palette and playful copy. <strong>And the elegant part: dark mode leans B, light mode leans C — the theme toggle becomes the bridge between your two favorites.</strong></td><td>Fusion risk is real but paid already — the mockup exists; if it reads as "neither" to you, it dies here at zero further cost.</td></tr>
+  <tr><td><strong>Skin toggle</strong> (both, intact)</td><td>B and C shipped whole as two CSS skins over the same pages, switched like the theme toggle. Zero compromise on either.</td><td>Every future component styled twice — roughly +20–30% on all frontend work of the center, forever. The data layer is unaffected (skins are pure CSS), so the guardrail survives.</td></tr>
+  <tr><td><strong>Altitude split</strong></td><td>C for the hub (the daily warm glance), B for the dense drill pages (tables, matrices). Each style where it's strongest.</td><td>Crossing an altitude boundary changes the whole visual world — can feel like two sites unless status colors, icons, and the topbar stay shared. Needs discipline, not more code.</td></tr>
+</table></div>
+<div class="dirs">
+  <div class="dir">
+    <a class="shot" href="mockups/hub-g-pixel-console.html"><img src="assets/shots/dir-g-console-dark.png" alt="Direction G dark — Pixel Console, the B side"></a>
+    <div class="body"><span class="tag">Direction G · fusion — dark mode</span><h3>Pixel Console, dark = the B soul</h3>
+      <p>Warm-black console: monospace, dense matrix, event ticker — but with C's LED blocks, chunky 2px borders,
+      hard shadows, pixel icons, and "what could burn" microcopy. Kitchen colors on console structure.</p>
+      <a class="open" href="mockups/hub-g-pixel-console.html">Open mockup (toggle inside) →</a></div>
+  </div>
+  <div class="dir">
+    <a class="shot" href="mockups/hub-g-pixel-console.html"><img src="assets/shots/dir-g-console-light.png" alt="Direction G light — Pixel Console, the C side"></a>
+    <div class="body"><span class="tag">Direction G · fusion — light mode</span><h3>Pixel Console, light = the C soul</h3>
+      <p>The exact same page flipped light: cream paper, dark chunky lines, the same density and layout. One skin,
+      two souls — flip the ◐ and watch B become C without anything moving.</p>
+      <a class="open" href="mockups/hub-g-pixel-console.html">Open mockup (toggle inside) →</a></div>
+  </div>
+</div>
+
+<h2>Where the work happens (your session question)</h2>
+<p><strong>Recommended split, matching what you sketched:</strong> polish the look-and-feel HERE (this folder, fake-data
+mockups, fast iteration — no gustify writes, no session coordination needed) → once a direction is locked, the
+<strong>gustify session builds the real generator</strong> against live data per the spike plan (its writable surfaces:
+tests + docs/site + scripts). The handover artifact is small: the chosen mockup file IS the spec — the generator ports
+its CSS and fills it from real sources. COMMS carries the baton; nothing needs to run in both places.</p>
+
+<div class="footer">Seven self-contained mockups under <code>mockups/</code> (each with the ◐ light/dark toggle) · same data, same semantics, different skins ·
+PixelLab icons shared via <code>assets/icons/</code> · screenshots regenerable via the scratchpad playwright script ·
+part of investigation 2026-07-10-testing-command-center.</div>
+</main>
+</body>
+</html>

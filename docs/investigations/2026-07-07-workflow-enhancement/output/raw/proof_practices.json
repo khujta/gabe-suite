@@ -1,0 +1,1697 @@
+[
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "npm run build (tsc -b + vite) is explicitly treated as the REAL typecheck each turn; npx tsc --noEmit is called out as a no-op due to project references \u2014 a standing verification distinction carried through every DF2 screen."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Each DF2 re-skin followed the same gate before any visual proof: eslint 0 errors, build/tsc 0 errors, full vitest suite green, npm run check:token-classes (gt-* Tailwind token guard)."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Playwright proof screenshots were captured per feature into durable, gitignored tests/web-e2e/proof/<feature>/*.png folders (df2-history, df2-history-embeds, df2-groups, df2-trends, df2-trends-donut, df2-trends-ref, ca0-scan-trust) and actually opened/viewed via Read before any 'done' claim."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Long Playwright runs were launched in the background and the AI explicitly waited for task-notification completion (or polled until pass/fail appeared) rather than assuming success."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "A locale bug (Playwright defaulting to en-US) was caught by inspecting an actual rendered header in an error-context snapshot, then fixed by forcing es-CL locale so proof screenshots genuinely match the Spanish-configured mockups."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Storybook-vs-live comparisons were built as rendered Artifact galleries (reference screenshot beside live screenshot, MATCH/GAP/DEFERRED annotations) and regenerated after every fix round rather than trusting a single before/after glance."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "The /gabe-commit gate was run before every commit with each of its checks (lint, types, tests, shape, deferred/PENDING cross-reference, docs, structure) explicitly enumerated pass/fail, plus a matching LEDGER.md append per commit."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Secrets were handled by reading a gitignored .secrets/prod-dsn file straight into an env var, deliberately never echoed/printed, with an explicit auto-mode permission rule added rather than the DSN being pasted or logged."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "A 'reset 0' transaction count from the seed script was treated as a red flag rather than accepted at face value, leading to discovery that the wrong user had been seeded; the fix was re-verified with a fresh Playwright capture before being trusted."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "/gabe-handoff --dry-run was run against the live session as a self-test before shipping the command, and it surfaced real uncommitted/undocumented work that the session summary had missed."
+ },
+ {
+  "project": "gastify",
+  "session": "44afa232",
+  "obs": "Every feature commit routes through a full local pre-push gate (scripts/pre-push.sh: backend ruff/mypy/pytest coverage, web build/lint/token-classes/vitest, mobile api-drift) run and confirmed green before any push."
+ },
+ {
+  "project": "gastify",
+  "session": "44afa232",
+  "obs": "Playwright e2e proof is captured on a dedicated prod-e2e :5174 lane against real seeded prod data, with screenshots saved to gitignored tests/web-e2e/proof/<feature>/ folders as the durable local evidence."
+ },
+ {
+  "project": "gastify",
+  "session": "44afa232",
+  "obs": "Adversarial multi-dimension background review Workflows are launched after nearly every non-trivial diff (before commit), with a verify/skeptic pass that CONFIRMS or REFUTES each raw finding before it's actioned \u2014 used repeatedly (CA3, CA4, CA4-fidelity, treemap layout, Sankey grouping, Sankey icon-node port)."
+ },
+ {
+  "project": "gastify",
+  "session": "44afa232",
+  "obs": "Production deploys are verified by grepping the served bundle for a commit-unique string plus `railway deployment list` SUCCESS+commitHash, not just a bundle-hash flip (a documented gotcha saved to project memory after being learned the hard way)."
+ },
+ {
+  "project": "gastify",
+  "session": "44afa232",
+  "obs": "Despite this rigor, the D100 'side-by-side against Storybook' visual-fidelity claim was asserted from code/test inspection alone (not an actual rendered comparison) at least twice before the human forced a real screenshot-based look (CA1, CA4) \u2014 proof discipline was strong for tests/deploys but weak for visual fidelity until explicitly demanded."
+ },
+ {
+  "project": "gastify",
+  "session": "44afa232",
+  "obs": "HTML 'proof artifact' galleries (data-URI-embedded screenshots) are generated via python scripts + the Artifact tool for CA1, CA4, and the Sankey/Treemap fidelity comparisons \u2014 but this format was initially misapplied to an exploratory spike before the human clarified spikes belong in Storybook, artifacts are only for implemented-vs-reference comparison."
+ },
+ {
+  "project": "gastify",
+  "session": "44afa232",
+  "obs": "Session survived two mid-work power outages; state recovery relied on git status checks plus durably-written .kdbp/PLAN.md, LEDGER.md, and cross-session memory files (project_push_deploy_topology.md, project_prod_seed_e2e_data.md) rather than any human re-explaining what was in progress."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Every W-phase required a Playwright screenshot proof against real (and later seeded) production data via a local 'prod-e2e' dev server, and the AI explicitly opened/viewed each screenshot rather than trusting a green checkmark, per the session's standing rule."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Live production deploys were verified by polling the deployed JS bundle's content hash for a flip plus grepping the bundle for phase-specific markers, not just by confirming the PR merged."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "gabe-commit's deterministic gate (lint, types, tests, structure, deferred-backlog, doc-drift) ran every phase before commit; gabe-review priced findings and logged deferred items (P90-P103) each phase."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "AI discovered e2e test users had zero persistent seeded data (specs create+cleanup in-test) and proactively pulled the production DB's public DSN via Railway CLI to seed 101 realistic demo transactions for genuine feature verification, rather than accepting empty-state screenshots as proof."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "A CI-only test failure (donut lazy-chunk timeout) was root-caused via a CI-exact `npm ci` reproduction rather than just re-running or skipping the test."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "The spacing/padding bug was root-caused via custom Playwright DOM-measurement scripts (computed style inspection) after visual comparison alone was misleading (device-frame scale mismatch, then a genuine CSS bug)."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Secrets handling was self-corrected mid-session: AI caught its own new `.env.prod-e2e` file was not covered by `.gitignore` and fixed the glob before anything could be staged."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Backend changes were consistently gated on ruff + mypy + pytest (running the affected suite, then the full suite) before every commit; frontend changes gated on tsc, eslint, and vitest."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "The location/scan-prompt work was proven via real (not mocked) Gemini calls through the prompt-lab CLI on committed Chilean/US/UK/French receipt fixtures, paced to avoid rate limits, with batch-report scoring against hand-curated baselines rather than trusting the model's output on faith."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Multiple 'ultracode' adversarial-review workflows (parallel finder agents + independent skeptic verification) were run before high-risk commits/ships; one caught a real HIGH-severity bug (a DB settings-load outside the try/except block that could strand a scan forever) and another caught 2 CRITICAL runtime bugs in the settings Data screen that tsc had not caught (a stale/loosely-typed API client masking a response-envelope mismatch and a missing required request body)."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Playwright screenshots were captured into dated/feature-named proof folders (tests/web-e2e/proof/settings-fidelity-all/, df2-dashboard/, df2-scope-logo/, df2-header-cleanup/, df2-items/, df2-history/) as visual evidence before declaring UI work done, and were used to visually diff rebuilt screens against the Ladle/Storybook reference."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "A dedicated pre-ship gate workflow (full suites + 5-dimension adversarial diff review) ran before merging to main/production; it caught a real npm run build failure that the whole session's tsc --noEmit checks had missed because the web root uses TS project references (making tsc --noEmit a no-op) -- this was recorded as a durable lesson in project memory afterward."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "After production deploy, the agent verified the deployment by hitting live endpoints/bundle hashes directly (confirming migration 044's new columns were queryable, and that the deployed JS bundle contained new UI markers) rather than assuming the Railway auto-deploy succeeded."
+ },
+ {
+  "project": "gastify",
+  "session": "54614bed",
+  "obs": "Every meaningful commit was accompanied by KDBP bookkeeping (DECISIONS.md entries, PENDING.md follow-ups, LEDGER.md records) as a durable evidence/decision trail."
+ },
+ {
+  "project": "gastify",
+  "session": "5dd2ff51",
+  "obs": "After writing production auth code (prodTestAuth.ts, useAuth.tsx, sign-in.tsx), ran the full local verification chain before calling it done: tsc -b, targeted vitest (useAuth.test.tsx), eslint on changed files, `npm run build`, then the full web vitest suite (137/137) \u2014 self-initiated, no human reminder needed."
+ },
+ {
+  "project": "gastify",
+  "session": "5dd2ff51",
+  "obs": "After bumping backend dependencies (starlette, pypdf, cryptography, python-multipart) to clear SCA findings, ran the full backend suite with coverage gate (`uv run pytest --cov=app --cov-fail-under=80`) to catch regressions before trusting the fix \u2014 caught nothing broke (943 passed, 88% coverage)."
+ },
+ {
+  "project": "gastify",
+  "session": "5dd2ff51",
+  "obs": "A broad `npm audit fix` mobile fix silently broke 72 jest tests across 14 suites; this was only caught because the AI re-ran the full mobile jest suite in the background rather than assuming the audit fix was safe, then reverted and replaced it with surgical per-package overrides (ws, @babel/core, protobufjs) and re-verified with a full green run (255 tests) before committing."
+ },
+ {
+  "project": "gastify",
+  "session": "5dd2ff51",
+  "obs": "Explicitly caught that a background `gh pr checks --watch` task's exit code 0 was misleading (3 checks had actually failed) by reading the real check output instead of trusting the wrapper's summary \u2014 a self-correction, not a human-prompted one."
+ },
+ {
+  "project": "gastify",
+  "session": "5dd2ff51",
+  "obs": "Used Playwright end-to-end against the live production URL to prove the shipped test-login actually works: captured an error screenshot when the deployed bundle was blank (diagnosed a missing Docker ARG for VITE_* vars), then after the fix, captured a pre-login screenshot (form present) and a post-login authenticated-dashboard screenshot as final proof, reading each back with the Read tool before declaring done."
+ },
+ {
+  "project": "gastify",
+  "session": "5dd2ff51",
+  "obs": "Recorded infra/decision state at each major step: .kdbp/DECISIONS.md (D97 policy pivot), .kdbp/LEDGER.md entries at every commit/push/deploy, .kdbp/DEPLOYMENTS.md rows, and three persistent memory files (project_railway_staging_dropped.md, project_production_direct.md, project_railway_vite_build_args.md) so the Dockerfile ARG gotcha and the environment teardown are discoverable in future sessions."
+ },
+ {
+  "project": "gastify",
+  "session": "734a025f",
+  "obs": "First E2E harness (Playwright, screenshot+console-error+mermaid-render check) falsely passed because it served the site over http://localhost instead of file://, masking a real rendering failure the user hit in their actual browser \u2014 a proxy-vs-real-environment test gap."
+ },
+ {
+  "project": "gastify",
+  "session": "734a025f",
+  "obs": "After the file:// bug was found, a durable tools/diagram-compliance.mjs gate was written and deliberately run against the unfixed site first (red, exit 1, all 5 diagrams flagged) then against the fix (green, exit 0) before declaring done."
+ },
+ {
+  "project": "gastify",
+  "session": "734a025f",
+  "obs": "Chiless's 'ALWAYS Read the PNG before integrating' meme rule was followed consistently \u2014 every generated meme (3 on the drift page, 7 for the critical findings) was visually read/inspected before being wired into a document."
+ },
+ {
+  "project": "gastify",
+  "session": "734a025f",
+  "obs": "Proof screenshots were deliberately moved out of the generated docs/site/ output into a dated evidence folder (tests/web-e2e/proof/2026-07-05-docsite/) so they survive regeneration and don't pollute the build artifact."
+ },
+ {
+  "project": "gastify",
+  "session": "734a025f",
+  "obs": "python3 -c \"import ast; ast.parse(...)\" was used repeatedly as a fast syntax-correctness gate after each generator .py edit, before running a full site build."
+ },
+ {
+  "project": "gastify",
+  "session": "734a025f",
+  "obs": "Before extending the generator for the new gastify site, a regression build of the already-shipped gabe-suite site was re-run and diffed to confirm byte-identical output (no accidental breakage)."
+ },
+ {
+  "project": "gastify",
+  "session": "734a025f",
+  "obs": "Final verification of the 110-page gastify site ran the full file:// diagram-compliance gate in the background (Monitor) and confirmed exit 0 / 18 diagrams compliant before reporting completion, plus targeted screenshots of the hub, myopic-walk, wells, and runbook pages."
+ },
+ {
+  "project": "gastify",
+  "session": "8610c1e0",
+  "obs": "P68 e2e failure root-caused via raw Playwright trace parsing (network + trace JSON via python3) down to a specific callId/snapshot rather than guessing, then fix verified green 3x for stability before moving on."
+ },
+ {
+  "project": "gastify",
+  "session": "8610c1e0",
+  "obs": "Selector-sweep fix spot-checked across multiple specs, explicitly noting it skipped a long capture-proof for 'mechanically identical' changes rather than re-verifying every one."
+ },
+ {
+  "project": "gastify",
+  "session": "8610c1e0",
+  "obs": "Every phase of the rate-limit plan ran the same 4-gate discipline (pytest, ruff check+format, mypy, then web tsc/eslint/vitest and mobile tsc/jest) before commit, and CI was watched in the background (gh run watch) before promoting staging->main."
+ },
+ {
+  "project": "gastify",
+  "session": "8610c1e0",
+  "obs": "After each production promotion, migrations were verified live by querying the prod DB directly (alembic head, constraint definitions, table existence) rather than trusting the deploy log alone."
+ },
+ {
+  "project": "gastify",
+  "session": "8610c1e0",
+  "obs": "Two-user hardening fixes were proven with a dedicated real-two-browser-context Playwright spec (groups-two-user-stats.spec.ts) run against a live staging-e2e deployment, not just backend unit tests."
+ },
+ {
+  "project": "gastify",
+  "session": "8610c1e0",
+  "obs": "Bookkeeping (DEPLOYMENTS.md rows, PLAN Push ticks) was found to have silently slipped during rapid phase cadence (Phases 3-4-5 stuck at Commit \ud83d\udd04) and was self-caught and batched-fixed by the AI, not flagged by the user."
+ },
+ {
+  "project": "gastify",
+  "session": "8610c1e0",
+  "obs": "Before committing the new OVERHAUL-ASSEMBLY-GUIDE.md, AI ran an explicit adversarial verification pass re-checking every load-bearing factual claim (file paths, exact hex color values, script names) against the real repo."
+ },
+ {
+  "project": "gastify",
+  "session": "8610c1e0",
+  "obs": "AI explicitly checked git status to confirm parallel mockup-lane untracked files (design-lab/, shared/, PLAN-MOCKUPS.md) were not accidentally staged in its own commit."
+ },
+ {
+  "project": "gastify",
+  "session": "77e637c1",
+  "obs": "Near-universal per-change loop: npm run build (tsc), npm run test-storybook (Storybook 169->222 tests over the session, all kept green), and Playwright screenshots saved to /tmp/<feature>/*.png and read back via the Read tool before declaring anything done."
+ },
+ {
+  "project": "gastify",
+  "session": "77e637c1",
+  "obs": "Adversarial multi-agent review (the Workflow tool, 4-10 agents each) run after most feature batches, with each finding independently verified (verdict/real/severity fields) before being counted -- caught real defects: nested buttons, WCAG contrast failures, consent-gate leaks, decimal-input bugs."
+ },
+ {
+  "project": "gastify",
+  "session": "77e637c1",
+  "obs": "Structured .kdbp/LEDGER.md entries appended after nearly every commit, tagged [MOCKUPS], cross-referencing commit hashes -- a consistent audit trail maintained without being asked each time."
+ },
+ {
+  "project": "gastify",
+  "session": "77e637c1",
+  "obs": "Two full gap-analyses run by fanning out parallel read-only subagents to compare mockups against real backend/mobile/web code and documented use cases, persisted to docs/mockups/MOCKUP-GAP-ANALYSIS.md."
+ },
+ {
+  "project": "gastify",
+  "session": "77e637c1",
+  "obs": "A recurring class of bug (novel/arbitrary Tailwind utility classes silently failing to compile on the dev server) was manually diagnosed and worked around at least 3 separate times before the session finally invested in a permanent automated gate (check-token-classes.mjs) during Phase 10 -- proof infrastructure arrived only after repeated manual pain, not before it."
+ },
+ {
+  "project": "gastify",
+  "session": "77e637c1",
+  "obs": "gabe-commit skill/gate was explicitly invoked once at the very start of the session (Skill(gabe-commit)); for the ~50 subsequent commits the AI manually reproduced the same checks (typecheck, tests, structure, deferred, doc-drift) and LEDGER format from memory rather than re-invoking the skill."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Every build turn ends with a fixed verification gate before declaring 'done': `npm run typecheck && npm run build && npm run build-storybook && npm run test-storybook` \u2014 test count tracked incrementally (25\u219239\u219244\u219295\u219299\u2192108\u2192116\u2192117 stories/tests) as a running regression signal, established early and followed without being re-asked each time."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Heavy, self-initiated Playwright screenshot capture (ad hoc scripts writing to /tmp/dl*, /tmp/*-proof, etc.) before reporting any visual change as complete \u2014 AI explicitly cited this as a standing requirement at least once ('since this is a UI change and the user has emphasized polish... visual proof')."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Byte-level verification was only produced on demand: AI's own 'catalog is transformed' completion claim wasn't independently re-checked until the human explicitly asked 'Did we actually update the catalog...?', at which point AI checked file sizes/mtimes/served-bytes to confirm."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Interactive controls (Storybook option/platform args) were verified by driving them programmatically via Playwright rather than trusting that wiring 'should' work \u2014 this caught real defects (frozen dev-server iframe, non-functional click targets, story-slug mismatches) before reporting completion."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Decisions with real product/behavioral weight were gated through AskUserQuestion before building (e.g. palette lock, payment-method modal scope, Sankey icon-node approach) rather than the AI unilaterally proceeding \u2014 a good example of the harness enforcing a checkpoint without the human having to ask for it."
+ },
+ {
+  "project": "gastify",
+  "session": "9009ae22",
+  "obs": "User shared a screenshot of the VS Code Ports panel to help the AI diagnose why the port-visibility option was missing \u2014 AI's reply opens with 'Thanks, that screenshot tells the whole story.' No automated tests/evidence folders involved; this was a quick infra/troubleshooting exchange, not a build task."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Every substantive change was followed by a 'full gate': npm run typecheck -> build -> build-storybook -> test-storybook, with pass/fail test counts tracked turn over turn (e.g. '119 passed -> 120 passed')."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Visual claims were repeatedly backed by ad hoc Playwright scripts (written to /tmp or _*.mjs scratch files) that navigated Storybook, clicked/interacted, and captured screenshots which the AI then read back before describing results."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "After being burned twice by 'matches Gustify' claims that didn't hold up (06-16 03:15/03:28), the AI switched to writing live-DOM measurement scripts (getBoundingClientRect diffs) comparing the gastify Storybook (6008) against the reference Gustify Storybook (6006) side by side, rather than eyeballing."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Design decisions were logged as numbered DM-entries in .kdbp/PLAN-MOCKUPS.md as a durable ledger, but this ledger was shown to be unreliable at least once (06-15 19:30-19:32) when the AI had recorded a 'settled' decision that the user says never actually happened via the real spike-review process, requiring a retraction edit."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "A dedicated gabe-mockup-driven consolidation audit (3 parallel sub-agents) was run mid-session specifically to self-audit for drift/duplication before continuing, and surfaced real duplicated color-mapping logic that had crept in across the session's own new files."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Storybook dev server outages/restarts happened multiple times across the session (port 6008 dying between compacted sessions, at 22:40 and 13:33), each requiring the AI to detect the failure via curl before re-verifying anything visually."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Every meaningful edit was followed by `npx tsc --noEmit` (often noting it 'catches dangling refs' / 'catches unused after rewrite') before the AI declared work done."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "`npm run build-storybook` was run as a hard build gate after nearly every change set, with results explicitly reported as 'Build green' before moving on."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Playwright-based headless probe scripts (ad hoc `_v*.mjs` files piped through `chromium`) were written per-change to assert DOM state (node counts, colors, badge text, story registration) rather than relying on visual inspection alone."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Screenshots were captured via Playwright and then actually opened with the Read tool for visual confirmation before the AI reported success, catching real defects the DOM probes missed (e.g. a probe false-negative on uppercase CSS text, and the asymmetric Switch knob bug only visible in the screenshot)."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Before the first commit of the untracked design-lab/ workspace, the AI ran a git-add dry run specifically to confirm .gitignore correctly excluded node_modules/dist/storybook-static rather than assuming it."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "The /gabe-commit gate was invoked before every commit and reported a fixed checklist (types, build, lint, tests/coverage/shape, docs, structure) each time, explicitly marking tests/coverage/shape as skipped ('n/a at mockup-mvp') \u2014 meaning verification in this whole session was type-check + build + manual/Playwright screenshot only, with no unit/integration test suite ever exercised."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Before deleting files during the archive cleanup, the AI traced exact import edges (grep for '=who imports X') per candidate file to confirm zero external references, rather than deleting on inference, and re-ran tsc with noUnusedLocals afterward as a safety net."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Newly generated PixelLab icons were opened and eyeballed (Read on the PNG) before being wired into any component, which is how repeated misfires (donut\u2192pastry, tree\u2192plant, oversized icons vs. spec) were caught each time."
+ },
+ {
+  "project": "gastify",
+  "session": "b8d4f660",
+  "obs": "No tests, screenshots, or evidence artifacts were produced or requested in this session \u2014 the work was pure documentation generation (Write/Edit of Markdown well docs) with no runtime code changes to verify."
+ },
+ {
+  "project": "gastify",
+  "session": "b8d4f660",
+  "obs": "The AI self-corrected one bad edit target inline (tried to edit a cross-well consumers table in G3 that actually lives in G5) without any human involvement \u2014 handled silently via the next Edit calls, no proof step around it."
+ },
+ {
+  "project": "gastify",
+  "session": "b8d4f660",
+  "obs": "The human's only quality check in-session was a documentation-completeness read (noticing undefined G1-G7 shorthand), not a functional/test-based verification."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "Nearly every UI change follows a fixed loop: `npx tsc --noEmit` type-check \u2192 an ad hoc Playwright script written to /tmp (_v.mjs) that probes DOM state \u2192 a screenshot read via Read(/tmp/*.png) \u2192 periodically `npm run build-storybook` as an explicit 'final build gate' before declaring a task done."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "The AI repeatedly catches its own Playwright probe/selector bugs (wrong story id casing, ambiguous selectors, stale locators) and explicitly defers to the actual screenshot as ground truth rather than trusting the automated assertion \u2014 this pattern recurs dozens of times across the session."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "A dedicated correspondence-checker script (`~/.claude/skills/gabe-mockup/scripts/check-storybook-correspondence.js`) is run periodically to catch Storybook taxonomy drift (e.g., flat-titled stories that should live under '/Screens')."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "No unit/integration/E2E test suite exists or is run in this workspace \u2014 verification is entirely type-check + visual screenshot + storybook build, which is appropriate for a pure design-lab/mockup workspace but leaves no regression safety net (see the dropped drill-down regression incident)."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "The multi-agent Workflow tool is used twice for heavier verification/research: once to parallel-build 5 picker/screen components from spec, and once (triggered by the 'stop reinventing' complaint) to survey existing Storybook assets plus the legacy app before resuming diagram work."
+ },
+ {
+  "project": "gastify",
+  "session": "88332774",
+  "obs": "The AI proactively writes a standing-preference memory file (feedback_storybook_urls.md) and updates the project's MEMORY.md the moment the human states a recurring preference, so subsequent turns include Storybook URLs by default \u2014 reactive capture rather than a pre-existing skill default."
+ },
+ {
+  "project": "gastify",
+  "session": "990a6f7e",
+  "obs": "Every feature increment gets a dedicated Playwright e2e spec plus screenshots saved to tests/web-e2e/proof/<feature>/ that the AI reads back with the Read tool before declaring done."
+ },
+ {
+  "project": "gastify",
+  "session": "990a6f7e",
+  "obs": "Two side-by-side acceptance galleries (Artifacts) were built comparing design-lab Storybook reference screenshots against live app screenshots for visual fidelity sign-off (PeriodControl, CategoryDetailScreen)."
+ },
+ {
+  "project": "gastify",
+  "session": "990a6f7e",
+  "obs": "Full local gate (lint, tsc build, vitest, check:token-classes) run and reported with explicit exit codes before every commit via the gabe-commit gate; PENDING.md/LEDGER.md updated each time to keep KDBP state in sync."
+ },
+ {
+  "project": "gastify",
+  "session": "990a6f7e",
+  "obs": "Throwaway '_probe' specs (_donut-probe, _count-probe, _tree-probe, _l3-capture) were written to empirically observe live app/API behavior before diagnosing or fixing, rather than guessing."
+ },
+ {
+  "project": "gastify",
+  "session": "990a6f7e",
+  "obs": "Despite green local gates on two separate commits, the AI pushed with only partial local verification (ruff check on changed files + a pytest subset, missing ruff format --check, mypy, and mobile api-type regeneration) \u2014 CI caught real failures both times."
+ },
+ {
+  "project": "gastify",
+  "session": "990a6f7e",
+  "obs": "After the CI misses, the AI first wrote a passive memory note, then \u2014 at the user's explicit request \u2014 built and end-to-end validated scripts/pre-push.sh that mirrors the exact CI job commands, running it once fully green before trusting it."
+ },
+ {
+  "project": "gastify",
+  "session": "990a6f7e",
+  "obs": "Post-merge, the AI did not just trust the CI/merge result: it queried the live production OpenAPI schema to confirm the new category_key filter had actually deployed, then re-ran the category-detail e2e spec against the live prod backend to prove the fix worked end-to-end."
+ },
+ {
+  "project": "gastify",
+  "session": "990a6f7e",
+  "obs": "Two of the four flagged incidents (donut untested, duplicate 'Otros' labels) were bugs that passed the automated gate (green tests) but were only caught by the human visually inspecting the running app/screenshots \u2014 automated proof did not equal correctness."
+ },
+ {
+  "project": "gastify",
+  "session": "d51fedbb",
+  "obs": "AI self-initiated a check for e2e proof screenshots without being asked, citing an internalized memory rule: 'let me confirm the e2e proof screenshots landed (memory: proof artifacts required, absolute paths)'."
+ },
+ {
+  "project": "gastify",
+  "session": "d51fedbb",
+  "obs": "All Playwright e2e specs (CA6, CA8, DF2 regression, IA-consolidation) were run against a live prod-e2e server on real user data (June/July), not mocks, and re-run after every UI tweak to catch regressions."
+ },
+ {
+  "project": "gastify",
+  "session": "d51fedbb",
+  "obs": "Screenshots under tests/web-e2e/proof/<spec>/*.png were read back via the Read tool after nearly every change to visually confirm fidelity (back button, chip casing, filter row layout, bezel removal, category flash) before declaring done."
+ },
+ {
+  "project": "gastify",
+  "session": "d51fedbb",
+  "obs": "Full local web gate (build, lint, token-classes check, vitest 174 tests) was re-run after essentially every edit batch, self-driven, not prompted by the user."
+ },
+ {
+  "project": "gastify",
+  "session": "d51fedbb",
+  "obs": "An adversarial multi-dimension code-review workflow (background Task w7eb91ir7) was launched on the diff with a refute-verify pass, surfacing 12 raw findings reduced to 6 confirmed, which were then fixed before the user's feedback even arrived."
+ },
+ {
+  "project": "gastify",
+  "session": "d51fedbb",
+  "obs": "/gabe-commit's quality gate re-ran fresh deterministic checks (lint, types/build, tests, token-classes) as commit evidence, plus a deferred-items scan against STRUCTURE.md, entirely automated by the skill."
+ },
+ {
+  "project": "gastify",
+  "session": "d51fedbb",
+  "obs": "No instance in this session of the human having to remind the AI to run tests or take screenshots \u2014 proof discipline was fully self-driven throughout."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "Consistent four-stage gate (typecheck -> build -> build-storybook -> test-storybook) run after nearly every change, with the running Storybook test count tracked and explicitly reconciled turn over turn (e.g. \"was 119 -> 120\", \"was 129 -> 132\") to catch unintended regressions."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "Ad hoc Playwright scripts (`cat > ./_name.mjs <<'EOF' ... playwright ...`) written fresh for almost every UI change to drive the live Storybook instance, click through interaction sequences, and screenshot the result before declaring a feature done \u2014 used for the Sankey tap/pulse/level-peel sequences, Trend drill sequence, Reports timeframe density, and nav/header chrome."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "When a claimed 'settled' state (Reports spike archived + DM-33 logged as settled) was challenged by the user, the AI verified via `git log`/`git status` and by listing the actual spike files on disk rather than trusting its own prior summary, then retracted the premature ledger entry."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "After applying the user's 144 icon selections from a delivered JSON file, the AI verified correctness by checksum comparison of each production icon file against its chosen option file, rather than assuming the copy succeeded."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "A gabe-mockup skill 'consolidation audit' was run as a deliberate pre-flight check (3 parallel auditors for token discipline, structure/duplication, and visual consistency) before starting the next roadmap phase, surfacing real P0/P1 drift (duplicate DIRECTION_COLOR/OTROS_GREY definitions, an orphaned old AppShell import) that were then fixed in one pass."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "Screenshots and measurement scripts were used to debug subtle rendering bugs (e.g. `getBBox()` vs `getBoundingClientRect()` icon offset, and eventually a `PixelIcon` component's `object-contain` vs `image-rendering: pixelated` mismatch) rather than guessing at CSS fixes."
+ },
+ {
+  "project": "gustify",
+  "session": "289ba0e4",
+  "obs": "Backend contract changes were consistently verified with ruff + pyright + full pytest suite, plus regenerating the OpenAPI snapshot/api-types and checking an additive-only freeze gate before considering a change done."
+ },
+ {
+  "project": "gustify",
+  "session": "289ba0e4",
+  "obs": "Every new/changed UI component was headless-verified by starting Storybook (--ci --quiet) and running a throwaway Playwright probe script against the iframe to assert DOM state (e.g., toggle text, data attributes, image counts) rather than trusting the story compiled."
+ },
+ {
+  "project": "gustify",
+  "session": "289ba0e4",
+  "obs": "Multi-lens adversarial-verify 'ultracode' workflows (Workflow tool) were used as an explicit commit gate for H1, the H2/H3/H4 batch, and H5b -- each spawning 3 independent adversarial lenses before a scoped commit+push was allowed."
+ },
+ {
+  "project": "gustify",
+  "session": "289ba0e4",
+  "obs": "The H5b adversarial-verify workflow caught a real deploy-breaking blocker that 1094 passing tests had missed: the new alembic migration was written to a stray apps/api/alembic/versions/ directory instead of the real repo-root alembic/ tree, meaning `alembic upgrade head` would never reach it in production."
+ },
+ {
+  "project": "gustify",
+  "session": "289ba0e4",
+  "obs": "A CI failure surfaced a verification gap the AI flagged on itself: it had run pyright only on selected files locally (all clean) but CI runs full-project pyright, which caught 3 unused-variable errors; the AI explicitly noted the lesson to run full pyright before pushing next time."
+ },
+ {
+  "project": "gustify",
+  "session": "289ba0e4",
+  "obs": "E2E journey (match-modes) was re-run twice back-to-back specifically to rule out flakiness before it was allowed into the commit."
+ },
+ {
+  "project": "gustify",
+  "session": "289ba0e4",
+  "obs": "CI runs were watched to completion via `gh run` polling (including a Docker boot smoke test that exercises the real migration path) rather than treating a green local run as sufficient proof."
+ },
+ {
+  "project": "gustify",
+  "session": "289ba0e4",
+  "obs": "After each of the two power outages, the AI re-ran the full local verification suite (ruff, tests, migration smoke) before trusting or committing pre-outage work, rather than assuming the working tree was intact."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "A four-gate verification sequence (npm run typecheck && build && build-storybook && test-storybook) was run after nearly every change throughout the session \u2014 self-imposed convention, not tied to the global 80%-coverage testing rule (which doesn't really apply to a pure Storybook/spike lane)."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "Visual proof via headless Playwright screenshots was captured before nearly every 'done' report (dozens of /tmp/dl*.png, decision-artifact, and proof-folder screenshots), and the AI explicitly cited 'the user's standing requirement that UI changes need visual proof' as the reason."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "When the human asked 'Did we actually update the catalog on assets with the new icons?' the AI re-verified at the byte level (on-disk file sizes/mtimes vs served bytes) instead of re-asserting the earlier claim \u2014 but only did so reactively, after being asked."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "Before a broad mechanical refactor (spacing-scale codemod across 27 files), the AI wrote a dry-run + false-positive check script and spot-checked conversions before applying, then did a visual parity check afterward to confirm no layout shift."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "Screenshot/story-ID mistakes were common and self-corrected: several turns hit wrong Storybook story slugs (e.g. Unicode middle-dot '\u00b7' in titles) and the AI recovered by reading storybook-static/index.json for canonical IDs rather than guessing."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "Background research/extraction was run via parallel-agent Workflow tool calls (legacy code extraction, Gustify-pattern study, ECharts sankey-node research) with ScheduleWakeup fallbacks; on at least two occasions the scheduled wakeup fired after the work was already done, producing a harmless 'stale fallback wakeup' message."
+ },
+ {
+  "project": "gastify",
+  "session": "f1c84b22",
+  "obs": "No unit/integration/e2e application tests were written in this session at all \u2014 'test-storybook' here refers to Storybook interaction/browser-render smoke tests (Chromium), not behavioral tests; this is a pure design/mockup lane with no backend or app logic under test."
+ },
+ {
+  "project": "gustify",
+  "session": "3de7aa00",
+  "obs": "AI grounded cost claims in real data before reporting: pulled live GitHub Actions billing via `gh api /users/.../settings/billing/actions`, per-job timing via `gh run view --json jobs`, and a 30-day run count via `gh run list` before concluding the suite was ~2x over quota."
+ },
+ {
+  "project": "gustify",
+  "session": "3de7aa00",
+  "obs": "Wrote and ran a scratch Python script (timing.py) to compute per-job billed-minute costs rather than eyeballing durations."
+ },
+ {
+  "project": "gustify",
+  "session": "3de7aa00",
+  "obs": "After each workflow YAML edit, validated syntax with `python3 -c \"import yaml; yaml.safe_load(...)\"` before proceeding (done twice \u2014 after the main-only Postgres gate edit, and after the Lever 1/2 rewrite)."
+ },
+ {
+  "project": "gustify",
+  "session": "3de7aa00",
+  "obs": "Before committing, verified `origin/staging..HEAD` was empty and staged only the single intended file, to guarantee the parallel session's uncommitted work would not be swept into the push."
+ },
+ {
+  "project": "gustify",
+  "session": "3de7aa00",
+  "obs": "After pushing, polled the live GitHub Actions run (`gh run view --json status,conclusion`) in a loop to confirm the new job-gating logic actually behaved as designed (gitleaks/legacy-import/postgres-suite skipped on staging; api+web jobs ran)."
+ },
+ {
+  "project": "gustify",
+  "session": "3de7aa00",
+  "obs": "When the AI's own run got cancelled by a concurrency rule, it did not treat that as a failure without investigation \u2014 it checked `gh run list` for a newer competing push, identified the parallel session's commit, and re-verified the workflow logic against that run's results instead."
+ },
+ {
+  "project": "gustify",
+  "session": "3de7aa00",
+  "obs": "Persisted findings into durable project memory (`~/.claude/projects/.../memory/ci-actions-cost-budget.md` and an edit to MEMORY.md) so the CI cost-budget facts survive into future sessions rather than being re-discovered."
+ },
+ {
+  "project": "gustify",
+  "session": "4ac69d8c",
+  "obs": "Wrote a standalone Node probe script (tests/web-e2e/d108-staging-probe.mjs) authenticating as a real Firebase test user to exercise 15 edge cases against the live staging-e2e API, then deleted it after use rather than leaving it as debris."
+ },
+ {
+  "project": "gustify",
+  "session": "4ac69d8c",
+  "obs": "Ran the same Playwright spec against both local Vite (serving uncommitted changes) and the deployed staging/production URLs via GUSTIFY_E2E_WEB_URL/GUSTIFY_E2E_API_URL env vars, capturing gitignored screenshots in tests/web-e2e/artifacts/web-journey/... as evidence for each visual fix."
+ },
+ {
+  "project": "gustify",
+  "session": "4ac69d8c",
+  "obs": "Discovered mid-session that file-scoped pyright/ruff runs before push were insufficient \u2014 CI runs pyright project-wide and caught a strict-typing error in test code a file-scoped run missed; switched to always running full-project pyright/ruff before every subsequent push."
+ },
+ {
+  "project": "gustify",
+  "session": "4ac69d8c",
+  "obs": "Enforced a documented post-incident protocol (D70) requiring verification that alembic_version on the actual staging/production Postgres reached the expected migration head, not just deploy-status SUCCESS + /healthz 200, since a green deploy can still serve a stale schema."
+ },
+ {
+  "project": "gustify",
+  "session": "4ac69d8c",
+  "obs": "Before each git commit, diffed git status against known unrelated in-flight work (profile-spike files, icon-catalog refactor) to keep unrelated changes out of every scoped commit."
+ },
+ {
+  "project": "gustify",
+  "session": "4ac69d8c",
+  "obs": "For production verification, deliberately chose a read-only zero-spend plan (static bundle grep for feature markers, read-only API probes, one browser screenshot) instead of the full write-heavy Playwright spec, to avoid real Gemini API costs and writes against real user data \u2014 decided explicitly with the user via AskUserQuestion."
+ },
+ {
+  "project": "gustify",
+  "session": "4ac69d8c",
+  "obs": "The OpenAPI freeze guard (D81/D85, scripts/check_openapi_frozen.sh) caught an accidental contract regression (removed `diet` field) at CI time; the AI performed a deliberate 'full re-freeze' (regenerate snapshot + types from the live app, diffed to confirm only the intended change) rather than working around the guard."
+ },
+ {
+  "project": "gustify",
+  "session": "501dcd46",
+  "obs": "npx tsc --noEmit run after nearly every edit across the whole session as the primary correctness gate for spike code."
+ },
+ {
+  "project": "gustify",
+  "session": "501dcd46",
+  "obs": "Python one-off scripts used repeatedly to numerically verify geometry (rotation/bounding-box math), ranking logic (flavor tie-breaks), color-contrast (footer tone legibility), and score-formula contrasts before/after wiring into UI \u2014 a computational verification habit distinct from visual verification."
+ },
+ {
+  "project": "gustify",
+  "session": "501dcd46",
+  "obs": "No automated unit/e2e tests were run in this session; verification relied on typecheck + reasoning/math checks, and this gap directly caused two visual-correctness misses (pills not showing, overlay icons still separated) that the human had to catch via screenshots."
+ },
+ {
+  "project": "gustify",
+  "session": "501dcd46",
+  "obs": "Session-local memory files (flavor-octagon-spike.md, match-score-spike.md, card-anatomy-doc.md) updated after nearly every major turn for cross-session continuity, and the MEMORY.md index kept pointed at the live doc."
+ },
+ {
+  "project": "gustify",
+  "session": "501dcd46",
+  "obs": "Explicit HANDOFF.md / HANDOFF-MATCH-MODES.md documents written on human request to make the spike's decisions followable by a separate implementing session."
+ },
+ {
+  "project": "gustify",
+  "session": "501dcd46",
+  "obs": "Before publishing the doc-site update, the AI explicitly diffed against the actual shipped commit (a4d2756) to ensure [[live]] tags in the docs were true rather than aspirational."
+ },
+ {
+  "project": "gustify",
+  "session": "501dcd46",
+  "obs": "PixelLab icon generation followed a checked pipeline: balance check before generating, visual Read of the generated PNGs to inspect them, then registry regeneration via a script \u2014 rather than assuming generation succeeded."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "tsc --noEmit run repeatedly, scoped to own files and explicitly filtering known 'not-mine' parallel-session errors, before every commit."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "vitest unit + storybook-project test suites run and pass counts reported (e.g. 14/14, 101/101, 37/37, 367 tests) before presenting or shipping work."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "Playwright headless screenshot harness used extensively to visually QA every spike/story before presenting to the human, checking for 0 pageerror each time, with re-runs when story IDs failed to resolve (title slugification bugs)."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "git status/diff used repeatedly to scope commits precisely on a shared working tree, excluding the parallel session's concurrent edits; a stash-based check was used to prove a tsc failure was pre-existing and not caused by this session's edits."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "CI explicitly watched via `gh run watch`/`gh run list` after every push, distinguishing this session's own job (web) from an unrelated failing job (api) before declaring success."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "Production deploy verified post-promotion via curl smoke tests on live healthz/app URLs, plus a deploy-ledger entry (DEPLOYMENTS.md P121) recorded as evidence."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "A proactive two-lens adversarial verification workflow (converter-robustness + doc-vs-code accuracy) was launched before committing doc changes, catching one real mismatch (doc's 'Ingrediente nueva' vs code's 'Ingrediente nuevo') that was then fixed."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "Docsite was regenerated after every markdown edit and diffed to confirm only the intended page changed, routinely reverting timestamp-only churn on ~17 untouched pages before committing."
+ },
+ {
+  "project": "gustify",
+  "session": "7cff892b",
+  "obs": "Claude ran `npx tsc --noEmit` / `npm run typecheck` after editing generatedIconCatalog.ts and IconAssetCatalog.stories.tsx, confirming the rewrite compiled cleanly."
+ },
+ {
+  "project": "gustify",
+  "session": "7cff892b",
+  "obs": "Claude discovered `npm run lint` was broken (missing eslint.config.js, untracked/pre-existing repo issue) and explicitly decided not to fix it as out of scope, noting the typecheck was the meaningful gate instead."
+ },
+ {
+  "project": "gustify",
+  "session": "7cff892b",
+  "obs": "Claude ran `npm run build-storybook` as 'the real verification' and inspected the built asset chunk to confirm canonical-only families (beverages, origen, sweeteners) were present and stale `samples/` were absent, before declaring the fix complete."
+ },
+ {
+  "project": "gustify",
+  "session": "7cff892b",
+  "obs": "Before deleting anything, Claude did a repo-wide reference check for the stale docs/mockups/assets/generated-icons path (including HTML mockups) rather than assuming the Storybook catalog was the only consumer \u2014 this caught the 24 icons still needed by HTML mockups and prevented a destructive deletion."
+ },
+ {
+  "project": "gustify",
+  "session": "7cff892b",
+  "obs": "Final sanity check: `git status --short` on the changed files to confirm the diff was exactly the two intended files before summarizing to the user."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "Standard local gate sequence run before nearly every commit: `npx tsc --noEmit`, `npx vitest run --project unit`, `npx vitest run --project storybook`, `npm run build`, and `bash scripts/check-no-legacy-imports.sh` (which false-positives unless run from repo root \u2014 this tripped CI once, fixed and documented in the session summary)."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "Backend gate for API changes: `uv run ruff check`, `uv run pyright`, `uv run pytest` (suite grew from 1001 to 1011+ passing tests over the session) plus `bash scripts/check_openapi_frozen.sh` to enforce additive-only contract changes."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "An adversarial-review Workflow (multi-finder + independent refutation) was run on nearly every non-trivial diff before shipping and caught real regressions that all local gates had missed: a hardcoded Spanish aria-label, a legacy multi-value complexity range silently dropping values, a missing cache invalidation that broke the F1 A-probar/Favoritos flip, and the N2 dead-on-arrival portal bug."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "e2e validation ran against a live staging-e2e backend plus a local Vite dev server rather than mocks; a CORS/port gotcha (must serve on :5173) caused a full false-failure diagnosis detour before being root-caused and written to memory."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "Ad hoc, single-use Playwright 'probe' specs (web-journey-zzprobe-*.spec.ts) were repeatedly written to visually/behaviorally confirm a specific fix live against staging, then deleted after use \u2014 real but throwaway verification, not a durable regression asset."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "Prod smoke checks (api healthz 200, an auth-gated route 401, web root 200/SPA shell served) were run after every production promotion and recorded as numbered entries (P116-P120) in .kdbp/DEPLOYMENTS.md."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "A verification gap surfaced directly by the user: an AI-written probe asserted a data-attribute (internal state) instead of the actually-rendered CSS animation class, producing a false 'verified' claim that the user's manual retest then contradicted \u2014 prompting a second, stricter probe checking the visible class."
+ },
+ {
+  "project": "gustify",
+  "session": "519cc314",
+  "obs": "Design-spike screenshots were rendered via a static Storybook build + headless-browser capture script and sent to the founder for comparison (SendUserFile) rather than requiring the founder to boot Storybook themselves; the screenshot script itself had undetected whitespace/cropping defects that shipped across 11 images before the founder caught the systemic pattern."
+ },
+ {
+  "project": "gustify",
+  "session": "706f0486",
+  "obs": "The Workflow itself included a self-driven adversarial verification pass over every critical/high claim before the report was written \u2014 not something the human had to request."
+ },
+ {
+  "project": "gustify",
+  "session": "706f0486",
+  "obs": "AI ran its own inline verification of specific claims (e.g., grepping apps/api/services/recipes.py and seed scripts for 'animal'/'IngredientRestriction' fields, running catalog_audit.py, and checking fish-sauce/worcestershire/anchovy entries against shared/taxonomy.json) before asserting them in the report."
+ },
+ {
+  "project": "gustify",
+  "session": "706f0486",
+  "obs": "The final report (docs/rebuild/PRODUCT-STATE-ANALYSIS-2026-07-01.md) was deliberately left uncommitted so the human could review it before it entered git history."
+ },
+ {
+  "project": "gustify",
+  "session": "706f0486",
+  "obs": "Workflow was resumable via resumeFromRunId \u2014 completed analyst agents returned cached results across two interruptions (a dropped previous session and a monthly spend-limit hit) instead of re-running; the AI explicitly flagged the 3 completeness-critic follow-ups that were lost to the spend limit as a known caveat rather than silently dropping them."
+ },
+ {
+  "project": "gustify",
+  "session": "80fe1f87",
+  "obs": "Report claims were code-grounded with file:line citations (e.g. apps/api/services/recipes.py:193-235, apps/api/db.py:62-88) rather than taken from docs."
+ },
+ {
+  "project": "gustify",
+  "session": "80fe1f87",
+  "obs": "Workflow included a dedicated adversarial-verification pass (24 verifier agents) checking every critical/high claim from the six dimension analysts before synthesis."
+ },
+ {
+  "project": "gustify",
+  "session": "80fe1f87",
+  "obs": "When 3 completeness-critic follow-up agents hit the monthly spend cap, Claude closed 2 of the 3 open topics via its own inline grep/read verification (e.g. checking animal:\"fish\" field usage in derivation code) rather than leaving the claim unverified."
+ },
+ {
+  "project": "gustify",
+  "session": "80fe1f87",
+  "obs": "Final report was written to docs/rebuild/PRODUCT-STATE-ANALYSIS-2026-07-01.md and deliberately left uncommitted so the user could review it before it entered version control."
+ },
+ {
+  "project": "gustify",
+  "session": "80fe1f87",
+  "obs": "A background-workflow resume relied on cached per-agent results (resumeFromRunId) so no completed analysis was silently redone after the session interruption."
+ },
+ {
+  "project": "gustify",
+  "session": "6490478c",
+  "obs": "After nearly every docsite change, AI ran a headless Playwright render check confirming 0 true pageerrors before committing (screenshots + JS console checks), distinguishing real errors from pre-existing file:// CORS console noise."
+ },
+ {
+  "project": "gustify",
+  "session": "6490478c",
+  "obs": "AI took full-page and element-targeted screenshots to visually verify widgets (dashboard tiles, scorecard, island map, meme figures, mermaid diagrams) and caught a real CSS grid bug (chevron consuming a grid cell) purely from a screenshot, then re-verified after the fix."
+ },
+ {
+  "project": "gustify",
+  "session": "6490478c",
+  "obs": "Per chiless's meme-hilo skill's hard rule, AI Read() each downloaded meme PNG (individually, then via a montage contact sheet for a batch of 11) to confirm captions/personas rendered correctly before integrating them."
+ },
+ {
+  "project": "gustify",
+  "session": "6490478c",
+  "obs": "AI verified Mermaid SVGs were actually cached/inlined (not falling back to CDN or <pre> text) by grepping build output and counting fallback warnings after each rebuild."
+ },
+ {
+  "project": "gustify",
+  "session": "6490478c",
+  "obs": "AI ran the new regression test suite (vitest) and specifically checked *why* each test failed (assertion vs. import error) rather than assuming red==correct; when C1 unexpectedly passed, it cross-checked directly against the locale JSON source rather than trusting the report snapshot."
+ },
+ {
+  "project": "gustify",
+  "session": "6490478c",
+  "obs": "Before every commit, AI ran `git status`/`git diff` scoping checks to ensure only intended files were staged, given a parallel session was concurrently dirtying the same working tree \u2014 repeated across at least 5 separate commits in this session."
+ },
+ {
+  "project": "gustify",
+  "session": "6490478c",
+  "obs": "AI ran the project's gabe-commit gate (deterministic checks: deferred-scan, doc-drift, structure) before each commit rather than committing raw, per the project's stated 'no raw commits' invariant."
+ },
+ {
+  "project": "gustify",
+  "session": "8f58c911",
+  "obs": "Every code change gated on `cd apps/web && npx tsc --noEmit` + `npm run build` before presenting or committing (repeated ~15+ times through the session)."
+ },
+ {
+  "project": "gustify",
+  "session": "8f58c911",
+  "obs": "PostHog PII/no-op-safety change was run through a dedicated adversarial-review Workflow (10 agents, 4 dimensions) before being presented as done; 2 confirmed findings were fixed and re-verified with tsc+build."
+ },
+ {
+  "project": "gustify",
+  "session": "8f58c911",
+  "obs": "AI cites pre-established personal rules it follows without being reminded: 'Per your verified-render rule' and 'your headless-sampling rule' \u2014 used to justify running headless Playwright checks against Storybook (DOM state assertions, animation height/opacity interpolation samples) instead of eyeballing screenshots."
+ },
+ {
+  "project": "gustify",
+  "session": "8f58c911",
+  "obs": "Screenshots are taken via Playwright/CLI, then read back with the Read tool by the AI itself before being described to the user (self-check before reporting)."
+ },
+ {
+  "project": "gustify",
+  "session": "8f58c911",
+  "obs": "Deploys are verified by fetching the served JS bundle and grepping for expected string/config markers (e.g. the VITE_POSTHOG_KEY, the U1/U2 UI copy strings) rather than trusting CI status alone; also cross-checked healthz 200 and `gh run view` CI conclusion."
+ },
+ {
+  "project": "gustify",
+  "session": "8f58c911",
+  "obs": "Commits routed through the project's `/gabe-commit` quality gate (staged-file scoping, deferred-item triage, structure checks) rather than raw `git commit`, per a stated project invariant."
+ },
+ {
+  "project": "gustify",
+  "session": "8f58c911",
+  "obs": "Session ends with `/gabe-handoff`, which syncs .kdbp/PLAN.md (Exec/Commit/Push ticks with commit-hash + bundle-marker evidence) and rewrites .kdbp/HANDOFF.md as the resume artifact for the next session."
+ },
+ {
+  "project": "gustify",
+  "session": "925511fd",
+  "obs": "Every phase's runtime-evidence requirement (browser Playwright vs. unit/integration only) was derived mechanically from Phase Details tags (user-facing/client-state -> runtime_journey_required + staging_proof_required) rather than assumed, and honored precisely each time."
+ },
+ {
+  "project": "gustify",
+  "session": "925511fd",
+  "obs": "Full regression suites were run before every commit and their counts tracked explicitly in text (API pytest 784->788->793->795->796->799; web vitest 207->213->628->630), plus tsc/ruff/pyright on changed files."
+ },
+ {
+  "project": "gustify",
+  "session": "925511fd",
+  "obs": "A dedicated OpenAPI contract freeze gate (scripts/check_openapi_frozen.sh) was run and its diff manually confirmed additive-only before every schema-touching commit."
+ },
+ {
+  "project": "gustify",
+  "session": "925511fd",
+  "obs": "Real staging-e2e Playwright runs used a live Firebase-authenticated shared test user against a real API, captured evidence screenshots, and self-cleaned test data (title-prefix sweep); the AI explicitly refused to mark a phase's Exec complete without this evidence ('I won't fake runtime evidence' / 'Phase 70 stays Exec \ud83d\udd04 \u2014 I won't fake runtime evidence')."
+ },
+ {
+  "project": "gustify",
+  "session": "925511fd",
+  "obs": "Production deploys were verified not by CI-green inference but by querying Railway's GraphQL API for the actual deployed commit hash on each service, explicitly citing this as 'the P89 standard, not deploy-green inference.'"
+ },
+ {
+  "project": "gustify",
+  "session": "925511fd",
+  "obs": "Phase 71's review used two independent parallel reviewer agents (code-quality + DB/SQL) which surfaced real test-coverage gaps (missing Postgres-parity case, missing empty-array case); both were fixed and verified (796 passed) before commit."
+ },
+ {
+  "project": "gustify",
+  "session": "925511fd",
+  "obs": "A required adversarial 'roast' gate (architect + food-safety perspectives) was run before starting the HEAVY-GATE Phase 68, surfacing 12 gaps including 2 CRITICAL before any code was written."
+ },
+ {
+  "project": "gustify",
+  "session": "925511fd",
+  "obs": "The new staging sandbox-seed feature was iteratively debugged against real deploy logs (two separate MissingGreenlet failures) and only declared done after live API verification of every seeded data category post-deploy, not after tests-passing alone."
+ },
+ {
+  "project": "gustify",
+  "session": "925511fd",
+  "obs": "Deployment history (P92-P100) and runtime-evidence entries were logged to .kdbp/LEDGER.md/DEPLOYMENTS.md after each verified step, giving an auditable evidence trail per phase."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Mandatory local gate sequence enforced before every commit: `npx tsc --noEmit`, `npx vitest run --project unit`, `npx vitest run --project storybook`, `npm run build`, and `bash scripts/check-no-legacy-imports.sh`; api changes additionally require `uv run ruff check`, `uv run pyright`, `uv run pytest`, and `bash scripts/check_openapi_frozen.sh` for contract changes."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Adversarial-review Workflow (multi-finder + independent refutation) run on every substantial diff before shipping; caught real regressions other gates missed, e.g. a HIGH bug where cook-complete didn't invalidate the recipes query cache (F1 to-try/favorites silently stale), an i18n/ARIA regression (hardcoded 'Cerrar' aria-label), and a broken pre-dial seam in the Time Discovery v3 integrated spike (10 findings, 2 HIGH)."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Playwright e2e run live against the real staging-e2e backend (not just unit/storybook) to validate every behavior change (sign-out confirm, completion gate, dialog migrations, facet flows); failures were root-caused rather than dismissed \u2014 e.g. traced a false e2e failure to a CORS/port mismatch (vite landed on :5175 instead of the CORS-allowlisted :5173) via network trace inspection, not guesswork."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "A known flaky Storybook test (`IconAssetCatalog > All Assets`, ~15-20s render vs 15s cap under parallel load) is explicitly identified and re-verified in isolation every time it surfaces, rather than being waved off."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Screenshot proof pipeline for design spikes: builds a static Storybook build, serves it, and headlessly screenshots each story (shot-spike.mjs) before presenting options to the human, rather than describing UI changes only in text."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "One shallow-verification failure: a fix was 'verified' via a DOM state-attribute probe instead of checking the actually-rendered visible CSS class, producing a false-positive 'fixed and confirmed' claim that the human later disproved by re-testing in the real app; a corrected probe (checking the visible animate class) was then used."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Deployment ledger discipline: every staging/prod promotion recorded in .kdbp/DEPLOYMENTS.md (P116-P120) with commit hash, CI run id, and smoke-test results (api healthz 200, protected route 401, web root 200/SPA shell), tied back into PLAN.md phase completion."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "The `/gabe-commit` deterministic CHECK5 shape gate flagged pre-existing god-files (CookingLogComponents.tsx 1622 lines, RecipeFilterPanel.tsx 2170 lines) and logged them to PENDING.md instead of silently ignoring the debt."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "SendUserFile (image-sending) tool failed transiently 3 separate times in one session; each time the AI fell back to giving direct Storybook story URLs rather than blocking, but this degraded the human's ability to review without opening Storybook themselves."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Standard spike loop enforced throughout: build-storybook (or dev-server) \u2192 headless screenshot script \u2192 Read the image to visually confirm the design \u2192 only then git add/commit; several rounds explicitly deferred committing until a fresh screenshot proved the visual claim (e.g. 'Per the last round, I'll verify visually before committing')."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Backend changes gated on ruff + pyright(strict) + full pytest suite + an Alembic migration smoke test (upgrade/downgrade round-trip on SQLite) + an OpenAPI 'freeze' gate that diffs the regenerated contract snapshot against the committed one to block accidental breaking changes."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Every push to staging is watched via `gh run watch --exit-status`, though this safeguard was not airtight (see the CI-failure incident where the human, not the watch, caught the failure)."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "A staging Postgres reseed was dry-run first (validates + rolls back, no writes) before the real --commit run; the real run was also launched OS-detached (setsid/nohup) after a prior attempt was killed by session teardown."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "An 'adversarial 3-lens review' workflow (keep-preservation / client-matcher-regression / contract-dangling-refs, each with its own refute pass) was run on the large Tiempo-retirement diff before it was committed."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Every commit across the whole session is preceded by an explicit git status/diff scoping step to stage only the AI's own files and exclude a concurrently-active parallel session's uncommitted work \u2014 repeated by hand dozens of times rather than via any isolation mechanism (e.g. worktrees)."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Password rotation for an exposed staging DB credential was verified in both directions (new credential connects, old leaked credential is rejected) plus an app-health check before declaring it done."
+ },
+ {
+  "project": "gustify",
+  "session": "9aad4c13",
+  "obs": "npx tsc --noEmit and npm run build run after essentially every edit batch throughout the session, not just before commit."
+ },
+ {
+  "project": "gustify",
+  "session": "9aad4c13",
+  "obs": "Headless Playwright scripts written ad hoc (sample-u5.mjs, .u5-shot.mjs/.u5-shot2/.u5-shot3/.u5-shot4, .arch-shot.mjs) to render Storybook stories and screenshot/assert UI before reporting results to the founder \u2014 repeated at least 5 times across the session."
+ },
+ {
+  "project": "gustify",
+  "session": "9aad4c13",
+  "obs": "After the icon-sizing correction, measured actual rendered pixel dimensions (32px item height vs 32px icon) headlessly to confirm the fix numerically instead of relying on a visual screenshot alone."
+ },
+ {
+  "project": "gustify",
+  "session": "9aad4c13",
+  "obs": "Backend DB reseed used dry-run-first discipline: ran a DRY-RUN (apply+rollback) against the staging Postgres proxy, inspected the counts (539 updated, 0 created/skipped), and only then ran the real --commit."
+ },
+ {
+  "project": "gustify",
+  "session": "9aad4c13",
+  "obs": "Explicitly scoped git staging to avoid parallel-session contamination (checked which files a prior commit touched, diffed locale files to confirm only own keys changed) before every commit."
+ },
+ {
+  "project": "gustify",
+  "session": "9aad4c13",
+  "obs": "Backend changes verified with a full gate: ruff, pyright, targeted pytest (test_recipes.py, test_openapi_contract.py, test_match_score_route.py) plus an offline OpenAPI snapshot diff to prove the schema change was purely additive before regenerating api-types.ts."
+ },
+ {
+  "project": "gustify",
+  "session": "9aad4c13",
+  "obs": "Post-push verification watched CI to green and independently curl-fetched the live served JS bundle and live OpenAPI JSON on staging to confirm the deployed artifact (not just the local build) carried the change, on two separate occasions."
+ },
+ {
+  "project": "gustify",
+  "session": "9aad4c13",
+  "obs": "After the subagent's large deletion, the parent session re-ran verification itself (tsc, build, grep for leftover refs, confirmed the single deleted test was manage-mode-only) instead of accepting the subagent's claim of success."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Nearly every code change is gated by running the project's real lint/typecheck/test/build commands (ruff, pyright, pytest, tsc, vitest, npm build) before commit, and CI is watched to completion via `gh run watch` before the AI reports success."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Storybook UI work is verified with headless Playwright scripts (not just visual inspection) \u2014 checking console errors, counting rendered rows/icons, and for animations, sampling getComputedStyle(transform) at multiple timestamps to prove interpolation and catch first-frame flash bugs; this pattern was formalized into gabe-mockup SKILL.md rule 12."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Critical fixes (fish-allergen R8 leak, plan-to-buy loop, Disponibles toggle) are proven end-to-end against the live staging API using a sandbox account, clearing/restoring the account's settings in a try/finally so verification doesn't corrupt real state."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Independent adversarial sub-agent reviews (a Security review agent for the R8-critical allergen fix, an Adversarial review workflow for the bulk-add banner spike) were dispatched before shipping and surfaced real MEDIUM findings that were fixed prior to commit."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "A DB reseed was dry-run first (script applies then rolls back) before any live write was attempted, and the AI explicitly confirmed the Railway environment was staging (not production) before running it."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "Docker boot-smoke in CI is relied on as the gate that catches startup regressions introduced by new deploy-time reconcile logic (new COPY paths, new boot-time seeders)."
+ },
+ {
+  "project": "gustify",
+  "session": "96070dd4",
+  "obs": "The AI's own icon-completeness check ('0 broken images') was shown by the human to be an insufficient proxy for 'has a dedicated icon' \u2014 a concrete example of a weak assertion passing while the real defect (generic fallback rendering) was present."
+ },
+ {
+  "project": "gustify",
+  "session": "9db487f7",
+  "obs": "Full gate run after every implementation: typecheck (tsc --noEmit), unit tests (vitest), Storybook component tests, production build, and backend ruff+pyright+pytest."
+ },
+ {
+  "project": "gustify",
+  "session": "9db487f7",
+  "obs": "Background adversarial multi-dimension review workflow launched after each feature; findings independently verified/refuted, confirmed issues fixed, then a separate focused verification agent re-checked the fixes resolved the findings without regression."
+ },
+ {
+  "project": "gustify",
+  "session": "9db487f7",
+  "obs": "Flaky test (IconAssetCatalog storybook timeout) was not dismissed on sight -- confirmed pre-existing via diff-scope check and isolated re-run before treating it as unrelated."
+ },
+ {
+  "project": "gustify",
+  "session": "9db487f7",
+  "obs": "CI watched to completion by polling gh run view until green before promoting staging to prod, rather than assuming a push succeeded."
+ },
+ {
+  "project": "gustify",
+  "session": "9db487f7",
+  "obs": "Prod smoke-tested after each promotion via curl against healthz plus the new endpoints (expecting 401 auth-gated) to confirm the deploy was actually live, not just that CI passed."
+ },
+ {
+  "project": "gustify",
+  "session": "9db487f7",
+  "obs": "Deferred/non-blocking review findings recorded into .kdbp/PENDING.md instead of being silently dropped; LEDGER.md and DEPLOYMENTS.md bookkeeping updated per commit/push/promotion."
+ },
+ {
+  "project": "gustify",
+  "session": "9db487f7",
+  "obs": "Self-audited the trickiest diff hunks manually in addition to (not instead of) the background adversarial review agent."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "After nearly every HTML edit to the atlas docs, the AI ran ad hoc Python structural validators (tag balance, well-formed-SVG XML parse, anchor resolution, entity-leak scan) as its primary 'is this correct' signal \u2014 but these checks never covered actual visual/browser rendering, and real display bugs still slipped through and had to be caught by the human via screenshots three separate times."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Backend slices (sensory-columns migration, the #35 DishHistoryEvent snapshot/reader-rewire, technique-exclude filter) were each gated on `uv run pytest` + `ruff check` + `pyright` plus an Alembic upgrade/downgrade smoke test before being marked done, and the safety-critical #35 spine change was additionally sent through a code-reviewer subagent before commit."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "A gabe-roast architect review was run as a mandatory pre-build gate before starting the PROGRESSION engine spine, per the founder's own stated hard constraint that the agent cannot self-approve that gate."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "The fork-consolidation report was backed by a deterministic (non-LLM) Python overlap analysis run over the real 539-recipe corpus, and the script was saved into the repo specifically so the analysis would be reproducible rather than a one-off /tmp artifact."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Session state was persisted into per-project memory markdown files after almost every milestone (taste-variations-progression-atlas.md, future-features-plan.md), intended to survive context resets \u2014 yet two separate mid-task interruptions still forced the human to resend full instructions verbatim, showing the memory practice didn't close the gap for in-flight, uncommitted turns."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Before every git commit, the project's /gabe-commit quality gate (lint/type/test + doc-drift + structure checks) was run, and staged files were scoped precisely to exclude unrelated in-flight changes (pre-existing profile-spike .tsx edits) rather than committing indiscriminately."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Full local gates (ruff, pyright, pytest, tsc, vitest, vite build, OpenAPI freeze-check) were run before every commit, and 'gh run watch' was used to block on real CI results rather than assuming a push succeeded."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Adversarial multi-lens background Workflows (5 lenses for the SAFE change set, 4 lenses for Phase 6, a pre-promotion gate run 3 times) were run before risky merges/promotions and repeatedly caught real bugs the primary pass missed: a frontend-inert MAX_ALLERGENS cap raise, missing fish-free UI wiring, a systemic food-safety content gap (duck/mussels/ground-beef/honey-bee/raw-flour), and two more broken ingredient-filter picker ids."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Playwright headless-browser checks were used to verify Storybook stories actually rendered client-side after a static curl/HTTP-200 check was explicitly called out as a 'false positive' that couldn't prove real rendering."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Deploys to staging/prod were verified with authed API fetches of real data (not just healthz/CI-green), which is what caught a Dockerfile that silently omitted the data/ directory needed by the sensory-note feature, and a pyright-only CI job failure that had silently blocked an earlier deploy."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Lessons from hard-won diagnosis chains were written to session/project memory files (ai-data-disclaimer-stance.md, sensory-backfill-como-sabe.md) \u2014 e.g. '3 silent-fail deploy gotchas' \u2014 explicitly to avoid relearning them on the full backfill run."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Despite the memory-file discipline, the icon-generation style still drifted across multiple prior sessions ('this has happened every time') until the founder asked for it to be pinned to a machine-read config file (data/icons/icon-style.json) rather than left as free-text guidance in a doc."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "DEPLOYMENTS.md and LEDGER.md were updated as durable bookkeeping after every push/promotion (P101-P111 in this chunk), including retroactive corrections when a deployment row was recorded before its CI had actually finished."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Nearly every UI change was screenshotted via headless Chromium/Playwright against a locally-running Storybook instance and read back (Read /tmp/*.png) before the AI described it as done."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Standard pre-commit gate throughout: npm run typecheck / vitest / build (and ruff/pyright/pytest on the API side) run and confirmed green before every git commit; CI watched afterward via background gh run list polling."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "After every promote/deploy, the AI curled the live staging/prod bundle hash and API healthz/openapi.json to confirm the new code was actually live, rather than trusting the push alone (e.g. bundle hash flip index-CTaf-tmp -> index-DAB7kkcn)."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Following the founder's explicit mandate ('do an end-to-end test on Playwright and verify that the change actually took place'), the AI began writing bespoke one-off Playwright verification scripts per feature (verify-sabor-bars.cjs, verify-sabor-mobile.cjs, verify-grouping.cjs, verify-tipo-or.cjs, verify-slot-cap.cjs, verify-clear-dialog.cjs) that asserted DOM state/pixel alignment (e.g. '0.00px drift') instead of relying on visual judgment alone."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Live-data verification was used to prove backend semantics rather than just reading code: e.g. probing the staging sensory API with real sandbox credentials to confirm filter counts (salty:3 -> 132 recipes) and proving Tipo OR semantics via exact union math (139+8=147)."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Adversarial multi-lens 'Workflow' code reviews were run before each production promote of a risky change (Phase 13: 8/8 confirmed findings incl. a HIGH bug; Sabor cap: 7/8 confirmed incl. a HIGH floor>cap contradiction; PROG-engine: 6/10 confirmed incl. a HIGH silent-demotion bug) \u2014 each caught real defects that typecheck/tests/build had passed clean over."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Evidence (screenshots, verification scripts) was written to /tmp with descriptive filenames but not organized into dated evidence folders or persisted in the repo; proof artifacts were transient/session-local rather than archived."
+ },
+ {
+  "project": "gustify",
+  "session": "9ad1fc28",
+  "obs": "Despite these strong per-change verification habits, the entire session used raw git commit/push throughout (confirmed by the AI's own mid-session context-compaction summary noting 'never use raw git commit per KDBP (use /gabe-commit) \u2014 though raw git was used pragmatically this session with the founder's implicit approval'), so the suite's own quality-gate command was bypassed even while ad-hoc verification was being invented from scratch each time."
+ },
+ {
+  "project": "gustify",
+  "session": "b00a1aa3",
+  "obs": "Headless-Playwright render-verification after nearly every generator/CSS/JS change: pageerror count, DOM element counts (carousels loaded, mermaid svg count, syntax-error flags), and a screenshot read before declaring a change done."
+ },
+ {
+  "project": "gustify",
+  "session": "b00a1aa3",
+  "obs": "Byte-identical diff-gating (date-pinned regen + md5/diff against committed baselines) used repeatedly to prove shell/data extractions and refactors produced zero output change."
+ },
+ {
+  "project": "gustify",
+  "session": "b00a1aa3",
+  "obs": "Every Mermaid diagram validated via the mcp Mermaid-Chart validate_and_render tool ('.valid': true) before being embedded in a generated page."
+ },
+ {
+  "project": "gustify",
+  "session": "b00a1aa3",
+  "obs": "Real Playwright E2E suites run against the live staging-e2e environment to 'prove conditions work' before trusting any journey-page claim; fresh screenshots captured as evidence and kept gitignored (only the generated HTML site is committed)."
+ },
+ {
+  "project": "gustify",
+  "session": "b00a1aa3",
+  "obs": "Dedicated free-tier and chef-tier fixture users were created specifically to avoid state contamination between tier-cap tests, after diagnosing that a shared user's mutable tier made two tests unreliable."
+ },
+ {
+  "project": "gustify",
+  "session": "b00a1aa3",
+  "obs": "A custom Playwright reporter writes a gitignored run-status.json/.js manifest so pages show live pass/fail chips client-side, with an explicit 'fresh clone/CI shows not-run, honest by default' design rule."
+ },
+ {
+  "project": "gustify",
+  "session": "b00a1aa3",
+  "obs": "/gabe-commit quality gate (lint, structure pattern check, PENDING.md cross-check, LEDGER.md entry) run before every commit instead of raw git commit; on one commit the AI detected a parallel dev session's unrelated changes in the tree and surgically staged only its own files."
+ },
+ {
+  "project": "gustify",
+  "session": "b00a1aa3",
+  "obs": "Despite the heavy automated verification above, several real bugs (CSS leaking as page text, a table column-overflow, a breadcrumb/sidebar data-source mismatch) passed the automated '0 pageerrors' checks and were only caught by the human visually reviewing the rendered page \u2014 a repeated blind spot in the verify loop."
+ },
+ {
+  "project": "gustify",
+  "session": "b00a1aa3",
+  "obs": "A dedicated 4-lens 'user-perspective UX review' Workflow was run against the actual captured evidence screenshots (not just pass/fail) to produce a written, prioritized feedback report (docs/rebuild/E2E-UX-FEEDBACK.md), explicitly grounded in what the screenshots show rather than assumption."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "AI gated nearly every commit on typecheck + vite build (the web-lint-build CI gate) plus the Storybook vitest suite (grew from 362 to 374 stories across the session) and unit tests, treating that combination as the primary regression-safety net for the additive-prop 'live mode' pattern."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Live deploy verification was done by polling the deployed bundle's JS filename hash via curl until it changed, then confirming with grep for new class/attribute strings unique to the just-shipped commit, before trusting a live Playwright check against the real Railway URL."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Runtime 'proof' screenshots and API-call traces were produced via one-off Playwright scripts (verify_*.mjs, repro_*.mjs, shot_*.mjs) written to /tmp or the repo root, run once against the deployed staging URL, sent to the user via SendUserFile, then deleted (`rm -f`) immediately after \u2014 none were committed as regression tests, so similar bugs later required rewriting near-duplicate throwaway scripts."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "The user explicitly called out that headless Chromium verification could not reproduce real mobile-device-only behavior (rubber-band overscroll bounce, touch drag-scroll of a nav bar), so those specific regressions could only be confirmed/denied by the user testing on his own physical phone across multiple round trips."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "After ad hoc scripts repeatedly missed real layout regressions, the AI built a durable, policy-asserting layout E2E harness (docs/rebuild/WEB-LAYOUT-POLICY.md + tests/web-e2e-layout/layout.spec.ts) that soft-asserts spacing/nav/no-mock-data rules across mobile/tablet/desktop and was run RED-first to produce a measured fix-list before any code changed."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "A throwaway admin-SDK seed script was written to populate realistic demo data for the user's real Google-auth account on staging, then deleted immediately after running per the standing rule that the Firebase admin service-account file must never be referenced by a committed script."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Two separate 'verify against Storybook showcase' vs 'verify against the live/chromeless code path' failures occurred in the same session, both caught by the user comparing the live app to a known-good reference screen rather than by any automated check."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Consistent 4-gate discipline before every commit: npx tsc --noEmit, npm run build, unit tests, and npm run test-storybook (381/381 held constant across dozens of phases) -- gates re-run even when the AI believed they were already green."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Visual proof via headless Playwright screenshots (e.g. gen-idle.png, gen-result.png, gen-allergen.png) was used to verify UI states before committing, but screenshots were routinely deleted from /tmp immediately after inspection rather than saved to a dated evidence folder -- proof was momentary, not durably archived."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "A durable Playwright 'web-journey' E2E suite (tests/web-e2e/) was eventually built (Phase 44) with step-numbered screenshot evidence checked into an artifacts folder (gitignored) and a README documenting the determinism contract -- this became the standing regression gate re-run on almost every subsequent phase."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Independent 'Agent(Independent review of X diff)' review agents were launched after nearly every multi-agent Workflow build, before commit, catching real HIGH/MEDIUM issues (e.g. unmount-callback bug in 42a, IDOR test gap in Phase 53) that the build agent itself missed."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "CI was explicitly watched via gh run watch/gh run list after every push, and Railway deploy bundle hashes were diffed to confirm the live app actually picked up new code before declaring a phase closed."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Production verification for Phase-45/52 go-live deliberately used the staging-e2e test user (never the human's real account) to prove free-tier 402s and chef-tier real-Gemini calls, restoring the test user to a clean baseline afterward."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "PixelLab icon generation was governed by a hard, file-based 'ledger' (data/icons/ledger.json) counting every provider call (success/retry/reject) against a fixed 1500-generation budget, checked before/after every batch run."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Data seeding to staging/production always ran a dry-run validation pass before --commit, and post-seed API probes (recipe counts, facet counts, allergen-filtered totals) were used as evidence rather than trusting the seed script's own exit code alone."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Very disciplined AI-driven gate culture throughout: every shipped change ran tsc, build, vitest unit, and Storybook byte-identical checks on web, plus ruff/pyright/pytest on the backend, before commit; most non-trivial changes also got an independent typescript-reviewer and/or security-reviewer subagent pass before shipping."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Deploys were verified via the 'authoritative' Railway GraphQL meta.commitHash + /healthz rather than trusting bundle-hash heuristics; a bundle-hash-based background watcher produced a false-negative timeout once (comparing against a locally-rebuilt hash that included uncommitted deps) and was explicitly diagnosed and corrected rather than ignored."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Despite the heavy automated-gate discipline, several real defects (desktop button DOM placement, batch-grid generic icons, missing collapsible/location controls) escaped every gate because none of the gates checked actual visual/UX placement \u2014 these were only caught by the human testing on staging and sending screenshots."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Recurring self-inflicted lint miss: ruff/pyright weren't run before push twice in the same phase (Phase 58), causing two separate CI failures (E501/E402, then another E501 in test_catalog.py) that a pre-push lint hook would have prevented; the AI explicitly noted it had already learned this lesson once before ('the lesson from P67 about running ruff after every api edit applies again') and repeated the mistake in the same session."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Missing-icon root cause was found via a from-scratch cross-reference audit (a temp icon_audit.mjs, later formalized as scripts/check_icon_coverage.py) comparing all 407 taxonomy.json codes against the actual resolver chain and on-disk files, rather than guessing \u2014 and the resulting unmapped.json table was committed as a durable, regenerable artifact per the user's explicit request to be told which icons are missing."
+ },
+ {
+  "project": "gustify",
+  "session": "dc58b25c",
+  "obs": "No coding was performed in this session (explicitly forbidden by the user), so no tests/screenshots were applicable."
+ },
+ {
+  "project": "gustify",
+  "session": "dc58b25c",
+  "obs": "The analysis workflow itself was framed as a verification-included pipeline ('a verification pass on the load-bearing claims' before synthesis) but the chunk ends before that pass completes or any output is reviewed by the human."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "CI runs were polled to completion in background tasks (gh run view loop) and required 6/6 green before the AI proceeded to deploy verification."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Every push was followed by explicit Railway GraphQL deploy-status checks plus curl /healthz 200 verification for both web and api, on staging and on production, before bookkeeping (P-rows in DEPLOYMENTS.md) was recorded."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "A new admin seed script (seed_frequent_ingredients.py) was dry-run against the real staging DB first, output inspected, and only committed to the DB after confirming the target account/household before running with --commit."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "gabe-commit's deterministic checks (types/tests, CHECK 6 deferred-items, CHECK 7 doc-drift, CHECK 8 structure) were run and reported before every commit; lint being pre-existing-broken (ESLint 9 flat-config drift) was explicitly called out as environment debt rather than silently skipped."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Storybook test-runner story count was tracked as an explicit regression gate across the whole session (392 to 399 to 402 to 405 to 408 to 409 to 414 to 426), and a single cold-render timeout failure was diagnosed as a flake and confirmed passing on a warm re-run rather than accepted at face value."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "A separate Workflow agent was used as an independent adversarial reviewer against a 14-point spec checklist (date-range filter + pagination feature) before the implementing agent's work was accepted as done."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Icon generation budget was tracked in data/icons/ledger.json; when an ad hoc one-off script bypassed the canonical icon_factory.py (which normally updates the ledger), the AI manually reconciled the ledger count afterward."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Visual/style regressions (icon style mismatch, layout overlap, moving flash-label placeholders) were caught only via the user's own screenshots \u2014 there is no automated visual/pixel-diff testing; Storybook tests are explicitly smoke-render only ('a smoke render, not a visual pixel diff')."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Every commit in this session ran a fixed local gate before /gabe-commit: tsc --noEmit, the full vitest unit suite, biome/ruff lint, and (when UI touched) the affected Storybook interaction stories (`vitest --project storybook` / `test-storybook`) \u2014 applied dozens of times across Phase 64/66 sub-steps."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "User explicitly requested TDD ('Todd approach... create tests that are producing results that are not the ones we expect') for the R8-critical Step 3b; AI wrote 13 failing tests first (RED, confirmed by running them), then implemented recipeDietarySync.ts to GREEN before wiring it in."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "User explicitly requested e2e edge/usage-simulation coverage ('consider having edge cases and usage cases simulation cases on the e2e for these changes'); AI added it to the plan doc and later ran real Playwright specs against a locally served Vite build plus the staging-e2e API, including a screenshot (SendUserFile) as 'definitive runtime evidence' that a UI badge/count matched expectations."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Deployment verification repeatedly went beyond 'CI green': the AI checked served *content* (byte size/dimensions of a just-regenerated icon, presence of a new API query param in the live OpenAPI) to prove the correct commit was actually live, explicitly citing 'per the P87 lesson' not to infer deploy success from CI alone."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "KDBP bookkeeping (.kdbp/DEPLOYMENTS.md, LEDGER.md, DECISIONS.md, PENDING.md) was updated at essentially every commit/push/promotion as a durable audit trail (P88 through P93 recorded with commit hashes and verification notes)."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Before any destructive delete of accumulated E2E test recipes, the AI ran a 3-agent read-only audit (FK graph, spec dependencies) then executed a dry-run-by-default cleanup script (mirroring an existing grant-tier.sh pattern) and only committed the delete after the dry run proved zero unsafe matches."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "The human's own manual visual check in the browser (screenshots) was, at least twice, the only gate that caught a real regression (missing Technique facet; divergent allergen icon/labels) that the automated tsc/unit/storybook/CI pipeline did not catch, because none of those gates diff against an expected-UI manifest."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Storybook test-runner pass counts (426->427->424->411 etc.) tracked as a regression gate after nearly every spike/graduation/i18n edit; a recurring 'IconAssetCatalog cold-render timeout' flake was repeatedly diagnosed as environmental rather than a real regression by re-running warm."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Mid-session the AI discovered the reliable test gate is `npm run test-storybook` (Vitest, compiles fresh) versus `@storybook/test-runner` against the long-running dev server, which suffered stale-module-graph 404s that looked like real breakage."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "tsc/build/pytest/ruff/pyright run before nearly every commit; backend pytest count tracked across the build (708 -> 724 -> 758 -> 762 -> 759 passed)."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "A dedicated Playwright e2e suite (tests/web-e2e/web-journey-*.spec.ts) was used against a staging-e2e API to validate the language-switch feature in a real browser; it took several selector-fragility iterations, and it eventually caught a real production bug (P87 stale-session 401) that unit/integration tests and tsc/build had all missed."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Every Workflow invocation was structured as diagnose -> implement -> e2e -> adversarial independent review, and the orchestrating session re-verified sub-agent/reviewer claims directly rather than trusting them at face value (e.g. re-grepping to confirm a reviewer's 'clientStaysFirebaseFree: true' claim, and treating a reviewer's changes-needed verdict as a real HIGH-severity leak to fix, not a nit)."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "CI (GitHub Actions) was watched via a background Monitor per push; a real deploy-blocking bug (an Alembic migration revision id one character over Postgres's VARCHAR(32) limit) was caught only by the Docker boot-smoke CI job, not by local SQLite-backed migration tests -- prompted the AI to add a guard test asserting all revision ids stay <=32 chars."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Production deploy verification went beyond 'CI green' / 'deploy SUCCESS' to a direct read of the live DB state (querying alembic_version through a public Postgres proxy) -- an explicit discipline carried forward from a 'prior promotion's lesson' recorded in project memory."
+ },
+ {
+  "project": "gustify",
+  "session": "c0caef68",
+  "obs": "Despite all of the above layered verification, the actual feature under test (language switching) still shipped a live bug to production; only the human's own manual click-through in prod caught it, which is what forced the two proof-reminder incidents recorded above."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "Every backend change was gated on: full pytest suite (grew from 869 to 958 tests over the session), ruff, pyright, and an OpenAPI freeze-check (additive-only contract) before any deploy; every schema-touching migration additionally got an alembic upgrade+downgrade round-trip test on SQLite before shipping."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "Every frontend change was gated on: npm run typecheck, vitest unit + storybook-story tests, and npm run build \u2014 run once by the delegated implementation sub-agent and independently re-confirmed by the orchestrating turn before review."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "A 3-lens 'adversarial review' Workflow (independently cross-verified findings) ran before nearly every commit-to-staging step across 15+ phases; it caught one CRITICAL cross-user IDOR vulnerability in the Phase 8 mixing backend (idempotency-key replay + missing user_id scoping let one user hijack another's cook session) plus dozens of lower-severity issues (stale doc comments claiming 'four trees' after a fifth was added, DRY icon-constant duplication, a missing i18n aria-label, a locale-threading bug leaking Spanish labels to en-US users)."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "After every staging deploy the AI polled Railway's GraphQL deploy-status API (handling expired-token refresh manually) to confirm the exact commit SHA was live before re-running the relevant Playwright verification script against the *deployed* staging environment (not just local/CI), and only then promoted to prod."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "Verification defaulted to JSON/API-assertion Playwright scripts rather than visual screenshots; actual screenshots were captured only on explicit user request, and several dedicated screenshot-tour specs failed repeatedly on selector/navigation races before producing usable images (see thread4 episode)."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "The AI self-audited its own roadmap doc mid-session: before trusting a planning sub-workflow's claim that 4 exclude-facet dimensions were 'already fully shipped,' it independently grep-verified the claim against actual code and git history, discovered .kdbp/PLAN.md had drifted stale relative to reality, and committed a doc-reconciliation fix rather than blindly re-building already-shipped work."
+ },
+ {
+  "project": "gustify",
+  "session": "ef595a24",
+  "obs": "Every spike and doc change goes through a Playwright headless render/screenshot verification loop (build storybook-static, resolve story ids from index.json, capture, Read the PNG back) before being sent or committed \u2014 this was consistently applied throughout the session for v1-v4 spikes, the tone-wash spike, and every docsite change."
+ },
+ {
+  "project": "gustify",
+  "session": "ef595a24",
+  "obs": "tsc --noEmit, vitest (unit + storybook project), and scripts/check-no-legacy-imports.sh are run as gates before every commit, including for pure documentation/asset changes."
+ },
+ {
+  "project": "gustify",
+  "session": "ef595a24",
+  "obs": "An adversarial verification workflow (2 parallel lenses: converter-robustness + doc-accuracy) was explicitly run before committing the tag/inline-image docsite converter change, catching one real doc-accuracy bug (a masculine/feminine mismatch in a novelty label that would have shown up in the badge's aria-label)."
+ },
+ {
+  "project": "gustify",
+  "session": "ef595a24",
+  "obs": "Multiple screenshot renders failed silently on the first attempt (mis-resolved story IDs due to '\u00d7' character slugification, cold-Storybook waitFor timeouts) and had to be manually diagnosed and re-run by the AI \u2014 no built-in retry/robustness in the screenshot harness itself."
+ },
+ {
+  "project": "gustify",
+  "session": "ef595a24",
+  "obs": "Before deleting any spike files during the Lab cleanup, the AI ran an explicit dependency check (grep for importers) to confirm no kept spike (v2/v4) imported from a to-be-deleted one (v1/v3), then ran full gates (tsc, storybook suite) after deletion to confirm nothing broke."
+ },
+ {
+  "project": "gustify",
+  "session": "ef595a24",
+  "obs": "Before every commit, the AI explicitly checked git status/diff to exclude the parallel session's in-flight files (shared working tree with another concurrent Claude session), and checked for remote drift via git fetch before pushing."
+ },
+ {
+  "project": "gustify",
+  "session": "ef595a24",
+  "obs": "Production promotion (P121) was verified end-to-end: CI job list checked for green, Railway deploy status queried via GraphQL, and live prod endpoints smoke-tested via curl (healthz + web root) before declaring success."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "Every code change is gated by typecheck + unit tests + build before commit, and re-verified after each fix (e.g. 332/337 unit tests tracked run-to-run)."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "AI runs its own adversarial 'Workflow' review (multi-agent, verify phase) on any change touching the prod cooking loop before deploying, and treats confirmed findings as blocking (e.g. caught a critical 'zombie session' race and a resume-cursor regression)."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "Staging deploys are polled for bundle-hash flip before verification proceeds, then Playwright e2e specs are run against the live staging deploy (not just unit tests) to prove fixes, and throwaway verification specs are deleted after use."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "Screenshots are captured and then actually opened/read (Read tool on PNG artifacts) to visually confirm UI fixes before reporting them done, rather than trusting DOM assertions alone."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "For the step-persistence fix, verification was made 'conclusive' by wiping localStorage on boot first, so a value surviving reload could only have come from the server -- a deliberately strong proof design, not just a status check."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "OpenAPI snapshot diffs are checked to be purely additive (0 removals) before regenerating types and running a freeze-gate script, on every backend schema change."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "Full backend regression suite (971 tests) plus lint/format/pyright are run project-wide before every backend commit, even for small additive endpoints."
+ },
+ {
+  "project": "gustify",
+  "session": "df378fd1",
+  "obs": "A frontend refactor was deliberately deferred to a fresh context window rather than risk a half-applied change, with the plan persisted to a durable memory file so no state was lost across the reset."
+ },
+ {
+  "project": "suite",
+  "session": "1b718d93",
+  "obs": "No automated tests were run this session \u2014 it is a documentation/research/planning session with no code changes; verification here means fact-checking claims, not code testing."
+ },
+ {
+  "project": "suite",
+  "session": "1b718d93",
+  "obs": "Before answering the operator's opening question, the AI verified repo/remote sync via actual git commands (git remote -v, fetch, comm -23 skill-diff) rather than asserting from memory."
+ },
+ {
+  "project": "suite",
+  "session": "1b718d93",
+  "obs": "AI exhausted four distinct technical methods (youtube-transcript-api, yt-dlp, yt-dlp+installed Deno runtime, WebFetch) attempting to fetch YouTube transcripts before concluding the source was gated, documenting the negative result in the brief instead of silently dropping the source."
+ },
+ {
+  "project": "suite",
+  "session": "1b718d93",
+  "obs": "When automated transcript fetch failed, the operator manually obtained and pasted mini-summaries of both videos as substitute source material (a human-in-the-loop workaround for an external tool/IP-block limitation, not a suite design gap)."
+ },
+ {
+  "project": "suite",
+  "session": "1b718d93",
+  "obs": "Operator explicitly requested a dedicated 'final coherence read-through of the whole brief' pass before treating it as sealed/handoff-ready; AI performed a full re-read and reported/fixed 5 concrete stale-or-contradictory spots (e.g. '\u00a78 says \"Two videos\" \u2014 stale; there are now four sources')."
+ },
+ {
+  "project": "suite",
+  "session": "1b718d93",
+  "obs": "The investigation's centerpiece is an 'Evidence Doctrine' (mandatory-but-risk-scoped proof per change type: API tests, E2E, screenshots, dated evidence folders) that the operator locked as a design requirement for the *future* redesigned workflow \u2014 it is the subject of the audit, not evidence produced by this session."
+ },
+ {
+  "project": "suite",
+  "session": "1b718d93",
+  "obs": "Session survived a real interruption ('we suffer a power outage, resume') and resumed cleanly by re-reading its own saved README/BRIEF files rather than requiring the operator to re-explain state \u2014 the dated-folder + memory-pointer discipline built earlier in the session paid off here."
+ },
+ {
+  "project": "suite",
+  "session": "1b718d93",
+  "obs": "Final KICKSTART.md hand-off prompt was extended with explicit model-routing guidance (cheap/mechanical model for fan-out reading, higher-tier model for judgment) as a cost-discipline practice for the actual Fable analysis run."
+ }
+]

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Center · BOARD — all skins</title>
+<link rel="stylesheet" href="center-skins.css">
+</head>
+<body>
+<script src="center-skins.js"></script>
+<div class="topbar"><img src="../assets/icons/kind-integration.png" alt="">
+  <span class="t-sys">GUSTIFY::KITCHEN-CONSOLE</span><span class="t-crumb">center › board</span>
+  <span class="t-clock" style="margin-right:230px">2026-07-10 21:04 · HEAD 956c992d</span></div>
+<div class="nav-strip">
+  <a href="center-hub-multi.html">HUB</a>
+  <a class="on" href="center-board-multi.html">BOARD</a>
+  <a href="center-tests-multi.html">TESTS</a>
+  <a href="center-drill-multi.html">DRILL (safety × recipes)</a>
+</div>
+<main>
+  <h1>The board</h1>
+  <p class="lede">phases and tickets as the pass rail — read-only by design: the gabe lifecycle commands are the write path, this page is the window.</p>
+
+  <h2><img src="../assets/icons/kind-deployed.png" alt=""> on the burner now <em>— the order being cooked</em></h2>
+  <div class="featured">
+    <span class="fid">DL1</span>
+    <div class="fname"><b>D145 demand loop</b><small>next product phase · resumes via HANDOFF.md</small></div>
+    <span class="mchip">mvp</span>
+    <div style="display:flex;gap:6px">
+      <span class="cellchip todo">E<small>exec</small></span>
+      <span class="cellchip todo">R<small>review</small></span>
+      <span class="cellchip todo">C<small>commit</small></span>
+      <span class="cellchip todo">P<small>push</small></span>
+    </div>
+  </div>
+
+  <h2><img src="../assets/icons/kind-gate.png" alt=""> orders served <em>— 30 phases done (E·R·C·P mini-cells; amber = review debt)</em></h2>
+  <div class="cards-grid">
+    <div class="gcard" style="opacity:.75"><div class="hd"><b>1 · SAFE</b><span class="n">allergen safety</span></div>
+      <div style="display:flex;gap:4px"><span class="cellchip done">E</span><span class="cellchip done">R</span><span class="cellchip done">C</span><span class="cellchip done">P</span></div></div>
+    <div class="gcard" style="opacity:.75"><div class="hd"><b>4 · PROG-engine</b><span class="n">ent tier</span></div>
+      <div style="display:flex;gap:4px"><span class="cellchip done">E</span><span class="cellchip done">R</span><span class="cellchip done">C</span><span class="cellchip done">P</span></div></div>
+    <div class="gcard"><div class="hd"><b>U1 · UX hub polish</b><span class="n">review debt</span></div>
+      <div style="display:flex;gap:4px"><span class="cellchip done">E</span><span class="cellchip debt">R</span><span class="cellchip done">C</span><span class="cellchip done">P</span></div></div>
+    <div class="gcard"><div class="hd"><b>H7 · cook-state</b><span class="n">review debt</span></div>
+      <div style="display:flex;gap:4px"><span class="cellchip done">E</span><span class="cellchip debt">R</span><span class="cellchip done">C</span><span class="cellchip done">P</span></div></div>
+    <div class="gcard"><div class="hd"><b>H8 · cook photos</b><span class="n">review debt</span></div>
+      <div style="display:flex;gap:4px"><span class="cellchip done">E</span><span class="cellchip debt">R</span><span class="cellchip done">C</span><span class="cellchip done">P</span></div></div>
+    <div class="gcard" style="opacity:.75"><div class="hd"><b>SU1 · suite upgrade</b><span class="n">interlude</span></div>
+      <div style="display:flex;gap:4px"><span class="cellchip done">E</span><span class="cellchip done">R</span><span class="cellchip done">C</span><span class="cellchip done">P</span></div></div>
+    <div class="gcard" style="opacity:.6"><div class="hd"><b>…</b><span class="n">+24 more, collapsed</span></div>
+      <div style="display:flex;gap:4px"><span class="cellchip done">E</span><span class="cellchip done">R</span><span class="cellchip done">C</span><span class="cellchip done">P</span></div></div>
+  </div>
+  <p class="lens-note">⚠ review debt: 7 phases carry an open Review cell (U1 U2 U4 U5 · H6 H7 H8) — each links to its diff.</p>
+
+  <h2><img src="../assets/icons/kind-manual.png" alt=""> the order rail <em>— open tickets from PENDING.md (10 open of 44 tracked)</em></h2>
+  <p class="lens-note" style="margin:0 0 8px">medium priority</p>
+  <div class="cards-grid">
+    <div class="gcard"><div class="hd"><b style="color:var(--accent)">#97</b><b>Split ProfileScreens.tsx (3,805)</b></div>
+      <p class="sub">four unrelated screens in one file — every profile change churns it</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="mchip pri">medium</span><span class="mchip">mvp</span><span class="mchip">age 1d</span></div></div>
+    <div class="gcard"><div class="hd"><b style="color:var(--accent)">#98</b><b>Split RecipeFilterPanel.tsx (2,881)</b></div>
+      <p class="sub">hottest churn file — 72 commits / 90 days</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="mchip pri">medium</span><span class="mchip">mvp</span></div></div>
+    <div class="gcard"><div class="hd"><b style="color:var(--accent)">#99</b><b>Split CookingScreenModel.ts (2,456)</b></div>
+      <p class="sub">types / taxonomy / mockData / filtering / units in one model</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="mchip pri">medium</span><span class="mchip">mvp</span></div></div>
+    <div class="gcard"><div class="hd"><b style="color:var(--accent)">#100</b><b>Decompose RecipeBrowseContainer</b></div>
+      <p class="sub">a single 1,140-line function, 60 hooks → its six named hooks</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="mchip pri">medium</span><span class="mchip">mvp</span></div></div>
+  </div>
+  <p class="lens-note" style="margin:10px 0 8px">low priority · parked</p>
+  <div class="cards-grid">
+    <div class="gcard"><div class="hd"><b style="color:var(--accent)">#101–102</b><b>dup helpers · dead archive files</b></div>
+      <div style="display:flex;gap:6px"><span class="mchip">low</span><span class="mchip">mvp</span></div></div>
+    <div class="gcard"><div class="hd"><b style="color:var(--accent)">#96</b><b>Monetization — end of dev</b></div>
+      <p class="sub">founder call: nothing until the whole app is polished</p>
+      <div style="display:flex;gap:6px"><span class="mchip">⏸ parked</span></div></div>
+    <div class="gcard"><div class="hd"><b style="color:var(--accent)">#20</b><b>Multi-user / household</b></div>
+      <p class="sub">far — un-defers with RLS (#10) when back in scope</p>
+      <div style="display:flex;gap:6px"><span class="mchip">⏸ far</span><span class="mchip">forward-trigger</span></div></div>
+  </div>
+
+  <div class="ticker"><b>ticker:</b> <span class="ok">✓</span> PLAN 31 phases · <span class="ok">✓</span> 34 tickets resolved in place · ⚠ 7 review cells open · ⏸ 2 parked by design</div>
+</main>
+</body>
+</html>

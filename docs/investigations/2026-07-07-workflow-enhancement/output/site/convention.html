@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docsite convention v-next — a working specimen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.provenance{border:1px solid #cfc6b0;background:#f5f0e2;border-radius:8px;padding:.65rem .9rem;margin:0 0 1.4rem;font-size:.82rem;color:#4a463c}
+.provenance b{color:#1b1a17}
+.provenance .pv-row{display:block;margin:.15rem 0}
+.provenance .ok{color:#3a6b3a;font-weight:600}
+.receipt{font-family:"JetBrains Mono",monospace;font-size:.78em;color:#6e6757;background:#e6dec8;border-radius:4px;padding:.05em .4em;white-space:nowrap}
+.mode-chip{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#f5f0e2;background:#7a5a8a;border-radius:4px;padding:.15em .55em;vertical-align:middle;margin-left:.5em}
+.toc-inline ul{margin:.3rem 0 0;padding-left:1.2rem}
+.toc-inline li{margin:.15rem 0}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <a class="top-brand" href="index.html">🔎 GABE<span class="dot">.</span>investigation <span class="sub">workflow enhancement · 2026-07</span></a>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Findings</a> <span class="crumb-sep">›</span> <span class="crumb-here">Docsite convention (specimen)</span></nav>
+  <button class="adhd-toggle" id="adhd-toggle" type="button" aria-pressed="false" aria-label="Toggle bionic reading" title="Bionic reading"><span class="adhd-dot"></span></button>
+</header>
+<aside class="sidebar" id="sidebar">
+  <button class="side-collapse" id="side-collapse" type="button" aria-pressed="false" aria-label="Collapse navigation" title="Collapse navigation"><span class="side-collapse-glyph">«</span></button>
+  <nav class="sidenav">
+    <a class="side-link side-hub" href="index.html"><span class="sw" style="background:#b65a2b"></span><span class="side-label">Findings &amp; the plan</span></a>
+    <details class="side-group" open>
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">This investigation <span class="chip core">core</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="values.html"><span class="sw" style="background:#3a6b3a"></span><span class="side-label">Values → changes</span></a>
+        <a class="side-link active" href="convention.html"><span class="sw" style="background:#7a5a8a"></span><span class="side-label">Docsite convention (specimen)</span></a>
+        <a class="side-link" href="alternatives.html"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">Structural alternatives</span></a>
+        <a class="side-link" href="target.html"><span class="sw" style="background:#a04030"></span><span class="side-label">Target state (after)</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Deliverables (markdown) <span class="chip advanced">source</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="../FINDINGS.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">FINDINGS.md</span></a>
+        <a class="side-link" href="../04-evidence-doctrine-operationalized.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">4 · Evidence Doctrine</span></a>
+      </div>
+    </details>
+    <a class="side-link" href="../../../../site/index.html"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">↩ GABE.docs (main suite site)</span></a>
+  </nav>
+</aside>
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<div class="wrap"><main data-verify-page="investigation-convention" data-verify-claims="0">
+  <header class="masthead">
+    <div class="kicker">Investigation · convention proposal <span class="mode-chip">reference</span></div>
+    <h1>Docsite convention v-next — this site is the specimen</h1>
+    <p class="lede">The investigation surfaced 13 doc-drift incidents and a doctrine that says evidence should feed docs. This page states the resulting convention — and the two pages next to it are built with it, so you can judge the convention by inspecting the thing it produced.</p>
+  </header>
+
+  <div class="provenance">
+    <span class="pv-row"><b>Source of truth:</b> pattern P12 (<code>../01-reinstruction-pattern-catalog.md</code>) + Evidence Doctrine §6 (<code>../04-evidence-doctrine-operationalized.md</code>) + the documentation-skills scan (<code>../../documentation-skills-scan.md</code>: HADS, Diataxis, living-docs)</span>
+    <span class="pv-row"><b>Status:</b> proposed — if adopted, rules C1–C9 move into <code>gabe-docsite</code>'s generator + <code>gabe-docs</code>'s standards, and the specimen CSS graduates into <code>site.css</code></span>
+    <span class="pv-row"><b>Generated:</b> 2026-07-08 · <span class="ok">✓ self-applied: this page follows every rule it states</span></span>
+  </div>
+
+  <div class="note toc-inline"><span class="lbl">On this page</span>
+    <ul>
+      <li><a href="#why">01 · Why a new convention (the evidence)</a></li>
+      <li><a href="#rules">02 · The nine rules, C1–C9</a></li>
+      <li><a href="#agent">03 · The agent-facing layer</a></li>
+      <li><a href="#ledger">04 · Completeness ledger for this site</a></li>
+      <li><a href="#adopt">05 · Adoption path</a></li>
+    </ul>
+  </div>
+
+  <h2 id="why"><span class="num">01</span>Why a new convention (the evidence)</h2>
+  <p>Three measured failures shape it. First, <b>doc drift</b>: 13 incidents of doc conventions re-taught or indexes silently incomplete — a docsite command index shipped missing 6 of 22 commands; the per-page "On this page" nav was re-requested twice; an established numbering pattern wasn't carried to later sections. <span class="receipt">P12 · raw/incidents.json</span> Second, <b>docs that narrate what the source doesn't contain</b>: the suite's own site describes a hardening pass its skill files never received — a page with no provenance stamp can't be caught lying. <span class="receipt">F3 · raw/scan-installed-state-0.md</span> Third, the <b>Evidence Doctrine</b>: verification artifacts should be the raw material of documentation, which only works if pages declare what evidence backs them. <span class="receipt">deliverable 4 §6</span></p>
+
+  <h2 id="rules"><span class="num">02</span>The nine rules, C1–C9</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Rule</th><th>Where you can see it on this site</th><th>Root</th></tr></thead>
+    <tbody>
+      <tr><td><b>C1</b></td><td><b>Provenance stamp.</b> Every page opens with: source-of-truth files, evidence behind it, generation date, verified-against state. A page that can drift must say what it drifts <em>from</em></td><td>the beige box under every masthead</td><td>F3</td></tr>
+      <tr><td><b>C2</b></td><td><b>On-page nav.</b> Every page carries its own "On this page" list — no exceptions for short pages</td><td>top of all three pages</td><td>P12 (taught twice)</td></tr>
+      <tr><td><b>C3</b></td><td><b>Claims carry receipts.</b> Any load-bearing number or assertion gets an inline receipt (file, session id, or deliverable §) a reader can chase</td><td>the <span class="receipt">mono chips</span> throughout</td><td>E1 / Evidence Doctrine</td></tr>
+      <tr><td><b>C4</b></td><td><b>Mode label.</b> Each page declares its Diataxis mode (explanation · how-to · reference · tutorial) so readers and agents know what they're holding</td><td>the purple chip in each kicker</td><td>doc-scan (Diataxis)</td></tr>
+      <tr><td><b>C5</b></td><td><b>Dual audience (HADS).</b> Human prose up top; a machine-readable page manifest at the bottom — same facts, both readers</td><td>§03 below</td><td>doc-scan (HADS) + Ara V4</td></tr>
+      <tr><td><b>C6</b></td><td><b>Analogy-first opener + one-line handles.</b> Section 01 of an explanation page opens with the concrete picture before the detail; recurring ideas get a handle</td><td>index §01 ("the plumber"); the orange handles on the values page</td><td>gabe-docs house style</td></tr>
+      <tr><td><b>C7</b></td><td><b>Memes where the concept matches — and only there.</b> One meme per concept it actually names; never decoration</td><td>index §03/§06 — each meme sits beside its own pattern</td><td>existing docsite pass</td></tr>
+      <tr><td><b>C8</b></td><td><b>Diagrams as code, house palette.</b> Mermaid with the Cifra theme variables; color used to mean something (orange = act first / gate, green = done state)</td><td>every <code>mermaid-fig</code> on the site</td><td>gabe-docs diagrams library</td></tr>
+      <tr><td><b>C9</b></td><td><b>Completeness ledger.</b> A site's hub (or its convention page) enumerates everything the site claims to cover, so omissions are visible instead of silent</td><td>§04 below</td><td>P12 (6-of-22 incident)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="lbl">Report-where, always</span><p>Inherited unchanged from E7: every page ends by saying where the artifacts live, with real paths — see index §10. A doc that describes work without saying where the work <em>is</em> forces the next re-instruction.</p></div>
+
+  <h2 id="agent"><span class="num">03</span>The agent-facing layer (C5, in detail)</h2>
+  <p>Borrowed from the agent-native-verification lead (publish state to the DOM so an agent verifies without scraping) and applied to documentation:</p>
+  <ul>
+    <li><b><code>data-verify-*</code> attributes</b> on load-bearing elements: <code>&lt;main data-verify-page data-verify-claims="N"&gt;</code>, and <code>data-verify-claim="C2" data-verify-receipt="…"</code> on the paragraphs that carry claims. An agent can enumerate every claim on a page with one query selector — no prose parsing.</li>
+    <li><b>A page manifest</b> — <code>&lt;script type="application/json" id="gabe-page-manifest"&gt;</code> at the end of <code>&lt;main&gt;</code>: page, mode, generation date, source-of-truth paths, evidence paths, and the claims index with receipts. A future <code>gabe-commit docs-audit</code> can diff the manifest against the named sources mechanically — that's the drift-closing loop from the doc scan, made checkable.</li>
+    <li><b>What an audit would check:</b> (1) every <code>data-verify-claim</code> id appears in the manifest; (2) every manifest source/evidence path exists; (3) the page's generated date is not older than its newest source of truth. Three <code>jq</code>-grade checks — deliberately boring. (Query the DOM, not the raw text — a regex audit false-positives on code examples like the one above; this page's first self-audit proved it.)</li>
+  </ul>
+  <figure class="mermaid-fig"><pre class="mermaid">flowchart LR
+  SRC["source of truth&lt;br&gt;FINDINGS.md · deliverables"]
+  PAGE["HTML page&lt;br&gt;prose + data-verify-* + manifest"]
+  AUD["gabe-commit docs-audit&lt;br&gt;3 deterministic checks"]
+  SRC --&gt;|renders to| PAGE
+  PAGE --&gt;|manifest points back| SRC
+  AUD --&gt;|claims ⊆ manifest&lt;br&gt;paths exist&lt;br&gt;dates fresh| PAGE
+  AUD -.-&gt;|drift found → warn| SRC
+  style SRC fill:#f5f0e2
+  style PAGE fill:#e6dec8
+  style AUD fill:#b65a2b,color:#f5f0e2</pre></figure>
+
+  <h2 id="ledger"><span class="num">04</span>Completeness ledger for this site</h2>
+  <p>Everything this site covers or links, enumerated so nothing can be silently missing (the 6-of-22 lesson):</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Artifact</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Pages: <code>index.html</code> · <code>values.html</code> · <code>convention.html</code> · <code>alternatives.html</code> · <code>target.html</code></td><td>5 of 5 present, cross-linked in every sidebar</td></tr>
+      <tr><td>Deliverables linked: FINDINGS + 01–10</td><td>11 of 11 in the index sidebar</td></tr>
+      <tr><td>Raw evidence: <code>incidents.json</code> · <code>thread4.json</code> · <code>proof_practices.json</code> · <code>session_summaries.json</code> · 4 scans</td><td>8 files under <code>../raw/</code>, referenced from provenance stamps</td></tr>
+      <tr><td>Memes used: claim-without-proof · task-downgrade · recreate-not-reuse</td><td>3 of 3 available memes placed, each beside its own concept (C7)</td></tr>
+      <tr><td>Patterns catalogued: P1–P16 · values: V1–V7 · waves: 0–2 · twin items: T1–T12</td><td>all enumerated on index/values or in the linked deliverables</td></tr>
+      <tr><td>Assets vendored locally (<code>site.css</code>, <code>site.js</code>, <code>mermaid.min.js</code>, icons, memes)</td><td>self-contained; pages open via <code>file://</code>. One exception: Google Fonts loads from the network (inherited from the current shell — falls back to system fonts offline; a candidate C-rule if full offline fidelity matters)</td></tr>
+      <tr><td>The site's own living proof set: <code>proof/manifest.json</code> + 4 render screenshots</td><td>generated at build-QA time (headless chromium: mermaid/meme/icon load checks, zero page errors, C5 self-audit PASS) — the Evidence Doctrine applied to the docs themselves</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="adopt"><span class="num">05</span>Adoption path (if the operator approves)</h2>
+  <ul>
+    <li><b>Where the rules live:</b> C1–C9 become a section of <code>gabe-docs/SKILL.md</code> (standards) + template logic in <code>gabe-docsite</code>'s generator (stamp, TOC, manifest, and the audit checks emitted automatically — hand-authoring them, as here, is the specimen, not the workflow).</li>
+    <li><b>The specimen CSS</b> (<code>.provenance</code>, <code>.receipt</code>, <code>.mode-chip</code>, <code>.toc-inline</code>, <code>.handle</code>, <code>.value-head</code>) graduates into <code>site.css</code>.</li>
+    <li><b>The audit</b> (§03) lands as three deterministic checks inside <code>gabe-commit docs-audit</code> — enforcement over instruction, same as everywhere else in the plan.</li>
+    <li><b>Sequencing:</b> this is Wave-1-adjacent work (rides with 1.4's suite-owned conventions move); nothing blocks on it.</li>
+  </ul>
+
+  <script type="application/json" id="gabe-page-manifest">
+  {
+    "page": "convention.html",
+    "mode": "reference",
+    "generated": "2026-07-08",
+    "source_of_truth": ["../01-reinstruction-pattern-catalog.md#P12", "../04-evidence-doctrine-operationalized.md", "../../documentation-skills-scan.md"],
+    "evidence": ["../raw/incidents.json"],
+    "status": "proposed convention — this site is the working specimen",
+    "rules": ["C1 provenance stamp", "C2 on-page nav", "C3 claims carry receipts", "C4 mode label", "C5 dual audience: DOM attributes + page manifest", "C6 analogy-first + handles", "C7 memes only where the concept matches", "C8 diagrams as code, house palette", "C9 completeness ledger"]
+  }
+  </script>
+</main></div>
+
+<footer class="stamp">
+  <b>GABE</b> · workflow investigation 2026-07 · docsite convention specimen<br>
+  Source of truth: <b>P12 + Evidence Doctrine §6 + documentation-skills-scan.md</b> · this page follows every rule it states<br>
+  Visual system: Cifra · Chile editorial palette
+</footer>
+
+<script src="assets/site.js"></script>
+<script src="assets/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad: true, theme: "base", themeVariables: {background: "#ece6d8", primaryColor: "#f5f0e2", primaryBorderColor: "#b65a2b", primaryTextColor: "#1b1a17", secondaryColor: "#e6dec8", tertiaryColor: "#ece6d8", lineColor: "#6e6757", fontFamily: "Space Grotesk, system-ui, sans-serif", fontSize: "13px"}, flowchart: {curve: "basis", htmlLabels: true, useMaxWidth: true}});</script>
+</body>
+</html>

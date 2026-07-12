@@ -1,0 +1,41 @@
+SOURCE TYPE: operator-supplied mini-summary (timestamped rubric — NOT a verbatim transcript)
+TITLE: Beyond the basics with Claude Code
+SPEAKER: Daisy Holman
+URL: https://www.youtube.com/watch?v=tuY2ChJIx48
+VIDEO ID: tuY2ChJIx48
+CAPTURED: 2026-07-07
+
+---
+
+This video, presented by Daisy Holman, focuses on moving beyond basic use of Claude Code to
+achieve true agentic software engineering. The core philosophy is to provide Claude with the
+same access, knowledge, and tools that a human engineer possesses.
+
+Actionable Rubric for Developers:
+
+Expand Agent Access (4:24 - 8:19):
+- Connect Claude to your ecosystem: Slack threads, emails, design documents, and internal wikis.
+- Tip: If you have to switch contexts or manually copy-paste information to answer a question,
+  build a connection or tool to bring that data directly into the agent's workflow.
+
+Optimize Context Usage (16:30 - 21:47):
+- Mind the context window: Treat tokens as constrained. Put stable, global information at the
+  start of your prompts and volatile, task-specific information at the end to minimize cost and
+  cache invalidation.
+- Use the "zero overhead" principle: Don't pay for what you don't use.
+
+Implement Scalable Abstractions (22:33 - 36:18):
+- Hooks: Use these for "red squiggly" functionality (e.g., linters, type checkers). They are
+  highly recommended for large codebases as they run outside the context window.
+- Skills: Use these for task-specific knowledge, but be mindful that the description is always
+  loaded in the system prompt.
+- Avoid: Overloading the system prompt with excessive descriptions (like redundant CLAUDE.md
+  files for every plugin) which do not scale.
+
+Adopt Efficient Workflows (37:31 - 46:37):
+- Git Worktrees: Use separate checkouts for different tasks to keep Claude Code instances isolated.
+- Session Management: Rename sessions and use slashcolor to maintain clarity while multitasking.
+- Automation: Utilize sloop (the cron tool) for repetitive tasks like babysitting CI/CD pipelines.
+- Safety: Enable Auto Mode for complex, long-running agent tasks (44:13).
+- Remote Control: Use the mobile or desktop check-in feature to monitor agents while away from
+  your primary workstation (46:15).

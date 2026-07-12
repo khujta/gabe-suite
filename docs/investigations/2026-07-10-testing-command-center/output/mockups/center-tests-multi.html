@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Center · TESTS — all skins</title>
+<link rel="stylesheet" href="center-skins.css">
+</head>
+<body>
+<script src="center-skins.js"></script>
+<div class="topbar"><img src="../assets/icons/kind-integration.png" alt="">
+  <span class="t-sys">GUSTIFY::KITCHEN-CONSOLE</span><span class="t-crumb">center › tests</span>
+  <span class="t-clock" style="margin-right:230px">2026-07-10 21:04 · HEAD 956c992d</span></div>
+<div class="nav-strip">
+  <a href="center-hub-multi.html">HUB</a>
+  <a href="center-board-multi.html">BOARD</a>
+  <a class="on" href="center-tests-multi.html">TESTS</a>
+  <a href="center-drill-multi.html">DRILL (safety × recipes)</a>
+</div>
+<main>
+  <h1>Every test on the counter</h1>
+  <p class="lede">the whole estate by station — filter by kind, drill any group to its specs, every green carries its date.</p>
+
+  <div class="filters">
+    <span class="pill on">ALL · 1,650</span>
+    <span class="pill"><img src="../assets/icons/kind-unit.png" alt="">unit</span>
+    <span class="pill"><img src="../assets/icons/kind-journey.png" alt="">journeys</span>
+    <span class="pill"><img src="../assets/icons/kind-deployed.png" alt="">deployed</span>
+    <span class="pill"><img src="../assets/icons/kind-manual.png" alt="">hand-run</span>
+    <span class="pill">⚠ stale only</span>
+  </div>
+
+  <h2><img src="../assets/icons/kind-journey.png" alt=""> dress rehearsals <em>— 8 journey groups (journey-groups.json, the single source)</em></h2>
+  <div class="cards-grid">
+    <div class="gcard" style="border-color:var(--good)"><div class="hd"><b>cooking</b><span class="autotag">AUTO-GATE</span><span class="n">15/15</span></div>
+      <p class="sub">cook flow: step marks, Paso 0, timers, cancel paths</p>
+      <div class="row-line"><span class="dot"></span><span class="nm">cook-state (8)</span><span>T−1d</span></div>
+      <div class="row-line"><span class="dot"></span><span class="nm">cancel-focus (3) · cancel-normal (3)</span><span>T−1d</span></div></div>
+    <div class="gcard"><div class="hd"><b>browse</b><span class="n">18/18</span></div>
+      <p class="sub">match modes, saved modes, facets, language pill</p>
+      <div class="row-line"><span class="dot"></span><span class="nm">match-modes (4) · saved-modes (7)</span><span>T−13h</span></div>
+      <div class="row-line"><span class="dot"></span><span class="nm">facets · d108 · phase64 · lang (7)</span><span>T−1d</span></div></div>
+    <div class="gcard"><div class="hd"><b>core</b><span class="n">17/17</span></div>
+      <p class="sub">golden path end-to-end + edges — run locally</p>
+      <div class="row-line"><span class="dot"></span><span class="nm">core (11) · edges (6)</span><span>T−1d</span></div></div>
+    <div class="gcard"><div class="hd"><b>api-loop</b><span class="n">1/6 ⚠</span></div>
+      <p class="sub">deployed staging-e2e: setup + product loop</p>
+      <div class="row-line"><span class="dot stale"></span><span class="nm">setup (5) — A0: README/LEDGER conflict</span><span>T−6d</span></div>
+      <div class="row-line"><span class="dot stale"></span><span class="nm">product-loop (1)</span><span>T−6d</span></div></div>
+    <div class="gcard"><div class="hd"><b>storage · i18n · profile · settings</b><span class="n">12/12</span></div>
+      <p class="sub">expiry banners · bilingual coverage · progression · auth recovery</p>
+      <div class="row-line"><span class="dot"></span><span class="nm">4 groups, 8 specs — all green</span><span>T−1d</span></div></div>
+  </div>
+
+  <h2><img src="../assets/icons/kind-unit.png" alt=""> the prep kitchen <em>— pytest, 1,095 checks / 85 files (api-junit.xml)</em></h2>
+  <table class="ftable">
+    <tr><th>station</th><th>tests</th><th></th><th>state</th><th>freshness</th></tr>
+    <tr><td>recipes · browse · facets<small>incl. the 130-test allergen/exclusion core</small></td><td><b>~320</b></td><td><div class="bar"><i style="width:100%"></i></div></td><td><span class="chip ok">PASS</span></td><td class="fresh">T−2h · CI + local</td></tr>
+    <tr><td>cooking · pantry · shopping<small>sessions, storage, completion loops</small></td><td><b>~260</b></td><td><div class="bar"><i style="width:100%"></i></div></td><td><span class="chip ok">PASS</span></td><td class="fresh">T−2h</td></tr>
+    <tr><td>AI pipeline<small>error taxonomy · breaker · credits (SDK mocked)</small></td><td><b>~120</b></td><td><div class="bar"><i style="width:100%"></i></div></td><td><span class="chip ok">PASS</span></td><td class="fresh">T−2h</td></tr>
+    <tr><td>security<small>XFF spoof (20) · db roles · redaction · rate-limit (12)</small></td><td><b>~60</b></td><td><div class="bar"><i style="width:100%"></i></div></td><td><span class="chip ok">PASS</span></td><td class="fresh">T−2h</td></tr>
+    <tr><td>platform<small>migrations ↑↓ · dialect · PG parity · streaming · contracts</small></td><td><b>~80</b></td><td><div class="bar"><i style="width:100%"></i></div></td><td><span class="chip ok">PASS</span></td><td class="fresh">T−2h · PG16 at main</td></tr>
+    <tr><td>everything else<small>profile · setup · i18n units · models · schemas…</small></td><td><b>~255</b></td><td><div class="bar"><i style="width:100%"></i></div></td><td><span class="chip ok">PASS</span></td><td class="fresh">T−2h</td></tr>
+  </table>
+
+  <h2><img src="../assets/icons/kind-unit.png" alt=""> the dining room <em>— vitest, ~408 checks / 45 files (web-junit.xml)</em></h2>
+  <table class="ftable">
+    <tr><th>station</th><th>tests</th><th></th><th>state</th><th>freshness</th></tr>
+    <tr><td>models &amp; logic<small>filters, ranges, cooking state, pantry</small></td><td><b>~290</b></td><td><div class="bar"><i style="width:100%"></i></div></td><td><span class="chip ok">PASS</span></td><td class="fresh">T−2h</td></tr>
+    <tr><td>i18n parity gate<small>es-CL ↔ en-US: keys, placeholders, no empties</small></td><td><b>~48</b></td><td><div class="bar"><i style="width:100%"></i></div></td><td><span class="chip ok">PASS</span></td><td class="fresh">T−2h</td></tr>
+    <tr><td>components &amp; data layer<small>AuthProvider · PersistGate · query cache</small></td><td><b>~70</b></td><td><div class="bar"><i style="width:100%"></i></div></td><td><span class="chip ok">PASS</span></td><td class="fresh">T−2h</td></tr>
+  </table>
+
+  <h2><img src="../assets/icons/kind-manual.png" alt=""> hand-run stations <em>— visible now, scheduled never (A9 makes the dates real)</em></h2>
+  <table class="ftable">
+    <tr><th>suite</th><th>tests</th><th></th><th>state</th><th>last hand-run</th></tr>
+    <tr><td>storybook project<small>107 stories as render/interaction tests</small></td><td><b style="color:var(--stale)">107</b></td><td><div class="bar"><i style="width:20%;background:var(--stale)"></i></div></td><td><span class="chip stale">STALE</span></td><td class="fresh">unknown → run-local-checks.sh</td></tr>
+    <tr><td>mockup gallery<small>58 tests · 397 icon cells</small></td><td><b style="color:var(--stale)">58</b></td><td><div class="bar"><i style="width:20%;background:var(--stale)"></i></div></td><td><span class="chip stale">STALE</span></td><td class="fresh">unknown</td></tr>
+    <tr><td>layout policy ×3 · audits<small>deployed-web tape measure · pip-audit/npm audit (A9)</small></td><td><b style="color:var(--stale)">3+</b></td><td><div class="bar"><i style="width:20%;background:var(--stale)"></i></div></td><td><span class="chip stale">STALE</span></td><td class="fresh">unknown / arrives A9</td></tr>
+  </table>
+
+  <div class="ticker"><b>ticker:</b> <span class="ok">✓</span> 1,503 green in CI lanes · ⚠ 168 hand-run tests, unknown freshness · ⚠ api-loop pending A0 · coverage arrives A6</div>
+</main>
+</body>
+</html>

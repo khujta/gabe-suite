@@ -1,0 +1,49 @@
+SOURCE TYPE: operator-supplied mini-summary (timestamped rubric — NOT a verbatim transcript)
+TITLE: (session) Boris Cherny (Head of Claude Code) x Jarred Sumner (Creator of Bun)
+URL: not supplied by operator (add here if/when available)
+CAPTURED: 2026-07-07
+
+---
+
+This session with Boris Cherny (Head of Claude Code) and Jarred Sumner (Creator of Bun)
+details a highly advanced developer workflow using autonomous AI agents to manage codebase
+maintenance, bug fixing, and feature implementation. Below is a rubric of actionable practices
+for developers looking to implement similar AI-assisted engineering pipelines.
+
+Key Practices for AI-Assisted Development
+
+Establish a Verification Loop (The "Self-Healing" Pipeline)
+- Automate Reproductions: Implement a bot (like Robo Bun) that automatically triggers whenever
+  a new GitHub issue is created (2:13). The bot should attempt to reproduce the bug in a clean
+  environment.
+- Hard Testing Requirements: Ensure that AI-generated PRs include tests by default (2:44). The
+  system should only allow PR submission if the tests fail on the base branch and pass on the
+  proposed fix branch (2:59).
+
+Optimize the Development Environment (claude.md)
+- Document Everything: Maintain a claude.md file that stores tribal knowledge, preferred
+  patterns, and solutions to common errors (8:17, 9:07).
+- Iterative Improvement: Whenever an AI agent repeats a mistake, update the claude.md
+  documentation to prevent recurrence (9:52).
+- Contextual Clarity: Ensure the agent has access to CI logs, build errors, and a clear
+  architectural overview (10:07, 10:22).
+
+Leverage Multi-Agent Collaboration
+- Style vs. Substance: Combine different agents for specific roles. Use tools like Code Rabbit
+  for stylistic linting and standard code reviews, while using Claude Code for complex logic
+  tracing and architectural edge cases (5:02).
+- Adversarial Review: Allow agents to interact with each other (e.g., one agent proposes a
+  change, another reviews it) to surface subtle bugs before human intervention (4:20).
+
+Adopt Autonomous Tooling
+- Auto-Mode Permissions: Use "Auto" mode for permissions to prevent agents from getting stuck
+  waiting for human approval, provided you have sufficient test-based verification in place
+  (22:19, 29:19).
+- Terminal UI Efficiency: Utilize "no-flicker" modes (e.g., CLAUDE_CODE_NO_FLICKER=1) for a
+  smoother, virtualized terminal rendering experience that supports better mouse interaction
+  and constant performance (23:01).
+
+Hill Climbing for Performance
+- Metric-Driven Engineering: For performance optimization, provide the AI with a benchmark
+  (e.g., "make this faster than Sharp"). The AI can iteratively "hill climb" by writing tests,
+  running them, analyzing performance, and adjusting code until the metric is met (19:48, 20:23).

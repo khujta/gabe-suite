@@ -1,0 +1,1 @@
+suite-doctor: CLEAN — repo, ~/.claude and ~/.agents are in sync.

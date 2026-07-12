@@ -1,0 +1,47 @@
+SOURCE TYPE: operator-supplied mini-summary (timestamped rubric — NOT a verbatim transcript)
+TITLE: Stop babysitting your agents
+SPEAKER: Sid Buddhisara
+URL: https://www.youtube.com/watch?v=wI0ptqCSL0I
+VIDEO ID: wI0ptqCSL0I
+CAPTURED: 2026-07-07
+
+---
+
+This video by Sid Buddhisara focuses on transitioning from "babysitting" AI agents to
+orchestrating them effectively within Claude Code. Here is a practical rubric of specific
+actions for developers to optimize their workflows.
+
+I. Prerequisites (Table Stakes)
+Before starting, ensure these are configured to provide your agent with the necessary context
+and durability:
+- High-Quality claude.md file (1:28): Create a comprehensive instruction file to define project
+  standards.
+- Connect Your Tools (1:42): Integrate your daily tools (e.g., Slack, Asana, Linear, DataDog)
+  so Claude has rich, actionable context.
+- Remote Environment (2:11): Set up Claude Code on the web to decouple compute from your local
+  laptop, ensuring sessions persist if your hardware fails.
+
+II. Verification Loops
+Teach Claude to check its own work, mirroring human development workflows (6:17):
+- The Loop Playbook (7:22): Enable your agent to follow the full cycle: design, build, test,
+  fix, and deploy.
+- Create Verification Loops (9:39): Use tools like the Chrome MCP (12:52) to perform automated
+  end-to-end tests (clicking buttons, checking UI, verifying logs).
+- Package as Skills (14:47): Summarize verification learnings into a skill.md file. Instruct the
+  agent to make these skills self-improving so that it documents blockers and fixes for future use.
+
+III. Multiclouding & Scaling Attention
+Stop context-switching by managing multiple sessions effectively:
+- Use the Desktop App (27:31): Utilize the GUI to manage sessions across local, cloud, and Git
+  repos from a single control plane.
+- Claude Agents (29:53): Use the claude agents command in the terminal to view all sessions,
+  sorted by their need for human attention.
+- Remote Control (31:41): Enable /remote-control to receive mobile notifications and provide
+  inputs to sessions while away from your desk.
+
+IV. Background Orchestration
+Remove your keyboard from the "hot path" by setting up autonomous loops:
+- Loop Commands (34:34): Use /loop [interval] (e.g., /loop 10 minutes) to have the agent monitor
+  PRs, triage feedback, or update documentation automatically.
+- Routines (35:16): Configure event-based or time-based triggers in the web/desktop app to
+  perform routine tasks (like daily doc updates or CI maintenance) without manual intervention.

@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The values behind the plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.provenance{border:1px solid #cfc6b0;background:#f5f0e2;border-radius:8px;padding:.65rem .9rem;margin:0 0 1.4rem;font-size:.82rem;color:#4a463c}
+.provenance b{color:#1b1a17}
+.provenance .pv-row{display:block;margin:.15rem 0}
+.provenance .ok{color:#3a6b3a;font-weight:600}
+.receipt{font-family:"JetBrains Mono",monospace;font-size:.78em;color:#6e6757;background:#e6dec8;border-radius:4px;padding:.05em .4em;white-space:nowrap}
+.mode-chip{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#f5f0e2;background:#7a5a8a;border-radius:4px;padding:.15em .55em;vertical-align:middle;margin-left:.5em}
+.toc-inline ul{margin:.3rem 0 0;padding-left:1.2rem}
+.toc-inline li{margin:.15rem 0}
+.value-head{display:flex;align-items:center;gap:.6rem;margin:0 0 .3rem}
+.value-head img.doc-icon{width:34px;height:34px;margin:0}
+.handle{font-family:"JetBrains Mono",monospace;font-size:.85rem;color:#b65a2b;margin:.1rem 0 .8rem;font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <a class="top-brand" href="index.html">🔎 GABE<span class="dot">.</span>investigation <span class="sub">workflow enhancement · 2026-07</span></a>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Findings</a> <span class="crumb-sep">›</span> <span class="crumb-here">Values → changes</span></nav>
+  <button class="adhd-toggle" id="adhd-toggle" type="button" aria-pressed="false" aria-label="Toggle bionic reading" title="Bionic reading"><span class="adhd-dot"></span></button>
+</header>
+<aside class="sidebar" id="sidebar">
+  <button class="side-collapse" id="side-collapse" type="button" aria-pressed="false" aria-label="Collapse navigation" title="Collapse navigation"><span class="side-collapse-glyph">«</span></button>
+  <nav class="sidenav">
+    <a class="side-link side-hub" href="index.html"><span class="sw" style="background:#b65a2b"></span><span class="side-label">Findings &amp; the plan</span></a>
+    <details class="side-group" open>
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">This investigation <span class="chip core">core</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link active" href="values.html"><span class="sw" style="background:#3a6b3a"></span><span class="side-label">Values → changes</span></a>
+        <a class="side-link" href="convention.html"><span class="sw" style="background:#7a5a8a"></span><span class="side-label">Docsite convention (specimen)</span></a>
+        <a class="side-link" href="alternatives.html"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">Structural alternatives</span></a>
+        <a class="side-link" href="target.html"><span class="sw" style="background:#a04030"></span><span class="side-label">Target state (after)</span></a>
+      </div>
+    </details>
+    <details class="side-group">
+      <summary><span class="side-chevron" aria-hidden="true"></span><span class="side-label">Deliverables (markdown) <span class="chip advanced">source</span></span></summary>
+      <div class="side-panel">
+        <a class="side-link" href="../FINDINGS.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">FINDINGS.md</span></a>
+        <a class="side-link" href="../06-sequenced-change-plan.md"><span class="sw" style="background:#6e6757"></span><span class="side-label">6 · Change plan</span></a>
+      </div>
+    </details>
+    <a class="side-link" href="../../../../site/index.html"><span class="sw" style="background:#1f3a6b"></span><span class="side-label">↩ GABE.docs (main suite site)</span></a>
+  </nav>
+</aside>
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<div class="wrap"><main data-verify-page="investigation-values" data-verify-claims="0" data-verify-values="7">
+  <header class="masthead">
+    <div class="kicker">Investigation · principles <span class="mode-chip">explanation</span></div>
+    <h1>The values behind the changes</h1>
+    <p class="lede">Every change in the plan traces back to one of seven values. If a proposed change doesn't serve one of these, it doesn't ship — that's how the plan stays small.</p>
+  </header>
+
+  <div class="provenance">
+    <span class="pv-row"><b>Source of truth:</b> <code>output/06-sequenced-change-plan.md</code> + <code>FINDINGS.md</code> (this page re-groups the same changes by the value they serve)</span>
+    <span class="pv-row"><b>Generated:</b> 2026-07-08 · <b>status:</b> value framework proposed 2026-07-08 — most driven plan steps EXECUTED 2026-07-09 (see <a href="target.html">target state</a> for per-step receipts) · <span class="ok">✓ each value cites its evidence</span></span>
+  </div>
+
+  <div class="note toc-inline"><span class="lbl">On this page</span>
+    <ul>
+      <li><a href="#v1">V1 · Evidence over claims</a></li>
+      <li><a href="#v2">V2 · Reuse before build</a></li>
+      <li><a href="#v3">V3 · Enforcement over instruction</a></li>
+      <li><a href="#v4">V4 · One source of truth</a></li>
+      <li><a href="#v5">V5 · Declared differences</a></li>
+      <li><a href="#v6">V6 · Simplification &amp; restraint</a></li>
+      <li><a href="#v7">V7 · Human judgment preserved</a></li>
+      <li><a href="#matrix">The full map — values × changes</a></li>
+    </ul>
+  </div>
+
+  <h2 id="v1"><span class="num">V1</span><span class="value-head"><img class="doc-icon" src="assets/icons/fam-evidence.png" alt="">Evidence over claims</span></h2>
+  <p class="handle">"Done" is something you show, not something you say.</p>
+  <p><b>Why it's on the list:</b> the single largest measured tax — ~32 incidents of work declared done/verified/matching without anyone rendering or comparing anything, in both projects, with no improvement trend. <span class="receipt">P1 · raw/incidents.json</span></p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Change it drives</th><th>Plan step</th></tr></thead>
+    <tbody>
+      <tr><td><code>proof:</code> field per phase, declared at plan time by the human</td><td>1.3a</td></tr>
+      <tr><td>Living test set — one committed, feature-named evidence folder per feature</td><td>1.3b</td></tr>
+      <tr><td>Side-by-side reference-vs-<em>live</em> render as the frontend proof form (never the showcase)</td><td>1.2 / 1.3</td></tr>
+      <tr><td>Fresh-context evaluator grades the evidence — the builder never grades itself</td><td>1.3d</td></tr>
+      <tr><td>Capture tool (pagecast / Playwright+ffmpeg) as a per-project manifest field; the proof GIF doubles as the demo</td><td>1.3e</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="v2"><span class="num">V2</span><span class="value-head"><img class="doc-icon" src="assets/icons/fam-reuse.png" alt="">Reuse before build</span></h2>
+  <p class="handle">Lift, don't rebuild — a stand-in shell is a defect.</p>
+  <p><b>Why:</b> ~22 reconstruction incidents; five spike rounds discarded in one arc; the same lesson paid for twice, once per twin. The costliest pattern per incident in the corpus. <span class="receipt">P4 · deliverable 3 §1</span></p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Change it drives</th><th>Plan step</th></tr></thead>
+    <tbody>
+      <tr><td>The lift SOP (L0 resolve → L1 inventory → L2 spike → L3 lift → L4 wire+verify)</td><td>1.2</td></tr>
+      <tr><td>Dispatch fix — the skill fires on ad-hoc UI asks, not just <code>/gabe-mockup</code></td><td>1.2</td></tr>
+      <tr><td>gastify gets the missing reuse layer: RULES.md, screen map, CLAUDE.md hard rule</td><td>0.2</td></tr>
+      <tr><td>Cross-project tool registry in gabe-help ("does this already exist somewhere?")</td><td>0.2 / Wave 2</td></tr>
+      <tr><td>gustify R4 sweep — archive the 20 settled-but-active spike stories (reuse searches must not hit dead ends)</td><td>0.4</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="v3"><span class="num">V3</span><span class="value-head"><img class="doc-icon" src="assets/icons/fam-verification.png" alt="">Enforcement over instruction</span></h2>
+  <p class="handle">The harness remembers so the human doesn't have to.</p>
+  <p><b>Why:</b> the E1–E7 contract was installed into 38 files and the incidents continued — prose the model must remember is not a gate. Deterministic checks, output contracts, and hooks are. <span class="receipt">F1 · FINDINGS.md</span></p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Change it drives</th><th>Plan step</th></tr></thead>
+    <tbody>
+      <tr><td>NEXT pointer as part of each lifecycle command's <em>output contract</em> (not a suggestion the model may forget)</td><td>0.3</td></tr>
+      <tr><td>One single-fire Stop hook: tree dirty + no commit this session → "next: /gabe-commit"</td><td>0.3</td></tr>
+      <tr><td>Evidence freshness check at the gabe-commit chokepoint — WARN-and-LOG first, blocking only where warnings get ignored</td><td>1.3c</td></tr>
+      <tr><td>suite-doctor drift check (hash repo vs installs) so silent divergence gets caught mechanically</td><td>0.1</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="v4"><span class="num">V4</span><span class="value-head"><img class="doc-icon" src="assets/icons/fam-state.png" alt="">One source of truth</span></h2>
+  <p class="handle">Patch the repo, not the install.</p>
+  <p><b>Why:</b> three divergent suite copies exist right now; the repo documents a hardening its own source never received; a careless <code>install.sh</code> run would destroy it. <span class="receipt">F3 · raw/scan-installed-state-0.md</span></p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Change it drives</th><th>Plan step</th></tr></thead>
+    <tbody>
+      <tr><td>Reconcile: commit the hardening pass home, ship the orphaned hooks.json + gabe-review references, re-install both homes</td><td><b>0.1 — first</b></td></tr>
+      <tr><td>Standing rule: suite changes land in the repo first; installs are always regenerable</td><td>0.1</td></tr>
+      <tr><td>De-dup into a suite-owned conventions file shipped to both homes (never referencing the private <code>~/.claude/rules</code>)</td><td>1.4</td></tr>
+      <tr><td>Rename gabe-review's "80%" to <em>finding-confidence ≥ 80%</em> — one number, one meaning per name</td><td>1.4</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="v5"><span class="num">V5</span><span class="value-head"><img class="doc-icon" src="assets/icons/idea-replaceable.png" alt="">Declared differences</span></h2>
+  <p class="handle">Same shape, different details — declared in a manifest, not discovered by failure.</p>
+  <p><b>Why:</b> the twins hold <em>opposite</em> correct rules (gustify: never import legacy; gastify: read legacy first — 8 incidents from skipping it). Knowledge like that can't live at suite altitude; it must be declared per project. <span class="receipt">T8 · deliverable 7</span></p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Change it drives</th><th>Plan step</th></tr></thead>
+    <tbody>
+      <tr><td>The one-page per-project mockup manifest — bindings only (tool, roots, ports, screen map, verify commands, lift kind, capture tool)</td><td>1.1</td></tr>
+      <tr><td>Global skill sheds gustify's bindings; keeps every lesson rewritten project-neutrally (split by KIND)</td><td>1.1</td></tr>
+      <tr><td>Twin divergences resolved as 5 unify / 5 keep / 2 cleanup — never forced identical</td><td>deliverable 7</td></tr>
+      <tr><td>Env topology (URLs, secrets <em>locations</em>, quotas) recorded in PUSH.md's manifest section</td><td>1.1 / P13</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="v6"><span class="num">V6</span><span class="value-head"><img class="doc-icon" src="assets/icons/fam-antifab.png" alt="">Simplification &amp; restraint</span></h2>
+  <p class="handle">Build only what measured pain justifies — and be willing to kill your own ideas.</p>
+  <p><b>Why:</b> both anti-goals (overfit / over-generalize) are restraint failures, and the operator's locked decision #3 makes measured frequency the arbiter. The plan proves it lives this value: its own proposed <code>/gabe-simplify</code> wrapper was killed by a skeptic on zero measured evidence. <span class="receipt">R-D verdict · FINDINGS.md</span></p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Change it drives</th><th>Plan step</th></tr></thead>
+    <tbody>
+      <tr><td><code>/gabe-simplify</code>: standalone wrapper rejected; after the 0.5a audit (2026-07-09) the capability ships as an evidence-triggered <b>simplify tier inside gabe-commit</b> — restraint kept, measured need honored</td><td>0.5a / deliverable 10</td></tr>
+      <tr><td>gabe-myopic description compressed 1,060 → ~200 chars (21% of the always-loaded surface in one skill)</td><td>0.4</td></tr>
+      <tr><td>Shelf-ware review: ~10 zero-use commands priced for consolidation or retirement — operator call</td><td>Wave 2</td></tr>
+      <tr><td>Manifest stays a freeform one-pager — no schema until a third project exists</td><td>1.1</td></tr>
+      <tr><td>No parallel-session locking, no auto-router, no committed screenshot dumps — each rejected with a re-open trigger</td><td>not-do list</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="v7"><span class="num">V7</span><span class="value-head"><img class="doc-icon" src="assets/icons/idea-decision.png" alt="">Human judgment preserved</span></h2>
+  <p class="handle">Encode the detectable; keep the taste.</p>
+  <p><b>Why:</b> ~40 design-taste corrections are the price of caring about the product — the variation is in the reasoning, not a procedure. Encoding them would be the overfit trap. But taste that repeats or becomes detectable graduates: gustify already turned "taste" into machine checks three times (token-class coverage, the P1–P7 layout oracle, icon params). <span class="receipt">P16 · R-K verdict</span></p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Change it drives</th><th>Plan step</th></tr></thead>
+    <tbody>
+      <tr><td>The graduation rule: encode at n=1 <em>iff</em> statable as one RULES.md row with a runnable <code>Detection:</code> command; else one-line taste-log; a second recurrence forces encode-or-tag-unencodable</td><td>not-do list / 0.2</td></tr>
+      <tr><td>Design, architecture, and mockup work stay visible and steppable (locked decision #1) — autonomy only for mechanical loops</td><td>standing</td></tr>
+      <tr><td>Twin divergences: every unify/keep is the operator's call, never unilateral (locked decision #4)</td><td>deliverable 7</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="matrix"><span class="num">08</span>The full map — values × waves</h2>
+  <figure class="mermaid-fig"><pre class="mermaid">flowchart LR
+  subgraph VALUES["Seven values"]
+    V1["V1 evidence&lt;br&gt;over claims"]
+    V2["V2 reuse&lt;br&gt;before build"]
+    V3["V3 enforcement&lt;br&gt;over instruction"]
+    V4["V4 one source&lt;br&gt;of truth"]
+    V5["V5 declared&lt;br&gt;differences"]
+    V6["V6 simplification&lt;br&gt;&amp; restraint"]
+    V7["V7 human judgment&lt;br&gt;preserved"]
+  end
+  W0["Wave 0&lt;br&gt;reconcile · gastify layer&lt;br&gt;NEXT contract · hygiene"]
+  W1["Wave 1&lt;br&gt;manifest · lift SOP&lt;br&gt;Evidence Doctrine · de-dup"]
+  W2["Wave 2&lt;br&gt;re-measure&lt;br&gt;then decide"]
+  V4 --&gt; W0
+  V3 --&gt; W0
+  V2 --&gt; W0
+  V6 --&gt; W0
+  V1 --&gt; W1
+  V2 --&gt; W1
+  V5 --&gt; W1
+  V4 --&gt; W1
+  V6 --&gt; W2
+  V7 --&gt; W2
+  style VALUES fill:#f5f0e2
+  style W0 fill:#b65a2b,color:#f5f0e2
+  style W1 fill:#e6dec8
+  style W2 fill:#ece6d8</pre></figure>
+  <div class="note"><span class="lbl">How to use this page</span><p>When reviewing the plan, argue with the <em>values</em>, not the steps. Strike a value and its rows fall out of the plan; add one (the operator floated "security" — today it lives inside V3's gates and the global security rules) and the next mining pass measures whether it earns rows of its own.</p></div>
+
+  <script type="application/json" id="gabe-page-manifest">
+  {
+    "page": "values.html",
+    "mode": "explanation",
+    "generated": "2026-07-08",
+    "source_of_truth": ["../06-sequenced-change-plan.md", "../FINDINGS.md"],
+    "evidence": ["../raw/incidents.json"],
+    "status": "value framework proposed 2026-07-08; driven plan steps 0.1/0.3/0.5a/0.5b (suite-side) and forks A2 (gustify)/B2 EXECUTED 2026-07-09 — see target.html for receipts",
+    "values": [
+      {"id": "V1", "name": "Evidence over claims", "handle": "Done is something you show, not something you say", "drives": ["1.3a", "1.3b", "1.3c", "1.3d", "1.3e", "1.2"]},
+      {"id": "V2", "name": "Reuse before build", "handle": "Lift, don't rebuild — a stand-in shell is a defect", "drives": ["1.2", "0.2", "0.4"]},
+      {"id": "V3", "name": "Enforcement over instruction", "handle": "The harness remembers so the human doesn't have to", "drives": ["0.3", "1.3c", "0.1"]},
+      {"id": "V4", "name": "One source of truth", "handle": "Patch the repo, not the install", "drives": ["0.1", "1.4"]},
+      {"id": "V5", "name": "Declared differences", "handle": "Same shape, different details — declared, not discovered by failure", "drives": ["1.1"]},
+      {"id": "V6", "name": "Simplification & restraint", "handle": "Build only what measured pain justifies", "drives": ["0.4", "not-do list", "Wave 2"]},
+      {"id": "V7", "name": "Human judgment preserved", "handle": "Encode the detectable; keep the taste", "drives": ["not-do list", "0.2"]}
+    ]
+  }
+  </script>
+</main></div>
+
+<footer class="stamp">
+  <b>GABE</b> · workflow investigation 2026-07 · values → changes<br>
+  Source of truth: <b>output/06-sequenced-change-plan.md + FINDINGS.md</b> · hand-authored specimen of the <a href="convention.html">v-next docsite convention</a><br>
+  Visual system: Cifra · Chile editorial palette
+</footer>
+
+<script src="assets/site.js"></script>
+<script src="assets/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad: true, theme: "base", themeVariables: {background: "#ece6d8", primaryColor: "#f5f0e2", primaryBorderColor: "#b65a2b", primaryTextColor: "#1b1a17", secondaryColor: "#e6dec8", tertiaryColor: "#ece6d8", lineColor: "#6e6757", fontFamily: "Space Grotesk, system-ui, sans-serif", fontSize: "13px"}, flowchart: {curve: "basis", htmlLabels: true, useMaxWidth: true}});</script>
+</body>
+</html>

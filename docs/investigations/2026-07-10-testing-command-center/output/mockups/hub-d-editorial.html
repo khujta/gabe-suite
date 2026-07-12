@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Center · D — Editorial Broadsheet</title>
+<style>
+  :root{--page:#fbfaf7;--ink:#141310;--ink2:#55524a;--muted:#96928a;--hair:#dedbd2;
+    --good:#1c7c1c;--fail:#b3261e;--stale:#9a7208;
+    --good-t:rgba(28,124,28,.07);--fail-t:rgba(179,38,30,.07);--stale-t:rgba(154,114,8,.09)}
+  :root[data-theme="dark"]{--page:#131211;--ink:#f0eee9;--ink2:#b8b4ab;--muted:#7d7a72;
+    --hair:#2e2c28;--good:#5cb85c;--fail:#e57373;--stale:#d1a02c}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);color:var(--ink);font:16px/1.6 Georgia,'Times New Roman',serif}
+  main{max-width:960px;margin:0 auto;padding:40px 24px 80px}
+  .mast{border-bottom:3px double var(--ink);padding-bottom:14px;margin-bottom:8px}
+  .mast .over{font-family:system-ui,sans-serif;font-size:.7rem;text-transform:uppercase;letter-spacing:.22em;color:var(--muted)}
+  h1{font-size:2.5rem;font-weight:400;margin:.1em 0 .05em;letter-spacing:-.01em}
+  .dek{font-style:italic;color:var(--ink2);font-size:1.05rem;margin:.2em 0 0}
+  .dateline{font-family:system-ui,sans-serif;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;
+    border-bottom:1px solid var(--hair);padding:8px 0 10px;margin-bottom:26px}
+  .figures{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;margin:10px 0 34px}
+  .fig{padding:6px 18px;border-left:1px solid var(--hair)}
+  .fig:first-child{border-left:none;padding-left:0}
+  .fig b{display:block;font-size:2.3rem;font-weight:400;line-height:1.1}
+  .fig span{font-family:system-ui,sans-serif;font-size:.7rem;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em}
+  .fig i{display:block;font-size:.75rem;color:var(--muted);font-style:italic;margin-top:2px}
+  .fig.dim b{color:var(--muted)}
+  h2{font-size:.8rem;font-family:system-ui,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.18em;
+    margin:38px 0 4px;color:var(--ink)}
+  .rule{border:none;border-top:1px solid var(--ink);margin:0 0 16px;max-width:64px}
+  table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.8rem}
+  th{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;
+    padding:8px 10px;text-align:center;border-bottom:1px solid var(--hair)}
+  td{padding:10px;border-bottom:1px solid var(--hair);text-align:center;vertical-align:middle}
+  .tier{text-align:left;font-family:Georgia,serif;white-space:nowrap}
+  .tier b{font-size:1rem;font-weight:600}
+  .tier small{display:block;font-style:italic;color:var(--muted);font-size:.76rem;font-family:Georgia,serif}
+  .num{font-size:1.05rem;font-variant-numeric:tabular-nums}
+  .num.ok{color:var(--good)} .num.stale{color:var(--stale)} .num.bad{color:var(--fail);font-weight:700}
+  .num small{display:block;font-size:.64rem;color:var(--muted);letter-spacing:.03em}
+  .void{color:var(--hair)}
+  tr.t1{background:var(--fail-t)}
+  tr.t1 .tier b{font-size:1.15rem}
+  .note{font-family:system-ui,sans-serif;font-size:.72rem;color:var(--muted);font-style:italic;margin-top:8px}
+  .drill{margin:14px 0;border-top:1px solid var(--hair)}
+  .story{display:flex;gap:16px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--hair)}
+  .story img{width:24px;height:24px;image-rendering:pixelated;align-self:center}
+  .story .lead{flex:1}
+  .story .lead b{font-size:1.02rem;font-weight:600}
+  .story .lead p{margin:.15em 0 0;color:var(--ink2);font-size:.88rem;font-style:italic}
+  .story .verdict{font-family:system-ui,sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+  .verdict.ok{color:var(--good)} .verdict.stale{color:var(--stale)}
+  .story .when{font-family:system-ui,sans-serif;font-size:.7rem;color:var(--muted);width:90px;text-align:right;white-space:nowrap}
+  footer{margin-top:44px;border-top:3px double var(--ink);padding-top:10px;
+    font-family:system-ui,sans-serif;font-size:.68rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+
+  .theme-btn{position:fixed;top:10px;right:12px;z-index:99;width:38px;height:38px;border-radius:50%;
+    border:1px solid rgba(128,128,128,.4);background:var(--surface);color:var(--ink);cursor:pointer;
+    font-size:1.05rem;line-height:1;display:flex;align-items:center;justify-content:center}
+  .theme-btn:hover{transform:scale(1.08)}
+</style>
+</head>
+<body>
+<button id="themeBtn" class="theme-btn" aria-label="Toggle light/dark theme">◐</button>
+<script>
+(function(){
+  var r=document.documentElement,b=document.getElementById('themeBtn'),saved=null;
+  try{saved=localStorage.getItem('center-theme')}catch(e){}
+  function set(x){r.setAttribute('data-theme',x);b.textContent=x==='dark'?'☀':'☾';
+    try{localStorage.setItem('center-theme',x)}catch(e){}}
+  set(saved||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+  b.onclick=function(){set(r.getAttribute('data-theme')==='dark'?'light':'dark')};
+})();
+</script>
+
+<main>
+  <div class="mast">
+    <div class="over">Gustify · The Testing Ledger — Direction D, Editorial Broadsheet</div>
+    <h1>State of the Kitchen</h1>
+    <p class="dek">Everything tested, everything dated, nothing shouting — the quiet report you read with coffee.</p>
+  </div>
+  <div class="dateline">Regenerated 10 July 2026, 21:04 · head 956c992d · CI 29128453353 green</div>
+
+  <div class="figures">
+    <div class="fig"><b>1,095</b><span>backend checks</span><i>all passing, 2h ago</i></div>
+    <div class="fig"><b>408</b><span>web checks</span><i>all passing</i></div>
+    <div class="fig"><b>86</b><span>journeys · 8 groups</span><i>1 group on-demand stale</i></div>
+    <div class="fig"><b>107</b><span>storybook, local</span><i>last hand-run: unknown</i></div>
+    <div class="fig dim"><b>—</b><span>coverage</span><i>arrives with the spike</i></div>
+  </div>
+
+  <h2>The risk ledger</h2><hr class="rule">
+  <table>
+    <tr><th style="text-align:left">Tier</th><th>Recipes</th><th>Cooking</th><th>Pantry</th><th>AI pipeline</th><th>Platform</th><th>UI · i18n</th></tr>
+    <tr class="t1"><td class="tier"><b>Safety</b><small>someone could get hurt</small></td>
+      <td><span class="num ok">130<small>exclusion filters</small></span></td>
+      <td><span class="num ok">4<small>SAFE journey</small></span></td>
+      <td><span class="num ok">10<small>expiry guards</small></span></td>
+      <td><span class="num stale">pivot<small>in-house generation</small></span></td>
+      <td class="void">—</td><td class="void">—</td></tr>
+    <tr><td class="tier"><b>Data</b><small>state survives</small></td>
+      <td><span class="num ok">60</span></td><td><span class="num ok">40</span></td>
+      <td><span class="num ok">35</span></td><td><span class="num ok">15</span></td>
+      <td><span class="num ok">26<small>migrations ↑↓</small></span></td><td class="void">—</td></tr>
+    <tr><td class="tier"><b>Money &amp; abuse</b><small>cost, intrusion</small></td>
+      <td class="void">—</td><td class="void">—</td><td class="void">—</td>
+      <td><span class="num ok">50</span></td><td><span class="num ok">60</span></td><td class="void">—</td></tr>
+    <tr><td class="tier"><b>Core loop</b><small>the app is usable</small></td>
+      <td><span class="num ok">80</span></td><td><span class="num stale">17<small>on-demand</small></span></td>
+      <td><span class="num ok">45</span></td><td><span class="num stale">6</span></td>
+      <td><span class="num ok">30</span></td><td class="void">—</td></tr>
+    <tr><td class="tier"><b>Polish</b><small>it feels right</small></td>
+      <td><span class="num ok">50</span></td><td class="void">—</td><td class="void">—</td>
+      <td class="void">—</td><td class="void">—</td>
+      <td><span class="num stale">180<small>storybook local</small></span></td></tr>
+  </table>
+  <p class="note">Green figures passed on their last run; gold figures exist but run on request — their date is part of their meaning. The safety row is set in red wash and reads first.</p>
+
+  <h2>Front page — Safety × Recipes</h2><hr class="rule">
+  <div class="drill">
+    <div class="story"><img src="../assets/icons/kind-unit.png" alt="">
+      <div class="lead"><b>The exclusion suite holds the line</b><p>130 backend tests keep a restricted user's list clean — exact-token matching, null-guards, proven on SQLite and real Postgres alike.</p></div>
+      <span class="verdict ok">130 pass</span><span class="when">2h ago</span></div>
+    <div class="story"><img src="../assets/icons/kind-journey.png" alt="">
+      <div class="lead"><b>The SAFE journey, witnessed</b><p>A fish-allergic user signs in; the warning appears; the recipe is gone from the shelf. Screenshot at every step.</p></div>
+      <span class="verdict ok">4 pass</span><span class="when">yesterday</span></div>
+    <div class="story"><img src="../assets/icons/kind-deployed.png" alt="">
+      <div class="lead"><b>The deployed replay waits its turn</b><p>The same milk-exclusion, against the real deployed API — runs on request, and six days is starting to show.</p></div>
+      <span class="verdict stale">on demand</span><span class="when">6 days ago</span></div>
+    <div class="story"><img src="../assets/icons/kind-gate.png" alt="">
+      <div class="lead"><b>The contract that cannot drift</b><p>The OpenAPI freeze keeps <em>restriction_codes</em> unrenameable — additive changes only, checked at every commit.</p></div>
+      <span class="verdict ok">gate</span><span class="when">every commit</span></div>
+  </div>
+</main>
+<footer>The Testing Ledger · Direction D “Editorial Broadsheet” · static · regenerated at checkpoints · set in Georgia</footer>
+</body>
+</html>

@@ -1,0 +1,46 @@
+SOURCE TYPE: operator-supplied mini-summary (timestamped rubric — NOT a verbatim transcript)
+TITLE: (workshop) Agent-native verification — from markdown docs to agent-native verification
+SPEAKER: Anthropic engineer "Ara"
+URL: not supplied by operator (add here if/when available)
+REPO MENTIONED: CWC/workshops (Requirements gathering / Design exploration / Verification framework)
+CAPTURED: 2026-07-07
+
+---
+
+This workshop, led by Anthropic engineer Ara, demonstrates how developers can optimize their
+workflow using Claude Code by shifting from simple markdown documentation to agent-native
+verification. Below is a rubric of actionable steps and best practices for developers:
+
+1. Optimize Your Prompting & Interaction
+- Let Claude Interview You: Instead of trying to define every detail upfront, prompt Claude to
+  act as an interviewer to extract latent requirements (6:48). Explicitly instruct it to use
+  the ask-user-question tool.
+- Use Advanced Modes: Always leverage auto mode for efficiency (8:10) and set your effort
+  parameter to X-high or max-effort for complex tasks (8:23).
+- Iterative Design: Use Claude to generate multiple design directions as HTML files rather than
+  markdown (11:04). HTML is more information-dense and allows for richer human-agent feedback loops.
+
+2. Implement Agent-Native Verification
+- Shift to HTML Specs: Move away from long markdown files (often exceeding 200 lines) toward
+  HTML artifacts that are more ergonomic for agents to parse (10:27, 12:54).
+- Publish State to the DOM: To enable agent-driven verification, ensure your components publish
+  their internal state to the DOM using data attributes (e.g., data-verify-unit) (17:34). This
+  allows the agent to read the state directly without complex scraping.
+- Three-Layered Verification: Aim to support three levels of verification:
+    - Human-Readable Dashboard: For direct manual review (16:44).
+    - Agent-Driven Verification: Allowing Claude to run tests directly from the browser (16:48).
+    - Headless CI Execution: Running tests like bun verify to ensure stability in CI/CD
+      pipelines (17:13, 29:34).
+
+3. Workflow Pro-Tips
+- Leverage Vision Models: Utilize Claude 3.5 Opus/4.7 for its superior vision capabilities,
+  which make it better at diagnosing UI misalignments and layout issues when you provide
+  screenshots (12:07, 30:46).
+- Record Evidence: Use the agent to record verification clips as evidence of success, which can
+  be stored (e.g., on S3) and shared with team members (14:03, 27:26).
+- Use the Workshop Repo: The presenter provides a GitHub repository (CWC/workshops) that
+  contains three distinct phases of setup: Requirements gathering, Design exploration, and
+  Verification framework implementation (14:54).
+- Note: The speaker emphasizes that while HTML specs may seem token-inefficient for one-off
+  instances, they save significant tokens in the long run by reducing iteration cycles and
+  miscommunication (31:07).
