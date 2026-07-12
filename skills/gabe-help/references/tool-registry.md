@@ -27,6 +27,7 @@ Each KDBP project declares its notable tooling in its own `.kdbp/STRUCTURE.md` (
 it in `.kdbp/RULES.md`). Known cross-project asset classes — check the sibling project
 before building:
 
+- **Testing Command Center** (per-project generated site: features + matrix + docs wings) → reference implementation lives in gustify (`scripts/build_center_docs.py` family + `scripts/{scaffold_feature,curate_proof,next_feature}.py` + `refresh_center.sh`; overlay `docs/site/center/center.config.json`); driven by `/gabe-feature`; NEW projects bootstrap by COPY per `skills/gabe-feature/references/feature-spec.md` §Bootstrap — promotion to a suite generator is D7, decided at n=2.
 - **Prompt experiments / LLM proof harnesses** → an existing `prompt_lab/` tree (never an ad-hoc harness beside it).
 - **Pixel-art icon pipelines** → the pixellab-icons skill + the project's icon catalog.
 - **Session handoffs** → `/gabe-handoff` (never a bespoke handoff doc).

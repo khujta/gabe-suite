@@ -108,6 +108,7 @@ The Gabe Suite — 22 command wrappers, 12 skills:
 | gabe-commit | /gabe-commit [msg] | Commit quality gate — deterministic checks, triage |
 | gabe-debt | /gabe-debt [brief\|dry-run\|target] | Architecture decision-debt scan with AP evidence citations |
 | gabe-execute | /gabe-execute | Execute the current PLAN.md phase |
+| gabe-feature | /gabe-feature [phase\|--range] \| status \| backfill \| curate | Command-center feature coverage — card/diagrams/narration; only in projects with docs/site/center/ |
 | gabe-handoff | /gabe-handoff [--dry-run\|--no-sync\|note] | Session handoff — resume prompt + evidence-gated KDBP state sync |
 | gabe-health | /gabe-health [focus] | Codebase structural health — gods, churn, coupling, bugs |
 | gabe-init | /gabe-init [name] | Project setup — .kdbp/, hooks, project type, maturity |

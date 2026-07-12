@@ -52,6 +52,7 @@ covers the full KDBP lifecycle from project init through ship:
 | `/gabe-commit` | Commit quality gate — deterministic checks, interactive triage, defer/accept/fix |
 | `/gabe-debt` | Architecture decision-debt scanner — decisions, rules, open questions, AP citations |
 | `/gabe-execute` | Phase execution — tier-cap task breakdown, mid-phase escalation gate |
+| `/gabe-feature` | Testing-command-center feature coverage — lens card + diagrams + evidence narration over machine facts; status/backfill/curate (projects with `docs/site/center/`) |
 | `/gabe-handoff` | Session handoff — paste-able next-session resume prompt + evidence-gated KDBP state sync (PLAN/LEDGER/PENDING) into `.kdbp/HANDOFF.md` |
 | `/gabe-health` | Codebase structural health — god files, churn hotspots, coupling, bugs |
 | `/gabe-help` | Context-aware guide — scans environment and suggests the right workflow |

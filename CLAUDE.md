@@ -50,7 +50,7 @@ There is no `commands/` directory: it was retired in the B2 skills-only migratio
 - Architecture Principles AP1–AP13 live in `templates/architecture-principles.md` and are advisory context for `/gabe-align`, `/gabe-debt`, and `/gabe-review`.
 - Suite changes land in the REPO first; installs regenerate via `./install.sh`; `scripts/suite-doctor.sh` makes drift visible. Never patch `~/.claude` in place.
 
-## Capabilities (25 skills)
+## Capabilities (26 skills)
 
 | Skill | Version | Purpose |
 |---|---|---|
@@ -62,6 +62,7 @@ There is no `commands/` directory: it was retired in the B2 skills-only migratio
 | **gabe-docs** | 1.1.1 | Documentation standards + diagrams library + the suite execution contract (background) |
 | **gabe-docsite** | 1.0.0 | Publish docs onto the generated HTML docs site |
 | **gabe-execute** | 2.1.0 | Phase execution with tier cap, escalation gate, checkpoint commits |
+| **gabe-feature** | 1.0.0 | Command-center feature coverage — card/diagrams/narration over machine facts; status, backfill, curate |
 | **gabe-handoff** | 2.1.0 | Session handoff — paste-able resume prompt + KDBP state sync |
 | **gabe-health** | 1.1.1 | Codebase health — god files, churn hotspots, coupling (fork/read-only) |
 | **gabe-help** | 1.1.1 | Context-aware guide + the P14 cross-project tool registry |

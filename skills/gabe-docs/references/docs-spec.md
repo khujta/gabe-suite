@@ -91,6 +91,35 @@ Rules:
 | `classDiagram` | Object models, class hierarchies, interfaces | Typed system with inheritance or composition |
 | `gitGraph` | Branch strategies, release flows | Explaining version-control conventions |
 
+### Node-shape semantics (flowcharts)
+
+One shape per operation KIND — a reader should know what a node does before
+reading its label. Do not improvise new shape meanings; extend this table.
+
+| Operation kind | Shape | Mermaid syntax |
+|---|---|---|
+| Start / end (terminal) | stadium | `id([label])` |
+| Process / action step | rectangle | `id[label]` |
+| Decision / conditional | diamond | `id{label}` |
+| File created / written / artifact I/O | parallelogram | `id[/label/]` |
+| Database read / write | cylinder | `id[(label)]` |
+| External system / service call | hexagon | `id{{label}}` |
+| Human / manual step | trapezoid | `id[\label\]` |
+
+### Change-highlight rule (all diagram types)
+
+When a diagram illustrates a CHANGE (a feature page, an ADR, a migration doc),
+highlight only the shapes the change touches; surrounding context keeps normal
+colors. The highlight is the accent treatment, applied consistently:
+
+- `flowchart` / `stateDiagram-v2`: `classDef changed fill:#fae7de,stroke:#c2461e,stroke-width:2.5px;`
+  then `class NodeA,NodeB changed` — ONLY the touched nodes/states.
+- `sequenceDiagram`: wrap the new/changed exchanges in `rect rgb(250,231,222)` … `end`;
+  unchanged exchanges stay outside the rect.
+- Tint/stroke ride the host page's accent tokens where the page defines them
+  (`--fail-t`/`--accent` in the command-center skin); the hex values above are
+  the defaults for standalone docs.
+
 ### Syntax templates
 
 **Flowchart** (data/control flow):
