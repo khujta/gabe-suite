@@ -115,6 +115,21 @@ Run:
 - Commit pending: `/gabe-commit`
 - Push pending: `/gabe-push`
 
+**Projects with a Testing Command Center** (`docs/site/center/` — see `/gabe-feature`)
+add one step to the per-phase rhythm, between review and commit:
+
+```
+/gabe-execute → /gabe-review → /gabe-feature <phase> → /gabe-commit → /gabe-push
+```
+
+That slot is where all of `/gabe-feature`'s inputs exist (shipped commits, review
+verdict, test runs) and the commit then carries the regenerated center pages in the
+same checkpoint. `/gabe-next` stays cell-only (zero-logic); the feature step is part
+of the close-out ritual, not a PLAN cell — promoting it to a cell is D6/Wave-2.
+At PLAN time, the lightweight counterpart: note in the phase's `proof` which of the
+five angles (pytest · vitest · journey · deployed · motion) the phase commits to —
+`/gabe-feature` reads the promise back at close-out.
+
 For React-first UI projects, run:
 
 ```sh
