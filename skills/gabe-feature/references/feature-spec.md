@@ -1,5 +1,12 @@
 # Feature spec — the binding intentions behind /gabe-feature
 
+> The one deep home for the card contract. SKILL.md carries intention + flow
+> and points here; nothing below is restated there. Angle ids: `pytest` ·
+> `vitest` · `journey` · `deployed` · `motion`. Diagram headings (exact):
+> `# DIAGRAM USERFLOW` · `# DIAGRAM DATAFLOW` · `# DIAGRAM WORKFLOW` — any
+> other heading renders nowhere and the gate flags it. One card renders TWO
+> pages: the cookbook page carries the story, the feature page the testing.
+
 The FORMAT authority is the project's validator (`scripts/_center_data.py` — it
 fails loud on referential errors: unknown entities, unmatched globs, missing
 card sections). This file records the INTENTIONS the validator cannot check,
