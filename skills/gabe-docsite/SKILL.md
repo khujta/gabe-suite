@@ -84,6 +84,7 @@ No-dependency markdown → HTML. Supported subset: ATX headings (`##` auto-numbe
 
 ## Guardrails
 - **Placement + rendering only.** Do NOT fact-check the doc against the code — accuracy/drift is owned elsewhere. Mention a glaring contradiction; do not fix it here.
+- **The Testing Command Center is not this site.** `docs/site/center/` is a specialized machine-truth build owned by `/gabe-feature` — never place or edit pages there.
 - **Markdown is the source of truth** under `docs/src/`. Never hand-edit generated `docs/site/*.html` (overwritten every build).
 - **Never recolor the Cifra palette** or hand-roll a page — reuse the shell.
 - **Diagrams: vendored classic mermaid only.** Never a CDN URL, never `type="module"` (breaks over `file://`).
