@@ -24,7 +24,7 @@ never drift from the truth.
 | FLOWS | the user flows it lives in; journey links resolve at render | route lists |
 | IS / IS NOT | shipped behaviors / deliberate non-goals + known gaps, plainly | IS NOT as excuses; hiding gaps |
 | DECIDED | D-refs + one-line rulings that shaped it | re-arguing decisions |
-| ENTITIES | ids from config `entities[]` (validator enforces) | inventing entities inline |
+| ENTITIES | ids from config `entities[]` (validator enforces). The list MAY grow: when a feature genuinely introduces a domain entity, add it to config `entities[]` (id + label + a NEW distinct color) in the same authoring pass — the addition is part of the card review, and the validator's hard-fail is the prompt, not a wall | inventing entities inline; splitting hairs (a variant of an existing entity is that entity) |
 | ANGLES | one REASON line per absent angle; "not yet mapped/run", never 'untested'-sounding words; notes on partial angles render as footnotes | justifying instead of recording |
 | DIAGRAM USERFLOW / DATAFLOW / WORKFLOW | flowchart / sequenceDiagram / stateDiagram-v2 — types, node shapes, and the change-highlight rule are BINDING per `gabe-docs/references/docs-spec.md` §Mermaid (shapes-per-operation table + `classDef changed` / sequence `rect` blocks; validate highlight targets — mermaid silently ignores misses) | drawing the whole system; highlighting everything |
 | REVIEWED | date + who, stamped ONLY after the human reviewed the BUILT pages | stamping a TODO-free draft |
