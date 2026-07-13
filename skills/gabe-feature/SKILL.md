@@ -3,7 +3,7 @@ name: gabe-feature
 description: "Feature coverage for a project's Testing Command Center — translate a shipped feature into its lens card, diagrams, and evidence narration over machine-derived facts, and keep the center regenerating green. Usage: /gabe-feature [<phase>|--range A..B] | status | backfill | curate <artifact-subdir> <shot-nums…>"
 when_to_use: "Cover a shipped feature in the command center, center status, backfill the center feature-by-feature, curate proof + narration after a green run — ONLY in projects that have docs/site/center/center.config.json (elsewhere: STOP with the bootstrap pointer)."
 metadata:
-  version: 1.0.3
+  version: 1.0.4
 ---
 
 # Gabe Feature — the command center's per-feature ritual
@@ -41,7 +41,7 @@ Any binding missing → E6 STOP, name it, done. Format authority: the project's 
 ### `/gabe-feature <phase>` or `--range A..B` (default — author one feature)
 
 1. Run the scaffold script. It prints a DRAFT registry entry (globs marked `TODO(verify-glob)`) and writes a card skeleton (`TODO(author)` on every prose section).
-2. Insert the entry into `features[]` (commits[] = every commit that grew or reshaped this feature's TESTS — it feeds the verification changelog, not just the footprint); author the card: HANDLE → WHAT & WHY (+ one analogy line) → FOR WHOM → FLOWS → IS / IS NOT → DECIDED → ENTITIES (config ids, MOST SPECIFIC first — the first is the home cluster) → ANGLES (per absent angle: a reason — never 'untested'-sounding words — ENDING in a verdict: "Worth growing: <gain, cost>" or "Nothing to gain: <why>") → the 3 DIAGRAM sections (types, shapes, highlights per `gabe-docs/references/docs-spec.md` §Mermaid). Ground every line in commits/code you actually read. One card renders TWO pages: the docs page carries the story, the feature page carries the testing — don't fight the split.
+2. Insert the entry into `features[]` (commits[] = every commit that grew or reshaped this feature's TESTS — it feeds the verification changelog, not just the footprint; junit globs claim the tests that VERIFY the promise, which may predate the phase — authorship is the changelog's job, not the glob's); author the card: HANDLE → WHAT & WHY (+ one analogy line) → FOR WHOM → FLOWS → IS / IS NOT → DECIDED → ENTITIES (config ids, MOST SPECIFIC first — the first is the home cluster) → ANGLES (keys are EXACTLY the five angle ids — `pytest` · `vitest` · `journey` · `deployed` · `motion` — one line per absent angle: a reason, never 'untested'-sounding words, ENDING in "Worth growing: <gain, cost>" or "Nothing to gain: <why>") → the three diagram sections named EXACTLY `# DIAGRAM USERFLOW`, `# DIAGRAM DATAFLOW`, `# DIAGRAM WORKFLOW` (raw mermaid inside; type/shape/highlight rules per `gabe-docs/references/docs-spec.md` §Mermaid — any other heading renders NOWHERE and the gate flags it). Ground every line in commits/code you actually read. One card renders TWO pages: the docs page carries the story, the feature page carries the testing — don't fight the split.
 3. Regenerate (`refresh_center.sh regen`). Read the built feature page's **resolved match list** — trim any over-claiming glob, then delete the `TODO(verify-glob)` marker. Gate must be green (WARNs for THIS feature cleared).
 4. Evidence, when it exists or one run away: journey run → `curate` mode below. When it doesn't: the ANGLES reasons carry the absence honestly.
 5. Present the built pages (feature + docs) to the human for THE review. On approval, stamp the card `# REVIEWED` (date + who). One feature per invocation; report what remains.
