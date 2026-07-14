@@ -4,7 +4,7 @@
 
 ## Shape
 
-Greenfield work starts with the highest uncertainty — and the fewest guardrails, which is exactly when it's easiest to pour concrete in the wrong shape. The job is to reduce that uncertainty before the first plan hardens.
+Greenfield work starts with the highest uncertainty. The job is to reduce that uncertainty before the first plan hardens.
 
 ```mermaid
 flowchart TD

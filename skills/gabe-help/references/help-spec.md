@@ -118,7 +118,7 @@ The Gabe Suite — 22 command wrappers, 12 skills:
 | gabe-myopic | /gabe-myopic [mode] [target] | Short-sighted-user walkthrough — flags foresight traps, overwhelm, recall, no-undo |
 | gabe-next | /gabe-next | Zero-logic router for the current phase state |
 | gabe-plan | /gabe-plan [goal] | KDBP planning + per-phase tier decision |
-| gabe-quip | /gabe-quip [target] [title\|hook\|aside\|pass] | Sarcastic doc-wit — surfaces pain points in titles/hooks/asides; proposes, dosed, punch-up |
+| gabe-quip | /gabe-quip [surface] [title\|hook\|aside\|pass] | Sarcastic wit on human-facing HTML surfaces — titles/hooks/callouts; proposes, dosed, punch-up |
 | gabe-push | /gabe-push | Push, create PR, watch CI, branch promotion |
 | gabe-review | /gabe-review [target] | Code review with risk pricing + confidence score + triage |
 | gabe-roast | /gabe-roast [perspective] [target] | Adversarial gap review from a specific viewpoint |

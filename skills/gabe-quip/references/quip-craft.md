@@ -7,9 +7,10 @@
 
 ## The shapes of a good quip
 
-A quip is not "a joke in a doc." It is a compression: it makes the reader *feel*
+A quip is not "a joke on a page." It is a compression: it makes the reader *feel*
 the point in fewer words than the straight version would take, then hands them
-back to the content leaning in. The recurring shapes:
+back to the content leaning in. On a rendered surface it rides a title, a hero, a
+callout, or a label. The recurring shapes:
 
 | Shape | What it does | Example (subject) |
 |---|---|---|
@@ -20,7 +21,7 @@ back to the content leaning in. The recurring shapes:
 | **The self-aware aside** | Admits the friction the reader is already feeling | "(Yes, that's three framing blocks before any content. We counted too.)" |
 | **The inverted expectation** | Frames a good thing by the bad thing it isn't | "It compiles, ships, and regenerates green — which, if you've met software, is the surprise." |
 
-## Anti-patterns — the ways wit kills a doc
+## Anti-patterns — the ways wit kills a page
 
 - **The joke that ate the fact.** If a reader finishes the line and can't say what
   it *taught*, cut it. Decoration is worse than dry — it costs a read and returns
@@ -39,18 +40,24 @@ back to the content leaning in. The recurring shapes:
 - **The forced callback.** Reusing a bit past its first landing (the third "elephant"
   reference) is trying-hard; each quip earns its place fresh or not at all.
 
-## Register — how much wit each doc type can carry
+## Register — how much wit each SURFACE can carry
 
-| Doc type | Dose | Where it goes |
+Human-facing surfaces only — skill/reference/config markdown carries none (the
+scope gate). Among the surfaces a person browses:
+
+| Surface / view | Dose | Where it goes |
 |---|---|---|
-| README / landing / narrative intro | Bold | The hook, section openers, one memorable close |
-| Workflow / how-to guide | Moderate | The intro, a per-step aside that names a real snag |
-| Concept explainer / retro / investigation | Moderate | Titles + the "here's the thing nobody says" beat |
-| API / config reference, checklists | Sparse | At most one framing aside up top; the entries stay straight |
-| Runbook / safety / migration steps | None to one | The intro only; every actionable line reads dead-straight |
+| Landing hero / report intro / page hero | Bold | The hook line, one memorable close |
+| Feature/story page title + section headings | Moderate | Titles that name what the section delivers; a card HANDLE |
+| Section lede / explainer beat | Moderate | The "here's the thing nobody says" line |
+| Callout / empty-state / tooltip / chip label | Sparse-but-sharp | One line that names the obvious/implicit |
+| Stat strip · data table · endpoint/field list | None | Numbers and entries stay straight — wit here just slows the scan |
+| Warning · custody note · destructive step | None | Reads dead-straight, every time |
 
-Rule of thumb: **the faster a page is scanned under pressure, the less wit it can
-carry.** Hooks and intros are where wit pays; load-bearing bodies are where it taxes.
+Rule of thumb: **the faster a surface is scanned under pressure, the less wit it can
+carry.** Heroes, titles, and callouts are where wit pays; stat strips, tables, and
+warnings are where it taxes. And remember it's ONE lever — if a diagram, a meme, or
+a well-placed collapse is already doing the engaging on that view, a quip is noise.
 
 ## Worked before / after
 

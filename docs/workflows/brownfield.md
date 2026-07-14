@@ -4,7 +4,7 @@
 
 ## Shape
 
-Brownfield work starts with evidence, not intention. The repository already contains decisions, shortcuts, tests, and drift — a paper trail of choices nobody remembers making. Gabe Suite should first discover those facts and only then create KDBP structure around them.
+Brownfield work starts with evidence, not intention. The repository already contains decisions, shortcuts, tests, and drift. Gabe Suite should first discover those facts and only then create KDBP structure around them.
 
 ```mermaid
 flowchart TD
