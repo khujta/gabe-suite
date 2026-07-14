@@ -14,7 +14,7 @@
 
 ## Common Rule
 
-Do not start with implementation. Start by finding the current state:
+Do not start with implementation — the reflex this page exists to interrupt. Start by finding the current state:
 
 - For greenfield, the current state is the idea, constraints, and intended user.
 - For brownfield, the current state is the repository, tests, docs, existing decisions, and drift.
