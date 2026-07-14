@@ -68,7 +68,7 @@ There is no `commands/` directory: it was retired in the B2 skills-only migratio
 | **gabe-help** | 1.1.1 | Context-aware guide + the P14 cross-project tool registry |
 | **gabe-init** | 2.1.0 | Project setup — `.kdbp/`, hooks, project type, maturity (human-initiated only) |
 | **gabe-lens** | 2.4.0 | Cognitive translation — analogies, maps, constraint boxes, handles |
-| **gabe-meme** | 1.0.0 | Oblique-meme generation — template-persona-matched visual metaphors via memegen.link; verified PNGs, punch-up (ported from chiless meme-hilo) |
+| **gabe-meme** | 1.1.0 | Oblique-meme generation — per-project tone setup + template-persona-matched visual metaphors via memegen.link; verified PNGs, punch-up (ported from chiless meme-hilo) |
 | **gabe-mockup** | 2.1.0 | The lift SOP (L0–L4) over a per-project mockup manifest; Storybook + legacy HTML modes |
 | **gabe-myopic** | 1.1.0 | Short-sighted-user walkthrough — foresight traps, overwhelm, recall, no-undo (fork) |
 | **gabe-next** | 2.0.0 | Zero-logic lifecycle router over PLAN.md state |

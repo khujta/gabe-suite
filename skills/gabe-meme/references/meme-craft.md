@@ -7,6 +7,42 @@
 > `MemePanel.tsx`/`hilos` wiring, and per-article changelog dropped. The insights
 > below were each a real fix in that pipeline (dates kept as scars, not history).
 
+## §Setup — the per-project config (seeded on first use)
+
+Tone is per-project; `/gabe-meme` seeds it once and reads it every run after. The
+setup gate writes `meme.config.json` into the output dir:
+
+```json
+{
+  "tone": "oblique-dark",
+  "tone_note": "the voice in the human's own words — one line, editable by hand",
+  "output_dir": "docs/memes",
+  "real_subjects": true
+}
+```
+
+- `tone` — one of the menu ids below (or a custom id the human named via "Other").
+- `tone_note` — a free line the human can edit; it goes verbatim into the writing
+  prompt's tone slot, so the voice stays theirs even if the menu id is coarse.
+- `output_dir` — where PNGs (and this config) live. Default `docs/memes/`.
+- `real_subjects` — `true` when the project memes real people/entities (Ethics gate
+  engages hard, captions carry sources); `false` for abstract/dev-only humor (still
+  punch-up, but no legal-standing classification). Defaults `true`.
+
+**The tone menu** — present each with its example as an AskUserQuestion preview, all
+on ONE shared subject ("*shipping a risky change on a Friday afternoon*") so the
+human feels the tonal difference, not a content difference:
+
+| id | Voice | Example on the shared subject |
+|---|---|---|
+| `oblique-dark` | Satirical tangent, punch-up, the ported house voice — the edge is in what it doesn't say | This Is Fine — "just a small change / before the weekend" |
+| `dry-deadpan` | Understated, self-aware engineering humor; flat affect | Futurama Fry — "not sure if it's done / or if I stopped looking" |
+| `wholesome` | Earnest, celebratory, punches nowhere; gentle and sincere | Success Kid — "shipped on Friday / and nothing broke" |
+| `absurdist` | Surreal non-sequitur; the humor is the wrongness of the frame | Doge — "such deploy / very friday / wow consequences" |
+
+If the human picks "Other", capture their description as `tone_note` and set `tone`
+to a short slug of their own words. The four ids are starting points, not a fence.
+
 ## §Writing — the oblique method
 
 The meme goes by the tangent of the fact. Say the normal-sounding thing; let the
@@ -30,8 +66,9 @@ Test: if it reads clear without thinking, rewrite it more oblique.
 ETHICAL LIMIT (non-negotiable): punch up, never down. Never assert a crime as fact
 about a named real person without a final conviction — satirize the conduct or the
 entity; the un-convicted go outside the punchline or as attributed suspicion.
-Tone: dry/ironic, punch-up only, natural voice. Max ~10 words per field. Distinct
-templates (no repeats within a set).
+Tone: {TONE_NOTE from the project meme.config.json — e.g. "satirical tangent, the
+edge is in what it doesn't say"}. Punch-up only, always. Max ~10 words per field.
+Distinct templates (no repeats within a set).
 </system>
 <context>Subject: {TITLE} · Key facts: {FACTS} · Most absurd angle: {ANGLE}</context>
 <task>Generate {N} meme concepts. Each: position, template, exact text per field,
