@@ -3,7 +3,7 @@ name: gabe-feature
 description: "Feature coverage for a project's Testing Command Center — translate a shipped feature into its lens card, diagrams, and evidence narration over machine-derived facts, and keep the center regenerating green. Usage: /gabe-feature [<phase>|--range A..B] | status | backfill | curate <artifact-subdir> <shot-nums…>"
 when_to_use: "Cover a shipped feature in the command center, center status, backfill the center feature-by-feature, curate proof + narration after a green run — ONLY in projects that have docs/site/center/center.config.json (elsewhere: STOP with the bootstrap pointer)."
 metadata:
-  version: 1.2.0
+  version: 1.2.1
 ---
 
 # Gabe Feature — the command center's per-feature ritual
