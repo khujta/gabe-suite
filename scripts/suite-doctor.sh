@@ -48,6 +48,13 @@ check_home() { # home label
       done < <(find "$home/skills/$name" -type f ! -path '*__pycache__*')
     fi
   done
+  # whole skill dirs present in the install but absent from the repo glob — decommissioned
+  # skills (skills/_archive/) must leave the install too, or they stay live and triggerable
+  for d in "$home"/skills/gabe-*/; do
+    [ -d "$d" ] || continue
+    name=$(basename "$d")
+    [ -d "$REPO/skills/$name" ] || report "$label" "orphaned skill still installed (not in repo skills/ — decommissioned? remove): $d"
+  done
   # commands retired (B2 skills-only migration) — any surviving gabe command file is a straggler
   for f in "$home"/commands/gabe-*.md; do
     [ -e "$f" ] || continue

@@ -16,7 +16,8 @@ if [ -f ".kdbp/BEHAVIOR.md" ]; then
       newtests=$(git diff --cached --name-only --diff-filter=A 2>/dev/null \
         | grep -E '(^|/)tests?/|(^|/)test_[^/]+\.|\.(test|spec)\.[a-zA-Z]+$' || true)
       for f in $newtests; do
-        if [ -f "$f" ] && ! grep -qE 'C[0-9]{1,5}' "$f" 2>/dev/null; then
+        # token must not ride inside another word (SEC101, RFC1234, UTC2024 are not case ids)
+        if [ -f "$f" ] && ! grep -qP '(?<![A-Za-z0-9])C[0-9]{1,5}(?![0-9])' "$f" 2>/dev/null; then
           echo "[WARN] C-ID: new test file $f carries no C[N] case id (gabe-red red-spec — ids are born in test names)"
         fi
       done
@@ -34,7 +35,9 @@ try:
 except Exception:
     pass' 2>/dev/null || true)
         for cid in $ids; do
-          if ! git grep -q "$cid" 2>/dev/null; then
+          # exclude .kdbp — the PLAN that DECLARES the id must not satisfy its own corpus check;
+          # bound the match so C147 never rides on C1472
+          if ! git grep -qE "${cid}([^0-9]|\$)" -- ':(exclude).kdbp' 2>/dev/null; then
             echo "[WARN] C-ID: declared $cid (current phase Cases record) greps 0 hits in the corpus"
           fi
         done
