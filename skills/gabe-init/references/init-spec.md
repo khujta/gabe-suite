@@ -241,20 +241,16 @@ Template files can evolve with new columns. Existing `.kdbp/` files predating th
 
 | Target | Old shape | New shape | Detection |
 |--------|-----------|-----------|-----------|
-| `~/.claude/gabe-arch/STATE.md` | Missing | Present | File doesn't exist at `~/.claude/gabe-arch/STATE.md` |
-| `~/.claude/gabe-arch/HISTORY.md` | Missing | Present | File doesn't exist at `~/.claude/gabe-arch/HISTORY.md` |
+| _(gabe-arch state rows retired — skill archived 2026-07-15; see `skills/_archive/`)_ | | | |
 
 `.kdbp/KNOWLEDGE.md` is retired as of A2 KDBP-lite — no longer scaffolded, migrated, or scanned by `/gabe-init`. Legacy projects that already have one keep it untouched wherever it sits; `update` mode does not move, migrate, or delete it.
 
-**Procedure for ~/.claude/gabe-arch/ global state:**
+**~/.claude/gabe-arch/ global state — ARCHIVED (2026-07-15).** The lazy bootstrap is retired with
+the gabe-arch skill (`skills/_archive/`). Existing `~/.claude/gabe-arch/` user state is NEVER
+touched by any init mode — cross-project learning data survives decommission. Reinstatement
+restores the copy procedure (see the archive README).
 
-1. If `~/.claude/gabe-arch/` does not exist, create it: `mkdir -p ~/.claude/gabe-arch`
-2. If `~/.claude/gabe-arch/STATE.md` is missing, copy the template: `cp ~/.claude/templates/gabe/gabe-arch-STATE.md ~/.claude/gabe-arch/STATE.md`
-3. If `~/.claude/gabe-arch/HISTORY.md` is missing, copy the template: `cp ~/.claude/templates/gabe/gabe-arch-HISTORY.md ~/.claude/gabe-arch/HISTORY.md`
-4. These files are user-global (all projects share them), created lazily — never overwritten if already present.
-5. During `reset` mode, do NOT touch `~/.claude/gabe-arch/` — the user's cross-project learning state is never lost by a per-project reset.
-
-**No LLM calls during migration** — purely structural rewrite (template file copy for `~/.claude/gabe-arch/`).
+**No LLM calls during migration** — purely structural rewrite.
 
 ### Step 2: Check hooks
 
@@ -279,7 +275,7 @@ If all hooks present: "All 6 KDBP hooks installed."
 
 Ask: "Project type?"
 
-For ALL project types, create doc stubs if they don't already exist. **Every stub gets a standards-reference marker as the first non-heading line**, pointing to the `gabe-docs` skill so downstream edits (by humans or by `/gabe-teach` auto-append) follow the house style:
+For ALL project types, create doc stubs if they don't already exist. **Every stub gets a standards-reference marker as the first non-heading line**, pointing to the `gabe-docs` skill so downstream edits follow the house style:
 
 ```markdown
 <!-- Standards: see ~/.claude/skills/gabe-docs/SKILL.md (CommonMark + Mermaid + analogy-first) -->
@@ -289,7 +285,7 @@ For ALL project types, create doc stubs if they don't already exist. **Every stu
   - `docs/architecture.md` with headings: `# Architecture`, `## Data Model`, `## API Contracts`, `## API Endpoints`, `## Integrations`
   - `docs/AGENTS_USE.md` with headings: `# Agent Documentation`, `## Agent Design`, `## Tools`, `## Prompts`, `## Safety`, `## Context Engineering`
   - `docs/SCALING.md` with headings: `# Scaling`, `## Observability`
-  - `docs/architecture-patterns.md` — copy from `~/.claude/templates/gabe/architecture-patterns.md`. This is the project's "patterns we use and why" ledger; `/gabe-teach arch` auto-appends to it on concept verify (Step 9c.2).
+  - `docs/architecture-patterns.md` — copy from `~/.claude/templates/gabe/architecture-patterns.md`. This is the project's "patterns we use and why" ledger.
   - Add U4-U8 to project VALUES.md + show agent blueprint checklist (see below)
 
 - **Web app**:
@@ -346,10 +342,8 @@ Next steps:
   1. Add project-specific values to .kdbp/VALUES.md
   2. Run /gabe-plan to create your first plan
   3. Start building — hooks will checkpoint automatically at commit
-  4. Before your first /gabe-teach session, run /gabe-teach init-wells to define
      the architectural sections (gravity wells) topics will anchor to. The teach
      command also prompts for this automatically the first time it runs.
-  5. After commits/pushes, run /gabe-teach to stay architect-level current with changes
   6. Run /gabe-health anytime for codebase health check
   7. Customize .kdbp/DOCS.md if your project structure differs from the standard
 ```

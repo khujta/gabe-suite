@@ -424,7 +424,6 @@ Scope authoring complete.
 Next:
 - `/gabe-plan 1` — decompose Phase 1 into tasks
 - `/gabe-scope-change` — if anything needs adjusting (routes to -addition or -pivot)
-- `/gabe-teach scope` — learn the scope you just authored (future phase)
 
 **Checkpoint 8:** SCOPE.md frozen. Only `/gabe-scope-change` can modify it from here.
 
@@ -514,7 +513,6 @@ Accounting is observable-only: after every LLM call, count it (`llm_calls += 1`)
 
 - **`/gabe-plan <phase-id>`** is called AFTER `/gabe-scope` finalizes (Step 8 in next phase). Does not interact with in-progress scope sessions.
 - **`/gabe-align`, `/gabe-review`, `/gabe-commit`** read SCOPE.md — including its `## Phases` section — for drift detection. None write. `/gabe-commit` audit warns on direct edits (bypass of `-change`).
-- **`/gabe-teach`** (SCOPE mode, future Phase 7) re-reads sections for lessons.
 - **`/gabe-scope-change`** is the only write path post-finalize. Runs from any step — if invoked mid-session, tells user to finish or abort the in-progress session first.
 
 ---

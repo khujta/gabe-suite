@@ -167,14 +167,14 @@ The phase arc derived from §12 Requirements. Unnumbered by design — it sits b
 
 ### Phase Detail
 
-Each phase below is deep-linkable via `{#phase-N}` anchor. `/gabe-teach` SCOPE mode surfaces these on demand.
+Each phase below is deep-linkable via `{#phase-N}` anchor.
 
 #### Phase 1 — <name> {#phase-1}
 
 **Status:** pending
 **Goal:** <goal-backward observable user truth — "By end of this phase, a user can observe X">
 
-**Why (business intent):** <one paragraph explaining why this phase exists now in the arc; what would be broken or impossible without it. Read by `/gabe-teach` SCOPE mode.>
+**Why (business intent):** <one paragraph explaining why this phase exists now in the arc; what would be broken or impossible without it.>
 
 **Covers REQs:** [REQ-01](#req-01)
 **Depends-on:** —

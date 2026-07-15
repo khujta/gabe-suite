@@ -439,7 +439,7 @@ This step commits those writes automatically and returns the working tree to a c
 
 **What this replaces:** the previous behavior left these files dirty and the user had to remember to run `/gabe-commit` again for audit bookkeeping. This step removes that requirement entirely. `/gabe-push` finishes with a clean working tree.
 
-### Step 9: Suggest /gabe-teach (if applicable)
+### Step 9: RETIRED — was: suggest /gabe-teach (skill archived 2026-07-15; permanent no-op)
 
 (legacy — KNOWLEDGE.md is retired from the default KDBP inventory; this check no-ops when the file is absent)
 

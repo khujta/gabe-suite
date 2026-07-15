@@ -36,7 +36,7 @@ Tagged fences like ```bash, ```python, ```json, ```yaml, ```diff are **always** 
 | YAML / JSON / diff / SQL / code in any language | Keep fenced (prefer tagged fence) |
 | Mermaid diagram body | Keep fenced with ` ```mermaid ` — always code |
 
-Commands/skills that produce user-facing triage tables (`/gabe-commit`, `/gabe-commit docs-audit`, `/gabe-review`, `/gabe-teach`, `/gabe-assess`, `/gabe-roast`, `/gabe-push`) MUST apply this convention. A one-line inline reminder sits in each affected spec header.
+Commands/skills that produce user-facing triage tables (`/gabe-commit`, `/gabe-commit docs-audit`, `/gabe-review`, `/gabe-assess`, `/gabe-roast`, `/gabe-push`) MUST apply this convention. A one-line inline reminder sits in each affected spec header.
 
 ## Three load-bearing rules
 

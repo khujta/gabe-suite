@@ -35,8 +35,7 @@ Skills and hooks for understanding, reviewing, deciding, and shipping — with a
 | **Gabe Health** | `/gabe-health` | Codebase health — god files, churn hotspots, coupling, deferred items, maintenance |
 | **Gabe Help** | `/gabe-help` | Context-aware guide — scans environment, suggests the right tool |
 | **Gabe Mockup** | `/gabe-mockup` | UX/mockup execution — legacy HTML recipes plus React-first Storybook modes |
-| **Gabe Docs** | _(consulted)_ | Documentation house style — CommonMark, Mermaid library, per-well diagram recommendations (used by `/gabe-teach`, `/gabe-init`, `/gabe-commit`) |
-| **Gabe Arch** | _(consulted)_ | Architecture curriculum — concept library organized by tier × specialization (used by `/gabe-teach`) |
+| **Gabe Docs** | _(consulted)_ | Documentation house style — CommonMark, Mermaid library, per-well diagram recommendations (used by `/gabe-init`, `/gabe-commit`) |
 
 ### Command Surface (25 skills)
 
@@ -73,7 +72,6 @@ covers the full KDBP lifecycle from project init through ship:
 | `/gabe-scope-change` | Scope-change router. Classifies your intended change → routes to `-addition` or `-pivot` |
 | `/gabe-scope-addition` | Additive scope change — inserts new REQs / phases / refs without changing premise |
 | `/gabe-scope-pivot` | Scope pivot — direction change, archives v{N} and creates v{N+1} |
-| `/gabe-teach` | Human knowledge consolidation — renders lessons from recent commits with Socratic verification; runs stateless (no persistent topic tracking) unless a legacy `KNOWLEDGE.md` already exists |
 
 ### KDBP System
 

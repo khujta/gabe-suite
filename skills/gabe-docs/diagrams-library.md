@@ -1,6 +1,6 @@
 ---
 name: gabe-docs-diagrams-library
-description: "Rich Mermaid pattern library — 14 advanced diagrams with styling, subgraphs, multi-layer flows. Inspirational reference for /gabe-commit update-docs / upgrade-diagram and /gabe-teach diagram prompts. Not direct templates — pull styling ideas and composition patterns, then adapt to project context."
+description: "Rich Mermaid pattern library — 14 advanced diagrams with styling, subgraphs, multi-layer flows. Inspirational reference for /gabe-commit update-docs / upgrade-diagram (and the archived /gabe-teach's diagram prompts). Not direct templates — pull styling ideas and composition patterns, then adapt to project context."
 source: Brownbull visual architecture v0.3.0 (khujta_mem/.research/diagrams/DIAGRAMS.md)
 ---
 

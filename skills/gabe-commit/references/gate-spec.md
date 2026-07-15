@@ -9,7 +9,7 @@ Deterministic commit quality gate. Runs checks, shows findings, lets you act on 
 
 ## Gabe-Lens Output Rule
 
-The normal commit flow prints `**Gabe-Lens brief**`, the commit-shaped member of the shared output-only Gabe-Lens explanation family. It is never written to `.kdbp/PLAN.md`, `.kdbp/REVIEW.md`, `.kdbp/LEDGER.md`, `.kdbp/PENDING.md`, or docs, and it is only included in a commit body when the commit-message generator already owns that body. This is a command-time understanding aid; `/gabe-teach` remains the durable knowledge consolidation path.
+The normal commit flow prints `**Gabe-Lens brief**`, the commit-shaped member of the shared output-only Gabe-Lens explanation family. It is never written to `.kdbp/PLAN.md`, `.kdbp/REVIEW.md`, `.kdbp/LEDGER.md`, `.kdbp/PENDING.md`, or docs, and it is only included in a commit body when the commit-message generator already owns that body. This is a command-time understanding aid; the command-time briefs are the surviving explanation surface (`/gabe-teach` is archived).
 
 ## Procedure
 
@@ -283,14 +283,14 @@ If the commit went through `force-commit: <reason>` (Blocked-commit rule above),
    - If the user supplied the commit message, generate the visible brief from the final commit subject plus the committed diff/changed-file list. Do not amend the commit, rewrite the commit body, or ask for another message.
    - Every commit gets a brief. Use a light physical analogy only for conceptual changes (new pattern, abstraction, architecture, or workflow boundary). For mechanical changes, use direct plain-language mapping.
    - Do not write this brief to `.kdbp/LEDGER.md`, `.kdbp/PENDING.md`, docs, or any other persistence target. Only reuse it in the commit body when the generated commit-message path already produced that body.
-   - This brief does not replace `/gabe-teach`; it is a command-time understanding aid, while `/gabe-teach` remains the durable knowledge consolidation path.
+   - This brief does not replace `/gabe-teach`; it is a command-time understanding aid, while the command-time briefs are the surviving explanation surface (`/gabe-teach` is archived).
 
 6. (legacy — KNOWLEDGE.md is retired from the default KDBP inventory; these checks no-op when it is absent) If `.kdbp/KNOWLEDGE.md` exists, suggest `/gabe-teach` when the commit likely introduces new topics. Heuristic (deterministic, zero cost):
    - Commit message starts with `feat:` or `refactor:` → suggest
    - Commit added new file(s) in a new folder → suggest
    - Commit modified `.kdbp/DECISIONS.md` → suggest
    - Otherwise: skip suggestion
-   - Message: `ℹ New topics likely introduced. Run /gabe-teach topics to consolidate understanding.`
+   - Message: retired (gabe-teach archived) — print nothing.
 
 7. **Auto-tick Commit column in PLAN.md** (never silent: on mismatch print `ℹ PLAN: commit tick skipped (no-plan | phase-not-found | legacy-format | column-missing | footer-mismatch)` — one line, non-blocking). Only runs when the `git commit` in step 6.2 returned 0.
    - Follow the shared procedure documented in `/gabe-plan` under "Shared: auto-tick phase column" — including its precondition 5 (footer cross-check) and its step 4b, which also mirrors the tick into `.kdbp/PLAN.json`; this command does not restate that logic

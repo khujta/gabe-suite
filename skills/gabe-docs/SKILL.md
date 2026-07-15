@@ -1,6 +1,6 @@
 ---
 name: gabe-docs
-description: "Documentation standards for gabe-generated docs. CommonMark compliance, Mermaid diagram selection, analogy-first openers, per-well diagram recommendations. Consulted by /gabe-teach (stub scaffolding, topic auto-append), /gabe-init (doc stubs), and /gabe-commit (drift check)."
+description: "Documentation standards for gabe-generated docs. CommonMark compliance, Mermaid diagram selection, analogy-first openers, per-well diagram recommendations. Consulted by /gabe-init (doc stubs) and /gabe-commit (drift check)."
 when_to_use: "Background standards consulted by other gabe skills — doc structure standards, Mermaid diagram selection, and the suite execution contract (references/execution-contract.md). Not a user-facing command."
 user-invocable: false
 metadata:
@@ -17,7 +17,7 @@ This skill runs under the suite execution contract — E1 EVIDENCE · E2 RUN-BEF
 
 The house style for every markdown file the Gabe Suite creates or touches — distilled from BMAD tech-writer standards plus Gabe-Suite-specific conventions (analogy-first openers, per-well diagram recommendations).
 
-This is a **background standards skill**, not a user-facing command. It is consulted by `/gabe-teach` (well-doc stub scaffolding, topic auto-append), `/gabe-init` (doc stubs at project scaffold time), and `/gabe-commit docs-audit` (drift + diagram-staleness checks) — and by any gabe skill that renders spec-meta output templates at runtime.
+This is a **background standards skill**, not a user-facing command. It is consulted by `/gabe-init` (doc stubs at project scaffold time) and `/gabe-commit docs-audit` (drift + diagram-staleness checks) — and by any gabe skill that renders spec-meta output templates at runtime.
 
 ## References this skill owns
 
@@ -30,7 +30,6 @@ Not directly invoked by a user. Consumers read this skill's standards at the poi
 
 | Consumer | When it reads this skill |
 |---|---|
-| `/gabe-teach` | Well-doc stub scaffolding (`init-wells`); auto-append after topic verification; diagram-upgrade offers |
 | `/gabe-init` | Doc stub creation at project scaffold time |
 | `/gabe-commit docs-audit` | CommonMark/diagram drift checks against these standards |
 | Any gabe skill producing user-facing tables/prompts | The runtime output rendering convention (bare-fence vs tagged-fence) |

@@ -13,7 +13,7 @@ Executes phase tasks from `.kdbp/PLAN.md`. Complements `/gabe-plan` (write plan)
 
 ## Gabe-Lens Output Rule
 
-`**Gabe-Lens block**` is an output-only command-time explanation. It is never written to `.kdbp/PLAN.md`, `.kdbp/REVIEW.md`, `.kdbp/LEDGER.md`, `.kdbp/PENDING.md`, commits, or docs unless another command already owns that write. These blocks help the user understand the current command result; `/gabe-teach` remains the durable knowledge consolidation path.
+`**Gabe-Lens block**` is an output-only command-time explanation. It is never written to `.kdbp/PLAN.md`, `.kdbp/REVIEW.md`, `.kdbp/LEDGER.md`, `.kdbp/PENDING.md`, commits, or docs unless another command already owns that write. These blocks help the user understand the current command result; the command-time briefs are the surviving explanation surface (`/gabe-teach` is archived — `skills/_archive/`).
 
 `**Gabe-Lens brief — Platform progress**` follows the same output-only rule. It is the plain-language capability delta for `/gabe-execute`: what changed in the platform, what is newly possible now, and what remains blocked or deferred.
 
@@ -274,7 +274,7 @@ Not supported mid-phase. Orphaned higher-tier patterns would require manual clea
 
 ### Step 4.5: Commit (when user picks `commit` or `--auto-commit` active):
 
-   **MUST invoke `/gabe-commit` inline.** Raw `git commit` / `git commit -m` at this step is prohibited. `/gabe-commit` is the sole owner of CHECK 6 (deferred), CHECK 7 (doc drift), CHECK 8 (structure), the per-commit LEDGER thin-index row (findings/deferred/size-budget), PENDING.md updates, the `/gabe-teach topics` suggestion (Step 6.5), and the auto-tick of the `Commit` column (Step 6.6). Bypassing it silently drops all six responsibilities — the observed failure mode being: `Exec=✅` yet `Commit=⬜`, no findings row in LEDGER, no teach trigger, and `docs/AGENTS_USE.md` / `docs/wells/*.md` drift uncaught.
+   **MUST invoke `/gabe-commit` inline.** Raw `git commit` / `git commit -m` at this step is prohibited. `/gabe-commit` is the sole owner of CHECK 6 (deferred), CHECK 7 (doc drift), CHECK 8 (structure), the per-commit LEDGER thin-index row (findings/deferred/size-budget), PENDING.md updates, and the auto-tick of the `Commit` column (Step 6.6). Bypassing it silently drops all six responsibilities — the observed failure mode being: `Exec=✅` yet `Commit=⬜`, no findings row in LEDGER, no teach trigger, and `docs/AGENTS_USE.md` / `docs/wells/*.md` drift uncaught.
 
    Procedure:
 
@@ -442,7 +442,7 @@ When last task T_K commits successfully:
    - Explain what was implemented in the phase, how the changed pieces now connect, and why the next route is review.
    - Base the block only on the completed phase, task/commit summary, changed-file categories, verification outcomes, deviations, and current PLAN state.
    - Keep the block output-only per the Gabe-Lens Output Rule. Do not append it to PLAN, LEDGER, PENDING, REVIEW, commits, or docs.
-9. **Teach nudge (phase-level).** Deterministic heuristic, zero LLM cost. Suggest `/gabe-teach topics` before `/gabe-next` if ANY of:
+9. **Teach nudge (phase-level) — RETIRED** (gabe-teach archived 2026-07-15; `skills/_archive/`). Formerly: suggest `/gabe-teach topics` before `/gabe-next` if ANY of:
    - Phase added ≥2 new files in a new folder (matches `/gabe-commit` Step 6.5 trigger at phase scope)
    - Phase introduced new top-level imports in changed files (e.g. `pydantic-ai`, `langchain`, `ai-sdk`, auth libs — any dep not present before the phase)
    - Phase modified `.kdbp/DECISIONS.md`
@@ -450,7 +450,7 @@ When last task T_K commits successfully:
 
    If triggered, print (one line):
    ```
-   ℹ Phase N introduced new architectural concepts. Run /gabe-teach before /gabe-next to consolidate them.
+   (retired output — no nudge is printed)
    ```
    This is a redundant safety net — per-commit `/gabe-commit` Step 6.5 already suggests teach, but scroll-loss in bulk commits can lose it.
 10. If scope arg was `all` → advance Current Phase to N+1 and re-enter Step 1. Else → print final route and exit:
@@ -495,7 +495,7 @@ Per U8 (Measure the Machine): folded into the Step 7 phase-completion LEDGER thi
 - Does NOT replace `/gabe-commit` — it invokes it
 - Does NOT replace `/gabe-review` — surfaces findings via `/gabe-commit` which already runs deterministic checks
 - Does NOT auto-push — that's `/gabe-push`
-- Does NOT write architectural docs — `/gabe-teach` handles architect-level consolidation post-commit
+- Does NOT write architectural docs (architect-level consolidation is archived with gabe-teach)
 
 ## Example session
 

@@ -128,7 +128,6 @@ The Gabe Suite — 22 command wrappers, 12 skills:
 | gabe-scope-addition | /gabe-scope-addition | Additive scope evolution |
 | gabe-scope-change | /gabe-scope-change | Route a scope change to addition or pivot |
 | gabe-scope-pivot | /gabe-scope-pivot | Direction-changing scope rewrite |
-| gabe-teach | /gabe-teach | Consolidate architect-level knowledge |
 ```
 
 Installed workflow docs:
@@ -138,4 +137,4 @@ Installed workflow docs:
 - `docs/workflows/brownfield.md` — existing codebase adoption.
 - `docs/suite-state-audit.md` — current inventory, install state, and known gaps.
 
-Skills installed behind those commands: `gabe-align`, `gabe-arch`, `gabe-assess`, `gabe-debt`, `gabe-docs`, `gabe-health`, `gabe-help`, `gabe-lens`, `gabe-mockup`, `gabe-myopic`, `gabe-review`, `gabe-roast`.
+Skills installed behind those commands: `gabe-align`, `gabe-assess`, `gabe-debt`, `gabe-docs`, `gabe-health`, `gabe-help`, `gabe-lens`, `gabe-mockup`, `gabe-myopic`, `gabe-review`, `gabe-roast`. (Archived, not installed: `gabe-teach`, `gabe-arch` — `skills/_archive/`.)

@@ -57,7 +57,7 @@ git rev-list --count HEAD..@{u} 2>/dev/null   # commits behind (drift)
 Record: branch, HEAD sha + subject, uncommitted/untracked files, unpushed commit count, upstream drift.
 
 **KDBP state (read):**
-- `.kdbp/PLAN.md` — `## Current Phase` pointer + the `## Phases` table (columns `# | Phase | Description | Tier | Complexity | Exec | Review | Commit | Push`, plus an optional `Center` column in command-center projects; symbols ⬜ not started · 🔄 in progress · ✅ complete). Identify the active phase row(s) touched this session.
+- `.kdbp/PLAN.md` — `## Current Phase` pointer + the `## Phases` table (columns `# | Phase | Description | Tier | Complexity | Exec | Review | Commit | Push`, plus optional `Red` (TDD projects, before Exec) and `Center` (command-center projects) columns; symbols ⬜ not started · 🔄 in progress · ✅ complete). Identify the active phase row(s) touched this session.
 - `.kdbp/PENDING.md` — open deferred items (table; `Status != resolved/closed`).
 - `.kdbp/LEDGER.md` — the most recent row (for continuity + to avoid duplicating).
 - `.kdbp/SCOPE.md` `## Phases` (if present) — the larger arc the session sits inside. (Pre-A2 projects that still carry a separate `.kdbp/ROADMAP.md` — or its archived copy under `.kdbp/archive/retired/` — read the same field there.)
@@ -192,7 +192,7 @@ Print, in order:
 - Does NOT fabricate PLAN ✅ without evidence. A cell with no supporting citation is left untouched and noted.
 - Does NOT write a per-session `docs/*-HANDOFF.md`. The durable record is PLAN/LEDGER/PENDING; the ephemeral resume vehicle is the singleton `.kdbp/HANDOFF.md` + the printed prompt.
 - Does NOT replace the automatic `ECC:SUMMARY` (session-end hook). It supersedes it in fidelity; both can coexist.
-- Does NOT modify VALUES.md, DECISIONS.md, or hooks. (Recording a *decision* is `/gabe-teach` / a DECISIONS edit; handoff only points at in-flight work.)
+- Does NOT modify VALUES.md, DECISIONS.md, or hooks. (Recording a *decision* is a DECISIONS edit; handoff only points at in-flight work.)
 
 ## Integration
 

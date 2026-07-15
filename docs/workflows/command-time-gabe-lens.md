@@ -4,4 +4,4 @@
 
 These sections are understanding aids for the current command run. They are not persisted to `PLAN.md`, `REVIEW.md`, `LEDGER.md`, `PENDING.md`, commits, or docs unless another command already owns that write.
 
-`/gabe-teach` remains the durable knowledge consolidation path. The command-time blocks explain what just happened or what the plan is about to build; `/gabe-teach` turns repeated or architectural concepts into lasting KDBP knowledge.
+the command-time briefs are the surviving explanation surface (`/gabe-teach` is archived — `skills/_archive/`). The command-time blocks explain what just happened or what the plan is about to build; `/gabe-teach` turns repeated or architectural concepts into lasting KDBP knowledge.

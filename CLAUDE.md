@@ -50,12 +50,11 @@ There is no `commands/` directory: it was retired in the B2 skills-only migratio
 - Architecture Principles AP1–AP13 live in `templates/architecture-principles.md` and are advisory context for `/gabe-align`, `/gabe-debt`, and `/gabe-review`.
 - Suite changes land in the REPO first; installs regenerate via `./install.sh`; `scripts/suite-doctor.sh` makes drift visible. Never patch `~/.claude` in place.
 
-## Capabilities (30 skills)
+## Capabilities (28 skills)
 
 | Skill | Version | Purpose |
 |---|---|---|
 | **gabe-align** | 1.1.1 | Alignment guardian — shallow/standard/deep values and AP advisory checks |
-| **gabe-arch** | 1.1.1 | Architecture curriculum layer used by `/gabe-teach` (background; not user-invocable) |
 | **gabe-assess** | 1.1.1 | Rapid change impact assessment: blast radius, maturity scope, prerequisites |
 | **gabe-commit** | 2.2.0 | Commit quality gate — deterministic checks incl. size-budget, triage, simplify tier, docs-audit; optional results_out digest (reports every tier, gates none) |
 | **gabe-debt** | 1.1.1 | Architecture decision-debt scanner with AP evidence citations (fork/read-only) |
@@ -82,8 +81,14 @@ There is no `commands/` directory: it was retired in the B2 skills-only migratio
 | **gabe-scope-addition** | 2.1.0 | Additive scope evolution (routed from /gabe-scope-change) |
 | **gabe-scope-change** | 2.1.0 | Scope-change router — pivot vs addition classifier |
 | **gabe-scope-pivot** | 2.1.0 | Direction-change scope rewrite (human/router-initiated only) |
-| **gabe-teach** | 2.0.1 | Human knowledge consolidation — lessons from commits under gravity wells |
 | **gabe-walk** | 1.0.0 | Record a human walking the build — who·when·result·evidence appended to walks.jsonl; records never judges; NEVER-walked renders red until walked |
+
+## Archived skills
+
+Decommissioned-not-deleted skills live in `skills/_archive/` (outside the install/doctor glob) with a
+README covering why + how to reinstate. Currently: **gabe-teach** + **gabe-arch** (archived 2026-07-15 —
+2,740 lines serving ~2 observed uses; trim-matrix audit). `~/.claude/gabe-arch/` user state is never
+touched by decommission.
 
 ## Workflow Docs
 

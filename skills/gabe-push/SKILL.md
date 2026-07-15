@@ -34,7 +34,7 @@ Env-aware shipping. One command pushes local work to the configured target env, 
    - **Step 7.5 / 7.5b** — append a row to `.kdbp/DEPLOYMENTS.md` (deterministic aggregation, zero LLM) and run the operational-decision classifier (Haiku, trigger-gated on CI-config/infra/deploy-config changes, rollback commits, trunk-first pushes, skipped promotions) with interactive triage.
    - **Step 8** — record to `.kdbp/LEDGER.md`.
    - **Step 8.5** — auto-commit post-push bookkeeping (PUSH.md/DEPLOYMENTS.md/LEDGER.md/DECISIONS.md/PENDING.md writes) as a local, unpushed commit through the normal hook chain — never `git add -A`, never a hook bypass.
-   - **Step 9** — non-blocking suggestion to run `/gabe-teach topics` when KNOWLEDGE.md has ≥2 pending topics (legacy — KNOWLEDGE.md is retired from the default KDBP inventory; no-ops when the file is absent).
+   - **Step 9** — retired (was a legacy `/gabe-teach topics` suggestion; the skill is archived and KNOWLEDGE.md left the default inventory — always a no-op now).
    - **Step 10** — auto-tick the `Push` column in PLAN.md via the shared auto-tick helper (`/gabe-plan`'s "Shared: auto-tick phase column"), only when push succeeded, CI is green, the env is the configured final environment, and promotion reached the final link; prints the decision record before ticking or skipping.
    - **Step 10.5** — branch cleanup prompt (delete/keep/always/never) after a successful push, skipped for promotion pushes and direct-to-target pushes.
 

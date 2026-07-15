@@ -433,7 +433,7 @@ Topics whose verified material may no longer match the code:
   T5 — Why 202 Accepted + BackgroundTask (well G3, verified 2026-04-10)
        Changed since verification: app/api/main.py, app/api/tasks.py
 
-  [mark-stale]  Flag these topics `stale` in KNOWLEDGE.md (re-surface in /gabe-teach)
+  [mark-stale]  Flag these topics `stale` in KNOWLEDGE.md (legacy file; /gabe-teach is archived)
   [skip]        Ignore this session
 ```
 
@@ -636,7 +636,7 @@ Block focus:
 - If there are no findings, map the validated coverage to reduced risk instead of inventing concerns.
 - Tie the signal to the verdict/confidence: why APPROVE, WARNING, or BLOCK follows from the evidence.
 
-Persistence rule: this block is output-only. Do not write it to `.kdbp/REVIEW.md`, `.kdbp/PLAN.md`, `.kdbp/LEDGER.md`, `.kdbp/PENDING.md`, commits, or docs. It is a command-time understanding aid; `/gabe-teach` remains the durable knowledge consolidation path.
+Persistence rule: this block is output-only. Do not write it to `.kdbp/REVIEW.md`, `.kdbp/PLAN.md`, `.kdbp/LEDGER.md`, `.kdbp/PENDING.md`, commits, or docs. It is a command-time understanding aid; the command-time briefs are the surviving explanation surface (`/gabe-teach` is archived — `skills/_archive/`).
 
 ### Step 5: Triage
 

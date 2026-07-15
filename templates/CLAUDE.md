@@ -34,7 +34,6 @@ Maturity: **{MATURITY}** · Stack: {TECH}
 | `/gabe-review` | Risk-priced code review with triage + confidence |
 | `/gabe-commit` | Commit quality gate — **never use raw `git commit`** |
 | `/gabe-push` | Push + PR + CI watch + branch promotion |
-| `/gabe-teach` | Consolidate architect-level understanding post-commit |
 
 ### Invariants
 
@@ -42,8 +41,7 @@ Maturity: **{MATURITY}** · Stack: {TECH}
 2. **PLAN before code.** Check `.kdbp/PLAN.md` phase state (✅/⬜/🔄) before implementing — `/gabe-execute` enforces the Commit-column invariant.
 3. **STRUCTURE before placement.** New files must match a pattern in `.kdbp/STRUCTURE.md` — PostToolUse hook warns on drift.
 4. **VALUES override defaults.** Project `.kdbp/VALUES.md` + user `~/.kdbp/VALUES.md` outrank model priors.
-5. **Verified topics trump re-derivation.** If a topic has already been verified via `/gabe-teach`, honor that explanation rather than re-explaining from scratch.
-6. **Orchestration restraint:** before any multi-agent design/mockup fan-out, run the premise past the human with ONE cheap single-agent spike — orchestrate to verify, not to generate taste.
+5. **Orchestration restraint:** before any multi-agent design/mockup fan-out, run the premise past the human with ONE cheap single-agent spike — orchestrate to verify, not to generate taste.
 
 ### Full reference
 
