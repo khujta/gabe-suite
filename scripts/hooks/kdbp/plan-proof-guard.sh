@@ -30,41 +30,57 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 
 viol=$(python3 - <<'PY' 2>/dev/null
-import glob as globmod, json, os, re, subprocess, sys
+import collections, glob as globmod, json, os, re, subprocess, sys
 
 MAX_BRACE = 256  # expansion cap — a runaway brace product must not hang past the hook timeout
 
 def brace_expand(tok):
-    done, work = [], [tok]
+    # FIFO (breadth-first): on a cap-trip the leftovers are evenly partially-expanded, so
+    # their brace-free prefixes are deep enough for a fair per-candidate parent probe
+    done, work = [], collections.deque([tok])
     while work and len(done) + len(work) <= MAX_BRACE:
-        t = work.pop()
+        t = work.popleft()
         m = re.search(r"\{([^{}]*)\}", t)
         if not m:
             done.append(t)
             continue
         head, tail = t[: m.start()], t[m.end():]
         work.extend(head + part + tail for part in m.group(1).split(","))
-    return done + work  # cap hit → partial expansion; fine for an existence probe
+    return done + list(work)  # cap hit → partial expansion; prefixes still probeable
 
 def concrete_parent(tok):
-    # deepest brace/glob-free leading directory — a cap-tripped multi-brace token still gets a
-    # fair non-empty-parent probe (dirname of the raw token would still contain the braces)
+    # deepest brace/glob-free leading directory of THIS candidate
     prefix = re.split(r"[*?\[\]{]", tok)[0]
     parent = prefix if prefix.endswith("/") else os.path.dirname(prefix)
     return parent.rstrip("/")
 
 def evidence_exists(tok):
-    # R2: literal path → brace-expanded glob → non-empty concrete parent dir (human shorthand
-    # tolerated; a missing or empty evidence dir still fails). Reject tokens with no concrete
-    # path component first — a bare */**/{..} matches everything and proves nothing.
+    # R2: literal path → brace-expanded glob → non-empty parent dir (human shorthand tolerated;
+    # a missing or empty evidence dir still fails). Two rules keep the leniency honest:
+    #  · a token with no concrete path component (bare */**/{,}) is never evidence;
+    #  · the parent probe is PER-CANDIDATE — a mid-path brace whose alternatives don't exist
+    #    must NOT pass off an unrelated shared ancestor (docs/{a,b}/x.png needs docs/a or
+    #    docs/b to be real, not merely a non-empty docs/).
     if os.path.exists(tok):
         return True
     if not re.sub(r"[*?\[\]{},]|\.\.|/|\.", "", tok).strip():
         return False
+    magic_in_dir = bool(re.search(r"[*?\[\]{]", tok.rpartition("/")[0]))
     for cand in brace_expand(tok):
-        if globmod.glob(cand):
+        if "{" in cand:  # cap leftover — probe its (now deeper) brace-free parent
+            p = concrete_parent(cand)
+            if p and os.path.isdir(p) and os.listdir(p):
+                return True
+        elif globmod.glob(cand):
             return True
-    parent = concrete_parent(tok)
+        elif magic_in_dir:
+            # fully-expanded candidate with a concrete dir: its OWN parent may vouch for it
+            p = os.path.dirname(cand)
+            if p and not re.search(r"[*?\[\]]", p) and os.path.isdir(p) and os.listdir(p):
+                return True
+    if magic_in_dir:
+        return False  # no alternative's own directory is real — ancestors prove nothing
+    parent = tok.rpartition("/")[0]
     return bool(parent) and os.path.isdir(parent) and bool(os.listdir(parent))
 
 try:

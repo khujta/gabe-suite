@@ -76,7 +76,7 @@ they explain most of the design:
 | 9 | Center | `/gabe-feature <phase>` | the per-feature translation + test-strategy audit | card · curated proof · REVIEWED stamp → Center ✅ | **extended-shrunk:** verdicts RENDERED from review triage; identity from C-ids (path globs retire) |
 | 10 | Release | `/gabe-feature release` | — none (that's the finding: it's a MODE, not a beat) | stakeholder showcase (shots + diagrams; video = named gap, D3) | **new mode**; trigger = terminal-env promotion, derived |
 | 11 | Router | `/gabe-next` | zero-logic dispatch over PLAN cells | — | **extended:** red-before-execute as a machine predicate; optional `red` cell like `center` |
-| — | Advisors | align · assess · debt · health · myopic · roast (+lens/meme/quip/mockup/init/handoff) | quality judgment / design / birth / resume | — | unchanged (outside the beat loop) |
+| — | Advisors | align · assess · debt · health · myopic · roast (+lens/meme/quip/mockup/init/adopt/handoff) | quality judgment / design / birth / adoption / resume | — | unchanged (outside the beat loop) |
 
 **`/gabe-red` essentials** (full brief: [`gabe-red-design.html`](gabe-red-design.html)):
 - Deliverable = **a commit whose declared cases fail by assertion** (`RED:` trailer). Red isn't
@@ -163,7 +163,7 @@ under negative controls) — its two prototyped tools ship in the suite
 | # | Ruling |
 |---|--------|
 | R1 | **Red-column retrofits seed honestly.** Adding `Red` to an existing plan seeds ⬜ only where Exec is ⬜; ✅ **and 🔄** rows render `—` and the mirror OMITS the `red` key. Verified: an omitted key settles in `next.mjs`; ⬜ on a shipped row re-opens it and demands a fake red; ✅ is guard-blocked. *(Amended by the round-3 literal-executor review: an in-progress phase has already passed red's before-first-source-write moment — seeding it ⬜ only defers the fake-red demand to the debt sweep one phase later.)* |
-| R2 | **The guard tolerates evidence shorthand.** A proof token passes by literal path, brace-expanded glob, or non-empty parent dir; empty/missing dirs still block. Both twins' first PLAN writes would otherwise have been false-positive-blocked (`01..06-*.png` / `{…}.png` tokens). The two live shorthand strings still get normalized in slice-5 chunk 0 (hygiene). |
+| R2 | **The guard tolerates evidence shorthand.** A proof token passes by literal path, brace-expanded glob, or non-empty parent dir; empty/missing dirs still block. Two honesty rules bound the leniency (round-3/5 hardening): a pure-wildcard token (no concrete path component — bare `*`, `../../**`) is never evidence, and the parent-dir probe is per-candidate (a mid-path brace whose alternatives don't exist cannot pass off an unrelated ancestor). Both twins' first PLAN writes would otherwise have been false-positive-blocked (`01..06-*.png` / `{…}.png` tokens). The two live shorthand strings still get normalized in slice-5 chunk 0 (hygiene). |
 | R3 | **`C` belongs to cases; scenario labels take `M`.** Sweeps use the anchored token pattern (bare `C[0-9]+` over-matches — `RFC1234` → C1235) and rename colliding label families in the same commit: gustify's myopic C1–C11 → M1–M11 + its PLAN "C4" reference. gabe-myopic labels findings `M[N]` from now on. |
 | R4 | **`results_out` is a path or a LIST** (one report per corpus); digest per entry; a report the run didn't refresh is named `stale`, never digested as current; a gitignored reports dir gets a `!*.digest.json` negation (gustify) rather than un-ignoring junit. |
 | R5 | **Ever-red ships with the rebuilt center, not as a patch.** Slice-5 chunk 3's promise reduces to junit names + `Cases:` record + `RED:` trailer; ever-red rendering lands in `/gabe-adopt`'s suite-owned generator templates — the n=2→3 generator-promotion moment §5 already flagged as ripe. |
@@ -190,8 +190,10 @@ Suite-first (this repo), install regenerates `~/.claude`, doctor must be CLEAN p
      (concrete dir + strippable annotation: `proof/<dir> (N shots, …)`) · retrofit BEHAVIOR.md
      to the D4 template shape (`## Verify Commands` + `results_out` list; legacy B-rules kept as
      a trailing section, legacy frontmatter dropped; gustify's pass adds the `!*.digest.json`
-     negation). TWO OPERATOR INPUTS here: author the real Verify Commands (gates never guess),
-     and resolve gastify's `project_type: mockup` (BEHAVIOR) vs `code` (PLAN) contradiction ·
+     negation). THREE OPERATOR INPUTS here: author the real Verify Commands (gates never
+     guess) · resolve gastify's `project_type: mockup` (BEHAVIOR) vs `code` (PLAN) contradiction ·
+     reconcile gastify's five over-ticked table rows (12, 13, 25, 30, 31 — table says ✅ where
+     the mirror + column-debt prose say todo) BEFORE regenerating, or the debt signal is erased ·
      THEN wire the 6th hook marker via `/gabe-init update` — the guard goes live globally only
      after the state is honest.
    - chunk 1: C-id backfill sweep — the tested tool ships at `gabe-red/scripts/backfill-sweep.py`

@@ -28,6 +28,7 @@ gabe-suite/                   # current local folder: gabe_lens/ (rename deferre
   prompts/*.md                # /gabe-scope prompt library
   schemas/*.json              # JSON Schemas for scope-session + scope-references
   scripts/suite-doctor.sh     # drift check: repo vs ~/.claude
+  tests/hooks/run.sh          # hook/router fixture harness — run after ANY enforcement-layer edit
   assets/                     # Images for README
   docs/                       # User docs (start at docs/WORKFLOW.md)
   README.md                   # Public-facing documentation
@@ -72,10 +73,10 @@ There is no `commands/` directory: it was retired in the B2 skills-only migratio
 | **gabe-mockup** | 2.1.0 | The lift SOP (L0–L4) over a per-project mockup manifest; Storybook + legacy HTML modes |
 | **gabe-myopic** | 1.2.0 | Short-sighted-user walkthrough — foresight traps, overwhelm, recall, no-undo (fork); findings labeled M[N], never C[N] |
 | **gabe-next** | 2.4.1 | Zero-logic lifecycle router over PLAN.md state — optional `Red` (routes /gabe-red BEFORE Exec) → Exec→Review→Commit→Push + optional `Center` (routes /gabe-feature) |
-| **gabe-plan** | 2.5.0 | KDBP planning + per-phase tier decision (MVP/enterprise/scale); `proof_type` (test|visual|journey) declared at plan time; optional `Red`/`Center` columns (Red retrofits seed ⬜ only where Exec is ⬜) |
+| **gabe-plan** | 2.5.1 | KDBP planning + per-phase tier decision (MVP/enterprise/scale); `proof_type` (test|visual|journey) declared at plan time; optional `Red`/`Center` columns (Red retrofits seed ⬜ only where Exec is ⬜) |
 | **gabe-push** | 2.2.0 | Push, PR, CI watch, promotion — env-aware shipping via `.kdbp/PUSH.md`; terminal-env ship prints the /gabe-feature release pointer |
 | **gabe-quip** | 1.1.0 | Sarcastic wit for human-facing HTML surfaces — titles/hooks/callouts surfacing pain points; one engagement lever, proposes not rewrites, dosed (sibling of gabe-meme) |
-| **gabe-red** | 1.3.0 | TDD's first half as a beat — inspect the corpus, declare cases (C-ids in test names, corpus = registry), prove RED by assertion, commit the red checkpoint; GUARDs for refactors, enumerated skips |
+| **gabe-red** | 1.3.1 | TDD's first half as a beat — inspect the corpus, declare cases (C-ids in test names, corpus = registry), prove RED by assertion, commit the red checkpoint; GUARDs for refactors, enumerated skips |
 | **gabe-review** | 1.7.0 | Code review — risk pricing, confidence scoring, plan alignment, triage; case-estate subjects (NEW CASE/BUMP/DRIFT, reserved C-ids) + absent-angle GROWTH triage (cap 7) on the same pricing |
 | **gabe-roast** | 1.1.0 | Adversarial gap review from a required perspective (fork/read-only) |
 | **gabe-scope** | 2.1.0 | Scope authoring — SCOPE.md (stable premise + §Phases arc) for a new project |

@@ -26,16 +26,26 @@ Runbook (rehearsed end-to-end on a synthetic twin, 2026-07-15):
      ride its own commit);
   4. re-run the sweep (must print stamped=0) — idempotency is the regression check.
 Known limits (pre-scan the corpus for these BEFORE the real run): no it.each/test.each/
-describe.each handling, no template-literal titles, no pytest parametrize-id special cases.
+describe.each handling, no template-literal (backtick) titles, no pytest parametrize-id special
+cases. H-family scenario labels (e.g. "H11 · …") are NOT renamed — they get a dual-token title
+("C415 · H11 · …") like any other stamp, which is the ruled dual-token form. Allocation reads
+full file text by spec (corpus = registry), so data/comment C-tokens inflate the start id —
+harmless burn, note it in the sweep commit.
 """
 import re
 import sys
 from pathlib import Path
 
 ANCHORED = re.compile(r"(?<![A-Za-z0-9])C([0-9]{1,5})(?![0-9])")
-PY_DEF = re.compile(r"^(?P<indent>\s*)def (?P<name>test_[A-Za-z0-9_]+)\(", re.M)
-# vitest/jest test title openers: it("...  it('...  test("...  (each/skip not in scope: prototype)
-TS_TITLE = re.compile(r"(?P<callq>\b(?:it|test)\(\s*(?P<q>[\"']))(?P<title>(?:[^\"'\\]|\\.)*?)(?P=q)")
+# `async def test_` is 58%+ of a modern pytest corpus (gastify: 616/1061) — capture and keep it
+PY_DEF = re.compile(r"^(?P<indent>\s*)(?P<a>async\s+)?def (?P<name>test_[A-Za-z0-9_]+)\(", re.M)
+# vitest/jest test title openers: it("...  it('...  test("...  — the title class excludes only
+# the DELIMITING quote, so contractions/apostrophes inside double quotes match (real corpora:
+# 97 such titles across the twins). Backtick titles + .each remain known manual follow-ups.
+TS_TITLE = re.compile(r"(?P<callq>\b(?:it|test)\(\s*(?P<q>[\"']))(?P<title>(?:\\.|(?!(?P=q))[^\\])*?)(?P=q)")
+# already-id'd checks are POSITION-anchored — a mid-title reference like "(C3)" is not an id
+PY_HAS_ID = re.compile(r"_C[0-9]{1,5}(v[0-9]+)?$")
+TS_HAS_ID = re.compile(r"^C[0-9]{1,5}(v[0-9]+)? ·")
 
 PY_GLOBS = ("test_*.py", "*_test.py")
 TS_GLOBS = ("*.test.ts", "*.test.tsx", "*.spec.ts", "*.spec.tsx")
@@ -105,13 +115,13 @@ def main():
 
         def sub_py(m):
             nonlocal counter, skipped
-            if ANCHORED.search(m.group("name")):
+            if PY_HAS_ID.search(m.group("name")):
                 skipped += 1
                 return m.group(0)
             cid = f"C{counter}"
             counter += 1
             stamped.append((str(f), f"{m.group('name')} -> {m.group('name')}_{cid}"))
-            return f"{m.group('indent')}def {m.group('name')}_{cid}("
+            return f"{m.group('indent')}{m.group('a') or ''}def {m.group('name')}_{cid}("
 
         new = PY_DEF.sub(sub_py, text)
         if new != text:
@@ -122,7 +132,7 @@ def main():
 
         def sub_ts(m):
             nonlocal counter, skipped
-            if ANCHORED.search(m.group("title")):
+            if TS_HAS_ID.match(m.group("title")):
                 skipped += 1
                 return m.group(0)
             cid = f"C{counter}"
