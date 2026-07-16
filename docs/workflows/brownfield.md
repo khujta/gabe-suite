@@ -19,7 +19,7 @@ flowchart TD
     Scope --> Plan["/gabe-plan"]
 ```
 
-This is a guide-only workflow. There is no dedicated `/gabe-adopt` command yet.
+This guide covers KDBP adoption (init/scope/plan). For adopting the **Testing Command Center** into an existing codebase — archiving legacy docs, bootstrapping the center, and ingesting the back-catalog one approved section at a time — the dedicated command is `/gabe-adopt`.
 
 ## Step 1 - Inventory Without Writing
 

@@ -46,6 +46,7 @@ covers the full KDBP lifecycle from project init through ship:
 
 | Command | What it does |
 |---|---|
+| `/gabe-adopt` | Brownfield command-center adoption — archive existing docs (never delete), bootstrap the center, machine-rank the critical entities, ingest one section per run at human speed with checklist + walk-recorded approval |
 | `/gabe-align` | Alignment guardian — shallow, standard, and deep checks; standard/deep include AP1-AP13 advisory checks |
 | `/gabe-assess` | Change impact assessment — blast radius, maturity scope, prerequisites |
 | `/gabe-commit` | Commit quality gate — deterministic checks, interactive triage, defer/accept/fix |
