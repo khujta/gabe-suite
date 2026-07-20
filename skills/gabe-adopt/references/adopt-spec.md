@@ -66,8 +66,10 @@ Small, append-only in spirit: rows change status, never vanish.
    `center.config.json` skeleton (project name, corpora bindings, results globs from
    `.kdbp/BEHAVIOR.md` `results_out` when present), the generator scripts, assets/shell, empty
    section dirs.
-   - **Generator promotion (first-ever adoption only):** if `templates/center/` does not exist
-     in the installed suite, init's first job IS the promotion (design record §5: ripe at n=2,
+   - **Generator promotion (first-ever adoption only):** if the GENERATOR SCRIPTS do not exist
+     in the installed suite's `templates/center/` (the `shell/` skeletons alone do NOT satisfy
+     this — shell and generators are independent, and the shell landed first, 2026-07-20),
+     init's first job IS the promotion (design record §5: ripe at n=2,
      executed at n=3 with purpose): port the most mature existing center implementation
      (gustify `scripts/_center_*.py`, `refresh_center.sh`, `check_center_links.py`),
      generalize hard-coded paths into `center.config.json` bindings, land them in the SUITE
@@ -91,11 +93,15 @@ Small, append-only in spirit: rows change status, never vanish.
      of section/entity nouns (`class="side"`) + a per-feature four-tab bar (`nav.tabbar`), the
      hub with its own shell (tabs fit a feature, not the hub). **The shell SHIPS as suite
      templates: `templates/center/shell/` (installed at `~/.claude/templates/gabe/center/shell/`)
-     — `a3.css` verbatim + the FULL station set (`index`/`feature`/`tests`/`board`/
+     — `assets/` (a3.css incl. the IDENTITY LAYER: landed-map group colors, `.sechead` section
+     banners, exclusive icons; plus slots.js, the raw-skeleton slot affordance — inert on
+     generated pages) + the FULL station set (`index`/`feature`/`tests`/`board`/
      `entity-index`/`docs`/`ledger`/`releases`.html) with the placeholder contract + the
-     station↔sources mapping table in that dir's README. Every crucial section is generated
-     FROM its skeleton — a section page built from scratch instead of its template is a
-     defect.** Init copies the shell and wires the project's generators to fill
+     station↔sources mapping table in that dir's README. The INVARIANT chrome ships in the
+     skeletons (colored+iconed station sidebar, four-tab icons, `data-sec` section banners);
+     generators fill only the project-specific slots the README lists. Every crucial section is
+     generated FROM its skeleton — a section page built from scratch instead of its template is a
+     defect.** Init copies the shell (incl. `assets/`) and wires the project's generators to fill
      its slots; the shell is independent of the generator promotion (a project's own generators
      may emit into it before the python promotion happens). Decision record: the layout lab's
      README (`docs/investigations/2026-07-14-center-layout-lab/`). **Restoring the archived
