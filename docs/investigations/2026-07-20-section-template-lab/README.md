@@ -10,6 +10,15 @@ slot ⟷ also-appears-on ⟷ machine sources) plus the identity scheme. Group pa
 `entities` · `docs` · `testing` · `ledger` · `releases`) hold the direction renders; recommended
 direction always listed first with a green pill.
 
+**Navigation + palette:** every mapping-table row links to its section's directions; every "home
+template" cell links BOTH to the raw shipped skeleton (`templates/center/shell/`) and to the
+filled shell-preview page — all relative paths, navigable over `file://`. Group colors
+(`--h-now` #0d7a84 · `--h-board` #1f6feb · `--h-ent` #0a7d6b · `--h-docs` #8e4585 · `--h-test`
+#3f6d4c · `--h-ledger` #9a5a00 · `--h-rel` #7a5a8a · `--h-leaf` #8494a4) and command-chip colors
+(`--c-plan`, `--c-red`, `--c-commit`, …) are verbatim from the landed-map artifact's CSS vars;
+each section carries "written by" chips derived from the map's edge data — solid = writes,
+dashed = verifies (guard), dotted = reads.
+
 ## The identity scheme (the point of this lab)
 
 A section is not a page — it is a unit of meaning that may render on several pages
