@@ -60,7 +60,10 @@ hub Overview subsections `{{RECENT_CHANGES}}` `{{NEEDS_YOU}}` (under their shipp
 banners above them are static). Tabs are pure-CSS `:target` (`.tabbar` anchors →
 `.tabbody > .tabpane#tab-*`) — deep-linkable, no script; the Overview pane shows by default
 when nothing is targeted. Raw skeletons render styled in place (`assets/a3.css` resolves in
-this dir) — unfilled slots show as literal `{{TOKEN}}` text inside the styled chrome.
+this dir), and `assets/slots.js` renders any unfilled `{{TOKEN}}` as a labeled dashed chip
+plus a "template skeleton" notice bar — so a raw open reads as a template awaiting its
+generator, never as a broken page. On generated pages no tokens remain and the script is a
+no-op (tab navigation stays pure CSS either way). Generators copy `assets/` wholesale.
 
 ## Rules
 

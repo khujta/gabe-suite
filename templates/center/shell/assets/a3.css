@@ -276,3 +276,8 @@ section[data-sec]{margin:0 0 22px}
 .sechead p{margin:3px 0 0;color:var(--muted);font-size:.78rem}
 .tabbar a{display:inline-flex;align-items:center;gap:7px}
 .tabbar a svg{width:15px;height:15px}
+
+/* ---------- raw-skeleton affordance (assets/slots.js) — inert on generated pages ---------- */
+.slottoken{display:inline-flex;align-items:center;font:var(--mono);font-size:.66rem;color:var(--accent-ink);background:var(--accent-soft);border:1px dashed var(--accent-ink);border-radius:6px;padding:1px 7px;margin:0 2px;white-space:nowrap;vertical-align:baseline}
+.side .slottoken{color:#aab6ff;background:rgba(255,255,255,.07);border-color:#5560a8;margin:4px 10px}
+.slotnotice{background:var(--warn-soft);border:1px solid #ecd9b8;color:var(--warn);border-radius:10px;padding:10px 14px;margin:12px 18px 0;font-size:.8rem}
