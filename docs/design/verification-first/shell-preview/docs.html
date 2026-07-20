@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docs · Gastify Command Center</title>
+<link rel="stylesheet" href="assets/a3.css">
+</head>
+<body>
+<!-- STATION: Docs — the map's left column "Docs" section. Single-lens station page.
+     SOURCES: cards/*.md + center.config.json (feature docs accumulator) ·
+     .kdbp/{SCOPE.md,DECISIONS.md,RULES.md,BEHAVIOR.md} (foundations — authored, human-owned). -->
+<div class="app">
+
+<aside class="side"><div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg></span><span><b>Gastify</b><small>Command Center</small></span></div><div class="search">Search features, tests…<kbd>⌘K</kbd></div><div class="navlabel">Overview</div><a class="navitem" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Overview</a><a class="navitem" href="board.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Board</a><div class="navlabel">Catalog</div><a class="navitem" href="entity-index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Entities <span class="count">7</span></a><a class="navitem" href="feature.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Card aliases (example)</a><a class="navitem on" href="docs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Docs</a><div class="navlabel">Verification</div><a class="navitem" href="tests.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Tests <span class="count">1,585</span></a><div class="navsub"><a href="tests.html#tab-tests">Matrix</a><a href="tests.html#tab-evidence">Walks · shelf</a><a href="tests.html#tab-risk">Gates</a></div><div class="navlabel">History</div><a class="navitem" href="ledger.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Ledger (latest change)</a><a class="navitem" href="releases.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Releases</a><div class="navlabel">Leaf</div><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> htmlcov ↗</a><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> playwright report ↗</a><div class="foot">regen 2026-07-17 (preview)<br>HEAD 44a3ecd · preview-fill</div></aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="crumb"><a href="index.html">Overview</a> › <b>Docs</b></div>
+    <div class="spacer"></div>
+    <span class="statuspill warn"><span class="dot"></span> preview</span>
+    <span class="stamp">synced · preview</span>
+  </div>
+
+  <div class="subject">
+    <div class="subjecthead">
+      <div class="pagehead">
+        <h1>Docs</h1>
+        <p>The feature-doc accumulator plus the human-owned foundations.</p>
+      </div>
+      <div class="kpis"><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Cards</div><div class="val">0</div><div class="sub">clean slate — re-ingestion pending</div></div><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Foundations</div><div class="val">4</div><div class="sub">SCOPE · DECISIONS · RULES · BEHAVIOR</div></div></div>  <!-- cards total · reviewed · TODO-marked · foundations count -->
+    </div>
+
+    <div class="tabbody">
+      <section class="tabpane" id="docs" style="display:block">
+        <div class="panel" style="padding:10px 14px;margin-bottom:14px"><b>Illustrative preview</b> — the shipped skeleton filled by hand (gastify baseline; sweep numbers real, rows illustrative). Real pages are generator-emitted.</div><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Feature docs (accumulator)</h2><div class="panel" style="padding:14px 16px">Empty by design after clean-slate init — cards re-enter one section at a time via /gabe-adopt.</div>  <!-- the accumulator: every card with entity chips, review stamp, freshness — .catalog/.tbl -->
+        <h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Foundations</h2><div class="panel" style="padding:14px 16px">SCOPE.md (premise + arc) · DECISIONS.md (D1–D121) · RULES.md · BEHAVIOR.md (verify commands) — authored, linked out.</div>   <!-- SCOPE premise · DECISIONS · RULES · BEHAVIOR — .panel per foundation, links out -->
+      </section>
+    </div>
+  </div>
+</main>
+
+</div>
+</body>
+</html>

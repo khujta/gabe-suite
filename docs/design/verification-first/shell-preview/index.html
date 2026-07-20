@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overview · Gastify Command Center</title>
+<link rel="stylesheet" href="assets/a3.css">
+</head>
+<body>
+<div class="app">
+
+<!-- ============ SIDEBAR — picks a subject. Nouns come from the APPROVED entity baseline
+     (adopt rank), never from an archived nav. Generators fill <div class="navlabel">Overview</div><a class="navitem on" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Overview</a><a class="navitem" href="board.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Board</a><div class="navlabel">Catalog</div><a class="navitem" href="entity-index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Entities <span class="count">7</span></a><a class="navitem" href="feature.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Card aliases (example)</a><a class="navitem" href="docs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Docs</a><div class="navlabel">Verification</div><a class="navitem" href="tests.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Tests <span class="count">1,585</span></a><div class="navsub"><a href="tests.html#tab-tests">Matrix</a><a href="tests.html#tab-evidence">Walks · shelf</a><a href="tests.html#tab-risk">Gates</a></div><div class="navlabel">History</div><a class="navitem" href="ledger.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Ledger (latest change)</a><a class="navitem" href="releases.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Releases</a><div class="navlabel">Leaf</div><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> htmlcov ↗</a><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> playwright report ↗</a> with
+     .navlabel group headers + .navitem links (+ optional .navsub sublists, .count badges);
+     the current page's .navitem carries class "on". -->
+<aside class="side">
+  <div class="brand">
+    <span class="logo"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg></span>
+    <span><b>Gastify</b><small>Command Center</small></span>
+  </div>
+  <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Search features, tests…<kbd>⌘K</kbd></div>
+
+  <div class="navlabel">Overview</div><a class="navitem on" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Overview</a><a class="navitem" href="board.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Board</a><div class="navlabel">Catalog</div><a class="navitem" href="entity-index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Entities <span class="count">7</span></a><a class="navitem" href="feature.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Card aliases (example)</a><a class="navitem" href="docs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Docs</a><div class="navlabel">Verification</div><a class="navitem" href="tests.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Tests <span class="count">1,585</span></a><div class="navsub"><a href="tests.html#tab-tests">Matrix</a><a href="tests.html#tab-evidence">Walks · shelf</a><a href="tests.html#tab-risk">Gates</a></div><div class="navlabel">History</div><a class="navitem" href="ledger.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Ledger (latest change)</a><a class="navitem" href="releases.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Releases</a><div class="navlabel">Leaf</div><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> htmlcov ↗</a><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> playwright report ↗</a>
+
+  <div class="foot">regen 2026-07-17 (preview)<br>HEAD 44a3ecd · preview-fill</div>
+</aside>
+
+<!-- ============ MAIN — the hub as the self-similar tabbed subject (tabs fit a feature;
+     the hub gets its OWN shell: this page). Pure-CSS :target tabs — no script; the
+     Overview pane is the default when nothing is targeted. -->
+<main class="main">
+  <div class="topbar">
+    <div class="crumb"><b>Overview</b></div>
+    <div class="spacer"></div>
+    <span class="statuspill warn"><span class="dot"></span> preview</span>
+    <span class="stamp">synced · preview</span>
+  </div>
+
+  <div class="subject">
+    <div class="subjecthead">
+      <div class="pagehead">
+        <h1>The ledger, mission-controlled</h1>
+        <p>What shipped, how it was verified, where the proof lives. The sidebar picks a subject; four tabs re-lens it.</p>
+      </div>
+      <div class="kpis"><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Automated checks</div><div class="val">1,585</div><div class="sub">1,070 backend · 515 web+e2e</div></div><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> C-id coverage</div><div class="val">98.3%</div><div class="sub">27 unstamped, named</div></div><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Waiting on you</div><div class="val">4</div><div class="sub">2 reviews · 1 push · 1 walk</div></div></div>
+    </div>
+
+    <nav class="tabbar">
+      <a href="#tab-overview">Overview</a>
+      <a href="#tab-tests">Tests</a>
+      <a href="#tab-evidence">Evidence</a>
+      <a href="#tab-risk">Risk</a>
+    </nav>
+
+    <div class="tabbody">
+      <section class="tabpane" id="tab-overview"><div class="panel" style="padding:10px 14px;margin-bottom:14px"><b>Illustrative preview</b> — the shipped skeleton filled by hand (gastify baseline; sweep numbers real, rows illustrative). Real pages are generator-emitted.</div><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Recent changes</h2><div class="panel" style="padding:14px 16px">The sweep (1,585 C-ids) · Red column adopted · chunk-0 repairs — from git + LEDGER.</div><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Needs-you</h2><div class="panel" style="padding:14px 16px">DF5 red checkpoint approval · 2 amber reviews · never-walked deploy-rollback.</div></section>
+      <section class="tabpane" id="tab-tests"><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Tests lens</h2><div class="panel" style="padding:14px 16px">Corpus buckets + link to the Tests station.</div></section>
+      <section class="tabpane" id="tab-evidence"><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Evidence lens</h2><div class="panel" style="padding:14px 16px">Latest proof sets + digests.</div></section>
+      <section class="tabpane" id="tab-risk"><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Risk lens</h2><div class="panel" style="padding:14px 16px">Open findings, deferred debt, gate states.</div></section>
+    </div>
+  </div>
+</main>
+
+</div>
+</body>
+</html>

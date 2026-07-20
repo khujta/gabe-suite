@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board · Gastify Command Center</title>
+<link rel="stylesheet" href="assets/a3.css">
+</head>
+<body>
+<!-- STATION: Board — the map's left column "Board" section. Single-lens station page
+     (the four tabs re-lens subjects; a station shows ONE thing well).
+     SOURCES: .kdbp/PLAN.md + PLAN.json (rail cells, backlog) · git (non-phase lane)
+     · .kdbp/PENDING.md (review-debt lane) · .kdbp/SCOPE.md (backlog framing). -->
+<div class="app">
+
+<aside class="side"><div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg></span><span><b>Gastify</b><small>Command Center</small></span></div><div class="search">Search features, tests…<kbd>⌘K</kbd></div><div class="navlabel">Overview</div><a class="navitem" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Overview</a><a class="navitem on" href="board.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Board</a><div class="navlabel">Catalog</div><a class="navitem" href="entity-index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Entities <span class="count">7</span></a><a class="navitem" href="feature.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Card aliases (example)</a><a class="navitem" href="docs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Docs</a><div class="navlabel">Verification</div><a class="navitem" href="tests.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Tests <span class="count">1,585</span></a><div class="navsub"><a href="tests.html#tab-tests">Matrix</a><a href="tests.html#tab-evidence">Walks · shelf</a><a href="tests.html#tab-risk">Gates</a></div><div class="navlabel">History</div><a class="navitem" href="ledger.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Ledger (latest change)</a><a class="navitem" href="releases.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Releases</a><div class="navlabel">Leaf</div><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> htmlcov ↗</a><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> playwright report ↗</a><div class="foot">regen 2026-07-17 (preview)<br>HEAD 44a3ecd · preview-fill</div></aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="crumb"><a href="index.html">Overview</a> › <b>Board</b></div>
+    <div class="spacer"></div>
+    <span class="statuspill warn"><span class="dot"></span> preview</span>
+    <span class="stamp">synced · preview</span>
+  </div>
+
+  <div class="subject">
+    <div class="subjecthead">
+      <div class="pagehead">
+        <h1>The board</h1>
+        <p>The lifecycle rail from PLAN.json — glyphs are the machine truth; debts are named, never nagged.</p>
+      </div>
+      <div class="kpis"><div class="kpis"><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Phases</div><div class="val">43 / 47</div><div class="sub">done incl. GS suite</div></div><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Current</div><div class="val">16 · DF5</div><div class="sub">next: /gabe-red 16</div></div><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Owed cells</div><div class="val">15</div><div class="sub">13 Center · 2 Review</div></div></div></div>  <!-- phases done/total · current phase · owed cells by kind -->
+    </div>
+
+    <div class="tabbody">
+      <section class="tabpane" id="board" style="display:block">
+        <div class="panel"><table class="tbl"><thead><tr><th>#</th><th>Phase</th><th>Red</th><th>Exec</th><th>Review</th><th>Commit</th><th>Push</th><th>Center</th></tr></thead><tbody><tr><td>15</td><td>DF4 · notifications</td><td>—</td><td>✅</td><td>⬜</td><td>✅</td><td>✅</td><td>⬜</td></tr><tr><td>16</td><td>DF5 · SSE families</td><td>⬜</td><td>⬜</td><td>⬜</td><td>⬜</td><td>⬜</td><td>⬜</td></tr><tr><td>37</td><td>GS1 · detail share</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>⬜</td></tr><tr><td>41</td><td>GS5 · Efectivo</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>⬜</td></tr><tr><td>42</td><td>P134 · consent</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>⬜</td></tr></tbody></table></div>             <!-- the lifecycle rail: red→exec→review→commit→push(→center) per phase,
+                                  glyphs 1:1 from PLAN.json cells — .tbl (one row per phase) -->
+        <h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Review-debt lane</h2><div class="panel" style="padding:14px 16px">P147 · P149 · P150 open (non-blocking) — from PENDING.md with ages.</div> <!-- PENDING.md open items, escalation ages — .panel + .tlist -->
+        <h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Non-phase lane</h2><div class="panel" style="padding:14px 16px">GS6 chooser cards (LEDGER-only, PR #63) — work outside phases, from git.</div>    <!-- git/LEDGER work outside phases — .panel + .tlist -->
+        <h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Backlog</h2><div class="panel" style="padding:14px 16px">17 · DF6 overlays — 26 · CA7 — 27 · CA8, plus the SCOPE arc remainder.</div>          <!-- unstarted phases + SCOPE arc remainder — .panel -->
+      </section>
+    </div>
+  </div>
+</main>
+
+</div>
+</body>
+</html>

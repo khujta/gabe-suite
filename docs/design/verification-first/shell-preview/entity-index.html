@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entities · Gastify Command Center</title>
+<link rel="stylesheet" href="assets/a3.css">
+</head>
+<body>
+<!-- STATION: Entities — the map's left column "Entities" section. Single-lens station page.
+     SOURCES: center.config.json entities[] + features[] (which cards touch each entity)
+     · adoption.json (baseline/section status during adoption). -->
+<div class="app">
+
+<aside class="side"><div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg></span><span><b>Gastify</b><small>Command Center</small></span></div><div class="search">Search features, tests…<kbd>⌘K</kbd></div><div class="navlabel">Overview</div><a class="navitem" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Overview</a><a class="navitem" href="board.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Board</a><div class="navlabel">Catalog</div><a class="navitem on" href="entity-index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Entities <span class="count">7</span></a><a class="navitem" href="feature.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Card aliases (example)</a><a class="navitem" href="docs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Docs</a><div class="navlabel">Verification</div><a class="navitem" href="tests.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Tests <span class="count">1,585</span></a><div class="navsub"><a href="tests.html#tab-tests">Matrix</a><a href="tests.html#tab-evidence">Walks · shelf</a><a href="tests.html#tab-risk">Gates</a></div><div class="navlabel">History</div><a class="navitem" href="ledger.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Ledger (latest change)</a><a class="navitem" href="releases.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Releases</a><div class="navlabel">Leaf</div><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> htmlcov ↗</a><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> playwright report ↗</a><div class="foot">regen 2026-07-17 (preview)<br>HEAD 44a3ecd · preview-fill</div></aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="crumb"><a href="index.html">Overview</a> › <b>Entities</b></div>
+    <div class="spacer"></div>
+    <span class="statuspill warn"><span class="dot"></span> preview</span>
+    <span class="stamp">synced · preview</span>
+  </div>
+
+  <div class="subject">
+    <div class="subjecthead">
+      <div class="pagehead">
+        <h1>Entities</h1>
+        <p>The durable nouns — each links to its subject page; coverage states from adoption.json.</p>
+      </div>
+      <div class="kpis"><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Entities</div><div class="val">7</div><div class="sub">baseline approved</div></div><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Covered</div><div class="val">0/7</div><div class="sub">adoption starting</div></div><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Parked</div><div class="val">4</div><div class="sub">notif · auth · billing · ref</div></div></div>  <!-- entities total · covered · in-adoption · parked -->
+    </div>
+
+    <div class="tabbody">
+      <section class="tabpane" id="entities" style="display:block">
+        <h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Transactions</h2><div class="panel" style="padding:14px 16px">The T1 ledger spine — 113 web C-ids, churn 21. <div class="echips"><span class="echip">6 cards to reorganize</span></div></div><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Scan / Receipt</h2><div class="panel" style="padding:14px 16px">The acquisition funnel — 353 api C-ids. <div class="echips"><span class="echip">3 cards adequate</span></div></div><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Statements</h2><div class="panel" style="padding:14px 16px">117 api C-ids, zero dedicated cards — the biggest gap. <div class="echips"><span class="echip">NEW section</span></div></div><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Card aliases</h2><div class="panel" style="padding:14px 16px">GS5 money-destruction guard rails. <div class="echips"><span class="echip">NEW section</span></div></div><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Groups & sharing</h2><div class="panel" style="padding:14px 16px">90-day window, locks — well tested. <div class="echips"><span class="echip">2-3 cards, index</span></div></div><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Consent & privacy</h2><div class="panel" style="padding:14px 16px">Ley 21.719 — register + erasure uncarded. <div class="echips"><span class="echip">extend ce card</span></div></div><h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Analytics drill-down</h2><div class="panel" style="padding:14px 16px">Sankey · treemap · L1→L4 · drill to items. <div class="echips"><span class="echip">NEW nav-story card</span></div></div>   <!-- one block per entity: name, one-liner, its cards (.echips + .echip),
+                               test counts by corpus, coverage/adoption state — .catalog or .panel grid;
+                               each entity links to its feature.html-shaped subject page -->
+      </section>
+    </div>
+  </div>
+</main>
+
+</div>
+</body>
+</html>

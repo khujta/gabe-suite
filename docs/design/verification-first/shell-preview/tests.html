@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tests · Gastify Command Center</title>
+<link rel="stylesheet" href="assets/a3.css">
+</head>
+<body>
+<!-- STATION: Testing — the map's left column "Testing" section.
+     SOURCES (middle column): test corpus C-ids (grep) · junit + committed digests (results_out)
+     · git log -S "C<id>" + RED: trailers (ever-red) · .kdbp/walks.jsonl (manual angles)
+     · tests/**/proof/ shots+manifests (demo shelf). A SUBJECT page: carries the four tabs. -->
+<div class="app">
+
+<aside class="side"><div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg></span><span><b>Gastify</b><small>Command Center</small></span></div><div class="search">Search features, tests…<kbd>⌘K</kbd></div><div class="navlabel">Overview</div><a class="navitem" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Overview</a><a class="navitem" href="board.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Board</a><div class="navlabel">Catalog</div><a class="navitem" href="entity-index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Entities <span class="count">7</span></a><a class="navitem" href="feature.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Card aliases (example)</a><a class="navitem" href="docs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Docs</a><div class="navlabel">Verification</div><a class="navitem on" href="tests.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Tests <span class="count">1,585</span></a><div class="navsub"><a href="tests.html#tab-tests">Matrix</a><a href="tests.html#tab-evidence">Walks · shelf</a><a href="tests.html#tab-risk">Gates</a></div><div class="navlabel">History</div><a class="navitem" href="ledger.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Ledger (latest change)</a><a class="navitem" href="releases.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Releases</a><div class="navlabel">Leaf</div><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> htmlcov ↗</a><a class="navitem" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> playwright report ↗</a><div class="foot">regen 2026-07-17 (preview)<br>HEAD 44a3ecd · preview-fill</div></aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="crumb"><a href="index.html">Overview</a> › <b>Tests</b></div>
+    <div class="spacer"></div>
+    <span class="statuspill warn"><span class="dot"></span> preview</span>
+    <span class="stamp">synced · preview</span>
+  </div>
+
+  <div class="subject">
+    <div class="subjecthead">
+      <div class="pagehead">
+        <h1>The test estate</h1>
+        <p>Every number names its source; an empty ever-red is history, not shame.</p>
+      </div>
+      <div class="kpis"><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Corpus</div><div class="val">1,585</div><div class="sub">junit ×3, digested</div></div><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> C-id’d</div><div class="val">98.3%</div><div class="sub">27 backtick residue</div></div><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Ever-red</div><div class="val">1</div><div class="sub">C1592 · red@95849f2</div></div><div class="kpi"><div class="lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Never walked</div><div class="val">1</div><div class="sub">deploy-rollback</div></div></div>  <!-- .kpi cells: corpus total · C-id'd % · ever-red count · digest state · unstamped residue -->
+    </div>
+
+    <nav class="tabbar">
+      <a href="#tab-overview">Overview</a>
+      <a href="#tab-tests">Tests</a>
+      <a href="#tab-evidence">Evidence</a>
+      <a href="#tab-risk">Risk</a>
+    </nav>
+
+    <div class="tabbody">
+      <section class="tabpane" id="tab-overview">
+        <div class="panel"><table class="tbl"><thead><tr><th>Corpus</th><th>Tests</th><th>Junit</th><th>Fresh</th></tr></thead><tbody><tr><td>backend · pytest</td><td>1,070</td><td>api-junit.xml</td><td>T−0d</td></tr><tr><td>web · vitest</td><td>344</td><td>web-junit.xml</td><td>T−0d</td></tr><tr><td>e2e · playwright</td><td>171</td><td>e2e-junit.xml</td><td>T−2d</td></tr></tbody></table></div>          <!-- per-corpus buckets (api/web/e2e counts, junit freshness) — .panel + .tbl -->
+        <h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Verification changelog</h2><div class="panel" style="padding:14px 16px">5dbd928 sweep C1–C1585 · 7a449ab blame-ignore · d2309ef Red column — commits that reshaped the corpus, from git.</div> <!-- git-derived: commits that grew/reshaped the corpus incl. RED: entries — .tlist -->
+      </section>
+      <section class="tabpane" id="tab-tests">
+        <div class="panel" style="padding:10px 14px;margin-bottom:14px"><b>Illustrative preview</b> — the shipped skeleton filled by hand (gastify baseline; sweep numbers real, rows illustrative). Real pages are generator-emitted.</div><div class="panel"><table class="tbl"><thead><tr><th>C-id</th><th>test</th><th>corpus</th><th>status</th><th>ever-red?</th><th>last run</th></tr></thead><tbody><tr><td>C38</td><td>invite deep-link survives redirect</td><td>api</td><td>pass</td><td>RED seen · red@c6dd185</td><td>07-17 09:41</td></tr><tr><td>C187</td><td>list consents empty (async)</td><td>api</td><td>pass</td><td>— backfilled</td><td>07-17 09:41</td></tr><tr><td>C926</td><td>SharedGroupsCard owner chip</td><td>web</td><td>fail</td><td>— backfilled</td><td>07-17 09:43</td></tr><tr><td>—</td><td>it(`shows ${count} scans`)</td><td>web</td><td>no id — unstamped</td><td>n/a</td><td>07-17 09:43</td></tr></tbody></table></div>           <!-- THE matrix: C-id · test · corpus · status · ever-red? · last run — .tbl;
+                                  ever-red cells: red@sha link when observed, honest — when backfilled-empty -->
+      </section>
+      <section class="tabpane" id="tab-evidence">
+        <h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Manual angles — walks.jsonl</h2><div class="panel" style="padding:14px 16px">walked: gs1-detail-share · pass · 07-15 · khujta — NEVER walked: deploy-rollback (renders red until a human walks it).</div>    <!-- walks.jsonl: walked (who·when·result·evidence) + NEVER-walked red — .panel -->
+        <h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Demo shelf</h2><div class="panel" style="padding:14px 16px">ca10-destructive-guards (6 shots) · p134-consent (manifest) — curated proof sets from tests/web-e2e/proof/.</div>       <!-- curated proof shots/manifests — .gal + .shot -->
+      </section>
+      <section class="tabpane" id="tab-risk">
+        <h2 class="sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> Gates</h2><div class="panel" style="padding:14px 16px">crawl gate 0 dead links · token-classes green · quarantine empty · web digest ⤫ skipped(no reporter) until flags land.</div>            <!-- gate states, flaky/quarantine, skipped(no reporter) honest gaps — .panel -->
+      </section>
+    </div>
+  </div>
+</main>
+
+</div>
+</body>
+</html>
