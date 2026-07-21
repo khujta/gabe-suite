@@ -12,6 +12,18 @@ pages carry the invariant FIVE-tab bar (Overview · Code · Tests · Evidence ·
 single-lens pages. Pure-CSS `:target` tabs (`:has(:target)` variant so in-page anchors and
 subnav links do not collapse the pane).
 
+## The exemplar — follow it, don't re-derive it
+
+`example/feature-transaction.html` is a SNAPSHOT of the gastify trial's real generated page —
+the field-tested output every ruling in this README was shaped on. Open it beside any section
+you build: the five tabs, the hide/show behaviours (secinfo ⊕ legends, pmore truncation,
+proofset/legset folds, expander rows + cascade), the color encodings (verbs, layers,
+severities, type families — each with its legend), the meters, the cid chips, the subnavs, the
+diagram picker, the viewer. It renders from the SHIPPED `../assets/` (proof the css here is the
+css that built it); proof shots are labeled placeholders (real artifacts live in gastify);
+sidebar links open the raw skeletons. **The rules live in the specs; the example of the rules
+lives here.** When a rule and the exemplar disagree, that is a handoff finding, not a choice.
+
 ## The ownership rule (binding)
 
 **The skeleton owns the TAB SET and the NAV GROUPS; the generator owns the sections inside a
