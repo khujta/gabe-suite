@@ -10,8 +10,8 @@ REPO = OUT.parents[3]
 T = REPO / 'templates/center/shell'
 
 (OUT / 'assets').mkdir(exist_ok=True)
-shutil.copy(T / 'assets/a3.css', OUT / 'assets/a3.css')
-shutil.copy(T / 'assets/slots.js', OUT / 'assets/slots.js')
+for asset in ('a3.css', 'slots.js', 'a3-settings.js', 'a3-lightbox.js'):
+    shutil.copy(T / f'assets/{asset}', OUT / f'assets/{asset}')
 
 IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>'
 BOX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>'
@@ -71,6 +71,10 @@ fill('feature.html', {
  'SUBJECT_HEADLINE_STATS': '<div class="kpis">' + kpi('Tests', '10', 'test_card_aliases.py, all C-id’d')
     + kpi('Ever-red', '—', 'backfilled; none observed yet') + kpi('Migrations', '049 · 050', 'cash unique guard') + '</div>',
  'TAB_OVERVIEW': NOTE + panel('The story', 'Aliases are learned from statements; Efectivo is a SYSTEM alias (D119) excluded from dedup.'),
+ 'TAB_CODE': panel('Endpoints (from archmap.json — the read-once code map)',
+    'GET /api/card-aliases · POST /api/card-aliases · DELETE /api/card-aliases/{id} (Efectivo guarded, 409) — decorators, docstrings, response models read by ast once per build.')
+    + panel('Data model', 'CardAlias: id · user_id (FK users.id) · display_name · is_system — relationships rendered APART from columns, backing FK named.')
+    + panel('Code map', 'api/card_aliases.py 214 lines · services/alias_dedup.py 388 · migrations 049/050 — 800-line heat green.'),
  'TAB_TESTS': tbl(['C-id', 'test', 'status'], [['<b>C201</b>', 'create alias from statement', 'pass'],
     ['<b>C202</b>', 'Efectivo reserved name 409', 'pass'], ['<b>C203</b>', 'dedup orphan guard (B1)', 'pass']]),
  'TAB_EVIDENCE': panel('Proof', 'gs6-chooser-card-pill e2e 3/3 · settings.cards unit shots.'),

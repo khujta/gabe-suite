@@ -5,6 +5,8 @@
 <title>Card aliases · Gastify Command Center</title>
 <link rel="stylesheet" href="assets/a3.css">
 <script src="assets/slots.js" defer></script>
+<script src="assets/a3-settings.js" defer></script>
+<script src="assets/a3-lightbox.js" defer></script>
 </head>
 <body>
 <!-- SUBJECT: one entity/feature — same four tabs as every subject. Section banners carry
@@ -22,7 +24,7 @@
     <span class="logo"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg></span>
     <span><b>Gastify</b><small>Command Center</small></span>
   </div>
-  <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Search features, tests…<kbd>⌘K</kbd></div>
+  <div class="search" title="Find-in-page reaches the OPEN tab only — the other panes are display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Find-in-page reaches <b>this tab only</b></div>
   <div class="navlabel g-now">Now</div>
   <a class="navitem" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Overview</a>
   <div class="navlabel g-board">Board</div>
@@ -48,8 +50,6 @@
   <div class="topbar">
     <div class="crumb"><a href="index.html">Overview</a> › <b>Card aliases</b></div>
     <div class="spacer"></div>
-    <span class="statuspill warn"><span class="dot"></span> preview</span>
-    <span class="stamp">synced · preview</span>
   </div>
 
   <div class="subject">
@@ -65,29 +65,38 @@
          contract. Pure-CSS :target tabs, no script; exclusive tab icons ship here. -->
     <nav class="tabbar">
       <a href="#tab-overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Overview</a>
+      <a href="#tab-code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Code</a>
       <a href="#tab-tests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Tests</a>
       <a href="#tab-evidence"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> Evidence</a>
       <a href="#tab-risk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Risk</a>
+      <div class="tpills"><span class="statuspill warn"><span class="dot"></span> preview</span><span class="stamp">regen · preview</span></div>
     </nav>
 
     <div class="tabbody">
       <section class="tabpane" id="tab-overview">
-        <section data-sec="docs.feature-cards" style="--gc:#8e4585">
-        <div class="sechead"><span class="secic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><div><h2><span class="gtag">Docs</span> The feature card</h2></div></div>
-        <div class="panel" style="padding:10px 14px;margin-bottom:14px"><b>Illustrative preview</b> — the shipped skeleton filled by hand (gastify baseline; sweep numbers real, rows illustrative). Real pages are generator-emitted.</div><div class="panel" style="padding:14px 16px;margin-bottom:12px"><b>The story</b><p style="margin:4px 0 0;font-size:.82rem;color:var(--ink-2)">Aliases are learned from statements; Efectivo is a SYSTEM alias (D119) excluded from dedup.</p></div>     <!-- the card, single-instance: cards/<entity>.md · # REVIEWED stamp -->
-        </section>
+        <!-- Section banners (The feature card · Diagrams · Growth ·
+             Changelog) are emitted by the generator, which owns the subnav
+             and the growth table, so the pane ships bare.
+             SOURCES: cards/<entity>.md (# LENS, # DECIDED) · the build's own
+             gap set (junit, specs on disk, walks.jsonl, proof artifacts). -->
+        <div class="panel" style="padding:10px 14px;margin-bottom:14px"><b>Illustrative preview</b> — the shipped skeleton filled by hand (gastify baseline; sweep numbers real, rows illustrative). Real pages are generator-emitted.</div><div class="panel" style="padding:14px 16px;margin-bottom:12px"><b>The story</b><p style="margin:4px 0 0;font-size:.82rem;color:var(--ink-2)">Aliases are learned from statements; Efectivo is a SYSTEM alias (D119) excluded from dedup.</p></div>
       </section>
+      <!-- CODE — the technical decode for developers: endpoints · code map ·
+           data model. SOURCES: FastAPI decorators + docstrings (ast) · files on
+           disk (measured lines) · SQLAlchemy Mapped columns (ast). -->
+      <section class="tabpane" id="tab-code"><div class="panel" style="padding:14px 16px;margin-bottom:12px"><b>Endpoints (from archmap.json — the read-once code map)</b><p style="margin:4px 0 0;font-size:.82rem;color:var(--ink-2)">GET /api/card-aliases · POST /api/card-aliases · DELETE /api/card-aliases/{id} (Efectivo guarded, 409) — decorators, docstrings, response models read by ast once per build.</p></div><div class="panel" style="padding:14px 16px;margin-bottom:12px"><b>Data model</b><p style="margin:4px 0 0;font-size:.82rem;color:var(--ink-2)">CardAlias: id · user_id (FK users.id) · display_name · is_system — relationships rendered APART from columns, backing FK named.</p></div><div class="panel" style="padding:14px 16px;margin-bottom:12px"><b>Code map</b><p style="margin:4px 0 0;font-size:.82rem;color:var(--ink-2)">api/card_aliases.py 214 lines · services/alias_dedup.py 388 · migrations 049/050 — 800-line heat green.</p></div></section>
       <section class="tabpane" id="tab-tests">
-        <section data-sec="testing.matrix" style="--gc:#3f6d4c">
-        <div class="sechead"><span class="secic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg></span><div><h2><span class="gtag">Testing</span> Matrix — entity-scoped</h2></div></div>
-        <div class="panel"><table class="tbl"><thead><tr><th>C-id</th><th>test</th><th>status</th></tr></thead><tbody><tr><td><b>C201</b></td><td>create alias from statement</td><td>pass</td></tr><tr><td><b>C202</b></td><td>Efectivo reserved name 409</td><td>pass</td></tr><tr><td><b>C203</b></td><td>dedup orphan guard (B1)</td><td>pass</td></tr></tbody></table></div>        <!-- SAME section as tests.html's matrix, filtered to this entity -->
-        </section>
+        <!-- Section banners (Kinds & coverage · Matrix) are emitted by the
+             generator — the summary must precede the matrix, so the pane
+             ships bare. SOURCES: junit per-file records · coverage state. -->
+        <div class="panel"><table class="tbl"><thead><tr><th>C-id</th><th>test</th><th>status</th></tr></thead><tbody><tr><td><b>C201</b></td><td>create alias from statement</td><td>pass</td></tr><tr><td><b>C202</b></td><td>Efectivo reserved name 409</td><td>pass</td></tr><tr><td><b>C203</b></td><td>dedup orphan guard (B1)</td><td>pass</td></tr></tbody></table></div>
       </section>
       <section class="tabpane" id="tab-evidence">
-        <section data-sec="testing.proof" style="--gc:#3f6d4c">
-        <div class="sechead"><span class="secic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span><div><h2><span class="gtag">Testing</span> Feature proof (accumulator)</h2></div></div>
-        <div class="panel" style="padding:14px 16px;margin-bottom:12px"><b>Proof</b><p style="margin:4px 0 0;font-size:.82rem;color:var(--ink-2)">gs6-chooser-card-pill e2e 3/3 · settings.cards unit shots.</p></div>     <!-- proof/ manifests + shots for this entity -->
-        </section>
+        <!-- Section banners (Proof sets · Not proven here) are emitted by the
+             generator, which also owns the subnav and the row expanders, so the
+             pane ships bare. SOURCES: tests/web-e2e/proof/*/manifest.json +
+             the artifacts walked off disk. -->
+        <div class="panel" style="padding:14px 16px;margin-bottom:12px"><b>Proof</b><p style="margin:4px 0 0;font-size:.82rem;color:var(--ink-2)">gs6-chooser-card-pill e2e 3/3 · settings.cards unit shots.</p></div>
       </section>
       <section class="tabpane" id="tab-risk"><div class="panel" style="padding:14px 16px;margin-bottom:12px"><b>Findings history</b><p style="margin:4px 0 0;font-size:.82rem;color:var(--ink-2)">B3 IntegrityError honesty + B7 race guard — resolved #66/#67; P155 prod 0 orphans.</p></div></section>  <!-- findings history · open debt for this entity -->
     </div>

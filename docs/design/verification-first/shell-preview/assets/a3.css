@@ -11,16 +11,25 @@
   --sidebar:#101726; --sidebar-2:#1b2436; --sidebar-ink:#c7cfdd; --sidebar-muted:#79839a;
   --radius:10px; --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.05);
   --shadow-lift:0 4px 14px rgba(16,24,40,.10);
-  --font:15px/1.55 'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --mono:12px/1.5 ui-monospace,'Cascadia Mono',Consolas,monospace;
+  /* Viewer settings (a3-settings.js writes these on :root, persisted per
+     browser). --root-size drives every rem in the shell, so one value scales
+     nav + content together; --font-content is CONTENT-only, so re-typesetting
+     the reading column never disturbs the navigation's identity. */
+  --root-size:14px;
+  --font-ui:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-content:Menlo,Consolas,'DejaVu Sans Mono',ui-monospace,monospace;
+  --side-w:248px;
+  --font:0.9375rem/1.55 var(--font-ui);
+  --mono:0.75rem/1.5 ui-monospace,'Cascadia Mono',Consolas,monospace;
 }
+html{font-size:var(--root-size)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:var(--font);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 svg{flex:none}
 
 /* ---------- app shell: sidebar + main ---------- */
-.app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+.app{display:grid;grid-template-columns:var(--side-w) 1fr;min-height:100vh}
 .side{background:var(--sidebar);color:var(--sidebar-ink);padding:16px 12px;position:sticky;top:0;height:100vh;overflow:auto;display:flex;flex-direction:column;gap:4px}
 .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 12px}
 .brand .logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:grid;place-items:center;color:#fff;flex:none}
@@ -43,15 +52,27 @@ svg{flex:none}
 .side .foot{margin-top:auto;font:var(--mono);font-size:.6rem;color:var(--sidebar-muted);padding:12px 10px 2px;border-top:1px solid #26314a}
 
 /* ---------- main column ---------- */
-.main{min-width:0}
-.topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;padding:12px 30px;
-  background:rgba(246,247,249,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.main{min-width:0;font-family:var(--font-content)}
+.topbar{display:flex;align-items:center;gap:14px;padding:12px 30px;
+  background:var(--bar-bg,rgba(246,247,249,.86));backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .crumb{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:7px;min-width:0}
 .crumb a{color:var(--muted);text-decoration:none}.crumb a:hover{color:var(--accent)}
 .crumb b{color:var(--ink)}
 .crumb .sep{color:var(--faint)}
 .topbar .spacer{flex:1}
-.statuspill{display:inline-flex;align-items:center;gap:7px;font-size:.74rem;font-weight:600;padding:5px 11px;border-radius:20px;border:1px solid var(--line)}
+.statuspill{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;padding:5px 11px;border-radius:20px;border:1px solid var(--line)}
+/* In the sticky bar the pills are a status LINE, not page furniture — tighter
+   than the same component in a page head, where there is room to breathe. */
+.tabbar .statuspill{font-size:calc(.35rem + 4.8px);padding:4px 8px;gap:5px;
+  white-space:nowrap}
+/* The pills are LINKS: each one jumps to the section that owns its number.
+   A number a reader cannot trace is a number they have to take on faith,
+   which is the opposite of what this page is for. */
+a.statuspill{text-decoration:none;cursor:pointer;transition:filter .12s,transform .12s}
+a.statuspill:hover{filter:brightness(.96);transform:translateY(-1px)}
+[data-theme="dark"] a.statuspill:hover{filter:brightness(1.25)}
+a.statuspill:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tabbar .stamp{font-size:calc(.31rem + 4.3px);white-space:nowrap}
 .statuspill .dot{width:8px;height:8px;border-radius:50%}
 .statuspill.ok{background:var(--good-soft);color:var(--good);border-color:#cfe6da}.statuspill.ok .dot{background:var(--good)}
 .statuspill.warn{background:var(--warn-soft);color:var(--warn);border-color:#f0dcc0}.statuspill.warn .dot{background:var(--warn)}
@@ -205,40 +226,61 @@ h2.sec .more:hover{text-decoration:underline}
    (file://-safe, no JS, deep-linkable). Same shell for every subject.
    ============================================================ */
 
-/* the self-similar subject container (mirrors .wrap's max-width) */
-.subject{max-width:1060px;margin:0 auto}
+/* The subject container. 1060px is a READING MEASURE — correct for prose, wrong
+   for a sticky title bar, which has no measure. Capping both at 1060 left 612px
+   of the main column unused at 1920px while the bar wrapped to three lines. The
+   container now widens; the PANES keep the reading measure and stay left-aligned
+   with the bar, so the bar and the content share a left edge and only the status
+   cluster uses the extra room. */
+.subject{max-width:1400px;margin:0 auto}
+.tabbody{max-width:1060px}
+.subjecthead{max-width:1060px}
 .subjecthead{padding:24px 30px 0}
 .subjecthead .pagehead{margin-bottom:12px}
 
 /* tab strip — reuses the .seg segmented-control look, sticky under topbar */
-.tabbar{position:sticky;top:48px;z-index:4;display:flex;gap:4px;flex-wrap:wrap;
-  padding:11px 30px;background:rgba(246,247,249,.86);backdrop-filter:blur(8px);
+/* nowrap, never truncate: under width pressure the bar scrolls sideways so a
+   number is never hidden and never cut. Wrapping was the bug — the operator
+   ruling is that this bar IS the title bar on scroll, and a title bar that
+   grows to three lines has stopped being one. */
+.tabbar{position:sticky;top:0;z-index:6;display:flex;gap:3px;flex-wrap:nowrap;align-items:center;
+  overflow-x:auto;scrollbar-width:none;
+  padding:10px 16px 10px 30px;background:var(--bar-bg,rgba(246,247,249,.86));backdrop-filter:blur(8px);
   border-bottom:1px solid var(--line)}
-.tabbar a{font-size:.84rem;font-weight:600;color:var(--ink-2);text-decoration:none;
-  padding:8px 15px;border-radius:9px;display:flex;align-items:center;gap:8px;
-  border:1px solid transparent}
-.tabbar a svg{width:15px;height:15px;color:var(--faint)}
+.tabbar a{display:inline-flex;font-size:calc(.41rem + 5.6px);font-weight:600;color:var(--ink-2);text-decoration:none;
+  padding:7px 9px;border-radius:9px;display:flex;align-items:center;gap:6px;
+  border:1px solid transparent;white-space:nowrap}
+.tabbar a svg{width:13px;height:13px;color:var(--faint)}
 .tabbar a .n{font:var(--mono);font-size:.63rem;color:var(--muted);background:var(--panel);
   border:1px solid var(--line);border-radius:20px;padding:1px 7px}
 .tabbar a:hover{background:var(--panel);color:var(--ink)}
+.tabbar::-webkit-scrollbar{display:none}
 
 /* panes: only the targeted pane shows; Overview is the default */
-.tabpane{display:none;padding:22px 30px 60px;scroll-margin-top:112px}
+.tabpane{display:none;padding:22px 30px 60px;scroll-margin-top:118px}
 .tabpane:target{display:block}
-.tabbody:not(:has(.tabpane:target)) #tab-overview{display:block}
+.tabpane:has(:target){display:block}
+.tabbody:not(:has(:target)) #tab-overview{display:block}
 
 /* active-tab highlight (mirrors .seg a.on); default = Overview */
-.subject:not(:has(.tabpane:target)) .tabbar a[href="#tab-overview"],
-.subject:has(#tab-overview:target) .tabbar a[href="#tab-overview"],
-.subject:has(#tab-tests:target) .tabbar a[href="#tab-tests"],
-.subject:has(#tab-evidence:target) .tabbar a[href="#tab-evidence"],
-.subject:has(#tab-risk:target) .tabbar a[href="#tab-risk"]{
+/* The selected tab. Two rules the four-tab original got wrong: Code was added
+   later and never joined this list, and every selector keyed on `#tab-X:target`
+   ONLY — so jumping to a section anchor INSIDE a pane un-highlighted every tab
+   and the reader lost the answer to "where am I". Matching a descendant target
+   as well keeps the pill lit through subnav jumps. */
+.subject:not(:has(:target)) .tabbar a[href="#tab-overview"],
+.subject:has(#tab-overview:target, #tab-overview :target) .tabbar a[href="#tab-overview"],
+.subject:has(#tab-code:target, #tab-code :target) .tabbar a[href="#tab-code"],
+.subject:has(#tab-tests:target, #tab-tests :target) .tabbar a[href="#tab-tests"],
+.subject:has(#tab-evidence:target, #tab-evidence :target) .tabbar a[href="#tab-evidence"],
+.subject:has(#tab-risk:target, #tab-risk :target) .tabbar a[href="#tab-risk"]{
   background:var(--surface);color:var(--ink);box-shadow:var(--shadow);border-color:var(--line)}
-.subject:not(:has(.tabpane:target)) .tabbar a[href="#tab-overview"] svg,
-.subject:has(#tab-overview:target) .tabbar a[href="#tab-overview"] svg,
-.subject:has(#tab-tests:target) .tabbar a[href="#tab-tests"] svg,
-.subject:has(#tab-evidence:target) .tabbar a[href="#tab-evidence"] svg,
-.subject:has(#tab-risk:target) .tabbar a[href="#tab-risk"] svg{color:var(--accent)}
+.subject:not(:has(:target)) .tabbar a[href="#tab-overview"] svg,
+.subject:has(#tab-overview:target, #tab-overview :target) .tabbar a[href="#tab-overview"] svg,
+.subject:has(#tab-code:target, #tab-code :target) .tabbar a[href="#tab-code"] svg,
+.subject:has(#tab-tests:target, #tab-tests :target) .tabbar a[href="#tab-tests"] svg,
+.subject:has(#tab-evidence:target, #tab-evidence :target) .tabbar a[href="#tab-evidence"] svg,
+.subject:has(#tab-risk:target, #tab-risk :target) .tabbar a[href="#tab-risk"] svg{color:var(--accent)}
 
 /* risk grid (re-housed verbatim from A-catalog's inline block) */
 .riskgrid{width:100%;border-collapse:separate;border-spacing:5px;font-size:.72rem}
@@ -257,7 +299,14 @@ h2.sec .more:hover{text-decoration:underline}
 
 @media(max-width:820px){
   .subjecthead,.tabbar,.tabpane{padding-left:18px;padding-right:18px}
-  .tabbar{top:0;position:static}
+  /* The tab strip STAYS sticky here. It used to go static, so scrolling into a
+     pane many screens long left no way back to the tabs at all — and .subnav's
+     top:49px was never reset, so it stuck into the gap the strip left behind.
+     Narrow means scrollable, not absent. */
+  .tabbar{top:0;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .tabbar::-webkit-scrollbar{display:none}
+  .tabbar .tpills{margin-left:12px}
+  .subnav{top:44px}
 }
 
 /* ---------- identity layer — the landed-map palette shipped with the shell ----------
@@ -268,16 +317,371 @@ h2.sec .more:hover{text-decoration:underline}
 .navlabel.g-now{color:#3bb3bd}.navlabel.g-board{color:#6aa6f5}.navlabel.g-ent{color:#4fc3a8}.navlabel.g-docs{color:#c98bbb}
 .navlabel.g-test{color:#6fa77d}.navlabel.g-ledger{color:#d79a3c}.navlabel.g-rel{color:#b795c9}.navlabel.g-leaf{color:#8494a4}
 section[data-sec]{margin:0 0 22px}
-.sechead{display:flex;gap:12px;align-items:flex-start;background:color-mix(in srgb,var(--gc,var(--accent)) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--gc,var(--accent)) 30%,transparent);border-radius:var(--radius);padding:12px 14px;margin:0 0 12px;box-shadow:var(--shadow)}
-.secic{width:36px;height:36px;flex:none;border-radius:9px;background:var(--gc,var(--accent));color:#fff;display:grid;place-items:center}
-.secic svg{width:18px;height:18px}
-.sechead h2{margin:0;font-size:.98rem;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+/* Section banners are TITLES over their rows — never cards beside them. The
+   tint HUGS the label (inline-flex + fit-content); the card signals (full-width
+   surface, border, shadow) are gone, so a section header can never be mistaken
+   for one of the item rows it introduces. */
+.sechead{display:flex;gap:9px;align-items:flex-start;background:none;border:0;border-radius:0;padding:0;margin:2px 0 12px;box-shadow:none}
+.secic{width:28px;height:28px;flex:none;border-radius:50%;background:var(--gc,var(--accent));color:#fff;display:grid;place-items:center}
+.secic svg{width:15px;height:15px}
+.sechead h2{margin:0;font-size:.95rem;font-weight:700;letter-spacing:-.01em;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;width:fit-content;background:color-mix(in srgb,var(--gc,var(--accent)) 12%,transparent);border-radius:999px;padding:3px 14px}
 .sechead .gtag{font-size:.64rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gc,var(--accent))}
-.sechead p{margin:3px 0 0;color:var(--muted);font-size:.78rem}
-.tabbar a{display:inline-flex;align-items:center;gap:7px}
-.tabbar a svg{width:15px;height:15px}
+.sechead p{margin:5px 0 0 3px;color:var(--muted);font-size:.78rem}
+/* (tab box + icon size are declared once, above — a later duplicate at equal
+   specificity silently overrode the compressed values for a whole session) */
 
 /* ---------- raw-skeleton affordance (assets/slots.js) — inert on generated pages ---------- */
 .slottoken{display:inline-flex;align-items:center;font:var(--mono);font-size:.66rem;color:var(--accent-ink);background:var(--accent-soft);border:1px dashed var(--accent-ink);border-radius:6px;padding:1px 7px;margin:0 2px;white-space:nowrap;vertical-align:baseline}
 .side .slottoken{color:#aab6ff;background:rgba(255,255,255,.07);border-color:#5560a8;margin:4px 10px}
 .slotnotice{background:var(--warn-soft);border:1px solid #ecd9b8;color:var(--warn);border-radius:10px;padding:10px 14px;margin:12px 18px 0;font-size:.8rem}
+
+/* ---------- viewer settings: density + rail ---------- */
+/* COMPACT = vertical density. Same width, less air: the sidebar fits more rows
+   without changing what any row says. */
+:root[data-compact="1"] .side{padding:8px 10px;gap:1px}
+:root[data-compact="1"] .brand{padding:2px 8px 7px}
+:root[data-compact="1"] .side .search{padding:5px 10px;margin:1px 4px 6px}
+:root[data-compact="1"] .navlabel{padding:7px 10px 2px}
+:root[data-compact="1"] .navitem{padding:4px 10px}
+:root[data-compact="1"] .navsub a{padding:2px 10px}
+:root[data-compact="1"] .side .foot{padding:7px 10px 2px}
+
+/* RAIL = collapse to icons, width to content. Toggled by the button in the
+   sidebar's bottom-right corner, independent of density. */
+:root[data-rail="1"]{--side-w:64px}
+:root[data-rail="1"] .navlabel,
+:root[data-rail="1"] .navsub,
+:root[data-rail="1"] .side .search,
+:root[data-rail="1"] .side .foot,
+:root[data-rail="1"] .brand small,
+:root[data-rail="1"] .brand b,
+:root[data-rail="1"] .navitem .count{display:none}
+:root[data-rail="1"] .side{align-items:center}
+:root[data-rail="1"] .brand{padding:6px 0 12px}
+:root[data-rail="1"] .navitem{justify-content:center;gap:0;font-size:0;padding:9px 0;width:100%}
+:root[data-rail="1"] .navitem svg{width:18px;height:18px}
+
+/* collapse toggle: icon-only, directly AFTER the last menu group */
+.a3rail{align-self:flex-start;margin:8px 0 0 8px;display:inline-flex;align-items:center;
+  justify-content:center;background:var(--sidebar-2);border:1px solid #26314a;
+  color:var(--sidebar-muted);border-radius:8px;padding:6px;cursor:pointer}
+.a3rail:hover{color:var(--sidebar-ink);border-color:#3a4763}
+:root[data-rail="1"] .a3rail{align-self:center;margin-left:0}
+
+/* Diagram text follows the content font. Mermaid inlines its own
+   <style>#m0{font-family:...} — an ID selector — so this must be !important. */
+.dgm svg,.dgm svg text,.dgm svg tspan,.dgm svg .nodeLabel,.dgm svg .edgeLabel,
+.dgm svg foreignObject div,.dgm svg span{font-family:var(--font-content)!important}
+
+/* ---------- diagram picker: one diagram at a time, no script ---------- */
+.dgm>input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.dgmbar{display:inline-flex;gap:4px;background:var(--panel);border:1px solid var(--line);
+  border-radius:11px;padding:4px;margin:0 0 14px}
+.dgmbar a{text-decoration:none;font-size:.78rem;font-weight:600;color:var(--ink-2);padding:5px 13px;
+  border-radius:8px;cursor:pointer;user-select:none}
+.dgmbar a:hover{color:var(--accent)}
+.dgm .pane{display:none}
+.dgm .panes svg{max-width:100%;height:auto}
+/* :target, not a radio — the choice now rides in the URL, so a link to "the
+   dataflow of transaction" survives a reload and a paste to a colleague.
+   Nothing else on the page can be inside .dgm, so :not(:has(:target)) is a
+   safe "nobody picked yet" default. */
+.dgm:not(:has(:target)) .panes .p0{display:block}
+.dgm .panes .pane:target{display:block}
+.dgm:not(:has(:target)) .dgmbar a:nth-of-type(1),
+.dgm:has(.p0:target) .dgmbar a:nth-of-type(1),
+.dgm:has(.p1:target) .dgmbar a:nth-of-type(2),
+.dgm:has(.p2:target) .dgmbar a:nth-of-type(3){background:var(--surface);color:var(--ink);
+  box-shadow:var(--shadow)}
+
+/* ---------- settings panel (injected by a3-settings.js) ---------- */
+.a3gear{display:inline-flex;align-items:center;gap:7px;background:var(--surface);
+  border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:.74rem;
+  font-weight:600;color:var(--ink-2);cursor:pointer;font-family:var(--font-ui)}
+.a3gear:hover{color:var(--accent);border-color:var(--accent)}
+.a3panel{position:fixed;right:20px;top:56px;z-index:60;width:270px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-lift);
+  padding:14px;display:none;font-family:var(--font-ui)}
+.a3panel.on{display:block}
+.a3panel h4{margin:0 0 10px;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted)}
+.a3panel label.row{display:block;font-size:.68rem;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--muted);margin:12px 0 5px}
+.a3panel select{width:100%;font-size:.82rem;padding:6px 8px;border:1px solid var(--line);
+  border-radius:8px;background:var(--panel);color:var(--ink);font-family:inherit}
+.a3seg{display:flex;gap:4px}
+.a3seg button{flex:1;font-size:.76rem;font-weight:600;padding:6px 0;border-radius:7px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink-2);cursor:pointer;
+  font-family:inherit}
+.a3seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.a3toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:.82rem;color:var(--ink);margin-top:4px}
+
+/* ---------- gabe-lens block: the page's opening ---------- */
+.lens{margin:0 0 20px}
+.lenshandle{margin:0 0 14px;font-size:1.08rem;font-weight:650;letter-spacing:-.01em;
+  color:var(--ink);font-family:var(--font-content)}
+.lensbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;
+  margin:0 0 14px}
+.lenscell{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:9px;padding:10px 12px}
+.lenscell b{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--muted);margin-bottom:3px}
+.lenscell span{font-size:.84rem;color:var(--ink-2)}
+.lenscell:nth-child(2){border-left-color:var(--warn)}
+.lenscell:nth-child(3){border-left-color:var(--good)}
+.lensanalogy{margin:0 0 12px;font-size:.9rem;color:var(--ink-2);font-style:italic}
+
+/* Progressive disclosure — the full card is present, just folded. */
+details.more{margin:18px 0 0;border-top:1px solid var(--line);padding-top:12px}
+details.more>summary{cursor:pointer;font-size:.8rem;font-weight:650;color:var(--accent);
+  list-style:none;display:flex;align-items:center;gap:7px;font-family:var(--font-ui)}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:"▸";font-size:.9rem}
+details.more[open]>summary::before{content:"▾"}
+details.more>summary:hover{opacity:.8}
+
+/* ---------- semantic color tags: HTTP verbs · code layers · severities ----------
+   One vocabulary, used with a legend beside every table that speaks it. */
+.tag.m-get{background:var(--good-soft);color:var(--good)}
+.tag.m-post{background:var(--accent-soft);color:var(--accent-ink)}
+.tag.m-mut{background:var(--warn-soft);color:var(--warn)}
+.tag.m-del{background:var(--bad-soft);color:var(--bad)}
+.tag.l-api{background:var(--accent-soft);color:var(--accent-ink)}
+.tag.l-services{background:#e0f2f1;color:#0f766e}
+.tag.l-models{background:#f3e8ff;color:#7c3aed}
+.tag.l-schemas{background:#e0e7ff;color:#4338ca}
+.tag.l-web{background:var(--good-soft);color:var(--good)}
+.tag.l-mobile{background:#ffedd5;color:#c2410c}
+.tag.l-evidence{background:#fce7f3;color:#be185d}
+/* growth pricing: effort class + the maturity stage it belongs to */
+.tag.e-xs{background:var(--good-soft);color:var(--good)}
+.tag.e-s{background:#e0f2f1;color:#0f766e}
+.tag.e-m{background:var(--warn-soft);color:var(--warn)}
+.tag.e-l{background:var(--bad-soft);color:var(--bad)}
+.tag.st-mvp{background:var(--accent-soft);color:var(--accent-ink)}
+.tag.st-ent{background:#f3e8ff;color:#7c3aed}
+.tag.st-scale{background:var(--line-2);color:var(--muted)}
+.tag.s-high{background:var(--bad-soft);color:var(--bad)}
+.tag.s-med{background:var(--warn-soft);color:var(--warn)}
+.tag.s-low{background:var(--accent-soft);color:var(--accent-ink)}
+.tag.s-ok{background:var(--good-soft);color:var(--good)}
+.tag.s-gap{background:var(--line-2);color:var(--muted)}
+.leg{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:2px 0 12px;
+  font-size:.76rem;color:var(--muted)}
+.leg .tag{font-size:.62rem}
+
+/* proof-set rows: a toggleable row that opens into its own gallery */
+details.proofset{border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);margin:0 0 8px;box-shadow:var(--shadow)}
+details.proofset>summary{cursor:pointer;list-style:none;display:flex;align-items:center;
+  gap:10px;padding:11px 16px;font-size:.85rem}
+details.proofset>summary::-webkit-details-marker{display:none}
+details.proofset>summary::before{content:"▸";color:var(--accent);font-size:.85rem}
+details.proofset[open]>summary::before{content:"▾"}
+details.proofset>summary b{font-weight:650}
+details.proofset>summary .count{margin-left:auto;font:var(--mono);font-size:.68rem;
+  color:var(--muted)}
+details.proofset .gal{padding:0 14px 14px;margin:0}
+
+/* ---------- code-tab cross-links: rows are anchor targets ---------- */
+/* font-only verb colors (backgrounds stay for the endpoints table's own tags) */
+.fm-get{color:var(--good)} .fm-post{color:var(--accent-ink)}
+.fm-mut{color:var(--warn)} .fm-del{color:var(--bad)}
+a.fm-get,a.fm-post,a.fm-mut,a.fm-del{text-decoration:none;font:var(--mono);
+  font-size:.68rem;white-space:nowrap}
+a.fm-get:hover,a.fm-post:hover,a.fm-mut:hover,a.fm-del:hover{text-decoration:underline}
+a.flink{text-decoration:none;font-weight:600}
+a.flink:hover{text-decoration:underline}
+a.dlink{text-decoration:none;font-weight:600;color:#7c3aed}
+a.dlink:hover{text-decoration:underline}
+/* expandable purpose cell — closed shows the cut, open swaps in the full text */
+details.pmore{display:inline}
+details.pmore summary{list-style:none;cursor:pointer;display:inline}
+details.pmore summary::-webkit-details-marker{display:none}
+details.pmore .full{display:none}
+details.pmore[open] .cut{display:none}
+details.pmore[open] .full{display:inline}
+details.pmore i{font-style:normal;color:var(--accent);font-size:.7rem;
+  white-space:nowrap;margin-left:4px}
+details.pmore i::after{content:"⊕ more"}
+details.pmore[open] i::after{content:"⊖ less"}
+
+/* right cluster of the sticky tabbar: pills + sync ride with the tabs, so the
+   one bar that stays on screen carries tests · phase · last-sync */
+.tabbar .tpills{margin-left:auto;display:flex;gap:5px;align-items:center;
+  flex-wrap:nowrap;flex:none}
+
+/* secondary nav: per-tab section links, sticky just under the tabbar */
+.subnav{position:sticky;top:55px;z-index:5;display:flex;gap:2px;flex-wrap:wrap;
+  background:var(--bg);border-bottom:1px solid var(--line-2);padding:6px 0;margin:0 0 14px}
+.subnav a{font-size:.74rem;font-weight:600;color:var(--muted);text-decoration:none;
+  padding:4px 11px;border-radius:7px}
+.subnav a:hover{background:var(--panel);color:var(--ink)}
+[id^="sec-"]{scroll-margin-top:118px}
+[id^="ep-"],[id^="cm-"],[id^="dm-"]{scroll-margin-top:150px}
+
+/* ---------- dark mode (a3-settings.js toggles data-theme on :root) ---------- */
+[data-theme="dark"]{
+  --bg:#0f141c; --surface:#161d29; --panel:#1b2433; --line:#2a3547; --line-2:#242e40;
+  --ink:#e6ebf3; --ink-2:#b7c1d1; --muted:#8391a5; --faint:#5c6a80;
+  --accent:#818cf8; --accent-soft:#272e4d; --accent-ink:#a5b0ff;
+  --good:#4ade80; --good-soft:#173226; --warn:#fbbf24; --warn-soft:#3a2c14;
+  --bad:#f87171; --bad-soft:#3b1f1e;
+  --shadow:none; --shadow-lift:0 6px 18px rgba(0,0,0,.5);
+  --bar-bg:rgba(15,20,28,.88)}
+/* pre-rendered mermaid SVGs carry light-theme colors — give them a light plate
+   rather than pretending they re-theme */
+[data-theme="dark"] .dgm .pane{background:#f6f7f9;border-radius:10px;padding:10px}
+[data-theme="dark"] .shot .ph{background:repeating-linear-gradient(135deg,#1b2433,#1b2433 10px,#242e40 10px,#242e40 20px)}
+.a3gear.icononly{width:30px;height:30px;padding:0;justify-content:center;border-radius:50%;flex:none}
+
+
+/* subnav: icons + true vertical centering (same height) */
+/* labels ride LOWER in the same bar height: more air above, less below */
+.subnav{align-items:center;padding:8px 0 2px}
+.subnav a{display:inline-flex;align-items:center;gap:6px}
+.subnav a svg{width:12px;height:12px;color:var(--faint);flex:none}
+.subnav a:hover svg{color:var(--accent)}
+
+/* section-title info toggle: the title row is the summary; ⊕ reveals the
+   section's description + legends (never its tables) */
+details.secinfo{margin:0}
+details.secinfo>summary{list-style:none;cursor:pointer}
+details.secinfo>summary::-webkit-details-marker{display:none}
+details.secinfo>summary h2{display:inline-flex;align-items:center;gap:8px;margin:0}
+.secinfo i.tgl{font-style:normal;display:inline-flex;width:17px;height:17px;flex:none;
+  border-radius:50%;align-items:center;justify-content:center;font-size:.78rem;
+  font-weight:700;background:color-mix(in srgb,var(--gc,var(--accent)) 16%,transparent);
+  color:var(--gc,var(--accent))}
+.secinfo i.tgl::after{content:"+"}
+details.secinfo[open] i.tgl::after{content:"–"}
+.secinfo .secbody{margin-top:7px}
+.secinfo .secbody p{margin:3px 0 0;color:var(--muted);font-size:.78rem}
+.secinfo .secbody .leg{margin:8px 0 2px}
+
+/* the settings gear sits in the brand row, right of the title — BARE icon,
+   no container; its panel opens anchored to the cog (positioned by JS) */
+.brand .a3gear{margin-left:auto;background:none;border:0;padding:0;
+  width:auto;height:auto;color:var(--sidebar-muted)}
+.brand .a3gear:hover{color:var(--sidebar-ink)}
+.brand .a3gear svg{width:15px;height:15px}
+:root[data-rail="1"] .side .brand{flex-direction:column;gap:8px}
+:root[data-rail="1"] .brand .a3gear{margin-left:0}
+/* .a3panel position is set from the gear's rect by a3-settings.js */
+
+/* ---------- data-model TYPE vocabulary: family = hue, depth = width ----------
+   Three families a reader scans a Type column for -- numeric, temporal,
+   textual -- one hue each. Within a family the WIDER type renders DEEPER: an
+   int is the plain member of the numeric family, a float/Decimal the deep one.
+   Legended wherever used (a color without a legend is decoration). */
+.ty{font:var(--mono);font-size:.76rem;font-weight:600}
+.ty-num1{color:#7089c4} .ty-num2{color:#1d4ed8}
+.ty-tim1{color:#c08a4a} .ty-tim2{color:#9a4b06}
+.ty-str1{color:#4f9a86} .ty-str2{color:#0b6a55}
+.ty-bool{color:#b83280} .ty-json{color:#7c6bb8} .ty-id{color:#78849a}
+.ty-null{color:var(--faint);font-weight:500}
+[data-theme="dark"] .ty-num1{color:#9db4ee}
+[data-theme="dark"] .ty-num2{color:#6c8cff}
+[data-theme="dark"] .ty-tim1{color:#e3b579}
+[data-theme="dark"] .ty-tim2{color:#f0913c}
+[data-theme="dark"] .ty-str1{color:#84c9b6}
+[data-theme="dark"] .ty-str2{color:#3fd6ac}
+[data-theme="dark"] .ty-bool{color:#f472b6}
+[data-theme="dark"] .ty-json{color:#b4a8f0}
+[data-theme="dark"] .ty-id{color:#8391a5}
+
+/* ---------- meter: a counter and its proportion in one cell ----------
+   A percentage alone hides the denominator; a bar alone hides the count. */
+.meter{display:flex;align-items:center;gap:8px;min-width:118px}
+.meter .bar{flex:1;min-width:52px}
+.meter .pct{font:var(--mono);font-size:.7rem;color:var(--muted);
+  font-variant-numeric:tabular-nums;min-width:36px;text-align:right}
+.meter.full .pct{color:var(--good)}
+
+/* ---------- expander row: a table row that opens INSIDE the table ----------
+   The detail belongs to the row, so it renders under it rather than on a page
+   the reader has to navigate away to. */
+.tbl tr.exp>td{padding:0;border-top:0;background:var(--panel);
+  box-shadow:inset 3px 0 0 transparent;transition:background .12s}
+.tbl tr.exp details.more{margin:0;padding:5px 18px 10px;border-top:0}
+.tbl tr.exp details.more>summary{font-size:.72rem;color:var(--muted);font-weight:600}
+/* an OPEN expander is highlighted: with several sets on one page, the row that
+   is currently unfolded has to be findable without re-reading every summary */
+.tbl tr.exp:has(details.more[open])>td{background:var(--accent-soft);
+  box-shadow:inset 3px 0 0 var(--accent)}
+.tbl tr.exp details.more[open]>summary{color:var(--accent-ink);font-weight:700}
+.tbl tr.exp details.more[open]>summary code{color:inherit}
+.tbl tr.exp .tbl{font-size:.76rem;background:var(--surface);
+  border:1px solid var(--line);border-radius:8px;margin-top:8px}
+.tbl tr.exp .tbl td,.tbl tr.exp .tbl th{padding:6px 12px}
+.cid{font:var(--mono);font-size:.68rem;font-weight:700;color:var(--accent-ink);
+  background:var(--accent-soft);border-radius:5px;padding:1px 6px}
+.cid.none{color:var(--faint);background:var(--line-2);font-weight:600}
+
+/* ---------- proof viewer: the artifact opens IN the page ----------
+   Navigating away to a raw PNG loses the reader's place in the page and the
+   set they were reading. The viewer keeps both: one gallery is one navigable
+   group, moved through with the side arrows or the left/right keys. */
+.a3lb{position:fixed;inset:0;z-index:80;display:none;background:rgba(9,12,18,.93);
+  backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:64px 72px 96px}
+.a3lb.on{display:flex}
+.a3lb-stage{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;
+  max-width:100%;max-height:100%}
+.a3lb-media{display:flex;align-items:center;justify-content:center;min-height:0}
+.a3lb-media img,.a3lb-media video{max-width:min(1180px,92vw);max-height:76vh;
+  border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.55);background:#fff;display:block}
+.a3lb-cap{display:flex;flex-direction:column;align-items:center;gap:4px;
+  max-width:min(900px,90vw);color:#c9d3e2;font-size:.8rem;text-align:center}
+.a3lb-cap b{font:var(--mono);font-size:.72rem;color:#aeb9c9;font-weight:500}
+.a3lb-cap .note{color:#d3dbe7;font-size:.86rem;line-height:1.5}
+.a3lb-cap .set{color:#6f7d92;font-size:.72rem}
+/* the top line: which leg, and where in it — it changes as the arrows cross
+   from one leg into the next, so the reader is never lost mid-walk */
+.a3lb-title{position:absolute;top:18px;left:50%;transform:translateX(-50%);
+  color:#c9d3e2;font-size:.86rem;letter-spacing:.01em;text-align:center;
+  max-width:70vw}
+.a3lb-title b{font:var(--mono);font-size:.72rem;text-transform:uppercase;
+  letter-spacing:.06em;background:rgba(129,140,248,.22);color:#b9c2ff;
+  border-radius:5px;padding:2px 8px;margin-right:7px}
+.a3lb-nav,.a3lb-x{position:absolute;background:rgba(255,255,255,.08);border:1px solid
+  rgba(255,255,255,.16);color:#e8eef8;cursor:pointer;border-radius:50%;
+  display:grid;place-items:center;transition:background .12s}
+.a3lb-nav{top:50%;transform:translateY(-50%);width:46px;height:46px}
+.a3lb-nav svg{width:22px;height:22px}
+.a3lb-nav.prev{left:14px} .a3lb-nav.next{right:14px}
+.a3lb-x{top:14px;right:14px;width:34px;height:34px;font-size:1.3rem;line-height:1}
+.a3lb-nav:hover,.a3lb-x:hover{background:rgba(255,255,255,.2)}
+.a3lb-nav:focus-visible,.a3lb-x:focus-visible{outline:2px solid #818cf8;outline-offset:2px}
+.a3lb-nav[hidden]{display:none}
+.a3lb-idx{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+  font:var(--mono);font-size:.72rem;color:#8f9db2}
+@media (max-width:640px){
+  .a3lb{padding:40px 12px 84px}
+  .a3lb-nav{width:38px;height:38px} .a3lb-nav.prev{left:6px} .a3lb-nav.next{right:6px}
+}
+
+/* gallery tiles are viewer triggers, not file links */
+a.shot[data-lb]{cursor:zoom-in}
+.shot .ph.vid{font:var(--mono);font-size:.8rem;color:var(--accent);letter-spacing:.06em}
+.leghead{margin:14px 0 4px;font-size:.82rem;color:var(--ink-2)}
+.leghead b{font:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--accent-ink);background:var(--accent-soft);border-radius:5px;padding:2px 7px}
+
+/* gallery tile: its position in the leg, so a shot read on its own still
+   says where in the walk it sits */
+.shot .cap .ix{float:right;font:var(--mono);font-size:.6rem;color:var(--faint)}
+
+/* a leg of a walk: its own collapsible sub-section inside the set expander,
+   so a 53-artifact set can be read one journey at a time */
+details.legset{margin:12px 0 0}
+details.legset>summary{cursor:pointer;list-style:none;display:flex;align-items:center;
+  gap:9px;font-size:.82rem;color:var(--ink-2);padding:3px 0}
+details.legset>summary::-webkit-details-marker{display:none}
+details.legset>summary::before{content:"▸";color:var(--accent);font-size:.8rem}
+details.legset[open]>summary::before{content:"▾"}
+details.legset>summary b{font:var(--mono);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--accent-ink);background:var(--accent-soft);
+  border-radius:5px;padding:2px 7px}
+details.legset>summary .count{font:var(--mono);font-size:.66rem;color:var(--faint)}
+details.legset .gal{margin:8px 0 4px}
