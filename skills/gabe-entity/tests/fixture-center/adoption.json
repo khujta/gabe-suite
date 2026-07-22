@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "started": "2026-07-21",
+  "archived_to": null,
+  "shortlist_approved": true,
+  "sections": [
+    { "entity": "widget", "display_name": "Widget", "rank": "critical",
+      "status": "building",
+      "checklist": { "testing_inventory": true, "legacy_reverified": true, "card": true,
+                     "diagrams": false, "proofs": false, "gate_green": false, "walk_recorded": false },
+      "signals": "junit 42 · critical-path", "approved_walk": null, "notes": "" },
+    { "entity": "gadget", "display_name": "Gadget", "rank": "medium",
+      "status": "pending",
+      "checklist": { "testing_inventory": false, "legacy_reverified": false, "card": false,
+                     "diagrams": false, "proofs": false, "gate_green": false, "walk_recorded": false },
+      "signals": "junit 3", "approved_walk": null, "notes": "" }
+  ]
+}

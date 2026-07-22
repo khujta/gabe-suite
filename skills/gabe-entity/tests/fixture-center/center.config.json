@@ -1,0 +1,20 @@
+{
+  "_comment": "SMOKE FIXTURE (canonical shape) for entity-context.py — two linked entities. Not real data; validates the reader's join, not reality (that is the gastify dry-run recorded in the commit).",
+  "project": { "name": "fixture", "display_name": "Fixture", "lang": "en" },
+  "paths": { "center": "docs/site/center" },
+  "code_layers": ["api", "models", "schemas", "web"],
+  "entities": {
+    "widget": {
+      "test_rx": "widget|wdg",
+      "proofs": ["widget-detail", "widget-list"],
+      "models": ["Widget"],
+      "code": {
+        "api": ["backend/app/api/widgets.py"],
+        "models": ["backend/app/models/widget.py"],
+        "schemas": ["backend/app/schemas/widget.py"],
+        "web": ["web/src/components/widgets/*.tsx"]
+      }
+    },
+    "gadget": { "test_rx": "gadget|gdg" }
+  }
+}

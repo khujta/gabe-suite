@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "head": "fix7ure",
+  "generated": "2026-07-21 00:00Z",
+  "entities": {
+    "widget": {
+      "endpoints": [
+        { "method": "GET", "path": "/widgets", "fn": "list_widgets",
+          "file": "backend/app/api/widgets.py", "doc": "Paginated widget list.",
+          "resp": "WidgetListItem", "status": "200", "touches": ["Widget"] },
+        { "method": "POST", "path": "/widgets", "fn": "create_widget",
+          "file": "backend/app/api/widgets.py", "doc": "Create a widget.",
+          "resp": "WidgetOut", "status": "201", "touches": ["Widget", "WidgetCreate"] }
+      ],
+      "models": [
+        { "cls": "Widget", "table": "widgets", "file": "backend/app/models/widget.py",
+          "doc": "A widget owned by a gadget.",
+          "cols": [["id", "int"], ["name", "str"], ["gadget_id", "int"]],
+          "fks": { "gadget_id": "gadgets.id" },
+          "rels": [{ "name": "gadget", "target": "Gadget", "many": false, "back": "widgets", "cascade": null }],
+          "uqs": [] }
+      ],
+      "schemas": [
+        { "cls": "WidgetCreate", "file": "backend/app/schemas/widget.py",
+          "fields": [["name", "str"], ["gadget_id", "int"]], "doc": "Widget create payload." }
+      ],
+      "files": [
+        ["api", "backend/app/api/widgets.py", 120],
+        ["models", "backend/app/models/widget.py", 44],
+        ["web", "web/src/components/widgets/WidgetList.tsx", 88]
+      ],
+      "defines": {
+        "backend/app/models/widget.py": ["Widget"],
+        "web/src/components/widgets/WidgetList.tsx": ["WidgetList"]
+      }
+    },
+    "gadget": {
+      "endpoints": [],
+      "models": [
+        { "cls": "Gadget", "table": "gadgets", "file": "backend/app/models/gadget.py",
+          "doc": "A gadget.", "cols": [["id", "int"], ["label", "str"]],
+          "fks": {}, "rels": [], "uqs": [] }
+      ],
+      "schemas": [],
+      "files": [["models", "backend/app/models/gadget.py", 22]],
+      "defines": { "backend/app/models/gadget.py": ["Gadget"] }
+    }
+  }
+}
