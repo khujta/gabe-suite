@@ -36,6 +36,24 @@ The perspective is **never optional**. Always require it. Examples:
 
 The reviewer adopts the perspective fully — think like that person, worry about what they worry about, catch what they would catch.
 
+#### Canonical archetype perspectives
+
+Beyond the role examples above, the suite ships a canonical five-perspective set — the
+work-mode archetypes in `templates/archetype-map.md` (load path: `templates/archetype-map.md`
+or `~/.claude/templates/gabe/archetype-map.md`). Passing one as the perspective adopts a
+lens with a fixed meaning across runs:
+
+| Perspective | Attacks (gap lens) |
+|---|---|
+| Prototyper | commitment too early — polish/infra built before the idea is validated |
+| Builder | what isn't production-grade — the path from prototype to shippable |
+| Sweeper | unnecessary surface, complexity, dead paths, unshipped cruft, slow paths |
+| Grower | what blocks PMF iteration — unmeasurable outcomes, friction to change |
+| Maintainer | what breaks at 10x — regressions, reliability, security, operability |
+
+These compose with the maturity classification unchanged — a Sweeper still reports gaps as
+M/E/S. The archetype only sets what the reviewer worries about, never the output contract.
+
 ---
 
 ## Classification Dimensions

@@ -22,7 +22,7 @@ Stress-tests a target (file, folder, plan, architecture, or concept) from a requ
 
 `/gabe-roast [perspective] [target]`
 
-Two inputs are required — target (file, folder, inline plan/concept, or "this conversation") and perspective (never optional; examples: Architect, UX/UI Designer, Security Auditor, QA/Testing Lead, DevOps Engineer, Domain Expert, End User). If either is missing, ask before proceeding.
+Two inputs are required — target (file, folder, inline plan/concept, or "this conversation") and perspective (never optional; examples: Architect, UX/UI Designer, Security Auditor, QA/Testing Lead, DevOps Engineer, Domain Expert, End User — or a canonical work-mode archetype: Prototyper / Builder / Sweeper / Grower / Maintainer, defined in `templates/archetype-map.md`). If either is missing, ask before proceeding.
 
 | Mode | Output |
 |------|--------|

@@ -74,6 +74,8 @@ The skill identifies which level the CURRENT project/situation is at, and flags 
 
 Current level := the `maturity:` frontmatter field of `.kdbp/BEHAVIOR.md` (same source /gabe-debt Step 0 uses). If the file/field is absent, print `maturity unknown — assuming MVP` in D2 output — never guess from vibes.
 
+**Posture mix (advisory).** Once the level is known, D2 may cite the archetype posture-mix for that maturity from `templates/archetype-map.md` (or `~/.claude/templates/gabe/archetype-map.md`) — e.g. at MVP lean Prototyper + Builder + Sweeper; at Scale, Sweeper + Grower + Maintainer with a Builder in reserve. This frames *what mode the fix should be made in*, not just its level, and can flag a change made in the wrong posture (Maintainer-grade hardening on a pre-PMF prototype). Advisory only — never a gate.
+
 ### D3: Prerequisites
 
 What must be true or verified before this change is safe?

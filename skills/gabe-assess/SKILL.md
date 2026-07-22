@@ -22,7 +22,7 @@ Pause before an "obvious yes" and take a photograph of what a proposed change ac
 
 Required input: the proposed change (inline description, a reference to earlier discussion, or "this") plus its context (mid-task / planning / post-review / blocker) — auto-detected or stated.
 
-Every full-mode assessment covers five dimensions: **D1** Blast Radius (Contained/Local/Cross-cutting/External), **D2** Maturity-Appropriate Scope (MVP/Enterprise/Scale, vs. the project's actual maturity), **D3** Prerequisites, **D4** Alternatives (do nothing / minimal / proper / workaround), **D5** Structural Fit (only when `.kdbp/STRUCTURE.md` exists — flags files proposed in undeclared locations).
+Every full-mode assessment covers five dimensions: **D1** Blast Radius (Contained/Local/Cross-cutting/External), **D2** Maturity-Appropriate Scope (MVP/Enterprise/Scale, vs. the project's actual maturity — optionally citing the archetype posture-mix from `templates/archetype-map.md`), **D3** Prerequisites, **D4** Alternatives (do nothing / minimal / proper / workaround), **D5** Structural Fit (only when `.kdbp/STRUCTURE.md` exists — flags files proposed in undeclared locations).
 
 | Mode | Alias | Output | Use when |
 |------|-------|--------|----------|
