@@ -29,24 +29,11 @@ Gaps are numbered `W1..Wn`. Numbering stable across revisions — new gaps appen
 
 ---
 
-## W2 — `/gabe-teach` is optional post-commit, no enforcement
+## W2 — (retired) `gabe-teach` cadence enforcement
 
-**What's missing.** `/gabe-teach` consolidates architect-level understanding, but since the A2 KDBP-lite migration it renders lessons statelessly — it no longer writes to `KNOWLEDGE.md` by default (that file is legacy-only now, honored if a project still has one, never created fresh). It's not in the phase state columns, not dispatched by `/gabe-next`, not required before advancing. Nothing tracks whether a topic was ever taught.
+**Status.** Retired. `gabe-teach` was archived 2026-07-15 (trim-matrix audit, ruling in [design/trim-ledger.md](design/trim-ledger.md) — 2,740 combined lines with `gabe-arch` serving ~2 observed uses). A cadence-enforcement gap for a command that no longer runs is moot; the options below (hook, 5th state column, cadence flag) no longer have a target skill to dispatch. `.kdbp/KNOWLEDGE.md` stays legacy-only — honored if a project already has one, never created fresh by anything live.
 
-**Why it matters.** Gravity wells drift from reality. Future `/gabe-commit` Notable Updates digest has less context. Human architect model becomes shallow.
-
-**Current workaround.** Manual call after each phase push.
-
-### Options
-
-| Option | Approach | Cost | Risk |
-|--------|----------|------|------|
-| **A** — Hook after N commits | Post-commit hook counts + prompts `/gabe-teach` after N commits on a phase | medium (counter in LEDGER) | low — just a prompt |
-| **B** — 5th state column | Extend `PLAN.md` Phases table with `Teach` column. `/gabe-next` dispatches `/gabe-teach` after `Push ✅`. | high (schema migration, `/gabe-plan check` retrofit) | medium — widens surface |
-| **C** — BEHAVIOR cadence flag | `BEHAVIOR.md` frontmatter: `teach_cadence: per-commit \| per-phase \| weekly \| manual`. Commands honor. | low (config + honor logic) | low |
-| **D** — Leave optional | Status quo | zero | high (quiet rot) |
-
-**Recommend.** C — configurable cadence, default `per-phase`. Matches serial workflow; respects users who explicitly skip. Implementation: `/gabe-help` shows "⚠ teach due after phase 3" when cadence elapsed.
+**Revisit trigger.** If knowledge-consolidation duties are reinstated (a new skill, or `gabe-teach` un-archived from `skills/_archive/`), re-open this gap and re-evaluate the same option set (hook / state column / cadence flag) against the reinstated command.
 
 ---
 
@@ -216,24 +203,26 @@ Gaps are numbered `W1..Wn`. Numbering stable across revisions — new gaps appen
 
 ---
 
-## W12 — Diagram standards not enforced for own docs
+## W12 — (resolved-by-ruling) Diagram standards not enforced for own docs
+
+**Status.** RESOLVED-BY-RULING (2026-07-22): the suite repo is built with the advisory arm only — `scripts/suite-doctor.sh` + `/gabe-roast` + adversarial verify + dry-run numbers — and never carries a `.kdbp/` of its own; Option A below (dogfood `.kdbp/` + `/gabe-commit docs-audit` on the suite itself) is closed.
 
 **What's missing.** [skills/gabe-docs/SKILL.md](../skills/gabe-docs/SKILL.md) defines CommonMark + Mermaid standards. Gabe Suite's own docs aren't CI-checked for compliance.
 
 **Why it matters.** Standards drift. New contributors introduce patterns that conflict with what the suite teaches downstream projects.
 
-**Current workaround.** None — review-time catch only.
+**Current workaround.** `scripts/suite-doctor.sh` + review-time catch (roast / adversarial verify) — not a full docs-audit.
 
 ### Options
 
 | Option | Approach | Cost | Risk |
 |--------|----------|------|------|
-| **A** — Apply `/gabe-commit docs-audit` to suite itself | Suite is a project with its own `.kdbp/`; dogfood the standards | medium (scaffold suite's own `.kdbp/`) | low |
+| **A** — Apply `/gabe-commit docs-audit` to suite itself | Suite is a project with its own `.kdbp/`; dogfood the standards | medium (scaffold suite's own `.kdbp/`) | low — **closed by the 2026-07-22 ruling above** |
 | **B** — CI check (markdownlint + mermaid-lint) | Run CommonMark + Mermaid syntax checks on PR | medium (CI config) | low |
 | **C** — Pre-commit hook | Local check before push | low (one hook) | medium (easy to bypass) |
 | **D** — Trust review | Status quo | zero | medium |
 
-**Recommend.** A — scaffold `.kdbp/` for `gabe_lens` itself + run `/gabe-commit docs-audit` periodically. Eat own dog food. Also cheapest way to find standards gaps.
+**Recommend.** B or C, only if standards drift becomes evidenced. A is closed per the ruling above — advisory-arm-only stays the suite repo's model.
 
 ---
 
@@ -270,10 +259,10 @@ Gaps are numbered `W1..Wn`. Numbering stable across revisions — new gaps appen
 | 6 | W3 phase reset | small | medium (quality-of-life) |
 | 7 | W8 plan complete docs | tiny | low (UX polish) |
 | 8 | W14 brownfield adoption | small-to-medium | medium (reduces onboarding surprise) |
-| 9 | W2, W6, W7 cadence flags | medium (bundled) | medium (structural drift prevention) |
-| 10 | W12 standards enforcement | medium | low (invisible until it bites) |
+| 9 | W6, W7 cadence flags | medium (bundled) | medium (structural drift prevention) |
+| 10 | W12 | — | done (resolved-by-ruling) |
 
-Ship order: close small high-impact gaps first (W1, W9), strengthen brownfield detection (W14-C), then tackle cadence bundle (W2 + W6 + W7 share BEHAVIOR config surface).
+Ship order: close small high-impact gaps first (W1, W9), strengthen brownfield detection (W14-C), then tackle cadence bundle (W6 + W7 share BEHAVIOR config surface).
 
 ---
 

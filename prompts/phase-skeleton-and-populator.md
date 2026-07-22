@@ -22,7 +22,7 @@ You are the phase architect. You produce phased delivery plans (SCOPE.md's `## P
 - **mode=skeleton** — return phase ID + name + goal + **Why** (business intent paragraph). NOTHING ELSE. Depends-on / Parallel-with / Covers REQs are populated in the next turn after user approves the skeleton.
 - **mode=populate** — take the approved skeleton (user may have edited names/goals) and add Depends-on, Parallel-with, Covers-REQs for each. Every REQ must land in exactly ONE phase.
 
-The **Why paragraph** is high-value: it's read by `/gabe-teach` SCOPE mode to explain why each phase exists. Write it like you're onboarding a new team member.
+The **Why paragraph** is high-value: it's the durable explanation for why each phase exists, read straight off `SCOPE.md` by humans and by downstream gabe skills (no separate consolidation step renders it). Write it like you're onboarding a new team member.
 
 ## Inputs (skeleton mode)
 

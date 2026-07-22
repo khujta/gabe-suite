@@ -124,7 +124,7 @@ flowchart LR
     Pivot --> PivotResult["SCOPE vN archived to<br/>.kdbp/archive/scope-vN.md<br/>SCOPE v&lcub;N+1&rcub; written fresh"]
 ```
 
-Direct entry points: `/gabe-scope-pivot` can be invoked directly when you already know it's a pivot. Additions always run inside `/gabe-scope-change` (its Step 5 — use `--force-addition` to skip the classifier); the former standalone `/gabe-scope-addition` is archived.
+Direct entry points: `/gabe-scope-pivot` can be invoked directly when you already know it's a pivot. Additions always run inside `/gabe-scope-change` (its Step 5 — use `--force-addition` to skip the classifier); the former standalone `gabe-scope-addition` skill is archived — see `skills/_archive/`.
 
 ---
 
@@ -169,7 +169,6 @@ Direct entry points: `/gabe-scope-pivot` can be invoked directly when you alread
 | `/gabe-health [focus]` | codebase structural health — god files, churn, coupling, bugs |
 | `/gabe-debt [brief\|dry-run\|target]` | architecture decision-debt scan with AP evidence citations |
 | `/gabe-mockup [mode]` | mockup, React Storybook, and design-reference workflows |
-| `/gabe-teach` | consolidate architect-level understanding post-commit — stateless lesson rendering (honors a legacy `KNOWLEDGE.md` if one already exists, never creates one) |
 | `/gabe-lens [concept]` | cognitive translation — analogies, constraint boxes, Gabe Blocks |
 
 ---
@@ -212,7 +211,7 @@ User-level (cross-project):
 2. **PLAN before code.** `/gabe-execute` reads `.kdbp/PLAN.md` state column before implementing. No implementation without a phase row.
 3. **STRUCTURE before placement.** New files must match a pattern in `.kdbp/STRUCTURE.md`. PostToolUse hook warns on drift; CHECK 9 escalates at commit.
 4. **VALUES override defaults.** Project `.kdbp/VALUES.md` + user `~/.kdbp/VALUES.md` outrank model priors. `/gabe-align` audits.
-5. **Verified KNOWLEDGE topics trump re-derivation, when present.** `.kdbp/KNOWLEDGE.md` is legacy-only — `/gabe-teach` never creates one, but if a project still has one and it marks a topic `verified`, honor that explanation rather than re-deriving.
+5. **Verified KNOWLEDGE topics trump re-derivation, when present.** `.kdbp/KNOWLEDGE.md` is legacy-only — no live command creates one (the `gabe-teach` skill that owned this is archived, see `skills/_archive/`), but if a project still has one and it marks a topic `verified`, honor that explanation rather than re-deriving.
 6. **SCOPE.md writes only by the `/gabe-scope` family.** That includes its `## Phases` section. `/gabe-commit` warns on direct edits.
 7. **`/gabe-next` is read-only except for `## Current Phase` advancement.** No other state mutation. Zero LLM.
 

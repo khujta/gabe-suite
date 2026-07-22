@@ -160,6 +160,19 @@ PY
   [ -n "$hits" ] && report "invariant" "operator-machine path in shipped surface(s): $(echo "$hits" | tr '\n' ' ')"
   bare=$(grep -rn '\$ECC_ROOT' "$REPO"/templates "$REPO"/skills 2>/dev/null | grep -v 'ECC_ROOT:-' || true)
   [ -n "$bare" ] && report "invariant" "bare \$ECC_ROOT (no :-\$HOME/.claude fallback): $(echo "$bare" | cut -d: -f1-2 | tr '\n' ' ')"
+  # G1 — runtime docs must never present an ARCHIVED skill in INVOCABLE form:
+  # docs/WORKFLOW.md, docs/GAPS.md, docs/workflows/ and prompts/ install as
+  # live guidance, and a /gabe-<archived> there routes users to a skill that
+  # no longer exists. Non-invocable mentions (archive paths, prose history)
+  # stay legal — the check keys on the slash-command form only.
+  for d in "$REPO"/skills/_archive/*/; do
+    [ -d "$d" ] || continue
+    slug=$(basename "$d")
+    hits=$(grep -rlE "(^|[[:space:]\`(|])/$slug\b" \
+      "$REPO/docs/WORKFLOW.md" "$REPO/docs/GAPS.md" \
+      "$REPO/docs/workflows" "$REPO/prompts" 2>/dev/null || true)
+    [ -n "$hits" ] && report "invariant" "archived skill /$slug still presented as live in: $(echo "$hits" | tr '\n' ' ')"
+  done
   # P3/P4 — docsite: markdown source newer than its generated page means the
   # site is stale. hub.md renders as the FRONT PAGE (docsite.config.py
   # hub_intro_md → index.html) — the old name-based mapping compared it against

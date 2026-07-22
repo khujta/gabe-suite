@@ -1,100 +1,191 @@
 # Feature spec — the binding intentions behind /gabe-feature
 
 > The one deep home for the card contract. SKILL.md carries intention + flow
-> and points here; nothing below is restated there. Angle ids: `pytest` ·
-> `vitest` · `journey` · `deployed` · `motion`. Diagram headings (exact):
-> `# DIAGRAM USERFLOW` · `# DIAGRAM DATAFLOW` · `# DIAGRAM WORKFLOW` — any
-> other heading renders nowhere and the gate flags it. One card renders TWO
-> pages: the cookbook page carries the story, the feature page the testing.
+> and points here; nothing below is restated there. Cards are PER ENTITY:
+> `cards/<slug>.md`, one per slug registered in `adoption.json` (the entity
+> registry — D123; an `entities.<slug>` config key the registry does not know
+> aborts the build). Diagram headings (exact): `# DIAGRAM USERFLOW` ·
+> `# DIAGRAM DATAFLOW` · `# DIAGRAM WORKFLOW` — any other heading renders
+> nowhere and the gate flags it. One card renders the entity's feature page
+> under the invariant five-tab bar (Overview · Code · Tests · Evidence · Risk).
 
-The FORMAT authority is the project's validator (`scripts/_center_data.py` — it
-fails loud on referential errors: unknown entities, unmatched globs, missing
-card sections). This file records the INTENTIONS the validator cannot check,
-plus the bootstrap for new projects. Never duplicate the schema here.
+The FORMAT authority is the generator suite: `_center_data.py`'s `parse_card`
+fails loud on a missing or empty required section, `build_center_a3.py` aborts
+on an unregistered entity slug, and `check_center_links.py` WARNs on
+card-quality drift (no canonical diagrams, no reviewed stamp, TODO markers,
+narration gaps). This file records the INTENTIONS the validators cannot check.
+Never duplicate the schema here.
 
 ## The editorial line (the whole system in two sentences)
 
 **Machine sources assert; authored artifacts translate.** The config maps
-(which sources belong to which feature), the card explains (what/why/whom/
-is/is-not/decided), the narration describes (what the evidence shows) — none
-of them may ever state a count, a pass/fail, or a coverage number: those come
-only from junit / run-status / coverage / OpenAPI at build time, so they can
-never drift from the truth.
+(which tests, code files and proof sets belong to which entity), the card
+explains (what/why/whom/is/is-not/decided), the narration describes (what the
+evidence shows) — none of them may ever state a count, a pass/fail, or a
+coverage number: those come only from junit / run-history / coverage / archmap
+at build time, so they can never drift from the truth.
+
+## The one binding file — center.config.json (shape, stated once)
+
+- `project` — `name` · `display_name` · `lang` (page chrome only).
+- `paths` — `center` · `kdbp` · `results` · `proof` · `e2e_spec_glob` ·
+  `mermaid_renderer`: every loader resolves from here; nothing is hardcoded.
+- `corpora[]` — one per test suite: `key` · `runner` · `kind` · `kind_detail` ·
+  `tag_class` · `kpi_detail`. Drives junit loading, the estate totals, the
+  corpus matrix, the per-entity Tests tab, and run-history sources.
+- `e2e` — runner + the local-only / coverage-gate notes the prose interpolates.
+- `commands` — `junit[]` · `coverage[]` · `e2e[]`: the shell lines
+  `scripts/refresh_center.sh <mode>` runs, one line each, from the repo root
+  (`regen` runs none).
+- `leaf_reports[]` · `foundations[]` · `code_layers[]` · `build_architecture`.
+- `entities` — a DICT keyed by adoption.json slug: `test_rx` (required — it
+  claims test files into the corpus matrix even before a section is built),
+  and once the section is adopted `proofs[]` · `code{layer: [globs]}` ·
+  `models[]`.
+
+Names live in the REGISTRY, not here: display names come from adoption.json
+rows (`display_name`, with `label` as the pre-rename fallback); entity colors
+come from the generator maps. Config that names or colors things is drift
+waiting to render.
 
 ## The card, section by section (what GOOD looks like)
+
+Required — `parse_card` refuses a card missing any of these (or with one empty):
 
 | Section | Intention | Trap to avoid |
 |---|---|---|
 | HANDLE | one line a stranger repeats correctly (≤14 words) | feature-name restating |
 | WHAT & WHY | before → after → why it matters; close with ONE physical-analogy line (house voice) | implementation detail; multiple analogies |
 | FOR WHOM | who feels it, in their words | "users" |
-| FLOWS | the user flows it lives in; journey links resolve at render | route lists |
+| FLOWS | the entity's flow registry — grammar below (§Flow coverage) | route lists; multi-word keys |
 | IS / IS NOT | shipped behaviors / deliberate non-goals + known gaps, plainly | IS NOT as excuses; hiding gaps |
 | DECIDED | D-refs + one-line rulings that shaped it | re-arguing decisions |
-| ENTITIES | ids from config `entities[]` (validator enforces), ORDERED BY PRIMACY — the FIRST entity is the feature's home cluster on the hub/docs groupings, and it must be the MOST SPECIFIC entity the feature is about ('user' is almost never primary; a photos feature homes under photos, not under the person holding the camera). The list MAY grow: a genuinely new domain entity is added to config `entities[]` (id + label + a NEW distinct color) in the same authoring pass — part of the card review; the validator's hard-fail is the prompt, not a wall | 'user' first by default; inventing entities inline; splitting hairs (a variant of an existing entity is that entity) |
-| ANGLES | one REASON line per absent angle ("not yet mapped/run", never 'untested'-sounding words), ENDING IN A VERDICT: either "Worth growing: <what adding tests would buy, at what cost>" or "Nothing (further) to gain: <why>". The verdict IS the summary label — the renderer replaces the generic ABSENT chip with **GROWTH OPPORTUNITY** (amber, pops; on "Worth growing:") · **SETTLED** (quiet grey; on any "nothing … to gain" phrasing — plain / more / (further)) · **VERDICT MISSING** (red — the reason has no such call, fix the card); a growth angle's body also gets a generated angle-typed "grow it →" next-action (the HOW to the reason's WHAT — the reason carries the specifics). **Verdict precedence (D6/ASK-4):** when a review triage outcome exists for the angle (review-spec Step 3.4 — implemented case / PENDING row / dismissed-with-reason), the verdict is RENDERED from that outcome and the card only translates; the hand-authored verdict is the fallback for angles no review has priced; VERDICT MISSING = neither exists. Notes on partial angles render as footnotes | justifying instead of recording; reasons with no call (renders red) |
-| DIAGRAM USERFLOW / DATAFLOW / WORKFLOW | flowchart / sequenceDiagram / stateDiagram-v2 — types, node shapes, and the change-highlight rule are BINDING per `gabe-docs/references/docs-spec.md` §Mermaid (shapes-per-operation table + `classDef changed` / sequence `rect` blocks; validate highlight targets — mermaid silently ignores misses) | drawing the whole system; highlighting everything |
-| REVIEWED | date + who, stamped ONLY after the human reviewed the BUILT pages — the stamp flips the board's fifth lifecycle cell (L · card) green and clears the rail's card-review filter; every lifecycle cell on the feature page shows its trigger command, struck through once done. The SAME stamp closes the PLAN loop (E5): the phase's `Center` cell → ✅ in PLAN.md + PLAN.json, so `/gabe-next` stops routing to `/gabe-feature` for it (SKILL.md §Modes step 5) | stamping a TODO-free draft; leaving the PLAN Center cell ⬜ after review |
 
-## Post-trial card additions (transaction trial, absorbed 2026-07-21)
+Optional — rendered where present:
 
-Binding alongside the table above; the five-tab section inventory lives in the shell README.
+- `# LENS` — LEADS the feature page (`handle:` · `is:` · `is not:` ·
+  `decides:` · `analogy:` · `map:` as `X → Y` rows · `confuse:` · `limits:`);
+  the full card folds behind it — a reader who only reads the lens still
+  leaves with the entity's shape.
+- `# CODE` — the Code tab's authored outro, rendered at the END of the tab
+  (the machine half — endpoints · code map · data model — renders from
+  archmap, never from prose).
+- `# RISKS` — grammar `SEV · status · Kind · what is at stake · detail`
+  (older 3/4-field forms still parse); an unparseable line renders MALFORMED,
+  never dropped. A severity with no consequence is a number nobody can argue
+  with.
+- `# ANGLES` — per-kind INTENT only (`- <kind> — what it is for on this
+  entity`); hand-written counts are FORBIDDEN (the card says WHAT FOR; the
+  machine says HOW MUCH). The open moves themselves are machine business: the
+  Action Ledger derives every gap — missing/red/skipped corpus, e2e, coverage
+  slice, walk, deployed probes, proof and flow gaps, the structure budget —
+  with its close-price AND its keep-open-price, ripeness read against
+  BEHAVIOR.md's maturity. The card never restates a row of it.
+- `# NOT CARRIED FORWARD` — dropped legacy claims with one-line reasons
+  (visible on the page).
+- `# DIAGRAM USERFLOW / DATAFLOW / WORKFLOW` — flowchart / sequenceDiagram /
+  stateDiagram-v2 — types, node shapes, and the change-highlight rule are
+  BINDING per `gabe-docs/references/docs-spec.md` §Mermaid (shapes-per-
+  operation table + `classDef changed` / sequence `rect` blocks; validate
+  highlight targets — mermaid silently ignores misses).
+- `# REVIEWED` — date + who, stamped ONLY after the human reviewed the BUILT
+  pages; the gate warns on its absence (a TODO-free draft is not a reviewed
+  card). Supersede flow: a material rewrite after a walk flips the tracker
+  back to `awaiting-approval` — **a walk approves a SCOPE, not a slug.** The
+  SAME stamp closes the PLAN loop (E5): the phase's `Center` cell → ✅ in
+  PLAN.md + PLAN.json (SKILL.md §Modes step 5).
 
-- `# LENS` — gabe-lens fields (handle · analogy · is · is not · decides · map · confuse ·
-  limits) LEADS the feature page; the full card folds behind `details.more`.
-- `# CODE` — the Code tab's authored intro, rendered at the END of the tab (the machine half —
-  endpoints · code map · data model — renders from archmap, never from prose).
-- `# RISKS` — structured 4-field grammar: `SEV · status · Kind · what is at stake — detail`
-  (three-field lines still parse; a missing stake renders as a named gap). A severity with no
-  consequence is a number nobody can argue with.
-- `# NOT CARRIED FORWARD` — dropped legacy claims with one-line reasons (visible on the page).
-- `# ANGLES` — per-kind INTENT only, inside the section's ⊕ toggle; hand-written counts are
-  FORBIDDEN (the card says WHAT FOR; the machine says HOW MUCH).
-- `# REVIEWED` supersede flow — a material rewrite after a walk flips the tracker back to
-  `awaiting-approval`: **a walk approves a SCOPE, not a slug.**
-- Feature pages are generated from registration data (config + registry + card + machine
-  sources) — per-entity page code is a defect.
+Feature pages are generated from registration data (config + registry + card +
+machine sources) — per-entity page code is a defect.
 
-## The verification changelog (machine — but fed by commits[])
+## Flow coverage (card # FLOWS ⟷ proof-set manifests)
 
-Run results are replaced on every refresh BY DESIGN; the durable memory is
-git, rendered: each testing page carries a verification changelog (per
-registry commit: what it did to the test surface), and suite sections say
-when each file entered the corpus. This makes `commits[]` double as the
-changelog SOURCE: list every commit that grew or reshaped the feature's
-tests — not just the headline product commits. A pruning conversation years
-later starts from this record ("these tests exist because…"), never from
-run counts.
+The card's `# FLOWS` section is the entity's flow registry (authored once);
+each proof set is classified against it from its own `manifest.json`.
+Derived, never interviewed.
+
+**Card grammar** — one line per flow:
+
+    - <key> [★] → <description>
+
+`<key>` is the flow's ONE-word name, lowercase (backticks allowed); `★` (or
+`(golden)`) after the key marks the flow as part of THIS entity's GOLDEN PATH —
+the authored judgment of which flows are the main journey, so the build can
+rank an unproven golden flow above an ordinary gap. A line that does not parse
+(multi-word key, missing `→`) is surfaced as MALFORMED — a build warning, a
+coverage-note line, and an Action-Ledger move — never silently dropped: a
+quietly shrunken denominator makes the coverage note lie about the card.
+
+**Manifest keys** — in the set's `manifest.json`:
+
+- `role:` — one of `principal` (the main workflow) · `edge` (guards ·
+  degraded · destructive paths) · `reference` (design-lab fidelity — NOT
+  workflow proof) · `supporting` (context around the main flows).
+- `flows:` — a LIST of keys the card's `# FLOWS` actually declares.
+
+Explicit fields win. Absent fields are INFERRED from the set's identity
+(name · feature · proof_form — never from legs/story: one degrade leg must not
+flip a journey set to edge) and labeled "inferred". A MALFORMED explicit
+signal — a `role:` outside the four, a `flows:` that is not a list, a key the
+card does not have — renders the set UNCLASSIFIED with its reason: guessing
+over a broken declaration is how a typo'd reference set becomes golden
+coverage. A reference set never covers a flow: what the screen was built to
+match is not proof of the workflow.
+
+**Coverage semantics** — a flow is COVERED when a principal/edge/supporting
+set matches it; inferred matches count toward coverage, and the topline says
+how many covered flows rest on inference alone ("confirm with `flows:`"). A
+flow no classified set covers is UNPROVEN — a placeholder row and an action
+item ("the golden path has no proof" is a finding, not a blank); a set the
+build cannot classify is a clarification move ("add `role:`/`flows:` to its
+manifest"), never a silent guess.
+
+## The verification changelog (machine — run-history.jsonl)
+
+Run results are replaced on every refresh BY DESIGN; the center's durable
+memory is `run-history.jsonl`, written by the builder itself: one line per
+source per build whose totals MOVED (committed, capped at 50), rendered as the
+Tests-station changelog. A regen that changed nothing adds nothing. Nothing
+here is authored — there is no commit list to maintain; per-file corpus entry
+dates come from git at build time.
 
 ## Narration (proof manifests)
 
 Authored by the session that creates the evidence, in the manifest's
-`narration` block: `story` (2–3 sentences, anyone), `capture_story` (what the
-video shows), `legs` (one plain sentence per leg — each leg is a claim, its
-shots are the proof). Describes, never asserts. Video custody: capture output
-is machine-local and never committed (stable name `latest.mp4` via the journey
-runner); committed proof = the curated shots. The pages state both.
+`narration` block: `story` (2–3 sentences, anyone) + `legs` (one plain
+sentence per leg — each leg is a claim, its shots are the proof). Describes,
+never asserts. Classification (`role:`/`flows:`) rides the same manifest —
+§Flow coverage above; `/gabe-feature curate` authors both and registers the
+set in `entities.<slug>.proofs[]`. Video custody: recordings are
+machine-local and never committed; committed proof = the curated shots. The
+pages state both.
 
 ## Backfill tiers
 
 - **full** — recent work: evidence exists or is one run away. Everything.
-- **card-only** — history: registry + card; ANGLES carry why evidence isn't
-  demanded of the past. No fake proof, ever.
-- **skip** — dropped/obsoleted work: one line in `backfill_dispositions`
-  with the reason. A skip with a reason beats a hollow page.
+- **card-only** — history: registry block + card; ANGLES carry why evidence
+  isn't demanded of the past. No fake proof, ever.
+- **skip** — dropped/obsoleted work: the disposition is recorded where the
+  queue reads it — a phase marks its PLAN `Center` cell ⏸ (deferred) or ⚰️
+  (obsolete), a cardless entity carries the reason on its registry row. A
+  skip with a reason beats a hollow page.
 
-Queue denominator honesty: `next_feature.py` covers the CURRENT PLAN.json
-generation; prior-plan phases are a separately-agreed pass.
+Queue denominator honesty: `next_feature.py` counts and NAMES the phases that
+predate the Center column as out-of-generation — never silently absent.
 
 ## Bootstrap (a project without a center)
 
-Owned by `/gabe-adopt` (ruling R7 — its own skill, its own spec): `init` archives existing
-docs (never deletes) and bootstraps the shell from suite `templates/center/` — whose
-first-ever run IS the generator promotion (port the reference implementation, gustify's
-`scripts/_center_*.py` + `refresh_center.sh` + `check_center_links.py`, into the suite as
-templates); `rank`/`section` then ingest the back-catalog one approved section at a time.
-This spec owns the FORWARD track only: covering shipped phases in a center that already
-exists.
+Owned by `/gabe-adopt` (ruling R7 — its own skill, its own spec). The
+machinery is SUITE TEMPLATES: `templates/center/generators/` (builder + data
+and ingest layers + gate + refresh + `curate_proof.py` + `next_feature.py`),
+`templates/center/shell/` (the vendored A3-Tabbed skeletons) and
+`templates/center/verify_center_chrome.mjs`. Adoption copies them into the
+project (`scripts/` + `docs/site/center/`), copies
+`center.config.template.json` to `docs/site/center/center.config.json` and
+fills it (`center.config.example.json` is the worked example); `rank`/
+`section` then ingest the back-catalog one approved section at a time. This
+spec owns the FORWARD track only: covering shipped work in a center that
+already exists.
 
 ## Release (the stakeholder showcase — a MODE, not a beat)
 
@@ -103,13 +194,12 @@ stakeholders: the covered set = phases whose `Center` cell went ✅ since the la
 row in `.kdbp/DEPLOYMENTS.md` (the trigger is derived — `/gabe-push` detects the terminal-env
 ship and prints the pointer; staging ships fire nothing; projects without a center: silent skip).
 Contents v1 (design record D3): curated proof shots + diagrams + each feature's summary/narration
-— **video slots render as named gaps** ("capture available on the build machine") until video
+— **video slots render as named gaps** ("recording available on the build machine") until video
 custody is decided at the first real release. Pure re-runnable join over committed data: no new
 state, no config key, nobody is asked "is this a release?".
 
 ## Wave-2 notes (recorded, not built)
 
-gabe-commit runs the crawl gate when `docs/site/center/**` is staged · KDBP
-schema enrichment (D6) absorbs the feature registry · diagram library
-(`center/diagrams/*.mmd` bases + per-feature highlight refs) when a second
-feature shares a topology.
+gabe-commit runs the crawl gate when `docs/site/center/**` is staged · diagram
+library (`center/diagrams/*.mmd` bases + per-entity highlight refs) when a
+second entity shares a topology.

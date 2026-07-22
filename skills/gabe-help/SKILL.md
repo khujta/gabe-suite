@@ -3,7 +3,7 @@ name: gabe-help
 description: "Context-aware guide for the Gabe Suite. Detects project state, shows what's configured, and suggests the right workflow. Usage: /gabe-help"
 when_to_use: "What can the suite do, which gabe command fits, where do I start, does tooling for X already exist (check references/tool-registry.md before building anything)."
 metadata:
-  version: 1.2.0
+  version: 1.2.1
 ---
 
 # Gabe Help — Suite Entry Point

@@ -125,7 +125,8 @@ def build_pack(slug, center, cfg, archmap, adoption):
 
     return {
         "slug": slug,
-        "display_name": (row or {}).get("display_name") or labels.get(slug) or slug,
+        "display_name": ((row or {}).get("display_name") or (row or {}).get("label")
+                        or labels.get(slug) or slug),
         "source": {"archmap_head": (archmap or {}).get("head"),
                    "archmap_generated": (archmap or {}).get("generated"),
                    "center": str(center)},
@@ -239,7 +240,8 @@ def render_list(archmap, adoption):
     for s in rows:
         slug = s.get("entity")
         out.append("- `%s` — %s · rank %s · status %s · %s"
-                   % (slug, s.get("display_name", slug), s.get("rank"), s.get("status"),
+                   % (slug, s.get("display_name") or s.get("label") or slug,
+                      s.get("rank"), s.get("status"),
                       "mapped" if slug in mapped else "unmapped"))
     only_map = sorted(mapped - {s.get("entity") for s in rows})
     if only_map:

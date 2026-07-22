@@ -3,7 +3,7 @@ name: gabe-entity
 description: "Entity-context reader — assembles ONE application entity's slice (code map + registry + bindings) into a context pack from the command center's committed data, without re-reading the codebase. Usage: /gabe-entity <slug> | list | <slug> --json"
 when_to_use: "Everything about an entity (e.g. Transaction), an entity brief or context pack, what code/endpoints/models/schemas touch entity X, related entities via FK, an entity's coverage status — assembled from docs/site/center data (archmap.json + adoption.json + center.config.json). ONLY in projects with a built command center; elsewhere STOP → /gabe-adopt."
 metadata:
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # Gabe Entity — Entity-Context Reader Skill

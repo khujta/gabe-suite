@@ -4,4 +4,4 @@
 
 These sections are understanding aids for the current command run. They are not persisted to `PLAN.md`, `REVIEW.md`, `LEDGER.md`, `PENDING.md`, commits, or docs unless another command already owns that write.
 
-the command-time briefs are the surviving explanation surface (`/gabe-teach` is archived — `skills/_archive/`). The command-time blocks explain what just happened or what the plan is about to build; `/gabe-teach` turns repeated or architectural concepts into lasting KDBP knowledge.
+the command-time briefs are the surviving explanation surface (`gabe-teach`, which used to turn repeated or architectural concepts into lasting KDBP knowledge, is archived — see `skills/_archive/`). The command-time blocks explain what just happened or what the plan is about to build; nothing downstream consolidates that into standing knowledge anymore.

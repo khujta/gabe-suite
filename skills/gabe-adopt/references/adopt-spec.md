@@ -27,6 +27,7 @@ Small, append-only in spirit: rows change status, never vanish.
   "sections": [
     {
       "entity": "cook-state",
+      "display_name": "Cook State",
       "rank": "critical",
       "status": "pending",
       "checklist": {
@@ -126,11 +127,12 @@ Small, append-only in spirit: rows change status, never vanish.
    proofs found y/n). No signal, no row — an entity the machine cannot see is proposed only by
    the operator.
 3. **Checkpoint:** the operator trims, re-ranks, adds, drops. On approval: write one
-   `sections[]` row per shortlisted entity — `status: "pending"`, `rank`, `signals` (the
-   evidence string), `checklist` with ALL SEVEN keys `false`, `approved_walk: null`,
-   `notes: ""` — and set `shortlist_approved` to today's ISO date (that date IS the truth test
-   `section`/`status` check). Report. Re-running `rank` later APPENDS new candidates;
-   approved rows are never re-ranked silently.
+   `sections[]` row per shortlisted entity — `status: "pending"`, `rank`, `display_name` (one
+   human-facing word, e.g. `"Transaction"` — D123: the registry's rendered name, never left to
+   default to the raw slug), `signals` (the evidence string), `checklist` with ALL SEVEN keys
+   `false`, `approved_walk: null`, `notes: ""` — and set `shortlist_approved` to today's ISO
+   date (that date IS the truth test `section`/`status` check). Report. Re-running `rank`
+   later APPENDS new candidates; approved rows are never re-ranked silently.
 
 ## Mode `section <entity>`
 
@@ -190,18 +192,23 @@ feature-spec (card contract). This section states what adoption must OBEY.
   registry (adopted → feature-page link; pending → muted + tracker state chip).
 - **archmap — the read-once rule.** The build reads the whole application ONCE per run (ast,
   no LLM; context reads are expensive) into committed `archmap.json`; every consumer — the
-  Code tab, the app-wide **Architecture station** (`architecture.html`, spec'd; first build =
-  next loop iteration), any section needing architecture facts — reads the MAP, never the
-  codebase. Committed so a PR diff of it IS the architecture change.
+  Code tab, the app-wide **Architecture station** (`architecture.html`, built whenever
+  `center.config.json` sets `build_architecture: true` — `render_architecture()` in
+  `build_center_a3.py` renders it straight from archmap.json), any section needing
+  architecture facts — reads the MAP, never the codebase. Committed so a PR diff of it IS
+  the architecture change.
 - **Ephemeral/accumulator is a REQUIREMENT per tab:** Overview=card/growth · Code=card
-  `# CODE`/archmap renders · Tests=**testing claim card (spec'd — `# CLAIMS`, one
-  `class — intent` line each; the build joins each claim by the class NAME the card names
-  and checks it still runs in junit — the cases' C-ids are read for DISPLAY, not the join
-  key; a claimed class not running renders as drift, a name matching several classes as
-  ambiguous, and if junit is incomplete the verdict is withheld; build next loop)**/matrix ·
+  `# CODE`/archmap renders · Tests=**testing claim card (`# CLAIMS`, one
+  `class — intent` line each; `claim_verdicts()` in `_a3_feature.py` joins each claim by the
+  class NAME the card names and checks it still runs in junit — the cases' C-ids are read
+  for DISPLAY, not the join key; a claimed class not running renders as drift, a name
+  matching several classes as ambiguous, and if junit is incomplete the verdict is
+  withheld)**/matrix ·
   Evidence=`manifest.json` per set/disk walk · Risk=card
   `# RISKS`/derived GAP rows. The CENTER's own accumulator is `run-history.jsonl` (one line
-  per build: ts · source · totals — writer lands next loop; reader + named gap exist).
+  per build: ts · source · totals — `append_history()` in `build_center_a3.py` appends it
+  every regen a source's totals moved, capped at 50 rows; reader + named gap render
+  alongside).
 - **Machine-surface-first section builds:** a section starts from endpoints + models + junit
   inventory; legacy cards are supporting testimony (the six-card reorganize method produced a
   page narrower than its own evidence).

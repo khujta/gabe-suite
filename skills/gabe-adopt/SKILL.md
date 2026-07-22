@@ -4,7 +4,7 @@ description: "Brownfield command-center adoption — archive existing docs (neve
 when_to_use: "An existing codebase needs a Testing Command Center — bootstrap it and ingest what already exists (features, tests, docs, proofs) section by section, in spare time, alongside normal feature development. Also: /gabe-feature stopped you with its bootstrap pointer. NOT for covering a freshly shipped phase (that is /gabe-feature) and NOT for publishing a doc page (that is /gabe-docsite)."
 disable-model-invocation: true
 metadata:
-  version: 1.2.0
+  version: 1.2.1
 ---
 
 # Gabe Adopt — the back-catalog, at human speed

@@ -58,19 +58,19 @@ There is no `commands/` directory: it was retired in the B2 skills-only migratio
 
 | Skill | Version | Purpose |
 |---|---|---|
-| **gabe-adopt** | 1.2.0 | Brownfield command-center adoption — archive-never-delete init, machine-ranked shortlist, one section per run at human speed, walk-recorded approval; tracker lives outside PLAN.md (human-initiated only) |
+| **gabe-adopt** | 1.2.1 | Brownfield command-center adoption — archive-never-delete init, machine-ranked shortlist, one section per run at human speed, walk-recorded approval; tracker lives outside PLAN.md (human-initiated only) |
 | **gabe-align** | 1.1.1 | Alignment guardian — shallow/standard/deep values and AP advisory checks |
 | **gabe-assess** | 1.1.1 | Rapid change impact assessment: blast radius, maturity scope, prerequisites |
 | **gabe-commit** | 2.4.0 | Commit quality gate — deterministic checks incl. size-budget, triage, simplify tier, docs-audit; optional results_out digest, path or list (reports every tier, gates none) |
 | **gabe-debt** | 1.1.1 | Architecture decision-debt scanner with AP evidence citations (fork/read-only) |
 | **gabe-docs** | 1.2.0 | Documentation standards + diagrams library + the suite execution contract (background) |
 | **gabe-docsite** | 1.0.2 | Publish docs onto the generated HTML docs site |
-| **gabe-entity** | 1.0.0 | Entity-context reader — assembles one entity's slice (code map + registry + bindings) into a context pack from the center's committed data (archmap/adoption/config), joined on slug; a DATA lens not a per-entity skill (D7); brief or `--json`, plus `list` mode |
+| **gabe-entity** | 1.0.1 | Entity-context reader — assembles one entity's slice (code map + registry + bindings) into a context pack from the center's committed data (archmap/adoption/config), joined on slug; a DATA lens not a per-entity skill (D7); brief or `--json`, plus `list` mode |
 | **gabe-execute** | 2.2.1 | Phase execution with tier cap, escalation gate, checkpoint commits; TASK CONTRACT carries the phase's `CASES:` (C-ids from /gabe-red) + case-scoped verify; narration legs authored hot |
-| **gabe-feature** | 1.5.0 | Command-center feature coverage — card/diagrams/narration over machine facts; verdicts RENDERED from review triage (authored fallback); closes the PLAN `Center` cell on review; status, backfill, curate, release; bootstrap pointer → /gabe-adopt |
+| **gabe-feature** | 1.6.0 | Command-center feature coverage — card/diagrams/narration over machine facts; verdicts RENDERED from review triage (authored fallback); closes the PLAN `Center` cell on review; status, backfill, curate, release; bootstrap pointer → /gabe-adopt |
 | **gabe-handoff** | 2.1.0 | Session handoff — paste-able resume prompt + KDBP state sync |
 | **gabe-health** | 1.1.1 | Codebase health — god files, churn hotspots, coupling (fork/read-only) |
-| **gabe-help** | 1.2.0 | Context-aware guide + the P14 cross-project tool registry; Full Suite Catalog is GENERATED from skill frontmatter (scripts/gen-help-catalog.py, run by install.sh) |
+| **gabe-help** | 1.2.1 | Context-aware guide + the P14 cross-project tool registry; Full Suite Catalog is GENERATED from skill frontmatter (scripts/gen-help-catalog.py, run by install.sh) |
 | **gabe-init** | 2.3.0 | Project setup — `.kdbp/`, hooks, project type, maturity (human-initiated only) |
 | **gabe-lens** | 2.4.0 | Cognitive translation — analogies, maps, constraint boxes, handles |
 | **gabe-meme** | 1.1.0 | Oblique-meme generation — per-project tone setup + template-persona-matched visual metaphors via memegen.link; verified PNGs, punch-up (ported from chiless meme-hilo) |
