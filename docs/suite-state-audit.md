@@ -86,10 +86,14 @@ The installer copied runtime specs and templates but not suite docs. That made i
 
 ## Verification Targets
 
-The current documentation contract should be checked by:
+The current documentation contract is checked by:
 
-- `python3 tests/architecture-principles/check.py`
-- `python3 tests/suite-docs/check.py`
-- `./install.sh --dry-run`
-- `./install.sh`
-- byte-for-byte comparisons between repo docs and installed docs in both local homes
+- `bash scripts/suite-doctor.sh` — the standing gate: repo⟷install drift, every
+  zero-arg battery under `tests/*/run.sh` green, version/count parity, the
+  dispatch-surface budget, portability lint, docsite staleness
+- `./install.sh` then re-running the doctor (CLEAN required)
+
+*(2026-07-22, M10: `tests/architecture-principles/check.py` and
+`tests/suite-docs/check.py` moved to `tests/_archive/` — both asserted the
+pre-migration suite shape and could never pass; see `tests/_archive/README.md`
+for where their live residue went.)*

@@ -463,6 +463,8 @@ The command writes session.json after every successful sub-step. Writes are atom
 
 Validate the session.json against `schemas/scope-session.schema.json` after every write. Schema violation = abort with dump of the violating state to stderr.
 
+Validator exit 2 (missing deps / cannot run — e.g. pyyaml or jsonschema absent) = E6 STOP: a gate that could not run has proven nothing, so the run stops — it does NOT pass.
+
 ### In-file `[PENDING APPROVAL — step-N]` markers
 
 Each step's generated content is bracketed by a marker the user sees in their editor. Format:

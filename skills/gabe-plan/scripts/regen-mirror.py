@@ -21,7 +21,10 @@ from pathlib import Path
 GLYPH = {"⬜": "todo", "🔄": "in_progress", "✅": "done", "⏸": "deferred", "⚰️": "obsolete", "⚰": "obsolete"}
 CELL_COLS = ("red", "exec", "review", "commit", "push", "center")
 
-md = Path(".kdbp/PLAN.md").read_text(encoding="utf-8")
+_md_path = Path(".kdbp/PLAN.md")
+if not _md_path.exists():
+    sys.exit("BREAK: no .kdbp/PLAN.md — nothing to mirror (run /gabe-plan first)")
+md = _md_path.read_text(encoding="utf-8")
 notes = []
 
 def comment(tag, default):
@@ -83,7 +86,11 @@ for m in re.finditer(r"^### Phases? ([\w.]+)(?:\s*[–—-]\s*([\w.]+))?\s+—[^
 def detail(pid, key):
     b = blocks.get(pid, "")
     m = re.search(rf"^- \*\*{key}:\*\*\s*(.+)$", b, re.M)
-    return m.group(1).strip() if m else None
+    val = m.group(1).strip() if m else None
+    # A whitespace-only bullet is NO value, never the empty string — "" would
+    # overwrite a recorded old-mirror proof while the preservation rule guards
+    # exact-None only, silently wiping evidence (battery finding, M26).
+    return val or None
 
 def detail_types(pid):
     b = blocks.get(pid, "")
@@ -116,7 +123,7 @@ for cells in rows:
         return cells[i] if i is not None and i < len(cells) else None
     pid = cell("#")
     old_ph = old_by_id.get(str(pid), {})
-    types = detail_types(pid) or [t.strip(" `") for t in (cell("types") or "").split(",") if t.strip(" `[]")]
+    types = detail_types(pid) or [t.strip(" `[]") for t in (cell("types") or "").split(",") if t.strip(" `[]")]
     proof = detail(pid, "Proof")
     proof_type = detail_proof_type(pid)
     cases = detail(pid, "Cases")

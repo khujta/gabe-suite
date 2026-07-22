@@ -3,7 +3,7 @@ name: gabe-scope
 description: "Backbone authoring command for the Gabe Suite. Produces SCOPE.md — stable premise plus a `## Phases` phase arc — for a new project. Multi-step, checkpoint-gated, Opus-reasoning + Sonnet-templating. Every major step requires explicit user approval before the next runs. Usage: /gabe-scope [--resume | --start-over]"
 when_to_use: "Scope a NEW project — produce SCOPE.md (premise + phase arc) from an idea; checkpoint-gated authoring. For changing an existing scope use /gabe-scope-change instead."
 metadata:
-  version: 2.1.0
+  version: 2.1.1
 ---
 
 # Gabe Scope — project backbone authoring

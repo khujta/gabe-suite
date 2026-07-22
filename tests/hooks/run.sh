@@ -83,6 +83,64 @@ echo "$out" | grep -q 'my spaced.spec.js carries no' && ok || bad "pre: spaced f
 echo "$out" | grep -q 'test_decoy_noid.py carries no' && ok || bad "pre: SEC101 decoy must not satisfy the id check (round-2)"
 echo "$out" | grep -q 'test_good.py carries no' && bad "pre: C147 file must NOT warn" || ok
 
+# --- pre-checkpoint: declared-case warn class (M25) ------------------------
+# The guard fixtures above leave PLAN.json with phase id 'r' vs current_phase
+# '1', so the ids loop never ran — this whole warn class sat outside the
+# battery. Matching phase id + a fabricated C999 enters it for real.
+python3 -c "import json;json.dump({'version':1,'status':'active','current_phase':'1','phases':[{'id':'1','cells':{'exec':'done'},'cases':'NEW C999','proof':None}]},open('.kdbp/PLAN.json','w'))"
+out=$(printf '%s' '{"tool_input":{"command":"git commit -m x"}}' | bash "$PRE" 2>/dev/null)
+echo "$out" | grep -q 'declared C999' && ok || bad "pre: declared id with 0 corpus hits must WARN (M25)"
+python3 -c "import json;json.dump({'version':1,'status':'active','current_phase':'1','phases':[{'id':'1','cells':{'exec':'done'},'cases':'NEW C147','proof':None}]},open('.kdbp/PLAN.json','w'))"
+out=$(printf '%s' '{"tool_input":{"command":"git commit -m x"}}' | bash "$PRE" 2>/dev/null)
+echo "$out" | grep -q 'declared C147' && bad "pre: id present in the corpus must NOT warn (M25)" || ok
+
+# --- session + stop + structure hooks (M24 — 4 of 6 hooks had no cases) ----
+STOPH="$REPO/scripts/hooks/kdbp/stop-session-reminder.sh"
+POSTH="$REPO/scripts/hooks/kdbp/post-structure-warning.sh"
+SKA="$REPO/scripts/hooks/kdbp/session-kdbp-active.sh"
+SPA="$REPO/scripts/hooks/kdbp/session-plan-awareness.sh"
+H="$T/hookfix"
+mkdir -p "$H/.kdbp" "$H/src"
+(cd "$H" && git init -q && git config user.email t@t && git config user.name t)
+printf 'name: Fixture\nmaturity: mvp\ntech: bash\n' > "$H/.kdbp/BEHAVIOR.md"
+printf '# patterns\n' > "$H/.kdbp/STRUCTURE.md"
+(cd "$H" && printf x > tracked.txt && git add -A \
+  && GIT_COMMITTER_DATE="@$(( $(date +%s) - 2400 )) +0000" git commit -qm base --date "@$(( $(date +%s) - 2400 )) +0000" \
+  && printf y >> tracked.txt)
+
+so() { (cd "$H" && printf '%s' "$1" | bash "$STOPH" 2>/dev/null); }
+so '{}' | grep -q 'next: /gabe-commit' && ok || bad "stop: dirty tree + old HEAD + no transcript must print the routing line (M24)"
+printf 'ran git commit here\n' > "$T/transcript.txt"
+[ -z "$(so "{\"transcript_path\": \"$T/transcript.txt\"}")" ] && ok || bad "stop: transcript containing a commit must stay silent"
+(cd "$H" && git add -A && GIT_COMMITTER_DATE="@$(( $(date +%s) - 2400 )) +0000" git commit -qm clean --date "@$(( $(date +%s) - 2400 )) +0000")
+[ -z "$(so '{}')" ] && ok || bad "stop: clean tree must stay silent"
+(cd "$H" && printf z > untracked-only.txt)
+[ -z "$(so '{}')" ] && ok || bad "stop: untracked-only dirt must stay silent"
+rm -f "$H/untracked-only.txt"
+
+po() { (cd "$H" && printf '%s' "$1" | bash "$POSTH" 2>/dev/null); }
+touch "$H/src/stray.py"
+po "{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$H/src/stray.py\"}}" \
+  | grep -q 'STRUCTURE: new file src/stray.py' && ok || bad "post-structure: stray Write must warn (M24)"
+[ -z "$(po "{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$H/.kdbp/PENDING.md\"}}")" ] \
+  && ok || bad "post-structure: a .kdbp write must stay silent"
+[ -z "$(po "{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"$H/src/stray.py\"}}")" ] \
+  && ok || bad "post-structure: a non-Write tool must stay silent"
+
+(cd "$H" && bash "$SKA" 2>/dev/null) | grep -q 'KDBP Active — Fixture (mvp) \[bash\]' \
+  && ok || bad "session-kdbp: must announce name/maturity/tech (M24)"
+spa() { (cd "$H" && bash "$SPA" 2>/dev/null); }
+python3 -c "import json;json.dump({'version':1,'status':'active','current_phase':'1','phases':[{'id':'1','name':'Fix','cells':{'exec':'done','review':'todo','commit':'todo','push':'todo'}}]},open('$H/.kdbp/PLAN.json','w'))"
+spa | grep -q 'ACTIVE PLAN: Phase 1 — Fix' && ok || bad "session-plan: active mirror must summarize the phase (M24)"
+python3 -c "import json;json.dump({'version':1,'status':'archived'},open('$H/.kdbp/PLAN.json','w'))"
+spa | grep -q 'none — run /gabe-plan' && ok || bad "session-plan: non-active mirror must say none"
+rm "$H/.kdbp/PLAN.json"
+printf 'No active plan\n' > "$H/.kdbp/PLAN.md"
+spa | grep -q 'none — run /gabe-plan' && ok || bad "session-plan: PLAN.md fallback must say none"
+mkdir -p "$T/nokdbp"
+[ -z "$( (cd "$T/nokdbp" && bash "$SKA" 2>/dev/null; printf '{}' | bash "$STOPH" 2>/dev/null; bash "$SPA" 2>/dev/null) )" ] \
+  && ok || bad "hooks: a non-KDBP dir must stay fully silent"
+
 # --- next.mjs: routing + mirror refusal contract --------------------------
 nx() { python3 -c "import json;json.dump($1,open('.kdbp/PLAN.json','w'))"; node "$NEXT" >/dev/null 2>&1; echo $?; }
 nxout() { python3 -c "import json;json.dump($1,open('.kdbp/PLAN.json','w'))"; node "$NEXT" 2>/dev/null; }

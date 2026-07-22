@@ -81,7 +81,10 @@ if [ -d "$SCRIPT_DIR/templates" ]; then
     run "cp \"$SCRIPT_DIR/templates/\"*.md ~/.claude/templates/gabe/ 2>/dev/null || true"
     run "cp \"$SCRIPT_DIR/templates/\"*.yaml ~/.claude/templates/gabe/ 2>/dev/null || true"
     run "cp \"$SCRIPT_DIR/templates/\"*.json ~/.claude/templates/gabe/ 2>/dev/null || true"
-    TPL_COUNT=$(ls -1 "$SCRIPT_DIR/templates/" 2>/dev/null | grep -v '^tier-sections$' | grep -v '^mockup$' | grep -v '^debt-patterns$' | wc -l)
+    # Count FILES, not directory entries — the old per-name exclusion list is
+    # the exact pattern the comment below condemns, and it drifted the moment
+    # templates/center/ landed (reported 20, copied 19).
+    TPL_COUNT=$(find "$SCRIPT_DIR/templates" -maxdepth 1 -type f 2>/dev/null | wc -l)
     echo "  OK: $TPL_COUNT templates → ~/.claude/templates/gabe/"
 
     # ALL template subdirectories, recursively — a new subdir must never need its own stanza
@@ -91,7 +94,11 @@ if [ -d "$SCRIPT_DIR/templates" ]; then
         subname=$(basename "$sub")
         run "mkdir -p ~/.claude/templates/gabe/$subname"
         run "cp -r \"$sub\"* ~/.claude/templates/gabe/$subname/ 2>/dev/null || true"
-        SUB_COUNT=$(find "$sub" -type f 2>/dev/null | wc -l)
+        # Local python runs leave __pycache__ beside the generators; stale
+        # bytecode must not ship (or count) — it would ride /gabe-adopt's
+        # promotion into user projects.
+        run "find ~/.claude/templates/gabe/$subname -name __pycache__ -type d -exec rm -rf {} + 2>/dev/null || true"
+        SUB_COUNT=$(find "$sub" -type f ! -path '*__pycache__*' ! -name '*.pyc' 2>/dev/null | wc -l)
         echo "  OK: $SUB_COUNT files → ~/.claude/templates/gabe/$subname/"
     done
 fi

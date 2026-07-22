@@ -9,12 +9,27 @@ Usage:
 Exit codes:
   0 — valid
   1 — validation failed (errors printed)
-  2 — harness error (missing file, etc.)
+  2 — harness error (missing file, missing pyyaml/jsonschema dep, etc. — the gate could not run; STOP, never a pass)
 """
 import datetime as dt
+import importlib.util
 import json
 import sys
 from pathlib import Path
+
+# Dependency preflight — pyyaml + jsonschema are third-party, and this script is
+# the /gabe-scope abort gate: if it cannot run it has proven nothing, so a
+# missing dep is a loud one-line exit 2 (STOP), never a traceback.
+_MISSING_DEPS = [pkg for mod, pkg in (("yaml", "pyyaml"), ("jsonschema", "jsonschema"))
+                 if importlib.util.find_spec(mod) is None]
+if _MISSING_DEPS:
+    print(
+        f"GATE CANNOT RUN — missing package(s): {', '.join(_MISSING_DEPS)}. "
+        f"Schema validation is the /gabe-scope abort gate; exit 2 = STOP, the doc is "
+        f"NOT proven valid. Install: pip install {' '.join(_MISSING_DEPS)}",
+        file=sys.stderr,
+    )
+    sys.exit(2)
 
 import yaml
 from jsonschema import Draft202012Validator
