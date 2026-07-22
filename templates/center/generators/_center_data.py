@@ -132,7 +132,9 @@ def load_plan() -> dict:
     push not done. When a PLAN.json mirror is present it carries the AUTHORED
     current phase — reported alongside, so a drift between them is visible."""
     path = KDBP / "PLAN.md"
-    lines = path.read_text().splitlines()
+    # Gracefully absent like every other source: a project with no PLAN yet
+    # (mid-adoption, or plan archived) gets an empty board, not a dead build.
+    lines = path.read_text().splitlines() if path.exists() else []
     cols = _plan_columns(lines)
     phases: list[dict] = []
 

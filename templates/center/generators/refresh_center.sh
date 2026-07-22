@@ -34,7 +34,12 @@ run_group() {   # $1 = command-group key
     echo "── $key: $cmd"
     bash -c "$cmd"
   done < <(_group_cmds "$key")
-  [ "$found" = 0 ] && echo "── $key: no commands declared in center.config.json — skipping"
+  # `[ … ] && echo` as the last command made run_group return 1 whenever
+  # commands WERE found, and set -e then killed the script before the
+  # regenerate+gates block — captures ran, gates never did (M01).
+  if [ "$found" = 0 ]; then
+    echo "── $key: no commands declared in center.config.json — skipping"
+  fi
 }
 
 case "$MODE" in

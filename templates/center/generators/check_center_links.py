@@ -2,22 +2,24 @@
 """Command-center crawl gate (corpus design §6 mods 7–8; stdlib only).
 
 "Navigable" is a GATE, not a hope: after every regen this checks that
-  1. every internal href in docs/site/center/*.html resolves to a file on disk,
+  1. every internal href in the center's *.html resolves to a file on disk,
   2. every #anchor resolves to an id= in its target page,
   3. every local asset src exists,
+  4. every estate reference that leaves the center (../… proof shots, spec
+     files) exists on disk — the build walked those files moments ago, so a
+     missing target is a broken href, not a view-time concern,
 and WARNs (non-fatal) when
-  4. an ADOPTED entity (adoption.json — the D123 registry) has no card yet (the
+  5. an ADOPTED entity (adoption.json — the D123 registry) has no card yet (the
      forgotten-step nudge), or an entity's card lacks canonical DIAGRAM sections /
      a reviewed stamp / carries an unfinished TODO. Completeness is checked on the
      ENTITY axis the center renders from, not the PLAN-phase axis (build waves
      live in PLAN/LEDGER/git — they were never per-phase feature cards).
 
-Live-probe references (../tests/web-e2e/**) are exempt by doctrine — they
-resolve at view time. Dead links are a FAILURE (exit 1): a regen that ships
-them should not complete silently.
+Dead links are a FAILURE (exit 1), and so is an EMPTY crawl: a gate that
+finds zero pages proves nothing and must say so, not pass green.
 
 Run standalone:  python3 scripts/check_center_links.py
-Also invoked at the end of every build_center_docs.py run.
+Chained after build_center_a3.py by scripts/refresh_center.sh (every mode).
 """
 
 from __future__ import annotations
@@ -27,8 +29,13 @@ import re
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-CENTER = REPO_ROOT / "docs" / "site" / "center"
+# Path resolution lives in _center_data (paths.center, GABE_REPO_ROOT,
+# GABE_CONFIG) — a hardcoded center path here made the gate crawl an empty
+# default dir and pass green whenever a project retargeted paths.center.
+import _center_data as D
+
+REPO_ROOT = D.REPO_ROOT
+CENTER = D.CENTER_DIR
 
 HREF_RX = re.compile(r'(?:href|src)="([^"]+)"')
 ID_RX = re.compile(r'id="([^"]+)"')
@@ -41,6 +48,10 @@ def run_checks() -> int:
              if "leaf/" not in p.relative_to(CENTER).as_posix()
              and "archive/" not in p.relative_to(CENTER).as_posix()}
     ids = {name: set(ID_RX.findall(html)) for name, html in pages.items()}
+    if not pages:
+        print(f"  crawl gate: 0 pages found under {CENTER} — an empty crawl "
+              f"proves nothing; refusing the vacuous pass")
+        return 1
     dead: list[str] = []
     checked = 0
     for name, html in pages.items():
@@ -50,7 +61,14 @@ def run_checks() -> int:
                 continue
             target, _, anchor = ref.partition("#")
             resolved = posixpath.normpath(posixpath.join(here, target)) if target else ""
-            if resolved.startswith(".."):  # live-probe / estate refs — doctrine-exempt
+            if resolved.startswith(".."):
+                # Estate refs (proof shots, spec files) leave the center but
+                # point at THIS disk — the build walked them at render time, so
+                # probe existence instead of exempting (a single-file proof set
+                # once rendered dead hrefs no layer could see).
+                checked += 1
+                if not (CENTER / resolved).exists():
+                    dead.append(f"{name}: {ref} — estate target missing on disk")
                 continue
             checked += 1
             if target:
@@ -69,7 +87,11 @@ def run_checks() -> int:
 
     warns: list[str] = []
     try:
-        config = json.loads((CENTER / "center.config.json").read_text())
+        # The same config the builder used (honors GABE_CONFIG); {} = no
+        # config, which the registry checks below must SAY, not skip silently.
+        config = D.CFG
+        if not config:
+            raise OSError("no center.config.json found")
         # Documentation completeness is checked against the ENTITY registry
         # (adoption.json — D123), not PLAN phases: the center's feature pages are
         # per ADOPTED ENTITY, so both the forgotten-step nudge and the card-quality
@@ -83,8 +105,7 @@ def run_checks() -> int:
         sections = adoption.get("sections", [])
         entities_cfg = config.get("entities", {})
         cards_dir = CENTER / "cards"
-        proof_root = REPO_ROOT / config.get("paths", {}).get(
-            "proof", "tests/web-e2e/proof")
+        proof_root = D.PROOF_DIR
 
         # Forgotten-step nudge: an entity the registry treats as ADOPTED (any
         # non-pending status) but with no card on disk — the registry claims it,

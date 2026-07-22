@@ -423,7 +423,9 @@ def _struct_effort(lines: int) -> tuple[str, str]:
 def angle_rows(slug: str, inv: dict, specs: list[str], walks: list[dict],
                section: dict, proof_root, corpora: list, e2e: dict,
                over_files: list, maturity: str = "mvp",
-               flow_gaps: list = (), unclear_sets: list = ()) -> tuple[list[dict], list[str]]:
+               flow_gaps: list = (), unclear_sets: list = (),
+               flows_malformed: list = (),
+               inferred_cover: list = ()) -> tuple[list[dict], list[str]]:
     """Every OPEN move on the entity (one dict per row, both prices) plus the
     CLOSED-angle labels (a green / walked / proven angle emits no row). The
     single source the ledger, the Risk residual and the hub rollup read."""
@@ -527,9 +529,19 @@ def angle_rows(slug: str, inv: dict, specs: list[str], walks: list[dict],
             add("evidence", f"card flow `{key}` has no covering proof set",
                 "capture the flow's proof, or mark the covering set's `flows:`",
                 eff, hours, stage)
-    for name in unclear_sets:
-        add("evidence", f"proof set `{name}` — unclear what it proves",
+    for name, why in unclear_sets:
+        add("evidence", f"proof set `{name}` — {why or 'unclear what it proves'}",
             "add `role:` / `flows:` to its manifest (author it if missing)",
+            "XS", "~10 min", "mvp")
+    if flows_malformed:
+        add("evidence", f"{len(flows_malformed)} FLOWS line(s) in the card do "
+                        f"not parse — excluded from the coverage denominator",
+            "fix the card grammar — `- <key> [★] → <description>`, one-word key",
+            "XS", "~10 min", "mvp")
+    if inferred_cover:
+        add("evidence", f"{len(inferred_cover)} covered flow(s) rest on "
+                        f"inference alone: " + " · ".join(inferred_cover[:4]),
+            "confirm with an explicit `flows:` in the covering manifest(s)",
             "XS", "~10 min", "mvp")
 
     for fpath, n in over_files:
@@ -858,18 +870,25 @@ def build_feature_pages(ctx) -> list[str]:
         # roles say so, no signal = unclassified). Computed BEFORE the ledger so
         # unproven flows and unclassified sets become evidence moves; a broken
         # manifest degrades to "no coverage verdicts", never a dead build.
-        _flows = parse_flows(card.get("FLOWS", []))
+        _flows, _flows_bad = parse_flows(card.get("FLOWS", []))
+        if _flows_bad:
+            print(f"    ⚠ feature-{slug}.html: {len(_flows_bad)} FLOWS line(s) "
+                  f"did not parse (grammar `- key [★] → desc`) — the coverage "
+                  f"denominator excludes them")
         try:
             _cov = collect_coverage(ENTITY_PROOFS.get(slug, []), proof_root,
-                                    _flows)
+                                    _flows, malformed=_flows_bad)
         except Exception as _cov_err:                      # noqa: BLE001
             print(f"    ⚠ feature-{slug}.html flow coverage skipped: "
                   f"{type(_cov_err).__name__}: {_cov_err}")
-            _cov = {"sets": [], "flows": _flows, "unproven": [], "unclear": []}
+            _cov = {"sets": [], "flows": _flows, "malformed": _flows_bad,
+                    "covered_inferred": [], "unproven": [], "unclear": []}
         ledger_rows, ledger_closed = angle_rows(
             slug, inv, specs, ctx.walks, s, proof_root, ctx.corpora, ctx.e2e,
             over_files, maturity,
-            flow_gaps=_cov["unproven"], unclear_sets=_cov["unclear"])
+            flow_gaps=_cov["unproven"], unclear_sets=_cov["unclear"],
+            flows_malformed=_cov["malformed"],
+            inferred_cover=_cov["covered_inferred"])
         ledger_ripe = sum(1 for r in ledger_rows if r["ripe"])
         _lw = [w for w in ctx.walks if w.get("subject") == f"adopt:{slug}"]
 

@@ -33,9 +33,11 @@ _SHOT_EXT = (".png", ".jpg", ".jpeg", ".webp")
 _VIDEO_EXT = (".webm", ".mp4", ".mov")
 _TRACE_EXT = (".zip",)
 # Web pages resolve proof files relative to the center dir — the link gate
-# exempts this prefix from its dead-link crawl (files are probed at view time).
-# Derived from the configured center/proof paths so a different layout stays
-# correct (gastify's docs/site/center + tests/web-e2e/proof -> ../../../…).
+# probes these estate hrefs against the disk after every regen (the files were
+# walked at build time, so a missing target is a broken href, not a view-time
+# concern). Derived from the configured center/proof paths so a different
+# layout stays correct (gastify's docs/site/center + tests/web-e2e/proof ->
+# ../../../…).
 _PREFIX = os.path.relpath(_PROOF_REL, _CENTER_REL).replace(os.sep, "/")
 
 
@@ -108,24 +110,31 @@ _FLOW_STOP = frozenset(
     "http mode same one works even inside past whole any clears".split())
 
 
-def parse_flows(lines: list[str]) -> list[tuple[str, str, bool]]:
+def parse_flows(lines: list[str]) -> tuple[list[tuple[str, str, bool]], list[str]]:
     """Card `# FLOWS` grammar: `- <key> [★] → <description>` — the key is the
     flow's one-word name (scan, manual, browse…), the description its path. A
     `★` (or `(golden)`) after the key marks the flow as part of THIS feature's
     GOLDEN PATH — the authored judgment of which flows are the main journey, so
-    the build can rank an unproven golden flow above an ordinary gap."""
+    the build can rank an unproven golden flow above an ordinary gap.
+
+    Returns (flows, malformed). A line that does not parse — multi-word key,
+    missing `→` — rides the MALFORMED bucket instead of vanishing: a silently
+    shrunken denominator makes the coverage note lie about the card."""
     out: list[tuple[str, str, bool]] = []
+    bad: list[str] = []
     for ln in lines or []:
         s = ln.strip().removeprefix("- ")
         if not s:
             continue
-        key, _, desc = s.partition("→")
+        key, sep, desc = s.partition("→")
         golden = "★" in key or bool(re.search(r"\(golden\)", key, re.I))
         key = re.sub(r"★|\(golden\)", "", key, flags=re.I)
         key = key.strip().strip("`").lower()
-        if key and " " not in key:
+        if sep and key and " " not in key:
             out.append((key, desc.strip(), golden))
-    return out
+        else:
+            bad.append(ln.strip())
+    return out, bad
 
 
 def _flow_tokens(desc: str) -> set[str]:
@@ -135,7 +144,12 @@ def _flow_tokens(desc: str) -> set[str]:
 
 def _classify(s: dict, flows: list[tuple[str, str]]) -> dict:
     """One set's role + matched flows. Explicit manifest fields win; inference
-    is labeled; no manifest / no signal → unclassified (role "")."""
+    is labeled; no manifest / no signal → unclassified (role "", with a reason).
+
+    A MALFORMED explicit signal — a `role:` outside the role set, a `flows:`
+    that is not a list, a `flows:` entry naming a key the card does not have —
+    also lands on unclassified WITH ITS REASON. Guessing over a broken
+    declaration is how a typo'd reference set becomes golden coverage."""
     man = s["man"]
     identity = " ".join(str(man.get(k, "")) for k in ("feature", "proof_form"))
     identity = f'{s["name"]} {identity}'.lower()
@@ -144,9 +158,27 @@ def _classify(s: dict, flows: list[tuple[str, str]]) -> dict:
     text = " ".join([identity, story.lower(),
                      " ".join(leg["name"] for leg in s["legs"])]).lower()
 
+    known = {k for k, _, _g in flows}
+
+    def _bad(reason: str) -> dict:
+        return {"role": "", "inferred": False, "flows": [], "golden": False,
+                "explicit_match": False, "reason": reason}
+
+    _role_raw = man.get("role")
+    if _role_raw is not None and (not isinstance(_role_raw, str)
+                                  or _role_raw not in _ROLE_TAG):
+        return _bad(f"manifest `role:` {_role_raw!r} is not one of "
+                    "principal|edge|reference|supporting")
     _fl = man.get("flows")
+    if _fl is not None and not isinstance(_fl, list):
+        return _bad("manifest `flows:` must be a LIST of flow keys")
     explicit_flows = [f.lower() for f in _fl
                       if isinstance(f, str)] if isinstance(_fl, list) else []
+    unknown = [f for f in explicit_flows if f not in known]
+    if unknown:
+        return _bad("manifest `flows:` names key(s) the card's # FLOWS does "
+                    "not have: " + " · ".join(unknown[:4]))
+
     if explicit_flows:
         matched = [k for k, _, _g in flows if k in explicit_flows]
     else:
@@ -158,45 +190,56 @@ def _classify(s: dict, flows: list[tuple[str, str]]) -> dict:
                 matched.append(key)
     golden = bool(set(matched) & {k for k, _, g in flows if g})
 
-    def _out(role: str, inferred: bool, m: list[str]) -> dict:
+    def _out(role: str, inferred: bool, m: list[str], reason: str = "") -> dict:
         return {"role": role, "inferred": inferred, "flows": m,
-                "golden": golden and bool(m)}
+                "golden": golden and bool(m),
+                "explicit_match": bool(explicit_flows) and bool(m),
+                "reason": reason}
 
-    explicit_role = man.get("role") if isinstance(man.get("role"), str) else ""
+    explicit_role = _role_raw if isinstance(_role_raw, str) else ""
     if explicit_role in _ROLE_TAG:
         return _out(explicit_role, False, matched)
     if not man:
-        return _out("", False, matched)
+        return _out("", False, matched, "no manifest")
     if _REF_SIG_RX.search(identity) and not _JOURNEY_SIG_RX.search(identity):
         return _out("reference", True, matched)
     if _EDGE_SIG_RX.search(identity):
         return _out("edge", True, matched)
     if matched:
         return _out("principal", True, matched)
-    return _out("", False, [])
+    return _out("", False, [], "no role signal in the set's identity")
 
 
 def collect_coverage(names: list[str], proof_root: Path,
-                     flows: list[tuple[str, str]]) -> dict:
+                     flows: list[tuple[str, str]],
+                     malformed: list[str] = ()) -> dict:
     """All of an entity's proof sets, classified, plus the coverage verdicts:
-    which card flows are UNPROVEN and which sets are UNCLEAR. The single source
-    the Evidence tab, the placeholders, and the action moves read."""
+    which card flows are UNPROVEN, which sets are UNCLEAR (name, reason), which
+    covered flows rest on INFERENCE alone, and the card's malformed FLOWS
+    lines. The single source the Evidence tab, the placeholders, and the
+    action moves read."""
     sets = [collect_set(n, proof_root / n) for n in names]
     for s in sets:
         s["cls"] = _classify(s, flows)
     covered: set[str] = set()
+    covered_explicit: set[str] = set()
     for s in sets:
         if s["cls"]["role"] in ("principal", "edge", "supporting"):
             covered.update(s["cls"]["flows"])
-    return {"sets": sets, "flows": flows,
+            if s["cls"]["explicit_match"]:
+                covered_explicit.update(s["cls"]["flows"])
+    return {"sets": sets, "flows": flows, "malformed": list(malformed),
+            "covered_inferred": sorted(covered - covered_explicit),
             "unproven": [(k, d, g) for k, d, g in flows if k not in covered],
-            "unclear": [s["name"] for s in sets if not s["cls"]["role"]]}
+            "unclear": [(s["name"], s["cls"].get("reason", ""))
+                        for s in sets if not s["cls"]["role"]]}
 
 
 def _role_cell(cls: dict) -> str:
     if not cls["role"]:
+        why = cls.get("reason") or "clarify"
         return ('<span class="tag s-gap">unclassified</span>'
-                '<br><small>clarify — see Pending above</small>')
+                f'<br><small>{E(trunc(why, 64))} — see Pending above</small>')
     tag, _ = _ROLE_TAG[cls["role"]]
     # ★ only on roles that COUNT as coverage — a reference set touching a golden
     # flow is still not proof of it, so it never wears the star.
@@ -355,7 +398,11 @@ def _tile(s: dict, leg: dict, f: Path, label: str, i: int, n: int) -> str:
     with JS off and the link gate can probe it); the viewer intercepts the
     click and opens it in place instead of navigating away."""
     rel = str(f.relative_to(s["dir"])).replace("\\", "/")
-    href = f'{_PREFIX}/{E(s["name"])}/{E(rel)}'
+    # A single-FILE set sits loose at the proof root — s["dir"] IS the root, so
+    # prepending the set name here minted hrefs to a directory that does not
+    # exist (…/proof/<set>/<set>.png). The set name is identity, not a path.
+    href = (f'{_PREFIX}/{E(rel)}' if s["single"]
+            else f'{_PREFIX}/{E(s["name"])}/{E(rel)}')
     is_video = f.suffix.lower() in _VIDEO_EXT
     title = s["man"].get("feature", s["name"])
     if not isinstance(title, str):        # feature authored as a list/dict
@@ -496,6 +543,16 @@ def build_evidence_tab(cov: dict, label: str = "this entity") -> str:
     if _gold_all:
         _cover_note += (f" · golden path "
                         f"{len(_gold_all) - len(_gold_open)}/{len(_gold_all)}")
+    # Inference counts toward coverage (settled design) but never silently: the
+    # topline SAYS which part of the verdict rests on a guess awaiting `flows:`.
+    _inf = cov.get("covered_inferred", [])
+    if _inf:
+        _cover_note += (f" · {len(_inf)} of them by inference — confirm with "
+                        f"`flows:`")
+    _bad = cov.get("malformed", [])
+    if _bad:
+        _cover_note += (f" · {len(_bad)} FLOWS line(s) did not parse "
+                        f"(grammar `- key [★] → desc`)")
     _unclear_note = (f" · {len(cov['unclear'])} set(s) unclassified"
                      if cov["unclear"] else "")
     # `spec` authored as a list/dict is unhashable — guard the set membership on
