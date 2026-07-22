@@ -212,6 +212,72 @@ grep -q "no commands declared" "$T/rf.out" && ok || bad "refresh junit(no cmds):
 
 [ "$(run_rf bogus-mode)" = 2 ] && ok || bad "refresh: unknown mode must exit 2"
 
+# --- render/consume wiring (M19 Decisions · M40 coverage · M38 · M30) ------
+DEP="$T/dep"; mk_fixture "$DEP"
+mkdir -p "$DEP/.kdbp" "$DEP/tests/results"
+cat > "$DEP/.kdbp/DEPLOYMENTS.md" <<'MD'
+| # | Date | Branch → Target | PR | CI result | Notes | Decisions |
+|---|------|-----------------|----|-----------|-------|-----------|
+| d0 | 2026-07-21 | main → staging | — | green | first |
+| d1 | 2026-07-22 | main → prod | PR#5 | green | notes here | D42 chose the estate probe |
+MD
+python3 - "$DEP" <<'PY'
+import json, sys
+from pathlib import Path
+p = Path(sys.argv[1]) / "docs/site/center/center.config.json"
+cfg = json.loads(p.read_text())
+cfg["coverage"] = {"api": {"json": "tests/results/api-coverage.json"}}
+p.write_text(json.dumps(cfg))
+(Path(sys.argv[1]) / "tests/results/api-coverage.json").write_text(
+    json.dumps({"totals": {"percent_covered": 78.31}}))
+PY
+[ "$(build "$DEP" "$SHELL_SRC")" = 0 ] && ok || bad "dep: wired fixture builds"
+grep -q 'D42 chose the estate probe' "$DEP/docs/site/center/releases.html" \
+  && ok || bad "M19: the Decisions column must render on the releases station"
+grep -q '78.3% api' "$DEP/docs/site/center/tests.html" \
+  && ok || bad "M40: a wired coverage reporter must ride the Testing KPI row"
+# Silent halves on the plain fixture: no reporter -> named gap; no 7th column
+# -> no decisions cell invented.
+grep -q 'no reporter wired' "$FIX/docs/site/center/tests.html" \
+  && ok || bad "M40: no reporter must stay the honest named gap"
+# M38: the architecture station fills its OWN skeleton, completely.
+[ -f "$SHELL_SRC/architecture.html" ] && ok || bad "M38: shell/architecture.html skeleton must ship"
+grep -q '<h1>Architecture</h1>' "$FIX/docs/site/center/architecture.html" \
+  && ok || bad "M38: architecture.html renders"
+grep -q '{{' "$FIX/docs/site/center/architecture.html" \
+  && bad "M38: architecture.html left unfilled slot tokens" || ok
+# M30: archmap.json carries the machine-readable flow-coverage verdict.
+python3 - "$FIX" <<'PY' && ok || bad "M30: archmap coverage block wrong (see above)"
+import json, sys
+from pathlib import Path
+a = json.loads((Path(sys.argv[1]) / "docs/site/center/archmap.json").read_text())
+c = a["coverage"]["gadget"]
+assert (c["covered"], c["total"]) == (1, 2), c
+assert (c["golden_covered"], c["golden_total"]) == (1, 1), c
+assert c["unproven"] == ["manual"], c
+assert "solo" in c["unclassified"], c
+PY
+# M30 gate warns: malformed FLOWS card (reuse the M5 fixture) + a typo'd role.
+gate "$M5" >/dev/null 2>&1
+grep -q 'FLOWS line(s) do not parse' "$T/gate.out" \
+  && ok || bad "M30: gate must WARN on a card FLOWS line that does not parse"
+ROLE="$T/role"; mk_fixture "$ROLE"
+python3 - "$ROLE" <<'PY'
+import json, sys
+from pathlib import Path
+m = Path(sys.argv[1]) / "tests/web-e2e/proof/g1/manifest.json"
+man = json.loads(m.read_text())
+man["role"] = "Principal"
+man["flows"] = ["scam"]
+m.write_text(json.dumps(man))
+PY
+build "$ROLE" "$SHELL_SRC" >/dev/null
+gate "$ROLE" >/dev/null 2>&1
+grep -q "role 'Principal' is not one of" "$T/gate.out" \
+  && ok || bad "M30: gate must WARN on a role outside the role set"
+grep -q 'names key(s) the card lacks: scam' "$T/gate.out" \
+  && ok || bad "M30: gate must WARN on flows naming a card-unknown key"
+
 # --- flow grammar + classifier honesty (M05/M12/M03) -----------------------
 if (cd "$GEN" && python3 - <<'PY'
 import sys

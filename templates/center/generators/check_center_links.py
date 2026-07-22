@@ -33,6 +33,7 @@ from pathlib import Path
 # GABE_CONFIG) — a hardcoded center path here made the gate crawl an empty
 # default dir and pass green whenever a project retargeted paths.center.
 import _center_data as D
+from _a3_evidence import _ROLE_TAG, parse_flows
 
 REPO_ROOT = D.REPO_ROOT
 CENTER = D.CENTER_DIR
@@ -146,6 +147,22 @@ def run_checks() -> int:
             if "reviewed:" not in low and "# reviewed" not in low:
                 warns.append(f"entity '{slug}': card lacks a reviewed: stamp "
                              "(a TODO-free draft is not a reviewed card)")
+            # Flow layer: the card's # FLOWS must parse, and the manifests'
+            # role:/flows: signals must be well-formed against it — the build
+            # already classifies (malformed = unclassified with reason); the
+            # gate makes the same drift a standing warn after every regen.
+            flow_lines, in_flows = [], False
+            for ln in text.splitlines():
+                if ln.startswith("# "):
+                    in_flows = ln[2:].strip().upper() == "FLOWS"
+                    continue
+                if in_flows and ln.strip():
+                    flow_lines.append(ln)
+            flows, badf = parse_flows(flow_lines)
+            if badf:
+                warns.append(f"entity '{slug}': {len(badf)} FLOWS line(s) do "
+                             "not parse (grammar `- key [★] → desc`)")
+            known = {k for k, _d, _g in flows}
             # The entity's declared proof sets carry their narration (config
             # entities.<slug>.proofs, resolved under the configured proof path).
             for pname in entities_cfg.get(slug, {}).get("proofs", []):
@@ -158,6 +175,32 @@ def run_checks() -> int:
                     elif "TODO(narration)" in mtext:
                         warns.append(f"entity '{slug}': proof set '{pname}' "
                                      "narration carries TODO(narration)")
+                    try:
+                        man = json.loads(mtext)
+                    except json.JSONDecodeError:
+                        man = None
+                    if isinstance(man, dict):
+                        role = man.get("role")
+                        if role is not None and (
+                                not isinstance(role, str)
+                                or role not in _ROLE_TAG):
+                            warns.append(
+                                f"entity '{slug}': proof set '{pname}' role "
+                                f"{role!r} is not one of "
+                                f"{'|'.join(_ROLE_TAG)}")
+                        fl = man.get("flows")
+                        if fl is not None and not isinstance(fl, list):
+                            warns.append(f"entity '{slug}': proof set "
+                                         f"'{pname}' flows: must be a LIST "
+                                         "of flow keys")
+                        elif isinstance(fl, list):
+                            unknown = [x for x in fl if isinstance(x, str)
+                                       and x.lower() not in known]
+                            if unknown:
+                                warns.append(
+                                    f"entity '{slug}': proof set '{pname}' "
+                                    "flows: names key(s) the card lacks: "
+                                    + " · ".join(unknown[:4]))
     except (OSError, json.JSONDecodeError, KeyError) as exc:
         warns.append(f"registry checks skipped: {exc}")
 

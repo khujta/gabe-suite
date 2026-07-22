@@ -883,6 +883,22 @@ def build_feature_pages(ctx) -> list[str]:
                   f"{type(_cov_err).__name__}: {_cov_err}")
             _cov = {"sets": [], "flows": _flows, "malformed": _flows_bad,
                     "covered_inferred": [], "unproven": [], "unclear": []}
+        # The machine-readable verdict rides archmap.json (M30) — same numbers
+        # the Evidence topline states, so no consumer scrapes the HTML.
+        _fc = getattr(ctx, "flow_coverage", None)
+        if _fc is not None and _flows:
+            _g_all = [k for k, _d2, g in _flows if g]
+            _g_open = [k for k, _d2, g in _cov["unproven"] if g]
+            _fc[slug] = {
+                "covered": len(_flows) - len(_cov["unproven"]),
+                "total": len(_flows),
+                "golden_covered": len(_g_all) - len(_g_open),
+                "golden_total": len(_g_all),
+                "inferred": _cov["covered_inferred"],
+                "unproven": [k for k, _d2, _g2 in _cov["unproven"]],
+                "malformed": len(_cov["malformed"]),
+                "unclassified": [n for n, _w in _cov["unclear"]],
+            }
         ledger_rows, ledger_closed = angle_rows(
             slug, inv, specs, ctx.walks, s, proof_root, ctx.corpora, ctx.e2e,
             over_files, maturity,

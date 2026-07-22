@@ -111,9 +111,8 @@ def load_coverage() -> dict[str, dict]:
     reporters named in center.config.json `coverage`. Absent reporter -> the
     key is simply missing (a named gap upstream, never a fabricated zero).
 
-    Wired but not yet consumed by the A3 build (coverage renders as a named gap
-    there); kept in the results-ingest surface so a project that turns a
-    per-path coverage reporter on has one place to read it."""
+    Consumed by the A3 build's Testing KPI row; with no reporter wired the KPI
+    stays the honest "no reporter wired" gap and the Risk tab names it."""
     cfg = _cd.CFG.get("coverage", {})
     out: dict[str, dict] = {}
     api = cfg.get("api", {})

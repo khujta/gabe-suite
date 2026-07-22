@@ -496,11 +496,18 @@ _corpus_kpis = [
     kpi(c["key"], f"{(junit_by.get(c['key']) or {}).get('total', 0):,}",
         f"{len((junit_by.get(c['key']) or {}).get('files', {}))} files · {c['runner']}")
     for c in CORPORA]
+# Coverage rides the KPI row when a reporter is wired (config `coverage`
+# block, read by load_coverage); absent it stays the honest named gap.
+_covd = D.load_coverage()
+_cov_kpi = (
+    kpi("coverage", " · ".join(f"{v['percent']}% {k}" for k, v in _covd.items()),
+        "lines, from the wired reporter(s)")
+    if _covd else kpi("coverage", "—", "no reporter wired"))
 tests_kpis = '<div class="kpis">' + "".join([
     kpi("total", f"{t_total:,}", f"{n_files} files"),
     *_corpus_kpis,
     kpi("failed", str(t_failed), f"{t_skipped} skipped", alert=bool(t_failed)),
-    kpi("coverage", "—", "no reporter wired"),
+    _cov_kpi,
 ]) + "</div>"
 
 # "N api + M web" — the per-corpus estate breakdown for the Testing lede.
@@ -699,8 +706,9 @@ for _n, _d in digests:
         _risk_rows.append([f'{E(_n)} evidence predates HEAD '
                            f'(recorded at <code>{E(str(_d.get("head_sha")))}</code>)',
                            "medium", "tests/results/", "digest"])
-_gaps = [("Coverage", "no reporter wired"),
-         ("e2e junit", "not wired — D121 local-only")]
+_gaps = [("e2e junit", "not wired — D121 local-only")]
+if not _covd:
+    _gaps.insert(0, ("Coverage", "no reporter wired"))
 if not walks:
     _gaps.append(("Manual angles", ".kdbp/walks.jsonl absent"))
 for _what, _src in _gaps:
@@ -818,7 +826,10 @@ def load_deployments() -> list[dict]:
         cells = [c.strip() for c in line.strip().strip("|").replace("\\|", "|").split("|")]
         if len(cells) >= 6 and cells[0] and cells[0] != "#":
             out.append({"id": cells[0], "date": cells[1], "target": cells[2],
-                        "pr": cells[3], "ci": cells[4], "notes": cells[5]})
+                        "pr": cells[3], "ci": cells[4], "notes": cells[5],
+                        # gabe-push 7.5b writes a 7th Decisions column; older
+                        # tables carry 6 — absent reads as the "—" it renders.
+                        "decisions": cells[6] if len(cells) >= 7 else "—"})
     return out
 
 
@@ -839,15 +850,19 @@ latest_release = table(
     [["<b>id</b>", E(deploys[-1]["id"])], ["<b>date</b>", E(deploys[-1]["date"])],
      ["<b>branch → target</b>", md(deploys[-1]["target"])],
      ["<b>PR</b>", md(deploys[-1]["pr"])], ["<b>CI result</b>", md(deploys[-1]["ci"])],
-     ["<b>notes</b>", md(trunc(deploys[-1]["notes"], 220))]],
+     ["<b>notes</b>", md(trunc(deploys[-1]["notes"], 220))]]
+    + ([["<b>decisions</b>", md(trunc(deploys[-1]["decisions"], 220))]]
+       if deploys[-1]["decisions"] not in ("—", "-", "") else []),
     note="Newest row of .kdbp/DEPLOYMENTS.md."
 ) if deploys else gap("Latest release", ".kdbp/DEPLOYMENTS.md")
 
 release_index = table(
-    ["#", "Date", "Branch → Target", "PR", "CI result"],
+    ["#", "Date", "Branch → Target", "PR", "CI result", "Decisions"],
     [[f'<b>{E(d["id"])}</b>', E(d["date"][:10]), md(trunc(d["target"], 40)),
-      md(d["pr"]), md(trunc(d["ci"], 40))] for d in _recent],
-    note=f"{len(deploys)} deployment(s) recorded · showing {len(_recent)} newest.")
+      md(d["pr"]), md(trunc(d["ci"], 40)),
+      md(trunc(d["decisions"], 40))] for d in _recent],
+    note=f"{len(deploys)} deployment(s) recorded · showing {len(_recent)} newest. "
+         f"Decisions come from /gabe-push 7.5b note actions.")
 
 # --------------------------------------------------------------------------- #
 # Docs station — feature-docs accumulator + foundations
@@ -1015,10 +1030,9 @@ def render_architecture(amap: dict) -> str:
     """The app-wide Architecture STATION, rendered FROM archmap.json (the
     read-once map: the whole application parsed once per build into a committed
     file, so a PR diff of it IS the architecture change). Every row here is a
-    consumer of the map — this station never re-reads the codebase. Chrome is
-    borrowed from the entity-index station skeleton (there is no dedicated
-    architecture.html template yet — a handoff finding for the next suite pass);
-    only its <main> is replaced.  SIDEBAR_CODE lights and marks itself current."""
+    consumer of the map — this station never re-reads the codebase. Fills its
+    OWN shell skeleton (shell/architecture.html — {{ARCH_KPIS}}/{{ARCH_BODY}})
+    like every other station.  SIDEBAR_CODE lights and marks itself current."""
     ents = amap.get("entities", {})
     mapped = {k: v for k, v in ents.items() if v}
 
@@ -1103,42 +1117,11 @@ def render_architecture(amap: dict) -> str:
                 note=f"{len(seen)} file(s) · {loc:,} lines. A file over the 800 "
                      f"budget is a split candidate."))
 
-    base = strip_slot_doc_comments((SHELL_SRC / "entity-index.html").read_text())
-    base = base.replace('<a class="navitem on" href="entity-index.html">',
-                        '<a class="navitem" href="entity-index.html">')
-    main_html = (
-        '<main class="main">\n'
-        '  <div class="topbar">\n'
-        '    <div class="crumb"><a href="index.html">Overview</a> › '
-        '<b>Architecture</b></div>\n'
-        '    <div class="spacer"></div>\n'
-        '    {{STATUS_PILLS}}\n'
-        '    <span class="stamp">regen · {{SYNC_AGE}}</span>\n'
-        '  </div>\n'
-        '  <div class="subject">\n'
-        '    <div class="subjecthead">\n'
-        '      <div class="pagehead">\n'
-        '        <h1>Architecture</h1>\n'
-        '        <p>The whole application read once per build (ast, no LLM) into '
-        '<code>archmap.json</code> — every feature Code tab and this station read '
-        'that map, never the codebase. A PR diff of the map IS the architecture '
-        'change.</p>\n'
-        '      </div>\n'
-        f'      {kpis}\n'
-        '    </div>\n'
-        '    <div class="tabbody">\n'
-        '      <section class="tabpane" id="architecture" style="display:block">\n'
-        f'        {body}\n'
-        '      </section>\n'
-        '    </div>\n'
-        '  </div>\n'
-        '</main>')
-    base = re.sub(r'<main class="main">.*?</main>', lambda _m: main_html, base,
-                  flags=re.S)
-    fills = {**SHARED, "{{SIDEBAR_CODE}}": _sidebar_code(current=True)}
+    base = strip_slot_doc_comments((SHELL_SRC / "architecture.html").read_text())
+    fills = {**SHARED, "{{SIDEBAR_CODE}}": _sidebar_code(current=True),
+             "{{ARCH_KPIS}}": kpis, "{{ARCH_BODY}}": body}
     for tok, val in fills.items():
         base = base.replace(tok, val)
-    base = base.replace("<title>Entities ·", "<title>Architecture ·")
     return base
 
 
@@ -1160,6 +1143,10 @@ def main() -> int:
 
     wrote = []
     for src in sorted(SHELL_SRC.glob("*.html")):
+        # architecture.html is owned by render_architecture below — the generic
+        # pass would ship it slot-empty (or at all when build_architecture off).
+        if src.name == "architecture.html":
+            continue
         text = strip_slot_doc_comments(src.read_text())
         for tok, val in SHARED.items():
             text = text.replace(tok, val)
@@ -1173,14 +1160,17 @@ def main() -> int:
         repo_root=REPO_ROOT, sections=sections, labels=LABELS,
         junit_by=junit_by, corpora=CORPORA, e2e=E2E, proof_root=proof_root,
         cfg=CFG, walks=walks, shared=SHARED, parse_card=D.parse_card,
-        maturity=MATURITY,
+        maturity=MATURITY, flow_coverage={},
     )
     for name in build_feature_pages(ctx):
         wrote.append((name, 0))
 
     # The committed architecture map — machine-derived (ast), regenerated every
     # build, diffable in PRs. Consumers read THIS instead of re-analyzing code.
+    # `coverage` carries each carded entity's flow-coverage verdict so agents
+    # read the machine numbers here instead of scraping the Evidence tab.
     amap = {"version": 1, "head": HEAD_SHA, "generated": STAMP,
+            "coverage": ctx.flow_coverage,
             "entities": {s: collect_entity_map(s, REPO_ROOT) for s in ENTITY_CODE}}
     (CENTER_OUT / "archmap.json").write_text(
         json.dumps(amap, indent=1, ensure_ascii=False) + "\n")
