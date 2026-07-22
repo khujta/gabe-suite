@@ -27,6 +27,7 @@
   .wrap{max-width:1260px;margin:0 auto;padding:clamp(16px,3vw,36px) clamp(10px,2.5vw,24px) 56px}
   h1{font-size:clamp(1.4rem,3.2vw,2rem);letter-spacing:-.02em;font-weight:750;margin:.2em 0 .12em}
   .lede{color:var(--ink2);font-size:.98rem;max-width:78ch;margin:0}
+  .lede b{color:var(--ink)}
   .kicker{font-family:var(--fm);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
   .kicker b{color:var(--accent)}
   .bar{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin:13px 0 4px}
@@ -45,13 +46,19 @@
   .k-adopt{background:color-mix(in srgb,var(--c-adopt) 16%,transparent);color:var(--c-adopt)}
   .pinbox{margin-left:auto;font-family:var(--fm);font-size:.7rem;color:var(--ink3)}
   .pinbox b{color:var(--accent2)}
-  .modes{display:flex;gap:12px;margin:2px 0 6px;font-family:var(--fm);font-size:.66rem;color:var(--ink3);align-items:center}
+  .modes{display:flex;flex-wrap:wrap;gap:6px 12px;margin:2px 0 6px;font-family:var(--fm);font-size:.66rem;color:var(--ink3);align-items:center}
   .modes svg{vertical-align:middle}
 
   .frame{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--paper);box-shadow:var(--shadow);margin-top:8px}
   .maphead{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);font-family:var(--fm);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;min-width:900px;padding:11px 20px}
   .maphead .l{color:var(--accent2)} .maphead .m{color:var(--ink3)} .maphead .r{color:var(--c-commit)}
-  .map{position:relative;display:grid;grid-template-columns:300px 250px 210px;justify-content:space-between;min-width:900px;padding:20px 20px 24px}
+  .map{position:relative;display:grid;grid-template-columns:195px 265px 240px 200px;justify-content:space-between;min-width:1060px;padding:20px 20px 24px;gap:0 26px}
+  .col.side{gap:5px;justify-content:center}
+  .col.side .shd{font-family:var(--fm);font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hc,var(--ink3));padding:6px 2px 2px 2px}
+  .col.side .node{border-left:4px solid var(--hc,var(--line))}
+  .col.side .node .t{font-family:var(--fm);font-size:.7rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .col.side .node.ghost{border-style:dashed}
+  .col.side .node.ghost .t{color:var(--c-red)}
   .wires{position:absolute;inset:0;pointer-events:none;z-index:1}
   .col{position:relative;z-index:2;display:flex;flex-direction:column}
   .col.mid{gap:7px;justify-content:center} .col.right{gap:8px;justify-content:center}
@@ -62,16 +69,45 @@
   .navitem .t{font-size:.8rem;font-weight:600;color:var(--ink)}
   .navitem:hover{background:color-mix(in srgb,var(--hc,#888) 12%,transparent)}
   .navitem.newi .t::after{content:" •new";font-family:var(--fm);font-size:.6rem;color:var(--c-red);font-weight:700}
+  .navitem.newt .t::after{content:" •2";font-family:var(--fm);font-size:.6rem;color:var(--c-commit);font-weight:700}
   .node{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:5px 10px;cursor:pointer;transition:opacity .12s,border-color .12s,transform .12s}
   .col.mid .node{border-left:4px solid var(--hc,var(--line))}
   .col.mid .node .t{font-family:var(--fm);font-size:.74rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .col.mid .node.newf{border-style:dashed}
   .col.mid .node.newf .t::after{content:" •";color:var(--c-red)}
+  .col.mid .node.newt{border-style:dashed}
+  .col.mid .node.newt .t::after{content:" •2";font-size:.62rem;color:var(--c-commit);font-weight:700}
   .col.right .node{border-right:4px solid var(--cc,var(--c-init));text-align:right}
   .col.right .node .t{font-family:var(--fm);font-size:.76rem;color:var(--cc,var(--ink))}
   .col.right .node.newc{border-style:dashed}
+  .col.right .node.newt{border-style:dashed}
+  .col.right .node.newt .t::after{content:" •2";font-size:.62rem;color:var(--c-commit);font-weight:700}
   .node:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
-  .map.dim .navitem:not(.lit),.map.dim .col.mid .node:not(.lit),.map.dim .col.right .node:not(.lit){opacity:.18}
+  .map.dim .navitem:not(.lit),.map.dim .col.mid .node:not(.lit),.map.dim .col.right .node:not(.lit),.map.dim .col.side .node:not(.lit){opacity:.18}
+  /* gap table + target nav */
+  .gsec{margin-top:26px}
+  .gsec h2{font-size:1.05rem;letter-spacing:-.01em;margin:0 0 4px}
+  .gsec .sub{color:var(--ink2);font-size:.86rem;max-width:80ch;margin:0 0 10px}
+  .gtbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--paper);box-shadow:var(--shadow)}
+  .gtbl table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:860px}
+  .gtbl th{text-align:left;font-family:var(--fm);font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);padding:9px 14px;border-bottom:1px solid var(--line)}
+  .gtbl td{padding:9px 14px;border-top:1px solid var(--line2);vertical-align:top;color:var(--ink2)}
+  .gtbl td b{color:var(--ink)}
+  .gk{display:inline-block;font-family:var(--fm);font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .gk.ok{background:color-mix(in srgb,var(--c-exec) 15%,transparent);color:var(--c-exec)}
+  .gk.drift{background:color-mix(in srgb,var(--c-review) 15%,transparent);color:var(--c-review)}
+  .gk.miss{background:color-mix(in srgb,var(--c-red) 14%,transparent);color:var(--c-red)}
+  .rec{font-family:var(--fm);font-size:.6rem;font-weight:700;color:var(--c-exec)}
+  .twocol{display:grid;grid-template-columns:1fr 260px;gap:18px;align-items:start}
+  @media (max-width:900px){.twocol{grid-template-columns:1fr}}
+  .navmock{border:1px solid var(--line);border-radius:12px;background:#101726;color:#c7cfdd;padding:12px 10px;box-shadow:var(--shadow)}
+  .navmock .g{font-family:var(--fm);font-size:.6rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:8px 8px 3px}
+  .navmock .i{font-size:.76rem;font-weight:600;padding:4px 10px;border-radius:7px;display:flex;gap:7px;align-items:center}
+  .navmock .i .ct{margin-left:auto;font-family:var(--fm);font-size:.6rem;background:rgba(255,255,255,.08);border-radius:12px;padding:0 7px}
+  .navmock .i.mut{color:#79839a;font-weight:500}
+  .navmock .i.mut .st{font-family:var(--fm);font-size:.56rem;color:#d79a3c;margin-left:auto}
+  .navmock .sub{font-size:.68rem;color:#79839a;padding:1px 10px 4px 24px}
+  .navmock .cap{font-family:var(--fm);font-size:.6rem;color:#79839a;padding:8px 8px 2px;border-top:1px solid #26314a;margin-top:8px}
   .map.dim .navsec:not(.lit) .sh{opacity:.3}
   .lit{border-color:var(--accent)!important}
   .navitem.lit{background:color-mix(in srgb,var(--accent) 12%,transparent)}
@@ -82,9 +118,9 @@
 </style>
 
 <div class="wrap">
-  <div class="kicker">Gabe Suite · <b>the landed map</b> · D1–D7 + rulings R1–R7 · click to pin · hover to peek</div>
-  <h1>Site ⟷ files ⟷ suite — the landed structure, connected</h1>
-  <p class="lede"><b>Left</b> = the center's pages and sections. <b>Middle</b> = the files the suite's execution generates. <b>Right</b> = the commands, skills and hooks that write them — each in its own colour. Pin a file to see it feed <em>several</em> page sections at once; pin a command to see everything it produces.</p>
+  <div class="kicker">Gabe Suite · <b>the landed map · v3</b> · D1–D7 · R1–R7 · D122–D123 · click to pin · hover to peek</div>
+  <h1>Nav ⟷ site ⟷ files ⟷ suite — the landed structure, connected</h1>
+  <p class="lede"><b>Far left (v3)</b> = the ACTUAL sidebar as gastify renders it today — the literal nav, extracted from the generated pages, gaps included. <b>Then:</b> the center's sections · the files execution generates · the commands that write them. Pin a nav item to see everything it opens, down to the commands; pin a file to see which nav paths surface it. Violet <b style="color:var(--c-commit)">•2</b> = transaction-trial additions; <b style="color:var(--c-red)">∅</b> = in the nav's contract but absent today. The gap table below prices each mismatch — <b>rule those before the templates change</b>.</p>
 
   <div class="bar">
     <span class="chip k-scope">/gabe-scope</span><span class="chip k-plan">/gabe-plan·next·regen</span><span class="chip k-red">/gabe-red·sweep</span>
@@ -97,32 +133,77 @@
     <span><svg width="26" height="6"><line x1="0" y1="3" x2="26" y2="3" stroke="currentColor" stroke-width="2.4"/></svg> writes (create·append·tick)</span>
     <span><svg width="26" height="6"><line x1="0" y1="3" x2="26" y2="3" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4"/></svg> verifies / blocks lies</span>
     <span><svg width="26" height="6"><line x1="0" y1="3" x2="26" y2="3" stroke="currentColor" stroke-width="1.6" stroke-dasharray="1.5 3.5"/></svg> reads</span>
-    <span style="color:var(--c-red)">• = the verification-first additions (landed)</span>
+    <span style="color:var(--c-red)">• = verification-first additions</span>
+    <span style="color:var(--c-commit)">•2 = transaction-trial additions</span>
+    <span style="color:var(--c-red)">∅ / dashed = promised in the nav's contract, absent today</span>
   </div>
 
   <div class="frame">
-    <div class="maphead"><span class="l">◀ The center (pages · sections)</span><span class="m">the files — generated by execution</span><span class="r">the suite (commands · skills · hooks) ▶</span></div>
+    <div class="maphead"><span class="l">◀ the nav (sidebar TODAY)</span><span class="l">sections of the center</span><span class="m">the files</span><span class="r">the suite ▶</span></div>
     <div class="map" id="map">
       <svg class="wires" id="wires" preserveAspectRatio="none"></svg>
+      <div class="col side" id="colSide"></div>
       <div class="col left" id="colNav"></div>
       <div class="col mid" id="colFiles"></div>
       <div class="col right" id="colCmds"></div>
     </div>
   </div>
 
-  <p class="caption"><b>Reading it:</b> the default pin is <code>PLAN.md · PLAN.json</code> — the tasks JSON: written by six commands (incl. the shipped <code>regen-mirror.py</code>, which also PRESERVES mirror-only proof/cases on regeneration), <b>verified by the guard hook</b> (dashed crimson = blocks a ✓ whose proof doesn't exist, D7 — shorthand-tolerant per R2), and rendered into <em>three</em> different page sections. Pin <code>walks.jsonl</code> to see one file feed the manual angles, needs-you, <em>and</em> adopt's approval reads. Pin <code>/gabe-red · sweep</code> for the red beat's whole footprint: the C-id corpus (backfilled by <code>backfill-sweep.py</code>), a RED: commit, the plan's red cell. Pin <code>/gabe-adopt</code> for the back-catalog track: cards, config, proof, and its own tracker (<code>adoption.json</code> — deliberately outside PLAN.md, and gate-ignored, so a section can never delete its own state to get green).</p>
+  <div class="gsec twocol">
+    <div>
+      <h2>Nav ⟷ structure gaps — RULED 2026-07-21 (merged as recommended; templates updated @ 0c8a307)</h2>
+      <p class="sub">Every mismatch between the sidebar as gastify renders it TODAY and the ruled structure. The operator merged all recommendations; the suite templates + specs now carry them (suite 0c8a307, awaiting operator template approval before propagation). The fourth column will match the mock once gastify re-vendors in the next loop iteration.</p>
+      <div class="gtbl"><table>
+        <tr><th></th><th>Finding</th><th>Options → <span class="rec">REC</span></th></tr>
+        <tr><td><span class="gk ok">ok</span></td><td><b>Overview contains Recent changes + Needs-you; Board contains its four lanes.</b> Page-level containment — nav stays one item per station.</td><td>Record as the containment rule in the README. No nav change.</td></tr>
+        <tr><td><span class="gk ok">ok</span></td><td><b>The Code tab has no nav item — deliberately.</b> Reachable inside each feature page; a tab, not a station.</td><td>Record the ruling so it is never "fixed".</td></tr>
+        <tr><td><span class="gk miss">missing</span></td><td><b>Architecture has no nav presence.</b> Ruled to exist (app-wide, from archmap), not yet built.</td><td><b>A <span class="rec">REC</span></b>: template ships a CODE group + Architecture item; generator renders it only once the station page exists (absent until built — honest). <b>B</b>: keep nav silent until built (nobody discovers it).</td></tr>
+        <tr><td><span class="gk drift">drift</span></td><td><b>6 pending entities are indistinguishable from the adopted one.</b> All link to the index as fallback; Transaction alone has a page.</td><td><b>A <span class="rec">REC</span></b>: adoption.json (THE registry) drives the sidebar — adopted entities link their pages; pending render muted with their tracker state chip, linking the index. <b>B</b>: hide pending entities — loses the roadmap at a glance.</td></tr>
+        <tr><td><span class="gk drift">drift</span></td><td><b>Testing navsub reads "matrix · corpora";</b> the suite skeleton shipped Matrix / Walks · shelf / Gates.</td><td><b>A <span class="rec">REC</span></b>: navsub mirrors the tests page's own tabs — matrix · evidence (walks + shelf) · gates — deep links to <code>#tab-*</code>. <b>B</b>: keep "matrix · corpora" (corpora already lead the page's Overview tab).</td></tr>
+        <tr><td><span class="gk miss">missing</span></td><td><b>Leaf: "none wired yet"</b> — htmlcov and the playwright report exist as tools but are not linked.</td><td><b>A <span class="rec">REC</span></b>: generator wires each known leaf report WHEN its file exists on disk; honest-empty otherwise (today's state stays legitimate). <b>B</b>: hardcode the links — dead until reports land.</td></tr>
+        <tr><td><span class="gk drift">drift</span></td><td><b>Naming drifts:</b> "Latest change" (nav) vs "Change pages" (map); "Card alias" / "Analytics" vs the baseline's "Card aliases" / "Analytics drill-down".</td><td><b>A <span class="rec">REC</span></b>: one-fact-one-word — the registry rows carry a <code>display_name</code>; nav, pages, and THIS map all render it. Nav-facing forms win ("Latest change" stays). <b>B</b>: leave labels per-surface — the three-vocabulary defect returns.</td></tr>
+        <tr><td><span class="gk ok">ok</span></td><td><b>Tests · 1,458 vs the sweep's 1,585:</b> the count is live junit truth, and the pill links to a page that leads with it (§7.4 traceable-chrome).</td><td>No change — numbers move; the link is the contract.</td></tr>
+      </table></div>
+    </div>
+    <div>
+      <div class="navmock">
+        <div class="g" style="color:#3bb3bd">Now</div><div class="i">Overview</div>
+        <div class="g" style="color:#6aa6f5">Board</div><div class="i">Board</div>
+        <div class="g" style="color:#4fc3a8">Entities</div>
+        <div class="i">Entity index <span class="ct">7</span></div>
+        <div class="i">Transaction</div>
+        <div class="i mut">Scan / Receipt <span class="st">pending</span></div>
+        <div class="i mut">Statement <span class="st">pending</span></div>
+        <div class="i mut">Card alias <span class="st">pending</span></div>
+        <div class="i mut">Group / Share <span class="st">pending</span></div>
+        <div class="i mut">Consent / Privacy <span class="st">pending</span></div>
+        <div class="i mut">Analytics <span class="st">pending</span></div>
+        <div class="g" style="color:#c98bbb">Docs</div><div class="i">Docs</div>
+        <div class="g" style="color:#9b93e6">Code</div><div class="i mut">Architecture <span class="st">next loop</span></div>
+        <div class="g" style="color:#6fa77d">Testing</div>
+        <div class="i">Tests <span class="ct">1,458</span></div>
+        <div class="sub">matrix · evidence · gates</div>
+        <div class="g" style="color:#d79a3c">Ledger</div><div class="i">Latest change</div>
+        <div class="g" style="color:#b795c9">Releases</div><div class="i">Releases</div>
+        <div class="g" style="color:#8494a4">Leaf</div><div class="i mut">htmlcov · playwright <span class="st">when present</span></div>
+        <div class="cap">THE RULED NAV — merged 2026-07-21; baked into the suite templates (0c8a307). gastify adopts it on its next re-vendor</div>
+      </div>
+    </div>
+  </div>
 
-  <div class="foot"><span>landed structure · D1–D7 + R1–R7 · verification-first additions marked •</span><span>updated 2026-07-16 — suite landed · rehearsed on a synthetic twin · dry-run on real-twin copies · slice 5 next</span></div>
+  <p class="caption"><b>Reading it:</b> the default pin is the <code>Transaction</code> nav item — the one adopted entity, showing the full chain: one sidebar noun → its four page sections → their files → the commands that write them. Pin <code>PLAN.md · PLAN.json</code> for the six-writer tasks file <b>verified by the guard hook</b> (dashed crimson = blocks a ✓ whose proof doesn't exist, D7). Pin <code>walks.jsonl</code> to see one file feed manual angles, needs-you, <em>and</em> adopt's approval reads. Pin <code>archmap.json</code> — the trial's read-once rule: the build reads the WHOLE application once per run (ast, no LLM; reading the codebase into context every build is expensive) and every consumer — the Code tab, the Architecture station, any section needing architecture facts — reads the MAP, never the codebase again; committed so a PR diff of it IS the architecture change. Pin the <code>A3 generator</code> for the build's full footprint. <code>adoption.json</code> is THE entity registry (D123): one vocabulary; the build aborts on unknown slugs.</p>
+
+  <div class="foot"><span>landed structure v3 · nav column = gastify's rendered sidebar, verified · • verification-first · •2 transaction-trial</span><span>updated 2026-07-21 — trial absorbed @ suite 55918c4 · nav merged 07-21 (templates await operator approval) · loop: suite ⇄ gastify until stable, then batch + gustify</span></div>
 </div>
 
 <script>
 (function(){
-  const HC={now:'--h-now',board:'--h-board',ent:'--h-ent',docs:'--h-docs',test:'--h-test',ledger:'--h-ledger',rel:'--h-rel',leaf:'--h-leaf'};
+  const HC={now:'--h-now',board:'--h-board',ent:'--h-ent',docs:'--h-docs',test:'--h-test',ledger:'--h-ledger',rel:'--h-rel',leaf:'--h-leaf',code:'--c-commit'};
   const CC={scope:'--c-scope',plan:'--c-plan',red:'--c-red',exec:'--c-exec',review:'--c-review',commit:'--c-commit',push:'--c-push',walk:'--c-walk',feature:'--c-feature',adopt:'--c-adopt',init:'--c-init',guard:'--c-guard'};
 
   const nav=[
     {sec:'Now',hc:'now',items:[
-      {id:'n-recent',label:'Recent changes',files:['f-ledgerf','f-git','f-deploy','f-digest']},
+      {id:'n-recent',label:'Recent changes',files:['f-ledgerf','f-git','f-deploy','f-digest','f-runhist']},
       {id:'n-needs',label:'Needs-you',files:['f-pending','f-walks','f-plan']},
     ]},
     {sec:'Board',hc:'board',items:[
@@ -132,17 +213,21 @@
       {id:'n-rdebt',label:'Review-debt lane',files:['f-pending']},
     ]},
     {sec:'Entities',hc:'ent',items:[
-      {id:'n-entidx',label:'Entity index',files:['f-config']},
+      {id:'n-entidx',label:'Entity index',files:['f-config','f-adoption']},
     ]},
     {sec:'Docs',hc:'docs',items:[
       {id:'n-fdocs',label:'Feature docs (accumulator)',files:['f-cards','f-config','f-decisions']},
       {id:'n-found',label:'Foundations',files:['f-scope','f-decisions','f-rules','f-behavior']},
     ]},
+    {sec:'Code',hc:'code',items:[
+      {id:'n-codetab',label:'Code tab · endpoints · map · model (per feature)',files:['f-archmap'],newt:1},
+      {id:'n-arch',label:'Architecture station (app-wide · next loop)',files:['f-archmap'],newt:1},
+    ]},
     {sec:'Testing',hc:'test',items:[
       {id:'n-matrix',label:'Matrix · id · ever-red?',files:['f-corpus','f-digest','f-git'],newi:1},
-      {id:'n-fproof',label:'Feature proof (accumulator)',files:['f-digest','f-proof','f-pending','f-git','f-corpus']},
+      {id:'n-fproof',label:'Feature proof (accumulator)',files:['f-digest','f-proof','f-manifest','f-pending','f-git','f-corpus']},
       {id:'n-manual',label:'· manual angles (walks)',files:['f-walks','f-behavior'],newi:1},
-      {id:'n-demo',label:'· demo shelf',files:['f-proof']},
+      {id:'n-demo',label:'· demo shelf → Evidence proof sets',files:['f-proof','f-manifest'],newt:1},
     ]},
     {sec:'Ledger',hc:'ledger',items:[
       {id:'n-change',label:'Change pages (ephemeral)',files:['f-git','f-plan']},
@@ -158,6 +243,7 @@
     {id:'f-git',label:'git · RED:/Cases: trailers',hc:'ledger'},
     {id:'f-corpus',label:'test corpus (C-ids)',hc:'test',newf:1},
     {id:'f-digest',label:'junit · coverage · digest',hc:'test',newf:1},
+    {id:'f-archmap',label:'archmap.json · read-once code map',hc:'code',newt:1},
     {id:'f-scope',label:'SCOPE.md',hc:'docs'},
     {id:'f-plan',label:'PLAN.md · PLAN.json',hc:'board'},
     {id:'f-pending',label:'PENDING.md',hc:'board'},
@@ -165,12 +251,14 @@
     {id:'f-walks',label:'walks.jsonl',hc:'test',newf:1},
     {id:'f-deploy',label:'DEPLOYMENTS.md',hc:'now'},
     {id:'f-ledgerf',label:'LEDGER.md',hc:'now'},
+    {id:'f-runhist',label:'run-history.jsonl (writer pending)',hc:'now',newt:1},
     {id:'f-decisions',label:'DECISIONS · RULES',hc:'docs'},
     {id:'f-rules',label:'RULES.md',hc:'docs'},
-    {id:'f-config',label:'center.config.json',hc:'ent'},
+    {id:'f-config',label:'center.config.json (editorial)',hc:'ent'},
     {id:'f-cards',label:'cards/*.md',hc:'docs'},
     {id:'f-proof',label:'proof/ shots+manifests',hc:'test'},
-    {id:'f-adoption',label:'adoption.json (tracker)',hc:'docs',newf:1},
+    {id:'f-manifest',label:'manifest.json (per proof set)',hc:'test',newt:1},
+    {id:'f-adoption',label:'adoption.json · THE registry (D123)',hc:'docs',newf:1},
     {id:'f-leafr',label:'htmlcov · playwright',hc:'leaf'},
   ];
   const cmds=[
@@ -184,6 +272,7 @@
     {id:'c-walk',label:'/gabe-walk',cc:'walk',newc:1},
     {id:'c-feature',label:'/gabe-feature +release',cc:'feature'},
     {id:'c-adopt',label:'/gabe-adopt',cc:'adopt',newc:1},
+    {id:'c-build',label:'A3 generator · Center CI',cc:'init',newt:1},
     {id:'c-init',label:'/gabe-init',cc:'init'},
     {id:'c-guard',label:'hooks · guard + warns',cc:'guard',newc:1},
   ];
@@ -192,38 +281,68 @@
     ['c-scope','f-scope','w'],
     ['c-plan','f-plan','w'],['c-plan','f-decisions','w'],
     ['c-red','f-corpus','w'],['c-red','f-git','w'],['c-red','f-plan','w'],
-    ['c-exec','f-git','w'],['c-exec','f-plan','w'],['c-exec','f-proof','w'],['c-exec','f-corpus','w'],
+    ['c-exec','f-git','w'],['c-exec','f-plan','w'],['c-exec','f-proof','w'],['c-exec','f-corpus','w'],['c-exec','f-manifest','w'],
     ['c-review','f-pending','w'],['c-review','f-plan','w'],['c-review','f-decisions','w'],
     ['c-commit','f-git','w'],['c-commit','f-digest','w'],['c-commit','f-ledgerf','w'],['c-commit','f-plan','w'],
     ['c-push','f-deploy','w'],['c-push','f-plan','w'],['c-push','f-leafr','w'],
     ['c-walk','f-walks','w'],
-    ['c-feature','f-cards','w'],['c-feature','f-config','w'],['c-feature','f-proof','w'],
+    ['c-feature','f-cards','w'],['c-feature','f-config','w'],['c-feature','f-proof','w'],['c-feature','f-manifest','w'],
     ['c-adopt','f-adoption','w'],['c-adopt','f-cards','w'],['c-adopt','f-config','w'],['c-adopt','f-proof','w'],['c-adopt','f-walks','r'],
+    ['c-build','f-archmap','w'],['c-build','f-runhist','w'],['c-build','f-corpus','r'],['c-build','f-digest','r'],['c-build','f-walks','r'],['c-build','f-config','r'],['c-build','f-adoption','r'],['c-build','f-cards','r'],
     ['c-init','f-behavior','w'],['c-init','f-scope','w'],['c-init','f-rules','w'],
     ['c-guard','f-plan','v'],['c-guard','f-git','v'],['c-guard','f-proof','r'],['c-guard','f-corpus','r'],
   ];
 
+  // the ACTUAL sidebar, extracted from gastify's generated index.html (2026-07-21)
+  const sidebar=[
+    {group:'Now',hc:'now',items:[{id:'s-overview',label:'Overview',secs:['n-recent','n-needs']}]},
+    {group:'Board',hc:'board',items:[{id:'s-board',label:'Board',secs:['n-rail','n-backlog','n-nonphase','n-rdebt']}]},
+    {group:'Entities',hc:'ent',items:[
+      {id:'s-entidx',label:'Entity index · 7',secs:['n-entidx']},
+      {id:'s-enttx',label:'Transaction → feature page',secs:['n-fdocs','n-codetab','n-matrix','n-fproof']},
+      {id:'s-entrest',label:'6 pending → index fallback',secs:['n-entidx'],gap:1},
+    ]},
+    {group:'Docs',hc:'docs',items:[{id:'s-docs',label:'Docs',secs:['n-fdocs','n-found']}]},
+    {group:'Code',hc:'code',items:[{id:'s-arch',label:'∅ Architecture — not in nav',secs:['n-arch'],gap:1,ghost:1}]},
+    {group:'Testing',hc:'test',items:[{id:'s-tests',label:'Tests · 1,458 ▸ matrix · corpora',secs:['n-matrix','n-fproof','n-manual','n-demo']}]},
+    {group:'Ledger',hc:'ledger',items:[{id:'s-ledger',label:'Latest change',secs:['n-change']}]},
+    {group:'Releases',hc:'rel',items:[{id:'s-rel',label:'Releases',secs:['n-release']}]},
+    {group:'Leaf',hc:'leaf',items:[{id:'s-leaf',label:'∅ none wired yet',secs:['n-leaf'],gap:1,ghost:1}]},
+  ];
+
   const cs=getComputedStyle(document.documentElement); const cv=v=>cs.getPropertyValue(v).trim();
-  const colNav=document.getElementById('colNav'),colFiles=document.getElementById('colFiles'),colCmds=document.getElementById('colCmds');
+  const colSide=document.getElementById('colSide'),colNav=document.getElementById('colNav'),colFiles=document.getElementById('colFiles'),colCmds=document.getElementById('colCmds');
   const map=document.getElementById('map'),svg=document.getElementById('wires'),pinlbl=document.getElementById('pinlbl');
-  const els={},secEls={},navFiles={},fileNavs={},navHc={},fileCmds={},cmdFiles={},cmdColor={};
+  const els={},secEls={},navFiles={},fileNavs={},navHc={},fileCmds={},cmdFiles={},cmdColor={},sideSecs={},secSides={},sideHc={},sideGap={};
 
   edges.forEach(([c,f,m])=>{(fileCmds[f]=fileCmds[f]||[]).push([c,m]);(cmdFiles[c]=cmdFiles[c]||[]).push([f,m]);});
   nav.forEach(s=>s.items.forEach(it=>{navFiles[it.id]=it.files;navHc[it.id]=s.hc;it.files.forEach(f=>{(fileNavs[f]=fileNavs[f]||[]).push(it.id);});}));
   cmds.forEach(c=>cmdColor[c.id]=c.cc);
+  sidebar.forEach(g=>g.items.forEach(it=>{sideSecs[it.id]=it.secs;sideHc[it.id]=g.hc;sideGap[it.id]=!!it.gap;it.secs.forEach(n=>{(secSides[n]=secSides[n]||[]).push(it.id);});}));
+
+  sidebar.forEach(g=>{
+    const gd=document.createElement('div');gd.style.setProperty('--hc','var('+HC[g.hc]+')');
+    const sh=document.createElement('div');sh.className='shd';sh.style.setProperty('--hc','var('+HC[g.hc]+')');sh.textContent=g.group;gd.appendChild(sh);
+    g.items.forEach(it=>{
+      const d=document.createElement('div');d.className='node'+(it.ghost?' ghost':'');d.id=it.id;d.dataset.id=it.id;d.dataset.type='side';
+      d.style.setProperty('--hc','var('+HC[g.hc]+')');
+      d.innerHTML='<div class="t">'+it.label+'</div>';gd.appendChild(d);els[it.id]=d;
+    });
+    colSide.appendChild(gd);
+  });
 
   nav.forEach(s=>{
     const sd=document.createElement('div');sd.className='navsec';sd.style.setProperty('--hc','var('+HC[s.hc]+')');
     const sh=document.createElement('div');sh.className='sh';sh.textContent=s.sec;sd.appendChild(sh);secEls[s.sec]=sd;
     s.items.forEach(it=>{
-      const d=document.createElement('div');d.className='navitem'+(it.newi?' newi':'');d.id=it.id;d.dataset.id=it.id;d.dataset.type='nav';
+      const d=document.createElement('div');d.className='navitem'+(it.newi?' newi':'')+(it.newt?' newt':'');d.id=it.id;d.dataset.id=it.id;d.dataset.type='nav';
       d.style.setProperty('--hc','var('+HC[s.hc]+')');
       d.innerHTML='<span class="dot"></span><span class="t">'+it.label+'</span>';sd.appendChild(d);els[it.id]=d;
     });
     colNav.appendChild(sd);
   });
-  files.forEach(f=>{const d=document.createElement('div');d.className='node'+(f.newf?' newf':'');d.id=f.id;d.dataset.id=f.id;d.dataset.type='file';d.style.setProperty('--hc','var('+HC[f.hc]+')');d.innerHTML='<div class="t">'+f.label+'</div>';colFiles.appendChild(d);els[f.id]=d;});
-  cmds.forEach(c=>{const d=document.createElement('div');d.className='node'+(c.newc?' newc':'');d.id=c.id;d.dataset.id=c.id;d.dataset.type='cmd';d.style.setProperty('--cc','var('+CC[c.cc]+')');d.innerHTML='<div class="t">'+c.label+'</div>';colCmds.appendChild(d);els[c.id]=d;});
+  files.forEach(f=>{const d=document.createElement('div');d.className='node'+(f.newf?' newf':'')+(f.newt?' newt':'');d.id=f.id;d.dataset.id=f.id;d.dataset.type='file';d.style.setProperty('--hc','var('+HC[f.hc]+')');d.innerHTML='<div class="t">'+f.label+'</div>';colFiles.appendChild(d);els[f.id]=d;});
+  cmds.forEach(c=>{const d=document.createElement('div');d.className='node'+(c.newc?' newc':'')+(c.newt?' newt':'');d.id=c.id;d.dataset.id=c.id;d.dataset.type='cmd';d.style.setProperty('--cc','var('+CC[c.cc]+')');d.innerHTML='<div class="t">'+c.label+'</div>';colCmds.appendChild(d);els[c.id]=d;});
 
   function pt(el,side){const m=map.getBoundingClientRect(),r=el.getBoundingClientRect();return{x:(side==='r'?r.right:r.left)-m.left,y:r.top-m.top+r.height/2};}
   function drawSeg(a,b,color,mode){const dx=Math.max(28,Math.abs(b.x-a.x)*0.45);
@@ -235,16 +354,20 @@
   function secOf(nid){for(const s of nav)if(s.items.some(i=>i.id===nid))return s.sec;return null;}
 
   function segsFor(id,type){
-    const lit=new Set([id]),secs=new Set(),segs=[];
-    function navFile(nid,fid){segs.push({a:els[nid],as:'r',b:els[fid],bs:'l',color:cv(HC[navHc[nid]]),mode:'w'});lit.add(nid);lit.add(fid);secs.add(secOf(nid));}
+    const lit=new Set([id]),secs=new Set(),segs=[],sidePairs=new Set();
+    function sideNav(sid,nid){const k=sid+'|'+nid;if(sidePairs.has(k))return;sidePairs.add(k);
+      segs.push({a:els[sid],as:'r',b:els[nid],bs:'l',color:sideGap[sid]?cv('--c-red'):cv(HC[sideHc[sid]]),mode:sideGap[sid]?'v':'w'});lit.add(sid);lit.add(nid);}
+    function navFile(nid,fid){segs.push({a:els[nid],as:'r',b:els[fid],bs:'l',color:cv(HC[navHc[nid]]),mode:'w'});lit.add(nid);lit.add(fid);secs.add(secOf(nid));
+      (secSides[nid]||[]).forEach(s=>sideNav(s,nid));}
     function fileCmd(fid,cid,m){segs.push({a:els[fid],as:'r',b:els[cid],bs:'l',color:cv(CC[cmdColor[cid]]),mode:m});lit.add(fid);lit.add(cid);}
-    if(type==='nav'){(navFiles[id]||[]).forEach(f=>{navFile(id,f);(fileCmds[f]||[]).forEach(([c,m])=>fileCmd(f,c,m));});}
+    if(type==='side'){(sideSecs[id]||[]).forEach(n=>{sideNav(id,n);secs.add(secOf(n));(navFiles[n]||[]).forEach(f=>{navFile(n,f);(fileCmds[f]||[]).forEach(([c,m])=>fileCmd(f,c,m));});});}
+    else if(type==='nav'){(secSides[id]||[]).forEach(s=>sideNav(s,id));(navFiles[id]||[]).forEach(f=>{navFile(id,f);(fileCmds[f]||[]).forEach(([c,m])=>fileCmd(f,c,m));});}
     else if(type==='file'){(fileNavs[id]||[]).forEach(n=>navFile(n,id));(fileCmds[id]||[]).forEach(([c,m])=>fileCmd(id,c,m));}
     else{(cmdFiles[id]||[]).forEach(([f,m])=>{fileCmd(f,id,m);(fileNavs[f]||[]).forEach(n=>navFile(n,f));});}
     return{segs,lit,secs};
   }
 
-  let pinned={id:'f-plan',type:'file'};
+  let pinned={id:'s-enttx',type:'side'};
   function render(id,type){
     svg.innerHTML='';const mr=map.getBoundingClientRect();svg.setAttribute('viewBox','0 0 '+mr.width+' '+mr.height);svg.setAttribute('width',mr.width);svg.setAttribute('height',mr.height);
     Object.values(els).forEach(e=>e.classList.remove('lit'));Object.values(secEls).forEach(e=>e.classList.remove('lit'));map.classList.add('dim');

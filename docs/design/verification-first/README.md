@@ -4,9 +4,13 @@
 > 2026-07-14/15 design arc: how the suite, its files, and the command center relate;
 > why each decision fell the way it did; and the traps already found and priced.
 > Human-facing visuals (same content, navigable): [`map-site-files-suite.html`](map-site-files-suite.html)
-> (pin/hover the site⟷files⟷suite connections — updated 2026-07-16 to the LANDED structure:
-> `/gabe-adopt` + its `adoption.json` tracker, the shipped `regen-mirror`/`backfill-sweep`
-> scripts, `/gabe-walk`, the guard+warn hook pair) · [`example-testing-page.html`](example-testing-page.html)
+> (**v3, 2026-07-22** — now four columns: the far-left column is the ACTUAL sidebar as
+> gastify renders it TODAY, extracted from the generated pages, gaps included; then the
+> center's sections, the files execution generates, and the commands that write them.
+> Pin/hover any node to trace the full chain. Below the map: the ruled Nav⟷structure
+> gap table — RULED 2026-07-21, merged into the templates @ `0c8a307`. Covers `/gabe-adopt`
+> + its `adoption.json` registry, `/gabe-walk`, the guard+warn hook pair) ·
+> [`example-testing-page.html`](example-testing-page.html)
 > (**how the Testing page will look after slice 5** — illustrative preview over the real
 > dry-run numbers: the C-id matrix, ever-red, walks, verification changelog) ·
 > [`consolidated-trees.html`](consolidated-trees.html) (the three leveled trees) ·
