@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime as _dt
 import json
+import os
 import re
 from pathlib import Path
 
@@ -30,13 +31,20 @@ from pathlib import Path
 # project retargets the loaders by editing config, never this file.
 # --------------------------------------------------------------------------- #
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+# GABE_REPO_ROOT lets a lab driver point the loaders at another project's tree
+# (read-only) without moving the scripts. Default = the two-up convention.
+REPO_ROOT = (Path(os.environ["GABE_REPO_ROOT"]).resolve()
+             if os.environ.get("GABE_REPO_ROOT")
+             else Path(__file__).resolve().parent.parent)
 CENTER_DIR = REPO_ROOT / "docs" / "site" / "center"
 
 
 def load_center_config() -> dict:
-    """The center.config.json bindings, or {} when absent (pre-adoption)."""
-    p = CENTER_DIR / "center.config.json"
+    """The center.config.json bindings, or {} when absent (pre-adoption).
+    GABE_CONFIG overrides the source path (a lab driver feeding a project's data
+    a config it does not carry yet)."""
+    p = (Path(os.environ["GABE_CONFIG"]) if os.environ.get("GABE_CONFIG")
+         else CENTER_DIR / "center.config.json")
     if not p.exists():
         return {}
     return json.loads(p.read_text())
@@ -176,6 +184,22 @@ def load_plan() -> dict:
             "current_phase": authored or first_owed,
             "authored_phase": authored, "first_owed": first_owed,
             "phases": phases}
+
+
+def load_maturity() -> str:
+    """The project's declared maturity tier from `.kdbp/BEHAVIOR.md`'s
+    `maturity:` line (mvp | enterprise | scale), lowercased. Returns "" when the
+    file or the line is absent — the caller renders an HONEST "not declared", it
+    never fabricates a tier or a provenance for one. This is the single read of
+    the value the Action Ledger's ripe-now/later split is computed against."""
+    path = KDBP / "BEHAVIOR.md"
+    if not path.exists():
+        return ""
+    for ln in path.read_text().splitlines():
+        m = re.match(r"\s*maturity\s*:\s*([A-Za-z]+)", ln, re.I)
+        if m:
+            return m.group(1).lower()
+    return ""
 
 
 def load_pending() -> list[dict]:

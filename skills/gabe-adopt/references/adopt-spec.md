@@ -194,9 +194,12 @@ feature-spec (card contract). This section states what adoption must OBEY.
   next loop iteration), any section needing architecture facts — reads the MAP, never the
   codebase. Committed so a PR diff of it IS the architecture change.
 - **Ephemeral/accumulator is a REQUIREMENT per tab:** Overview=card/growth · Code=card
-  `# CODE`/archmap renders · Tests=**testing claim card (spec'd — case classes with intent +
-  C-id anchors the build VALIDATES against junit; claimed-but-not-running renders as drift;
-  build next loop)**/matrix · Evidence=`manifest.json` per set/disk walk · Risk=card
+  `# CODE`/archmap renders · Tests=**testing claim card (spec'd — `# CLAIMS`, one
+  `class — intent` line each; the build joins each claim by the class NAME the card names
+  and checks it still runs in junit — the cases' C-ids are read for DISPLAY, not the join
+  key; a claimed class not running renders as drift, a name matching several classes as
+  ambiguous, and if junit is incomplete the verdict is withheld; build next loop)**/matrix ·
+  Evidence=`manifest.json` per set/disk walk · Risk=card
   `# RISKS`/derived GAP rows. The CENTER's own accumulator is `run-history.jsonl` (one line
   per build: ts · source · totals — writer lands next loop; reader + named gap exist).
 - **Machine-surface-first section builds:** a section starts from endpoints + models + junit

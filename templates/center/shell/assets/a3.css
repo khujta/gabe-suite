@@ -232,9 +232,9 @@ h2.sec .more:hover{text-decoration:underline}
    container now widens; the PANES keep the reading measure and stay left-aligned
    with the bar, so the bar and the content share a left edge and only the status
    cluster uses the extra room. */
-.subject{max-width:1400px;margin:0 auto}
-.tabbody{max-width:1060px}
-.subjecthead{max-width:1060px}
+/* width now lives once in --content-max (Action Ledger fold, at the END of this
+   file); .subject keeps only its centering here. */
+.subject{margin:0 auto}
 .subjecthead{padding:24px 30px 0}
 .subjecthead .pagehead{margin-bottom:12px}
 
@@ -685,3 +685,63 @@ details.legset>summary b{font:var(--mono);font-size:.7rem;text-transform:upperca
   border-radius:5px;padding:2px 7px}
 details.legset>summary .count{font:var(--mono);font-size:.66rem;color:var(--faint)}
 details.legset .gal{margin:8px 0 4px}
+
+/* ===== Action Ledger additions — folded from the retrofit. Loads AFTER the
+   base rules so it wins on source order; the superseded .subject/.tabbody/
+   .subjecthead base widths were removed (width lives once in --content-max). ===== */
+/* Expandable-row table (xtable): click a row to open its detail in place; open
+   row highlights; no button. Generic via --xcols. */
+.xtbl{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface);margin:0 0 16px}
+.xhead,.xrow>summary,.xrow.xflat>.xsummary{display:grid;grid-template-columns:var(--xcols,1fr);gap:14px;align-items:center;padding:11px 16px}
+.xhead{background:var(--panel);border-bottom:1px solid var(--line);font-size:.63rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.xrow{border-bottom:1px solid var(--line-2)}
+.xrow:last-child{border-bottom:0}
+.xrow>summary{cursor:pointer;list-style:none;font-size:.82rem}
+.xrow>summary::-webkit-details-marker{display:none}
+.xrow>summary>span,.xrow.xflat .xsummary>span{min-width:0;overflow-wrap:anywhere}
+.xrow>summary:hover{background:var(--panel)}
+.xrow[open]>summary{background:var(--accent-soft)}
+.xrow.xflat>.xsummary{cursor:default;font-size:.82rem}
+.xrow.xflat .xtgl{visibility:hidden}
+.xrow .xtgl{position:relative;width:14px;height:14px;justify-self:end;transition:transform .18s}
+.xrow .xtgl::before,.xrow .xtgl::after{content:"";position:absolute;top:6px;width:8px;height:2px;background:var(--muted);border-radius:1px}
+.xrow .xtgl::before{left:0;transform:rotate(45deg)}
+.xrow .xtgl::after{right:0;transform:rotate(-45deg)}
+.xrow[open] .xtgl{transform:rotate(180deg)}
+.xbody{padding:2px 16px 16px;border-top:1px dashed var(--line);background:var(--panel)}
+.xbody .tbl{margin:8px 0 0}
+@media(max-width:760px){.xhead{display:none}.xrow>summary,.xrow.xflat>.xsummary{grid-template-columns:1fr 18px}.xrow>summary>span:not(:first-child):not(:last-child),.xrow.xflat .xsummary>span:not(:first-child):not(:last-child){display:none}}
+/* row-click opens all expanders in a standard .tbl row (JS below) */
+.tbl tbody>tr:not(.exp):has(details),.tbl tbody>tr:not(.exp):has(+ tr.exp){cursor:pointer}
+.tbl tbody>tr.rowopen>td,.tbl tbody>tr.rowopen>th,.tbl tbody>tr.exp.rowopen>td{background:var(--accent-soft)}
+.xrow.xflat.rowopen>.xsummary{background:var(--accent-soft)}
+/* fixed-layout wide-column tables (action ledger / risk) — text columns get room */
+.tbl.wcol{table-layout:fixed}
+.tbl.wcol td,.tbl.wcol th{overflow-wrap:anywhere;word-break:break-word}
+
+/* LAYOUT — one content width for the subject, the panes AND the tab bar, so the
+   status pills (which live in the tab bar) align to the content edge instead of
+   floating into the old wider "subject" box; the top bar tracks the same centered
+   box; a minimized (rail) nav hands the reclaimed width to all of it. Base keeps a
+   readable measure; rail widens for the tables. Width lives ONLY here now — the
+   superseded .subject/.tabbody/.subjecthead base widths were removed above. */
+:root{--content-max:1120px}
+:root[data-rail="1"]{--content-max:1440px}
+.subject,.subjecthead,.tabbody,.tabbar{max-width:var(--content-max)}
+.topbar{padding-left:max(30px,calc((100% - var(--content-max)) / 2 + 30px));
+        padding-right:max(30px,calc((100% - var(--content-max)) / 2 + 30px))}
+:root[data-rail="1"] .wrap{max-width:1300px}
+.tbl.wcol .tag{white-space:nowrap;word-break:keep-all}
+/* narrow-screen escape for the wide fixed-layout ledger/risk tables — on the
+   phone/tablet widths the center already writes @media rules for, let the wide
+   table SCROLL sideways inside its panel instead of crushing 8 columns into a
+   wall of stacked characters (base .panel clips with overflow:hidden). The .xtbl
+   tables already drop columns at this breakpoint; .tbl.wcol keeps them and
+   scrolls. */
+@media(max-width:760px){
+  .panel:has(.tbl.wcol){overflow-x:auto}
+  .tbl.wcol{min-width:700px}
+}
+/* a targeted xrow (jumped-to via a #dm-… cross-reference link) — rowclick.js
+   opens it; this flags where the reader landed. */
+.xrow:target>summary{background:var(--accent-soft)}

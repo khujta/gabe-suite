@@ -18,7 +18,7 @@ import re
 from pathlib import Path
 
 import _center_data as _cd
-from _a3_render import E, legend, md, pmore, sechead, subnav, table, trunc
+from _a3_render import E, legend, md, pmore, sechead, subnav, table, trunc, xtable
 
 _CENTER_REL = _cd._PATHS.get("center", "docs/site/center")
 _PROOF_REL = _cd._PATHS.get("proof", "tests/web-e2e/proof")
@@ -95,6 +95,11 @@ def collect_set(name: str, pdir: Path) -> dict:
             man = json.loads(mpath.read_text())
         except json.JSONDecodeError:
             man = {}
+    # A structurally-valid JSON whose ROOT is not an object (a list, a string)
+    # would make every `man.get(...)` below throw and abort the WHOLE center
+    # build for one bad file. One entity's manifest degrades one entity's tab.
+    if not isinstance(man, dict):
+        man = {}
     shots: list[Path] = []
     videos: list[Path] = []
     traces: list[Path] = []
@@ -129,7 +134,8 @@ def collect_set(name: str, pdir: Path) -> dict:
 
     # The manifest's artifact list is an authored READING ORDER; files it does
     # not name still appear (never hide evidence), just after the named ones.
-    order = {n: i for i, n in enumerate(man.get("artifacts", []) or [])}
+    _arts = man.get("artifacts", [])
+    order = {n: i for i, n in enumerate(_arts if isinstance(_arts, list) else [])}
     # Reading order: what the manifest named, then the stills, then the
     # recordings — a walk is read as frames before it is watched.
     media = shots + videos
@@ -140,8 +146,18 @@ def collect_set(name: str, pdir: Path) -> dict:
 
     # Legs map a leg name to relative-path PREFIXES — they match both a file
     # stem convention ("ref-default.png") and a directory ("prod/cl/01.png").
-    legs_def = man.get("legs", {}) or {}
-    notes = (man.get("narration", {}) or {}).get("legs", {}) or {}
+    # legs / narration may be authored the wrong SHAPE (a list, a string) and
+    # still parse as JSON — coerce each non-dict to {} so a hand-edited manifest
+    # degrades to "no legs" instead of raising AttributeError mid-build.
+    legs_def = man.get("legs", {})
+    if not isinstance(legs_def, dict):
+        legs_def = {}
+    _narr = man.get("narration", {})
+    if not isinstance(_narr, dict):
+        _narr = {}
+    notes = _narr.get("legs", {})
+    if not isinstance(notes, dict):
+        notes = {}
     buckets: dict[str, list[Path]] = {k: [] for k in legs_def}
     unassigned: list[Path] = []
     for p in media:
@@ -154,7 +170,11 @@ def collect_set(name: str, pdir: Path) -> dict:
         if hit is None:
             hit = next((leg for leg in legs_def if p.stem == leg), None)
         (buckets[hit] if hit else unassigned).append(p)
-    legs = [{"name": leg, "note": notes.get(leg, ""), "files": files}
+    # A leg note authored as a non-string (a list/dict) would reach E()/md()
+    # downstream and raise — coerce it to "" at the source so every consumer
+    # (the tile data-note, the leg heading) gets a str.
+    _note = lambda leg: (n if isinstance(n := notes.get(leg, ""), str) else "")
+    legs = [{"name": leg, "note": _note(leg), "files": files}
             for leg, files in buckets.items() if files]
     if unassigned:
         legs.append({"name": "unfiled", "files": unassigned,
@@ -201,6 +221,8 @@ def _tile(s: dict, leg: dict, f: Path, label: str, i: int, n: int) -> str:
     href = f'{_PREFIX}/{E(s["name"])}/{E(rel)}'
     is_video = f.suffix.lower() in _VIDEO_EXT
     title = s["man"].get("feature", s["name"])
+    if not isinstance(title, str):        # feature authored as a list/dict
+        title = s["name"]
     body = (f'<span class="ph vid">▶ {E(f.suffix.lstrip("."))}</span>' if is_video
             else f'<img src="{href}" loading="lazy" style="width:100%;'
                  f'aspect-ratio:4/3;object-fit:cover;display:block">')
@@ -219,14 +241,18 @@ def _tile(s: dict, leg: dict, f: Path, label: str, i: int, n: int) -> str:
             f"<span>{E(trunc(label, 44))}</span></div></a>")
 
 
-def _set_detail(s: dict) -> str:
-    """What opens under a proof-set row: the run it came from, then one
+def _set_detail(s: dict, story: str = "") -> str:
+    """What opens under a proof-set row: the full story (its summary cell is
+    truncated PLAIN — see build_evidence_tab), the run it came from, then one
     collapsible leg per journey. The whole block is ONE viewer group, so
     arrowing runs across the entire set and not just the leg on screen."""
     man = s["man"]
     out = ""
-    if man.get("proof_form"):
-        out += f'<p class="sub">{md(man["proof_form"])}</p>'
+    if story:
+        out += f'<p class="sub"><b>What this set shows:</b> {md(story)}</p>'
+    _pf = man.get("proof_form")
+    if isinstance(_pf, str) and _pf:
+        out += f'<p class="sub">{md(_pf)}</p>'
     if s["refs"]:
         out += (f'<p class="sub"><b>{len(s["refs"])} reference artifact(s) held '
                 f"out.</b> Storybook / design-lab captures live in this "
@@ -260,7 +286,7 @@ def build_evidence_tab(names: list[str], proof_root: Path,
     if not names:
         return ""
     sets = [collect_set(n, proof_root / n) for n in names]
-    rows, exp = [], []
+    rows = []
     for s in sets:
         n_media = len(s["shots"]) + len(s["videos"])
         man = s["man"]
@@ -276,27 +302,37 @@ def build_evidence_tab(names: list[str], proof_root: Path,
             state = '<span class="tag s-med">no manifest</span>'
         else:
             state = f'<span class="tag s-ok">on disk · {len(s["legs"])} leg(s)</span>'
-        story_cell = pmore((man.get("narration", {}) or {}).get("story", ""), 150)
+        # xtable SUMMARY cells must never contain a <details> (a <details> nested
+        # in a <summary> is invalid HTML, and with JS off the inner ⊕ toggles the
+        # OUTER row). Truncate PLAIN here; the row opens to the full story below.
+        _narr = man.get("narration")
+        _story = _narr.get("story", "") if isinstance(_narr, dict) else ""
+        if not isinstance(_story, str):        # story authored as a list/dict
+            _story = ""
+        story_cell = (E(trunc(_story, 150)) if _story
+                      else '<span class="sub">—</span>')
         counts = " ".join(filter(None, [
             f'{len(s["shots"])} shot(s)' if s["shots"] else "",
             f'{len(s["videos"])} video(s)' if s["videos"] else "",
             f'{len(s["traces"])} trace(s)' if s["traces"] else ""])) or "—"
         captured = (f'{_rel_days(s["newest"])}<br>'
-                    + pmore(man.get("source_run", "run not recorded"), 42,
-                            small=True)
+                    f'<small>{E(trunc(str(man.get("source_run", "run not recorded")), 42))}</small>'
                     if s["newest"] else '<span class="sub">—</span>')
-        rows.append([
+        cells = [
             f'<b>{E(s["name"])}</b><br>'
-            + pmore(man.get("feature", "no manifest"), 60, small=True),
-            story_cell, counts, captured, state])
-        exp.append((f'Open the {n_media} artifact(s) of '
-                    f'<code>{E(s["name"])}</code>', _set_detail(s))
-                   if n_media else ("", ""))
+            f'<small>{E(trunc(str(man.get("feature", "no manifest")), 60))}</small>',
+            story_cell, counts, captured, state]
+        # Click the row to open the galleries in place (no separate button); a
+        # set with nothing on disk stays a flat, un-expandable row.
+        rows.append((cells, _set_detail(s, _story) if n_media else ""))
 
     n_sets = sum(1 for s in sets if s["shots"] or s["videos"])
     n_shots = sum(len(s["shots"]) for s in sets)
     n_vids = sum(len(s["videos"]) for s in sets)
-    specs = sorted({s["man"].get("spec", "") for s in sets if s["man"].get("spec")})
+    # `spec` authored as a list/dict is unhashable — guard the set membership on
+    # str-ness so one mis-typed field cannot raise mid-tab.
+    specs = sorted({s["man"]["spec"] for s in sets
+                    if isinstance(s["man"].get("spec"), str) and s["man"]["spec"]})
 
     html = subnav([("sec-ev-sets", "Proof sets", _IC_CAM),
                    ("sec-ev-gaps", "Not proven here", _IC_INBOX)])
@@ -318,12 +354,12 @@ def build_evidence_tab(names: list[str], proof_root: Path,
                  ("s-ok", "artifacts", "on disk this build ·"),
                  ("s-gap", "empty / absent",
                   "declared for this entity but nothing to show — a named gap")]))
-    html += table(
+    html += xtable(
         ["Proof set", "What it shows", "Artifacts", "Captured", "State"],
-        rows, expand=exp,
+        rows, widths=["1.5fr", "2.4fr", "0.9fr", "1.3fr", "1.2fr"],
         note=f"{n_sets} set(s) with evidence · {n_shots} shot(s) · {n_vids} "
-             f"video(s) · walked recursively from "
-             f"`{_PROOF_REL}/` at build time.")
+             f"video(s) · click a row to open its galleries · walked recursively "
+             f"from `{_PROOF_REL}/` at build time.")
     html += sechead("Evidence", "Not proven here", "#8a6d1a", _IC_INBOX,
                     sub="the evidence kinds this entity does not have",
                     id_="sec-ev-gaps")

@@ -76,10 +76,29 @@ def pmore(text: str, n: int, small: bool = False) -> str:
 
 
 def kpi(label: str, value: str, sub: str = "", alert: bool = False) -> str:
+    """A KPI card."""
     cls = "kpi alert" if alert else "kpi"
     sub_html = f'<div class="sub">{E(sub)}</div>' if sub else ""
     return (f'<div class="{cls}"><div class="lab">{E(label)}</div>'
             f'<div class="val">{E(value)}</div>{sub_html}</div>')
+
+
+def lines_grade(n: int, thousands: bool = False) -> str:
+    """The 800-line budget as colour — green at/below the cap, deepening red
+    toward 2,000, capped there. The number IS the flag.
+
+    ONE definition, shared by the code map (`thousands=False` → `812`) and the
+    structure move (`thousands=True` → `1,293`) so the two Lines columns cannot
+    drift on threshold or curve — only on the digit-grouping the caller asks
+    for. Move the 800 budget here and both surfaces move together."""
+    fmt = f"{n:,}" if thousands else f"{n}"
+    if n <= 800:
+        return f'<b style="color:var(--good)">{fmt}</b>'
+    frac = min((n - 800) / 1200, 1.0)
+    r = int(0xE5 + (0xB7 - 0xE5) * frac)
+    g = int(0x73 + (0x1C - 0x73) * frac)
+    b = int(0x73 + (0x1C - 0x73) * frac)
+    return f'<b style="color:rgb({r},{g},{b})">{fmt}</b>'
 
 
 def frow(name: str, desc: str, meta: str, href: str | None = None) -> str:
@@ -91,7 +110,8 @@ def frow(name: str, desc: str, meta: str, href: str | None = None) -> str:
 
 def table(headers: list[str], rows: list[list[str]],
           num: set[int] | frozenset = frozenset(), note: str = "",
-          expand: list[tuple[str, str]] | None = None) -> str:
+          expand: list[tuple[str, str]] | None = None,
+          widths: list[str] | None = None) -> str:
     """Any repeated-record section renders as a REAL table with a labeled header
     row — never a card list whose columns are only explained in the section
     title. Cell content is pre-escaped by the caller (it may carry markup).
@@ -99,7 +119,11 @@ def table(headers: list[str], rows: list[list[str]],
     `expand` is parallel to `rows`: each (summary, html) pair renders as an
     expander row directly UNDER its record, so the row's detail opens in place
     instead of on a page the reader has to navigate away to. An empty pair
-    means that record has nothing to open."""
+    means that record has nothing to open.
+
+    `widths` (parallel to `headers`) pins each column's width and switches the
+    table to fixed layout — so a wide-column table (the action ledger) gives its
+    text columns room instead of letting the browser starve them."""
     if not rows:
         return f'<p class="sub">{E(note or "nothing to show")}</p>'
     # A short `expand` list used to drop the trailing rows' detail in silence.
@@ -122,8 +146,46 @@ def table(headers: list[str], rows: list[list[str]],
     # The note is prose: markdown markers are RENDERED (a leaked `code`
     # span or a literal <code> tag reads as corrupted output).
     tail = f'<p class="sub">{md(note)}</p>' if note else ""
-    return (f'<div class="panel"><table class="tbl"><thead><tr>{head}</tr></thead>'
+    cls = "tbl wcol" if widths else "tbl"
+    colgroup = ("<colgroup>"
+                + "".join(f'<col style="width:{w}">' for w in widths)
+                + "</colgroup>") if widths else ""
+    return (f'<div class="panel"><table class="{cls}">{colgroup}'
+            f"<thead><tr>{head}</tr></thead>"
             f"<tbody>{body}</tbody></table></div>{tail}")
+
+
+def xtable(columns: list[str], rows: list, widths: list[str] | None = None,
+           note: str = "") -> str:
+    """An EXPANDABLE-ROW table: the summary IS the row — clicking anywhere on it
+    opens the row's detail in place, no separate button (`.xtbl`/`.xrow` shell
+    CSS). One component for the data model, the test matrix and the proof shelf.
+
+    `rows` items are (cells, detail_html[, row_id]) — cells pre-escaped by the
+    caller; a row with empty detail renders FLAT (no toggle). `widths` are grid
+    fractions parallel to `columns` (default equal); a trailing chevron column
+    is appended automatically."""
+    widths = widths or (["1fr"] * len(columns))
+    tmpl = " ".join(widths) + " 20px"
+    head = ('<div class="xhead">'
+            + "".join(f"<span>{E(c)}</span>" for c in columns)
+            + "<span></span></div>")
+    body = []
+    for row in rows:
+        cells, detail = row[0], row[1]
+        rid = row[2] if len(row) > 2 else ""
+        idattr = f' id="{rid}"' if rid else ""
+        summ = ("".join(f"<span>{c}</span>" for c in cells)
+                + '<span class="xtgl"></span>')
+        if detail:
+            body.append(f'<details class="xrow"{idattr}><summary>{summ}</summary>'
+                        f'<div class="xbody">{detail}</div></details>')
+        else:
+            body.append(f'<div class="xrow xflat"{idattr}>'
+                        f'<div class="xsummary">{summ}</div></div>')
+    tail = f'<p class="sub">{md(note)}</p>' if note else ""
+    return (f'<div class="xtbl" style="--xcols:{tmpl}">{head}'
+            + "".join(body) + f"</div>{tail}")
 
 
 def meter(done: int, total: int, label: str = "") -> str:

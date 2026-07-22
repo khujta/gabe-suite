@@ -17,7 +17,7 @@ import glob as _glob
 from pathlib import Path
 
 import _center_data as _cd
-from _a3_render import E, legend, sechead, subnav, table
+from _a3_render import E, legend, lines_grade, sechead, subnav, table, xtable
 
 # The layers a code map is organized by, in render order. Semantic names, not
 # paths: api=endpoints (FastAPI), models=SQLAlchemy, schemas=Pydantic, the rest
@@ -302,18 +302,6 @@ def code_map(repo: Path, layers: dict) -> list[tuple[str, str, int]]:
     return rows
 
 
-def _lines_cell(n: int) -> str:
-    """The 800-line budget as color: green at/below the cap; 801->2000 ramps to
-    the most intense red; beyond 2000 stays maxed. The number IS the flag."""
-    if n <= 800:
-        return f'<b style="color:var(--good)">{n}</b>'
-    frac = min((n - 800) / 1200, 1.0)
-    r = int(0xE5 + (0xB7 - 0xE5) * frac)
-    g = int(0x73 + (0x1C - 0x73) * frac)
-    b = int(0x73 + (0x1C - 0x73) * frac)
-    return f'<b style="color:rgb({r},{g},{b})">{n}</b>'
-
-
 def collect_entity_map(slug: str, repo: Path) -> dict | None:
     """The entity's architecture map, gathered ONCE per build: endpoints (with
     the documented types each handler touches), models (columns/FKs/relationship
@@ -464,7 +452,7 @@ def build_code_tab(slug: str, repo: Path, intro_html: str) -> str:
         ["Layer", "File", "Lines", "Defines"],
         [[f'<span class="tag {_LAYER_CLS.get(layer, "")}" '
           f'title="{E(layer_desc.get(layer, ""))}">{E(layer)}</span>',
-          f'<code id="{_anchor("cm", slug, f)}">{E(f)}</code>', _lines_cell(n),
+          f'<code id="{_anchor("cm", slug, f)}">{E(f)}</code>', lines_grade(n),
           defines_cell(layer, f)] for layer, f, n in files],
         num={2},
         note=f"{len(files)} file(s) · {sum(n for _, _, n in files):,} lines measured "
@@ -531,31 +519,20 @@ def build_code_tab(slug: str, repo: Path, intro_html: str) -> str:
                 f"<th>Stored as (the FK)</th><th>Paired via</th></tr></thead>"
                 f"<tbody>{rows}</tbody></table>")
 
-    def dm_card(cls: str, kind_html: str, file_rel: str, chips: list[str],
-                chips_label: str, fields: list[tuple[str, str]],
-                extra_html: str = "", rels: list[dict] | None = None) -> str:
-        """One panel per class: the header row, and the column list folded into
-        a LABELED full-width final row of the same table — one visual unit,
-        and the toggle names exactly what it reveals."""
+    def _dm_detail(cls: str, fields: list[tuple[str, str]], extra_html: str = "",
+                   rels: list[dict] | None = None) -> str:
+        """The in-place expansion for one class: its columns (Column/Type/
+        Example), then relationships, then any UNIQUE constraints."""
         body = "".join(
             f"<tr><td><code>{E(n)}</code></td><td>{link_types(t)}</td>"
             f"<td><code>{E(_example(n, t))}</code></td></tr>"
             for n, t in fields)
-        inner = (f'<table class="tbl"><thead><tr><th>Column</th><th>Type</th>'
-                 f"<th>Example (synthetic)</th></tr></thead>"
-                 f"<tbody>{body}</tbody></table>"
-                 f"{rel_rows(cls, rels or [])}{extra_html}")
-        return (
-            f'<div class="panel" id="{_anchor("dm", slug, cls)}" '
-            f'style="margin:0 0 14px">'
-            f'<table class="tbl"><thead><tr><th>Class</th><th>Kind</th><th>File</th>'
-            f"<th>{E(chips_label.title())}</th></tr></thead><tbody>"
-            f"<tr><td><b>{E(cls)}</b></td><td>{kind_html}</td>"
-            f"<td><code>{E(file_rel)}</code></td><td>{' · '.join(chips) or '—'}</td></tr>"
-            f'<tr><td colspan="4" style="padding:0">'
-            f'<details class="more" style="border-top:0;margin:0;padding:8px 18px">'
-            f"<summary>Columns of {E(cls)} ({len(fields)})</summary>{inner}"
-            f"</details></td></tr></tbody></table></div>")
+        return (f'<table class="tbl"><thead><tr><th>Column</th><th>Type</th>'
+                f"<th>Example (synthetic)</th></tr></thead>"
+                f"<tbody>{body}</tbody></table>"
+                f"{rel_rows(cls, rels or [])}{extra_html}")
+
+    _DM_W = ["1.5fr", "1.4fr", "1.8fr", "2fr"]
 
     html += sechead(
         "Code", "Data model", "#7c3aed", _IC_DB,
@@ -577,21 +554,32 @@ def build_code_tab(slug: str, repo: Path, intro_html: str) -> str:
                'structured · <span class="ty ty-id">UUID</span> identity · '
                '<span class="ty ty-null">None</span> nullable. An uncolored '
                "token is a domain alias (an enum defined in this codebase).</div>")
-    html += f'<p class="sub">{len(models)} DB entity class(es):</p>'
+    html += (f'<p class="sub"><span class="tag l-models">models</span> '
+             f"{len(models)} DB entity class(es) — click a row to open its "
+             f"columns:</p>")
+    _mrows = []
     for m in models:
         uq = "".join(f'<p class="sub">UNIQUE: <code>{E(u)}</code></p>' for u in m["uqs"])
-        html += dm_card(
-            m["cls"], f'<code>{E(m["table"])}</code> <small>table</small>',
-            m["file"], [ep_chip(e) for e in eps if m["cls"] in e["touches"]],
-            "touched by", m["cols"], uq, rels=m["rels"])
-    html += (f'<p class="sub" style="margin-top:14px">{len(schemas)} API schema(s) — '
-             f"the shapes the Returns column links to:</p>")
+        cells = [f'<b>{E(m["cls"])}</b>',
+                 f'<code>{E(m["table"])}</code> <small>table</small>',
+                 f'<code>{E(m["file"])}</code>',
+                 " · ".join(ep_chip(e) for e in eps if m["cls"] in e["touches"]) or "—"]
+        _mrows.append((cells, _dm_detail(m["cls"], m["cols"], uq, m["rels"]),
+                       _anchor("dm", slug, m["cls"])))
+    html += xtable(["Class", "Kind", "File", "Touched by"], _mrows, widths=_DM_W)
+    html += (f'<p class="sub" style="margin-top:14px">'
+             f'<span class="tag l-schemas">schemas</span> {len(schemas)} API '
+             f"schema(s) — the shapes the Returns column links to:</p>")
+    _srows = []
     for s_ in schemas:
-        html += dm_card(
-            s_["cls"], "<small>API schema</small>", s_["file"],
-            [ep_chip(e) for e in eps
-             if s_["cls"] in e["resp"] or s_["cls"] in e["touches"]],
-            "used by", s_["fields"])
+        cells = [f'<b>{E(s_["cls"])}</b>', "<small>API schema</small>",
+                 f'<code>{E(s_["file"])}</code>',
+                 " · ".join(ep_chip(e) for e in eps
+                            if s_["cls"] in e["resp"] or s_["cls"] in e["touches"])
+                 or "—"]
+        _srows.append((cells, _dm_detail(s_["cls"], s_["fields"]),
+                       _anchor("dm", slug, s_["cls"])))
+    html += xtable(["Class", "Kind", "File", "Used by"], _srows, widths=_DM_W)
 
     # Methodology prose LAST — the reader meets the tables first, the "how this
     # page is built" explanation after (operator: intros at the end).

@@ -103,25 +103,32 @@
   /* Every proof set on this page that has artifacts, in reading order. A set
      with none has no expander row, so it is skipped without a special case. */
   function siblings() {
-    var body = scope && scope.closest && scope.closest('tbody');
-    if (!body) return scope ? [scope] : [];
-    return Array.prototype.filter.call(
-      body.querySelectorAll('tr.exp'),
-      function (tr) { return tr.querySelector('a[data-lb]'); });
+    if (!scope || !scope.closest) return scope ? [scope] : [];
+    // Proof sets are .xrow within the same .xtbl — the only producer of
+    // data-lb anchors, so there is no other structure to walk.
+    var xt = scope.closest('.xtbl');
+    if (xt) return Array.prototype.filter.call(
+      xt.querySelectorAll('.xrow'),
+      function (r) { return r.querySelector('a[data-lb]'); });
+    return [scope];
+  }
+
+  // Open/close a proof SET — an .xrow opens itself, and the toggle handler below
+  // cascades its legs.
+  function setOpen(el, v) {
+    if (el && el.classList.contains('xrow')) el.open = v;
   }
 
   /* Up / down move between SETS, not artifacts: the set on screen folds shut,
-     the next one unfolds, and the viewer lands on its first artifact. At
-     either end nothing happens — a wrap here would silently change subject. */
+     the next one unfolds, and the viewer lands on its first artifact. So when
+     the viewer closes, the LAST set seen is the one left maximized in the
+     table. At either end nothing happens — a wrap would silently change subject. */
   function jumpSet(d) {
     var all = siblings();
     var target = all[all.indexOf(scope) + d];
     if (!target || target === scope) return;
-    var to = target.querySelector('details.more');
-    // The origin set stays OPEN. Folding it happened behind a full-screen
-    // overlay, so the reader could not see it and found a set they had opened
-    // for comparison closed when they came back out.
-    if (to) to.open = true;              // the toggle handler cascades its legs
+    setOpen(scope, false);   // minimize the set we are leaving
+    setOpen(target, true);   // maximize the set we are entering (cascades legs)
     scope = target;
     group = Array.prototype.slice.call(target.querySelectorAll('a[data-lb]'));
     at = 0;
@@ -134,7 +141,7 @@
     // The navigable group is the whole PROOF SET (the row expander), not the
     // one gallery clicked: a reader arrowing through evidence expects the next
     // leg to follow, not a dead end at the end of the current one.
-    scope = a.closest('tr.exp') || a.closest('.gal') || a.parentElement;
+    scope = a.closest('.xrow') || a.closest('.gal') || a.parentElement;
     group = Array.prototype.slice.call(scope.querySelectorAll('a[data-lb]'));
     at = Math.max(0, group.indexOf(a));
     opener = a;
@@ -183,8 +190,10 @@
      make one click rewrite the whole row. */
   document.addEventListener('toggle', function (e) {
     var d = e.target;
-    if (!d || d.tagName !== 'DETAILS' || !d.classList.contains('more')) return;
-    if (!d.closest('tr.exp')) return;
+    if (!d || d.tagName !== 'DETAILS') return;
+    // A set container is an .xrow (the proof shelf). Only it cascades its legs —
+    // not the ⊕ truncation toggles inside the row.
+    if (!d.classList.contains('xrow')) return;
     var kids = d.querySelectorAll('details[data-sub]');
     for (var i = 0; i < kids.length; i++) kids[i].open = d.open;
   }, true);

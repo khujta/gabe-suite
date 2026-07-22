@@ -23,6 +23,7 @@ from __future__ import annotations
 import contextlib
 import datetime as _dt
 import json
+import os
 import re
 import subprocess
 import sys
@@ -40,7 +41,11 @@ from _a3_feature import (  # noqa: E402
 )
 
 REPO_ROOT = D.REPO_ROOT
-CENTER = D.CENTER_DIR
+CENTER = D.CENTER_DIR               # READ root (config, adoption, cards, archmap)
+# GABE_CENTER_OUT redirects every WRITE (pages, assets, archmap, run-history) to
+# a scratch dir so a lab run can read a real project and never mutate it.
+CENTER_OUT = (Path(os.environ["GABE_CENTER_OUT"])
+              if os.environ.get("GABE_CENTER_OUT") else CENTER)
 CFG = D.CFG
 # The corpora a project verifies with — key · runner · kind, declared in
 # center.config.json so no test-suite name is hardcoded here. Defaults to the
@@ -55,6 +60,9 @@ E2E = CFG.get("e2e", {})
 _PROJECT = CFG.get("project", {})
 PROJECT_NAME = _PROJECT.get("name", REPO_ROOT.name)
 PROJECT_DISPLAY = _PROJECT.get("display_name", PROJECT_NAME)
+# Project maturity is READ from .kdbp/BEHAVIOR.md, not assumed. "" when absent —
+# the feature pages render an honest "not declared" rather than a fabricated tier.
+MATURITY = D.load_maturity()
 # This generator emits the app-wide Architecture station every run (rendered
 # from archmap.json — the read-once rule), so its Code-group nav item is always
 # lit. A binding a project has not wired yet would flip this False and get the
@@ -88,6 +96,9 @@ INSTALLED_SHELL = Path.home() / ".claude" / "templates" / "gabe" / "center" / "s
 
 def resolve_shell() -> tuple[Path, str]:
     """(shell dir, one-line provenance) — vendored first, installed as fallback."""
+    env = os.environ.get("GABE_SHELL_SRC")
+    if env:
+        return Path(env), f"shell: {env} (env override)"
     if VENDORED_SHELL.is_dir():
         note = f"shell: {VENDORED_SHELL.relative_to(REPO_ROOT)} (vendored)"
         if INSTALLED_SHELL.is_dir():
@@ -199,7 +210,7 @@ def append_history() -> list[dict]:
     if not new:
         return hist
     lines = (hist + new)[-HISTORY_CAP:]
-    (CENTER / "run-history.jsonl").write_text(
+    (CENTER_OUT / "run-history.jsonl").write_text(
         "".join(json.dumps(rec) + "\n" for rec in lines))
     return lines
 
@@ -1135,10 +1146,17 @@ def main() -> int:
     if not SHELL_SRC.exists():
         print(f"⛔ shell templates missing: {SHELL_SRC}")
         return 2
-    CENTER.mkdir(parents=True, exist_ok=True)
-    (CENTER / "assets").mkdir(exist_ok=True)
+    # GABE_CENTER_OUT is a lab override — if it is set, SAY SO loudly, so a leaked
+    # env var can never silently write the whole center to a scratch dir while
+    # printing "regen OK" (its sibling GABE_SHELL_SRC already announces itself).
+    if CENTER_OUT != CENTER:
+        print(f"  ⚠ WRITE redirected to {CENTER_OUT} (GABE_CENTER_OUT set) — "
+              f"reads still come from {CENTER}. LAB run: the real center was "
+              f"NOT touched.")
+    CENTER_OUT.mkdir(parents=True, exist_ok=True)
+    (CENTER_OUT / "assets").mkdir(exist_ok=True)
     for asset in (SHELL_SRC / "assets").iterdir():
-        (CENTER / "assets" / asset.name).write_bytes(asset.read_bytes())
+        (CENTER_OUT / "assets" / asset.name).write_bytes(asset.read_bytes())
 
     wrote = []
     for src in sorted(SHELL_SRC.glob("*.html")):
@@ -1147,14 +1165,15 @@ def main() -> int:
             text = text.replace(tok, val)
         for tok, val in PER_FILE.get(src.name, {}).items():
             text = text.replace(tok, val)
-        (CENTER / src.name).write_text(text)
+        (CENTER_OUT / src.name).write_text(text)
         wrote.append((src.name, text.count("{{")))
 
     ctx = SimpleNamespace(
-        center=CENTER, shell_src=SHELL_SRC, repo_root=REPO_ROOT,
-        sections=sections, labels=LABELS, junit_by=junit_by, corpora=CORPORA,
-        e2e=E2E, proof_root=proof_root, cfg=CFG, walks=walks, shared=SHARED,
-        parse_card=D.parse_card,
+        center=CENTER, center_out=CENTER_OUT, shell_src=SHELL_SRC,
+        repo_root=REPO_ROOT, sections=sections, labels=LABELS,
+        junit_by=junit_by, corpora=CORPORA, e2e=E2E, proof_root=proof_root,
+        cfg=CFG, walks=walks, shared=SHARED, parse_card=D.parse_card,
+        maturity=MATURITY,
     )
     for name in build_feature_pages(ctx):
         wrote.append((name, 0))
@@ -1163,7 +1182,7 @@ def main() -> int:
     # build, diffable in PRs. Consumers read THIS instead of re-analyzing code.
     amap = {"version": 1, "head": HEAD_SHA, "generated": STAMP,
             "entities": {s: collect_entity_map(s, REPO_ROOT) for s in ENTITY_CODE}}
-    (CENTER / "archmap.json").write_text(
+    (CENTER_OUT / "archmap.json").write_text(
         json.dumps(amap, indent=1, ensure_ascii=False) + "\n")
     n_eps = sum(len(v["endpoints"]) for v in amap["entities"].values() if v)
     n_models = sum(len(v["models"]) for v in amap["entities"].values() if v)
@@ -1174,7 +1193,7 @@ def main() -> int:
     # second read of the code. Lights up {{SIDEBAR_CODE}} across the estate.
     if BUILD_ARCHITECTURE:
         arch_html = render_architecture(amap)
-        (CENTER / "architecture.html").write_text(arch_html)
+        (CENTER_OUT / "architecture.html").write_text(arch_html)
         wrote.append(("architecture.html", arch_html.count("{{")))
 
     print(f"  A3 regen @ {STAMP} · HEAD {HEAD_SHA}")
@@ -1182,6 +1201,23 @@ def main() -> int:
     for name, left in wrote:
         state = "filled" if left == 0 else f"{left} slot(s) awaiting generator"
         print(f"    wrote docs/site/center/{name} — {state}")
+
+    # Asset↔markup guard. The pages emit expandable-row tables (.xtbl/.xrow) for
+    # the data model, the test matrix, Claimed coverage and the proof shelf. If
+    # the a3.css that was COPIED lacks the .xtbl rule, every one of those renders
+    # as unstyled stacked cells — the exact "regenerated with the new generators
+    # over a stale a3.css" failure. Refuse to report success, don't ship it quiet.
+    _css = CENTER_OUT / "assets" / "a3.css"
+    _css_text = _css.read_text() if _css.exists() else ""
+    if ".xtbl" not in _css_text:
+        print("  ⛔ assets/a3.css has NO .xtbl rule — the expandable tables (data "
+              "model · matrix · claims · proof shelf) will render UNSTYLED. Fold "
+              "proposed-a3css-additions.css into a3.css (at the END, after the "
+              "base rules) before regenerating. Refusing to report success.")
+        return 3
+    if not (CENTER_OUT / "assets" / "rowclick.js").exists():
+        print("  ⚠ assets/rowclick.js is missing — row-click-to-expand and the "
+              "targeted-row (#dm-…) opener degrade; wire it into the skeletons.")
     return 0
 
 
