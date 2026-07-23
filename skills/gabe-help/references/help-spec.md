@@ -131,7 +131,7 @@ The Gabe Suite — 29 skills (each skill IS its slash command).
 | gabe-scope | /gabe-scope [--resume \| --start-over] | Backbone authoring command for the Gabe Suite |
 | gabe-scope-change | /gabe-scope-change [--force-addition \| --force-pivot] <description> | Scope evolution, one entry point |
 | gabe-scope-pivot | /gabe-scope-pivot | Scope pivot — direction change |
-| gabe-walk | /gabe-walk <feature\|procedure> [pass\|fail\|partial] | Record a human walking the build — the one verification input with no machine source |
+| gabe-walk | /gabe-walk <feature\|procedure> [pass\|fail\|partial] | Human-eye verification of something built: BRIEF the walker first (why this walk · what changed · the flow itinerary · what pass means), then record the walk… |
 
 Archived (not installed; `skills/_archive/`): `gabe-arch`, `gabe-scope-addition`, `gabe-teach`.
 

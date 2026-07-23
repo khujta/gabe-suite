@@ -278,6 +278,28 @@ grep -q "role 'Principal' is not one of" "$T/gate.out" \
 grep -q 'names key(s) the card lacks: scam' "$T/gate.out" \
   && ok || bad "M30: gate must WARN on flows naming a card-unknown key"
 
+# --- walk subjects: bare slug AND adopt:<slug> both credit the entity ------
+# (the walk-briefing reshape: /gabe-walk transaction and /gabe-adopt's
+#  adopt:transaction are the same witness — an exact adopt:-only match left
+#  honest walks invisible on the very page they walked)
+WK="$T/walk"; mk_fixture "$WK"
+mkdir -p "$WK/.kdbp"
+printf '{"subject":"gadget","who":"t","when":"2026-07-23T00:00:00Z","result":"pass","evidence":null,"note":"walked"}\n' \
+  > "$WK/.kdbp/walks.jsonl"
+[ "$(build "$WK" "$SHELL_SRC")" = 0 ] && ok || bad "walk: fixture builds"
+grep -q 'manual — walked 2026-07-23' "$WK/docs/site/center/feature-gadget.html" \
+  && ok || bad "walk: BARE-slug subject must close the manual angle"
+printf '{"subject":"adopt:gadget","who":"t","when":"2026-07-23T00:00:00Z","result":"pass","evidence":null,"note":"approved"}\n' \
+  > "$WK/.kdbp/walks.jsonl"
+build "$WK" "$SHELL_SRC" >/dev/null
+grep -q 'manual — walked 2026-07-23' "$WK/docs/site/center/feature-gadget.html" \
+  && ok || bad "walk: adopt:-prefixed subject must still close the manual angle"
+printf '{"subject":"other-thing","who":"t","when":"2026-07-23T00:00:00Z","result":"pass","evidence":null,"note":"x"}\n' \
+  > "$WK/.kdbp/walks.jsonl"
+build "$WK" "$SHELL_SRC" >/dev/null
+grep -q 'no walk on record' "$WK/docs/site/center/feature-gadget.html" \
+  && ok || bad "walk: an unrelated subject must NOT credit the entity"
+
 # --- flow grammar + classifier honesty (M05/M12/M03) -----------------------
 if (cd "$GEN" && python3 - <<'PY'
 import sys

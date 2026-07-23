@@ -158,8 +158,13 @@ and the entity row exists and is `pending`/`building`.
    proofs render as named gaps, never staged. Tick `card` / `diagrams` / `proofs`.
 4. **Regenerate + gate:** run the center refresh; the link/gate check must be green with this
    section contributing zero WARNs. Tick `gate_green`.
-5. **Checklist render + checkpoint:** show the checklist, the built page paths, the
-   dropped-claims list. Operator verdict:
+5. **Checklist render + checkpoint:** BRIEF the operator before asking for a verdict —
+   per gabe-walk §Procedure step 2 (why this walk · the card's HANDLE/WHAT & WHY · the
+   `# FLOWS` itinerary with each flow's proof state, unproven flows called out as "your
+   eyes are the only verification" · what pass/partial/fail mean here). An approval
+   request without its briefing is a mystery, and a mystery produces a rubber stamp,
+   not a witness. Then show the checklist, the built page paths, the dropped-claims
+   list. Operator verdict:
    - **approve** → record via `/gabe-walk adopt:<entity> pass` (who·when·evidence = section
      path); store the walk timestamp in `approved_walk`; status `approved`. Tick
      `walk_recorded`.

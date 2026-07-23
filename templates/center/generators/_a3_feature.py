@@ -486,7 +486,7 @@ def angle_rows(slug: str, inv: dict, specs: list[str], walks: list[dict],
             "slice the coverage report per entity path", eff, hours, stage)
 
     eff, hours, stage, _, _ = _GROWTH_PRICE["manual"]
-    mine = [w for w in walks if w.get("subject") == f"adopt:{slug}"]
+    mine = [w for w in walks if w.get("subject") in (slug, f"adopt:{slug}")]
     if not mine:
         add("manual", "no walk on record for this entity",
             "walk the feature and record it", eff, hours, stage)
@@ -906,7 +906,7 @@ def build_feature_pages(ctx) -> list[str]:
             flows_malformed=_cov["malformed"],
             inferred_cover=_cov["covered_inferred"])
         ledger_ripe = sum(1 for r in ledger_rows if r["ripe"])
-        _lw = [w for w in ctx.walks if w.get("subject") == f"adopt:{slug}"]
+        _lw = [w for w in ctx.walks if w.get("subject") in (slug, f"adopt:{slug}")]
 
         # Partition moves by the section that owns them (each appears once). The
         # bucket set is DERIVED (_LEDGER_DOMAINS); a row whose domain has no
@@ -1085,7 +1085,7 @@ def build_feature_pages(ctx) -> list[str]:
         # proportion), then the per-file matrix whose rows open onto their own
         # cases. Every count here is read from junit at build time; the card
         # contributes only the INTENT of each kind, which rides in the ⊕ toggle.
-        walks_here = [w for w in ctx.walks if w.get("subject") == f"adopt:{slug}"]
+        walks_here = [w for w in ctx.walks if w.get("subject") in (slug, f"adopt:{slug}")]
         _e2e_runner = ctx.e2e.get("runner", "playwright")
         _gap_tag = ctx.e2e.get("junit_gap_tag", "local-only")
         _cov_gate = ctx.e2e.get("coverage_gate", "the coverage gate")

@@ -60,7 +60,7 @@ There is no `commands/` directory: it was retired in the B2 skills-only migratio
 
 | Skill | Version | Purpose |
 |---|---|---|
-| **gabe-adopt** | 1.2.1 | Brownfield command-center adoption — archive-never-delete init, machine-ranked shortlist, one section per run at human speed, walk-recorded approval; tracker lives outside PLAN.md (human-initiated only) |
+| **gabe-adopt** | 1.2.2 | Brownfield command-center adoption — archive-never-delete init, machine-ranked shortlist, one section per run at human speed, walk-recorded approval; tracker lives outside PLAN.md (human-initiated only) |
 | **gabe-align** | 1.1.1 | Alignment guardian — shallow/standard/deep values and AP advisory checks |
 | **gabe-assess** | 1.1.1 | Rapid change impact assessment: blast radius, maturity scope, prerequisites |
 | **gabe-commit** | 2.4.0 | Commit quality gate — deterministic checks incl. size-budget, triage, simplify tier, docs-audit; optional results_out digest, path or list (reports every tier, gates none) |
@@ -88,7 +88,7 @@ There is no `commands/` directory: it was retired in the B2 skills-only migratio
 | **gabe-scope** | 2.1.1 | Scope authoring — SCOPE.md (stable premise + §Phases arc) for a new project |
 | **gabe-scope-change** | 2.2.0 | Scope evolution, one entry point — classifies pivot vs addition; additions execute inline (absorbed gabe-scope-addition), pivots route to the safety-flagged gabe-scope-pivot |
 | **gabe-scope-pivot** | 2.1.0 | Direction-change scope rewrite (human/router-initiated only) |
-| **gabe-walk** | 1.0.0 | Record a human walking the build — who·when·result·evidence appended to walks.jsonl; records never judges; NEVER-walked renders red until walked |
+| **gabe-walk** | 1.1.0 | Human-eye verification — BRIEFS the walker first (why · what · flow itinerary · verdict meanings), then records who·when·result·evidence to walks.jsonl; records never judges; NEVER-walked renders red until walked |
 
 ## Archived skills
 

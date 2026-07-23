@@ -13,7 +13,7 @@ This is the full cycle as it runs today. Each beat has a *software* job — buil
 | 5 | Review | `/gabe-review` | Price each finding: fix-cost × defer-risk × maturity gate | `PENDING.md` (the review-debt lane) + case subjects |
 | 6 | Commit | `/gabe-commit` | The chokepoint quality gate | The commit + a `LEDGER.md` row + a results digest |
 | 7 | Push | `/gabe-push` | Ship — PR, CI watch, deploy-verify, promote | `DEPLOYMENTS.md`; a terminal-env write is the release trigger |
-| 8 | **Walk** | `/gabe-walk` | Record a *human* walking the build — the witness | `walks.jsonl` → the center's manual angles + staleness |
+| 8 | **Walk** | `/gabe-walk` | Brief a *human*, then record their walk — the witness (never a mystery: why this walk, the flow itinerary, what pass means) | `walks.jsonl` → the center's manual angles + staleness |
 | 9 | Center | `/gabe-feature <phase>` | Translate a shipped feature into its card + test-strategy audit | A feature card + curated proof → the center's `✅` |
 | 10 | Release | `/gabe-feature release` | A stakeholder showcase — a *mode*, not a beat | Shots + diagrams per shipped version |
 | 11 | Router | `/gabe-next` | Zero-logic dispatch over the `PLAN.md` status cells | Nothing of its own — it routes |
