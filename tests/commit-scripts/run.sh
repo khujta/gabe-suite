@@ -152,9 +152,21 @@ run_evid() { (cd "$T/evid" && bash "$EVID" >"$T/evid.out" 2>&1); echo $?; }
 
 (cd "$T/evid" && printf '{"status":"active","current_phase":"1","phases":[{"id":"1","proof":"PROOF: c -> m -> proof/x.png"}]}' > .kdbp/PLAN.json \
    && printf '# behavior\n' > .kdbp/BEHAVIOR.md)
+# archie F (2026-09-24): a bookkeeping-only commit has nothing to measure — no proof_root info line on it.
+# MUTATION: move the proof_root test back above the staged-source loop → this prints the info line.
+(cd "$T/evid" && printf 'row\n' >> .kdbp/LEDGER.md && git add .kdbp/LEDGER.md)
+rc=$(run_evid)
+[ "$rc" = 0 ] && ! grep -q "no proof_root" "$T/evid.out" \
+  && ok || bad "evidence: unset proof_root + a bookkeeping-only commit must stay SILENT (no info line every commit) (got $rc)"
+(cd "$T/evid" && git reset -q HEAD -- .kdbp/LEDGER.md && mkdir -p src && printf 'code0\n' > src/app0.py && git add src/app0.py)
 rc=$(run_evid)
 [ "$rc" = 0 ] && grep -q "no proof_root" "$T/evid.out" \
-  && ok || bad "evidence: missing proof_root in BEHAVIOR.md must degrade LOUDLY (info) yet exit 0 (got $rc)"
+  && ok || bad "evidence: missing proof_root + a staged source change must degrade LOUDLY (info) yet exit 0 (got $rc)"
+(cd "$T/evid" && printf -- '---\nproof_root:   # none — no committed evidence\n---\n' > .kdbp/BEHAVIOR.md)
+rc=$(run_evid)
+[ "$rc" = 0 ] && grep -q "no proof_root" "$T/evid.out" \
+  && ok || bad "evidence: a proof_root line holding only a # comment is UNSET, never the path '#none…' (got $rc)"
+(cd "$T/evid" && git reset -q HEAD -- src/app0.py)
 
 (cd "$T/evid" && printf 'proof_root: proof\n' > .kdbp/BEHAVIOR.md && mkdir -p proof src)
 [ "$(run_evid)" = 0 ] && ok || bad "evidence: proof carrying but no staged source files must stay SILENT"

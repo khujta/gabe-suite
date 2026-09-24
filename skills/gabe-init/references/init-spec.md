@@ -37,6 +37,7 @@ Create the baseline (absorbs the project-init behavior formerly invoked as `gabe
      ```
    - Persist to BEHAVIOR.md frontmatter as `project_type: <answer>`.
 5. Ask: "Tech stack?" (comma-separated, e.g., "python, fastapi, react")
+5.5. Ask: "Committed runtime-evidence folder (proof_root)? — where journey captures / screenshots that PROVE a phase live, e.g. `proof` or `tests/web-e2e/proof`. `none` if the project keeps none." Persist to BEHAVIOR.md frontmatter as `proof_root: <path>`; on `none`, write the key EMPTY (`proof_root:`) with the explanation on the comment line ABOVE it — never after the colon, where it would read as a path. /gabe-commit's evidence-freshness check measures this folder when a phase carries proof; unset, it stays quiet on bookkeeping commits and prints one info line only when source is staged (Evidence Doctrine §4).
 6. Create `.kdbp/` with these files **and `CLAUDE.md` at the project root** (see Step 1.7 for CLAUDE.md generation):
 
 ```
@@ -62,6 +63,8 @@ domain: [from answer]
 maturity: [mvp|enterprise|scale]
 tech: [from answer]
 created: [today's date]
+# proof_root: the committed evidence folder evidence-freshness measures — empty = none (item 5.5)
+proof_root: [from answer, or empty]
 ---
 
 ## Verify Commands

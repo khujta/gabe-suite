@@ -39,19 +39,18 @@ EOF
 
 [ "$proof" = "carrying" ] || exit 0   # phase carries no proof requirement
 
-# proof_root from the BEHAVIOR.md manifest (frontmatter line: proof_root: <path>)
-proof_root=$(grep -E '^\s*proof_root:' "$behavior" 2>/dev/null | head -1 | sed 's/^\s*proof_root:\s*//' | tr -d ' ')
-if [ -z "$proof_root" ]; then
-  echo "ℹ evidence-freshness: no proof_root in $behavior — check skipped (configure the manifest to enable it)"
-  exit 0
-fi
+# proof_root from the BEHAVIOR.md manifest (frontmatter line: proof_root: <path>; a trailing # comment is not
+# part of the path). Read here, JUDGED only after the staged-source test below: a bookkeeping-only commit has
+# nothing to measure, so an unset proof_root must not print its info line on every one (archie F, 2026-09-24).
+proof_root=$(grep -E '^\s*proof_root:' "$behavior" 2>/dev/null | head -1 | sed 's/^\s*proof_root:\s*//; s/\s*#.*$//' | tr -d ' ')
 
 # newest STAGED source change (exclude .kdbp bookkeeping and the proof folder itself)
 newest_src=0
 newest_src_file=""
 while IFS= read -r f; do
   case "$f" in
-    .kdbp/*|"$proof_root"/*) continue ;;
+    .kdbp/*) continue ;;
+    "${proof_root:-.kdbp}"/*) continue ;;                      # the proof folder itself (unset: a no-op repeat)
     docs/*|*.md) continue ;;                                   # prose is not source
     tests/*|test/*|*/tests/*|*/test/*|*/__tests__/*|__tests__/*|e2e/*|*/e2e/*|playwright/*|*/playwright/*) continue ;;   # test roots
     *.spec.*|*.test.*|*_test.py|test_*.py|*/test_*.py|conftest.py|*/conftest.py) continue ;;                          # test files by name
@@ -64,6 +63,11 @@ $(git diff --cached --name-only 2>/dev/null)
 EOF
 
 [ "$newest_src" -gt 0 ] || exit 0   # no staged source files — bookkeeping-only commit
+
+if [ -z "$proof_root" ]; then
+  echo "ℹ evidence-freshness: no proof_root in $behavior — check skipped (/gabe-init seeds it; set it to the committed evidence folder to enable the check)"
+  exit 0
+fi
 
 # newest artifact under proof_root
 newest_proof=0

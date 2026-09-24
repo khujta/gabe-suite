@@ -4,7 +4,7 @@ description: "Project setup — creates .kdbp/, installs hooks, configures by pr
 when_to_use: "Set up KDBP, initialize the Gabe stack — human-initiated only; never auto-invoke."
 disable-model-invocation: true
 metadata:
-  version: 2.3.7
+  version: 2.3.8
 ---
 
 # Gabe Init — KDBP project scaffolder

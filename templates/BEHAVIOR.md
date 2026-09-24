@@ -9,6 +9,11 @@
 - **Maturity:** {MATURITY}   <!-- prototype | mvp | production -->
 - **Tech:** {TECH}
 
+<!-- proof_root: the committed runtime-evidence folder (journey captures, screenshots) that /gabe-commit's
+     evidence-freshness check measures when a phase carries proof. Leave the value EMPTY when the project
+     keeps none — a comment after the colon would read as a path. -->
+proof_root: {PROOF_ROOT}
+
 ## Verify Commands
 
 <!-- The commands the commit gate and execute's task verification RUN. Author them to your real
