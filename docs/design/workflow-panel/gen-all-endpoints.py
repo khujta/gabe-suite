@@ -971,6 +971,10 @@ def build(argv: list) -> tuple:
         r["partly"] = sorted(g_part, key=lambda x: order.index(x[0]))
         r["rgaps"] = UNI.reverse_gaps(r, r["uni"], UW, set(r["has"]))        # the gaps the other way (D-040)
         r["uni"].pop("_drawn")                                          # the generator's own reading, never drawn
+    # D-044: every gap's reasons (D-042's rule) and its status line (one.gaps.status.table, my proposal), checked here
+    n_st = UNI.gap_whys(rows, fj, W, W["el"]["why"]["table"], UNI.names_table(W, A, inv, FLD), A, FLD, bool(only))
+    for r in rows:
+        r["rgaps"] = [g[:4] for g in r["rgaps"]]                        # each name's key and selector served the hover's reading only
     icon_names, colour_refs = UNI.mark_refs(W)
     icon_names |= {x["icon"] for x in spec.values() if isinstance(x, dict) and x.get("icon")}
     icon_names |= {f["icon"] for f in spec["RISK"]["flags"].values()} | {c["icon"] for c in W["cols"].values()}
@@ -998,6 +1002,7 @@ def build(argv: list) -> tuple:
            "nShare": n_share, "rTop": max(a["r"] for a in A.values()), "rLow": min(a["r"] for a in A.values()), "nR3": sum(1 for c in cols if c["r"] == max(a["r"] for a in A.values())),
            # the tier the station opens on, and the deeper ones that draw functions (the universe column is the opening card)
            "nAlias": X["nAlias"], "nNames": len(X["names"]), "nUnkeyed": len(X["unkeyed"]), "nKeys": len({k for r in rows for k in all_keys(r)}),
+           "nStSolved": n_st["solved"], "nStNot": n_st["not"], "nStOpen": n_st["open"],
            "uniTier": spec["_card"]["tier"], "uniDeeper": " · ".join(t["name"] for t in spec["_card"]["tiers"][spec["_card"]["bootTier"] + 1:] if not t["fnOff"])}
     if not spec["_card"]["tiers"][spec["_card"]["bootTier"]]["fnOff"]:
         die("the station now opens with functions drawn — one.uni.plain says they are hidden; reword it before building")

@@ -353,6 +353,16 @@
          border-radius: 8px; padding: 7px 10px; font-size: var(--fs-min); line-height: 1.45; box-shadow: var(--shadow); pointer-events: none; opacity: 0; }
   .tip[data-show="true"] { opacity: 1; }
   .tip b { font-weight: 700; } .tip .ln { display: block; } .tip .pl { display: block; margin-top: 4px; opacity: .86; }
+  /* D-044: a gap's hover — why (D-042's reasons) first, then its status (my proposal) with a link where it names a field. A hover
+     that holds a link is LIVE: it takes the pointer, so the pointer can move onto the link (a short grace covers the move) */
+  .tip[data-live="true"][data-show="true"] { pointer-events: auto; }
+  .tip .gw, .tip .gs { display: block; margin-top: 5px; padding-top: 4px; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); }
+  .tip .gw > i, .tip .gs > i { font-style: normal; text-transform: uppercase; letter-spacing: .06em; opacity: .7; margin-right: 4px; }
+  .tip .gs .mine { border-color: currentColor; color: inherit; opacity: .8; margin-left: 4px; }
+  .tip .elref { color: inherit; font-size: inherit; }
+  .tip .glk { display: block; margin-top: 3px; }
+  .tip .glk .elref:first-child { margin-left: 0; }
+  .tip .elref:hover, .tip .elref:focus-visible { outline-color: currentColor; }
 </style>
 
 <div class="artifact-page">
@@ -1071,15 +1081,17 @@
       b.setAttribute("aria-checked", GD === k ? "true" : "false"); b.setAttribute("aria-label", O.gaps.dir.opts[k].name); b.setAttribute("data-tip", "gdir");
       if (O.gaps.dir.pick === k) b.setAttribute("data-pick", "true");                 /* today's reading is the default and my pick: dashed (D-034) */
       var ic = document.createElementNS("http://www.w3.org/2000/svg", "svg"); ic.setAttribute("viewBox", "0 0 24 24"); ic.setAttribute("aria-hidden", "true"); ic.innerHTML = GICON[k]; b.appendChild(ic);
-      b.addEventListener("click", function () { GD = k; try { window.localStorage.setItem(GKEY, k); } catch (e) {} tip.setAttribute("data-show", "false"); renderOne(); applyEl(); }); dr.appendChild(b); });   /* the element light survives the turn */
+      b.addEventListener("click", function () { GD = k; S.gRef = null; try { window.localStorage.setItem(GKEY, k); } catch (e) {} tipOff(); renderOne(); applyEl(); }); dr.appendChild(b); });   /* the element light survives the turn */
     G.appendChild(dr);
+    G.appendChild(el("p", "plain ainfo", O.gaps.status.plain)); G.lastChild.id = "gap-st-plain";          /* D-044 */
+    G.appendChild(el("p", "plain ainfo", fill(O.gaps.status.count)));
     if (GD === "uni") { renderReverse(G, r); return; }
     G.appendChild(el("p", "plain ainfo", O.gaps.plain)); G.appendChild(el("div", "gcount", r.gaps.length || r.partly.length ? fill(O.gaps.count, { n: r.gaps.length }) + (r.partly.length ? " · " + r.partly.length + " " + O.gaps.partly : "") : O.gaps.none));
     /* a whole gap first, then one the card shows only part of here (its hover names what the card draws) */
     var gg = {}; r.gaps.forEach(function (a) { (gg[groupOfAttr(a)] = gg[groupOfAttr(a)] || []).push([a]); }); r.partly.forEach(function (x) { (gg[groupOfAttr(x[0])] = gg[groupOfAttr(x[0])] || []).push(x); });
     groupOrder().forEach(function (g) { if (!gg[g]) return; var bx = el("div", "gblk"); bx.setAttribute("data-block", g);
       var bh = el("div", "gbh"); bh.appendChild(markEl(g)); bh.appendChild(document.createTextNode(groupName(g))); if (D.marks[g] && D.marks[g].col) bh.style.setProperty("--bc", D.marks[g].col); bx.appendChild(bh);
-      gg[g].forEach(function (x) { var a = x[0], it = el("div", "gap", D.attrs[a].label); it.setAttribute("data-attr", a); it.setAttribute("data-tip", "gap");
+      gg[g].forEach(function (x) { var a = x[0], it = el("div", "gap", D.attrs[a].label); it.setAttribute("data-attr", a); it.setAttribute("data-tip", "gap"); it.setAttribute("data-gw", "a|" + a);
         if (x.length > 1) { it.setAttribute("data-part", x[1] + "/" + x[2]); it.appendChild(el("span", "pt", O.gaps.partly)); } bx.appendChild(it); }); G.appendChild(bx); });
   }
   /* THE GAPS THE OTHER WAY (D-040): what the universe card shows here that the code map does not hold, grouped by the card's
@@ -1088,12 +1100,12 @@
   function renderReverse(G, r) { var O = W.one, nA = 0, nF = 0;
     r.rgaps.forEach(function (g) { nA += g[1].length + (g[2] ? 1 : 0); nF += g[3].length; });
     G.appendChild(el("p", "plain ainfo", O.gaps.plainB)); G.appendChild(el("div", "gcount", r.rgaps.length ? fill(O.gaps.countB, { n: nA, names: nF }) : O.gaps.noneB));
-    r.rgaps.forEach(function (g) { var u = r.uni.rows.filter(function (x) { return x.row === g[0]; })[0], bx = el("div", "gblk"); bx.setAttribute("data-row", g[0]);
+    r.rgaps.forEach(function (g, gi) { var u = r.uni.rows.filter(function (x) { return x.row === g[0]; })[0], bx = el("div", "gblk"); bx.setAttribute("data-row", g[0]);
       var bh = el("div", "gbh"), bm = el("span", "bm"); bm.appendChild(uIco(u.icon)); bh.appendChild(bm); bh.appendChild(document.createTextNode(u.title || US[g[0]].name)); bx.appendChild(bh);
-      if (g[2]) { var um = el("div", "gap gunm", O.gaps.unmapped); um.setAttribute("data-row", g[0]); um.setAttribute("data-tip", "rgap"); bx.appendChild(um); }
-      g[1].forEach(function (a) { var it = el("div", "gap", D.attrs[a].label); it.setAttribute("data-attr", a); it.setAttribute("data-row", g[0]); it.setAttribute("data-tip", "rgap"); bx.appendChild(it); });
+      if (g[2]) { var um = el("div", "gap gunm", O.gaps.unmapped); um.setAttribute("data-row", g[0]); um.setAttribute("data-tip", "rgap"); um.setAttribute("data-gw", "b|" + gi + "|u"); bx.appendChild(um); }
+      g[1].forEach(function (a, i) { var it = el("div", "gap", D.attrs[a].label); it.setAttribute("data-attr", a); it.setAttribute("data-row", g[0]); it.setAttribute("data-tip", "rgap"); it.setAttribute("data-gw", "b|" + gi + "|a|" + i); bx.appendChild(it); });
       if (g[3].length) { var fs = el("div", "gfacts");
-        g[3].forEach(function (f, i) { var c = el("span", "gfact", f); c.setAttribute("data-fact", f); c.setAttribute("data-row", g[0]); c.setAttribute("data-tip", "rfact"); if (i >= FCAP) c.hidden = true; fs.appendChild(c); });
+        g[3].forEach(function (f, i) { var c = el("span", "gfact", f); c.setAttribute("data-fact", f); c.setAttribute("data-row", g[0]); c.setAttribute("data-tip", "rfact"); c.setAttribute("data-gw", "b|" + gi + "|f|" + i); if (i >= FCAP) c.hidden = true; fs.appendChild(c); });
         if (g[3].length > FCAP) { var mb = el("button", "gfmore", fill(O.gaps.rmore, { n: g[3].length - FCAP })); mb.type = "button";
           mb.addEventListener("click", function () { [].forEach.call(fs.querySelectorAll(".gfact[hidden]"), function (x) { x.hidden = false; }); mb.remove(); }); fs.appendChild(mb); }
         bx.appendChild(fs); }
@@ -1169,14 +1181,19 @@
     if (f && f.hidden) f.hidden = false; return f || null; }
   /* a pinned link (a click) keeps its field lit until the element light goes out, or until another endpoint's reasons stop naming it */
   function elPins() { document.querySelectorAll("[data-elref]").forEach(function (e) { e.removeAttribute("data-elref"); });
-    if (!S.el || !S.elRef || !document.querySelector('#el-cm .elref[data-ref="' + S.elRef + '"]')) { S.elRef = null; return; }
-    var t = S.elRef === "gap" ? (GD === "uni" && gapFact(S.el)) || refTarget("gap") : refTarget(S.elRef); if (t) t.setAttribute("data-elref", "pin"); }
+    if (!S.el || !S.elRef || !document.querySelector('#el-cm .elref[data-ref="' + S.elRef + '"]')) S.elRef = null;
+    else { var t = S.elRef === "gap" ? (GD === "uni" && gapFact(S.el)) || refTarget("gap") : refTarget(S.elRef); if (t) t.setAttribute("data-elref", "pin"); }
+    /* a gap's link, clicked (D-044): its field stays lit on this endpoint until Escape, another endpoint or the other direction */
+    if (S.gRef) { var g = S.gRefEp === S.open ? refTarget(S.gRef) : null; if (!g) S.gRef = null; else if (!g.hasAttribute("data-elref")) g.setAttribute("data-elref", "pin"); } }
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("#tip .elref[data-gref]"); if (!b) return; e.preventDefault();
+    S.gRef = b.getAttribute("data-gref"); S.gRefEp = S.open; tipOff(); REFH.m = null; elPins(); elRefHover();
+    var t = refTarget(S.gRef); if (t && t.scrollIntoView) t.scrollIntoView({ block: "center" }); });
   /* the link under the mouse and the link with the keyboard's focus light their fields apart, so a scroll the focus causes (and the
      mouseover it fires under a resting mouse) does not put out what the keyboard lit */
   var REFH = { m: null, f: null };
   function elRefHover() { document.querySelectorAll('[data-elref="hover"]').forEach(function (e) { e.removeAttribute("data-elref"); });
     [REFH.m, REFH.f].forEach(function (ref) { var t = ref ? refTarget(ref) : null; if (t && !t.hasAttribute("data-elref")) t.setAttribute("data-elref", "hover"); }); }
-  document.addEventListener("mouseover", function (e) { var b = e.target.closest && e.target.closest("#el-cm .elref"), ref = b ? b.getAttribute("data-ref") : null;
+  document.addEventListener("mouseover", function (e) { var b = e.target.closest && e.target.closest("#el-cm .elref, #tip .elref[data-gref]"), ref = b ? b.getAttribute("data-ref") || b.getAttribute("data-gref") : null;
     if (ref !== REFH.m) { REFH.m = ref; elRefHover(); } });
   document.addEventListener("focusin", function (e) { var b = e.target.closest && e.target.closest("#el-cm .elref"); REFH.f = b ? b.getAttribute("data-ref") : null; elRefHover(); });
   document.addEventListener("focusout", function (e) { if (e.target.closest && e.target.closest("#el-cm .elref")) { REFH.f = null; elRefHover(); } });
@@ -1190,7 +1207,7 @@
   function lightKey(K) { S.el = K && S.el !== K ? K : null; S.elRef = null; applyEl(); writeOut(LAST.L, LAST.GS); }
   document.addEventListener("click", function (e) { var t = e.target.closest && e.target.closest("#ocol-uni [data-key], #ocol-cm [data-key]"); if (!t) return;
     e.preventDefault(); lightKey(t.getAttribute("data-key")); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && S.el) lightKey(null); });
+  document.addEventListener("keydown", function (e) { if (e.key !== "Escape") return; tipOff(); if (S.gRef) { S.gRef = null; elPins(); } if (S.el) lightKey(null); });
 
   /* ── words for a value: what the cell's hover and the side panel say ── */
   function cellWords(c, r) {
@@ -1207,6 +1224,24 @@
     if (c.kind === "cat" && r.why[c.id]) s += " — " + r.why[c.id];
     return s;
   }
+
+  /* ── D-044 · A GAP'S HOVER: why the gap exists (D-042's reasons, which the generator read — gwa/gwb) and its status (my proposal,
+     one.gaps.status.table): solved elsewhere names the field that holds it, as a link that lights it (D-042's link, the same
+     refTarget); not solving says what keeps it off; open says what the code map's data would have to carry, and from where ── */
+  function gwOf(t, r) { var k = (t.getAttribute("data-gw") || "").split("|"); if (!r || !k[0]) return null;
+    if (k[0] === "a") return (r.gwa || {})[k[1]] || null;
+    var g = (r.gwb || [])[+k[1]]; return !g ? null : k[2] === "u" ? g[0] : k[2] === "a" ? g[1][+k[3]] : g[2][+k[3]]; }
+  function fieldWord(ref) { var t = refTarget(ref); return t && t.querySelector(".pk") ? t.querySelector(".pk").textContent : ref; }
+  function gwHtml(t, r) { var it = gwOf(t, r); if (!it) return ""; var WS = W.one.gaps.status, dir = t.getAttribute("data-gw").charAt(0), refs = [];
+    var h = "<span class=gw><i>" + esc(WS.why) + "</i> " + it[0].map(function (x) { var c = dir === "a" && WS.aWhy[x[0]] ? WS.aWhy[x[0]] : W.el.why.codes[x[0]],
+        det = x[0] === "cnt" || x[0] === "alt" ? x[1].map(fieldWord).join(" · ") : x[0] === "low" || x[0] === "map" ? x[1].map(function (a) { return D.attrs[a].label; }).join(" · ") : "";
+      if (x[0] === "cnt" || x[0] === "alt") x[1].forEach(function (f) { if (refs.indexOf(f) < 0) refs.push(f); });
+      return "<b>" + esc(c.name) + "</b>" + (det ? " — " + esc(det) : ""); }).join(" · ") + "</span>";
+    var e = it[1] >= 0 ? WS.table[it[1]] : null;
+    h += "<span class=gs data-st=\"" + (e ? e.status : "none") + "\"><i>" + esc(WS.st) + "</i> " + (e ? "<b>" + esc(WS.words[e.status].name) + "</b> — " + esc(fill(e.line)) : esc(WS.untabled));
+    h += e ? ' <span class="mine">' + esc(WS.mine) + "</span>" : "";
+    if (e && e.status === "solved") h += "<span class=glk>" + refs.map(function (f) { return '<button type="button" class="elref" data-gref="' + esc(f) + '">' + esc(fieldWord(f)) + "</button>"; }).join(" ") + "</span>";
+    return h + "</span>"; }
 
   /* ── one tooltip ── */
   var tip = $("tip");
@@ -1227,16 +1262,16 @@
     if (kind === "elref") { var rf = t.getAttribute("data-ref"); return "<b>" + esc(t.textContent) + "</b>" + "<span class=pl>" + esc(rf === "gap" ? W.one.gaps.dir.opts.uni.plain : W.el.why.refTip) + "</span>"; }
     if (kind === "gdir") { var gk = t.getAttribute("data-gdir"), gw = W.one.gaps.dir; return "<b>" + esc(gw.opts[gk].name) + "</b>" + (gw.pick === gk ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(gw.opts[gk].plain) + "</span>"; }
     if (kind === "rgap") { var ra = t.getAttribute("data-attr"), rr2 = US[t.getAttribute("data-row")];
-      return "<b>" + esc(ra ? D.attrs[ra].label : rr2.name) + "</b> · " + esc(rr2.title || rr2.name) + "<span class=ln>" + esc(ra ? W.one.gaps.rshows : W.one.gaps.unmapped) + "</span>" + (ra ? "<span class=pl>" + esc(D.attrs[ra].plain) + "</span>" : ""); }
-    if (kind === "rfact") { var rr3 = US[t.getAttribute("data-row")]; return "<b>" + esc(rr3.title || rr3.name) + "</b><span class=ln>" + esc(t.getAttribute("data-fact")) + "</span><span class=pl>" + esc(W.one.gaps.rfact) + "</span>"; }
+      return "<b>" + esc(ra ? D.attrs[ra].label : rr2.name) + "</b> · " + esc(rr2.title || rr2.name) + "<span class=ln>" + esc(ra ? W.one.gaps.rshows : W.one.gaps.unmapped) + "</span>" + gwHtml(t, r) + (ra ? "<span class=pl>" + esc(D.attrs[ra].plain) + "</span>" : ""); }
+    if (kind === "rfact") { var rr3 = US[t.getAttribute("data-row")]; return "<b>" + esc(rr3.title || rr3.name) + "</b><span class=ln>" + esc(t.getAttribute("data-fact")) + "</span><span class=pl>" + esc(W.one.gaps.rfact) + "</span>" + gwHtml(t, r); }
     if (kind === "uni" && r) { var u = r.uni.rows.filter(function (x) { return x.row === t.getAttribute("data-row"); })[0], us = D.uspec.filter(function (x) { return x.row === u.row; })[0];
       return "<b>" + esc(u.title || us.name) + "</b> · " + esc(W.one.uni.title) + "<span class=ln>" + esc(u.value) + "</span><span class=pl>" + esc(fill(W.one.attrOf, { v: us.attrs.map(function (a) { return D.attrs[a].label; }).join(" · ") || W.panel.none })) + " · " + esc(W.one.gaps.mine) + "</span>"; }
     if (kind === "pair") { var as = t.getAttribute("data-attr").split(" ");
       return "<b>" + esc(t.querySelector(".pk").textContent) + "</b>" + as.map(function (a) { return "<span class=ln>" + esc(fill(W.one.attrOf, { v: D.attrs[a].label })) + "</span>"; }).join("") + "<span class=pl>" + esc(D.attrs[as[0]].plain) + "</span>"
         + (t.getAttribute("data-gap") === "true" ? "<span class=pl>" + esc(W.one.gaps.shows) + "</span>" : ""); }
     if (kind === "gap") { var ga = t.getAttribute("data-attr"), at = D.attrs[ga], px = r && t.hasAttribute("data-part") ? r.partly.filter(function (x) { return x[0] === ga; })[0] : null;
-      if (px) return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.partly) + "<span class=ln>" + esc(fill(W.one.gaps.partlyTip, { names: px[3].join(", "), n: px[1], of: px[2] })) + "</span><span class=pl>" + esc(at.plain) + "</span>";
-      return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.shows) + "<span class=pl>" + esc(at.plain) + "</span>"; }
+      if (px) return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.partly) + "<span class=ln>" + esc(fill(W.one.gaps.partlyTip, { names: px[3].join(", "), n: px[1], of: px[2] })) + "</span>" + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>";
+      return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.shows) + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>"; }
     if (kind === "copycmd") return esc(W.panel.copy);
     /* D-043: a value chip — its words, its family, what it means, and where its look is read (an element's hover: a little richer) */
     if (kind === "vc") { var vf = t.getAttribute("data-vc"), vv = t.getAttribute("data-vv"), ve = EF[vf], vp = vcPlain(vf, vv);
@@ -1254,20 +1289,29 @@
     return null;
   }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (ch) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]; }); }
+  /* a hover that holds a link (D-044) is LIVE: it sits flush against its item, the pointer may move onto it, and leaving the item for
+     anything but another hover gives a short grace before it closes */
+  var TIPH = null, TIPAT = null;
+  function tipOff() { clearTimeout(TIPH); TIPH = null; TIPAT = null; tip.setAttribute("data-show", "false"); tip.setAttribute("data-live", "false"); }
   document.addEventListener("mouseover", function (e) {
-    var t = e.target.closest("[data-tip]"); if (!t) { tip.setAttribute("data-show", "false"); return; }
+    if (e.target.closest && e.target.closest("#tip")) { clearTimeout(TIPH); TIPH = null; return; }
+    var t = e.target.closest("[data-tip]");
+    if (!t && tip.getAttribute("data-live") === "true" && tip.getAttribute("data-show") === "true") { if (!TIPH) TIPH = setTimeout(function () { tipOff(); REFH.m = null; elRefHover(); }, 400); return; }
+    clearTimeout(TIPH); TIPH = null;
+    if (!t) { tipOff(); return; }
     if (t.getAttribute("data-tip") === "cell" && e.target.closest(".spine i")) { var si = e.target.closest(".spine i"), c = COL[t.getAttribute("data-col")];
       tip.innerHTML = "<b>" + esc(si.getAttribute("data-stage")) + "</b> · " + esc(fill(W.stageCell, { stage: si.getAttribute("data-stage"), n: si.getAttribute("data-n") })) + "<span class=pl>" + esc(W.stages[si.getAttribute("data-stage")] || "") + "</span>"; }
     else if (t.getAttribute("data-tip") === "cell" && e.target.closest(".dots i")) { tip.innerHTML = "<b>" + esc(e.target.closest(".dots i").getAttribute("data-f")) + "</b><span class=pl>" + esc(W.families) + "</span>"; }
-    else { var h = tipFor(t); if (!h) { tip.setAttribute("data-show", "false"); return; } tip.innerHTML = h; }
+    else { var h = tipFor(t); if (!h) { tipOff(); return; } tip.innerHTML = h; }
+    var live = !!tip.querySelector(".elref[data-gref]"), gp = live ? 0 : 6;
     var bx = t.getBoundingClientRect(), tw = tip.offsetWidth, thh = tip.offsetHeight;
-    var x = Math.min(window.innerWidth - tw - 8, Math.max(8, bx.left)), y = bx.bottom + 6; if (y + thh > window.innerHeight - 4) y = Math.max(4, bx.top - thh - 6);
-    tip.style.left = x + "px"; tip.style.top = y + "px"; tip.setAttribute("data-show", "true"); });
+    var x = Math.min(window.innerWidth - tw - 8, Math.max(8, bx.left)), y = bx.bottom + gp; if (y + thh > window.innerHeight - 4) y = Math.max(4, bx.top - thh - gp);
+    tip.style.left = x + "px"; tip.style.top = y + "px"; tip.setAttribute("data-live", live ? "true" : "false"); tip.setAttribute("data-show", "true"); TIPAT = t; });
   document.addEventListener("focusin", function (e) { var t = e.target.closest && e.target.closest(".opt[data-tip]"); if (!t || !t.matches(":focus-visible")) return;   /* a keyboard focus, not a mouse press */
     var h = tipFor(t); if (!h) return; tip.innerHTML = h; var bx = t.getBoundingClientRect();
     tip.style.left = Math.min(window.innerWidth - tip.offsetWidth - 8, Math.max(8, bx.left)) + "px"; tip.style.top = (bx.bottom + 6) + "px"; tip.setAttribute("data-show", "true"); });
-  document.addEventListener("focusout", function () { tip.setAttribute("data-show", "false"); });
-  window.hoverHide = function () { tip.setAttribute("data-show", "false"); };
+  document.addEventListener("focusout", function (e) { if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest("#tip")) return; tipOff(); });
+  window.hoverHide = function () { tipOff(); };
 
   /* ── copy text ── */
   function copyText(s, said, word) {
@@ -1331,7 +1375,18 @@
     var t4 = el("table"); t4.id = "elwhy-map"; var h4 = el("tr"); WY.tableHead.forEach(function (x) { h4.appendChild(el("th", null, x)); }); t4.appendChild(h4);
     WY.table.forEach(function (e) { var tr = el("tr"); tr.setAttribute("data-kind", e.kind);
       [W.el.kinds[e.kind] || e.kind, e.rows.map(function (x) { return US[x].title || US[x].name; }).join(" · "), e.attrs.map(function (a) { return D.attrs[a].label + " (" + D.attrs[a].r + ")"; }).join(" · "),
-       e.fields.map(fieldWord).join(" · "), e.about === "map" ? WY.mapMark : ""].forEach(function (v) { tr.appendChild(el("td", null, v)); }); t4.appendChild(tr); }); mb.appendChild(t4);
+       e.fields.map(fieldWord).join(" · "), e.about === "map" ? WY.mapMark : ""].forEach(function (v) { tr.appendChild(el("td", null, v)); }); t4.appendChild(tr); });
+    /* D-044: the things a row draws that carry no key of their own — the same shape, my proposal too */
+    WY.names.forEach(function (e) { var tr = el("tr"); tr.setAttribute("data-sel", e.sel);
+      [e.sel + " · " + WY.noKey, US[e.row].title || US[e.row].name, e.attrs.map(function (a) { return D.attrs[a].label + " (" + D.attrs[a].r + ")"; }).join(" · "),
+       (e.fields || []).map(fieldWord).join(" · "), e.about === "map" ? WY.mapMark : ""].forEach(function (v) { tr.appendChild(el("td", null, v)); }); t4.appendChild(tr); });
+    mb.appendChild(t4);
+    /* D-044: every gap's status line — MY PROPOSAL, keyed by the gap's place and its first reason (the reasons are derived) */
+    var GS = W.one.gaps.status, p5 = el("p", null, GS.minePlain); p5.id = "gapst-mine"; mb.appendChild(p5);
+    var t5 = el("table"); t5.id = "gapst-map"; var h5 = el("tr"); GS.tableHead.forEach(function (x) { h5.appendChild(el("th", null, x)); }); t5.appendChild(h5);
+    GS.table.forEach(function (e) { var tr = el("tr"); tr.setAttribute("data-st", e.status);
+      [W.one.gaps.dir.opts[e.dir === "a" ? "cm" : "uni"].name, e.dir === "a" ? D.attrs[e.at].label : e.at, (e.dir === "a" && GS.aWhy[e.why] ? GS.aWhy[e.why] : WY.codes[e.why]).name,
+       e.q || "", GS.words[e.status].name, fill(e.line)].forEach(function (v) { tr.appendChild(el("td", null, v)); }); t5.appendChild(tr); }); mb.appendChild(t5);
     /* the block marks, and whose each one is */
     var t3 = el("table"); t3.id = "marks"; D.blocks.concat([{ key: "_shared", name: W.sharedBlock.name }]).forEach(function (b) { var tr = el("tr"); var td = el("td"); td.appendChild(markEl(b.key)); td.appendChild(document.createTextNode(b.name)); tr.appendChild(td);
       tr.appendChild(el("td", null, markWords(b.key))); t3.appendChild(tr); }); mb.appendChild(t3); })();

@@ -161,6 +161,15 @@ await step('one-info-close', '#itog-one', 'the same toggle, again');
   { await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120); n++;
     const gb = await p.$eval('#ocol-gaps', (e) => { const r = e.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height }; });
     await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-the-gaps-the-other-way.png'), clip: { x: Math.max(0, gb.x - 8), y: Math.max(0, gb.y - 8), width: gb.width + 16, height: Math.min(1800, gb.height + 16) }, fullPage: true }); }
+  { // D-044: point at a gap the other way with the real mouse — the hover says WHY the gap exists (D-042's reasons) and its STATUS
+    // (my proposal); a "solved elsewhere" gap names the field that holds it as a link. The Guards row's first name the code map lacks
+    const gs = '#ocol-gaps .gfact[data-row="GUARDS"]', g = await p.$(gs);
+    if (g) { await g.evaluate((e) => e.scrollIntoView({ block: 'center' })); await wait(120); const bx = await g.boundingBox();
+      await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(300);
+      say('pointing at a gap the other way', { gap: await txt(gs), status: await p.$eval('#tip', (t) => (t.querySelector('.gs') || {}).getAttribute ? t.querySelector('.gs').getAttribute('data-st') : null),
+        links: await p.$$eval('#tip .elref[data-gref]', (ls) => ls.map((l) => l.textContent)), tip: await p.$eval('#tip', (t) => t.innerText.replace(/\s+/g, ' ')) });
+      await pic('hover-a-gap-the-other-way'); await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120); }
+    else say('MISSING a gap the other way in the Guards row', gs); }
   await step('gaps-back-this-way', '#ocol-gaps .opt[data-gdir="cm"]', 'the first square: in the code map, not in the universe'); }
 { // D-041: click an element in the universe column and it lights in the three places — the Household chip on POST /setup/complete
   const lit = async () => p.evaluate(() => ({ chip: document.getElementById('elchip').hidden ? null : document.getElementById('elsays').textContent,

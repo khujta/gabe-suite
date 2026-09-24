@@ -571,3 +571,14 @@ or the station already uses for the same catalog is REUSED, read from where it l
 yet gets one small set, marked as the agent's proposal, its colours kept apart from the status and series colours. Only the code-map
 column changes.
 Revisit if: two catalogs end up wearing look-alike chips — then one of them switches to an icon-only encoding.
+
+## D-044 — A gap's hover says why the gap exists and how it is solved, or that it is not being solved
+Date: 2026-09-24 · Input: his message.
+Decision, his: "in the gaps, especially in the ones that are in the universe and not in the code map, when I hover over it, it gives
+me more information. Can we also put the reason why we have that gap and how we solve it, or if we are not solving it?"
+Consequence: every item in THE GAPS — above all the "in the universe, not in the code map" direction — carries, in its hover, the
+REASON (the same derived reasons as D-042) and a STATUS: solved elsewhere (with the field that holds it, a link) · not solving (and
+why — rated 1, D-020; about the map, D-017; …) · open (and how it would be solved — what the code map's data would have to carry,
+and from where). The status lines are one authored table, the agent's proposal, said on the page; the reasons stay derived. The
+wording states facts and plans, not verdicts (D-025.6).
+Revisit if: an "open" line has no plan he can act on — then it names the missing measurement instead of a fix.

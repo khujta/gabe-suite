@@ -604,7 +604,7 @@
      "endings",
      "the endings"
     ],
-    "tip": "The endings · shown by no universe rowEvery distinct way a request to the endpoint can end."
+    "tip": "The endings · shown by no universe rowwhy not drawnstatus open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's produced[], returns[] and framework_exits[] (the endpoint pass and the paths arm). my proposalEvery distinct way a request to the endpoint can end."
    }
   ],
   [
@@ -700,12 +700,23 @@
    }
   ],
   [
-   "step 58 · gaps-back-this-way",
+   "pointing at a gap the other way",
+   {
+    "gap": "get_session",
+    "status": "solved",
+    "links": [
+     "in flight"
+    ],
+    "tip": "Guards get_session the universe card draws it; the code-map column never names it WHY shown another way — in flight STATUS solved elsewhere — The code map holds this dependency as the value it hands the handler: an in-flight value, in the field linked here. my proposal in flight"
+   }
+  ],
+  [
+   "step 59 · gaps-back-this-way",
    {
     "click": "in the code map, not in the universe",
     "at": [
      620,
-     524
+     442
     ],
     "size": [
      32,
@@ -715,7 +726,7 @@
    }
   ],
   [
-   "step 59 · light-household-in-the-universe",
+   "step 60 · light-household-in-the-universe",
    {
     "click": "Household",
     "at": [
@@ -751,7 +762,7 @@
    }
   ],
   [
-   "step 62 · another-endpoint-light-on",
+   "step 63 · another-endpoint-light-on",
    {
     "click": "GET/",
     "at": [
@@ -782,7 +793,7 @@
    }
   ],
   [
-   "step 64 · back-to-setup-complete",
+   "step 65 · back-to-setup-complete",
    {
     "click": "POST/setup/complete",
     "at": [
@@ -797,7 +808,7 @@
    }
   ],
   [
-   "step 65 · light-users-in-the-code-map",
+   "step 66 · light-users-in-the-code-map",
    {
     "click": "users",
     "at": [
@@ -828,7 +839,7 @@
    }
   ],
   [
-   "step 67 · clear-the-element-light",
+   "step 68 · clear-the-element-light",
    {
     "click": "clear",
     "at": [
@@ -855,7 +866,7 @@
    }
   ],
   [
-   "step 69 · light-a-case-the-code-map-counts",
+   "step 70 · light-a-case-the-code-map-counts",
    {
     "click": "C1048",
     "at": [
@@ -896,7 +907,7 @@
    }
   ],
   [
-   "step 72 · click-the-reason-link",
+   "step 73 · click-the-reason-link",
    {
     "click": "tests",
     "at": [
@@ -925,7 +936,7 @@
    }
   ],
   [
-   "step 74 · light-a-case-the-code-map-lacks",
+   "step 75 · light-a-case-the-code-map-lacks",
    {
     "click": "C1087",
     "at": [
@@ -951,7 +962,7 @@
    }
   ],
   [
-   "step 75 · click-not-carried",
+   "step 76 · click-not-carried",
    {
     "click": "the gaps: in the universe, not in the code map",
     "at": [
@@ -980,7 +991,7 @@
    }
   ],
   [
-   "step 77 · clear-the-light-again",
+   "step 78 · clear-the-light-again",
    {
     "click": "clear",
     "at": [
@@ -995,7 +1006,7 @@
    }
   ],
   [
-   "step 78 · gaps-back-to-this-way",
+   "step 79 · gaps-back-to-this-way",
    {
     "click": "in the code map, not in the universe",
     "at": [
@@ -1010,7 +1021,7 @@
    }
   ],
   [
-   "step 79 · open-in-the-lab",
+   "step 80 · open-in-the-lab",
    {
     "click": "open POST /setup/complete in the lab",
     "at": [
@@ -1039,7 +1050,7 @@
    }
   ],
   [
-   "step 81 · open-in-the-universe",
+   "step 82 · open-in-the-universe",
    {
     "click": "open POST /setup/complete in the Gabe Universe",
     "at": [
@@ -1069,7 +1080,7 @@
    }
   ],
   [
-   "step 83 · click-the-stream-row",
+   "step 84 · click-the-stream-row",
    {
     "click": "GET/recipe-creation/gustify/stream",
     "at": [
@@ -1132,11 +1143,11 @@
    "pointing at a gap shown in part",
    {
     "gap": "Own guardsshown in part",
-    "tip": "Own guards · shown in partThe card draws RECIPE_CREATION_ENABLED: 1 of 2. The rest is shown by no universe row.A check in the handler's own code that refuses the request."
+    "tip": "Own guards · shown in partThe card draws RECIPE_CREATION_ENABLED: 1 of 2. The rest is shown by no universe row.why not drawnstatus open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's preconditions[], each with the ending it guards. my proposalA check in the handler's own code that refuses the request."
    }
   ],
   [
-   "step 86 · more-information",
+   "step 87 · more-information",
    {
     "click": "Show how the map knows this",
     "at": [

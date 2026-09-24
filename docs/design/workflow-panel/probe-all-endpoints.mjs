@@ -962,6 +962,32 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
   ok(!!K3 && e3 && e3.here === 'false' && e3.why.length === 1 && e3.why[0][0] === 'gap' && g3 && g3.dir === 'uni' && g3.elref.some(([k, how]) => k === K3 && how === 'pin'),
     'a case that only arranges through ' + EP + ' (' + K3 + '): the code map says "not carried", and its link turns THE GAPS to the universe side, where the case is lit', { K3, why: e3 && e3.why, after: g3 && [g3.dir, g3.elref] });
   await p.click('#elclear').catch(() => {}); await p.click('#ocol-gaps .opt[data-gdir="cm"]').catch(() => {}); await p.waitForTimeout(60); }
+/* 12 · D-044: a gap's hover says WHY the gap exists (D-042's reasons) and a STATUS (my proposal): solved elsewhere · not solving · open.
+   On POST /setup/complete, the gaps the other way: every item's hover carries a reason in D-042's words and one of the three statuses;
+   and a "solved elsewhere" item's link lights the field it names — pointing lights it, a click keeps it lit, Escape puts it out. Real mouse. */
+{ const EP12 = 'POST /setup/complete', GSW = D.words.one.gaps.status, WHYW = [...Object.values(D.words.el.why.codes), ...Object.values(GSW.aWhy)].map((c) => c.name);
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + EP12 + '"] td.id'); await p.waitForTimeout(60);
+  await p.click('#ocol-gaps .opt[data-gdir="uni"]'); await p.waitForTimeout(60);
+  await p.evaluate(() => document.querySelectorAll('#ocol-gaps .gfmore').forEach((x) => x.click()));
+  const items = await p.$$('#ocol-gaps [data-gw]'), bad = [], seen = {}; let solvedAt = null;
+  for (const it of items) { await it.evaluate((x) => x.scrollIntoView({ block: 'center' })); await it.hover(); await p.waitForTimeout(15);
+    const h = await p.evaluate(() => { const t = document.getElementById('tip'), gw = t.querySelector('.gw'), gs = t.querySelector('.gs');
+      return { show: t.getAttribute('data-show'), why: gw ? [...gw.querySelectorAll('b')].map((b) => b.textContent) : [], st: gs ? gs.getAttribute('data-st') : null,
+        stName: gs && gs.querySelector('b') ? gs.querySelector('b').textContent : null, links: t.querySelectorAll('.elref[data-gref]').length }; });
+    const gw = await it.getAttribute('data-gw');
+    if (h.show !== 'true' || !h.why.length || !h.why.every((w) => WHYW.includes(w)) || !GSW.words[h.st] || h.stName !== GSW.words[h.st].name || (h.st === 'solved') !== (h.links > 0)) bad.push([gw, h]);
+    else { seen[h.st] = (seen[h.st] || 0) + 1; if (h.st === 'solved' && !solvedAt) solvedAt = gw; } }
+  const nB = (ROW[EP12].rgaps || []).reduce((n, g) => n + (g[2] ? 1 : 0) + g[1].length + g[3].length, 0);
+  ok(nB > 0 && items.length === nB && !bad.length, 'every gap the other way on ' + EP12 + ' (' + nB + ') has a hover with a reason in D-042\'s words and a status; a solved one carries a link', { n: items.length, nB, bad: bad.slice(0, 3), seen });
+  const lit = () => p.evaluate(() => [...document.querySelectorAll('[data-elref]')].map((e) => [e.getAttribute('data-k'), e.getAttribute('data-elref')]));
+  let ref = null, l1 = null, l2 = null, l3 = null;
+  if (solvedAt) { const g = await p.$('#ocol-gaps [data-gw="' + solvedAt + '"]'); await g.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40); await g.hover(); await p.waitForTimeout(60);
+    const ln = await p.$('#tip .elref[data-gref]'); ref = ln && await ln.getAttribute('data-gref'); const bx = ln && await ln.boundingBox();
+    if (bx) { await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2, { steps: 4 }); await p.waitForTimeout(80); l1 = await lit(); await p.mouse.click(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(100); l2 = await lit(); }
+    await p.keyboard.press('Escape'); await p.waitForTimeout(40); l3 = await lit(); }
+  ok(!!ref && l1 && l1.length === 1 && l1[0][0] === ref && l1[0][1] === 'hover' && l2 && l2.length === 1 && l2[0][0] === ref && l2[0][1] === 'pin' && l3 && !l3.length,
+    'a "solved elsewhere" gap (' + solvedAt + ') links the field it names: pointing at the link lights ' + ref + ' in the code map, a click keeps it lit, Escape puts it out', { ref, l1, l2, l3 });
+  await p.mouse.move(5, 5); await p.click('#ocol-gaps .opt[data-gdir="cm"]').catch(() => {}); await p.waitForTimeout(40); }
 ok(!errs.length, 'no page error after the D-041 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */

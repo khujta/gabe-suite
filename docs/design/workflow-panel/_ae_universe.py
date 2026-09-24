@@ -736,45 +736,51 @@ def _strings(x) -> list:
 
 
 def names_drawn(u: dict) -> list:
-    """The NAMES a universe row draws, as [what the row shows, the names that count as holding it]: a guard, an access's table,
-    a connection's member, a callee, a case, a journey, a key-value line's value, a flag, a sentence the row writes. Counts
-    are not names; the head and Above name the entity and the cluster."""
-    r, it = u["row"], u.get("items") or []
+    """The NAMES a universe row draws, as [what the row shows, the names that count as holding it, the element's key (the one
+    the row's `keys` hold for it, else None), which of the row's things it is (its SELECTOR — a key's kind when it has one; else
+    the station's own label for a key-value line, a flag's key, or a word for the row's one kind of thing)]: a guard, an access's
+    table, a connection's member, a callee, a case, a journey, a key-value line's value, a flag, a sentence the row writes. Counts
+    are not names; the head and Above name the entity and the cluster. The selector is what THE GAPS' hover reads a name by (D-044)."""
+    r, it, ks = u["row"], u.get("items") or [], u.get("keys") or []
+    at = lambda i: ks[i] if i < len(ks) and isinstance(ks[i], str) else None
+    sel = lambda k, word: k.split(":", 1)[0] if k else word
+    one = lambda s, k, word: [s, [s], k, sel(k, word)]
     if r == "HEAD":
-        return [[it[2], [it[2]]]]
+        return [one(it[2], at(2), "entity")]
     if r == "GUARDS":
-        return [[g[0], [g[0]]] for g in it]
+        return [one(g[0], at(i), "guard") for i, g in enumerate(it)]
     if r == "ACCESSES":
-        return [[f"{o[1]} · {o[2]}", [o[2]]] for o in {(o[1], o[2]): o for o in it}.values()]
+        return [[f"{o[1]} · {o[2]}", [o[2]], "table:" + o[2], "table"] for o in {(o[1], o[2]): o for o in it}.values()]
     if r == "CONNECTIONS":
-        return [[m, [m]] for g in it for m in g[3] + g[7]]
+        return [one(m, (ks[gi][mi] if gi < len(ks) and mi < len(ks[gi]) else None), "member") for gi, g in enumerate(it) for mi, m in enumerate(g[3] + g[7])]
     if r == "CODE BEHIND":
-        return [[n, [n]] for n in it + (u.get("rest") or [])]
+        return [one(n, at(i), "callee") for i, n in enumerate(it + (u.get("rest") or []))]
     if r == "TESTS":
-        return [[c[0], [c[0]]] for c in it] + [[f[0], [f[0]]] for f in u.get("files") or []]
+        return [one(c[0], at(i), "case") for i, c in enumerate(it)] + [one(f[0], None, "file") for f in u.get("files") or []]
     if r == "JOURNEYS":
-        return [[j[0], [j[0]]] for j in it]
+        return [one(j[0], (ks[i][0] if i < len(ks) and ks[i] else None), "journey") for i, j in enumerate(it)]
     if r in ("IDENTITY", "SOURCE"):
-        return [[str(v), [str(v)]] for _i, _k, v in u["kvs"][:2] if v not in (None, "")]
+        return [one(str(kv[2]), at(i), kv[1]) for i, kv in enumerate(u["kvs"][:2]) if kv[2] not in (None, "")]
     if r == "SIGNATURE":
-        return [[it[0], [it[0]]]] if it and it[0] else []
+        return [one(it[0], None, "signature")] if it and it[0] else []
     if r == "RISK":
-        return [[f[2], [f[2]]] for f in it]
+        return [one(f[2], None, f[0]) for f in it]
     if r == "ABOVE":
-        return [[x, [x]] for x in it]
+        return [one(x, at(i), ("cluster", "entity")[i]) for i, x in enumerate(it)]
     if r == "PAYLOAD":
-        return [[m.group(1), [m.group(1)]] for m in [re.search(r"→ (\S+)", u["value"])] if m]
+        return [one(m.group(1), at(0), "schema") for m in [re.search(r"→ (\S+)", u["value"])] if m]
     if r in ("EVIDENCE", "MODEL ROW", "DOCSTRING", "DELIVERY"):
-        return [[u["value"], [u["value"]]]]
+        return [one(u["value"], None, "value")]
     return []
 
 
 def reverse_gaps(row: dict, uni: dict, U: dict, carried_attrs: set) -> list:
     """THE GAPS, the other way (D-040): what the universe card shows for this endpoint that the code-map column does not hold.
     Per drawn row, in the card's order: [row, the row's attributes the code map holds nothing for here, whether the row maps to
-    no attribute at all, the names it draws that the code-map column never names]. The column's words are the values it
-    draws (the head, every cell, every detail); a name is held when one of its names is a whole word there, any case. A
-    connection's model counts as held by its table when the card's own Accesses pair them."""
+    no attribute at all, the names it draws that the code-map column never names, and each name's [key, selector] (parallel,
+    for its hover — D-044)]. The column's words are the values it draws (the head, every cell, every detail); a name is held
+    when one of its names is a whole word there, any case. A connection's model counts as held by its table when the card's
+    own Accesses pair them."""
     hay = " │ ".join(_strings([row[k] for k in ("m", "p", "fn", "file", "line", "ent", "seg", "declared")] + [row["v"], row["d"]]))
     table_of = {}
     for o in next((u["items"] for u in uni["rows"] if u["row"] == "ACCESSES"), []):
@@ -784,10 +790,12 @@ def reverse_gaps(row: dict, uni: dict, U: dict, carried_attrs: set) -> list:
     for u in uni["rows"]:
         attrs = (U["rows"].get(u["row"]) or {}).get("attrs") or []
         miss = [a for a in attrs if a not in carried_attrs]
-        facts = [n for n, keys in names_drawn(u) if not held(keys + [t for k in keys for t in table_of.get(k, [])])]
-        facts = [] if not attrs else list(dict.fromkeys(facts))
+        facts = {}
+        for n, keys, K, sl in names_drawn(u):
+            if attrs and n not in facts and not held(keys + [t for k in keys for t in table_of.get(k, [])]):
+                facts[n] = [K, sl]
         if miss or not attrs or facts:
-            out.append([u["row"], miss, not attrs, facts])
+            out.append([u["row"], miss, not attrs, list(facts), list(facts.values())])
     return out
 
 
@@ -990,21 +998,190 @@ def cm_reasons(rows: list, facts: list, T: list, A: dict, F: dict, partial: bool
                 off = sorted((c | a) - pairs)
                 if off:
                     die(f"{r['id']}: {K} sits in {off}, which el.why.table does not list for a {kind} drawn by {sorted(U_rows)} — add the field")
-            why = []
-            if c:
-                why.append(["cnt", sorted(c)])
-            if a:
-                why.append(["alt", sorted(a)])
             attrs = sorted({x for e in ents for x in e["attrs"]} | {x for p in c for x in pair_attrs[p]}, key=list(A).index)
-            if attrs and all(A[x]["r"] == r_low for x in attrs):
-                why.append(["low", attrs])
             mp = bool(ents) and all(e.get("about") == "map" for e in ents)
-            if mp:
-                why.append(["map", sorted({x for e in ents for x in e["attrs"]}, key=list(A).index)])
-            if not c and not a and not mp:
-                why.append(["gap", []])
-            nr[K] = why
+            nr[K] = why_of(c, a, attrs, sorted({x for e in ents for x in e["attrs"]}, key=list(A).index) if mp else None, A, r_low)
         r["nr"] = nr
+
+
+def why_of(c: set, a: set, attrs: list, map_attrs, A: dict, r_low: int) -> list:
+    """D-042's rule, in the ONE place it lives — the code map's element line (cm_reasons) and every gap's hover (gap_whys, D-044)
+    read their reasons here: counted, not named (the pairs `c` count it) · shown another way (the pairs `a` hold it another way)
+    · low priority (every attribute it belongs to is rated at the bottom) · about the map (`map_attrs`, the attributes of a kind
+    the table marks about the map; None when it is not) · not carried (nothing holds it and it is not about the map)."""
+    why = []
+    if c:
+        why.append(["cnt", sorted(c)])
+    if a:
+        why.append(["alt", sorted(a)])
+    if attrs and all(A[x]["r"] == r_low for x in attrs):
+        why.append(["low", list(attrs)])
+    if map_attrs is not None:
+        why.append(["map", list(map_attrs)])
+    if not c and not a and map_attrs is None:
+        why.append(["gap", []])
+    return why
+
+
+# ── D-044 · A GAP'S HOVER: WHY IT EXISTS, AND HOW IT IS SOLVED. Every item of THE GAPS carries D-042's reasons (why_of — never a
+# second rule) and a STATUS read from ONE authored table (one.gaps.status.table, my proposal): solved elsewhere · not solving ·
+# open. An item's reasons: a name the code map lacks → the element's own D-042 reasons (r["nr"]); a name the code map NAMES under
+# another form → shown another way, by the pairs that name it; a name with no key → el.why.names (my proposal: which attributes
+# and fields a row's key-less thing belongs to); an attribute of a row → counted, not named when fields of the code map count
+# the elements the row draws for it, else its own rating / map / not carried; a row that maps to no attribute → not carried.
+# THE GAPS' first direction (the code map holds it, no universe row shows it) reads the attribute's own rating / map / "not drawn".
+ST_WORDS = ("solved", "not", "open")
+
+
+def names_table(W: dict, A: dict, inv: set, F: dict) -> dict:
+    """el.why.names, checked: {(row, selector): entry} — every row a station row, every attribute a row of the ruled tree AND of
+    inventory-endpoint.md, every field a pair the code map draws, `hold` cnt / alt / none, no (row, selector) twice."""
+    out, rows = {}, {x for x, _ in ROWS}
+    for i, e in enumerate(W["el"]["why"]["names"]):
+        at = f"el.why.names[{i}] ({e.get('row')} · {e.get('sel')})"
+        if e.get("row") not in rows or not e.get("sel"):
+            die(f"{at}: a row the station's card does not have, or no selector")
+        bad = [a for a in e.get("attrs") or [] if a not in A or a not in inv] or ([] if e.get("attrs") else ["(none)"])
+        if bad:
+            die(f"{at}: attribute ids that are not rows of the ruled tree and of inventory-endpoint.md: {bad}")
+        bad = [f for f in e.get("fields") or [] if f not in F]
+        if bad:
+            die(f"{at}: fields the code-map column does not draw: {bad}")
+        if e.get("hold") not in (None, "cnt", "alt") or bool(e.get("fields")) != bool(e.get("hold")):
+            die(f"{at}: `hold` is cnt or alt exactly when fields are listed")
+        if e.get("about") not in (None, "map"):
+            die(f"{at}: `about` is \"map\" or absent")
+        if (e["row"], e["sel"]) in out:
+            die(f"{at}: listed twice")
+        out[(e["row"], e["sel"])] = e
+    return out
+
+
+def _gap_q(K: str, fep: dict, fj: dict, row: dict) -> str | None:
+    """A word the forms feed decides, splitting one status line where the plan differs (one.gaps.status.table `q`). A case the code
+    map does not hold: it calls this endpoint only to set another test up (the endpoint's `tests.arranged_by`), a helper does
+    (`helper_arranged`), the tests arm read no call of it (`test_cases.<id>.calls` empty), or it calls other endpoints only. A
+    schema the code map does not name: nested in the reply model or the body's schema (`schemas{}` field types, followed down),
+    or neither."""
+    kind, ident = K.split(":", 1)
+    if kind == "case":
+        t, tc = (fep.get("tests") or {}), (fj.get("test_cases") or {})
+        if ident in (t.get("arranged_by") or []):
+            return "arranged"
+        if ident in (t.get("helper_arranged") or []):
+            return "helper"
+        return "no calls" if not ((tc.get(ident) or {}).get("calls")) else "other"
+    if kind == "schema":
+        S, seen = fj.get("schemas") or {}, set()
+        tops = [((fep.get("declared") or {}).get("response_model") or {}).get("name"), (row["d"].get("request") or [None])[0]]
+        todo = [x for x in tops if x]
+        while todo:
+            n = todo.pop()
+            if n in seen:
+                continue
+            seen.add(n)
+            todo += [w for f in (S.get("schema:" + n) or {}).get("fields") or [] for w in IDENT.findall(str(f.get("annotation"))) if "schema:" + w in S]
+        return "nested" if ident in seen - set(tops) else "other"
+    return None
+
+
+def gap_whys(rows: list, fj: dict, W: dict, T: list, NT: dict, A: dict, F: dict, partial: bool) -> dict:
+    """Adds to every row `gwa` {attr: [why, st]} for THE GAPS' first direction and `gwb` (parallel to `rgaps`: [the unmapped row's
+    item or None, [an item per attribute], [an item per name]]) for the second — `why` D-042's reasons, `st` the index of the status
+    line in one.gaps.status.table (-1 on a fixture page where none is tabled). Returns the per-status counts, for the page."""
+    S, r_low, order = W["one"]["gaps"]["status"]["table"], min(a["r"] for a in A.values()), list(A)
+    rows_ok = {x for x, _ in ROWS}
+    for i, e in enumerate(S):
+        at = f"one.gaps.status.table[{i}] ({e.get('at')} · {e.get('why')})"
+        if e.get("dir") not in ("a", "b") or e.get("why") not in WHY_CODES or e.get("status") not in ST_WORDS or not e.get("line"):
+            die(f"{at}: dir a|b, why one of {WHY_CODES}, status one of {ST_WORDS}, and a line")
+        head = str(e.get("at") or "")
+        ok = head in A if e["dir"] == "a" else (head in rows_ok or (" @ " in head and head.rsplit(" @ ", 1)[1] in rows_ok))
+        if not ok:
+            die(f"{at}: `at` is an attribute id (a) or \"<kind|selector|attribute> @ <ROW>\" / \"<ROW>\" (b)")
+        if e["status"] == "solved" and e["why"] not in ("cnt", "alt"):
+            die(f"{at}: solved elsewhere needs a field that holds it — its reason must be counted, not named or shown another way")
+        if e["status"] == "not" and not re.search(r"\bD-\d{3}\b", e["line"]):
+            die(f"{at}: not solving must cite what keeps it off (a D-nnn ruling)")
+        if e.get("q") not in (None, "arranged", "helper", "no calls", "other", "nested", "drawn", "none drawn"):
+            die(f"{at}: `q` is a word _gap_q or an attribute item gives (where the feed holds it · drawn · none drawn), not {e.get('q')!r}")
+    idx = {(e["dir"], e["at"], e["why"], e.get("q")): i for i, e in enumerate(S)}
+    if len(idx) != len(S):
+        die("one.gaps.status.table lists a (dir, at, why, q) twice")
+    used, missing = set(), []
+    about_map = lambda a: bool([e for e in T if a in e["attrs"]]) and all(e.get("about") == "map" for e in T if a in e["attrs"])
+    own = lambda a: why_of(set(), set(), [a], [a] if about_map(a) else None, A, r_low)
+
+    def status(d, at, why, q, where):
+        i = idx.get((d, at, why[0][0], q), idx.get((d, at, why[0][0], None)))
+        if i is None:
+            missing.append(f"{where}: ({d}, {at}, {why[0][0]}{', ' + q if q else ''})")
+            return -1
+        used.add(i)
+        return i
+
+    for r in rows:
+        fep = (fj.get("endpoints") or {}).get("endpoint:" + r["id"]) or {}
+        named, held_f = cm_named(r), {f for fs in r["has"].values() for f in fs}
+        r["gwa"] = {a: [own(a), 0] for a in r["gaps"] + [x[0] for x in r["partly"]]}
+        for a, it in r["gwa"].items():
+            it[1] = status("a", a, it[0], None, r["id"])
+        U = {u["row"]: u for u in r["uni"]["rows"]}
+        gwb = []
+        for row, miss, unm, facts, fk in r["rgaps"]:
+            u = U[row]
+            flat = []
+            def walk(x):
+                if isinstance(x, str) and ":" in x:
+                    flat.append(x)
+                elif isinstance(x, (list, tuple)):
+                    for y in x:
+                        walk(y)
+            walk(u.get("keys")); walk([p[1] for p in u.get("parts") or []])
+            u_item = None
+            if unm:
+                w = why_of(set(), set(), [], None, A, r_low)
+                u_item = [w, status("b", row, w, None, r["id"])]
+            a_items = []
+            for a in miss:
+                lists = {e["kind"] for e in T if row in e["rows"] and a in e["attrs"]}
+                els = [K for K in dict.fromkeys(flat) if (K.split(":", 1)[0] in lists) or not any(a in e["attrs"] for e in T if row in e["rows"])]
+                c = {p for K in els for code, refs in (r["nr"].get(K) or []) if code == "cnt" for p in refs}
+                w = why_of(c, set(), [a], [a] if about_map(a) else None, A, r_low)
+                a_items.append([w, status("b", f"{a} @ {row}", w, "drawn" if els else "none drawn", r["id"])])
+            f_items = []
+            for name, (K, sl) in zip(facts, fk):
+                q = None
+                if K and K in r["nr"]:
+                    w = r["nr"][K]
+                elif K and K in named:
+                    ents = [e for e in T if e["kind"] == K.split(":", 1)[0] and row in e["rows"]]
+                    ats = sorted({x for e in ents for x in e["attrs"]}, key=order.index)
+                    w = why_of(set(), set(named[K]), ats, ats if ents and all(e.get("about") == "map" for e in ents) else None, A, r_low)
+                elif K:
+                    die(f"{r['id']}: {K} drawn by {row} is neither reasoned (D-042) nor named by the code map")
+                else:
+                    e = NT.get((row, sl)) or die(f"{r['id']}: el.why.names has no line for the {sl} {row} draws ({name[:60]})")
+                    hold = {F[f][0] for f in e.get("fields") or [] if f in held_f}
+                    w = why_of(hold if e.get("hold") == "cnt" else set(), hold if e.get("hold") == "alt" else set(), e["attrs"],
+                               e["attrs"] if e.get("about") == "map" else None, A, r_low)
+                if K and w[0][0] == "gap":
+                    q = _gap_q(K, fep, fj, r)
+                f_items.append([w, status("b", f"{sl} @ {row}", w, q, r["id"])])
+            gwb.append([u_item, a_items, f_items])
+        r["gwb"] = gwb
+    if missing and not partial:
+        die("one.gaps.status.table has no line for: " + "; ".join(sorted(set(m.split(": ", 1)[1] for m in missing))[:12]))
+    if not partial and len(used) != len(S):
+        die(f"one.gaps.status.table lines no gap on the page uses: {[S[i]['at'] + ' · ' + S[i]['why'] for i in sorted(set(range(len(S))) - used)]}")
+    if not partial and (set(NT) - {(row, sl) for r in rows for row, _m, _u, _f, fk in r["rgaps"] for K, sl in fk if not K}):
+        die(f"el.why.names lines no key-less name on the page uses: {sorted(set(NT) - {(row, sl) for r in rows for row, _m, _u, _f, fk in r['rgaps'] for K, sl in fk if not K})}")
+    n = {w: 0 for w in ST_WORDS}
+    for r in rows:
+        for it in list(r["gwa"].values()) + [x for g in r["gwb"] for x in ([g[0]] if g[0] else []) + g[1] + g[2]]:
+            if it[1] >= 0:
+                n[S[it[1]]["status"]] += 1
+    return n
 
 
 def ulook(spec: dict, unis: list) -> tuple:
