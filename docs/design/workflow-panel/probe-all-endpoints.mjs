@@ -572,8 +572,11 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
           /* what the row draws inside it: chips, a "+N more", a green count, its lines (a chip's own label, its icon and marks aside) */
           const lab = (c) => [...c.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
           const vis = (e) => e.offsetParent !== null;
-          if (row.row === 'CONNECTIONS') { row.groups = [...ch.querySelectorAll('.connbox > .sublbl')].map((sb) => { const box = sb.nextElementSibling;
-              return { head: norm(sb.innerText), chips: [...box.querySelectorAll(':scope > .xpl > .xrow > .xhead .pchip')].map(lab), more: norm((box.querySelector(':scope > .xpl > .xmore') || {}).textContent || '') }; });
+          if (row.row === 'CONNECTIONS') { row.groups = [...ch.querySelectorAll('.connbox > .sublbl')].map((sb) => { const box = sb.nextElementSibling, cs = [...box.querySelectorAll(':scope > .xpl > .xrow > .xhead .pchip')];
+              /* D-040: the group's look too — its icon, its trust badge, its list's class, each chip's class, glyph and twisty */
+              return { head: norm(sb.innerText), chips: cs.map(lab), more: norm((box.querySelector(':scope > .xpl > .xmore') || {}).textContent || ''),
+                icon: (sb.querySelector('svg') || {}).innerHTML || '', ttag: ((sb.querySelector('.ttag') || {}).className || ''), list: box.className,
+                chipCls: cs.map((c) => c.className.replace(/\bxnav\b/, '').trim()), chipIco: cs.map((c) => (c.querySelector('svg') || {}).innerHTML || ''), tw: cs.map((c) => c.previousElementSibling.className) }; });
             ch.querySelectorAll('.connbox .xmore').forEach((b) => b.click());           /* every member, the ones behind "+N more" too */
             const sbs = [...ch.querySelectorAll('.connbox > .sublbl')];
             row.groups.forEach((g, i) => { g.all = [...sbs[i].nextElementSibling.querySelectorAll(':scope > .xpl > .xrow > .xhead .pchip')].map(lab); }); }
@@ -685,20 +688,34 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
   for (const ep of SAMPLE9) {
     await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(60);
     const dom = await p.evaluate(() => ({ n: document.querySelector('#onehead h3').textContent, search: window.location.search,
-      uni: [...document.querySelectorAll('#ocol-uni .urow')].map((u) => ({ row: u.getAttribute('data-row'), count: (u.querySelector('.ut b') || {}).textContent || null, v: u.querySelector('.uv').textContent, icon: (u.querySelector('.ui svg') || {}).innerHTML || '' })),
+      /* changed 2026-09-24 (D-040): the column draws the station's card, so a row is read the way the station's card is read
+         below — its header (icon, title, count), then the words it draws after the header; a key-value row by its value */
+      uni: [...document.querySelectorAll('#ocol-uni .ust .urow')].map((u) => { const hd = u.querySelector(':scope > .sechd'), cnt = hd && hd.querySelector('.cnt'), kv = u.classList.contains('kv');
+        const ic = (hd || u).querySelector('svg'), t = hd ? u.innerText.slice(hd.innerText.length) : kv ? u.querySelector('.v').innerText : u.innerText;
+        return { row: u.getAttribute('data-row'), count: cnt ? cnt.textContent : null, text: t.replace(/\s+/g, ' ').trim(), icon: ic ? ic.innerHTML : '' }; }),
+      conns: [...document.querySelectorAll('#ocol-uni .urow[data-row="CONNECTIONS"] .connbox > .sublbl')].map((sb) => { const box = sb.nextElementSibling, cs = [...box.querySelectorAll(':scope > .xpl > .xrow > .xhead .pchip')];
+        const lab = (c) => [...c.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
+        return { head: sb.innerText.replace(/\s+/g, ' ').trim(), chips: cs.map(lab), more: ((box.querySelector(':scope > .xpl > .xmore') || {}).textContent || '').replace(/\s+/g, ' ').trim(),
+          icon: (sb.querySelector('svg') || {}).innerHTML || '', ttag: ((sb.querySelector('.ttag') || {}).className || ''), list: box.className,
+          chipCls: cs.map((c) => c.className.trim()), chipIco: cs.map((c) => (c.querySelector('svg') || {}).innerHTML || ''), tw: cs.map((c) => c.previousElementSibling.className) }; }),
+      behind: { chips: [...document.querySelectorAll('#ocol-uni .urow[data-row="CODE BEHIND"] .xpl > .xrow > .xhead .pchip')].map((c) => c.textContent.trim()),
+        more: ((document.querySelector('#ocol-uni .urow[data-row="CODE BEHIND"] .xpl > .xmore') || {}).textContent || '').trim() },
       /* changed 2026-09-23 (review finding 3/4): an attribute the card shows only in part is drawn in the column too, marked
          data-part — the whole gaps are the ones without that mark, and they are compared as before */
       gaps: [...document.querySelectorAll('#ocol-gaps .gap[data-attr]:not([data-part])')].map((g) => g.getAttribute('data-attr')),
       part: [...document.querySelectorAll('#ocol-gaps .gap[data-part]')].map((g) => [g.getAttribute('data-attr'), g.getAttribute('data-part')]),
-      uit: Object.fromEntries([...document.querySelectorAll('#ocol-uni .urow')].filter((u) => u.querySelector('.uit')).map((u) => [u.getAttribute('data-row'), u.querySelector('.uit').textContent])),
-      states: [...document.querySelectorAll('#ocol-uni .urow[data-row="TESTS"] .uit .st')].map((x) => [x.textContent, x.getAttribute('data-state')]),
-      testsOk: !!document.querySelector('#ocol-uni .urow[data-row="TESTS"] .ut b.ok'),
+      states: [...document.querySelectorAll('#ocol-uni .urow[data-row="TESTS"] .pchip[class*="st-"]')].filter((x) => x.offsetParent !== null).map((x) => [x.textContent.trim(), (x.className.match(/\bst-(\w+)/) || [])[1]]),
+      testsOk: !!document.querySelector('#ocol-uni .urow[data-row="TESTS"] .sechd .cnt.ok'),
       plain: (document.querySelector('#ocol-uni .plain') || {}).textContent || '',
       pairs: [...document.querySelectorAll('#ocol-cm .pair[data-attr]')].map((x) => ({ k: x.getAttribute('data-k'), attrs: x.getAttribute('data-attr').split(' ') })),
       lab: !!document.getElementById('lablink') && !!document.getElementById('labcmd') }));
     const r = ROW[ep], st = cards[ep];
     ok(dom.n === ep && dom.search === '?ep=' + slug9(ep), ep + ' · a click fills the section and the address', { n: dom.n, search: dom.search });
-    ok(JSON.stringify(dom.uni.map((u) => [u.row, u.count, u.v])) === JSON.stringify(r.uni.rows.map((u) => [u.row, u.count == null ? null : String(u.count), u.value])), ep + ' · the universe column draws its rows, counts and values', dom.uni.slice(0, 3));
+    /* changed 2026-09-24 (D-040): the rows were compared as flat values; the column now draws the station's card, so its rows and
+       counts are the row record's, and the words each row DRAWS are the station card's own words for that row, read off the station */
+    ok(JSON.stringify(dom.uni.map((u) => [u.row, u.count])) === JSON.stringify(r.uni.rows.map((u) => [u.row, u.count == null ? null : String(u.count)])), ep + ' · the universe column draws its rows and counts', dom.uni.slice(0, 3));
+    const wordsBad = dom.uni.filter((u) => { const s2 = u.row === 'HEAD' ? { text: st.head } : st.rows.find((x) => x.row === u.row); return !s2 || nv(s2.text) !== nv(u.text); }).map((u) => [u.row, u.text.slice(0, 90), ((st.rows.find((x) => x.row === u.row) || {}).text || st.head).slice(0, 90)]);
+    ok(!wordsBad.length, ep + ' · every row draws the words the station\'s card draws for it, in its order', wordsBad.slice(0, 2));
     /* the icon each row wears is the icon the station's card draws for that row (compared as drawn markup) */
     const iconBad = dom.uni.filter((u) => u.row !== 'HEAD').filter((u) => { const s2 = st.rows.find((x) => x.row === u.row); return !s2 || sq(s2.icon) !== sq(u.icon); }).map((u) => u.row);
     const headBad = sq(st.headIcon) !== sq(dom.uni[0].icon);
@@ -707,9 +724,14 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
     ok(JSON.stringify(dom.part) === JSON.stringify(r.partly.map((x) => [x[0], x[1] + '/' + x[2]])), ep + ' · the gaps column draws what the card shows only in part, marked so', dom.part);
     /* the lines drawn inside the rows: every station group's words and shown members, the listed callees, each case's state */
     const scn = st.rows.find((x) => x.row === 'CONNECTIONS'), sbh = st.rows.find((x) => x.row === 'CODE BEHIND'), sts = st.rows.find((x) => x.row === 'TESTS');
-    ok(!scn || scn.groups.every((g) => nv(dom.uit.CONNECTIONS || '').includes(nv(g.head)) && g.chips.every((m) => (dom.uit.CONNECTIONS || '').includes(m)) && (!g.more || (dom.uit.CONNECTIONS || '').includes(g.more))),
-      ep + ' · the Connections line draws each station group, its shown members and its more', [scn && scn.groups.slice(0, 2), dom.uit.CONNECTIONS]);
-    ok(!sbh || nv(dom.uit['CODE BEHIND']) === nv(sbh.chips.join(' ') + (sbh.more ? ' ' + sbh.more : '')), ep + ' · the Code behind line draws the callees the station lists and its more, nothing else', [sbh && sbh.more, dom.uit['CODE BEHIND']]);
+    /* D-040 · on two endpoints, the Connections row against the station's own card: the same groups in the same order, each with
+       its relation and count, its icon, its trust badge, its list's class, and each chip's class (the other end's kind), glyph,
+       label and twisty, then the same "+N more" */
+    if (ep === 'POST /setup/complete' || ep === 'GET /recipe-creation/gustify/stream') {
+      const key = (g) => [nv(g.head), sq(g.icon), g.ttag, g.list, g.chips, g.chipCls, g.chipIco.map(sq), g.tw, nv(g.more)];
+      ok(scn && scn.groups.length > 1 && JSON.stringify(dom.conns.map(key)) === JSON.stringify(scn.groups.map(key)),
+        ep + ' · the Connections row draws the station\'s groups — relation, count, icon, trust badge, chips with their kind\'s class and glyph, twisties, +N more', { page: dom.conns.map(key).slice(0, 2), station: scn && scn.groups.map(key).slice(0, 2) }); }
+    ok(!sbh || (JSON.stringify(dom.behind.chips) === JSON.stringify(sbh.chips) && nv(dom.behind.more) === nv(sbh.more)), ep + ' · the Code behind row draws the callees the station lists and its more, nothing else', [sbh && sbh.more, dom.behind]);
     ok(!sts || sts.chips.every(([cid, stt]) => dom.states.some(([c2, s2]) => c2 === cid && s2 === stt)), ep + ' · each case the station shows is drawn with its state', dom.states.slice(0, 3));
     ok(!sts || sts.ok === dom.testsOk, ep + ' · the Tests count is green exactly when the station\'s is', [sts && sts.ok, dom.testsOk]);
     ok(dom.plain.includes(view9.name), ep + ' · the universe column says which tier of the station it is', dom.plain);
@@ -720,6 +742,38 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
     const ks = new Set(dom.pairs.flatMap((x) => x.k.replace(/^c:/, '').split(',').map((y) => (x.k.startsWith('c:') ? 'c:' + y : x.k))));
     const miss = [...['handler', 'entity', 'segment', 'declared'].map((k) => 'h:' + k), ...D.cols.map((c) => 'c:' + c.id), ...OLD_PANEL.map((k) => 'd:' + k)].filter((k) => !ks.has(k));
     ok(!miss.length && dom.lab, ep + ' · every line the side panel held is in the code-map column (only its close button left, with the panel)', miss); }
+  /* D-040 · THE GAPS BOTH WAYS: two icon squares at the top of the gaps, today's reading the default and the agent's pick (dashed);
+     switching to the other way changes the list, and what it lists is the universe card's: a row the card draws, an attribute
+     of that row the code map holds nothing for here, or a name that row draws which no code-map value names. Remembered per viewer. */
+  { const GEP = 'POST /setup/complete', r = ROW[GEP], hold = holds(r);
+    await p.click('#board tr.row[data-ep="' + GEP + '"] td.id'); await p.waitForTimeout(60);
+    /* every member the card holds: its "+N more" opened, and a tabbed row read tab by tab (a row shows one tab at a time — the
+       Tests row's second corpus is drawn only once its tab is picked; found by the one run of 2026-09-24, fixed here) */
+    const readG = () => p.evaluate(() => { document.querySelectorAll('#ocol-uni .ust .xmore, #ocol-uni .ust .more').forEach((b) => b.click());
+      const tabbed = {}; document.querySelectorAll('#ocol-uni .ust .urow').forEach((u) => { const tabs = [...u.querySelectorAll('.tabbar .tab')];
+        tabbed[u.getAttribute('data-row')] = tabs.map((t) => { t.click(); return u.textContent; }).join(' \u2502 '); if (tabs.length) tabs[0].click(); });
+      return { dir: document.getElementById('ocol-gaps').getAttribute('data-dir'), count: document.querySelector('#ocol-gaps .gcount').textContent,
+        a: [...document.querySelectorAll('#ocol-gaps .gblk[data-block] .gap[data-attr]')].map((g) => g.getAttribute('data-attr')),
+        groups: [...document.querySelectorAll('#ocol-gaps .gblk[data-row]')].map((bx) => ({ row: bx.getAttribute('data-row'), attrs: [...bx.querySelectorAll('.gap[data-attr]')].map((g) => g.getAttribute('data-attr')),
+          unm: !!bx.querySelector('.gap.gunm'), facts: [...bx.querySelectorAll('.gfact')].map((f) => f.getAttribute('data-fact')) })),
+        squares: [...document.querySelectorAll('#ocol-gaps .opt[data-gdir]')].map((o) => [o.getAttribute('data-gdir'), o.getAttribute('aria-checked'), getComputedStyle(o).borderTopStyle, o.getAttribute('aria-label'), !!o.querySelector('svg')]),
+        cm: [...document.querySelectorAll('#ocol-cm .pv')].map((x) => x.innerText).join(' \u2502 '),
+        uni: Object.fromEntries([...document.querySelectorAll('#ocol-uni .ust .urow')].map((u) => [u.getAttribute('data-row'), u.textContent + ' \u2502 ' + (tabbed[u.getAttribute('data-row')] || '')])) }; });
+    const a0 = await readG();
+    ok(a0.dir === 'cm' && a0.squares.length === 2 && a0.squares[0][1] === 'true' && a0.squares[0][2] === 'dashed' && a0.squares[1][1] === 'false' && a0.squares[1][2] !== 'dashed'
+      && a0.squares.every((q) => q[3] && q[4]) && a0.a.length === r.gaps.length + r.partly.length, 'the gaps open on today\'s reading, the agent\'s pick dashed, beside a second icon square; each square carries its words', a0.squares);
+    await p.click('#ocol-gaps .opt[data-gdir="uni"]'); await p.waitForTimeout(60);
+    const b0 = await readG(), inWords = (f, t) => new RegExp('(?<![\\w])' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\w])', 'i').test(t);
+    const badB = b0.groups.filter((g) => !(g.row in b0.uni) || g.attrs.some((x) => hold.has(x) || !UMAP[g.row].includes(x)) || g.unm !== !UMAP[g.row].length
+      || g.facts.some((f) => inWords(f, b0.cm) || !b0.uni[g.row].toLowerCase().includes(f.toLowerCase()))).map((g) => g.row);
+    ok(b0.dir === 'uni' && b0.groups.length > 0 && !b0.a.length && b0.count !== a0.count && b0.groups.some((g) => g.facts.length) && !badB.length,
+      'switching the gaps to the other way changes the list: each item is a row the universe card draws, an attribute of it the code map holds nothing for here, or a name it draws that no code-map value names',
+      { bad: badB, count: [a0.count, b0.count], rows: b0.groups.map((g) => g.row) });
+    await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.click('#board tr.row[data-ep="' + GEP + '"] td.id'); await p.waitForTimeout(60);
+    const c0 = await readG();
+    ok(c0.dir === 'uni' && JSON.stringify(c0.groups) === JSON.stringify(b0.groups), 'the gaps\' direction is remembered for this viewer', c0.dir);
+    await p.click('#ocol-gaps .opt[data-gdir="cm"]'); await p.waitForTimeout(60);
+    ok((await readG()).dir === 'cm', 'the first square brings back today\'s reading'); }
   await p2.close();
 
   /* THE BLOCK MARKS: each block's icon and colour, expected from an independent read — the lab's registry run here, the tree's

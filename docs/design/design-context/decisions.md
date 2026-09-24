@@ -511,3 +511,20 @@ the table's measured column widths and follows its sideways scroll, so it reads 
 scrolled, the table's own header tucks behind it and its rows run on under the pinned row. Picking a row updates it; clicking the
 pinned row goes to ONE ENDPOINT.
 Revisit if: the pin's height crowds the screen at 1080 — then its block-name row folds away and only the column names stay.
+
+## D-040 — The universe column draws the station's own visual encoding, and the gaps go both ways
+Date: 2026-09-24 · Input: his message with a screenshot of the station's CONNECTIONS row (writes_to 3 · reads_from 7 · touches 2 ·
+walled by 1, each group badged INFERRED / STRUCTURAL, its items as coloured chips with kind icons, "+1 more").
+Decision, his: "In all the endpoints where we show one endpoint in the Gabe universe … Some groupings are not applied here and are
+not clear. For example, in the connections, write-to and read-from … are shown in the universe as very well-established different
+groups … Here they are just text items next to each other. We don't want that. We don't want to lose that kind of grouping,
+coloring, and labeling … so when I compare, I compare not just the text but also the visual encoding that we already created in
+the [Gabe] universe." And: "I'm not sure if the gaps are only in the left-to-right direction. Maybe there are some in the
+right-to-left direction. We should have a toggle button at the top of the gaps section, maybe two buttons to see the gaps between
+what the [Gabe] universe has in relation to the map and what the map might have in relation to the [Gabe] universe."
+Consequence: ONE ENDPOINT's left column draws each station row the way the station draws it — groups, their labels and badges,
+chips with their kind icons and colours, the "+N more" — its look lifted from gabe-universe.html itself, never retyped. THE GAPS
+carries two buttons: what the code map holds that the universe does not show (today's reading), and what the universe shows that
+the code map does not hold (new) — both marked as the agent's reading of "the gaps".
+Revisit if: a station row's look cannot be lifted without copying the station's code wholesale — then that row links to the
+station (?node=) instead of imitating it.

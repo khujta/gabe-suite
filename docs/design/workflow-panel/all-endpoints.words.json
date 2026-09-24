@@ -642,9 +642,10 @@
     "notFound": "The address names an endpoint this page does not hold ({ep}), so the first row is shown.",
     "uni": {
       "title": "the Gabe Universe",
-      "plain": "The card the station draws for this endpoint as it opens (the {uniTier} tier, functions hidden), row by row, in the station's order.",
+      "plain": "The card the station draws for this endpoint as it opens (the {uniTier} tier, functions hidden), row by row, in the station's order and in its own look: its groups, badges, chips, kind icons and colours, lifted from the station.",
       "silent": "The station draws no row here for: {rows}.",
-      "deeper": "On a deeper tier ({uniDeeper}) the station also draws functions, and its card for an endpoint changes: Connections gains the handler, and Code behind can be walked. The left column keeps the card the station opens on."
+      "deeper": "On a deeper tier ({uniDeeper}) the station also draws functions, and its card for an endpoint changes: Connections gains the handler, and Code behind can be walked. The left column keeps the card the station opens on.",
+      "twisty": "In the Gabe Universe this arrow opens the piece's own connections."
     },
     "gaps": {
       "title": "the gaps",
@@ -656,7 +657,28 @@
       "shows": "shown by no universe row",
       "partly": "shown in part",
       "partlyTip": "The card draws {names}: {n} of {of}. The rest is shown by no universe row.",
-      "perEp": "Some attributes are read per endpoint, from what the card draws for it. Request shape counts as shown when the card names the request schema, as a Connections chip or in the signature. A switch or an own guard counts as shown when a flag the card draws as walled by is a name its condition reads; some but not all of them makes the attribute shown in part."
+      "perEp": "Some attributes are read per endpoint, from what the card draws for it. Request shape counts as shown when the card names the request schema, as a Connections chip or in the signature. A switch or an own guard counts as shown when a flag the card draws as walled by is a name its condition reads; some but not all of them makes the attribute shown in part.",
+      "dir": {
+        "label": "which way the gaps are read",
+        "pick": "cm",
+        "opts": {
+          "cm": {
+            "name": "in the code map, not in the universe",
+            "plain": "What the code map holds for this endpoint that no row of the universe card shows."
+          },
+          "uni": {
+            "name": "in the universe, not in the code map",
+            "plain": "What the universe card shows for this endpoint that the code-map column does not hold."
+          }
+        }
+      },
+      "plainB": "What the universe card shows for this endpoint that the code map does not hold, row by row in the card's order: a row that maps to no attribute of the card, an attribute a row shows that the code map holds nothing for here, and a name a row draws (a guard, a connection, a callee, a case, a line it writes) that the code-map column never names. Counts are not compared, only names. Which attributes a row shows is the same proposal the other direction reads.",
+      "countB": "{n} attributes · {names} names",
+      "noneB": "None: the code map holds everything the universe card shows here.",
+      "unmapped": "maps to no attribute of the card",
+      "rshows": "the universe card shows it; the code map holds nothing for it here",
+      "rfact": "the universe card draws it; the code-map column never names it",
+      "rmore": "+{n} more"
     },
     "cm": {
       "title": "the code map",

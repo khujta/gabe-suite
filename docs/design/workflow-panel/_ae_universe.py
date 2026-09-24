@@ -15,8 +15,14 @@ THE MARKS. A block paired to a lab PART wears that part's icon and colour, read 
 running header and the blocks with no page yet have no registry row: their marks are the agent's pick, in the words file,
 and the page marks them so.
 
-THE GAPS. An inventory attribute the code map holds something for on this endpoint (a value that is not absent, unknown,
-zero or empty) and that no station row drawn for it shows. Which attributes a station row shows is an AUTHORED proposal
+THE LOOK (D-040). The column draws each row the way the station's card draws it: the card's CSS rules, its colour tokens
+per theme, its icon table and the small tables and words it draws with are lifted from the station's source (station_look,
+look_eval, ulook) and the page builds the card's own DOM from them. A rule, token, icon or pattern that is gone stops the build.
+
+THE GAPS, both ways. (a) An inventory attribute the code map holds something for on this endpoint (a value that is not absent,
+unknown, zero or empty) and that no station row drawn for it shows. (b) What a drawn station row shows that the code map does
+not hold: a row that maps to no attribute, an attribute of the row the code map holds nothing for here, a name the row draws
+that the code-map column never names (reverse_gaps). Which attributes a station row shows is an AUTHORED proposal
 (all-endpoints.words.json `universe.rows[*].attrs`), every id checked against the ruled tree and inventory-endpoint.md.
 """
 from __future__ import annotations
@@ -55,10 +61,10 @@ ROWS = [
     ("RISK", None),
     ("ABOVE", r'function aboveSec[\s\S]*?sechd\("(\w+)","(Above)"'),
 ]
-# the flag rows of the station's flagsSec: (key, icon, label) — lifted by these patterns
-FLAGS = [("god", r'flagrow god"\}, icoEl\("(\w+)"\), E\("span",\{class:"flbl"\},"([^"]+)"'),
-         ("untested", r'flagrow warn"\}, icoEl\("(\w+)"\), E\("span",\{class:"flbl"\},"(unguarded[^"]*)"'),
-         ("conflict", r'flagrow warn"\}, icoEl\("(\w+)"\), E\("span",\{class:"flbl"\},"(conflict · )"')]
+# the flag rows of the station's flagsSec: (key, row class, icon, label) — lifted by these patterns
+FLAGS = [("god", r'flagrow (god)"\}, icoEl\("(\w+)"\), E\("span",\{class:"flbl"\},"([^"]+)"'),
+         ("untested", r'flagrow (warn)"\}, icoEl\("(\w+)"\), E\("span",\{class:"flbl"\},"(unguarded[^"]*)"'),
+         ("conflict", r'flagrow (warn)"\}, icoEl\("(\w+)"\), E\("span",\{class:"flbl"\},"(conflict · )"')]
 
 
 def die(msg: str) -> None:
@@ -89,7 +95,7 @@ def station_spec() -> dict:
         m = re.search(rx, src)
         if not m:
             die(f"flag {key}: the station's source no longer matches {rx}")
-        flags[key] = {"icon": m.group(1), "label": m.group(2)}
+        flags[key] = {"cls": m.group(1), "icon": m.group(2), "label": m.group(3)}
     out["RISK"] = {"icon": flags["untested"]["icon"], "title": None, "flags": flags}
     # the connection groups' words and trust, as liveConns + relLabel write them
     m = re.search(r'function relLabel\(rel, dir\)\{ var O=\{([^}]*)\},[^\n]*\n\s*I=\{([^}]*)\};', src)
@@ -132,6 +138,188 @@ def station_spec() -> dict:
     if card["tiers"][card["bootTier"]]["fnOff"] != (card["showFns"] == "off"):
         die("the station's boot tier and its Functions default disagree — re-read the boot sequence")
     out["_card"] = card
+    out["_look"] = station_look(src)
+    return out
+
+
+# ── THE STATION'S LOOK (D-040): the universe column draws each row the way the station's card draws it, so the card's CSS
+# rules, its colour tokens, its kind icons and the small tables and words its card draws with are LIFTED from the station's
+# source here — never retyped. Every rule, token, icon and table named below must still be in the station, or the build
+# stops: that is the drift guard. The rules are scoped under `.ust` (the column's card) so they reach nothing else on the page.
+LOOK_CLASSES = {"pbody", "sec", "sechd", "ubar", "ufill", "sublbl", "kv", "pchip", "doc", "connbox", "more", "tabbar", "tab", "ttag",
+                "jsec", "jmeta", "jcid", "corp", "ncomp", "jfaces", "face", "flagssec", "flagrow", "xpl", "xrow", "xhead", "xtw",
+                "xtwsp", "xmeta", "xdeep", "xmore", "phead", "ptitle", "pname", "ptype", "pnav"}
+LOOK_MUST = (".pbody", ".sec", ".sechd", ".sechd svg", ".sechd .cnt", ".sechd .cnt.ok", ".ubar", ".ufill", ".sublbl", ".kv", ".kv .k",
+             ".kv .kico", ".pchip", ".pchip svg", ".pchip.model", ".pchip.schema", ".pchip.hook", ".pchip.fn", ".pchip.st-pass",
+             ".pchip.filecov", ".doc", ".connbox .cinf .pchip", ".more", ".ttag", ".ttag.structural", ".ttag.inferred", ".tabbar",
+             ".tab", ".tab.on", ".tab .tabn", ".jsec", ".jmeta", ".jcid", ".jcid.noc", ".corp", ".ncomp", ".jfaces", ".face",
+             ".face.fhome", ".flagssec", ".flagrow", ".flagrow .flbl", ".flagrow.warn", ".flagrow.god", ".xpl", ".xrow", ".xhead",
+             ".xtw", ".xtwsp", ".xtw::before", ".xmore", ".phead", ".ptitle", ".pname", ".ptype", ".pnav", ".pnav .pdot",
+             ".pnav .pnl", ".pnav .pdir", ".pnav .pcore")
+# the small tables and words the card draws with: name → pattern (its groups are the lifted values)
+LOOK_LIFT = {
+    "pico": r"""function pico\(n,cls,col\)\{ return '(<svg class="ico )'\+\(cls\|\|""\)\+'(" viewBox="[^"]+" width="\d+" height="\d+" fill="none" stroke=")'\+\(col\|\|"currentColor"\)\+'("[^>]*>)'\+\(P\[n\]\|\|GLYPH\[n\]\|\|""\)\+'</svg>'""",
+    "inline": r"""function svgInline\(kind, col, w\)\{ return '(<svg viewBox="0 0 24 24" width=")'\+\(w\|\|14\)\+'" height="'\+\(w\|\|14\)\+'(" fill="none" stroke=")'\+\(col\|\|'currentColor'\)\+'("[^>]*>)'\+GLYPH\[kind\]""",
+    "headW": r'svgInline\(_dispGlyph\(n\),K\.col,(\d+)\)',
+    "headEnt": r"""\(n\.ent\?"<span style='([^']+)'> · "\+n\.ent""",
+    "connico": r'var CONNICO=\{([^}]*)\}',
+    "chipcls": r'function chipCls\(k\)\{ return \((\{[^}]*\})\)\[k\]\|\|"(\w+)"; \}',
+    "state": r'var STATE_ICO=\{([^}]*)\}, STATE_LBL=\{([^}]*)\}',
+    "usage": r'E\("div",\{class:"ufill",style:"width:"\+Math\.min\((\d+),n\*(\d+)\)\+"%"\}\)\), E\("div",\{class:"sublbl"\}, icoEl\("(\w+)"\), breakdown\)',
+    "guards": r'icoEl\(m\.gate\?"(\w+)":"(\w+)"\),\s*m\.name\+" ", E\("span",\{style:"([^"]+)"\}, "· "\+m\.via\+\(m\.gate\?"( · \w+)":""\)\)',
+    "delivery": r'sechd\("\w+","Delivery"\), E\("div",\{class:"sublbl"\}, icoEl\("(\w+)"\), "([^"]+)", E\("span",\{style:"([^"]+)"\}',
+    "access": r'icoEl\(w\?"(\w+)":"(\w+)"\),\s*\(w\?"([^"]+)":"([^"]+)"\)\+o\.model\+" ", E\("span",\{style:"([^"]+)"\}, "· "\+o\.table\)',
+    "payload": r'E\("div",\{class:"sublbl"\}, icoEl\("(\w+)"\), p\.n\+" field"',
+    "conn": r'box\.append\(E\("div",\{class:"sublbl"\}, icoEl\(g\.icon\), g\.label\+" "\+g\.count, trustTag\(tr\)\),\s*E\("div",\{class:tr==="(\w+)"\?"(\w+)":""\}',
+    "ttag": r'E\("span",\{class:"ttag (\w+)",title:"([^"]+)"\},"(\w+)"\)\s*: E\("span",\{class:"ttag (\w+)",title:"([^"]+)"\},"(\w+)"\)',
+    "behind": r'E\("div",\{class:"sublbl"\}, icoEl\("(\w+)"\), "reach "\+b\.depth\+" · "\+b\.fns\+" behind"\+\(loaded\?"([^"]+)":"([^"]+)"\)\)',
+    "behindChip": r'return \{ label:nm, cls:"(\w+)", glyph:"(\w+)", node:node',
+    "testLabel": r'function testCredit\(c\)\{ var st=c\.state\|\|"unknown", label=/([^/]+)/\.test\(c\.cid\|\|""\)',
+    "testGroup": r'return G\(k,"(\w+)", cs\.length\|\|fs\.length',
+    "dcap": r'var w=E\("div"\), DCAP=(\d+);',
+    "seeLess": r'lb=E\("span",\{class:"more",style:"cursor:pointer;display:none"\},"([^"]+)"\)',
+    "casesMore": r'"\+"\+moreN\+" ([^"]+)"\)\);',
+    "fileCov": r'icoEl\("(\w+)"\), "([^"]+) · "\+fs\.length\+" \(([^)]*)\)"',
+    "fileChip": r'E\("span",\{class:"pchip (\w+)", title:"([^"]+)"\}, icoEl\("(\w+)"\), f\.name\)',
+    "jReal": r'var real=/([^/]+)/\.test\(j\.cid\|\|""\)',
+    "face": r'style:"color:hsl\("\+hue\+" ([\d.]+%) ([\d.]+%)\)"\}, icoEl\("(\w+)"\)\)',
+    "identity": r'kv\("(\w+)","(entity)", n\.ent\), kv\("(\w+)","(layer)", n\.layer\|\|n\.K\.layer\),[^\n]*\n\s*kv\("(\w+)","(fan-in)", fi\+" caller"',
+    "sig": r'det\.gsig\?E\("div",\{class:"doc",style:"([^"]+)"\}, det\.gsig\):null,\s*\(s\.lines!=null\)\?kv\("(\w+)","(\w+)"',
+    "source": r'kv\("(\w+)","(file)", det\.file\+\(det\.flines\?\(":"\+det\.flines\):""\)\),\s*det\.status\?kv\("(\w+)","(status)", det\.status\)',
+    "aboveCore": r'navRow\("__core","([^"]+)"\+n\.sub',
+    "aboveEnt": r'navRow\(null,"([^"]+)"\+\(window\.__uniEntLabel',
+    "aboveAll": r'navRow\("(\w+)","(everything)", null, null, function\(\)\{ panelAll\(\); \}, "up"\)\);\s*return w;',
+    "dirUp": r'function dirIco\(dir\)\{ return dir\?E\("span",\{class:"pdir "\+dir\},icoEl\(dir==="down"\?"drill":"(\w+)"\)\):null; \}',
+    "coreLead": r'E\("span",\{class:"pki pcore",html:\(window\.__uniCoreIco\?__uniCoreIco\(c\|\|"(\w+)",\d+\)',
+    "entFallback": r'ENT\[e\]=\(_C4\.colors&&_C4\.colors\[e\]\)\|\|"(#[0-9a-fA-F]{3,6})"',
+    "entHue": r'(function entHue\(s\)\{[^\n]*?return h%360; \})',
+}
+LOOK_EMPTY_OK = {"burst"}      # the conflict flag names a pill icon the card's icon table lacks, so the station draws it empty
+
+
+def _css_rules(css: str) -> list:
+    """(selector list, body) for every rule, brace-balanced; the rules inside an @media/@supports wrapper are skipped (the card
+    sets none), comments dropped."""
+    out, i, n = [], 0, len(css)
+    while i < n:
+        j = css.find("{", i)
+        if j < 0:
+            break
+        sel = re.sub(r"/\*.*?\*/", "", css[i:j], flags=re.S).split("/*")[0].strip()
+        depth, k = 1, j + 1
+        while k < n and depth:
+            depth += {"{": 1, "}": -1}.get(css[k], 0)
+            k += 1
+        if sel and not sel.startswith("@"):
+            out.append((sel, css[j + 1:k - 1]))
+        i = k
+    return out
+
+
+def _literal(src: str, marker: str) -> str:
+    """The balanced `{…}` a marker opens or is followed by (string- and comment-aware)."""
+    if src.count(marker) != 1:
+        die(f"the station holds {src.count(marker)} of {marker!r}, not one")
+    i = src.index(marker)
+    j = src.index("{", i + (marker.rfind("{") if "{" in marker else len(marker)))
+    depth, q, k = 0, None, j
+    while k < len(src):
+        c = src[k]
+        if q:
+            k += 2 if c == "\\" else 1
+            q = None if c == q else q
+            continue
+        if src.startswith("//", k) or src.startswith("/*", k):
+            k = src.index("\n" if src[k + 1] == "/" else "*/", k) + (1 if src[k + 1] == "/" else 2)
+            continue
+        if c in "'\"":
+            q = c
+        depth += {"{": 1, "}": -1}.get(c, 0)
+        k += 1
+        if not depth:
+            return src[j:k]
+    die(f"unbalanced literal after {marker!r}")
+
+
+def station_look(src: str) -> dict:
+    css = "\n".join(re.findall(r"<style[^>]*>(.*?)</style>", src, re.S))
+    rules, have, allr = [], set(), _css_rules(css)
+    for sel, body in allr:
+        keep = [s.strip() for s in sel.split(",") if (m := re.match(r"\.([\w-]+)", s.strip())) and m.group(1) in LOOK_CLASSES]
+        if not keep:
+            continue
+        have |= set(keep)
+        scoped = [".ust " + re.sub(r"\.sec(?![\w-])", ".usec", s) for s in keep]      # the kit's own section class is .sec
+        rules.append(", ".join(scoped) + "{ " + " ".join(body.split()) + " }")
+    miss = [s for s in LOOK_MUST if s not in have]
+    if miss:
+        die(f"the station's card no longer has these CSS rules: {miss} — re-read its <style>")
+    # the colour tokens the rules read: the station's :root (its dark default) and :root[data-theme="light"]
+    tok = {"dark": {}, "light": {}}
+    for sel, body in allr:
+        key = {":root": "dark", ':root[data-theme="light"]': "light"}.get(sel)
+        if key:
+            tok[key].update((a, " ".join(b.split())) for a, b in re.findall(r"(--[\w-]+)\s*:\s*([^;]+)", body))
+    base = re.search(r"html,body\{[^}]*?font:([^;]+);", css)
+    ground = re.search(r"\.panel\{[^}]*?background:(var\(--[\w-]+\))", css)
+    if not base or not ground:
+        die("the station's body font or its panel ground no longer match")
+    text = "\n".join(rules) + ground.group(1)
+    names = sorted(set(re.findall(r"var\((--[\w-]+)\)", text)) | set(re.findall(r"var\((--[\w-]+),", text)))
+    fallback = set(re.findall(r"var\((--[\w-]+),", text)) - set(re.findall(r"var\((--[\w-]+)\)", text))
+    lost = [v for v in names if v not in tok["dark"] and v not in fallback]
+    if lost:
+        die(f"CSS tokens the card's rules read that the station's :root no longer defines: {lost}")
+    dark = {v: tok["dark"][v] for v in names if v in tok["dark"]}
+    light = {v: tok["light"].get(v, tok["dark"][v]) for v in names if v in tok["dark"]}
+    lift = {}
+    for k, rx in LOOK_LIFT.items():
+        m = re.search(rx, src)
+        if not m:
+            die(f"card look {k}: the station's source no longer matches {rx[:90]}")
+        lift[k] = m.groups()
+    pairs = lambda x: dict(re.findall(r'"?(\w+)"?:"([^"]*)"', x))
+    js = {"glyph": _literal(src, "var GLYPH={"), "p": _literal(src, "var P={ link:"), "kindcol": _literal(src, "var KINDCOL={"),
+          "core": _literal(src, "var PATHS="),
+          "ink": "function inkCol(hex)" + _literal(src, "function inkCol(hex)"), "hue": lift["entHue"][0],
+          # every later GLYPH.<name>='…' (a guarded `if(!GLYPH.x)` one keeps a name already set) and the P.<name>='…' additions
+          "gx": [[g, lit, bool(guard)] for guard, g, lit in re.findall(r"(if\(!GLYPH\.\w+\)\s*)?(?<![\w.])GLYPH\.(\w+)\s*=\s*('(?:[^'\\]|\\.)*')", src)],
+          "galias": re.findall(r"GLYPH\.(\w+)=GLYPH\.(\w+);", src),
+          "px": re.findall(r"^\s*P\.(\w+)=('(?:[^'\\]|\\.)*');", src, re.M)}
+    if not js["px"]:
+        die("the station's card icon table no longer gains its P.up / P.drill markers")
+    return {"css": rules, "dark": dark, "light": light, "font": base.group(1).strip(), "ground": ground.group(1), "lift": lift, "js": js,
+            "connico": pairs(lift["connico"][0]), "chipcls": [pairs(lift["chipcls"][0]), lift["chipcls"][1]],
+            "stateIco": pairs(lift["state"][0]), "stateLbl": pairs(lift["state"][1])}
+
+
+def look_eval(look: dict, need: set, kinds: set, ents: set) -> dict:
+    """Run the lifted station code under node: the card's icons (pico: P[n] || GLYPH[n]), the endpoint's kind colour and its
+    light-theme ink (inkCol), the core glyph, and each entity's face hue (entHue). A name the card cannot draw stops the build;
+    a connection's other-end KIND the glyph table lacks draws the station's generic glyph, as the station draws it."""
+    J = look["js"]
+    code = r"""
+const I=JSON.parse(process.argv[1]); const window={}; const out={ico:{},missing:[],hue:{}};
+const GLYPH=eval('('+I.glyph+')'); for(const [n,lit,g] of I.gx){ if(g && GLYPH[n]) continue; GLYPH[n]=eval(lit); }
+for(const [a,b] of I.galias){ if(!GLYPH[a]) GLYPH[a]=GLYPH[b]; }
+const P=eval('('+I.p+')'); for(const [n,lit] of I.px) P[n]=eval(lit);
+const PATHS=eval('('+I.core+')'); const KINDCOL=eval('('+I.kindcol+')');
+const inkCol=eval('('+I.ink+')'); const entHue=eval('('+I.hue+')');
+for(const n of I.need){ const s=P[n]||GLYPH[n]||''; if(!s && I.emptyOk.indexOf(n)<0) out.missing.push(n); out.ico[n]=s; }
+for(const n of I.kinds){ out.ico[n]=P[n]||GLYPH[n]||GLYPH.__generic||''; if(!out.ico[n]) out.missing.push(n); }
+out.core=PATHS[I.core_mode]||'';
+out.kind={dark:KINDCOL.endpoint}; window.__uniTheme='light'; out.kind.light=inkCol(KINDCOL.endpoint);
+for(const e of I.ents) out.hue[e]=entHue(e);
+process.stdout.write(JSON.stringify(out));"""
+    arg = dict(J, need=sorted(need), kinds=sorted(kinds), emptyOk=sorted(LOOK_EMPTY_OK), ents=sorted(ents), core_mode=look["lift"]["coreLead"][0])
+    r = subprocess.run(["node", "-e", code, json.dumps(arg)], capture_output=True, text=True)
+    if r.returncode != 0:
+        die("the station's lifted card code could not run under node: " + r.stderr.strip()[-400:])
+    out = json.loads(r.stdout)
+    if out["missing"]:
+        die(f"icons the station's card no longer draws: {out['missing']}")
+    if not out["core"] or not out["kind"]["dark"]:
+        die("the station's core glyph or its endpoint colour could not be read")
     return out
 
 
@@ -231,7 +419,7 @@ def _station_links(feeds: dict, spec: dict) -> tuple:
 def station_conns(ID: str, feeds: dict, spec: dict, say: dict) -> list:
     """liveConns for one endpoint: its wires grouped by relation · direction · the other end's KIND, in the order the station
     meets them (outgoing groups first), each [label, count, trust, the members its list shows, how many more, rel, dir, every
-    member]. The last three are for this generator's own reading (the gaps) and never drawn."""
+    member, the other end's kind]."""
     nid, links = _station_links(feeds, spec)
     rel, cap = spec["_rel"], spec["_card"]["connCap"]
     out = []
@@ -241,13 +429,13 @@ def station_conns(ID: str, feeds: dict, spec: dict, say: dict) -> list:
             if (s_ if d == "out" else t_) != ID:
                 continue
             o = nid[t_ if d == "out" else s_]
-            g = by.setdefault(f"{r_}|{d}|{o['kind']}", {"rel": r_, "items": []})
+            g = by.setdefault(f"{r_}|{d}|{o['kind']}", {"rel": r_, "items": [], "kind": o["kind"]})
             g["items"].append(o["label"])
         for g in by.values():
             lab = (rel[d].get(g["rel"]) or (g["rel"] + ("" if d == "out" else " (in)")))
             tr = say["structural"] if g["rel"] in rel["structural"] else say["inferred"]
             it = g["items"]
-            out.append([lab, len(it), tr, it[:cap], max(0, len(it) - cap), g["rel"], d, it])
+            out.append([lab, len(it), tr, it[:cap], max(0, len(it) - cap), g["rel"], d, it, g["kind"]])
     return out
 
 
@@ -292,7 +480,8 @@ def universe(L: dict, spec: dict, feeds: dict, U: dict) -> dict:
     def add(row, count=None, value="", items=None):
         rows.append({"row": row, "icon": spec[row]["icon"], "title": spec[row]["title"], "count": count, "value": value, "items": items or []})
 
-    add("HEAD", None, f"{I['label']} · {I['type']} · {ent}")
+    add("HEAD", None, f"{I['label']} · {I['type']} · {ent}", [I["label"], I["type"], ent])
+    LK = spec["_look"]
     u = I.get("usage")
     n_use = ((u.get("api") or 0) + (u.get("internal") or 0)) if u else (I.get("fanin") or 0)
     add("USAGE", n_use, (f"{u.get('api') or 0} {say['api']} · {u.get('internal') or 0} {say['internal']}") if u
@@ -352,7 +541,8 @@ def universe(L: dict, spec: dict, feeds: dict, U: dict) -> dict:
     cg = station_conns(ID, feeds, spec, say)
     tot = sum(x[1] for x in cg)
     # liveConns always shows its total, a 0 included (showCount)
-    add("CONNECTIONS", tot, " · ".join(f"{g[0]} {g[1]}" for g in cg) or say["noEdges"], [g[:5] for g in cg])
+    add("CONNECTIONS", tot, " · ".join(f"{g[0]} {g[1]}" for g in cg) or say["noEdges"],
+        [g[:5] + [g[8], LK["connico"].get(g[5]) or "link", g[7][cap_c:]] for g in cg for cap_c in [card["connCap"]]])
     drawn = {"members": sorted({m for g in cg for m in g[7]}), "walls": sorted({m for g in cg if g[5] == "walls" and g[6] == "in" for m in g[7]})}
     b = fx.get("behind") or {}
     if b.get("fns"):
@@ -361,6 +551,7 @@ def universe(L: dict, spec: dict, feeds: dict, U: dict) -> dict:
         nm = list(b.get("names") or [])
         add("CODE BEHIND", b["fns"], f"{say['reach']} {b.get('depth')} · {b['fns']} {say['behind']}", nm[:card["behindCap"]])
         rows[-1]["more"] = max(0, len(nm) - card["behindCap"])
+        rows[-1]["rest"] = nm[card["behindCap"]:]
     else:
         silent.append("CODE BEHIND")
     byc, fil = {}, {}
@@ -373,17 +564,21 @@ def universe(L: dict, spec: dict, feeds: dict, U: dict) -> dict:
     tsum = sum(x[1] for x in tg)
     cs = tests.get("cases") or []
     add("TESTS", tsum if tg else None, " · ".join(f"{k} {n}" for k, n in tg) if tg else say["noCases"],
-        [[c["cid"], c.get("state") or "unknown"] for c in cs])
+        [[c["cid"], c.get("state") or "unknown", c.get("corpus") or "api", c.get("name") or ""] for c in cs])
     rows[-1]["ok"] = bool(cs) and all(c.get("state") == card["okState"] for c in cs)   # the station's green count (okAll)
+    rows[-1].update(tabs=tg, files=[[f.get("name"), f.get("corpus") or "api"] for f in tests.get("case_files") or []], casesMore=tests.get("cases_more") or 0)
     js_ = tests.get("journeys") or []
     if js_:
         mo = tests.get("journeys_more") or 0
         add("JOURNEYS", f"{len(js_)}+{mo}" if mo else len(js_), " · ".join(j["cid"] for j in js_[:3]) + (" …" if len(js_) > 3 else ""),
             [[j["cid"], j.get("corpus"), j.get("comp") or 0, list(j.get("entities") or [])] for j in js_])
+        rows[-1]["home"] = ent
     else:
         silent.append("JOURNEYS")
     fi = I.get("fanin") or 0
     add("IDENTITY", None, f"{say['entity']} {ent} · {say['layer']} {I.get('layer')} · {say['fanin']} {fi} " + (say["caller"] if fi == 1 else say["callers"]) + " " + say["indegree"])
+    ix = LK["lift"]["identity"]
+    rows[-1]["kvs"] = [[ix[0], ix[1], ent], [ix[2], ix[3], I.get("layer")], [ix[4], ix[5], f"{fi} " + (say["caller"] if fi == 1 else say["callers"]) + " " + say["indegree"]]]
     sg = I.get("sig") or {}
     if I.get("gsig") or I.get("sig"):
         body = ((say["async"] + " · ") if sg.get("async") else "") + f"{sg.get('lines')} {say['lines']} · → {sg.get('returns') or '—'}" if sg.get("lines") is not None else ""
@@ -396,20 +591,22 @@ def universe(L: dict, spec: dict, feeds: dict, U: dict) -> dict:
         silent.append("DOCSTRING")
     if I.get("file"):
         add("SOURCE", None, f"{I['file']}" + (f":{I['flines']}" if I.get("flines") else "") + (f" · {say['status']} {I['status']}" if I.get("status") else ""))
+        sx = LK["lift"]["source"]
+        rows[-1]["kvs"] = [[sx[0], sx[1], f"{I['file']}" + (f":{I['flines']}" if I.get("flines") else "")]] + ([[sx[2], sx[3], str(I["status"])]] if I.get("status") else [])
     else:
         silent.append("SOURCE")
     rk, fl = I.get("risk") or {}, spec["RISK"]["flags"]
     flags = []
     if rk.get("god") and not spec["_godOff"]:
-        flags.append(["god", fl["god"]["icon"], fl["god"]["label"]])
+        flags.append(["god", fl["god"]["icon"], fl["god"]["label"], fl["god"]["cls"]])
     # the station's test floor (_testFloor): the cases drawn, the capped overflow, and the case counts file coverage names —
     # the lab's `risk.untested` counts named cases only, so a web file that covers the endpoint is read here the station's way
     floor = len(tests.get("cases") or []) + (tests.get("cases_more") or 0) + sum(
         int(m.group(1)) for f in (tests.get("case_files") or []) for m in [re.search(r"(\d+)\s*case", f.get("name") or "")] if m)
     if floor == 0:
-        flags.append(["untested", fl["untested"]["icon"], fl["untested"]["label"]])
+        flags.append(["untested", fl["untested"]["icon"], fl["untested"]["label"], fl["untested"]["cls"]])
     if rk.get("conflict"):
-        flags.append(["conflict", fl["conflict"]["icon"], fl["conflict"]["label"] + rk["conflict"]])
+        flags.append(["conflict", fl["conflict"]["icon"], fl["conflict"]["label"] + rk["conflict"], fl["conflict"]["cls"]])
     if flags:
         rows.append({"row": "RISK", "icon": flags[0][1], "title": None, "count": None, "value": " · ".join(f[2] for f in flags), "items": flags})
     else:
@@ -417,6 +614,7 @@ def universe(L: dict, spec: dict, feeds: dict, U: dict) -> dict:
     uc = ((feeds["pieces"].get(claim) or {}).get("usecases") or {})
     sub = next((gp for gp, v in uc.items() if I["label"] in ((v or {}).get("cls") or []) or I["label"] in ((v or {}).get("eps") or [])), "other")
     add("ABOVE", None, f"{say['cluster']} · {sub} · {say['entity']} · {ent_label(ent, feeds)} · {say['everything']}", [sub, ent_label(ent, feeds)])
+    rows[-1]["dot"] = (feeds["graph"].get("colors") or {}).get(ent) or LK["lift"]["entFallback"][0]      # ENT[e], as the station fills it
     return {"rows": rows, "silent": silent, "_drawn": dict(drawn, sig=I.get("gsig") or "")}
 
 
@@ -523,6 +721,71 @@ def gaps(carried: set, uni: dict, U: dict, here: dict) -> tuple:
     return full, part
 
 
+def _strings(x) -> list:
+    """Every string and number a value holds, flattened (a dict's values, never its keys)."""
+    if isinstance(x, dict):
+        return [s for v in x.values() for s in _strings(v)]
+    if isinstance(x, (list, tuple)):
+        return [s for v in x for s in _strings(v)]
+    return [] if x is None or isinstance(x, bool) else [str(x)]
+
+
+def names_drawn(u: dict) -> list:
+    """The NAMES a universe row draws, as [what the row shows, the names that count as holding it]: a guard, an access's table,
+    a connection's member, a callee, a case, a journey, a key-value line's value, a flag, a sentence the row writes. Counts
+    are not names; the head and Above name the entity and the cluster."""
+    r, it = u["row"], u.get("items") or []
+    if r == "HEAD":
+        return [[it[2], [it[2]]]]
+    if r == "GUARDS":
+        return [[g[0], [g[0]]] for g in it]
+    if r == "ACCESSES":
+        return [[f"{o[1]} · {o[2]}", [o[2]]] for o in {(o[1], o[2]): o for o in it}.values()]
+    if r == "CONNECTIONS":
+        return [[m, [m]] for g in it for m in g[3] + g[7]]
+    if r == "CODE BEHIND":
+        return [[n, [n]] for n in it + (u.get("rest") or [])]
+    if r == "TESTS":
+        return [[c[0], [c[0]]] for c in it] + [[f[0], [f[0]]] for f in u.get("files") or []]
+    if r == "JOURNEYS":
+        return [[j[0], [j[0]]] for j in it]
+    if r in ("IDENTITY", "SOURCE"):
+        return [[str(v), [str(v)]] for _i, _k, v in u["kvs"][:2] if v not in (None, "")]
+    if r == "SIGNATURE":
+        return [[it[0], [it[0]]]] if it and it[0] else []
+    if r == "RISK":
+        return [[f[2], [f[2]]] for f in it]
+    if r == "ABOVE":
+        return [[x, [x]] for x in it]
+    if r == "PAYLOAD":
+        return [[m.group(1), [m.group(1)]] for m in [re.search(r"→ (\S+)", u["value"])] if m]
+    if r in ("EVIDENCE", "MODEL ROW", "DOCSTRING", "DELIVERY"):
+        return [[u["value"], [u["value"]]]]
+    return []
+
+
+def reverse_gaps(row: dict, uni: dict, U: dict, carried_attrs: set) -> list:
+    """THE GAPS, the other way (D-040): what the universe card shows for this endpoint that the code-map column does not hold.
+    Per drawn row, in the card's order: [row, the row's attributes the code map holds nothing for here, whether the row maps to
+    no attribute at all, the names it draws that the code-map column never names]. The column's words are the values it
+    draws (the head, every cell, every detail); a name is held when one of its names is a whole word there, any case. A
+    connection's model counts as held by its table when the card's own Accesses pair them."""
+    hay = " │ ".join(_strings([row[k] for k in ("m", "p", "fn", "file", "line", "ent", "seg", "declared")] + [row["v"], row["d"]]))
+    table_of = {}
+    for o in next((u["items"] for u in uni["rows"] if u["row"] == "ACCESSES"), []):
+        table_of.setdefault(o[1], []).append(o[2])
+    held = lambda keys: any(re.search(r"(?<![\w])" + re.escape(k) + r"(?![\w])", hay, re.I) for k in keys if k)
+    out = []
+    for u in uni["rows"]:
+        attrs = (U["rows"].get(u["row"]) or {}).get("attrs") or []
+        miss = [a for a in attrs if a not in carried_attrs]
+        facts = [n for n, keys in names_drawn(u) if not held(keys + [t for k in keys for t in table_of.get(k, [])])]
+        facts = [] if not attrs else list(dict.fromkeys(facts))
+        if miss or not attrs or facts:
+            out.append([u["row"], miss, not attrs, facts])
+    return out
+
+
 def _has(x) -> bool:
     """A value the code map HOLDS something for: not absent or unknown, not zero, not an empty list, not none."""
     if x is None or x in ("absent", "unknown", "none", ""):
@@ -570,12 +833,33 @@ def carried(row: dict, cols: list, CM: dict) -> dict:
     return out
 
 
-def as_station_draws(rows: list, pico: set) -> None:
-    """The station's card draws a row's icon with pico(n) = P[n] || GLYPH[n] — a name found only in its pill set (ICO) draws an
-    EMPTY glyph there (the conflict flag's "burst"). The universe column shows what the station draws, so such an icon is None."""
-    for r in rows:
-        if r.get("icon") and r["icon"] not in pico and r["row"] != "HEAD":
-            r["icon"] = None
-        for f in (r["items"] if r["row"] == "RISK" else []):
-            if f[1] not in pico:
-                f[1] = None
+def ulook(spec: dict, unis: list) -> tuple:
+    """The page's copy of the station's card look: (CSS — the tokens per theme, then the card's rules scoped to .ust; the
+    tables the page draws the rows with). Every icon comes out of the station's own icon table, run by look_eval."""
+    LK, lf = spec["_look"], spec["_look"]["lift"]
+    need = {x["icon"] for k, x in spec.items() if not k.startswith("_") and isinstance(x, dict) and x.get("icon")}
+    need |= {f["icon"] for f in spec["RISK"]["flags"].values()} | set(LK["connico"].values()) | set(LK["stateIco"].values())
+    need |= {lf[k][i] for k, i in (("usage", 2), ("guards", 0), ("guards", 1), ("delivery", 0), ("access", 0), ("access", 1), ("payload", 0),
+                                   ("behind", 0), ("behindChip", 1), ("testGroup", 0), ("fileCov", 0), ("fileChip", 2), ("face", 2), ("identity", 0), ("identity", 2),
+                                   ("identity", 4), ("sig", 1), ("source", 0), ("source", 2), ("aboveAll", 0), ("dirUp", 0))}
+    kinds = {g[5] for u in unis for r in u["rows"] if r["row"] == "CONNECTIONS" for g in r["items"]}
+    ents = {e for u in unis for r in u["rows"] if r["row"] == "JOURNEYS" for j in r["items"] for e in j[3]}
+    ev = look_eval(LK, need, kinds, ents)
+    decl = lambda d, ink: " ".join(f"{k}:{v};" for k, v in d.items()) + f" --uk-endpoint:{ink};"
+    css = ["/* THE GABE UNIVERSE'S CARD LOOK — lifted from templates/center/shell/gabe-universe.html by _ae_universe.py (D-040):",
+           "   its colour tokens per theme, then its card rules, scoped to .ust. Never edit here; the generator stops when one is gone. */",
+           ".ust{ " + decl(LK["light"], ev["kind"]["light"]) + f" font:{LK['font']}; color:var(--ink); background:{LK['ground']}; }}",
+           '@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .ust{ ' + decl(LK["dark"], ev["kind"]["dark"]) + " } }",
+           ':root[data-theme="dark"] .ust{ ' + decl(LK["dark"], ev["kind"]["dark"]) + " }"] + LK["css"]
+    card = spec["_card"]
+    return "\n".join(css), {
+        "svg": list(lf["pico"]), "inline": list(lf["inline"]), "headW": int(lf["headW"][0]), "headEnt": lf["headEnt"][0],
+        "ico": ev["ico"], "core": ev["core"], "kindCol": ev["kind"]["dark"],
+        "hue": {e: f"hsl({h} {lf['face'][0]} {lf['face'][1]})" for e, h in ev["hue"].items()}, "faceIco": lf["face"][2],
+        "chipCls": LK["chipcls"][0], "chipDef": LK["chipcls"][1], "stateIco": LK["stateIco"], "stateLbl": LK["stateLbl"],
+        "usage": [int(lf["usage"][0]), int(lf["usage"][1]), lf["usage"][2]], "guards": lf["guards"], "delivery": lf["delivery"],
+        "access": lf["access"], "payload": lf["payload"][0], "inferred": lf["conn"], "ttag": lf["ttag"], "behind": lf["behind"], "behindChip": lf["behindChip"],
+        "testLabel": lf["testLabel"][0], "testGroup": lf["testGroup"][0], "dcap": int(lf["dcap"][0]), "seeLess": lf["seeLess"][0],
+        "casesMore": lf["casesMore"][0], "fileCov": lf["fileCov"], "fileChip": lf["fileChip"], "jReal": lf["jReal"][0], "sig": lf["sig"],
+        "above": [lf["aboveCore"][0], lf["aboveEnt"][0], lf["aboveAll"][0], lf["aboveAll"][1], lf["dirUp"][0]],
+        "connCap": card["connCap"], "behindCap": card["behindCap"], "fnOff": card["tiers"][card["bootTier"]]["fnOff"]}

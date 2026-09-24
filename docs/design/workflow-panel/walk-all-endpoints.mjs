@@ -86,6 +86,9 @@ await pic('sorted-by-tables');
 await step('sort-again-reverses', '#board thead th[data-col="tables"] .hd', 'the same header, again');
 say('sorted says', await txt('#sortsays'));
 await step('back-to-path-order', '#board thead tr.ch th.idh .hd', 'the corner of the header row');
+// the page to its top first: scrolled down, the table's own header tucks behind the pinned row (D-039) and a click at the board
+// strip's centre lands on the pinned row instead (found 2026-09-24, the first walk after the pin)
+await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
 { // the largest piece of the "refused" strip — read which one it is from the page, then click it by mouse
   const bin = await p.$$eval('#board thead th[data-col="e_refusal"] .sg', (ss) => ss.map((s) => [s.getAttribute('data-bin'), +s.getAttribute('data-n')]).sort((a, b) => b[1] - a[1])[0][0]);
   await step('light-a-strip-piece', '#board thead th[data-col="e_refusal"] .sg[data-bin="' + bin + '"]', 'the biggest piece of the "refused" strip');
@@ -132,6 +135,23 @@ await step('one-info-close', '#itog-one', 'the same toggle, again');
   await p.mouse.move(bx.x + 10, bx.y + bx.height / 2); await wait(250);
   say('pointing at a gap', { gap: await p.$eval('#ocol-gaps .gap', (e) => e.textContent), lit: await p.$$eval('#ocol-cm [data-lit-attr="true"] .pk', (xs) => xs.map((x) => x.textContent)), tip: await txt('#tip') });
   await pic('point-at-a-gap'); }
+{ // D-040: the universe column draws the station's own card — the CONNECTIONS row photographed on its own, to set beside the
+  // station's card (the picture the universe link takes below)
+  const cn = await p.$('#ocol-uni .urow[data-row="CONNECTIONS"]'); await cn.scrollIntoViewIfNeeded(); await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(150);
+  const pageBox = (sel) => p.$eval(sel, (e) => { const r = e.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height }; });
+  const cb = await pageBox('#ocol-uni .urow[data-row="CONNECTIONS"]'); n++;
+  await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-the-universe-connections.png'), clip: { x: Math.max(0, cb.x - 12), y: Math.max(0, cb.y - 12), width: cb.width + 24, height: cb.height + 24 }, fullPage: true });
+  say('the universe column\'s connections', await p.$$eval('#ocol-uni .urow[data-row="CONNECTIONS"] .connbox > .sublbl', (ss) => ss.map((s) => s.innerText.replace(/\s+/g, ' ') + ' · ' + s.nextElementSibling.querySelectorAll('.pchip').length + ' chips'))); }
+{ // D-040: the gaps go both ways — the second square at the top of THE GAPS turns the list the other way, then the first turns it back
+  say('gaps squares', await p.$$eval('#ocol-gaps .opt[data-gdir]', (os) => os.map((o) => (o.getAttribute('aria-checked') === 'true' ? '[' : '') + (getComputedStyle(o).borderTopStyle === 'dashed' ? '{' + o.getAttribute('aria-label') + '}' : o.getAttribute('aria-label')) + (o.getAttribute('aria-checked') === 'true' ? ']' : ''))));
+  say('gaps, this way', { count: await txt('#ocol-gaps .gcount'), first: await p.$$eval('#ocol-gaps .gap', (gs) => gs.slice(0, 3).map((g) => g.textContent)) });
+  await step('gaps-the-other-way', '#ocol-gaps .opt[data-gdir="uni"]', 'the second square at the top of THE GAPS: in the universe, not in the code map');
+  say('gaps, the other way', { count: await txt('#ocol-gaps .gcount'), groups: await p.$$eval('#ocol-gaps .gblk[data-row]', (bs) => bs.map((bx) => bx.querySelector('.gbh').textContent + ': '
+    + [...bx.querySelectorAll('.gap, .gfact')].slice(0, 3).map((x) => x.textContent.slice(0, 40)).join(' | '))) });
+  { await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120); n++;
+    const gb = await p.$eval('#ocol-gaps', (e) => { const r = e.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height }; });
+    await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-the-gaps-the-other-way.png'), clip: { x: Math.max(0, gb.x - 8), y: Math.max(0, gb.y - 8), width: gb.width + 16, height: Math.min(1800, gb.height + 16) }, fullPage: true }); }
+  await step('gaps-back-this-way', '#ocol-gaps .opt[data-gdir="cm"]', 'the first square: in the code map, not in the universe'); }
 { // the lab link: a real click opens the lab on this endpoint, then back
   await step('open-in-the-lab', '#lablink', 'the open-in-the-lab link');
   await p.waitForLoadState('load'); await wait(1500);

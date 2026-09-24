@@ -605,6 +605,7 @@ def build(argv: list) -> tuple:
         g_full, g_part = UNI.gaps(set(r["has"]), r["uni"], UW, UNI.read_here(r, r["uni"]))
         r["gaps"] = sorted(g_full, key=order.index)
         r["partly"] = sorted(g_part, key=lambda x: order.index(x[0]))
+        r["rgaps"] = UNI.reverse_gaps(r, r["uni"], UW, set(r["has"]))        # the gaps the other way (D-040)
         r["uni"].pop("_drawn")                                          # the generator's own reading, never drawn
     icon_names, colour_refs = UNI.mark_refs(W)
     icon_names |= {x["icon"] for x in spec.values() if isinstance(x, dict) and x.get("icon")}
@@ -614,8 +615,7 @@ def build(argv: list) -> tuple:
     lab = UNI.lab_marks()
     marks = UNI.marks(blocks, got["parts"], W, lab)
     got["icons"].update({m["icon"]: m["svg"] for m in lab.values()})
-    for r in rows:
-        UNI.as_station_draws(r["uni"]["rows"], set(got["pico"]))
+    uni_css, ulook = UNI.ulook(spec, [r["uni"] for r in rows])          # the station's card look, lifted (D-040)
     uspec = [{"row": x, "icon": (spec.get(x) or {}).get("icon"), "title": (spec.get(x) or {}).get("title"), "name": UW["rows"][x]["name"], "attrs": UW["rows"][x]["attrs"]} for x, _ in UNI.ROWS]
     attrs = {a_id: {"label": a["label"], "plain": a["plain"], "r": a["r"], "home": a.get("home"), "shared": bool(a.get("shared")),
                        "sharedIn": a.get("shared_blocks") or []} for a_id, a in A.items()}
@@ -638,7 +638,7 @@ def build(argv: list) -> tuple:
         die("the words file's layouts and the page's differ")
     data = {"tok": tok, "partial": bool(only), "layouts": LAYOUTS, "rows": rows, "cols": cols, "blocks": blocks, "orders": orders, "families": families,
             "kinds5": list(KINDS5), "fates": list(FATES), "pieceWords": list(PIECE_WORDS), "words": W,
-            "icons": got["icons"], "marks": marks, "uspec": uspec, "attrs": attrs, "attrOrder": order,
+            "icons": got["icons"], "marks": marks, "uspec": uspec, "attrs": attrs, "attrOrder": order, "ulook": ulook,
             "ucard": {k: spec["_card"][k] for k in ("more", "comp", "okState")}}
 
     RUNTIME = set(W.get("_runtime") or [])
@@ -662,6 +662,7 @@ def build(argv: list) -> tuple:
     html = tpl_p.read_text(encoding="utf-8")
     for mark, val in (("<!--__KIT1__-->", K["k1"]), ("<!--__KIT2__-->", K["k2"].strip()), ("<!--__KIT3__-->", K["k3"]),
                       ("<!--__EPSLUG__-->", "<script>\n" + EPSLUG_JS.read_text(encoding="utf-8").replace("</", "<\\/") + "</script>"),
+                      ("<!--__UNILOOK__-->", '<style id="unilook">\n' + uni_css.replace("</", "<\\/") + "\n</style>"),
                       ("/*__DATA__*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c"))):
         if mark not in html:
             die("template marker missing: " + mark)
