@@ -1482,6 +1482,59 @@ check(not detached, "page carries tokens the glob build cannot fill on every pag
 for href in ('href="index.html"', 'href="tests.html"', 'href="entity-index.html"'):
     check(href in page, "station nav missing a sibling backlink: "+href)
 
+# ── 11c. PANE RUNTIME PARITY (D-045): the pane runtime in assets/ is a FRESH extract of THIS station ──
+#    The station keeps its private copies (it is not cut over), so nothing else notices when the shipped
+#    _uni-grammar.js falls behind it. promote.py re-extracts every band BY MARKER and byte-compares all its
+#    outputs (the lab copies too). FIRE: one band byte. SILENT: every band's line numbers shift. MARKER: rc 2.
+import importlib.util, shutil
+_prom = os.path.join(REPO, "docs/design/embed-graph/promote.py")
+_spec = importlib.util.spec_from_file_location("promote", _prom); _pm = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_pm)
+def _promote(station=None):
+    return subprocess.run(["python3", _prom, "--check"] + (["--station", station] if station else []), capture_output=True, text=True)
+def _variant(text):
+    f = tempfile.NamedTemporaryFile("w", suffix=".html", delete=False, encoding="utf-8"); f.write(text); f.close(); return f.name
+_r = _promote()
+check(_r.returncode == 0, "the shipped pane runtime drifted from gabe-universe.html or the embed-graph lab — run python3 docs/design/embed-graph/promote.py and commit: " + (_r.stderr or _r.stdout).strip()[-240:])
+_mut = page.replace('KINDCOL.web="#a855f7"', 'KINDCOL.web="#a855f8"', 1)
+check(_mut != page, "11c fixture: the KINDCOL.web literal the FIRE case mutates is gone — pick another band byte")
+_t = _variant(_mut); _r = _promote(_t); os.unlink(_t)
+check(_r.returncode == 1 and "DRIFT" in _r.stderr, "11c FIRE: a changed band byte must make promote.py --check report DRIFT (rc 1); got rc %d" % _r.returncode)
+_shift = page
+for _nm, _start, _end in [_pm.TIERS] + _pm.BANDS:
+    check(_start in _shift, "11c fixture: the %s band's start marker is gone from the station" % _nm)
+    _shift = _shift.replace(_start, "\n" + _start, 1)
+_t = _variant(_shift); _r = _promote(_t); os.unlink(_t)
+check(_r.returncode == 0, "11c SILENT: a newline above every band (every line number shifts) must stay in sync — a generated header carries a line number: " + _r.stderr.strip()[-200:])
+_t = _variant(page.replace("var OPMAP={", "", 1)); _r = _promote(_t); os.unlink(_t)
+check(_r.returncode == 2 and "OPMAP" in _r.stderr, "11c MARKER: a removed `var OPMAP={` must exit 2 and name the band; got rc %d %s" % (_r.returncode, _r.stderr.strip()[-160:]))
+#    rc 2, never a traceback: a traceback exits 1, which reads as DRIFT. A comment that never closes, an
+#    unreadable station and a lab copy that is gone each say which (SILENT: a well-formed block still closes).
+for _src in ("x={ a:1 // no newline", "x={ a:1 /* never closed"):
+    try: _pm.close_of(_src, 0, "t"); _how = "no error"
+    except _pm.Missing: _how = "Missing"
+    except Exception as _e: _how = type(_e).__name__
+    check(_how == "Missing", "11c UNCLOSED: close_of(%r) must raise Missing (exit 2), got %s" % (_src, _how))
+check(_pm.close_of('x={ a:"}", b:[1] /* } */ // }\n }', 0, "t") == 31, "11c UNCLOSED SILENT: a block with a bracket in a string and in both comment kinds closes at its own brace")
+_r = subprocess.run(["python3", _prom, "--check", "--station", os.path.join(tempfile.gettempdir(), "no-such-station.html")], capture_output=True, text=True)
+check(_r.returncode == 2 and "cannot be read" in _r.stderr, "11c SOURCE: a station path that is not there must exit 2 and say so; got rc %d %s" % (_r.returncode, _r.stderr.strip()[-160:]))
+_lab = tempfile.mkdtemp()
+for _n in ["_pane.css"] + _pm.COPIES:
+    if _n != "_slice.js": shutil.copy(os.path.join(_pm.HERE, _n), _lab)
+_here, _pm.HERE = _pm.HERE, pathlib.Path(_lab)
+try: _pm.outputs(pathlib.Path(REPO, _pm.STATION_REL)); _how = "no error"
+except _pm.Missing as _e: _how = "Missing" if "_slice.js" in str(_e) else "Missing without the file: " + str(_e)
+except Exception as _e: _how = type(_e).__name__
+_pm.HERE = _here; shutil.rmtree(_lab)
+check(_how == "Missing", "11c SOURCE: a lab copy that is gone must raise Missing naming it (exit 2), got " + _how)
+#    the pane zone is scoped SELECTOR by selector: a comma list must not ship its second item page-wide, a
+#    `(…)` never splits one, and a rule that is not a .pn rule is refused, never written unscoped.
+_css = _pm.pane_css(':root {\n  --ink: #fff;\n}\n/* ── the pane */\n.pn-a, .pn-b { color: red; }\n.pn-c:not(.x, .y),\n.pn-d { top: 0; }\n')
+check(".seat .pn-a, .seat .pn-b {" in _css, "11c CSS: every item of a comma list sits under .seat — got " + repr(_css.split("*/")[-1][:90]))
+check(".seat .pn-c:not(.x, .y),\n.seat .pn-d {" in _css, "11c CSS SILENT: a comma inside :not(…) is not a selector boundary — got " + repr(_css.split("*/")[-1][:120]))
+try: _pm.pane_css(":root {\n}\n/* ── the pane */\n.pn-a { top: 0; }\ncanvas { top: 0; }\n"); _how = "written"
+except _pm.Missing as _e: _how = "Missing" if "canvas" in str(_e) else "Missing without the rule: " + str(_e)
+check(_how == "Missing", "11c CSS: a pane-zone rule that is not a .pn rule must be refused naming it, got " + _how)
+
 print(f"  static: {pass_} passed, {fail} failed")
 sys.exit(1 if fail else 0)
 PY
@@ -1508,7 +1561,7 @@ done
 # ── 13. OPTIONAL headless render proof against the committed example feed ──
 EXPAGE="$SHELL_SRC/example/codebase-graph-station/gabe-universe.html"
 CHROME=/usr/bin/google-chrome-stable
-PWDIR="$REPO/docs/design/graft-adoption/spike/_build/node_modules/playwright-core"
+PWDIR="${GABE_PW_DIR:-$REPO/docs/design/graft-adoption/spike/_build/node_modules/playwright-core}"   # a worktree has no gitignored _build: point GABE_PW_DIR at one
 if [ -x "$CHROME" ] && [ -d "$PWDIR" ] && [ -f "$EXPAGE" ]; then
   node - "$EXPAGE" "$PWDIR" <<'JS'
 const path=require('path');

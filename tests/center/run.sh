@@ -1685,6 +1685,12 @@ grep -q "Gabe Center" "$FIX/docs/site/center/index.html" \
   && ok || bad "brand: the subtitle must read Gabe Center"
 [ -f "$FIX/docs/site/center/assets/gabe-icon.png" ] \
   && ok || bad "brand: gabe-icon.png must copy with the shell assets"
+# The PANE RUNTIME (D-045) rides the same wholesale assets/ copy — no list to edit, so a center
+# regen ships all seven files or the seats have nothing to mount.
+for f in _grammar.js _slice.js _uni-grammar.js _pane.js _pane-console.js _pane.css _pane-console.css; do
+  [ -f "$FIX/docs/site/center/assets/$f" ] \
+    && ok || bad "pane runtime: assets/$f must copy with the shell assets"
+done
 # The chrome harness ships with the generators and rides the refresh loop
 # (operator ruling 2026-07-24) — regen · crawl gate · browser behavior are
 # the three gates every center refresh runs.

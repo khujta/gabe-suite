@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>embed-pane harness</title>
+<!-- tests/embed-pane — the SHIPPED pane runtime, loaded by RELATIVE path exactly as a centre page loads it
+     (an absolute file URL resolves to nothing from Windows Chrome), over the committed example feed. -->
+<link rel="stylesheet" href="../../templates/center/shell/assets/_pane.css">
+<link rel="stylesheet" href="../../templates/center/shell/assets/_pane-console.css">
+</head>
+<body>
+<div class="seat"><div id="a"></div><div id="b"></div></div>
+<script>
+/* every WebGL context the page makes is counted: a destroyed pane must never mint another one */
+(function () {
+  var gc = HTMLCanvasElement.prototype.getContext;
+  window.__glMade = 0;
+  HTMLCanvasElement.prototype.getContext = function (t) {
+    if (/webgl/.test(String(t))) window.__glMade++;
+    return gc.apply(this, arguments);
+  };
+})();
+</script>
+<script src="../../templates/center/shell/example/codebase-graph-station/c4-graph.js"></script>
+<script src="../../templates/center/shell/example/codebase-graph-station/commits.js"></script>
+<script src="../../templates/center/shell/example/codebase-graph-station/workflows.js"></script>
+<script src="../../templates/center/shell/assets/3d-bundle.js"></script>
+<script src="../../templates/center/shell/assets/_grammar.js"></script>
+<script src="../../templates/center/shell/assets/_slice.js"></script>
+<script src="../../templates/center/shell/assets/_uni-grammar.js"></script>
+<script src="../../templates/center/shell/assets/_pane.js"></script>
+<script src="../../templates/center/shell/assets/_pane-console.js"></script>
+<script>
+window.__IX = window.GabeSlice && window.GABE_C4
+  ? GabeSlice.index(window.GABE_C4, window.GABE_COMMITS || [], window.GABE_WORKFLOWS || []) : null;
+</script>
+</body>
+</html>
