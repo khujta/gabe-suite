@@ -38,6 +38,7 @@ tool exists to kill, applied to its own config.
 | `build_center_a3.py` | orchestrator — loads sources, fills every station, writes the pages + `archmap.json` |
 | `_center_data.py` | durable layer — KDBP docs, gate configs, the lens-card parser, and **config + path resolution** every module reads |
 | `_results_ingest.py` | run-result loaders — junit / coverage / run-history (the P165 split seam: the sources a run REPLACES, apart from the durable layer) |
+| `_kdbp_ledger.py` | the LEDGER reader — dated rows newest first BY DATE whatever order the file keeps, plus the one guarded row split; pure (takes the kdbp dir) |
 | `_a3_render.py` | pure HTML helpers (tables, meters, section banners, markdown) — no data, no state |
 | `_a3_feature.py` | per-entity feature pages (Overview · Tests · Evidence · Risk · Growth) |
 | `_a3_code.py` | the Code tab — endpoints / models / schemas parsed from source with `ast` |

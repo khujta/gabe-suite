@@ -24,6 +24,10 @@ import os
 import re
 from pathlib import Path
 
+# pure: takes the kdbp dir, reads nothing at import; split_row is the ONE guarded
+# row split md_tables, load_plan and the LEDGER all read through
+from _kdbp_ledger import ledger_rows as _ledger_rows, split_row as _split_row
+
 # --------------------------------------------------------------------------- #
 # Config + path resolution — the ONE place project bindings enter the loaders.
 # center.config.json lives at the center dir (default docs/site/center); every
@@ -131,8 +135,7 @@ def md_tables(text: str) -> list[tuple[list[str], list[dict]]]:
     for i in range(len(lines)):
         if not _is_row(i) or _is_sep(i):
             continue
-        guarded = lines[i].strip().strip("|").replace("\\|", "\x00")
-        cells = [c.strip().replace("\x00", "|") for c in guarded.split("|")]
+        cells = _split_row(lines[i])
         if _is_sep(i + 1):
             if hdr:
                 tables.append((hdr, rows))
@@ -241,8 +244,7 @@ def load_plan() -> dict:
     for line in lines:
         if not line.startswith("|") or line.startswith("|--") or line.startswith("|---"):
             continue
-        guarded = line.strip().strip("|").replace("\\|", "\x00")
-        cells = [c.strip().replace("\x00", "|") for c in guarded.split("|")]
+        cells = _split_row(line)
         if len(cells) < 9 or not cells[0] or cells[0] in ("#",):
             continue
         marks = [_at(cells, i) for i in i_marks]
@@ -451,45 +453,20 @@ def load_pending() -> list[dict]:
 
 
 def load_ledger(n: int = 5) -> list[list[str]]:
-    """Latest N LEDGER table rows, cells verbatim (newest first in the file)."""
-    rows: list[list[str]] = []
-    path = KDBP / "LEDGER.md"
-    if not path.exists():
-        return rows
-    for line in path.read_text().splitlines():
-        if not line.startswith("|") or line.startswith("|--") or "| Date |" in line:
-            continue
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) >= 5:
-            rows.append(cells[:5])
-        if len(rows) >= n:
-            break
-    return rows
+    """Latest N dated LEDGER rows of the live file, cells verbatim, newest first
+    BY DATE — the twins write opposite orders (gastify appends, gustify is
+    mixed), so file position decides nothing; _kdbp_ledger holds the rule."""
+    return [r["cells"][:5] for r in _ledger_rows(KDBP) if len(r["cells"]) >= 5][:n]
 
 
 def load_ledger_events() -> list[dict]:
-    """Every dated LEDGER row, live file + archived halves.
+    """Every dated LEDGER row, live file + archived halves, newest first.
 
     PLAN.md records what a phase IS and which cells are ticked; it records no
     dates anywhere. LEDGER.md is the only per-phase clock either twin keeps —
     one dated row per command checkpoint, many of them naming their phase."""
-    out: list[dict] = []
-    paths = [KDBP / "LEDGER.md"]
-    if (KDBP / "archive").is_dir():
-        paths += sorted((KDBP / "archive").glob("LEDGER*.md"))
-    for p in paths:
-        if not p.exists():
-            continue
-        for line in p.read_text().splitlines():
-            if not re.match(r"^\|\s*20\d\d-\d\d-\d\d\s*\|", line):
-                continue
-            cells = [c.strip() for c in line.strip().strip("|").split("|")]
-            d = as_date(cells[0])
-            if d:
-                out.append({"date": d.isoformat(),
-                            "kind": cells[1] if len(cells) > 1 else "",
-                            "text": " ".join(cells[2:4])})
-    return out
+    return [{"date": r["date"], "kind": r["entry"], "text": " ".join(r["cells"][2:4])}
+            for r in _ledger_rows(KDBP, include_archive=True)]
 
 
 def phase_clock(events: list[dict] | None = None) -> dict[str, dict]:

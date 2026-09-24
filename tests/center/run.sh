@@ -1860,6 +1860,16 @@ assert total >= 1, "no badge rendered at all"
 assert stray == 0, f"{stray} stray badge(s) of {total}"
 print(f"{total} badge(s), all on the appended row")
 PY
+# Recent changes reads newest first BY DATE (Q7): the fixture appends its second
+# row at the BOTTOM of a headered file — the shape that rendered oldest first
+# while the reader trusted file position.
+python3 - "$RM/docs/site/center/index.html" <<'PY' && ok || bad "rowmark-e2e: Recent changes reads newest first — the appended 2026-07-23 row leads"
+import sys
+html = open(sys.argv[1]).read()
+i = html.index('data-sec="now.recent-changes"')
+s = html[i:html.index("</section>", i)]
+assert s.index("second row") < s.index("first row"), s[:600]
+PY
 cp "$RM/docs/site/center/rows-seen.json" "$T/rows-seen.1"
 build "$RM" "$SHELL_SRC" >/dev/null
 diff -q "$T/rows-seen.1" "$RM/docs/site/center/rows-seen.json" >/dev/null \
@@ -2081,6 +2091,123 @@ assert "1 in the last 7" in k, k
 sys.exit(0)
 BOARDPY
 ) >"$T/py.out" 2>&1; then ok; else bad "board card model + closure verdict (see below)"; cat "$T/py.out"; fi
+
+# --- LEDGER order (Q7): newest first BY DATE, whatever order the file keeps ---
+# The twins write opposite orders: gastify APPENDS under a headerless table,
+# gustify is MIXED (a prepended head over an appended tail). One history,
+# a1<a2 (07-10) < b0<b1 (08-01) < c1<c2 (09-23), is written in all three shapes
+# and must read back the same. Each shape is the FIRE case of one wrong rule:
+# file order fails APPENDED · (date, line) reversed fails PREPENDED · one
+# file-wide direction, or a count of date steps, fails MIXED at b0/b1.
+if (cd "$GEN" && python3 - "$T/ledger-order" <<'LEDPY'
+import sys
+from pathlib import Path
+sys.path.insert(0, ".")
+import _center_data as D
+
+root = Path(sys.argv[1])
+DAY = {"a": "2026-07-10", "b": "2026-08-01", "c": "2026-09-23"}
+HDR = ("| Date | Entry | Theme / scope | Commits | Gates / results |\n"
+       "|---|---|---|---|---|\n")
+
+
+def rows(*names):
+    return "".join(f"| {DAY[t[0]]} | COMMIT | {t} | abc1234 | ok |\n" for t in names)
+
+
+def kdbp(name, ledger=None, archive=None):
+    d = root / name / ".kdbp"
+    d.mkdir(parents=True)
+    if ledger is not None:
+        (d / "LEDGER.md").write_text(ledger)
+    if archive is not None:
+        (d / "archive").mkdir()
+        (d / "archive" / "LEDGER-2026H1.md").write_text(archive)
+    D.KDBP = d          # read at CALL time — the loaders must not have cached it
+
+
+WANT = ["c2", "c1", "b1", "b0", "a2", "a1"]
+SHAPES = {
+    # gastify: no header, prose sections above, oldest row first
+    "appended": "# LEDGER\n\n## 2026-07-10 — prose\n\nnotes\n\n"
+                + rows("a1", "a2", "b0", "b1", "c1", "c2"),
+    "prepended": "# LEDGER\n\n" + HDR + rows("c2", "c1", "b1", "b0", "a2", "a1"),
+    # gustify: a prepended head, then an appended tail
+    "mixed": "# LEDGER\n\n" + HDR + rows("c2", "c1", "a2", "a1") + rows("b0", "b1"),
+}
+for name, text in SHAPES.items():
+    kdbp(name, text)
+    got = [r[2] for r in D.load_ledger(8)]
+    assert got == WANT, (name, got)
+    assert [r[2] for r in D.load_ledger(2)] == WANT[:2], name     # the n cap
+
+# a file of ONE day carries no direction: the tie reads as the spec's prepended
+# shape (first line newest) — a pinned choice. An appending project's first-day
+# rows therefore flip once, the day its second day lands.
+kdbp("one-day", HDR + "".join(f"| 2026-07-10 | COMMIT | r{i} | abc1234 | ok |\n"
+                              for i in range(3)))
+assert [r[2] for r in D.load_ledger(8)] == ["r0", "r1", "r2"], D.load_ledger(8)
+
+# only a real date opens a row: an undated row and an impossible date reach
+# neither the hub nor the clock (the pre-Q7 hub kept any row of 5 cells)
+kdbp("undated", HDR + rows("c1") + "| — | COMMIT | undated | x | y |\n"
+     "| 2026-13-40 | COMMIT | badday | x | y |\n")
+assert [r[2] for r in D.load_ledger(8)] == ["c1"], D.load_ledger(8)
+assert [e["text"] for e in D.load_ledger_events()] == ["c1 abc1234"], D.load_ledger_events()
+
+# SILENT on the cells: an escaped pipe stays inside its cell, 5 cells verbatim —
+# also one that ENDS the row with no closing pipe (the guard runs before the
+# outer pipes are stripped). md_tables and load_plan read through the same split.
+kdbp("escaped", HDR + "| 2026-09-24 | COMMIT | pipe | abc1234 | echo \\| grep |\n"
+     "| 2026-09-23 | COMMIT | tail | abc1234 | ends with \\|\n")
+got = D.load_ledger(8)
+assert got == [["2026-09-24", "COMMIT", "pipe", "abc1234", "echo | grep"],
+               ["2026-09-23", "COMMIT", "tail", "abc1234", "ends with |"]], got
+got = D.pick_table("| # | Note |\n|---|---|\n| 1 | a \\| b \\|\n", "#", "Note")
+assert got == [{"#": "1", "Note": "a | b |"}], got
+(D.KDBP / "PLAN.md").write_text(
+    "| # | Phase | Tier | Complexity | Exec | Review | Commit | Push | Description |\n"
+    "|---|---|---|---|---|---|---|---|---|\n"
+    "| 1 | P1 · pipes | mvp | low | ✅ | ✅ | ✅ | ✅ | a \\| b \\|\n")
+got = [p["desc"] for p in D.load_plan()["phases"]]
+assert got == ["a | b |"], got
+
+# honest-empty: a header with no rows, and no LEDGER at all
+kdbp("header-only", "# LEDGER\n\n" + HDR)
+assert D.load_ledger(8) == [] and D.load_ledger_events() == []
+kdbp("absent")
+assert D.load_ledger(8) == [] and D.load_ledger_events() == []
+
+# the archive: its rows join the events (newest first) but never the hub, and
+# a same-day archive row sits BEHIND the live file's — the live file leads
+kdbp("archived", HDR + "| 2026-09-23 | COMMIT | P4 done | abc1234 | ok |\n",
+     archive=HDR + "| 2026-09-23 | REVIEW | P4 reviewed | — | — |\n"
+                   "| 2026-06-30 | PLAN | P4 opened | — | — |\n")
+ev = D.load_ledger_events()
+got = [(e["date"], e["kind"]) for e in ev]
+assert got == [("2026-09-23", "COMMIT"), ("2026-09-23", "REVIEW"),
+               ("2026-06-30", "PLAN")], ev
+assert ev[-1] == {"date": "2026-06-30", "kind": "PLAN", "text": "P4 opened —"}, ev
+assert [r[2] for r in D.load_ledger(8)] == ["P4 done"], D.load_ledger(8)
+clock = D.phase_clock(ev)
+assert clock["P4"] == {"first": "2026-06-30", "last": "2026-09-23"}, clock
+# a property of phase_clock (min/max per id), NOT of the reader: it holds for
+# every order of `ev`, so it pins the clock order-free and covers no reader rule
+assert clock == D.phase_clock(ev[::-1])
+
+# `src` names each file under the kdbp dir's OWN name — `.kdbp/…` by default,
+# the retargeted name when center.config.json#paths.kdbp moves the dir
+import _kdbp_ledger as L
+got = [r["src"] for r in L.ledger_rows(D.KDBP, include_archive=True)]
+assert got == [".kdbp/LEDGER.md"] + [".kdbp/archive/LEDGER-2026H1.md"] * 2, got
+moved = root / "retarget" / "kdbp"
+moved.mkdir(parents=True)
+(moved / "LEDGER.md").write_text(HDR + rows("c1"))
+got = [r["src"] for r in L.ledger_rows(moved)]
+assert got == ["kdbp/LEDGER.md"], got
+sys.exit(0)
+LEDPY
+) >"$T/ledger-order.out" 2>&1; then ok; else bad "LEDGER order: newest first by date in every file shape (see below)"; cat "$T/ledger-order.out"; fi
 
 # --- GUARD lens (2026-07-25): used-but-unguarded, and the by_endpoint trap ---
 if (cd "$GEN" && python3 - <<'GUARDPY'
