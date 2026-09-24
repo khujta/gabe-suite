@@ -52,6 +52,10 @@ W = mapfx.write
 def make_repo(T: str) -> tuple[str, dict]:
     """A KDBP project with a center: returns (root, shas)."""
     root = mapfx.make_repo(T)                      # source + center + 3 commits, .kdbp/ dir exists
+    # archie D (2026-09-24): an EARLIER plan's "Phase P2" row and a HANDOFF row name commits that are NOT this
+    # phase's work — review_target must drop both, or their files join changed_files and the base moves back
+    old_sha = git(root, "rev-list", "--max-parents=0", "--abbrev-commit", "HEAD")
+    pre_sha = git(root, "rev-parse", "--short", "HEAD")
     # the RED checkpoint (declares a case) then two exec commits "for phase P2" — review_target resolves all three
     W(root, "apps/api/tests/test_things_api.py", 'def test_get_thing_C8():\n    assert False  # red\n')
     git(root, "add", "-A"); git(root, "commit", "-q", "-m", "red(P2): C8 declared")
@@ -66,6 +70,8 @@ def make_repo(T: str) -> tuple[str, dict]:
 
 ## Goal
 Fixture goal.
+
+- **Created:** 2026-08-20
 
 ## Current Phase
 P2
@@ -118,10 +124,12 @@ P2
 
 | Date | Entry | Theme / scope | Commits | Gates / results |
 |---|---|---|---|---|
+| 2026-09-03 | HANDOFF | Phase P2 live; review next | HEAD %s | resume → HANDOFF.md |
 | 2026-09-02 | EXEC | Phase P2 — tasks 2/2 | %s %s | lint ✓ · tests 3 passed |
 | 2026-09-01 | RED | Phase P2 — 1 NEW · 1 REUSE | %s | RED: 1 failing (pytest, exit 1) · guards proven 0/0 · Red ✅ |
 | 2026-08-30 | PUSH | main ← main @ deadbee | deadbee | push ✓ |
-""" % (sha1, sha2, sha0))
+| 2026-07-10 | EXEC | Phase P2 — an EARLIER plan's P2 | %s | lint ✓ |
+""" % (pre_sha, sha1, sha2, sha0, old_sha))
     W(root, ".kdbp/BEHAVIOR.md", """# Behavior
 
 **Maturity:** mvp
@@ -196,7 +204,7 @@ def run(T):
     ok(d and d["pending"]["columns"] == ["#", "Date", "Source", "Finding", "File", "Scale", "Priority", "Impact", "Times Deferred", "Status", "Verified"], "K1/F2: the WIDEST keyword table wins — the canonical 11-col PENDING, not the 3-col gate-map decoy above it", d and d["pending"].get("columns"))
     ok(d and d["pending"]["open"] == 2 and d["pending"]["closed"] == 2, "PENDING closure: token-closed + comment-closed = 2 closed, 2 open", d and d.get("pending"))
     ok(d and d["pending"]["top"][0]["id"] == "P4" and d["pending"]["top"][0]["priority"] == "critical", "open rows ranked critical first", d and d["pending"]["top"])
-    ok(d and [r["entry"] for r in d["ledger"]["last"]] == ["EXEC", "RED", "PUSH"], "K4: ledger rows sorted newest-first by Date (EXEC 09-02 · RED 09-01 · PUSH 08-30)", d and [(r["date"], r["entry"]) for r in d["ledger"]["last"]])
+    ok(d and [r["entry"] for r in d["ledger"]["last"]] == ["HANDOFF", "EXEC", "RED", "PUSH", "EXEC"], "K4: ledger rows sorted newest-first by Date (HANDOFF 09-03 · EXEC 09-02 · RED 09-01 · PUSH 08-30 · EXEC 07-10)", d and [(r["date"], r["entry"]) for r in d["ledger"]["last"]])
     ok(d and d["decisions"]["rows"] == 2 and d["git"]["branch"] and d["git"]["dirty"]["total"] == 0, "decisions count + git facts", d and {k: d.get(k) for k in ("decisions", "git")})
     ok(len(text) < 6000, "snapshot stays small (%d bytes)" % len(text))
     # ── phase_context ──
@@ -234,6 +242,8 @@ def run(T):
     ok(d and d["target"]["phase"] == "P2" and set(d["commits"]) == {shas["sha0"], shas["sha1"], shas["sha2"]}, "review_target: P2 (Exec ✅ Review ⬜) via LEDGER shas — the RED row's commit included", d and {k: d.get(k) for k in ("target", "commits")})
     ok(d and set(d["changed_files"]) == {"apps/api/tests/test_things_api.py", "apps/api/services/thing.py", "apps/api/other.py"} and d["base"] == git(root, "rev-parse", "--short", shas["sha0"] + "^"),
        "changed files = union of RED + EXEC commits (the declared case rides along); base = parent of the EARLIEST (the red checkpoint)", d and {k: d.get(k) for k in ("changed_files", "base", "source")})
+    ok(d and d.get("floor") == "2026-08-20" and (d.get("floor_source") or "").startswith("PLAN.md") and d.get("skipped_rows") == {"before_floor": 1, "not_a_commit_entry": 1},
+       "review_target: the plan's Created date floors the rows (an earlier plan's P2 dropped) and a HANDOFF row's sha is not the phase's work (archie D + D2)", d and {k: d.get(k) for k in ("floor", "floor_source", "skipped_rows")})
     d, _, _, _ = call_json(c, "review_target", {"phase": "P3"})
     ok(d and d["target"]["phase"] == "P3" and "git diff HEAD" in d["source"], "forced phase without LEDGER rows falls back to git diff", d and d.get("source"))
     # ── next_beat ──
@@ -267,6 +277,18 @@ def run(T):
     ok(d and d["row"] == "| #22 | review | new debt |", "preview follows the file's own 3 columns and #-style ids", d and d.get("row"))
     d, _, _, _ = call_json(c, "review_target", {})
     ok(d and d["target"]["phase"] == "1" and d["target"]["cells"]["exec"] == "active", "review_target picks Exec 🔄 + Review ⬜ in the variant table", d and d.get("target"))
+    ok(d and d.get("floor") is None and "no Created date" in (d.get("floor_source") or ""), "a plan without a Created date says it has no floor (never a silent one)", d and {k: d.get(k) for k in ("floor", "floor_source")})
+    c.close()
+    # ── D-style PENDING ids (archie E, 2026-09-24: all 68 rows were D<n>, the preview minted P70) ──
+    ds = os.path.join(T, "dstyle"); os.makedirs(os.path.join(ds, ".kdbp"))
+    sh(["git", "init", "-q", ds]); git(ds, "config", "user.email", "t@t"); git(ds, "config", "user.name", "t")
+    W(ds, ".kdbp/PENDING.md", "# Pending\n\n| # | Date | Source | Finding | File | Priority | Times Deferred | Status |\n|---|---|---|---|---|---|---|---|\n"
+      "| D67 | 2026-09-20 | review | owner call pending | a.py | low | 1 |  |\n| D66 | 2026-09-19 | review | done thing | b.py | low | 1 | RESOLVED |\n"
+      "| P3 | 2026-06-01 | review | an old P-style row | c.py | low | 1 |  |\n")
+    W(ds, "README.md", "d\n"); git(ds, "add", "-A"); git(ds, "commit", "-q", "-m", "dstyle")
+    c = spawn(ds, T); c.initialize()
+    d, _, _, _ = call_json(c, "pending_row_preview", {"flag": {"description": "new debt"}})
+    ok(d and d["next_id"] == 68 and d["row"].startswith("| D68 | "), "preview mints the file's MAJORITY prefix (D67/D66 over one P3 → D68), never a P by default", d and d.get("row"))
     c.close()
     # ── headerless legacy LEDGER (gastify shape): rows present, no header/separator ──
     hl = os.path.join(T, "headerless"); os.makedirs(os.path.join(hl, ".kdbp"))

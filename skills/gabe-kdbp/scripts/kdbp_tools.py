@@ -150,6 +150,18 @@ def plan_json(kd: Path) -> dict | None:
         return None
 
 
+def plan_floor(kd: Path) -> tuple[str | None, str]:
+    """The active plan's Created date — LEDGER rows dated before it belong to an EARLIER plan whose phase ids
+    repeat ("Phase 1" in every plan). PLAN.json `created` first, then the PLAN.md `**Created:**` line."""
+    c = str((plan_json(kd) or {}).get("created") or "").strip()
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", c):
+        return c, "PLAN.json created"
+    m = re.search(r"\*\*Created:\*\*\s*(\d{4}-\d{2}-\d{2})", _read(kd, "PLAN.md") or "")
+    if m:
+        return m.group(1), "PLAN.md **Created:**"
+    return None, "none — the plan carries no Created date, so every plan's rows naming this phase id match"
+
+
 def phase_section(text: str, phase_id: str) -> str:
     m = re.search(r"### Phase %s\b.*?(?=\n### Phase |\n## |\Z)" % re.escape(phase_id), text, re.S)
     return m.group(0) if m else ""
@@ -353,6 +365,9 @@ def t_phase_context(args: dict, roots) -> dict:
     return out
 
 
+COMMIT_ENTRIES = {"RED", "EXEC", "COMMIT"}
+
+
 def t_review_target(args: dict, roots) -> dict:
     root, source, kd = _ctx(args, roots)
     if not kd:
@@ -373,10 +388,21 @@ def t_review_target(args: dict, roots) -> dict:
     led = _read(kd, "LEDGER.md") or ""
     lrows, _ = ledger_rows(led, 400)
     pid_rx = re.compile(r"(Phase|phase:?)\s*%s\b" % re.escape(r["id"]))
+    floor, floor_src = plan_floor(kd)
     shas: list[str] = []
+    skipped = {"before_floor": 0, "not_a_commit_entry": 0}
     for lr in lrows:
-        if pid_rx.search(lr.get("theme", "") or "") or pid_rx.search(lr.get("entry", "") or ""):
-            shas += re.findall(r"\b[0-9a-f]{7,40}\b", lr.get("commits", "") or "")
+        if not (pid_rx.search(lr.get("theme", "") or "") or pid_rx.search(lr.get("entry", "") or "")):
+            continue
+        date = (lr.get("date") or "").strip()
+        if floor and re.fullmatch(r"\d{4}-\d{2}-\d{2}", date) and date < floor:
+            skipped["before_floor"] += 1          # an earlier plan's phase of the same id
+            continue
+        etype = (re.match(r"[A-Za-z]+", (lr.get("entry") or "").strip()) or [""])[0].upper()
+        if etype and etype not in COMMIT_ENTRIES:
+            skipped["not_a_commit_entry"] += 1    # HANDOFF/PLAN/PUSH/… rows cite bookkeeping shas, not the phase's work
+            continue
+        shas += re.findall(r"\b[0-9a-f]{7,40}\b", lr.get("commits", "") or "")
     files, resolved = set(), []
     for sha in dict.fromkeys(shas):
         rc, o, _ = mq.sh(["git", "-C", root, "show", "--name-status", "--format=", sha])
@@ -402,6 +428,7 @@ def t_review_target(args: dict, roots) -> dict:
     else:
         src = "LEDGER rows for phase %s → %d commit(s)" % (r["id"], len(resolved))
     out.update({"target": {"phase": r["id"], "name": r["name"], "cells": {k: _state(v) for k, v in r["cells"].items()}},
+                "floor": floor, "floor_source": floor_src, "skipped_rows": skipped,
                 "commits": resolved[:CAP], "base": base, "changed_files": sorted(files)[:CAP], "changed_more": max(0, len(files) - CAP), "source": src,
                 "banner": "REVIEW · Phase %s — %s" % (r["id"], r["name"])})
     return out
@@ -497,7 +524,10 @@ def t_pending_row_preview(args: dict, roots) -> dict:
     today = _dt.date.today().isoformat()
     canon = ["#", "Date", "Source", "Finding", "File", "Scale", "Priority", "Impact", "Times Deferred", "Status", "Verified"]
     cols = hdr or canon
-    vals = {"#": "#%d" % next_id if any(r["id"].startswith("#") for r in rows) else "P%d" % next_id, "Date": today,
+    # the file's own id style: the prefix most of its rows carry (#N · PN · DN · bare N); P for an empty file
+    prefs = [m.group(1) for m in (re.match(r"^([A-Za-z#]*)\d", r["id"]) for r in rows) if m]
+    prefix = max(dict.fromkeys(prefs), key=prefs.count) if prefs else "P"
+    vals = {"#": "%s%d" % (prefix, next_id), "Date": today,
             "Source": str(flag.get("source") or flag.get("dimension") or "review"), "Gate": str(flag.get("source") or "review"),
             "Finding": "[%s] %s" % (flag.get("dimension") or "finding", flag["description"]) if flag.get("dimension") else str(flag["description"]),
             "File": str(flag.get("file") or ""), "Scale": str(flag.get("scale") or ""), "Priority": str(flag.get("severity") or flag.get("priority") or "medium"),
@@ -561,7 +591,7 @@ TOOLS = [
      "description": "The lint/types/tests commands the gate should run: BEHAVIOR.md ## Verify Commands first, else candidates from package.json/pyproject/Makefile — resolved, never run, never a guessed reporter flag.",
      "inputSchema": _schema({**ROOT_PROP})},
     {"name": "pending_row_preview", "fn": t_pending_row_preview, "annotations": RO,
-     "description": "PREVIEW a PENDING.md deferral row in this file's own column order with the next P-id and Verified anchor; flags recurring rows. Writes nothing — you paste it.",
+     "description": "PREVIEW a PENDING.md deferral row in this file's own column order with the next id in its own prefix (#N · PN · DN) and Verified anchor; flags recurring rows. Writes nothing — you paste it.",
      "inputSchema": _schema({"flag": {"type": "object", "description": "{dimension, entity, severity, description, fix, source, file}", "additionalProperties": True}, **ROOT_PROP}, ["flag"])},
     {"name": "ledger_row_preview", "fn": t_ledger_row_preview, "annotations": RO,
      "description": "PREVIEW a LEDGER.md row (Date · Entry · Theme · Commits · Gates verbatim) in this file's header order. Writes nothing — you insert it newest-first.",

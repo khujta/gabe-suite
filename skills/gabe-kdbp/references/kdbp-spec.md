@@ -57,9 +57,14 @@ searched}` · `details_excerpt` (≤ 2,000 chars of the phase section) · `behav
 
 ### 4.3 `review_target(phase?)`
 The first PLAN row with Review `todo` and Exec `done|active` (or the forced `phase`) → LEDGER rows whose Theme/Entry name
-`Phase <id>` → shas in their Commits cell → `git show --name-status` union (A/M/R/C only) → `changed_files` (≤40, `changed_more`),
-`commits`, `base` = parent of the earliest resolved sha, `source`, `banner`. No row → `target:null`, `reason`, and the
-spec's fallback `git diff --name-only HEAD` with `base: HEAD`.
+`Phase <id>`, **dated on or after the plan's Created date** (`floor`: PLAN.json `created`, else the PLAN.md `**Created:**`
+line; phase ids repeat across plans, so without it every earlier plan's "Phase 1" joins the scope) **and whose Entry is RED,
+EXEC or COMMIT** (a HANDOFF, PLAN, PUSH or CENTER row cites bookkeeping shas, not the phase's work) → shas in their Commits
+cell → `git show --name-status` union (A/M/R/C only) → `changed_files` (≤40, `changed_more`), `commits`, `base` = parent of
+the earliest resolved sha, `floor` + `floor_source`, `skipped_rows{before_floor, not_a_commit_entry}`, `source`, `banner`.
+The floor is a DATE: an earlier plan's rows dated the same day as the new plan's creation still pass. No Created date →
+`floor: null` and a `floor_source` that says every plan's rows match. No row → `target:null`, `reason`, and the spec's
+fallback `git diff --name-only HEAD` with `base: HEAD`.
 
 ### 4.4 `next_beat()`
 Spawns `node <skills>/gabe-next/scripts/next.mjs --json` in the root; `exit` (0 decision · 1 no decision · 2 mirror unusable ·
@@ -74,8 +79,8 @@ commands, the tool never does, and a reporter flag is never invented.
 
 ### 4.6 `pending_row_preview(flag)` — PREVIEW
 `flag{description (required), dimension, entity, severity|priority, fix|impact, source, file, scale}` → `row` in the file's own
-column order (canonical 11 columns when the file is new), `next_id` minted over live + archive rows (`#N` or `PN` following
-the file's style), `Verified: @<sha> <date>`, `recurring_candidates` (open rows with the same File and ≥3 shared words),
+column order (canonical 11 columns when the file is new), `next_id` minted over live + archive rows, in the prefix MOST of the file's rows carry (`#N` · `PN` · `DN` · a bare
+`N`; `P` for an empty file — a preview never decides a project's id style), `Verified: @<sha> <date>`, `recurring_candidates` (open rows with the same File and ≥3 shared words),
 `writer` (names `scripts/disposition.py --defer` when the project has it). `writes: nothing`.
 
 **Two cells are fixed, not derived:** `Times Deferred` is always `1` (a preview composes a NEW row; a repeat finding is the `recurring_candidates` path, where the existing row's counter is bumped instead) and `Status` is always blank (a row is born open; closure is the disposition step's verdict token). A caller that wants either cell to say something else edits the composed row before the Write.

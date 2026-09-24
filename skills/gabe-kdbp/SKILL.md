@@ -4,7 +4,7 @@ description: "The suite's second MCP server — a project's .kdbp/ lifecycle sta
 when_to_use: "Manage the gabe-kdbp MCP server: registered at user scope, disabled in this project, install parity. Human-initiated only; the TOOLS are reached for by every skill that touches lifecycle state — the spine (/gabe-plan, /gabe-red, /gabe-execute, /gabe-review, /gabe-commit, /gabe-push), /gabe-handoff, /gabe-next, /gabe-pulse and the satellites — through mcp__gabe-kdbp__*."
 disable-model-invocation: true
 metadata:
-  version: 1.0.2
+  version: 1.0.3
 ---
 
 # Gabe KDBP — the lifecycle state as tools
@@ -27,10 +27,10 @@ Design record: `../../docs/design/gabe-map/README.md` (§15). Binding contract: 
 |---|---|---|
 | `kdbp_snapshot` | where the project stands: branch, ahead/behind, dirty; PLAN phase table states; PENDING open rows (top 10); last LEDGER rows; DECISIONS count | git · PLAN · PENDING · LEDGER · DECISIONS |
 | `phase_context` | execute's preflight for one phase: record, row states, `Cases:`/`Reach:` records, Verify Commands, PENDING rows in scope, declared entities' briefs (via gabe-map), warnings | PLAN.json · PLAN.md · BEHAVIOR · PENDING · gabe-map |
-| `review_target` | what is pending review: the PLAN row with Review ⬜ and Exec ✅/🔄, its LEDGER commits → changed files + a base ref; git-diff fallback | PLAN · LEDGER · git |
+| `review_target` | what is pending review: the PLAN row with Review ⬜ and Exec ✅/🔄, its LEDGER commits (RED/EXEC/COMMIT rows dated on or after the plan's Created date) → changed files + a base ref; git-diff fallback | PLAN · LEDGER · git |
 | `next_beat` | the router's decision (`next.mjs --json`) with exit codes mapped to fields | gabe-next |
 | `verify_commands` | the lint/types/tests binding: BEHAVIOR first, else manifest candidates — never run, never a guessed flag | BEHAVIOR · package.json · pyproject · Makefile |
-| `pending_row_preview` | the exact PENDING row to paste (file's own columns, next P-id, Verified anchor, recurring-row flag) — writes nothing | PENDING (+ archive) · git |
+| `pending_row_preview` | the exact PENDING row to paste (file's own columns, next id in the file's majority prefix, Verified anchor, recurring-row flag) — writes nothing | PENDING (+ archive) · git |
 | `ledger_row_preview` | the exact LEDGER row to insert newest-first (Gates verbatim) — writes nothing | LEDGER |
 
 ## Procedure
