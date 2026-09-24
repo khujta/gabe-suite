@@ -368,7 +368,9 @@ def station_feeds() -> dict:
     G = json.JSONDecoder().raw_decode(s, s.index("{"))[0]
     LV = json.loads((EX / "levels.json").read_text(encoding="utf-8"))
     M, LM = G.get("models") or {}, LV.get("models") or {}
-    return {"models": M, "lmodels": LM, "pieces": LV.get("pieces") or {}, "naming": M.get("naming") or {}, "graph": G, "_links": None}
+    # the levels map's function ids (file#name), one of the feeds a callee NAME is resolved to its qualified function through (D-041)
+    fns = sorted({n["id"] for n in LV.get("fn_nodes") or []} | {e[k] for e in LV.get("fn_edges") or [] for k in ("s", "t") if e.get(k)})
+    return {"models": M, "lmodels": LM, "pieces": LV.get("pieces") or {}, "naming": M.get("naming") or {}, "graph": G, "_links": None, "lvfns": fns}
 
 
 def _station_links(feeds: dict, spec: dict) -> tuple:
@@ -429,13 +431,14 @@ def station_conns(ID: str, feeds: dict, spec: dict, say: dict) -> list:
             if (s_ if d == "out" else t_) != ID:
                 continue
             o = nid[t_ if d == "out" else s_]
-            g = by.setdefault(f"{r_}|{d}|{o['kind']}", {"rel": r_, "items": [], "kind": o["kind"]})
+            g = by.setdefault(f"{r_}|{d}|{o['kind']}", {"rel": r_, "items": [], "kind": o["kind"], "ids": []})
             g["items"].append(o["label"])
+            g["ids"].append(t_ if d == "out" else s_)                  # the member's node id: its identity key is read from it (D-041)
         for g in by.values():
             lab = (rel[d].get(g["rel"]) or (g["rel"] + ("" if d == "out" else " (in)")))
             tr = say["structural"] if g["rel"] in rel["structural"] else say["inferred"]
             it = g["items"]
-            out.append([lab, len(it), tr, it[:cap], max(0, len(it) - cap), g["rel"], d, it, g["kind"]])
+            out.append([lab, len(it), tr, it[:cap], max(0, len(it) - cap), g["rel"], d, it, g["kind"], g["ids"]])
     return out
 
 
@@ -490,6 +493,7 @@ def universe(L: dict, spec: dict, feeds: dict, U: dict) -> dict:
     if g:
         add("GUARDS", len(g), " · ".join(x["name"] + (f" ({say['gate']})" if x.get("gate") else "") for x in g),
             [[x["name"], x.get("via"), bool(x.get("gate"))] for x in g])
+        rows[-1]["fns"] = [x.get("fn") or (x.get("resolved") or {}).get("key") for x in g]      # each guard's qualified function (D-041)
     else:
         silent.append("GUARDS")
     if sec.get("stream"):
@@ -543,6 +547,7 @@ def universe(L: dict, spec: dict, feeds: dict, U: dict) -> dict:
     # liveConns always shows its total, a 0 included (showCount)
     add("CONNECTIONS", tot, " · ".join(f"{g[0]} {g[1]}" for g in cg) or say["noEdges"],
         [g[:5] + [g[8], LK["connico"].get(g[5]) or "link", g[7][cap_c:]] for g in cg for cap_c in [card["connCap"]]])
+    rows[-1]["ids"] = [g[9] for g in cg]                               # every member's node id, in the order the group lists it (D-041)
     drawn = {"members": sorted({m for g in cg for m in g[7]}), "walls": sorted({m for g in cg if g[5] == "walls" and g[6] == "in" for m in g[7]})}
     b = fx.get("behind") or {}
     if b.get("fns"):

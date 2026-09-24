@@ -826,6 +826,70 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
 }
 ok(!errs.length, 'no page error after the D-036 checks', errs);
 
+/* 10 · D-041: click an element in the universe column or the code-map column and it lights in the three places. The rows expected
+   lit are recomputed HERE from the row records (u · d · the universe card's rows), the model→table alias read here from the
+   station's own c4 graph — never from the keys the generator wrote. Real clicks, located by the words a chip draws. */
+{ await open(PAGE);
+  const c4s = fs.readFileSync(path.join(REPO, 'templates/center/shell/example/codebase-graph-station/c4-graph.js'), 'utf8');
+  const c4w = {}; (await import('node:vm')).runInNewContext(c4s, { window: c4w }); const C4 = c4w.GABE_C4, M2T = {};   /* the station's own feed, run as the station runs it */
+  Object.values(C4.l2 || {}).forEach((e) => (e.nodes || []).forEach((n) => { if (n.kind === 'model' && n.table) M2T[n.label] = n.table; }));
+  const uniOf = (r, row) => (r.uni.rows.find((u) => u.row === row) || { items: [] }).items;
+  /* where the card draws a table: an access line, a model chip, a model class its signature or its payload names */
+  const uniTables = (r) => new Set([...uniOf(r, 'ACCESSES').map((o) => o[2]),
+    ...uniOf(r, 'CONNECTIONS').filter((g) => g[5] === 'model').flatMap((g) => g[3].concat(g[7])).map((m) => M2T[m]),
+    ...(String(uniOf(r, 'SIGNATURE')[0] || '').match(/[A-Za-z_][A-Za-z0-9_]*/g) || []).map((w) => M2T[w]),
+    ...[/→ (\S+)/.exec((r.uni.rows.find((u) => u.row === 'PAYLOAD') || {}).value || '')].filter(Boolean).map((m) => M2T[m[1]])].filter(Boolean));
+  /* where the code map names one: the tables and writes columns, the login check's writes, the tables list, a request or reply model */
+  const cmTables = (r) => new Set([...(r.u.tables || []), ...(r.u.written || []), ...r.d.gateWrites, ...r.d.tables.items.map((x) => x[0]),
+    ...[r.d.request && r.d.request[0], r.d.response && r.d.response[0]].map((m) => M2T[m]).filter(Boolean)]);
+  const holdsT = (r, t) => uniTables(r).has(t) || cmTables(r).has(t);
+  const EP = 'POST /setup/complete', T0 = 'households', CLS = Object.keys(M2T).find((c) => M2T[c] === T0), WEL = D.words.el;
+  const lit = () => p.evaluate(() => ({ on: [...document.querySelectorAll('#board tr.row[data-el="on"]')].map((e) => e.getAttribute('data-ep')).sort(),
+    off: document.querySelectorAll('#board tr.row[data-el="off"]').length,
+    cells: Object.fromEntries([...document.querySelectorAll('#board tr.row[data-el="on"]')].map((e) => [e.getAttribute('data-ep'),
+      [...e.querySelectorAll('[data-elcell]')].map((c) => c.classList.contains('id') ? 'id' : (c.querySelector('[data-col]') || {}).getAttribute('data-col')).sort()])),
+    pin: [...document.querySelectorAll('#pin [data-elcell]')].length, chip: document.getElementById('elchip').hidden ? null : document.getElementById('elsays').textContent,
+    uni: [...document.querySelectorAll('#ocol-uni .elon')].map((e) => [(e.closest('.urow') || {}).getAttribute('data-row'), e.textContent.trim()]),
+    cm: [...document.querySelectorAll('#ocol-cm .elon')].map((e) => [(e.closest('.pair') || {}).getAttribute('data-k'), e.textContent.trim()]),
+    sayU: document.getElementById('el-uni').hidden ? null : [document.getElementById('el-uni').getAttribute('data-here'), document.getElementById('el-uni').textContent],
+    sayC: document.getElementById('el-cm').hidden ? null : [document.getElementById('el-cm').getAttribute('data-here'), document.getElementById('el-cm').textContent],
+    open: window.__allep.state.open, out: document.getElementById('out').value, any: document.querySelectorAll('[data-el], [data-elcell], .elon').length }));
+  await p.click('#board tr.row[data-ep="' + EP + '"] td.id'); await p.waitForTimeout(60);
+  ok(!!CLS && uniOf(ROW[EP], 'CONNECTIONS').some((g) => g[5] === 'model' && g[3].includes(CLS)), 'the c4 graph names the model class of ' + T0 + ', and ' + EP + '\'s card draws it as a connection chip', CLS);
+  await p.locator('#ocol-uni .urow[data-row="CONNECTIONS"] .pchip', { hasText: new RegExp('^' + CLS + '$') }).first().click(); await p.waitForTimeout(80);
+  const a = await lit(), want = FEED.filter((ep) => holdsT(ROW[ep], T0)).sort();
+  const wantCells = Object.fromEntries(want.map((ep) => [ep, ['tables', 'written'].filter((c) => (ROW[ep].u[c] || []).includes(T0)).sort()]));
+  ok(JSON.stringify(a.on) === JSON.stringify(want) && a.off === FEED.length - want.length && JSON.stringify(Object.entries(a.cells).sort()) === JSON.stringify(Object.entries(wantCells).sort()) && a.pin > 0
+    && a.chip && a.chip.includes(T0) && a.chip.includes(String(want.length)) && a.out.includes(D.words.copy.lines.el + ': ' + T0 + ' (' + WEL.kinds.table + ') · table:' + T0),
+    'clicking the ' + CLS + ' chip in the universe lights exactly the table rows whose record holds ' + T0 + ' (recomputed here), the columns that count it, the pinned row, the chip and the copy text',
+    { lit: a.on.length, want: want.length, chip: a.chip, cellsBad: want.filter((ep) => JSON.stringify(a.cells[ep]) !== JSON.stringify(wantCells[ep])).slice(0, 3) });
+  ok(a.cm.some(([k, t]) => k === 'd:tables' && t.startsWith(T0 + ' ')) && a.cm.some(([k]) => k === 'c:tables') && a.uni.some(([rw, t]) => rw === 'ACCESSES' && t.endsWith('· ' + T0))
+    && a.uni.filter(([rw, t]) => rw === 'CONNECTIONS' && t === CLS).length >= 1 && a.sayU[0] === 'true' && a.sayC[0] === 'true',
+    'the same element lights in the code-map column (its tables pair and its list item) and wherever the universe card draws it (the access lines, the model chips)', { uni: a.uni, cm: a.cm });
+  /* another endpoint, the light kept: a row that holds it, clicked in the table */
+  const other = want.find((ep) => ep !== EP && ROW[ep].u.written && ROW[ep].u.written.includes(T0)) || want.find((ep) => ep !== EP);
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + other + '"] td.id'); await p.waitForTimeout(80);
+  const b10 = await lit(), nU = uniTables(ROW[other]).has(T0), nC = cmTables(ROW[other]).has(T0);
+  ok(b10.open === other && JSON.stringify(b10.on) === JSON.stringify(want) && (b10.sayU[0] === 'true') === nU && (b10.sayC[0] === 'true') === nC && (b10.uni.length > 0) === nU,
+    'choosing another endpoint keeps the element lit, and its two columns say whether they hold it', { other, sayU: b10.sayU, sayC: b10.sayC });
+  /* a place that lacks it says so: the login check's table, which POST /setup/complete's code map names and its card does not */
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + EP + '"] td.id'); await p.waitForTimeout(60);
+  const T1 = ROW[EP].d.gateWrites.find((t) => !uniTables(ROW[EP]).has(t));
+  await p.locator('#ocol-cm .pair[data-k="d:gateWrites"] .pv span', { hasText: new RegExp('^' + T1 + '$') }).first().click(); await p.waitForTimeout(60);
+  const c10 = await lit();
+  ok(!!T1 && c10.sayU && c10.sayU[0] === 'false' && c10.sayU[1].includes(T1) && c10.sayU[1].includes(WEL.places.uni) && !c10.uni.length && c10.sayC[0] === 'true' && c10.cm.length > 0,
+    'an element the universe card lacks: the universe column says plainly it is not there, the code map outlines where it is', { T1, sayU: c10.sayU, cm: c10.cm.length });
+  /* out: the same element again, then Escape, then the clear link */
+  await p.locator('#ocol-cm .pair[data-k="d:gateWrites"] .pv span', { hasText: new RegExp('^' + T1 + '$') }).first().click(); await p.waitForTimeout(40);
+  const d1 = await lit();
+  await p.locator('#ocol-cm .pair[data-k="d:gateWrites"] .pv span', { hasText: new RegExp('^' + T1 + '$') }).first().click(); await p.waitForTimeout(40);
+  await p.keyboard.press('Escape'); await p.waitForTimeout(40); const d2 = await lit();
+  await p.locator('#ocol-cm .pair[data-k="d:gateWrites"] .pv span', { hasText: new RegExp('^' + T1 + '$') }).first().click(); await p.waitForTimeout(40);
+  await p.click('#elclear'); await p.waitForTimeout(40); const d3 = await lit();
+  ok([d1, d2, d3].every((x) => x.any === 0 && x.chip === null && x.sayU === null && x.sayC === null && !x.out.includes(D.words.copy.lines.el + ': ')),
+    'clicking it again, Escape, and clear each put everything out: no row lit or dimmed, no cell or element outlined, no chip, no line, no copy line', [d1.any, d2.any, d3.any]); }
+ok(!errs.length, 'no page error after the D-041 checks', errs);
+
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));
   copy.arms.frontend.present = false; copy.arms.frontend.reason = 'switched off for the probe';

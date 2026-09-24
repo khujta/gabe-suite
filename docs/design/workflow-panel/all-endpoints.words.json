@@ -27,7 +27,9 @@
     "home",
     "area",
     "rows",
-    "names"
+    "names",
+    "name",
+    "place"
   ],
   "eyebrow": "every endpoint of one app, side by side",
   "h1": "All {nRows} endpoints of {app}, one row each",
@@ -631,7 +633,8 @@
       "open": "endpoint",
       "cols": "columns",
       "your": "your words:",
-      "slook": "shared marked by"
+      "slook": "shared marked by",
+      "el": "element lit"
     }
   },
   "authNoScheme": "own check",
@@ -1038,5 +1041,42 @@
     "key": "dashed icon: my pick",
     "lab": "the lab's section map marks it this way ({v}) — my pick there too, not ruled"
   },
-  "pinRow": "The endpoint picked in the table, pinned at the top with the column names. Click it to go to its section below."
+  "pinRow": "The endpoint picked in the table, pinned at the top with the column names. Click it to go to its section below.",
+  "el": {
+    "_about": "D-041: click an element of information in the universe column or the code-map column and it lights in all three places. Keys and their aliases are read by gen-all-endpoints.py (key_index, keyspace); these are the words the light speaks.",
+    "says": "lit: {name} ({kind}) · {n} endpoints",
+    "noCol": "no column of the table counts it",
+    "clear": "clear",
+    "here": "{name} ({kind}) · {n} drawn here",
+    "not": "{name} ({kind}) — not in {place}",
+    "places": {
+      "uni": "the universe card",
+      "cm": "the code map"
+    },
+    "plain": "Click an element in either column (a chip, a pair, a list item, a name) and it lights everywhere it appears: the table rows whose endpoint holds it (the rest dim), the cells of the columns that count it, and every place either column draws it. A column that does not hold it says so at its top. Click it again, press Escape or clear to put it out; choosing another endpoint keeps it lit.",
+    "alias": "Which things are one element is my reading. Every element carries one key ({nKeys} on this page). A model class and its database table are one element, joined by the station graph's model-to-table map and the forms feed's models ({nAlias} classes). A function is its file and qualified name; a callee name for which the feeds hold no single function carries no key and cannot be lit ({nUnkeyed} of {nNames} names). A name a condition reads is a setting of the forms feed, else a flag; a guard, a switch or an in-flight value holds the settings and flags its condition reads. A row is lit when its endpoint holds the element anywhere on this page: in the table, its universe card or its code map.",
+    "kinds": {
+      "table": "table",
+      "fn": "function",
+      "schema": "schema",
+      "flag": "flag",
+      "setting": "setting",
+      "case": "test case",
+      "status": "exit status",
+      "file": "file",
+      "entity": "entity",
+      "endpoint": "endpoint",
+      "fe": "frontend piece",
+      "guard": "own guard",
+      "fork": "deciding branch",
+      "catch": "catch",
+      "switch": "switch",
+      "reason": "reason site",
+      "rule": "422 rule",
+      "inflight": "in-flight value",
+      "finding": "finding",
+      "limiter": "rate limiter",
+      "piece": "piece"
+    }
+  }
 }

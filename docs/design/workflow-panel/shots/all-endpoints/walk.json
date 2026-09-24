@@ -515,7 +515,7 @@
       953,
       53,
       935,
-      3174
+      3183
      ]
     ],
     "universe": [
@@ -683,12 +683,152 @@
    }
   ],
   [
-   "step 58 · open-in-the-lab",
+   "step 58 · light-household-in-the-universe",
+   {
+    "click": "Household",
+    "at": [
+     75,
+     529
+    ],
+    "size": [
+     99,
+     22
+    ],
+    "note": "the Household chip under reads_from, in the universe column"
+   }
+  ],
+  [
+   "lit: Household",
+   {
+    "chip": "lit: households (table) · 79 endpoints",
+    "rowsLit": 79,
+    "rowsDim": 1,
+    "uni": [
+     "reads → Household · households",
+     "writes → Household · households",
+     "Household",
+     "Household"
+    ],
+    "cm": [
+     "tables15",
+     "writes12",
+     "households · rw"
+    ],
+    "uniSays": "households (table) · 4 drawn here",
+    "cmSays": "households (table) · 3 drawn here"
+   }
+  ],
+  [
+   "step 61 · another-endpoint-light-on",
+   {
+    "click": "GET/",
+    "at": [
+     33,
+     567
+    ],
+    "size": [
+     224,
+     21
+    ],
+    "note": "a lit row: GET /"
+   }
+  ],
+  [
+   "lit, another endpoint",
+   {
+    "endpoint": "GET /",
+    "chip": "lit: households (table) · 79 endpoints",
+    "rowsLit": 79,
+    "rowsDim": 1,
+    "uni": [],
+    "cm": [
+     "tables6",
+     "households · r"
+    ],
+    "uniSays": "households (table) — not in the universe card",
+    "cmSays": "households (table) · 2 drawn here"
+   }
+  ],
+  [
+   "step 63 · back-to-setup-complete",
+   {
+    "click": "POST/setup/complete",
+    "at": [
+     33,
+     529
+    ],
+    "size": [
+     224,
+     21
+    ],
+    "note": "the row POST /setup/complete"
+   }
+  ],
+  [
+   "step 64 · light-users-in-the-code-map",
+   {
+    "click": "users",
+    "at": [
+     990,
+     532
+    ],
+    "size": [
+     37,
+     15
+    ],
+    "note": "users, under \"the login check writes\", in the code map"
+   }
+  ],
+  [
+   "lit: users",
+   {
+    "chip": "lit: users (table) · 79 endpoints",
+    "rowsLit": 79,
+    "rowsDim": 1,
+    "uni": [],
+    "cm": [
+     "tables15",
+     "users · rw",
+     "users"
+    ],
+    "uniSays": "users (table) — not in the universe card",
+    "cmSays": "users (table) · 3 drawn here"
+   }
+  ],
+  [
+   "step 66 · clear-the-element-light",
+   {
+    "click": "clear",
+    "at": [
+     403,
+     401
+    ],
+    "size": [
+     37,
+     19
+    ],
+    "note": "the clear link on the lit chip above the table"
+   }
+  ],
+  [
+   "after clear",
+   {
+    "chip": null,
+    "rowsLit": 0,
+    "rowsDim": 0,
+    "uni": [],
+    "cm": [],
+    "uniSays": null,
+    "cmSays": null
+   }
+  ],
+  [
+   "step 68 · open-in-the-lab",
    {
     "click": "open POST /setup/complete in the lab",
     "at": [
      480,
-     435
+     525
     ],
     "size": [
      64,
@@ -712,7 +852,7 @@
    }
   ],
   [
-   "step 60 · open-in-the-universe",
+   "step 70 · open-in-the-universe",
    {
     "click": "open POST /setup/complete in the Gabe Universe",
     "at": [
@@ -742,7 +882,7 @@
    }
   ],
   [
-   "step 62 · click-the-stream-row",
+   "step 72 · click-the-stream-row",
    {
     "click": "GET/recipe-creation/gustify/stream",
     "at": [
@@ -809,7 +949,7 @@
    }
   ],
   [
-   "step 65 · more-information",
+   "step 75 · more-information",
    {
     "click": "Show how the map knows this",
     "at": [

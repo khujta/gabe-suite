@@ -17,15 +17,18 @@
              the accent reads as a small number. Rose sits far from every skin's accent (indigo · blue · teal) and from --alert */
           --sh:#be185d; --shp:24%;   /* --shp: the Shared header's tint, stronger in dark where a pale tint drowns */
           /* the alternating block ground is NEUTRAL for the same reason: the accent is spent on the heat alone */
-          --bz:color-mix(in srgb, var(--ink) 4%, var(--card)); }
+          --bz:color-mix(in srgb, var(--ink) 4%, var(--card));
+          /* D-041: the element light's own colour — a highlighter yellow, apart from the accent (the heat), --alert (the strip
+             light) and --sh (the Shared group) */
+          --el:#c48a00; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --alert:#f0a35a; --alert-soft:#3b2914;
           --k-success:#5fc28e; --k-refusal:#e5b454; --k-framework:#94a3b8; --k-validation:#a78bfa; --k-uncaught:#f47272;
           --f-saved:#5fc28e; --f-maybe:#f2c94c; --f-rolled:#94a3b8; --f-unsaved:#f0955a; --f-after:#6fa8e8; --p-norm:#3b4658; --p-common:#64748b;
-          --m-GET:#6fa8e8; --m-POST:#5fc28e; --m-PUT:#e5b454; --m-PATCH:#b69cf0; --m-DELETE:#f47272; --sh:#f472b6; --shp:32%; } }
+          --m-GET:#6fa8e8; --m-POST:#5fc28e; --m-PUT:#e5b454; --m-PATCH:#b69cf0; --m-DELETE:#f47272; --sh:#f472b6; --shp:32%; --el:#facc15; } }
   :root[data-theme="dark"] { --alert:#f0a35a; --alert-soft:#3b2914;
           --k-success:#5fc28e; --k-refusal:#e5b454; --k-framework:#94a3b8; --k-validation:#a78bfa; --k-uncaught:#f47272;
           --f-saved:#5fc28e; --f-maybe:#f2c94c; --f-rolled:#94a3b8; --f-unsaved:#f0955a; --f-after:#6fa8e8; --p-norm:#3b4658; --p-common:#64748b;
-          --m-GET:#6fa8e8; --m-POST:#5fc28e; --m-PUT:#e5b454; --m-PATCH:#b69cf0; --m-DELETE:#f47272; --sh:#f472b6; --shp:32%; }
+          --m-GET:#6fa8e8; --m-POST:#5fc28e; --m-PUT:#e5b454; --m-PATCH:#b69cf0; --m-DELETE:#f47272; --sh:#f472b6; --shp:32%; --el:#facc15; }
   body { background: var(--ground); }
 
   .eyebrow { font-size: var(--fs-min); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 0; }
@@ -80,6 +83,18 @@
   .status { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: var(--fs-xs); color: var(--ink-soft); margin: 0 0 8px; }
   .litchip { display: inline-flex; gap: 8px; align-items: center; color: var(--alert); border: 1px solid var(--alert); background: var(--alert-soft); border-radius: 8px; padding: 2px 8px; }
   .litchip[hidden] { display: none; }
+  /* D-041: the element light — its chip, its rows and cells in the table, its marks in the two columns, its line at a column's top */
+  .elchip { color: var(--ink); border-color: var(--el); background: color-mix(in srgb, var(--el) 16%, var(--card)); }
+  .elchip b { font-weight: 700; }
+  tr.row[data-el="off"] td > *, .card[data-el="off"] > * { opacity: .22; }
+  tr.row[data-el="on"] td.id, .card[data-el="on"] { box-shadow: inset 5px 0 0 var(--el); }
+  td[data-elcell="true"], .cc[data-elcell="true"], .idc[data-elcell="true"] { outline: 2.5px solid var(--el); outline-offset: -2px; border-radius: 3px; }
+  #ocol-uni [data-key], #ocol-cm [data-key] { cursor: pointer; }
+  #ocol-uni [data-key]:hover, #ocol-cm [data-key]:hover { text-decoration: underline dotted; text-underline-offset: 2px; }
+  .elon { outline: 2.5px solid var(--el) !important; outline-offset: 1px; border-radius: 4px; box-shadow: 0 0 0 5px color-mix(in srgb, var(--el) 30%, transparent) !important; }
+  .elsay { font-size: var(--fs-xs); color: var(--ink); margin: 0 0 6px; padding: 2px 8px; border-left: 3px solid var(--el); background: color-mix(in srgb, var(--el) 10%, transparent); }
+  .elsay[hidden] { display: none; }
+  .elsay[data-here="false"] { color: var(--alert); border-left-color: var(--alert); background: var(--alert-soft); font-weight: 650; }
   .litchip button, .status button { font: inherit; font-size: var(--fs-min); cursor: pointer; background: none; border: 0; color: inherit; text-decoration: underline; padding: 0; }
 
   /* ── the pin: the selected endpoint's row under the table's names, always at the top of the page (his ask 2026-09-24) ── */
@@ -310,7 +325,7 @@
       <p class="keys" id="keys">—</p>
     </div>
     <div class="rail" id="rail"></div>
-    <div class="status" id="status"><span id="sortsays">—</span><span class="litchip" id="litchip" hidden><span id="litsays">—</span><button type="button" id="litclear">—</button></span></div>
+    <div class="status" id="status"><span id="sortsays">—</span><span class="litchip" id="litchip" hidden><span id="litsays">—</span><button type="button" id="litclear">—</button></span><span class="litchip elchip" id="elchip" hidden><span id="elsays">—</span><button type="button" id="elclear">—</button></span></div>
     <div class="board" id="board"></div>
   </section>
 
@@ -357,12 +372,17 @@
   var KEY = "gabe:allep:v2", OLD_KEYS = ["gabe:allep:v1"];
   var $ = function (id) { return document.getElementById(id); };
   function el(t, c, x) { var n = document.createElement(t); if (c) n.className = c; if (x != null) n.textContent = x; return n; }
+  /* D-041: an element's identity key(s) on the node that draws it — `data-keys` every key it IS (outlined when one is lit, one per
+     line: a key may hold a space), `data-key` the one a click lights (none when click is false: a count that holds many) */
+  function kd(n, keys, click) { var ks = (Array.isArray(keys) ? keys : [keys]).filter(function (k) { return k; }); if (!ks.length) return n;
+    n.setAttribute("data-keys", ks.join("\n")); if (click !== false) n.setAttribute("data-key", ks[0]); return n; }
+  function ksp(text, key) { return kd(el("span", null, text), key); }
   function nEp(n) { return fill(n === 1 ? W.group.countOne : W.group.count, { n: n }); }
   function fill(s, x) { return String(s).replace(/\{([a-zA-Z]\w*)\}/g, function (m, k) { return x && x[k] != null ? x[k] : (T[k] != null ? T[k] : m); }); }
 
   /* ── state: every rail defaults to the words file's default (his where the rail is ruled, else my pick), remembered per viewer ── */
   var RAILS = ["lay", "grp", "alone", "gord", "shared", "slook", "bord", "cols", "heat", "norm", "go"];
-  var S = { sort: null, lit: null, open: null };
+  var S = { sort: null, lit: null, open: null, el: null };     /* el: the element lit everywhere (D-041), apart from `lit`, the strip piece's light */
   RAILS.forEach(function (r) { S[r] = W.rail[r].pick; });
   try { OLD_KEYS.forEach(function (k) { window.localStorage.removeItem(k); }); } catch (e) {}
   try { var raw = window.localStorage.getItem(KEY); if (raw) { var o = JSON.parse(raw);
@@ -650,7 +670,7 @@
       $("litsays").textContent = fill(W.litSays, { col: COL[S.lit.col].head, what: b ? b.what : "", n: b ? b.n : 0 }); $("litchip").hidden = false; }
     else $("litchip").hidden = true;
     $("n-board").textContent = nEp(N);
-    renderOne(); writeOut(L, GS);
+    renderOne(); writeOut(L, GS); applyEl();
   }
   /* THE PIN: the board's own header rows (headRows — sorting and the strips work here too) and the selected row, drawn by the same
      cell renderer. In rows mode it copies the board's measured column widths (a fixed layout) and follows its sideways scroll, so
@@ -671,14 +691,18 @@
   /* ══ SECTION 2 · ONE ENDPOINT (D-036): the universe card · the gaps · the code map. The row picked in the table, or the one
      the address names (?ep=<slug>, the lab's own slug rule). Picking a row updates this section and the address. ══ */
   function kv(box, k, v) { box.appendChild(el("span", "k", k)); box.appendChild(el("span", null, v == null || v === "" ? W.panel.none : String(v))); }
-  function list(b, items, fmt) { if (!items.length) { b.appendChild(el("span", "z", W.panel.none)); return; } var u = el("ul"); items.forEach(function (x) { u.appendChild(el("li", null, fmt(x))); }); b.appendChild(u); }
+  /* a list; `keys` (D-041) keys each item, and an item's words may be a node (a keyed name inside it) */
+  function list(b, items, fmt, keys) { if (!items.length) { b.appendChild(el("span", "z", W.panel.none)); return; } var u = el("ul");
+    items.forEach(function (x, i) { var f = fmt(x, i), li = el("li", null, typeof f === "string" ? f : null); if (typeof f !== "string") li.appendChild(f); if (keys) kd(li, keys[i]); u.appendChild(li); }); b.appendChild(u); }
+  function frag() { var f = document.createDocumentFragment(); [].slice.call(arguments).forEach(function (x) { if (x != null) f.appendChild(typeof x === "string" ? document.createTextNode(x) : x); }); return f; }
+  function keyedJoin(b, names, keys, sep) { if (!names.length) { b.textContent = W.panel.none; return; } names.forEach(function (n, i) { if (i) b.appendChild(document.createTextNode(sep)); b.appendChild(typeof n === "string" ? ksp(n, keys[i]) : kd(n, keys[i])); }); }
   function more(b, lst) { if (lst.more) b.appendChild(el("div", "z", fill(W.panel.more, { more: lst.more }))); }
   function slugOf(id) { return window.EPSLUG.slug(id); }
   function setAddress(id) { try { var u = new URL(window.location.href); u.searchParams.set("ep", slugOf(id)); window.history.replaceState(null, "", u.pathname + "?" + u.searchParams.toString() + u.hash); } catch (e) {} }
   function pick(id, byClick) {
     S.open = id; setAddress(id); $("onenote").hidden = true;
     document.querySelectorAll("#board tr.row[data-ep], #board .card[data-ep]").forEach(function (e) { if (e.getAttribute("data-ep") === id) e.setAttribute("data-sel", "true"); else e.removeAttribute("data-sel"); });
-    renderPin(LAST.L); renderOne(); writeOut(LAST.L, LAST.GS);
+    renderPin(LAST.L); renderOne(); writeOut(LAST.L, LAST.GS); applyEl();     /* another endpoint keeps the element lit (D-041) */
     if (byClick && S.go === "scroll") { var so = $("sec-one"); if (so && so.scrollIntoView) so.scrollIntoView({ block: "start" }); } }
   /* where an attribute sits: its home block, or the Shared group (first block that needs it when the shared rail says so) */
   function groupOfAttr(a) { var at = D.attrs[a]; if (!at) return null; if (!at.shared) return at.home;
@@ -696,40 +720,48 @@
     return String(v).replace(/\+/g, " · "); }
   function pairEl(key, attrs, icon, label, wide) { var pr = el("div", "pair" + (wide ? " wide" : "")); pr.setAttribute("data-k", key); pr.setAttribute("data-attr", attrs.join(" "));
     pr.setAttribute("data-tip", "pair"); pr.appendChild(el("span", "pi")); pr.firstChild.appendChild(svgOf(icon)); var box = el("div"); box.appendChild(el("div", "pk", label)); pr.appendChild(box); return { pr: pr, box: box }; }
-  function detailPair(k, r) { var d = r.d, P = W.panel, cm = W.codemap.details[k], wide = ["exits", "fates", "guards", "inflight", "reasons", "pieces", "tables", "alarms"].indexOf(k) >= 0;
+  /* every item carries its element's key (r.dk, parallel to the items — D-041): a click lights it, the light outlines it */
+  function detailPair(k, r) { var d = r.d, dk = r.dk, P = W.panel, cm = W.codemap.details[k], wide = ["exits", "fates", "guards", "inflight", "reasons", "pieces", "tables", "alarms"].indexOf(k) >= 0;
     var o = pairEl("d:" + k, cm.attrs, cm.icon, P[k], wide), b = el("div", "pv"); o.box.appendChild(b);
     if (k === "exits") { var t = el("table"), th = el("tr"); P.exitCols.forEach(function (c) { th.appendChild(el("th", null, c)); }); t.appendChild(th);
-      d.exits.items.forEach(function (e) { var tr = el("tr"); [W.kinds[e[0]] ? W.kinds[e[0]].name : e[0], e[1], e[2], e[3], e[4]].forEach(function (v) { tr.appendChild(el("td", null, v == null ? "" : String(v))); }); t.appendChild(tr); });
+      d.exits.items.forEach(function (e, i) { var tr = el("tr"); [W.kinds[e[0]] ? W.kinds[e[0]].name : e[0], e[1], e[2], e[3], e[4]].forEach(function (v, j) { var td = el("td", null, v == null ? "" : String(v));
+        if (j === 2) kd(td, dk.exits[i][0]); if (j === 4) kd(td, dk.exits[i][1], false); tr.appendChild(td); }); t.appendChild(tr); });   /* the status lights; the test count holds its cases */
       b.appendChild(t); more(b, d.exits); }
-    else if (k === "tables") { list(b, d.tables.items, function (t2) { return t2[0] + " · " + t2[1]; }); more(b, d.tables); }
-    else if (k === "gateWrites") b.textContent = d.gateWrites.join(", ") || W.panel.none;
-    else if (k === "fates") { list(b, d.fates.items, function (f) { return f[0] + " (" + f[1] + ") · " + W.fates[f[2]].name; }); more(b, d.fates); }
-    else if (k === "guards") { list(b, d.guards.items, function (g) { return g[0] + " · " + g[1]; }); more(b, d.guards); }
-    else if (k === "gates") b.textContent = d.gates.join(", ") || W.panel.none;
-    else if (k === "limits") b.textContent = d.limits.map(function (l) { return l[0] + " " + fill(P.limitWords, { v: l[1] }) + (l[2] != null ? " / " + l[2] + "s" : ""); }).join(" · ") || W.panel.none;
-    else if (k === "request") b.textContent = d.request ? d.request[0] + " · " + d.request[1].join(", ") : W.panel.none;
-    else if (k === "response") b.textContent = d.response ? d.response[0] + " · " + d.response[1] : W.panel.none;
+    else if (k === "tables") { list(b, d.tables.items, function (t2) { return t2[0] + " · " + t2[1]; }, dk.tables); more(b, d.tables); }
+    else if (k === "gateWrites") keyedJoin(b, d.gateWrites, dk.gateWrites, ", ");
+    else if (k === "fates") { list(b, d.fates.items, function (f, i) { return frag(f[0] + " (", ksp(String(f[1]), dk.fates[i]), ") · " + W.fates[f[2]].name); }); more(b, d.fates); }
+    else if (k === "guards") { list(b, d.guards.items, function (g, i) { return frag(ksp(String(g[0]), dk.guards[i][2]), " · " + g[1]); }, dk.guards.map(function (x) { return [x[0]].concat(x[1]); })); more(b, d.guards); }
+    else if (k === "gates") keyedJoin(b, d.gates, dk.gates, ", ");
+    else if (k === "limits") keyedJoin(b, d.limits.map(function (l) { return frag(ksp(l[0], null), " " + fill(P.limitWords, { v: l[1] }) + (l[2] != null ? " / " + l[2] + "s" : "")); }).map(function (f) { var sp = el("span"); sp.appendChild(f); return sp; }), dk.limits, " · ");
+    else if (k === "request") { if (d.request) b.appendChild(frag(ksp(d.request[0], dk.request), " · " + d.request[1].join(", "))); else b.textContent = W.panel.none; }
+    else if (k === "response") { if (d.response) b.appendChild(frag(ksp(d.response[0], dk.response), " · " + d.response[1])); else b.textContent = W.panel.none; }
     else if (k === "cases") b.textContent = Object.keys(d.cases).map(function (q) { return q + " " + d.cases[q]; }).join(" · ") || W.panel.none;
-    else if (k === "deciders") { list(b, d.deciders.items, function (f) { return f; }); more(b, d.deciders); }
-    else if (k === "switches") b.textContent = d.switches.items.map(function (x) { return x[0] + (x[1] ? " (" + x[1] + ")" : ""); }).join(" · ") || W.panel.none;
+    else if (k === "deciders") { list(b, d.deciders.items, function (f) { return f; }, dk.deciders); more(b, d.deciders); }
+    else if (k === "switches") keyedJoin(b, d.switches.items.map(function (x) { return x[0] + (x[1] ? " (" + x[1] + ")" : ""); }), dk.switches.map(function (x) { return [x[0]].concat(x[1]); }), " · ");
     else if (k === "behind") b.textContent = d.behind[0] + " · " + d.behind[1];
     else if (k === "proof") b.textContent = fill(P.proofWords, { n: d.proof.tested + "/" + d.proof.produced, v: d.proof.rank + (d.proof.rank_to !== d.proof.rank ? "–" + d.proof.rank_to : ""), of: d.proof.of });
-    else if (k === "inflight") { list(b, d.inflight.items, function (f) { return f[0] + " · " + f[1] + " · " + f[2]; }); more(b, d.inflight); }
-    else if (k === "hook") b.textContent = d.hook || W.panel.none;
+    else if (k === "inflight") { list(b, d.inflight.items, function (f) { return f[0] + " · " + f[1] + " · " + f[2]; }, dk.inflight); more(b, d.inflight); }
+    else if (k === "hook") { if (d.hook) b.appendChild(ksp(d.hook, dk.hook)); else b.textContent = W.panel.none; }
     else if (k === "screens") b.textContent = String(d.screens);
-    else if (k === "reasons") { list(b, d.reasons.items, function (x) { return x[0] + " · " + x[1] + " · " + x[2]; }); more(b, d.reasons); }
-    else if (k === "alarms") list(b, d.alarms, function (a) { return a[0] + (a[1] ? " " + a[1] : "") + (a[2] ? " · " + a[2] : ""); });
-    else if (k === "pieces") { list(b, d.pieces.items, function (x) { return x[0] + " · " + x[1] + "/" + x[2] + " · " + W.pieceWords[x[3]].name; }); more(b, d.pieces); }
+    else if (k === "reasons") { list(b, d.reasons.items, function (x, i) { var at = String(x[0] || ""), c = at.lastIndexOf(":");   /* the site's file is its own element */
+        return frag(dk.reasons[i][1] && c > 0 ? ksp(at.slice(0, c), dk.reasons[i][1]) : at, dk.reasons[i][1] && c > 0 ? at.slice(c) : null, " · " + x[1] + " · " + x[2]); }, dk.reasons.map(function (x) { return x[0]; })); more(b, d.reasons); }
+    else if (k === "alarms") list(b, d.alarms, function (a) { return a[0] + (a[1] ? " " + a[1] : "") + (a[2] ? " · " + a[2] : ""); }, dk.alarms);
+    else if (k === "pieces") { list(b, d.pieces.items, function (x) { return x[0] + " · " + x[1] + "/" + x[2] + " · " + W.pieceWords[x[3]].name; }, dk.pieces); more(b, d.pieces); }
     else if (k === "lacks") list(b, d.lacks, function (x) { return x[0] + " · " + x[1] + "/" + x[2]; });
     return o.pr; }
-  function headPair(k, r) { var cm = W.codemap.head[k], P = W.panel;
+  function headPair(k, r) { var cm = W.codemap.head[k], P = W.panel, hk = r.hk[k];
     var val = k === "method" ? r.m + " " + r.p : k === "handler" ? r.fn + " · " + r.file + ":" + r.line : k === "entity" ? r.ent : k === "segment" ? r.seg : r.declared;
-    var o = pairEl("h:" + k, cm.attrs, cm.icon, cm.label || P[k], false); o.box.appendChild(el("div", "pv", val == null || val === "" ? W.panel.none : String(val))); return o.pr; }
+    var o = pairEl("h:" + k, cm.attrs, cm.icon, cm.label || P[k], false), pv = el("div", "pv", k === "handler" || val == null || val === "" ? null : String(val));
+    if (k === "handler") pv.appendChild(frag(ksp(r.fn, hk[0]), " · ", ksp(r.file, hk[1]), ":" + r.line));   /* the handler is a function and a file (D-041) */
+    else if (val == null || val === "") pv.textContent = W.panel.none; else kd(pv, hk);
+    o.box.appendChild(pv); return o.pr; }
   function colPair(cs, r) { var c = cs[0], kinds = cs.length > 1;
     var o = pairEl("c:" + cs.map(function (x) { return x.id; }).join(","), [c.attr], W.cols[c.id].icon, kinds ? W.codemap.kinds : c.head, false), b = el("div", "pv");
     cs.forEach(function (x) { b.appendChild(cell(x, r)); });
     if (!kinds && ["spine", "stack", "dots", "ratio"].indexOf(c.kind) >= 0) b.appendChild(el("span", "pk", " " + pairText(c, r)));
     var zero = cs.every(function (x) { var k = r.k[x.id]; return stateOf(r, x) || !k; }); if (zero) b.classList.add("z");
+    /* the pair counts what its columns count: it holds their keys, outlined when one is lit, never itself a click (D-041) */
+    kd(o.pr, [].concat.apply([], cs.map(function (x) { return r.ck[x.id] || []; })), false);
     o.box.appendChild(b); return o.pr; }
   var LABICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6"></path><path d="M10 3v6.5L4.6 18.4A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.4-2.6L14 9.5V3"></path><path d="M7.5 15h9"></path></svg>';
   var UNIICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><ellipse cx="12" cy="12" rx="10.5" ry="3.2" transform="rotate(-20 12 12)"></ellipse></svg>';
@@ -752,67 +784,77 @@
   function uKv(icon, k, v) { return E("div", "kv", uIco(icon, "kico"), el("span", "k", k), el("span", "v", v == null ? "" : String(v))); }
   function uChip(cls, glyph, label, title) { var c = E("span", "pchip " + cls, glyph ? uIco(glyph) : null, label); if (title) c.title = title; return c; }
   /* the station's expander: the first `cap` rows, then its own "+N more" button, which shows the rest */
-  function uList(labels, cap, cls, glyph, twisty) { var box = el("div", "xpl"), shown = Math.min(cap, labels.length);
+  function uList(labels, cap, cls, glyph, twisty, keys) { var box = el("div", "xpl"), shown = Math.min(cap, labels.length); keys = keys || [];
     function paint() { box.textContent = "";
-      labels.slice(0, shown).forEach(function (l) { var tw = el("span", twisty ? "xtw" : "xtwsp"); if (twisty) tw.title = W.one.uni.twisty;
-        box.appendChild(E("div", "xrow", E("div", "xhead", tw, uChip(cls, glyph, l)))); });
+      labels.slice(0, shown).forEach(function (l, i) { var tw = el("span", twisty ? "xtw" : "xtwsp"); if (twisty) tw.title = W.one.uni.twisty;
+        box.appendChild(E("div", "xrow", E("div", "xhead", tw, kd(uChip(cls, glyph, l), keys[i])))); });
       if (shown < labels.length) { var b = el("button", "more xmore", "+" + (labels.length - shown) + " " + D.ucard.more); b.type = "button";
         b.addEventListener("click", function () { shown = labels.length; paint(); }); box.appendChild(b); } }
+    /* a lit element behind "+N more" is shown, as the station's own "+N more" shows it (D-041) */
+    box._reveal = function (K) { if (shown < labels.length && keys.slice(shown).indexOf(K) >= 0) { shown = labels.length; paint(); } };
     paint(); return box; }
-  function uTests(u) { var cases = u.items, files = u.files || [], lab = new RegExp(UL.testLabel), first = u.tabs.length ? u.tabs[0][0] : null;
-    function body(k) { var w = el("div"), cs = cases.filter(function (c) { return c[2] === k; }), fs = files.filter(function (f) { return f[1] === k; });
-      var chip = function (c) { var st = c[1] || "unknown"; return uChip("st-" + st, UL.stateIco[st] || UL.testGroup, lab.test(c[0] || "") ? c[0] : (c[3] || c[0] || "?"), (UL.stateLbl[st] || st) + (c[3] ? " · " + c[3] : "")); };
-      cs.slice(0, UL.dcap).forEach(function (c) { w.appendChild(chip(c)); });
-      if (cs.length > UL.dcap) { var extra = el("div"); extra.style.display = "none"; cs.slice(UL.dcap).forEach(function (c) { extra.appendChild(chip(c)); }); w.appendChild(extra);
+  function uTests(u) { var cases = u.items, files = u.files || [], lab = new RegExp(UL.testLabel), first = u.tabs.length ? u.tabs[0][0] : null, ck = u.keys || [], cur = 0, reveal = null;
+    function body(k) { var w = el("div"), cs = cases.map(function (c, i) { return i; }).filter(function (i) { return cases[i][2] === k; }), fs = files.filter(function (f) { return f[1] === k; });
+      var chip = function (i) { var c = cases[i], st = c[1] || "unknown"; return kd(uChip("st-" + st, UL.stateIco[st] || UL.testGroup, lab.test(c[0] || "") ? c[0] : (c[3] || c[0] || "?"), (UL.stateLbl[st] || st) + (c[3] ? " · " + c[3] : "")), ck[i]); };
+      cs.slice(0, UL.dcap).forEach(function (i) { w.appendChild(chip(i)); }); reveal = null;
+      if (cs.length > UL.dcap) { var extra = el("div"); extra.style.display = "none"; cs.slice(UL.dcap).forEach(function (i) { extra.appendChild(chip(i)); }); w.appendChild(extra);
         var mb = el("span", "more", "+" + (cs.length - UL.dcap) + " " + D.ucard.more), lb = el("span", "more", UL.seeLess); mb.style.cursor = lb.style.cursor = "pointer"; lb.style.display = "none";
         mb.addEventListener("click", function () { extra.style.display = ""; mb.style.display = "none"; lb.style.display = ""; });
-        lb.addEventListener("click", function () { extra.style.display = "none"; mb.style.display = ""; lb.style.display = "none"; }); w.appendChild(mb); w.appendChild(lb); }
+        lb.addEventListener("click", function () { extra.style.display = "none"; mb.style.display = ""; lb.style.display = "none"; }); w.appendChild(mb); w.appendChild(lb);
+        reveal = function (K) { if (extra.style.display === "none" && cs.slice(UL.dcap).some(function (i) { return ck[i] === K; })) mb.click(); }; }
       if (u.casesMore && k === first) { var n = el("div", "sublbl", "+" + u.casesMore + " " + UL.casesMore); n.style.marginTop = "6px"; w.appendChild(n); }
       if (fs.length) { var fl = E("div", "sublbl", uIco(UL.fileCov[0]), UL.fileCov[1] + " · " + fs.length + " (" + UL.fileCov[2] + ")"); fl.style.marginTop = "7px"; w.appendChild(fl);
         fs.forEach(function (f) { w.appendChild(uChip(UL.fileChip[0], UL.fileChip[2], f[0], UL.fileChip[1])); }); }
       return w; }
     var box = el("div", "urow usec"); box.setAttribute("data-row", u.row); box.appendChild(uHd(u, u.count, u.ok));
+    /* a lit case in another tab: that tab is shown; one behind the tab's own "+N more": the rest is shown (D-041) */
+    box._reveal = function (K) { var i = ck.indexOf(K); if (i < 0) return; var t = u.tabs.map(function (x) { return x[0]; }).indexOf(cases[i][2]);
+      if (u.tabs.length > 1 && t >= 0 && t !== cur) show(t); if (reveal) reveal(K); };
     if (!u.tabs.length) { box.appendChild(styled("div", "font-size:12px;color:var(--muted)", u.value)); return box; }
     if (u.tabs.length === 1) { box.appendChild(E("div", "sublbl", uIco(UL.testGroup), u.tabs[0][0] + " " + u.tabs[0][1])); box.appendChild(body(u.tabs[0][0])); return box; }
     var bar = el("div", "tabbar"), hold = el("div");
-    function show(i) { hold.textContent = ""; hold.appendChild(body(u.tabs[i][0])); [].forEach.call(bar.children, function (c, j) { c.classList.toggle("on", j === i); }); }
+    function show(i) { cur = i; hold.textContent = ""; hold.appendChild(body(u.tabs[i][0])); [].forEach.call(bar.children, function (c, j) { c.classList.toggle("on", j === i); }); }
     u.tabs.forEach(function (t, i) { var b = E("button", "tab", uIco(UL.testGroup), t[0], el("span", "tabn", String(t[1]))); b.type = "button"; b.addEventListener("click", function () { show(i); }); bar.appendChild(b); });
     box.appendChild(bar); box.appendChild(hold); show(0); return box; }
-  function uRow(u, r) { var say = W.universe.say, it = u.items || [], box = el("div", "urow usec"); box.setAttribute("data-row", u.row);
+  function uRow(u, r) { var say = W.universe.say, it = u.items || [], ks = u.keys || [], box = el("div", "urow usec"); box.setAttribute("data-row", u.row);
     if (u.row === "HEAD") { box.className = "urow phead"; box.setAttribute("data-tip", "uni");
       var t = document.createElement("span"); t.innerHTML = UL.inline[0] + UL.headW + '" height="' + UL.headW + UL.inline[1] + UL.kindCol + UL.inline[2] + (UL.ico[u.icon] || "") + "</svg>";
-      var pt = E("div", "ptype", t.firstChild, el("span", null, it[1]), styled("span", UL.headEnt, " · " + it[2])); pt.style.color = "var(--uk-endpoint)";
-      box.appendChild(E("div", "ptitle", el("div", "pname", it[0]), pt)); return box; }
+      var he = styled("span", UL.headEnt, " · "); he.appendChild(ksp(it[2], ks[2]));
+      var pt = E("div", "ptype", t.firstChild, el("span", null, it[1]), he); pt.style.color = "var(--uk-endpoint)";
+      box.appendChild(E("div", "ptitle", kd(el("div", "pname", it[0]), ks[0]), pt)); return box; }
     if (u.row === "TESTS") return uTests(u);
     if (u.row === "EVIDENCE" || u.row === "MODEL ROW") { var kv = uKv(u.icon, u.title, u.value); kv.classList.add("urow"); kv.setAttribute("data-row", u.row); kv.setAttribute("data-tip", "uni"); return kv; }
     if (u.row === "RISK") { box.className = "urow flagssec"; box.setAttribute("data-tip", "uni");
       it.forEach(function (f) { box.appendChild(E("div", "flagrow " + f[3], uIco(f[1]), el("span", "flbl", f[2]))); }); return box; }
     box.appendChild(uHd(u, u.count, u.ok));
     if (u.row === "USAGE") { var ub = E("div", "ubar", el("div", "ufill")); ub.firstChild.style.width = Math.min(UL.usage[0], u.count * UL.usage[1]) + "%"; box.appendChild(ub); box.appendChild(E("div", "sublbl", uIco(UL.usage[2]), u.value)); }
-    else if (u.row === "GUARDS") box.appendChild(E("div", null, it.map(function (g) { return E("div", "sublbl", uIco(g[2] ? UL.guards[0] : UL.guards[1]), g[0] + " ", styled("span", UL.guards[2], "· " + g[1] + (g[2] ? UL.guards[3] : ""))); })));
+    else if (u.row === "GUARDS") box.appendChild(E("div", null, it.map(function (g, i) { return E("div", "sublbl", uIco(g[2] ? UL.guards[0] : UL.guards[1]), ksp(g[0], ks[i]), " ", styled("span", UL.guards[2], "· " + g[1] + (g[2] ? UL.guards[3] : ""))); })));
     else if (u.row === "DELIVERY") box.appendChild(E("div", "sublbl", uIco(UL.delivery[0]), UL.delivery[1], styled("span", UL.delivery[2], u.note)));
-    else if (u.row === "ACCESSES") box.appendChild(E("div", null, it.map(function (o) { var w = o[0] === "w"; return E("div", "sublbl", uIco(w ? UL.access[0] : UL.access[1]), (w ? UL.access[2] : UL.access[3]) + o[1] + " ", styled("span", UL.access[4], "· " + o[2])); })));
-    else if (u.row === "PAYLOAD") box.appendChild(E("div", "sublbl", uIco(UL.payload), u.value));
+    else if (u.row === "ACCESSES") box.appendChild(E("div", null, it.map(function (o, i) { var w = o[0] === "w"; return kd(E("div", "sublbl", uIco(w ? UL.access[0] : UL.access[1]), (w ? UL.access[2] : UL.access[3]) + o[1] + " ", styled("span", UL.access[4], "· " + o[2])), ks[i]); })));
+    else if (u.row === "PAYLOAD") { var pm = /→ (\S+)/.exec(u.value);
+      box.appendChild(pm && ks[0] ? E("div", "sublbl", uIco(UL.payload), u.value.slice(0, pm.index + 2), ksp(pm[1], ks[0]), u.value.slice(pm.index + 2 + pm[1].length)) : E("div", "sublbl", uIco(UL.payload), u.value)); }
     else if (u.row === "CONNECTIONS") { var cb = el("div", "connbox");
       if (!it.length) cb.appendChild(styled("div", "font-size:12px;color:var(--muted)", u.value));
       /* a group: its relation and count, its trust badge; then its members as the station's chips — the other end's kind picks
          the chip's class and glyph — the first `cap`, then "+N more" */
-      it.forEach(function (g) { var st = g[2] === say.structural, tt = st ? UL.ttag.slice(3) : UL.ttag.slice(0, 3), tg = el("span", "ttag " + tt[0], tt[2]); tg.title = tt[1];
+      it.forEach(function (g, gi) { var st = g[2] === say.structural, tt = st ? UL.ttag.slice(3) : UL.ttag.slice(0, 3), tg = el("span", "ttag " + tt[0], tt[2]); tg.title = tt[1];
         var hd = E("div", "sublbl", uIco(g[6]), g[0] + " " + g[1], tg); hd.setAttribute("data-group", g[0]);
-        var list = el("div", g[2] === UL.inferred[0] ? UL.inferred[1] : ""); list.appendChild(uList(g[3].concat(g[7]), UL.connCap, UL.chipCls[g[5]] || UL.chipDef, g[5], true));
+        var list = el("div", g[2] === UL.inferred[0] ? UL.inferred[1] : ""); list.appendChild(uList(g[3].concat(g[7]), UL.connCap, UL.chipCls[g[5]] || UL.chipDef, g[5], true, ks[gi]));
         cb.appendChild(hd); cb.appendChild(list); }); box.appendChild(cb); }
     else if (u.row === "CODE BEHIND") box.appendChild(E("div", null, E("div", "sublbl", uIco(UL.behind[0]), u.value + (UL.fnOff ? UL.behind[2] : UL.behind[1])),
-      uList(it.concat(u.rest || []), UL.behindCap, UL.behindChip[0], UL.behindChip[1], !UL.fnOff)));
+      uList(it.concat(u.rest || []), UL.behindCap, UL.behindChip[0], UL.behindChip[1], !UL.fnOff, ks)));
     else if (u.row === "JOURNEYS") { var js = el("div", "jsec"), real = new RegExp(UL.jReal);
-      it.forEach(function (j) { var ok = real.test(j[0] || ""); js.appendChild(E("div", "jmeta" + (ok ? "" : " jagg"), el("span", "jcid" + (ok ? "" : " noc"), j[0]), el("span", "corp", j[1]), el("span", "ncomp", j[2] + " " + D.ucard.comp)));
-        var fc = el("div", "jfaces"); j[3].filter(function (e, i, a) { return e && a.indexOf(e) === i; }).forEach(function (e) { var f = E("span", "face" + (e === u.home ? " fhome" : ""), uIco(UL.faceIco)); f.title = e; f.style.color = UL.hue[e]; fc.appendChild(f); });
+      it.forEach(function (j, ji) { var ok = real.test(j[0] || ""), jk = ks[ji] || [null, []]; js.appendChild(E("div", "jmeta" + (ok ? "" : " jagg"), kd(el("span", "jcid" + (ok ? "" : " noc"), j[0]), jk[0]), el("span", "corp", j[1]), el("span", "ncomp", j[2] + " " + D.ucard.comp)));
+        var fc = el("div", "jfaces"); j[3].filter(function (e, i, a) { return e && a.indexOf(e) === i; }).forEach(function (e, fi) { var f = E("span", "face" + (e === u.home ? " fhome" : ""), uIco(UL.faceIco)); f.title = e; f.style.color = UL.hue[e]; fc.appendChild(kd(f, jk[1][fi])); });
         js.appendChild(fc); }); box.appendChild(js); }
-    else if (u.row === "IDENTITY" || u.row === "SOURCE") u.kvs.forEach(function (k) { box.appendChild(uKv(k[0], k[1], k[2])); });
-    else if (u.row === "SIGNATURE") { if (it[0]) { var sd = styled("div", UL.sig[0], it[0]); sd.className = "doc"; box.appendChild(sd); } if (u.value) box.appendChild(uKv(UL.sig[1], UL.sig[2], u.value)); }
+    else if (u.row === "IDENTITY" || u.row === "SOURCE") u.kvs.forEach(function (k, i) { var kv = uKv(k[0], k[1], k[2]); kd(kv.querySelector(".v"), ks[i]); box.appendChild(kv); });
+    else if (u.row === "SIGNATURE") { if (it[0]) { var sd = styled("div", UL.sig[0], u.parts ? null : it[0]); sd.className = "doc";
+        (u.parts || []).forEach(function (q) { sd.appendChild(q[1] ? ksp(q[0], q[1]) : document.createTextNode(q[0])); }); box.appendChild(sd); }
+      if (u.value) box.appendChild(uKv(UL.sig[1], UL.sig[2], u.value)); }
     else if (u.row === "DOCSTRING") box.appendChild(el("div", "doc", u.value));
-    else if (u.row === "ABOVE") { var nav = function (lead, label) { return E("div", "pnav", lead, el("span", "pnl", label), E("span", "pdir " + UL.above[4], uIco(UL.above[4]))); };
+    else if (u.row === "ABOVE") { var nav = function (lead, label, key) { return E("div", "pnav", lead, E("span", "pnl", label, key ? ksp(key[0], key[1]) : null), E("span", "pdir " + UL.above[4], uIco(UL.above[4]))); };
       var core = E("span", "pki pcore", uSvg(UL.core)), dot = el("span", "pdot"); dot.style.background = u.dot;
-      box.appendChild(nav(core, UL.above[0] + it[0])); box.appendChild(nav(dot, UL.above[1] + it[1])); box.appendChild(nav(uIco(UL.above[2]), UL.above[3])); }
+      box.appendChild(nav(core, UL.above[0] + it[0])); box.appendChild(ks[1] ? nav(dot, UL.above[1], [it[1], ks[1]]) : nav(dot, UL.above[1] + it[1])); box.appendChild(nav(uIco(UL.above[2]), UL.above[3])); }
     return box; }
   /* the gaps' two directions (D-040): today's reading is the default and my pick; the choice is remembered per viewer */
   var GKEY = "gabe:allep:gapdir:v1", GD = W.one.gaps.dir.pick;
@@ -832,19 +874,21 @@
     var I = $("info-one"); I.textContent = "";
     I.appendChild(el("p", "sub", r.fn + " · " + r.file + ":" + r.line + " · " + (r.ent || "—")));
     I.appendChild(el("p", "cap", O.lede + " " + O.pickNote)); I.lastChild.id = "one-lede";
+    I.appendChild(el("p", "cap", fill(W.el.plain))); I.lastChild.id = "el-plain";       /* D-041: how the light works, and whose reading the aliases are */
+    I.appendChild(el("p", "cap", fill(W.el.alias))); I.lastChild.id = "el-alias";
     var cmd = el("div", "onecmd"); cmd.appendChild(el("span", null, P.labPlain)); var pre = el("pre"); pre.id = "labcmd"; pre.textContent = fill(P.cmd, { ep: r.id }); cmd.appendChild(pre);
     var cb = el("button", "btn quiet", P.copy); cb.type = "button"; cb.setAttribute("data-tip", "copycmd"); var said = el("span", "said");
     cb.addEventListener("click", function () { copyText(pre.textContent, said, P.copied); }); cmd.appendChild(cb); cmd.appendChild(said); I.appendChild(cmd);
     var gapSet = {}; if (GD === "cm") { r.gaps.forEach(function (a) { gapSet[a] = "true"; }); r.partly.forEach(function (x) { gapSet[x[0]] = "part"; }); }
     /* LEFT · the Gabe Universe, in the station's own look (D-040): each row drawn with the card's classes, icons and words,
        lifted from the station by the generator; the values are the ones the generator computed the station's way */
-    var U = $("ocol-uni"); U.textContent = ""; U.setAttribute("data-ep", r.id); U.appendChild(colH(O.uni.title, "endpoint")); U.appendChild(el("p", "plain ainfo", fill(O.uni.plain)));
+    var U = $("ocol-uni"); U.textContent = ""; U.setAttribute("data-ep", r.id); U.appendChild(colH(O.uni.title, "endpoint")); U.appendChild(elSay("el-uni")); U.appendChild(el("p", "plain ainfo", fill(O.uni.plain)));
     var card = el("div", "ust"), pbody = el("div", "pbody");
     r.uni.rows.forEach(function (u) { var row = uRow(u, r); if (u.row === "HEAD") card.appendChild(row); else pbody.appendChild(row); });
     card.appendChild(pbody); U.appendChild(card);
     if (r.uni.silent.length) U.appendChild(el("div", "usilent", fill(O.uni.silent, { rows: r.uni.silent.map(function (x) { return US[x].name; }).join(" · ") })));
     /* RIGHT · the code map: every pair the side panel held, under the block its attribute is homed in */
-    var C = $("ocol-cm"); C.textContent = ""; C.setAttribute("data-ep", r.id); C.appendChild(colH(O.cm.title, "layers")); C.appendChild(el("p", "plain ainfo", O.cm.plain));
+    var C = $("ocol-cm"); C.textContent = ""; C.setAttribute("data-ep", r.id); C.appendChild(colH(O.cm.title, "layers")); C.appendChild(elSay("el-cm")); C.appendChild(el("p", "plain ainfo", O.cm.plain));
     var byG = {}; function into(g, pr) { (byG[g] = byG[g] || []).push(pr); }
     Object.keys(W.codemap.head).forEach(function (k) { into(groupOfAttr(W.codemap.head[k].attrs[0]), headPair(k, r)); });
     var done = {};
@@ -897,6 +941,51 @@
     if (g.hasAttribute("data-row")) { var ur = document.querySelector('#ocol-uni .urow[data-row="' + g.getAttribute("data-row") + '"]'); if (ur) ur.setAttribute("data-lit-attr", "true"); return; }
     var a = g.getAttribute("data-attr");
     document.querySelectorAll("#ocol-cm .pair[data-attr]").forEach(function (x) { if (x.getAttribute("data-attr").split(" ").indexOf(a) >= 0) x.setAttribute("data-lit-attr", "true"); }); });
+
+  /* ══ D-041 · THE ELEMENT LIGHT. A click on an element in the universe column or the code-map column lights it in all three
+     places: the table's rows whose endpoint holds it (the rest dim) and the cells of the columns that count it, the pinned row
+     included; every node in the two columns that IS it; and a line at each column's top that says how often it is drawn there,
+     or that it is not there. A row HOLDS a key when its universe card or its code map draws it (the generator's keys, read here
+     from the row record); `ck` names the table columns that count it. Its own state: the strip piece's light is left alone. ══ */
+  function keysOf(x) { var a = x.getAttribute("data-keys"); return a ? a.split("\n") : []; }
+  function rowKeys(r) { if (r._ks) return r._ks; var U = {}, C = {}, T = {};
+    function walk(x, into) { if (!x) return; if (typeof x === "string") { if (x.indexOf(":") > 0) into[x] = 1; return; }
+      if (Array.isArray(x)) x.forEach(function (y) { walk(y, into); }); else if (typeof x === "object") Object.keys(x).forEach(function (k) { walk(x[k], into); }); }
+    r.uni.rows.forEach(function (u) { walk(u.keys, U); (u.parts || []).forEach(function (q) { walk(q[1], U); }); });
+    Object.keys(r.ck).forEach(function (c) { r.ck[c].forEach(function (k) { C[k] = 1; (T[k] = T[k] || []).push(c); }); });
+    walk(r.hk, C); walk(r.dk, C);
+    Object.defineProperty(r, "_ks", { value: { U: U, C: C, T: T }, enumerable: false }); return r._ks; }
+  function elHeld(r, K) { var ks = rowKeys(r); return !!(ks.U[K] || ks.C[K]); }
+  function elName(K) { if (D.elLabels[K]) return D.elLabels[K]; var i = K.indexOf(":"), kind = K.slice(0, i), id = K.slice(i + 1);
+    return kind === "fn" ? id.split("::").pop() : kind === "fe" ? id.split("#").pop() : id; }
+  function elKind(K) { var k = K.slice(0, K.indexOf(":")); return W.el.kinds[k] || k; }
+  function elSay(id) { var d = el("div", "elsay"); d.id = id; d.hidden = true; d.setAttribute("aria-live", "polite"); return d; }
+  function applyEl() { var K = S.el, n = 0, nCol = 0;
+    if (K) ROWS.forEach(function (r) { if (elHeld(r, K)) { n++; if ((rowKeys(r).T[K] || []).length) nCol++; } });
+    /* THE TABLE: rows (cards) and the pinned row — lit or dimmed, the counting cells outlined */
+    document.querySelectorAll("#board tr.row[data-ep], #board .card[data-ep], #pin tr.row[data-ep]").forEach(function (e) {
+      e.querySelectorAll("[data-elcell]").forEach(function (x) { x.removeAttribute("data-elcell"); });
+      if (!K) { e.removeAttribute("data-el"); return; }
+      var r = BYID[e.getAttribute("data-ep")]; e.setAttribute("data-el", elHeld(r, K) ? "on" : "off");
+      (rowKeys(r).T[K] || []).forEach(function (c) { var t = c === "id" ? (e.querySelector("td.id") || e.querySelector(".idc")) : e.querySelector('[data-col="' + c + '"]');
+        if (t && c !== "id") t = t.closest("td") || t.closest(".cc") || t; if (t) t.setAttribute("data-elcell", "true"); }); });
+    $("elchip").hidden = !K;
+    if (K) $("elsays").textContent = fill(W.el.says, { name: elName(K), kind: elKind(K), n: n }) + (nCol ? "" : " · " + W.el.noCol);
+    /* THE TWO COLUMNS: what is hidden behind a "+N more" or another tab is shown first, then every node that IS it is outlined */
+    [["ocol-uni", "el-uni", "uni"], ["ocol-cm", "el-cm", "cm"]].forEach(function (x) { var col = $(x[0]), say = $(x[1]); if (!col) return;
+      col.querySelectorAll(".elon").forEach(function (e) { e.classList.remove("elon"); });
+      if (!K) { if (say) say.hidden = true; return; }
+      col.querySelectorAll(".xpl, .urow").forEach(function (e) { if (e._reveal) e._reveal(K); });
+      var hits = [].filter.call(col.querySelectorAll("[data-keys]"), function (e) { return keysOf(e).indexOf(K) >= 0; });
+      hits.forEach(function (e) { e.classList.add("elon"); });
+      if (say) { say.hidden = false; say.setAttribute("data-here", hits.length ? "true" : "false");
+        say.textContent = hits.length ? fill(W.el.here, { name: elName(K), kind: elKind(K), n: hits.length }) : fill(W.el.not, { name: elName(K), kind: elKind(K), place: W.el.places[x[2]] }); } });
+  }
+  /* one click lights; the same element again, clear or Escape puts it out */
+  function lightKey(K) { S.el = K && S.el !== K ? K : null; applyEl(); writeOut(LAST.L, LAST.GS); }
+  document.addEventListener("click", function (e) { var t = e.target.closest && e.target.closest("#ocol-uni [data-key], #ocol-cm [data-key]"); if (!t) return;
+    e.preventDefault(); lightKey(t.getAttribute("data-key")); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && S.el) lightKey(null); });
 
   /* ── words for a value: what the cell's hover and the side panel say ── */
   function cellWords(c, r) {
@@ -984,6 +1073,7 @@
     lines.push(C.sort + ": " + (S.sort ? COL[S.sort.col].head + (S.sort.dir > 0 ? " ↑" : " ↓") : W.sortNone));
     if (S.lit) lines.push(C.lit + ": " + $("litsays").textContent);
     if (S.open) lines.push(C.open + ": " + S.open);   /* the endpoint the section below the table shows (D-036) */
+    if (S.el) lines.push(C.el + ": " + elName(S.el) + " (" + elKind(S.el) + ") · " + S.el);   /* the element lit (D-041), only while one is */
     lines.push("", C.your, "");
     $("out").value = lines.join("\n");
   }
@@ -993,7 +1083,7 @@
       off = pin && pin.offsetHeight && th ? Math.max(0, pin.offsetHeight - th.getBoundingClientRect().height) : 0;
     var y = board.getBoundingClientRect().top - off;
     board.style.setProperty("--pagetop", (y < 0 ? Math.min(-y, Math.max(0, board.clientHeight - 60)) : 0) + "px"); }
-  window.addEventListener("scroll", pageTop, { passive: true }); window.addEventListener("resize", function () { pageTop(); if (LAST.L) renderPin(LAST.L); });
+  window.addEventListener("scroll", pageTop, { passive: true }); window.addEventListener("resize", function () { pageTop(); if (LAST.L) { renderPin(LAST.L); applyEl(); } });
   $("board").addEventListener("scroll", function () { var pin = $("pin"); if (pin) pin.scrollLeft = $("board").scrollLeft; }, { passive: true });
   $("eyebrow").textContent = fill(W.eyebrow); $("h1").textContent = fill(W.h1); $("lede").textContent = fill(W.lede); $("prop").textContent = fill(W.proposal);
   $("stamp").textContent = fill(W.stamp); $("keys").textContent = fill(W.keys);
@@ -1008,6 +1098,7 @@
     try { window.localStorage.setItem(IKEY, JSON.stringify(INFO)); } catch (e) {} applyInfo(); tip.setAttribute("data-show", "false"); }); });
   applyInfo();
   $("litclear").textContent = W.litClear; $("litclear").addEventListener("click", function () { S.lit = null; render(); });
+  $("elclear").textContent = W.el.clear; $("elclear").addEventListener("click", function () { lightKey(null); });
   $("copy-intro").textContent = W.copy.intro; $("copy").textContent = W.copy.button;
   $("copy").addEventListener("click", function () { copyText($("out").value, $("said"), W.copy.copied); });
   $("more-btn").textContent = W.more.show;
@@ -1033,6 +1124,6 @@
     if (!want) return; var hit = ROWS.filter(function (r) { return slugOf(r.id) === want; })[0];
     if (hit) S.open = hit.id; else { $("onenote").hidden = false; $("onenote").textContent = fill(W.one.notFound, { ep: window.EPSLUG.valid(want) ? want : "?" }); } })();
   render();
-  window.__allep = { ready: true, key: KEY, rails: RAILS, icons: ICON, data: D, state: S, render: render, bins: BINS, layout: layout, groups: groups, cellWords: cellWords, aggOf: aggOf, pick: pick, slug: slugOf, groupOfAttr: groupOfAttr };
+  window.__allep = { ready: true, key: KEY, rails: RAILS, icons: ICON, data: D, state: S, render: render, bins: BINS, layout: layout, groups: groups, cellWords: cellWords, aggOf: aggOf, pick: pick, slug: slugOf, groupOfAttr: groupOfAttr, rowKeys: rowKeys, elName: elName };
 })();
 </script>

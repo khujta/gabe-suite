@@ -152,6 +152,33 @@ await step('one-info-close', '#itog-one', 'the same toggle, again');
     const gb = await p.$eval('#ocol-gaps', (e) => { const r = e.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height }; });
     await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-the-gaps-the-other-way.png'), clip: { x: Math.max(0, gb.x - 8), y: Math.max(0, gb.y - 8), width: gb.width + 16, height: Math.min(1800, gb.height + 16) }, fullPage: true }); }
   await step('gaps-back-this-way', '#ocol-gaps .opt[data-gdir="cm"]', 'the first square: in the code map, not in the universe'); }
+{ // D-041: click an element in the universe column and it lights in the three places — the Household chip on POST /setup/complete
+  const lit = async () => p.evaluate(() => ({ chip: document.getElementById('elchip').hidden ? null : document.getElementById('elsays').textContent,
+    rowsLit: document.querySelectorAll('#board tr.row[data-el="on"]').length, rowsDim: document.querySelectorAll('#board tr.row[data-el="off"]').length,
+    uni: [...document.querySelectorAll('#ocol-uni .elon')].map((e) => e.textContent.trim().slice(0, 50)), cm: [...document.querySelectorAll('#ocol-cm .elon')].map((e) => e.textContent.trim().slice(0, 50)),
+    uniSays: document.getElementById('el-uni').hidden ? null : document.getElementById('el-uni').textContent, cmSays: document.getElementById('el-cm').hidden ? null : document.getElementById('el-cm').textContent }));
+  const topPic = async (name) => { await p.mouse.move(5, H - 10); await p.evaluate(() => { window.hoverHide && window.hoverHide(); window.scrollTo(0, 0); }); await wait(200);
+    const st = await (await p.$('#status')).boundingBox(); n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + name + '.png'), clip: { x: 0, y: Math.max(0, st.y - 60), width: W, height: Math.min(H - Math.max(0, st.y - 60), 820) } }); };
+  // the chip is found by the key the page gave it — the first one, under reads_from; its words are read off it and logged
+  await step('light-household-in-the-universe', '#ocol-uni .urow[data-row="CONNECTIONS"] .pchip[data-key="table:households"]', 'the Household chip under reads_from, in the universe column');
+  say('lit: Household', await lit());
+  await topPic('the-table-lit');
+  await onePic('the-two-columns-lit');
+  // another endpoint with the light on: the first lit row below the open one, clicked in the table
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  const other = await p.evaluate(() => [...document.querySelectorAll('#board tr.row[data-el="on"]')].map((e) => e.getAttribute('data-ep')).find((x) => x !== window.__allep.state.open));
+  await step('another-endpoint-light-on', '#board tr.row[data-ep="' + other + '"] td.id', 'a lit row: ' + other);
+  say('lit, another endpoint', Object.assign({ endpoint: await txt('#onehead h3') }, await lit()));
+  await onePic('another-endpoint-lit');
+  // a code-map element the universe card does not draw: the login check's table on POST /setup/complete
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('back-to-setup-complete', '#board tr.row[data-ep="POST /setup/complete"] td.id', 'the row POST /setup/complete');
+  await step('light-users-in-the-code-map', '#ocol-cm .pair[data-k="d:gateWrites"] .pv span[data-key]', 'users, under "the login check writes", in the code map');
+  say('lit: users', await lit());
+  await onePic('users-not-in-the-universe');
+  await step('clear-the-element-light', '#elclear', 'the clear link on the lit chip above the table');
+  say('after clear', await lit());
+  await topPic('the-light-put-out'); }
 { // the lab link: a real click opens the lab on this endpoint, then back
   await step('open-in-the-lab', '#lablink', 'the open-in-the-lab link');
   await p.waitForLoadState('load'); await wait(1500);

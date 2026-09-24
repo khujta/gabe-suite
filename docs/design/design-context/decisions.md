@@ -528,3 +528,19 @@ carries two buttons: what the code map holds that the universe does not show (to
 the code map does not hold (new) — both marked as the agent's reading of "the gaps".
 Revisit if: a station row's look cannot be lifted without copying the station's code wholesale — then that row links to the
 station (?node=) instead of imitating it.
+
+## D-041 — Click an element of information and it lights everywhere it appears: the table, the universe column, the code map
+Date: 2026-09-24 · Input: his message.
+Decision, his: "in the panels for the [Gabe] universe and the code map, in the one endpoint and all endpoints, when I select, I
+should be able to click the elements of information that we are showing. That should highlight that element throughout all the
+panels in the table, in the Gabe universe, and in the code map. That way, I can clearly see if something is there or not and how
+it's being represented in different ways across the different interfaces that we have, which are the three ones: the table for all
+endpoints, the Gabe Universe section, the code map section in the one endpoint."
+Consequence: every element of information the universe and code-map columns draw (a table or its model, a function, a guard, a
+schema, a flag, a test case, a status, a file) carries one identity key, the same key space the table's rows already hold their
+members in. Clicking one lights it in all three places at once — the table (the endpoints whose rows hold it, and the cells that
+count it), the universe column and the code-map column (every chip or pair that is it, however it is drawn) — and each place says
+plainly when the element is NOT there. One click again, or clear, puts it out. How a model class and its table are treated as one
+element is the agent's reading, said on the page.
+Also this date: "All this work can remain local for now. Just committed." — commit the design work; no push until he says.
+Revisit if: a key joins two things he sees as different (or misses one he sees as the same) — then that alias is split or added.
