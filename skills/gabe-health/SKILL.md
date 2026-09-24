@@ -5,7 +5,7 @@ when_to_use: "How healthy is the codebase, are we accumulating mess, unexplained
 context: fork
 agent: Explore
 metadata:
-  version: 1.2.2
+  version: 1.3.0
 ---
 
 # Gabe Health — Codebase Health Analysis
@@ -33,7 +33,7 @@ Surfaces structural fragility in a codebase before it becomes an incident — th
 
 Optional flags: `--days N` (lookback window, default 60 days), `--threshold N` (minimum commits to flag, default 5).
 
-The six analyses: (1) God Files — touched in >25% of commits, (2) Churn Hotspots — most lines modified, (3) Coupling Clusters — files that always change together (>60% co-change), (4) Bug-Fix Concentration — where `fix:`/`bug` commits cluster, (5) Scope Creep — planned vs actually-touched files, (6) Deferred Items & Maintenance Staleness — `.kdbp/PENDING.md` health plus `.kdbp/MAINTENANCE.md` if a legacy copy is present (retired from the default KDBP inventory in A2).
+The six analyses: (1) God Files — touched in >25% of commits, (2) Churn Hotspots — most lines modified, (3) Coupling Clusters — files that always change together (>60% co-change), (4) Bug-Fix Concentration — where `fix:`/`bug` commits cluster, (5) Scope Creep — planned vs actually-touched files, (6) Deferred Items & Maintenance Staleness — `.kdbp/PENDING.md` health plus `.kdbp/MAINTENANCE.md` if a legacy copy is present (retired from the default KDBP inventory in A2). Analyses 1–4 exclude `.kdbp/**` (lifecycle bookkeeping — analysis 6 covers it); 1–3 also drop mass commits (>200 files, named in the header) and paths gone from HEAD.
 
 ## Decision-debt lens (absorbed from gabe-debt, 2026-07-30)
 
@@ -41,7 +41,7 @@ The six analyses: (1) God Files — touched in >25% of commits, (2) Churn Hotspo
 
 ## Estate-sweep lens (new, 2026-07-30 — ask-first, never auto)
 
-`/gabe-health estate` — the lazy-promotion rack model applied to the skill estate: (a) PROMOTE — did recent work produce a repeated behavior worth promoting to a skill? (b) ARCHIVE — is an installed skill long-unused (no invocations across a stated window) and a candidate for `skills/_archive/`? Both directions produce PROPOSALS presented to the human with the evidence (usage counts, window, inbound references); nothing is created or archived without an explicit yes. LIVE as the PRODUCTION-push gate since 2026-07-31: /gabe-push Step 3.7 dispatches the full three-lens scan on terminal-env and --epic pushes, presents findings, and asks proceed/hold.
+`/gabe-health estate` — the lazy-promotion rack model applied to the skill estate: (a) PROMOTE — did recent work produce a repeated behavior worth promoting to a skill? (b) ARCHIVE — is an installed skill long-unused (no invocations across a stated window) and a candidate for `skills/_archive/`? Both directions produce PROPOSALS presented to the human with the evidence (usage counts, window, inbound references); nothing is created or archived without an explicit yes. The binding rules — scope (suite-managed skills only; a user-level skill is never proposed), one-pass invocation evidence over the transcript-retention window, HARD code/route references force KEEP, description-loaded skills judged by invocations not references, pointers removed in the same change — live in `references/health-spec.md` §Estate-sweep lens. LIVE as the PRODUCTION-push gate since 2026-07-31: /gabe-push Step 3.7 dispatches the full three-lens scan on terminal-env and --epic pushes, presents findings, and asks proceed/hold.
 
 ## Procedure
 

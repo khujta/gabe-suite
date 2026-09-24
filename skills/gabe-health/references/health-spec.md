@@ -21,16 +21,43 @@
 
 ## The 6 Analyses
 
+### Filters every git analysis carries (§1–§4)
+
+Three kinds of commit data would drown the signal, so the detection blocks below filter them — each block
+is self-contained (shell state does not survive between tool calls), so the filters are inlined, never set once:
+
+- **`.kdbp/**` is excluded** — pathspec `-- . ':(exclude).kdbp'` on every `git log` / `git show`. LEDGER,
+  PLAN and PLAN.json ride every lifecycle beat's commit (archie: LEDGER.md in 36 of 47 commits over 60 days),
+  so unfiltered they are always the top god file and every top coupling pair. Analysis 6 covers `.kdbp/`.
+  The pathspec also shrinks the denominator: a commit that touched only `.kdbp/` is not a code commit.
+- **Mass commits are dropped** (§1–§3) — a commit touching more than 200 files (a vendor drop, a formatter
+  pass, a rename sweep) adds one to every file and swamps churn (archie: one 1,084-file commit was 96.8% of
+  60-day churn). The header names each one: `Outlier commits excluded: <sha> — <N> files, <L> lines`
+  (or `Outlier commits excluded: none`), from the block below.
+- **Only paths live at HEAD rank** (§1–§3) — a file deleted or renamed away is history, not a hotspot to fix
+  (archie: 18 of the top-20 churn files no longer existed). Filter: membership in `git ls-files`.
+
+```bash
+# the mass commits §1–§3 drop — printed in the report header
+git log --since=N.days --format=%h --shortstat -- . ':(exclude).kdbp' \
+  | awk '/^[0-9a-f]+$/ {s=$1} /changed/ {if ($1 > 200) print s " — " $1 " files, " $4+$6 " lines"}'
+```
+
 ### 1. God Files
 
 Files touched in >25% of PRs/commits in the lookback window. These are coupling magnets — every feature has to edit them.
 
 **Detection:**
 ```bash
-# Count commits per file in last N days
-git log --since=N.days --name-only --format="" | sort | uniq -c | sort -rn | head -20
-# Compare against total commit count
-git log --since=N.days --oneline | wc -l
+# commits per LIVE file over code commits (.kdbp/ excluded, mass commits dropped from count AND denominator)
+git log --since=N.days --name-only --format=tformat:--- -- . ':(exclude).kdbp' | python3 -c '
+import sys, subprocess, collections
+live = set(subprocess.run(["git", "ls-files"], capture_output=True, text=True).stdout.splitlines())
+cs = [c for c in ([f for f in c.split("\n") if f] for c in sys.stdin.read().split("---")) if c]
+kept = [c for c in cs if len(c) <= 200]
+n = collections.Counter(f for c in kept for f in c if f in live)
+print(f"denominator: {len(kept)} code commits ({len(cs) - len(kept)} mass commits dropped)")
+for f, k in n.most_common(20): print(f"{k}/{len(kept)} ({100 * k // max(len(kept), 1)}%)  {f}")'
 ```
 
 **Output:**
@@ -50,8 +77,17 @@ Files with the most modifications in the lookback window, regardless of PR count
 
 **Detection:**
 ```bash
-# Lines added+removed per file
-git log --since=N.days --numstat --format="" | awk '{files[$3]+=$1+$2} END {for(f in files) print files[f], f}' | sort -rn | head -20
+# lines added+removed per LIVE file (.kdbp/ excluded, mass commits dropped, binary rows skipped)
+git log --since=N.days --numstat --format=tformat:--- -- . ':(exclude).kdbp' | python3 -c '
+import sys, subprocess, collections
+live = set(subprocess.run(["git", "ls-files"], capture_output=True, text=True).stdout.splitlines())
+cs = [c for c in ([l.split("\t", 2) for l in c.split("\n") if l.count("\t") >= 2] for c in sys.stdin.read().split("---")) if c]
+ch, hits = collections.Counter(), collections.Counter()
+for c in (c for c in cs if len(c) <= 200):
+    for a, d, f in c:
+        if f in live and a != "-":
+            ch[f] += int(a) + int(d); hits[f] += 1
+for f, k in ch.most_common(20): print(f"{k} lines / {hits[f]} commits  {f}")'
 ```
 
 **Output:**
@@ -69,9 +105,11 @@ Files that always change together. If A and B are co-modified in >60% of commits
 
 **Detection:**
 ```bash
-git log --since=N.days --name-only --format=tformat:--- | python3 -c '
-import sys, itertools, collections
+git log --since=N.days --name-only --format=tformat:--- -- . ':(exclude).kdbp' | python3 -c '
+import sys, itertools, collections, subprocess
+live=set(subprocess.run(["git","ls-files"],capture_output=True,text=True).stdout.splitlines())
 commits=[set(filter(None,c.strip().split("\n"))) for c in sys.stdin.read().split("---") if c.strip()]
+commits=[c & live for c in commits if len(c) <= 200]
 pair=collections.Counter(); tot=collections.Counter()
 for c in commits:
     for f in c: tot[f]+=1
@@ -106,7 +144,7 @@ Where do `fix:` and `bug` commits cluster? If 60% of bug fixes touch the same di
 # file distribution
 git log --since=N.days --format='%H%x09%s' \
   | awk -F'\t' 'tolower($2) ~ /^(fix|hotfix|bugfix|bug)([(:!]|[[:space:]]|$)/ {print $1}' \
-  | while read -r sha; do git show --name-only --format="" "$sha"; done \
+  | while read -r sha; do git show --name-only --format="" "$sha" -- . ':(exclude).kdbp'; done \
   | grep -v '^$' | sort | uniq -c | sort -rn
 ```
 
@@ -188,6 +226,7 @@ Maintenance — .kdbp/MAINTENANCE.md (legacy, only if present):
 
 ### Severity legend + evidence gate
 
+- `.kdbp/**` is lifecycle bookkeeping — §1–§4 exclude it and analysis 6 covers it; a `.kdbp/` path in a §1–§4 row means the filter was skipped, so the row is void. Mass commits (>200 files) and paths gone from HEAD are dropped from §1–§3 and named in the header.
 - Churn: 🔴 >300 lines or top-10% · ⚠️ >100 · ✅ below. Fix concentration: 🔴 ≥50% of fix commits in one dir · ⚠️ ≥20%. God files: 🔴 >25% of commits · ⚠️ ≥20%. Coupling: 🔴 >60% co-change.
 - Every number in the report is copy-pasted from command output produced THIS run. The header `Commits: [total]` from `git log --since=N.days --oneline | wc -l` is the checksum — if you cannot produce it, the analysis did not run; print `<analysis> skipped`, never an estimate.
 
@@ -196,6 +235,7 @@ Maintenance — .kdbp/MAINTENANCE.md (legacy, only if present):
 ```
 📊 GABE HEALTH — [Project Name]
    Period: last [N] days | Commits: [total] | Files: [unique files touched]
+   Outlier commits excluded: [<sha> — <N> files, <L> lines · … | none]
 
 [1. God Files]
 [2. Churn Hotspots]
@@ -218,6 +258,54 @@ This report obeys the **findings contract** (`../../gabe-docs/references/executi
 ### Single Analysis Mode
 
 When invoked with a focus (e.g., `/gabe-health coupling`), only that analysis runs.
+
+---
+
+## Estate-sweep lens (`/gabe-health estate`)
+
+Ask-first, never auto: every proposal is presented with its evidence and nothing is created or archived
+without an explicit yes. Two directions — PROMOTE (a behavior recent work repeated that deserves a skill)
+and ARCHIVE? (an installed skill with no use in the window). The rules below bind the ARCHIVE? side.
+
+**Scope.** The suite repo's `skills/gabe-*/` plus `skills/dev-conventions/` — what `install.sh` installs.
+A skill under `~/.claude/skills/` that the suite repo does not carry (a user-level skill such as
+`pixellab-icons`) is listed on one `not suite-managed` line and NEVER proposed for ARCHIVE?: it is the
+user's machine-wide estate, available to every project, and outside this sweep's authority.
+
+**Evidence of use — one pass, run alone.** Invocations come from the transcripts, read ONCE for every
+skill (the store runs to 100+ GB on a long-lived machine — minutes of reading, never one pass per skill,
+never beside another heavy job):
+
+```bash
+grep -rhoE '"name":"Skill","input":\{"skill":"[^"]+"|<command-name>/?[A-Za-z0-9:_-]+</command-name>' \
+  --include='*.jsonl' ~/.claude/projects | sed -E 's/.*"skill":"//; s/"$//; s/<\/?command-name>//g; s/^\///' \
+  | sort | uniq -c | sort -rn
+```
+
+The WINDOW is the transcript retention, not a chosen lookback: its start is the oldest transcript's first
+`timestamp`, and the header prints it — `Window: <oldest> → <today> (<D> days, transcript retention)`.
+"0 invocations" is claimed over that window only, never as "unused".
+
+**Inbound references.** Whole-name matches (`\b<name>\b`) across the suite repo — `skills/`, `templates/`,
+`scripts/`, `docs/`, `CLAUDE.md`, `README.md` — EXCLUDING the skill's own directory; reported as
+lines / files / skills. Two classes decide more than a count:
+
+- **HARD** — a reference from code (`*.py *.mjs *.js *.sh`) or a routing/dispatch table (e.g.
+  `gabe-next/scripts/next.mjs` routes to `/gabe-mockup`; `gabe-map/scripts/mapquery.py` loads
+  `gabe-cc-entity`). Any HARD reference forces **KEEP** — archiving would break running code.
+- **Loaded by description** — a skill the model loads when its description matches the task
+  (`dev-conventions`, and any skill without `disable-model-invocation`) needs no pointer, so a zero
+  reference count is its normal state. ARCHIVE? for it needs zero invocations in the window — a
+  reference count never decides it.
+
+**Gated skills.** A skill that only fires for one project shape (`gabe-mockup` for mockup/hybrid projects,
+the `gabe-cc-*` family only where a command center exists) gets a caveat instead of ARCHIVE? when the window
+saw no project of that shape.
+
+**Output.** Per skill: `invocations (window)` · `refs lines/files/skills` · `HARD: <file:line> | —` ·
+proposal `KEEP | ARCHIVE? | PROMOTE?` with its one-line reason. An accepted ARCHIVE? moves the skill to
+`skills/_archive/` AND removes every pointer to it (help-spec, pulse-spec, tool-registry, CLAUDE.md, README)
+in the SAME change — a pointer left behind names a skill that no longer installs.
 
 ---
 
