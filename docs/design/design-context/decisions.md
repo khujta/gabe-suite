@@ -582,3 +582,69 @@ why — rated 1, D-020; about the map, D-017; …) · open (and how it would be 
 and from where). The status lines are one authored table, the agent's proposal, said on the page; the reasons stay derived. The
 wording states facts and plans, not verdicts (D-025.6).
 Revisit if: an "open" line has no plan he can act on — then it names the missing measurement instead of a fix.
+
+## D-045 — The embed-graph seats ship, board seats 10 + 11 first
+Date: 2026-09-24 · Input: the gastify brief `~/.kdbp/handoffs/2026-09-24-gastify-to-suite-seats.md` (Q1), put to him as a
+question in session `92f1e6c5…`, and his message: "Can we make these changes without disrupting the other work and then
+propagate it to the twin projects, so the [Gabe] command centers get updated with these changes, following the recommended paths
+mentioned in the message from the other session on Gastify?"
+Decision, his: yes to the seats; the first slice is the board's two seats — 10, the commit picker, and 11, the spine strip —
+not all eleven.
+Consequence: the seats stop being a mock (`embed-graph/seats/`) for the board only: the generators and the shell emit them, so a
+normal regen draws them from each center's own data. Seats 3, 4, 1/2, 5, 6/7, 8 and 9 wait, one page family at a time, until the
+feed shape (D-048) is ruled again for them.
+Revisit if: the board's seated page costs more to load than the board is worth (the 1.6 MB `3d-bundle.js` was never measured on
+a center page) — then the seats become opt-in per center.
+
+## D-046 — "3D mini planes" means panes
+Date: 2026-09-24 · Input: the same question round (embed-graph README D1).
+Decision, his: panes — small 3D viewports, each about one subject — not drawn layer floors.
+Consequence: `embed-graph/README.md` D1 is closed; the layer banding stays inside each pane.
+Revisit if: he asks for the layers to be visible surfaces.
+
+## D-047 — The pane runtime is copied into the shell; the station keeps its own copy, guarded by a drift check
+Date: 2026-09-24 · Input: the same question round (embed-graph README D2).
+Decision, his: option (b) — all seven runtime files (`_grammar.js`, `_slice.js`, `_uni-grammar.js`, `_pane.js`,
+`_pane-console.js`, `_pane.css`, `_pane-console.css`) are re-extracted fresh into `templates/center/shell/assets/`, with a
+public `GabePane.destroy` and the pane CSS scoped under `.seat`; `gabe-universe.html` is NOT cut over and keeps its private
+copies; `tests/gabe-universe` gains an assert that fails when the two drift.
+Consequence: every center ships the runtime on a normal regen; the station is not edited, so the D-040/D-041 work beside it is
+untouched. Cutting the station over (option a) is its own later change.
+Revisit if: the drift assert fires twice in a month — the copy costs more than the refactor, and the cut-over is due.
+
+## D-048 — The board is the first page, and it loads the whole feed
+Date: 2026-09-24 · Input: the same question round (embed-graph README D3 and the open feed-shape item `pending-02`).
+Decision, his: the board first; the board loads the whole `c4-graph.js`, `commits.js` and `workflows.js`, no per-subject slices.
+Consequence: one page carries the feed cost. Before any feature, ledger or tests seat, the feed shape is ruled again (per-subject
+slice files at regen time vs the whole feed on every page).
+Revisit if: a second page family is seated — that is the trigger to rule the feed shape again.
+
+## D-049 — D-023 is lifted for the seats only; the suite propagates gustify, gastify propagates itself
+Date: 2026-09-24 · Input: the same question round (brief Q2).
+Decision, his: D-023 ("no propagation") is lifted for the board-seats slice only. The suite session propagates gustify itself
+and commits there on its current branch, as `816665b2` did, with no push. Gastify gets the exact command and the hand-back
+report, and runs its own propagation through `/gabe-commit` (its D130) — the suite commits nothing in gastify.
+Consequence: the return path of the gastify brief is open for this slice; everything else under D-023 (the design pages read the
+frozen lab feed, no twin rebuild for design work) still stands.
+Revisit if: another slice needs a twin — each lift is its own entry.
+
+## D-050 — The seats are built on their own branch and worktree, merged at the end, not pushed
+Date: 2026-09-24 · Input: the same question round (the agent's question: a parallel session was busy in the same tree with an
+uncommitted `decisions.md`).
+Decision, his: all seat work happens on branch `center/seats` in the worktree `.claude/worktrees/seats` (off `6294da9`); the
+branch merges into `graft-adoption` when the slice is green, and only then does `./install.sh` run (`~/.claude` is shared, and an
+early install would show drift in the other session's doctor). Nothing is pushed: the other session's D-041 keeps its work local,
+and a push of `graft-adoption` would publish it. Gastify checks byte parity against this checkout, on the same machine.
+Consequence: the brief's Q3 ("push `graft-adoption` first") is replaced by this entry.
+Revisit if: gastify needs the suite sha from a remote — then the push is his call.
+
+## D-051 — The brief's other recommendations stand as the build's defaults
+Date: 2026-09-24 · Input: the agent listed them before the question round as "taken unless you overrule"; he overruled none.
+This is the agent's reading of his silence, said here so it can be overturned.
+Decision (defaults, not his words): Q4 (b) — the `commits.js` cap stays, its wording is corrected, and the beat tail refreshes
+it. Q5 — one fixed spine parser (newest first by date, deduped, `green@<sha>` read from Gates when Commits is `—`, archives read,
+EXEC and EXECUTE one beat, sha length normalized before any join), writing a gitignored spine feed beside `commits.js` with an
+always-written stub. Q6 (a) — done-card chips read PENDING by header with a positional fallback past the header. Q7 — the
+`load_ledger` order fix lands first, as its own commit. Q8 — the board seats mount through a generator token. Q9 — the pane keeps
+its dark ground for now. The suite centre's own shell fork (`docs/center/shell`) is out of this slice.
+Revisit if: he names any of these.
