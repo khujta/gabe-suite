@@ -447,7 +447,9 @@ K1 Does the cited evidence actually say this? (re-open the file/quote)
 K2 Is the failure concrete? (name the triggering input/state)
 K3 Does an existing test/guard already cover it?
 ```
-Stamp: CONFIRMED | DOWNGRADED(<reason>) | KILLED(K#). "Plausible but unverified" = KILLED. UNVERIFIED can never be CRITICAL or HIGH.
+Stamp: CONFIRMED | DOWNGRADED(<reason>) → <CRITICAL|HIGH|MEDIUM|LOW> | KILLED(K#). "Plausible but unverified" = KILLED. UNVERIFIED can never be CRITICAL or HIGH.
+
+A downgrade NAMES its target, and the target is one of the four scored severities, strictly lower than the draft's — there is no INFO, NOTE or NIT tier (the confidence score's deduction table has no row for one, so an unscored finding silently leaves the arithmetic). **A LOW cannot be downgraded: it is CONFIRMED or KILLED.** A verifier dispatched as a subagent returns `new_severity` from exactly that enum (`"enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]` in its schema); any other value is a verifier defect — re-ask, never remap by hand.
 
 The summary header MUST print: `raw N → killed X → downgraded Y → survived Z`.
 

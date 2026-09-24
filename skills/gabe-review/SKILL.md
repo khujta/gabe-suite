@@ -3,7 +3,7 @@ name: gabe-review
 description: "Code review — risk pricing, confidence scoring, interactive triage, deferred-item tracking, plan alignment, the cost of NOT fixing each finding."
 when_to_use: "Review this diff/PR/phase/commit before merging; also 'is this on-scope?', stale verified anchors, deferred follow-up."
 metadata:
-  version: 1.19.0
+  version: 1.19.1
 ---
 
 # Gabe Review — Code Review with Risk Pricing
