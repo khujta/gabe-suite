@@ -56,6 +56,12 @@ Interactive. Does not rely on heuristic auto-suggestion. Asks the user explicitl
    - `[2]`: two envs — `staging` → target=`staging`, `production` → target=`<default-branch>`, `promote_from`=`staging`. If `origin/staging` does not exist, offer: `[create]` branch from default / `[skip]` and create on first staging push
    - `[3]`: loop — ask env name + target branch + `promote_from` (or none) per env, until user says done
 7. For each env, ask: `branch_cleanup: always | never | ask` (default: `ask`)
+7.5. For each env WITH a `promote_from`, choose `promotion_mode: direct | pr-merge`. Probe the target's protection
+   first — `gh api repos/{owner}/{repo}/branches/<target_branch>/protection 2>/dev/null` — and show what it says:
+   `required_pull_request_reviews` or `required_status_checks` present → propose **pr-merge** (the branch
+   expects a PR; a direct push only lands because an admin skips it); absent → propose **direct**; 404 or no
+   access → `direct`, said as "protection unreadable". Record `enforce_admins.enabled` in the answer's note —
+   `direct` + `enforce_admins: false` on a protected branch is the combination Step 3 warns about.
 8. Known-branches inventory: `git branch -r --format='%(refname:short)'` → record the current remote-branch set in PUSH.md `known_branches` so Step 2.7 can detect drift.
 9. Write `.kdbp/PUSH.md` using the template format (see `templates/PUSH.md`).
 10. Show: "Push config saved to `.kdbp/PUSH.md`. Edit anytime to adjust or rerun `/gabe-push --reconfigure`."
@@ -72,7 +78,7 @@ Determines which env this invocation targets.
    - One positional arg → `env = <arg>` (e.g., `/gabe-push staging`)
    - `--reconfigure` flag → jump to Step 2 with confirmation
 2. Look up env block in PUSH.md:
-   - Found → bind `target_branch`, `promote_from`, `ci`, `branch_cleanup` from env config
+   - Found → bind `target_branch`, `promote_from`, `promotion_mode` (absent → `direct`), `ci`, `branch_cleanup` from env config
    - Not found → prompt: "No config for env `<name>`. Add it now? [Y/n]"
      - `Y` → run abbreviated Step 2 flow for just this env (target branch, promote_from, branch_cleanup), append to PUSH.md, continue
      - `n` → abort
@@ -80,7 +86,7 @@ Determines which env this invocation targets.
    ```
    ENV:         <name>
    TARGET:      origin/<target_branch>
-   PROMOTE FROM: <promote_from>  (or "none")
+   PROMOTE FROM: <promote_from>  (or "none")  · mode: <direct | pr-merge>
    CI:          <ci>
    ```
 
@@ -116,12 +122,18 @@ Runs every invocation. Detects branches on the remote that were not present when
          ```
          Promotion available: origin/<promote_from> is ahead of origin/<env.target_branch>.
          [promote]     push origin/<promote_from> -> <env.target_branch>  (ship what was tested)
+                       — pr-merge mode: PR <promote_from> -> <env.target_branch>, checks, merge
          [push-local]  push current HEAD (<current_branch>) -> <env.target_branch>  (override staging)
          [abort]
          ```
        - `[promote]`    → `push_source = origin/<promote_from>`, `source_label = <promote_from>`
        - `[push-local]` → `push_source = HEAD`, `source_label = <current_branch>`
      - Else (no `<promote_from>` on remote or not ahead) → `push_source = HEAD`
+     - `[promote]` in **direct** mode on a branch whose protection requires a PR (the Step 2 probe, re-read here
+       with one `gh api …/protection` call): print `⚠ promotion_mode: direct — origin/<target> requires a PR and
+       enforce_admins is <false|true>; this push <lands only because you are an admin, bypassing those checks |
+       will be rejected>. Set promotion_mode: pr-merge in .kdbp/PUSH.md to promote through the PR.` — a line,
+       not a question; the operator's `[promote]` stands.
    - Else → `push_source = HEAD`
 3. Guard: if `push_source = HEAD` AND `current_branch = env.target_branch` (direct push to the env branch):
    - Warn: "You are on [<target_branch>]. Push directly? This skips PR workflow. [y/N]"
@@ -143,9 +155,16 @@ Ruled 2026-07-31 (operator: terminal-env + explicit override · ask-before-push)
    - The target env is the TERMINAL env (no `promote_from` chain continues past it) **and** PUSH.md
      declares more than one env → **gated**.
    - The invocation says `--epic` (or the request says "push epic") → **gated**, any env, any project.
-   - PUSH.md declares a SINGLE env (no staging exists): automatic gating is OFF — print one line,
-     `ℹ ungated push — say 'push epic' (or --epic) to run the production gates`, and continue. The
-     line is informational, never a question.
+   - PUSH.md declares a SINGLE env (no staging exists): automatic gating is OFF (ruling 2026-07-31,
+     kept 2026-09-24 — a PR merge into that env is ungated too) — print one line that says the
+     consequence, `ℹ ungated push — this project declares one env, so no production scan runs before
+     <target_branch> moves; say 'push epic' (or --epic) to run it`, and continue. Then look for an
+     undeclared integration branch — one call, silent on any failure:
+     `gh pr list --base <target_branch> --state merged --limit 20 --json headRefName -q '.[].headRefName'`;
+     a head branch that still exists on origin and carried ≥3 of those merges prints
+     `ℹ origin/<b> looks like an integration branch (<n> of the last 20 merges into <target_branch>) —
+     declare it as an env (/gabe-push --reconfigure) and promotions from it get the production gate`.
+     Both lines are informational, never a question.
    - Staging / non-terminal envs → not gated; continue to Step 4 ("staging = keep moving").
 2. **Run the scan** (gated pushes only): dispatch `/gabe-health` — the full three-lens scan
    (structural rot · decision-debt · estate sweep), read-only fork. The estate sweep's
@@ -180,7 +199,10 @@ Ruled 2026-07-31 (operator: terminal-env + explicit override · ask-before-push)
 1. Push logic depends on `push_source`:
    - `push_source = HEAD` AND `current_branch = env.target_branch` → `git push -u [remote] <env.target_branch>`
    - `push_source = HEAD` AND `current_branch ≠ env.target_branch` → `git push -u [remote] <current_branch>:<env.target_branch>`
-   - `push_source = origin/<promote_from>` → promotion push: `git push [remote] origin/<promote_from>:<env.target_branch>` (fast-forward-only; remote-to-remote). If non-FF: stop with clear message and offer `[force-with-lease] [abort]`.
+   - `push_source = origin/<promote_from>`, `promotion_mode: direct` → promotion push: `git push [remote] origin/<promote_from>:<env.target_branch>` (fast-forward-only; remote-to-remote). If non-FF: stop with clear message and offer `[force-with-lease] [abort]`.
+   - `push_source = origin/<promote_from>`, `promotion_mode: pr-merge` → **no push here**: the promotion is the PR.
+     Step 5 opens (or reuses) the PR `<promote_from> → <env.target_branch>`, Step 6 watches its checks, and
+     Step 6.5 merges it. The marker written at Step 3.5 authorizes that merge (the hook resolves the PR's base).
 2. If push fails (rejected, auth error, non-FF): show error and stop — **leave the marker in place.**
    A failed push did not change HEAD, so the marker is still valid for the retry the operator was
    just offered (`[force-with-lease]`); consuming it here would block the suite's own offered
@@ -192,7 +214,9 @@ Ruled 2026-07-31 (operator: terminal-env + explicit override · ask-before-push)
 
 ### Step 5: Create or update PR
 
-Skipped when `push_source = HEAD` AND `current_branch = env.target_branch` (direct push to env branch — no PR needed). Skipped when `push_source = origin/<promote_from>` if `env.target_branch` is the promotion target and direct remote-to-remote push was taken (PR was already the staging→testing cycle; promotion is the merge). In both skip cases, jump to Step 6.
+Skipped when `push_source = HEAD` AND `current_branch = env.target_branch` (direct push to env branch — no PR needed). Skipped when `push_source = origin/<promote_from>` in **direct** mode (the remote-to-remote push was taken; PR was already the staging→testing cycle; promotion is the merge). In both skip cases, jump to Step 6.
+
+In **pr-merge** mode the promotion IS this PR: `source_label = <promote_from>`, `gh pr list --base <env.target_branch> --head <promote_from> --state open --json number,url` reuses an open one; otherwise create it with `--base <env.target_branch> --head <promote_from>` (title `promote: <promote_from> → <env.target_branch>`, body = the commit list `git log origin/<env.target_branch>..origin/<promote_from>`).
 
 1. Check for existing PR: `gh pr view <source_label> --json number,state,url 2>/dev/null`.
    - If PR exists and `OPEN`: show "PR already exists: [url]". Skip to Step 6.
@@ -235,6 +259,18 @@ Skipped when `push_source = HEAD` AND `current_branch = env.target_branch` (dire
    - `[assess]` — suggest `/gabe-assess [failure context]` for complex failures
    - `[ignore]` — continue without fixing
 6. Timeout (75s): "CI still running. Check later: `gh pr checks`."
+
+### Step 6.5: Merge the promotion PR (pr-merge mode only)
+
+1. Merge only on green: every check passed in Step 6's final `gh pr checks` output (pasted verbatim). Then
+   `gh pr merge <n> --merge --match-head-commit "$(git rev-parse origin/<promote_from>)"` — the head it merges is
+   the head that was checked. The push-gate hook resolves the PR's base; the Step 3.5 marker authorizes it.
+2. Checks still running at the 75 s limit → ONE question: `[wait]` poll Step 6 again · `[auto-merge]`
+   `gh pr merge <n> --merge --auto` (GitHub merges when the required checks pass; the hook gates this call
+   the same way) · `[stop]` leave the PR open, the marker in place, and report `promotion: PR #<n> open`.
+3. A failed check → no merge; Step 6's failure actions apply and the promotion reports `held: checks`.
+4. On a successful merge: consume the marker (Step 4.4) and report `Promoted <promote_from> → <target> via PR #<n>`.
+   Step 7.5 records the deployment with `mode: pr-merge` and the merge commit.
 
 **Long CI runs** can be babysat with `/loop` (e.g. `/loop 4m check CI on <branch> and report`) — use watch-and-report only; auto-fix loops are appropriate only where the phase has runtime-journey proof in place (PLAN.json `proof`).
 

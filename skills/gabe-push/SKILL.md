@@ -3,7 +3,7 @@ name: gabe-push
 description: "Push, PR, CI watch, promotion — env-aware shipping via .kdbp/PUSH.md; detects remote drift, offers branch cleanup. Terminal-env and --epic pushes run the production gates: /gabe-health three-lens scan, findings presented, ONE blocking proceed/hold question that mints the gate marker the machine-wide push-gate-guard hook requires — a raw terminal push without it fails closed."
 when_to_use: "Push, deploy, promote, ship to staging/production, babysit a pipeline after committing."
 metadata:
-  version: 2.6.4
+  version: 2.7.0
 ---
 
 # Gabe Push — env-aware shipping workflow
@@ -28,8 +28,8 @@ Env-aware shipping. One command pushes local work to the configured target env, 
    - **Step 2** — first-run setup: detect remote/default-branch/CI provider/PR template, ask the deploy pattern (production-only / staging-then-prod / custom), scaffold envs, ask `branch_cleanup` policy per env, write `.kdbp/PUSH.md`. `--reconfigure` clears and re-runs this step.
    - **Step 2.5** — resolve which env this invocation targets from `$ARGUMENTS` (default env, named env, or interview for an unknown env).
    - **Step 2.7** — remote branch drift detection every run: diff current remote branches against known set, prompt per unrecognized branch (`ignore-once`/`ignore-always`/`register-as-env`/`delete-remote`/`abort`), persist non-transient decisions.
-   - **Step 3–4** — determine push source (promote from `promote_from` vs push local HEAD), pre-flight checks, then push.
-   - **Step 5** — create or update the PR (skipped for direct pushes to the target branch or remote-to-remote promotion).
+   - **Step 3–4** — determine push source (promote from `promote_from` vs push local HEAD), pre-flight checks, then push. A promotion follows the env's `promotion_mode`: `direct` (remote-to-remote push, the default) or `pr-merge` (PR → checks → `gh pr merge`, Step 6.5 — proposed at setup when the target's branch protection requires a PR).
+   - **Step 5** — create or update the PR (skipped for direct pushes to the target branch or a `direct` remote-to-remote promotion; in `pr-merge` mode the promotion IS the PR).
    - **Step 6** — CI watch, non-blocking, up to 75s (5 polls × 15s); on failure offers `details`/`logs`/`auto-fix`/`assess`/`ignore`; `⏳` is never treated as `✅`.
    - **Step 6.7** — deploy verify: live-target smoke probe is the closing evidence, not CI-green alone.
    - **Step 7** — final summary; promotion to a further env only happens on a separate invocation (never recurses across envs).

@@ -26,6 +26,7 @@ Edit values directly or rerun `/gabe-push --reconfigure` to redo the interview.
 |---------|-------|
 | target_branch | main |
 | promote_from | — |
+| promotion_mode | direct |
 | ci | none |
 | branch_cleanup | ask |
 
@@ -35,6 +36,12 @@ promote_from:    If set (e.g., "staging"), /gabe-push for THIS env checks if
                  origin/<promote_from> is ahead of origin/<target_branch> and
                  offers to promote it (push origin/<promote_from> -> <target_branch>).
                  Leave blank/— when the env has no upstream source env.
+promotion_mode:  direct | pr-merge   (only read when promote_from is set; default direct)
+                   direct   → remote-to-remote push origin/<promote_from>:<target_branch>
+                   pr-merge → PR <promote_from> → <target_branch>, watch its checks, then
+                              `gh pr merge --merge` — use it when branch protection requires a
+                              PR, so the promotion runs the checks instead of an admin bypassing
+                              them. First-run setup proposes it when protection requires a PR.
 ci:              github-actions | none
 branch_cleanup:  ask | always | never   (applies to source branch after successful push)
 -->
