@@ -89,7 +89,7 @@ NUMWORD = re.compile(r"\b(two|three|four|five|six|seven|eight|nine|ten|eleven|tw
 QUOTED = re.compile(r"“[^”]*”")
 TOKEN = re.compile(r"\{[a-z]\w*\}", re.I)
 BANNED = re.compile(r"\b(door|doors|lock|locks)\b", re.I)                   # D-018 — the agent's own strings
-SWEEP_SKIP = {"cmd"}                                                          # a shell command, quoted as the machine needs it
+SWEEP_SKIP = {"cmd", "fields"}          # a shell command, quoted as the machine needs it · code-map field ids (a column id may hold a number)
 
 
 def scrub(s: str) -> str:
@@ -515,7 +515,14 @@ def key_index(fj: dict, am: dict, feeds: dict) -> dict:
         if "::" in q:
             short[q.split("::", 1)[1]].add(q)
     settings = {k.split(":", 1)[1] for k in (fj.get("settings") or {}) if k.startswith("setting:")}
+    # the cases whose calls ACT on each endpoint (D-042): the tests column counts those calls, so it counts these cases
+    acts, act_calls = collections.defaultdict(set), collections.Counter()
+    for cid, t in (fj.get("test_cases") or {}).items():
+        for c in t.get("calls") or []:
+            if c.get("role") == "act" and c.get("endpoint"):
+                acts[c["endpoint"]].add(cid); act_calls[c["endpoint"]] += 1
     return {"m2t": m2t, "node_t": node_t, "schemas": schemas, "short": short, "settings": settings, "nAlias": len(m2t), "nAliasC4": n_c4,
+            "acts": acts, "actCalls": act_calls,
             "flags": (set(am.get("flags") or {}) | flags) - settings, "unkeyed": set(), "names": set()}
 
 
@@ -549,10 +556,14 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
         if i.startswith("flag:"):
             return nkey(i[5:]) or i
         return i
-    ck = collections.defaultdict(set)
-    def to(col, *ks):
+    # ck: every key a column holds; cd: the ones it COUNTS as members; cv: the ones it holds only THROUGH another element (a
+    # member's condition reads it, a rule is on its schema) — D-042 tells "counted, not named" from "shown another way" by them
+    ck, cd, cv = collections.defaultdict(set), collections.defaultdict(set), collections.defaultdict(set)
+    def to(col, *ks, via=False):
         if v.get(col) != "absent":
-            ck[col].update(k for k in ks if k)
+            ks = [k for k in ks if k]
+            ck[col].update(ks)
+            (cv if via else cd)[col].update(ks)
     # the members the row record already holds by identity — the same ids, under their kind
     for c in KEY_COLS:
         for m in u.get(c) or []:
@@ -563,19 +574,25 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
     swk = [reads(" ".join(sorted(w.get("settings") or [])), w.get("expr"), w.get("pred"), fsw.get(w.get("id"), {}).get("pred"),
                  *[b.get("pred") for b in fsw.get(w.get("id"), {}).get("branches") or []]) for w in sws]
     for ks in gk:
-        to("guards", *ks)                            # a member holds the names its condition reads
+        to("guards", *ks, via=True)                  # a member holds the names its condition reads
     for ks in swk:
-        to("switches", *ks)
+        to("switches", *ks, via=True)
     inf = [x for x in ((F.get("inflight") or {}).get("rows") or [])]
     ikey = lambda x: x.get("ref") or "|".join(str(x.get(q)) for q in ("kind", "name", "set_at"))
     for x in inf:
-        to("inf_answer" if x.get("dies") == "with the answer" else "inf_server", *reads(" ".join(x.get("fields") or [])))
+        to("inf_answer" if x.get("dies") == "with the answer" else "inf_server", *reads(" ".join(x.get("fields") or [])), via=True)
     rs = F["frontend"].get("reason_sites") or []
     for s in rs:
-        to("reasons", "file:" + str(s.get("at") or "").rsplit(":", 1)[0] if s.get("at") else None)
+        to("reasons", "file:" + str(s.get("at") or "").rsplit(":", 1)[0] if s.get("at") else None, via=True)
     for m in u.get("cases422") or []:
         sm = re.match(r"case:schema:([^/]+)/", m)
-        to("cases422", tkey(sm.group(1)) if sm else None)
+        to("cases422", tkey(sm.group(1)) if sm else None, via=True)
+    # the tests column counts the calls that ACT on this endpoint (D-042): it holds the cases that make them, and its count is
+    # proven to be theirs
+    if v.get("acts") != "absent":
+        if X["actCalls"].get("endpoint:" + r["id"], 0) != r["k"]["acts"]:
+            die(f"{r['id']}: the tests column draws {r['k']['acts']} act calls, the feed's cases make {X['actCalls'].get('endpoint:' + r['id'], 0)}")
+        to("acts", *["case:" + c for c in sorted(X["acts"].get("endpoint:" + r["id"]) or [])])
     exits = F["exits"]
     for x in exits:
         to("e_" + x["kind"], stat(x.get("status"))); to("all", stat(x.get("status")))
@@ -596,7 +613,6 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
     hk = {"method": "endpoint:" + r["id"], "handler": [fkey(fep.get("handler")), "file:" + r["file"] if r.get("file") else None],
           "entity": "entity:" + r["ent"] if r.get("ent") else None, "segment": None, "declared": stat(r.get("declared"))}
     ck["id"].update(k for k in (hk["method"], *hk["handler"], hk["entity"]) if k)
-    r["ck"] = {c: sorted(ks) for c, ks in sorted(ck.items()) if ks}
     r["hk"] = hk
     # the code map's detail items, one key list per item, in the order the items are drawn
     lab = lambda k, t: CL.__setitem__(k, str(t)[:90]) if k else None
@@ -685,6 +701,13 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
             uu["parts"] = [p for p in parts + [[it[0][last:], None]] if p[0]]
             if "".join(p[0] for p in uu["parts"]) != it[0]:
                 die(f"{r['id']}: the signature's parts do not spell the signature")
+    # the functions-behind count (the column and its detail pair) counts the callees the card's Code behind names (D-042)
+    bk = sorted({k for uu in r["uni"]["rows"] if uu["row"] == "CODE BEHIND" for k in uu["keys"] if k})
+    to("behind", *bk)
+    dk["behind"] = bk if v.get("behind") != "absent" else []
+    r["ck"] = {c: sorted(ks) for c, ks in sorted(ck.items()) if ks}
+    r["_cd"] = {c: sorted(ks) for c, ks in cd.items() if ks}          # the generator's own reading (D-042), popped before the page
+    r["_cv"] = {c: sorted(ks - cd[c]) for c, ks in cv.items() if ks - cd[c]}
 
 
 def all_keys(r: dict) -> set:
@@ -839,6 +862,11 @@ def build(argv: list) -> tuple:
         die("the words file's universe rows and the station rows read here differ")
     if sorted(CM["details"]) != sorted(k for k in rows[0]["d"]):
         die(f"the code map's pairs and the row record's details differ: {sorted(set(CM['details']) ^ set(rows[0]['d']))}")
+    # D-042: why the code map lacks a lit element — read from each row's keys and ONE authored table (my proposal), checked here
+    FLD = UNI.cm_fields(cols, CM)
+    UNI.cm_reasons(rows, facts, UNI.why_table(W, A, inv, FLD, W["el"]["kinds"]), A, FLD, bool(only))
+    for r in rows:
+        r.pop("_cd"); r.pop("_cv")
     order = list(A)
     for r in rows:
         r["has"] = UNI.carried(r, cols, CM)
@@ -869,7 +897,7 @@ def build(argv: list) -> tuple:
     tok = {"app": app, "head": head, "uniHref": uni_href, "nFeed": len(keys), "nRows": len(rows), "nCols": len(cols), "nBlocks": len(blocks),
            "formsSha": sha(forms)[:8], "archmapSha": sha(archmap)[:8], "formsPath": tilde(forms), "archmapPath": tilde(archmap),
            "arms": " · ".join(arms_on) or "none", "armsOff": " · ".join(arms_off) or "none",
-           "nShare": n_share, "rTop": max(a["r"] for a in A.values()), "nR3": sum(1 for c in cols if c["r"] == max(a["r"] for a in A.values())),
+           "nShare": n_share, "rTop": max(a["r"] for a in A.values()), "rLow": min(a["r"] for a in A.values()), "nR3": sum(1 for c in cols if c["r"] == max(a["r"] for a in A.values())),
            # the tier the station opens on, and the deeper ones that draw functions (the universe column is the opening card)
            "nAlias": X["nAlias"], "nNames": len(X["names"]), "nUnkeyed": len(X["unkeyed"]), "nKeys": len({k for r in rows for k in all_keys(r)}),
            "uniTier": spec["_card"]["tier"], "uniDeeper": " · ".join(t["name"] for t in spec["_card"]["tiers"][spec["_card"]["bootTier"] + 1:] if not t["fnOff"])}

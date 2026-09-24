@@ -838,6 +838,175 @@ def carried(row: dict, cols: list, CM: dict) -> dict:
     return out
 
 
+# ── D-042 · WHY THE CODE MAP LACKS A LIT ELEMENT. The code-map column NAMES an element when a node that IS it can be clicked there;
+# a count pair that holds it, or an item that holds it through its own condition, lights with it (D-041) but does not name it.
+# For every element a row holds that its code map does not name, the reasons are read from the row's own keys and ONE authored
+# table (el.why.table, my proposal): which attributes an element of a kind, drawn by a universe row, belongs to, and which
+# code-map fields it can sit in. Nothing is typed per element.
+WHY_CODES = ("cnt", "alt", "low", "map", "gap")
+
+
+def cm_fields(cols: list, CM: dict) -> dict:
+    """{a field as the words table writes it (c:<column> · h:<head pair> · d:<detail pair>): (the pair's data-k on the page, its
+    attributes)}. The five kinds-of-ending columns are one pair on the page, so each names that pair."""
+    slots = [c["id"] for c in cols if c["kind"] == "slot"]
+    out = {"c:" + c["id"]: ("c:" + (",".join(slots) if c["kind"] == "slot" else c["id"]), [c["attr"]]) for c in cols}
+    out.update({"h:" + k: ("h:" + k, list(x["attrs"])) for k, x in CM["head"].items()})
+    out.update({"d:" + k: ("d:" + k, list(x["attrs"])) for k, x in CM["details"].items()})
+    return out
+
+
+def cm_named(r: dict) -> dict:
+    """{key: {pairs that NAME it}} — the nodes the page draws clickable as the key (kd with its first key), mirroring the
+    template's headPair/detailPair; the probe proves the page draws exactly these."""
+    hk, dk, d, out = r["hk"], r["dk"], r["d"], {}
+    def put(k, f):
+        if k:
+            out.setdefault(k, set()).add(f)
+    put(hk["method"], "h:method"); put(hk["handler"][0], "h:handler"); put(hk["handler"][1], "h:handler")
+    if r.get("ent"):
+        put(hk["entity"], "h:entity")
+    if r.get("declared") not in (None, ""):
+        put(hk["declared"], "h:declared")
+    for x in dk["exits"]:
+        put(x[0], "d:exits")
+    for k in ("tables", "gateWrites", "fates", "gates", "limits", "deciders", "inflight", "alarms", "pieces"):
+        for x in dk[k]:
+            put(x, "d:" + k)
+    for x in dk["guards"]:
+        put(x[0], "d:guards"); put(x[2], "d:guards")
+    for x in dk["switches"]:
+        put(x[0], "d:switches")
+    for x, it in zip(dk["reasons"], d["reasons"]["items"]):
+        put(x[0], "d:reasons")
+        if str(it[0] or "").rfind(":") > 0:
+            put(x[1], "d:reasons")
+    if d.get("request"):
+        put(dk["request"], "d:request")
+    if d.get("response"):
+        put(dk["response"], "d:response")
+    if d.get("hook"):
+        put(dk["hook"], "d:hook")
+    return out
+
+
+def cm_holds(r: dict, F: dict) -> tuple:
+    """({key: {pairs that COUNT it}}, {key: {pairs that hold it THROUGH another element}}) — a column's members and its
+    through-keys (the generator's _cd/_cv), a test count in the endings, the functions-behind count, a guard's or a switch's
+    condition that reads it."""
+    cnt, via = {}, {}
+    for col, ks in r["_cd"].items():
+        for k in ks:
+            cnt.setdefault(k, set()).add(F["c:" + col][0])
+    for col, ks in r["_cv"].items():
+        for k in ks:
+            via.setdefault(k, set()).add(F["c:" + col][0])
+    for x in r["dk"]["exits"]:
+        for k in x[1]:
+            cnt.setdefault(k, set()).add("d:exits")
+    for k in r["dk"].get("behind") or []:
+        cnt.setdefault(k, set()).add("d:behind")
+    for f, ks in [("d:guards", x[1]) for x in r["dk"]["guards"]] + [("d:switches", x[1]) for x in r["dk"]["switches"]]:
+        for k in ks:
+            via.setdefault(k, set()).add(f)
+    return cnt, via
+
+
+def uni_rows_of(r: dict) -> dict:
+    """{key: {the universe rows that draw it}} for one row."""
+    out = {}
+    def walk(x, row):
+        if isinstance(x, str) and ":" in x:
+            out.setdefault(x, set()).add(row)
+        elif isinstance(x, (list, tuple)):
+            for y in x:
+                walk(y, row)
+    for u in r["uni"]["rows"]:
+        walk(u.get("keys"), u["row"]); walk([p[1] for p in u.get("parts") or []], u["row"])
+    return out
+
+
+def why_table(W: dict, A: dict, inv: set, F: dict, kinds: dict) -> list:
+    """el.why.table, checked: every kind is a key kind the page has a word for, every row a station row, every attribute a row of
+    the ruled tree AND of inventory-endpoint.md, every field a pair the code map draws, and no (row, kind) listed twice."""
+    T, seen, rows = W["el"]["why"]["table"], set(), {x for x, _ in ROWS}
+    for i, e in enumerate(T):
+        at = f"el.why.table[{i}] ({e.get('kind')})"
+        if e.get("kind") not in kinds:
+            die(f"{at}: no key kind is called {e.get('kind')!r}")
+        bad = [x for x in e.get("rows") or [] if x not in rows] or ([] if e.get("rows") else ["(none)"])
+        if bad:
+            die(f"{at}: rows the station's card does not have: {bad}")
+        bad = [a for a in e.get("attrs") or [] if a not in A or a not in inv] or ([] if e.get("attrs") else ["(none)"])
+        if bad:
+            die(f"{at}: attribute ids that are not rows of the ruled tree and of inventory-endpoint.md: {bad}")
+        bad = [f for f in e.get("fields") or [] if f not in F]
+        if bad:
+            die(f"{at}: fields the code-map column does not draw: {bad}")
+        if e.get("about") not in (None, "map"):
+            die(f"{at}: `about` is \"map\" or absent, not {e.get('about')!r}")
+        for rw in e["rows"]:
+            if (rw, e["kind"]) in seen:
+                die(f"{at}: {e['kind']} drawn by {rw} is listed twice")
+            seen.add((rw, e["kind"]))
+    return T
+
+
+def cm_reasons(rows: list, facts: list, T: list, A: dict, F: dict, partial: bool) -> None:
+    """Adds `nr` to every row: {key: [[code, refs], …]} for each element the row holds (its universe card or its code map) that
+    its code map does not NAME, and that can be lit somewhere on the page. cnt/alt refs are pairs (data-k), low/map refs are
+    attributes, gap has none."""
+    pair_attrs = {p: a for p, a in F.values()}
+    r_low = min(a["r"] for a in A.values())
+    per = [(r, L, cm_named(r), uni_rows_of(r)) for r, L in zip(rows, facts)]
+    litable = {k for r, _L, nm, U in per for k in list(U) + list(nm)}
+    drawn = {(rw, k.split(":", 1)[0]) for _r, _L, _n, U in per for k, rs in U.items() for rw in rs}
+    dead = [f"{e['kind']} @ {rw}" for e in T for rw in e["rows"] if (rw, e["kind"]) not in drawn]
+    if dead and not partial:
+        die(f"el.why.table lists kinds no universe row draws on this page: {dead}")
+    for r, L, named, U in per:
+        cnt, via = cm_holds(r, F)
+        inf = ((L["forms"].get("inflight") or {}).get("rows") or []) if (L["forms"].get("inflight") or {}).get("state") == "present" else []
+        drawn_inf = len(r["dk"]["inflight"])
+        nr = {}
+        for K in sorted((set(U) | set(cnt) | set(via)) - set(named)):
+            if K not in litable:
+                continue
+            kind, U_rows = K.split(":", 1)[0], U.get(K, set())
+            ents = [e for e in T if e["kind"] == kind and U_rows & set(e["rows"])]
+            if U_rows and not ents:
+                die(f"{r['id']}: {K} is drawn by the universe row(s) {sorted(U_rows)} and el.why.table lists no {kind} there")
+            pairs = {F[f][0] for e in ents for f in e["fields"]}
+            c, a = set(cnt.get(K, ())), set(via.get(K, ()))
+            if kind == "fn":                             # a function handed in as a value: the in-flight row that says so
+                q = K[3:]
+                for i, x in enumerate(inf):
+                    if q in (x.get("dependency"), x.get("fn"), x.get("set_by")):
+                        p = "d:inflight" if i < drawn_inf else F["c:inf_answer" if x.get("dies") == "with the answer" else "c:inf_server"][0]
+                        if p in pairs:
+                            a.add(p)
+            a -= c
+            if U_rows:
+                off = sorted((c | a) - pairs)
+                if off:
+                    die(f"{r['id']}: {K} sits in {off}, which el.why.table does not list for a {kind} drawn by {sorted(U_rows)} — add the field")
+            why = []
+            if c:
+                why.append(["cnt", sorted(c)])
+            if a:
+                why.append(["alt", sorted(a)])
+            attrs = sorted({x for e in ents for x in e["attrs"]} | {x for p in c for x in pair_attrs[p]}, key=list(A).index)
+            if attrs and all(A[x]["r"] == r_low for x in attrs):
+                why.append(["low", attrs])
+            mp = bool(ents) and all(e.get("about") == "map" for e in ents)
+            if mp:
+                why.append(["map", sorted({x for e in ents for x in e["attrs"]}, key=list(A).index)])
+            if not c and not a and not mp:
+                why.append(["gap", []])
+            nr[K] = why
+        r["nr"] = nr
+
+
 def ulook(spec: dict, unis: list) -> tuple:
     """The page's copy of the station's card look: (CSS — the tokens per theme, then the card's rules scoped to .ust; the
     tables the page draws the rows with). Every icon comes out of the station's own icon table, run by look_eval."""

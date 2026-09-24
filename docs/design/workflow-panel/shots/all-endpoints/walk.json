@@ -823,12 +823,167 @@
    }
   ],
   [
-   "step 68 · open-in-the-lab",
+   "step 68 · light-a-case-the-code-map-counts",
+   {
+    "click": "C1048",
+    "at": [
+     60,
+     529
+    ],
+    "size": [
+     71,
+     22
+    ],
+    "note": "the C1048 chip under Tests, in the universe column"
+   }
+  ],
+  [
+   "lit: C1048, the code map says",
+   {
+    "here": "false",
+    "line": "C1048 (test case) — not named in the code map · counted, not namedtestsbeyondproventhe endings",
+    "reasons": [
+     "cnt: counted, not named | tests → c:acts | beyond → c:asserted | proven → c:proof | the endings → d:exits"
+    ],
+    "fieldsLit": []
+   }
+  ],
+  [
+   "hover the reason link",
+   {
+    "link": "tests",
+    "tip": "testsPointing lights this field of the code map; a click goes there and keeps it lit until the light is put out.",
+    "here": "false",
+    "line": "C1048 (test case) — not named in the code map · counted, not namedtestsbeyondproventhe endings",
+    "reasons": [
+     "cnt: counted, not named | tests → c:acts | beyond → c:asserted | proven → c:proof | the endings → d:exits"
+    ],
+    "fieldsLit": [
+     "c:acts · hover"
+    ]
+   }
+  ],
+  [
+   "step 71 · click-the-reason-link",
+   {
+    "click": "tests",
+    "at": [
+     1465,
+     530
+    ],
+    "size": [
+     45,
+     20
+    ],
+    "note": "the link \"tests\" in the code map's line"
+   }
+  ],
+  [
+   "clicked the reason link",
+   {
+    "fieldTop": 522,
+    "here": "false",
+    "line": "C1048 (test case) — not named in the code map · counted, not namedtestsbeyondproventhe endings",
+    "reasons": [
+     "cnt: counted, not named | tests → c:acts | beyond → c:asserted | proven → c:proof | the endings → d:exits"
+    ],
+    "fieldsLit": [
+     "c:acts · pin"
+    ]
+   }
+  ],
+  [
+   "step 73 · light-a-case-the-code-map-lacks",
+   {
+    "click": "C1087",
+    "at": [
+     64,
+     533
+    ],
+    "size": [
+     46,
+     14
+    ],
+    "note": "the journey C1087, in the universe column"
+   }
+  ],
+  [
+   "lit: C1087, the code map says",
+   {
+    "here": "false",
+    "line": "C1087 (test case) — not named in the code map · not carriedthe gaps: in the universe, not in the code map",
+    "reasons": [
+     "gap: not carried | the gaps: in the universe, not in the code map → gap"
+    ],
+    "fieldsLit": []
+   }
+  ],
+  [
+   "step 74 · click-not-carried",
+   {
+    "click": "the gaps: in the universe, not in the code map",
+    "at": [
+     1414,
+     530
+    ],
+    "size": [
+     361,
+     20
+    ],
+    "note": "the link of \"not carried\""
+   }
+  ],
+  [
+   "the gaps turned",
+   {
+    "dir": "uni",
+    "here": "false",
+    "line": "C1087 (test case) — not named in the code map · not carriedthe gaps: in the universe, not in the code map",
+    "reasons": [
+     "gap: not carried | the gaps: in the universe, not in the code map → gap"
+    ],
+    "fieldsLit": [
+     "C1087 · pin"
+    ]
+   }
+  ],
+  [
+   "step 76 · clear-the-light-again",
+   {
+    "click": "clear",
+    "at": [
+     425,
+     401
+    ],
+    "size": [
+     37,
+     19
+    ],
+    "note": "the clear link on the lit chip above the table"
+   }
+  ],
+  [
+   "step 77 · gaps-back-to-this-way",
+   {
+    "click": "in the code map, not in the universe",
+    "at": [
+     620,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the first square of THE GAPS, back to its default"
+   }
+  ],
+  [
+   "step 78 · open-in-the-lab",
    {
     "click": "open POST /setup/complete in the lab",
     "at": [
      480,
-     525
+     435
     ],
     "size": [
      64,
@@ -852,7 +1007,7 @@
    }
   ],
   [
-   "step 70 · open-in-the-universe",
+   "step 80 · open-in-the-universe",
    {
     "click": "open POST /setup/complete in the Gabe Universe",
     "at": [
@@ -882,7 +1037,7 @@
    }
   ],
   [
-   "step 72 · click-the-stream-row",
+   "step 82 · click-the-stream-row",
    {
     "click": "GET/recipe-creation/gustify/stream",
     "at": [
@@ -949,7 +1104,7 @@
    }
   ],
   [
-   "step 75 · more-information",
+   "step 85 · more-information",
    {
     "click": "Show how the map knows this",
     "at": [

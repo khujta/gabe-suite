@@ -544,3 +544,16 @@ plainly when the element is NOT there. One click again, or clear, puts it out. H
 element is the agent's reading, said on the page.
 Also this date: "All this work can remain local for now. Just committed." — commit the design work; no push until he says.
 Revisit if: a key joins two things he sees as different (or misses one he sees as the same) — then that alias is split or added.
+
+## D-042 — When the code map lacks a lit element, it says WHY, and links the field that holds it another way
+Date: 2026-09-24 · Input: his message.
+Decision, his: "when something is missing, I would like to know the reason. It's missing because it's not important, we
+deprioritize it, we are showing it with a different layout or in a different way in another field, or something like that. If
+it's in another field, it should link to the other field. When I click that or hover over it, it should highlight the other field.
+This should only apply to the code map section on the right side."
+Consequence: the code-map column's "not here" line (D-041) carries the reason(s), each derived from data the page holds, never
+typed per element — counted, not named (a field counts it without naming it) · shown another way in another field · low priority
+(its attribute is rated 1, D-020) · about the map, not the code (D-017) · not carried (a real gap, pointing at THE GAPS). A reason
+that names another field links it: hovering or clicking the link lights that field. The reason vocabulary and which kinds map to
+which fields are the agent's reading, said on the page. Only the code-map column; the universe column's note stays as it is.
+Revisit if: a reason reads as an excuse for a gap he wants closed — then it is re-worded as a gap, not a reason.

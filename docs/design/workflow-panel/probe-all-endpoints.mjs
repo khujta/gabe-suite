@@ -341,7 +341,10 @@ ok(labSha() === LAB0, 'the lab\'s own facts file is untouched by the sample');
    (2026-09-23: the table keeps its own scroll box — he asked for no change to the table, D-038) */
 { await p.evaluate(() => { const bd = document.getElementById('board'); window.scrollTo(0, 0); window.scrollTo(0, bd.getBoundingClientRect().top + 400); bd.scrollTop = 600; });
   const settle = (cond) => p.waitForFunction(cond, null, { timeout: 3000 }).catch(() => {});   /* a scroll event lands on the next frame, which a heavy table can delay */
-  await settle(() => { const pin = document.getElementById('pin'); return pin && Math.abs(pin.getBoundingClientRect().top) <= 1; });
+  /* wait for BOTH the pin to reach the top AND the table's header to tuck behind it — the header moves on the scroll event's next
+     frame, which a heavy table delays; measuring on the pin alone raced it on a first load (2026-09-24) */
+  await settle(() => { const pin = document.getElementById('pin'), b0 = document.querySelector('#board thead tr.bh th.bstart'); if (!pin || !b0) return false;
+    const pr = pin.getBoundingClientRect(), bt = b0.getBoundingClientRect().top; return Math.abs(pr.top) <= 1 && bt >= pr.top && bt < pr.bottom; });
   const at = await p.evaluate(() => { const bd = document.getElementById('board'), h = document.querySelector('#board thead tr.ch th[data-col]'), b0 = document.querySelector('#board thead tr.bh th.bstart');
     return { board: Math.round(bd.getBoundingClientRect().top), head: Math.round(h.getBoundingClientRect().top), band: Math.round(b0.getBoundingClientRect().top), scrolled: bd.scrollTop }; });
   ok(at.board < -300 && at.scrolled > 0, 'the page is scrolled past the board\'s top and the board is scrolled', at);
@@ -869,7 +872,10 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
   /* another endpoint, the light kept: a row that holds it, clicked in the table */
   const other = want.find((ep) => ep !== EP && ROW[ep].u.written && ROW[ep].u.written.includes(T0)) || want.find((ep) => ep !== EP);
   await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + other + '"] td.id'); await p.waitForTimeout(80);
-  const b10 = await lit(), nU = uniTables(ROW[other]).has(T0), nC = cmTables(ROW[other]).has(T0);
+  /* CHANGED 2026-09-24 (D-042): the code map's line says "here" only where it NAMES the element — its tables list, the login
+     check's writes, a request or reply model; a count that holds it lights with it, and the line then says why */
+  const cmNamesT = (r, t) => r.d.tables.items.some((x) => x[0] === t) || r.d.gateWrites.includes(t) || [r.d.request && r.d.request[0], r.d.response && r.d.response[0]].some((m) => m && M2T[m] === t);
+  const b10 = await lit(), nU = uniTables(ROW[other]).has(T0), nC = cmNamesT(ROW[other], T0);
   ok(b10.open === other && JSON.stringify(b10.on) === JSON.stringify(want) && (b10.sayU[0] === 'true') === nU && (b10.sayC[0] === 'true') === nC && (b10.uni.length > 0) === nU,
     'choosing another endpoint keeps the element lit, and its two columns say whether they hold it', { other, sayU: b10.sayU, sayC: b10.sayC });
   /* a place that lacks it says so: the login check's table, which POST /setup/complete's code map names and its card does not */
@@ -887,7 +893,48 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
   await p.locator('#ocol-cm .pair[data-k="d:gateWrites"] .pv span', { hasText: new RegExp('^' + T1 + '$') }).first().click(); await p.waitForTimeout(40);
   await p.click('#elclear'); await p.waitForTimeout(40); const d3 = await lit();
   ok([d1, d2, d3].every((x) => x.any === 0 && x.chip === null && x.sayU === null && x.sayC === null && !x.out.includes(D.words.copy.lines.el + ': ')),
-    'clicking it again, Escape, and clear each put everything out: no row lit or dimmed, no cell or element outlined, no chip, no line, no copy line', [d1.any, d2.any, d3.any]); }
+    'clicking it again, Escape, and clear each put everything out: no row lit or dimmed, no cell or element outlined, no chip, no line, no copy line', [d1.any, d2.any, d3.any]);
+
+  /* 11 · D-042: when the code map does not NAME a lit element, its line says why. What each case expects is recomputed HERE from
+     the forms feed and inventory-endpoint.md: the cases whose calls ACT on the endpoint (the tests column counts those calls), the
+     cases that only arrange through it, and the rating of the attribute Code behind shows. Real mouse, on POST /setup/complete. */
+  const EPK = 'endpoint:' + EP, TC = FJ.test_cases || {};
+  const callsOn = (cid, role) => ((TC[cid] || {}).calls || []).filter((c) => c.endpoint === EPK && c.role === role).length;
+  const actCalls = Object.keys(TC).reduce((n, cid) => n + callsOn(cid, 'act'), 0);
+  const invRate = (label) => { const row = fs.readFileSync(path.join(REPO, 'docs/design/design-context/inventory-endpoint.md'), 'utf8').split('\n')
+    .find((l) => l.toLowerCase().startsWith('| ' + label.toLowerCase() + ' |')); return row ? Number((row.split('|')[4].match(/\d/) || [])[0]) : null; };
+  const whyOf = () => p.evaluate(() => { const s = document.getElementById('el-cm'); return { here: s.getAttribute('data-here'), text: s.textContent,
+    why: [...s.querySelectorAll('.elwhy')].map((w) => [w.getAttribute('data-why'), [...w.querySelectorAll('.elref')].map((b) => b.getAttribute('data-ref')), (w.querySelector('.elat') || {}).textContent || null]),
+    named: [...document.querySelectorAll('#ocol-cm [data-key]')].map((e) => e.getAttribute('data-key')), elref: [...document.querySelectorAll('[data-elref]')].map((e) => [e.getAttribute('data-k') || e.getAttribute('data-fact') || e.getAttribute('data-gdir'), e.getAttribute('data-elref')]) }; });
+  const lightVisible = async (K) => { const h = await p.evaluateHandle((k) => [...document.querySelectorAll('#ocol-uni [data-key]')].find((e) => e.getAttribute('data-key') === k && e.offsetParent), K);
+    const e = h.asElement(); if (!e) return false; await e.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(60); await e.click(); await p.waitForTimeout(80); return true; };
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + EP + '"] td.id'); await p.waitForTimeout(60);
+  // (1) a case that ACTS here: counted by the tests column, never named — and the link lights exactly that field
+  const cardCases = ROW[EP].uni.rows.find((u) => u.row === 'TESTS').items.map((c) => c[0]);
+  const K1 = cardCases.find((cid) => callsOn(cid, 'act') > 0); let e1 = null, h1 = null;
+  if (K1 && await lightVisible('case:' + K1)) { e1 = await whyOf();
+    const ln = await p.$('#el-cm .elref[data-ref="c:acts"]'); if (ln) { await ln.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(60);
+      const bx = await ln.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(80); h1 = await whyOf(); await p.mouse.move(5, 5); } }
+  const R1 = ROW[EP].k.acts;
+  ok(!!K1 && R1 === actCalls && e1 && e1.here === 'false' && !e1.named.includes('case:' + K1) && e1.why.some(([w, refs]) => w === 'cnt' && refs.includes('c:acts'))
+    && h1 && h1.elref.length === 1 && h1.elref[0][0] === 'c:acts' && h1.elref[0][1] === 'hover',
+    'a case that acts on ' + EP + ' (the feed\'s act calls, ' + actCalls + ', are the tests column\'s count): the code map says "counted, not named" with a link to the tests field, and pointing at the link lights exactly that field',
+    { K1, drawn: R1, feed: actCalls, why: e1 && e1.why, lit: h1 && h1.elref });
+  // (2) a callee of Code behind that touches no data: its attribute is rated at the bottom of the inventory — low priority
+  const lowR = invRate('functions behind · walk levels'), fns2 = new Set([...(ROW[EP].u.datafns || []), ...(ROW[EP].u.deciders || [])].map((q) => q.split('::').pop()));
+  const cb = ROW[EP].uni.rows.find((u) => u.row === 'CODE BEHIND'), i2 = cb.items.findIndex((nm, i) => cb.keys[i] && !fns2.has(nm)), K2 = i2 >= 0 ? cb.keys[i2] : null;
+  let e2 = null; if (K2) { await p.evaluate(() => window.scrollTo(0, 0)); if (await lightVisible(K2)) e2 = await whyOf(); }
+  ok(!!K2 && lowR === Math.min(...Object.values(D.attrs).map((a) => a.r)) && e2 && e2.here === 'false' && e2.why.some(([w, , at]) => w === 'low' && at === D.attrs['functions-behind-walk-levels'].label),
+    'a Code behind callee that touches no data (' + (K2 || '').split('::').pop() + '): the inventory rates functions behind ' + lowR + ', and the code map says "low priority"', { K2, lowR, why: e2 && e2.why });
+  // (3) a case that only ARRANGES through this endpoint: nothing in the code map holds it — "not carried", and its link turns THE GAPS
+  const arr = new Set(((FJ.endpoints[EPK] || {}).tests || {}).arranged_by || []), inExits = new Set(ROW[EP].d.exits.items.length ? ROW[EP].dk.exits.flatMap((x) => x[1]) : []);
+  const K3 = cardCases.find((cid) => arr.has(cid) && !callsOn(cid, 'act') && !inExits.has('case:' + cid)); let e3 = null, g3 = null;
+  if (K3) { await p.evaluate(() => window.scrollTo(0, 0)); if (await lightVisible('case:' + K3)) { e3 = await whyOf();
+    await p.$eval('#el-cm .elref[data-ref="gap"]', (x) => x.scrollIntoView({ block: 'center' })).catch(() => {}); await p.click('#el-cm .elref[data-ref="gap"]').catch(() => {}); await p.waitForTimeout(80);
+    g3 = Object.assign({ dir: await p.$eval('#ocol-gaps', (x) => x.getAttribute('data-dir')) }, await whyOf()); } }
+  ok(!!K3 && e3 && e3.here === 'false' && e3.why.length === 1 && e3.why[0][0] === 'gap' && g3 && g3.dir === 'uni' && g3.elref.some(([k, how]) => k === K3 && how === 'pin'),
+    'a case that only arranges through ' + EP + ' (' + K3 + '): the code map says "not carried", and its link turns THE GAPS to the universe side, where the case is lit', { K3, why: e3 && e3.why, after: g3 && [g3.dir, g3.elref] });
+  await p.click('#elclear').catch(() => {}); await p.click('#ocol-gaps .opt[data-gdir="cm"]').catch(() => {}); await p.waitForTimeout(60); }
 ok(!errs.length, 'no page error after the D-041 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */

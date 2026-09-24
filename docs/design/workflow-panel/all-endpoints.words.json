@@ -29,7 +29,8 @@
     "rows",
     "names",
     "name",
-    "place"
+    "place",
+    "dir"
   ],
   "eyebrow": "every endpoint of one app, side by side",
   "h1": "All {nRows} endpoints of {app}, one row each",
@@ -1077,6 +1078,47 @@
       "finding": "finding",
       "limiter": "rate limiter",
       "piece": "piece"
+    },
+    "why": {
+      "_about": "D-042: when the code map does not NAME a lit element, the code-map column's top line says why. The reasons are my reading of his ask, read by _ae_universe.cm_reasons from each row's keys and from `table` below — never typed per element. `table` is MY PROPOSAL: for each kind of element and the universe rows that draw it, the card's attributes it belongs to (ids of the ruled tree, checked against inventory-endpoint.md; an unknown id stops the build) and the code-map fields it can sit in (c:<column> · h:<head pair> · d:<detail pair>). A field the data shows holding it that the table does not list also stops the build. `about: map` marks a kind whose presence is a fact about the map (D-017).",
+      "head": "{name} ({kind}) — not named in the code map",
+      "codes": {
+        "cnt": { "name": "counted, not named", "plain": "A field of the code map counts it but does not name it. Pointing at the link lights that field; a click goes there and keeps it lit." },
+        "alt": { "name": "shown another way", "plain": "The same thing sits in another field of the code map, under another form or kind: a dependency as the value it hands in, a flag as the condition that reads it, a schema as the rules on it. Pointing at the link lights that field; a click goes there and keeps it lit." },
+        "low": { "name": "low priority", "plain": "Every attribute it belongs to is rated {rLow} of {rTop} in the card's inventory: mentioned, never drilled. The card leaves it to a hover or to more information (D-020)." },
+        "map": { "name": "about the map, not the code", "plain": "It says how the map files or finds something, not what the code does, so it waits behind more information (D-017)." },
+        "gap": { "name": "not carried", "plain": "The code map's data holds nothing of the kind for this endpoint: a real gap. The link turns THE GAPS to what the universe shows that the code map does not hold." },
+        "none": { "name": "not on this endpoint", "plain": "Neither column draws it for this endpoint, so there is nothing here for the code map to name." }
+      },
+      "gapLink": "the gaps: {dir}",
+      "refTip": "Pointing lights this field of the code map; a click goes there and keeps it lit until the light is put out.",
+      "plain": "When the code map does not name a lit element, its top line says why, in my words, one reason or several. Counted, not named: a field counts it without naming it. Shown another way: the same thing sits in another field under another form or kind. Low priority: every attribute it belongs to is rated {rLow} of {rTop}, so the card leaves it to a hover or more information (D-020). About the map, not the code: it says how the map files or finds something (D-017). Not carried: the code map's data holds nothing of the kind here, a real gap. When neither column holds it here, the line says it is not on this endpoint. A reason that names a field links it: pointing lights the field, a click goes there and keeps it lit until the element's light is put out; the link of not carried turns THE GAPS to what the universe shows that the code map does not hold. Which attributes and fields each kind of element belongs to is my proposal, tabled under more information at the end of the page.",
+      "mine": "Why the code map lacks a lit element is read from this table, my proposal, not a ruling: for each kind of element and the universe rows that draw it, the attributes of the card it belongs to and the fields of the code map it can sit in. A field the data shows holding it that the table does not list stops the build.",
+      "tableHead": ["kind of element", "drawn by", "attributes, with their rating", "fields of the code map it can sit in", "about the map"],
+      "mapMark": "yes",
+      "table": [
+        { "kind": "endpoint", "rows": ["HEAD"], "attrs": ["method-path"], "fields": ["h:method"] },
+        { "kind": "entity", "rows": ["HEAD", "IDENTITY", "ABOVE"], "attrs": ["entity-cluster"], "fields": ["h:entity"], "about": "map" },
+        { "kind": "entity", "rows": ["JOURNEYS"], "attrs": ["workflow-step"], "fields": ["h:entity"] },
+        { "kind": "fn", "rows": ["GUARDS"], "attrs": ["auth-scheme-gate", "context-giving-functions"],
+          "fields": ["d:gates", "c:auth", "d:inflight", "c:inf_answer", "c:inf_server", "d:deciders", "c:deciders", "c:datafns"] },
+        { "kind": "fn", "rows": ["SIGNATURE"], "attrs": ["the-handler", "signature"],
+          "fields": ["h:handler", "d:gates", "c:auth", "d:inflight", "c:inf_answer", "c:inf_server", "d:deciders", "c:deciders", "c:datafns"] },
+        { "kind": "fn", "rows": ["CODE BEHIND"], "attrs": ["functions-behind-walk-levels"],
+          "fields": ["c:behind", "d:behind", "d:deciders", "c:deciders", "c:datafns", "d:inflight", "c:inf_answer", "c:inf_server"] },
+        { "kind": "table", "rows": ["ACCESSES", "CONNECTIONS"], "attrs": ["tables-touched", "operation-per-table"],
+          "fields": ["d:tables", "c:tables", "c:written", "d:gateWrites", "c:cases422", "d:request", "d:response", "c:request", "c:response"] },
+        { "kind": "schema", "rows": ["PAYLOAD"], "attrs": ["response-shape-per-ending"], "fields": ["d:response", "c:response", "c:cases422"] },
+        { "kind": "schema", "rows": ["CONNECTIONS", "SIGNATURE"], "attrs": ["request-shape", "response-shape-per-ending"],
+          "fields": ["d:request", "d:response", "c:request", "c:response", "c:cases422"] },
+        { "kind": "fe", "rows": ["CONNECTIONS"], "attrs": ["who-fetches-it"], "fields": ["d:hook", "c:fetched"] },
+        { "kind": "flag", "rows": ["CONNECTIONS"], "attrs": ["switches", "own-guards"],
+          "fields": ["d:switches", "d:guards", "c:switches", "c:guards", "c:inf_answer", "c:inf_server"] },
+        { "kind": "case", "rows": ["TESTS"], "attrs": ["cases", "case-role-on-this-endpoint"], "fields": ["c:acts", "c:asserted", "c:proof", "d:exits"] },
+        { "kind": "case", "rows": ["JOURNEYS"], "attrs": ["workflow-step"], "fields": ["c:acts", "c:asserted", "c:proof", "d:exits"] },
+        { "kind": "file", "rows": ["SOURCE"], "attrs": ["file-line"], "fields": ["h:handler", "d:reasons", "c:reasons"] },
+        { "kind": "status", "rows": ["SOURCE"], "attrs": ["declared-status"], "fields": ["h:declared", "d:exits", "d:fates", "d:guards", "c:all", "c:e_success"] }
+      ]
     }
   }
 }

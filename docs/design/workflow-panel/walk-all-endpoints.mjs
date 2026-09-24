@@ -179,6 +179,43 @@ await step('one-info-close', '#itog-one', 'the same toggle, again');
   await step('clear-the-element-light', '#elclear', 'the clear link on the lit chip above the table');
   say('after clear', await lit());
   await topPic('the-light-put-out'); }
+{ // D-042: an element the code map does not NAME says why, on the code map's top line; a reason that names a field links it —
+  // pointing at the link lights that field, a click goes there and keeps it lit. Then one the code map does not carry at all.
+  const why = async () => p.evaluate(() => { const s = document.getElementById('el-cm'); return { here: s.getAttribute('data-here'), line: s.textContent,
+    reasons: [...s.querySelectorAll('.elwhy')].map((w) => w.getAttribute('data-why') + ': ' + [...w.querySelectorAll('b, .elat, .elref')].map((b) => b.textContent + (b.getAttribute('data-ref') ? ' → ' + b.getAttribute('data-ref') : '')).join(' | ')),
+    fieldsLit: [...document.querySelectorAll('[data-elref]')].map((e) => (e.getAttribute('data-k') || e.getAttribute('data-fact') || e.getAttribute('data-gdir')) + ' · ' + e.getAttribute('data-elref')) }; });
+  const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };   /* clear of the pinned row at the top */
+  const C1 = '#ocol-uni .urow[data-row="TESTS"] .pchip[data-key="case:C1048"]';
+  await center(C1);
+  await step('light-a-case-the-code-map-counts', C1, 'the C1048 chip under Tests, in the universe column');
+  say('lit: C1048, the code map says', await why());
+  await onePic('the-code-map-says-why');
+  // the first link, pointed at with the real mouse: the field it names lights; the picture spans the line and the field
+  await center('#el-cm .elref');
+  const lk = await p.$('#el-cm .elref'), lb = await lk.boundingBox(), lw = await txt('#el-cm .elref');
+  await p.mouse.move(lb.x + lb.width / 2, lb.y + lb.height / 2); await wait(250);
+  say('hover the reason link', Object.assign({ link: lw, tip: await txt('#tip') }, await why()));
+  { const span = await p.evaluate(() => { const c = document.getElementById('ocol-cm').getBoundingClientRect(), a = document.getElementById('el-cm').getBoundingClientRect(),
+      f = document.querySelector('[data-elref="hover"]'), fb = f ? f.getBoundingClientRect() : a;
+      const top = Math.min(a.top, fb.top) + scrollY - 12, bot = Math.max(a.bottom, fb.bottom) + scrollY + 12; return { x: c.left + scrollX - 6, y: top, width: c.width + 12, height: bot - top }; });
+    n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-hover-the-reason-link.png'), clip: span, fullPage: true }); }
+  await step('click-the-reason-link', '#el-cm .elref', 'the link "' + lw + '" in the code map\'s line');
+  say('clicked the reason link', Object.assign({ fieldTop: await p.evaluate(() => { const f = document.querySelector('[data-elref="pin"]'); return f ? Math.round(f.getBoundingClientRect().top) : null; }) }, await why()));
+  await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120);
+  await pic('the-field-kept-lit');
+  // one the code map does not carry: C1087, a case that only sets something up through this endpoint — its journey id, clicked
+  const C2 = '#ocol-uni .urow[data-row="JOURNEYS"] [data-key="case:C1087"]';
+  await center(C2);
+  await step('light-a-case-the-code-map-lacks', C2, 'the journey C1087, in the universe column');
+  say('lit: C1087, the code map says', await why());
+  await center('#el-cm .elref[data-ref="gap"]');
+  await step('click-not-carried', '#el-cm .elref[data-ref="gap"]', 'the link of "not carried"');
+  say('the gaps turned', Object.assign({ dir: await p.$eval('#ocol-gaps', (e) => e.getAttribute('data-dir')) }, await why()));
+  await onePic('the-gaps-turned-to-the-case');
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('clear-the-light-again', '#elclear', 'the clear link on the lit chip above the table');
+  await center('#ocol-gaps .opt[data-gdir="cm"]');
+  await step('gaps-back-to-this-way', '#ocol-gaps .opt[data-gdir="cm"]', 'the first square of THE GAPS, back to its default'); }
 { // the lab link: a real click opens the lab on this endpoint, then back
   await step('open-in-the-lab', '#lablink', 'the open-in-the-lab link');
   await p.waitForLoadState('load'); await wait(1500);

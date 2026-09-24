@@ -95,6 +95,14 @@
   .elsay { font-size: var(--fs-xs); color: var(--ink); margin: 0 0 6px; padding: 2px 8px; border-left: 3px solid var(--el); background: color-mix(in srgb, var(--el) 10%, transparent); }
   .elsay[hidden] { display: none; }
   .elsay[data-here="false"] { color: var(--alert); border-left-color: var(--alert); background: var(--alert-soft); font-weight: 650; }
+  /* D-042: the code map's line says WHY it does not name the lit element; a reason that names a field links it. Pointing at the
+     link (or focusing it) lights that field, a click pins the light there — the element light's outline, dashed and filled */
+  .elsay .elwhy { white-space: normal; }
+  .elsay .elwhy b { font-weight: 700; cursor: help; }
+  .elsay .elat { font-weight: 500; color: var(--ink-soft); margin-left: 4px; }
+  .elref { font: inherit; font-weight: 600; background: none; border: 0; padding: 0 3px; margin: 0 1px 0 4px; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+  .elref:hover, .elref:focus-visible { outline: 2px solid var(--el); outline-offset: 1px; border-radius: 3px; }
+  [data-elref] { outline: 2.5px dashed var(--el) !important; outline-offset: 3px !important; border-radius: 4px; background-color: color-mix(in srgb, var(--el) 14%, transparent) !important; }
   .litchip button, .status button { font: inherit; font-size: var(--fs-min); cursor: pointer; background: none; border: 0; color: inherit; text-decoration: underline; padding: 0; }
 
   /* ── the pin: the selected endpoint's row under the table's names, always at the top of the page (his ask 2026-09-24) ── */
@@ -382,7 +390,7 @@
 
   /* ── state: every rail defaults to the words file's default (his where the rail is ruled, else my pick), remembered per viewer ── */
   var RAILS = ["lay", "grp", "alone", "gord", "shared", "slook", "bord", "cols", "heat", "norm", "go"];
-  var S = { sort: null, lit: null, open: null, el: null };     /* el: the element lit everywhere (D-041), apart from `lit`, the strip piece's light */
+  var S = { sort: null, lit: null, open: null, el: null, elRef: null };     /* el: the element lit everywhere (D-041), apart from `lit`, the strip piece's light; elRef: the code-map field a reason's link pinned (D-042) */
   RAILS.forEach(function (r) { S[r] = W.rail[r].pick; });
   try { OLD_KEYS.forEach(function (k) { window.localStorage.removeItem(k); }); } catch (e) {}
   try { var raw = window.localStorage.getItem(KEY); if (raw) { var o = JSON.parse(raw);
@@ -738,7 +746,7 @@
     else if (k === "cases") b.textContent = Object.keys(d.cases).map(function (q) { return q + " " + d.cases[q]; }).join(" · ") || W.panel.none;
     else if (k === "deciders") { list(b, d.deciders.items, function (f) { return f; }, dk.deciders); more(b, d.deciders); }
     else if (k === "switches") keyedJoin(b, d.switches.items.map(function (x) { return x[0] + (x[1] ? " (" + x[1] + ")" : ""); }), dk.switches.map(function (x) { return [x[0]].concat(x[1]); }), " · ");
-    else if (k === "behind") b.textContent = d.behind[0] + " · " + d.behind[1];
+    else if (k === "behind") { b.textContent = d.behind[0] + " · " + d.behind[1]; kd(b, dk.behind, false); }   /* it counts the callees the card names (D-042) */
     else if (k === "proof") b.textContent = fill(P.proofWords, { n: d.proof.tested + "/" + d.proof.produced, v: d.proof.rank + (d.proof.rank_to !== d.proof.rank ? "–" + d.proof.rank_to : ""), of: d.proof.of });
     else if (k === "inflight") { list(b, d.inflight.items, function (f) { return f[0] + " · " + f[1] + " · " + f[2]; }, dk.inflight); more(b, d.inflight); }
     else if (k === "hook") { if (d.hook) b.appendChild(ksp(d.hook, dk.hook)); else b.textContent = W.panel.none; }
@@ -876,6 +884,7 @@
     I.appendChild(el("p", "cap", O.lede + " " + O.pickNote)); I.lastChild.id = "one-lede";
     I.appendChild(el("p", "cap", fill(W.el.plain))); I.lastChild.id = "el-plain";       /* D-041: how the light works, and whose reading the aliases are */
     I.appendChild(el("p", "cap", fill(W.el.alias))); I.lastChild.id = "el-alias";
+    I.appendChild(el("p", "cap", fill(W.el.why.plain))); I.lastChild.id = "el-why";       /* D-042: the reasons' vocabulary, my reading */
     var cmd = el("div", "onecmd"); cmd.appendChild(el("span", null, P.labPlain)); var pre = el("pre"); pre.id = "labcmd"; pre.textContent = fill(P.cmd, { ep: r.id }); cmd.appendChild(pre);
     var cb = el("button", "btn quiet", P.copy); cb.type = "button"; cb.setAttribute("data-tip", "copycmd"); var said = el("span", "said");
     cb.addEventListener("click", function () { copyText(pre.textContent, said, P.copied); }); cmd.appendChild(cb); cmd.appendChild(said); I.appendChild(cmd);
@@ -907,7 +916,7 @@
       b.setAttribute("aria-checked", GD === k ? "true" : "false"); b.setAttribute("aria-label", O.gaps.dir.opts[k].name); b.setAttribute("data-tip", "gdir");
       if (O.gaps.dir.pick === k) b.setAttribute("data-pick", "true");                 /* today's reading is the default and my pick: dashed (D-034) */
       var ic = document.createElementNS("http://www.w3.org/2000/svg", "svg"); ic.setAttribute("viewBox", "0 0 24 24"); ic.setAttribute("aria-hidden", "true"); ic.innerHTML = GICON[k]; b.appendChild(ic);
-      b.addEventListener("click", function () { GD = k; try { window.localStorage.setItem(GKEY, k); } catch (e) {} tip.setAttribute("data-show", "false"); renderOne(); }); dr.appendChild(b); });
+      b.addEventListener("click", function () { GD = k; try { window.localStorage.setItem(GKEY, k); } catch (e) {} tip.setAttribute("data-show", "false"); renderOne(); applyEl(); }); dr.appendChild(b); });   /* the element light survives the turn */
     G.appendChild(dr);
     if (GD === "uni") { renderReverse(G, r); return; }
     G.appendChild(el("p", "plain ainfo", O.gaps.plain)); G.appendChild(el("div", "gcount", r.gaps.length || r.partly.length ? fill(O.gaps.count, { n: r.gaps.length }) + (r.partly.length ? " · " + r.partly.length + " " + O.gaps.partly : "") : O.gaps.none));
@@ -978,11 +987,52 @@
       col.querySelectorAll(".xpl, .urow").forEach(function (e) { if (e._reveal) e._reveal(K); });
       var hits = [].filter.call(col.querySelectorAll("[data-keys]"), function (e) { return keysOf(e).indexOf(K) >= 0; });
       hits.forEach(function (e) { e.classList.add("elon"); });
-      if (say) { say.hidden = false; say.setAttribute("data-here", hits.length ? "true" : "false");
-        say.textContent = hits.length ? fill(W.el.here, { name: elName(K), kind: elKind(K), n: hits.length }) : fill(W.el.not, { name: elName(K), kind: elKind(K), place: W.el.places[x[2]] }); } });
+      if (!say) return; say.hidden = false;
+      /* D-042: the code map NAMES it only where a node that IS it can be clicked; a count or a condition that holds it lights with
+         it (D-041) but does not name it — then the line says why, from the reasons the generator read (r.nr) */
+      if (x[2] === "cm") { var named = hits.filter(function (e) { return e.getAttribute("data-key") === K; }).length;
+        say.setAttribute("data-here", named ? "true" : "false");
+        if (named) say.textContent = fill(W.el.here, { name: elName(K), kind: elKind(K), n: hits.length }); else elWhy(say, BYID[S.open], K); return; }
+      say.setAttribute("data-here", hits.length ? "true" : "false");
+      say.textContent = hits.length ? fill(W.el.here, { name: elName(K), kind: elKind(K), n: hits.length }) : fill(W.el.not, { name: elName(K), kind: elKind(K), place: W.el.places[x[2]] }); });
+    REFH.m = REFH.f = null; elPins();          /* the line was drawn again: its links are new */
   }
+  /* the reasons, each a word (its hover says what it means) and, where it names a code-map field, a link to that field (D-042) */
+  function elWhy(say, r, K) { var WY = W.el.why, nr = r && r.nr ? r.nr[K] : null;
+    say.textContent = fill(WY.head, { name: elName(K), kind: elKind(K) });
+    (nr || (r && elHeld(r, K) ? [] : [["none", []]])).forEach(function (x) { var seg = el("span", "elwhy"), nm = el("b", null, WY.codes[x[0]].name);
+      seg.setAttribute("data-why", x[0]); nm.setAttribute("data-tip", "elwhy"); nm.setAttribute("data-why", x[0]); seg.appendChild(nm);
+      if (x[0] === "cnt" || x[0] === "alt") x[1].forEach(function (ref) { var t = refTarget(ref), b = el("button", "elref", t && t.querySelector(".pk") ? t.querySelector(".pk").textContent : ref);
+        b.type = "button"; b.setAttribute("data-ref", ref); b.setAttribute("data-tip", "elref"); seg.appendChild(b); });
+      else if (x[0] === "low" || x[0] === "map") seg.appendChild(el("span", "elat", x[1].map(function (a) { return D.attrs[a].label; }).join(" · ")));
+      else if (x[0] === "gap") { var g = el("button", "elref", fill(WY.gapLink, { dir: W.one.gaps.dir.opts.uni.name })); g.type = "button"; g.setAttribute("data-ref", "gap"); g.setAttribute("data-tip", "elref"); seg.appendChild(g); }
+      say.appendChild(document.createTextNode(" · ")); say.appendChild(seg); }); }
+  /* what a reason's link points at: a code-map pair by its data-k; "gap" = THE GAPS' second square, or, once turned, the name there */
+  function refTarget(ref) { if (ref === "gap") return document.querySelector('#ocol-gaps .opt[data-gdir="uni"]');
+    return [].filter.call(document.querySelectorAll("#ocol-cm .pair[data-k]"), function (p) { return p.getAttribute("data-k") === ref; })[0] || null; }
+  function gapFact(K) { var nm = elName(K), f = [].filter.call(document.querySelectorAll("#ocol-gaps .gfact[data-fact]"), function (e) { return e.getAttribute("data-fact") === nm; })[0];
+    if (f && f.hidden) f.hidden = false; return f || null; }
+  /* a pinned link (a click) keeps its field lit until the element light goes out, or until another endpoint's reasons stop naming it */
+  function elPins() { document.querySelectorAll("[data-elref]").forEach(function (e) { e.removeAttribute("data-elref"); });
+    if (!S.el || !S.elRef || !document.querySelector('#el-cm .elref[data-ref="' + S.elRef + '"]')) { S.elRef = null; return; }
+    var t = S.elRef === "gap" ? (GD === "uni" && gapFact(S.el)) || refTarget("gap") : refTarget(S.elRef); if (t) t.setAttribute("data-elref", "pin"); }
+  /* the link under the mouse and the link with the keyboard's focus light their fields apart, so a scroll the focus causes (and the
+     mouseover it fires under a resting mouse) does not put out what the keyboard lit */
+  var REFH = { m: null, f: null };
+  function elRefHover() { document.querySelectorAll('[data-elref="hover"]').forEach(function (e) { e.removeAttribute("data-elref"); });
+    [REFH.m, REFH.f].forEach(function (ref) { var t = ref ? refTarget(ref) : null; if (t && !t.hasAttribute("data-elref")) t.setAttribute("data-elref", "hover"); }); }
+  document.addEventListener("mouseover", function (e) { var b = e.target.closest && e.target.closest("#el-cm .elref"), ref = b ? b.getAttribute("data-ref") : null;
+    if (ref !== REFH.m) { REFH.m = ref; elRefHover(); } });
+  document.addEventListener("focusin", function (e) { var b = e.target.closest && e.target.closest("#el-cm .elref"); REFH.f = b ? b.getAttribute("data-ref") : null; elRefHover(); });
+  document.addEventListener("focusout", function (e) { if (e.target.closest && e.target.closest("#el-cm .elref")) { REFH.f = null; elRefHover(); } });
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("#el-cm .elref"); if (!b) return; e.preventDefault();
+    var ref = b.getAttribute("data-ref"); tip.setAttribute("data-show", "false"); S.elRef = ref;
+    /* turning THE GAPS redraws the columns, so the light is laid again; any other link only pins — the line stays, and a keyboard
+       user's focus stays on the link */
+    if (ref === "gap" && GD !== "uni") { GD = "uni"; try { window.localStorage.setItem(GKEY, GD); } catch (x) {} renderOne(); applyEl(); } else { elPins(); elRefHover(); }
+    var t = ref === "gap" ? $("ocol-gaps") : refTarget(ref); if (t && t.scrollIntoView) t.scrollIntoView({ block: ref === "gap" ? "start" : "center" }); });
   /* one click lights; the same element again, clear or Escape puts it out */
-  function lightKey(K) { S.el = K && S.el !== K ? K : null; applyEl(); writeOut(LAST.L, LAST.GS); }
+  function lightKey(K) { S.el = K && S.el !== K ? K : null; S.elRef = null; applyEl(); writeOut(LAST.L, LAST.GS); }
   document.addEventListener("click", function (e) { var t = e.target.closest && e.target.closest("#ocol-uni [data-key], #ocol-cm [data-key]"); if (!t) return;
     e.preventDefault(); lightKey(t.getAttribute("data-key")); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && S.el) lightKey(null); });
@@ -1018,6 +1068,8 @@
     if (kind === "unilink") return esc(t.getAttribute("aria-disabled") === "true" ? W.panel.uniMissing : W.panel.uni);
     if (kind === "itog") return esc(t.getAttribute("aria-expanded") === "true" ? W.info.close : W.info.open);
     if (kind === "mine") return esc(W.one.gaps.minePlain);
+    if (kind === "elwhy") { var wc = W.el.why.codes[t.getAttribute("data-why")]; return "<b>" + esc(wc.name) + "</b> · " + esc(W.one.gaps.mine) + "<span class=pl>" + esc(fill(wc.plain)) + "</span>"; }
+    if (kind === "elref") { var rf = t.getAttribute("data-ref"); return "<b>" + esc(t.textContent) + "</b>" + "<span class=pl>" + esc(rf === "gap" ? W.one.gaps.dir.opts.uni.plain : W.el.why.refTip) + "</span>"; }
     if (kind === "gdir") { var gk = t.getAttribute("data-gdir"), gw = W.one.gaps.dir; return "<b>" + esc(gw.opts[gk].name) + "</b>" + (gw.pick === gk ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(gw.opts[gk].plain) + "</span>"; }
     if (kind === "rgap") { var ra = t.getAttribute("data-attr"), rr2 = US[t.getAttribute("data-row")];
       return "<b>" + esc(ra ? D.attrs[ra].label : rr2.name) + "</b> · " + esc(rr2.title || rr2.name) + "<span class=ln>" + esc(ra ? W.one.gaps.rshows : W.one.gaps.unmapped) + "</span>" + (ra ? "<span class=pl>" + esc(D.attrs[ra].plain) + "</span>" : ""); }
@@ -1115,6 +1167,13 @@
     var t2 = el("table"); t2.id = "umap"; var h2 = el("tr"); W.universe.mapHead.forEach(function (x) { h2.appendChild(el("th", null, x)); }); t2.appendChild(h2);
     D.uspec.forEach(function (u) { var tr = el("tr"); tr.setAttribute("data-row", u.row); tr.appendChild(el("td", null, u.title || u.name));
       tr.appendChild(el("td", null, u.attrs.map(function (a) { return D.attrs[a].label; }).join(" · ") || W.panel.none)); t2.appendChild(tr); }); mb.appendChild(t2);
+    /* D-042: which kind of element belongs to which attribute and which code-map fields — MY PROPOSAL, the reasons are read from it */
+    var WY = W.el.why, fieldWord = function (f) { var k = f.slice(2); return f[0] === "c" ? (COL[k].kind === "slot" ? W.codemap.kinds : COL[k].head) : f[0] === "h" ? (W.codemap.head[k].label || W.panel[k]) : W.panel[k]; };
+    var p4 = el("p", null, WY.mine); p4.id = "elwhy-mine"; mb.appendChild(p4);
+    var t4 = el("table"); t4.id = "elwhy-map"; var h4 = el("tr"); WY.tableHead.forEach(function (x) { h4.appendChild(el("th", null, x)); }); t4.appendChild(h4);
+    WY.table.forEach(function (e) { var tr = el("tr"); tr.setAttribute("data-kind", e.kind);
+      [W.el.kinds[e.kind] || e.kind, e.rows.map(function (x) { return US[x].title || US[x].name; }).join(" · "), e.attrs.map(function (a) { return D.attrs[a].label + " (" + D.attrs[a].r + ")"; }).join(" · "),
+       e.fields.map(fieldWord).join(" · "), e.about === "map" ? WY.mapMark : ""].forEach(function (v) { tr.appendChild(el("td", null, v)); }); t4.appendChild(tr); }); mb.appendChild(t4);
     /* the block marks, and whose each one is */
     var t3 = el("table"); t3.id = "marks"; D.blocks.concat([{ key: "_shared", name: W.sharedBlock.name }]).forEach(function (b) { var tr = el("tr"); var td = el("td"); td.appendChild(markEl(b.key)); td.appendChild(document.createTextNode(b.name)); tr.appendChild(td);
       tr.appendChild(el("td", null, markWords(b.key))); t3.appendChild(tr); }); mb.appendChild(t3); })();
