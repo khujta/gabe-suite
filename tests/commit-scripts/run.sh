@@ -281,6 +281,29 @@ Class: Red')" = 0 ] && ok || bad "trailer: capitalised Class value must be accep
 rc=$(printf 'Task: T1/1 — x\nCases: C5 (guarded)\nClass: guard\n' | bash "$TRAIL" - >/dev/null 2>&1; echo $?)
 [ "$rc" = 0 ] && ok || bad "trailer: stdin form with valid trailer must stay SILENT"
 
+# =====================================================================
+# action-pins.sh — no args, reads the STAGED .github/workflows diff; exit 0=clean/skipped,
+# 2=warned (archie S1, 2026-09-24: 0 of 81 `uses:` refs SHA-pinned across three repos).
+# =====================================================================
+PINS="$REPO/skills/gabe-commit/scripts/action-pins.sh"
+mkgit "$T/pins"
+run_pins() { (cd "$T/pins" && bash "$PINS" >"$T/pins.out" 2>&1); echo $?; }
+SHA40=0123456789abcdef0123456789abcdef01234567
+[ "$(run_pins)" = 0 ] && ok || bad "pins: no staged workflow must stay SILENT"
+(cd "$T/pins" && mkdir -p .github/workflows && printf 'jobs:\n  a:\n    steps:\n      - uses: astral-sh/setup-uv@v5\n' > .github/workflows/ci.yml && git add -A && git commit -qm "pre-existing unpinned")
+(cd "$T/pins" && printf '      - run: echo hi\n' >> .github/workflows/ci.yml && git add -A)
+[ "$(run_pins)" = 0 ] && ok || bad "pins: an UNCHANGED pre-existing unpinned ref is not this diff's doing → SILENT"
+(cd "$T/pins" && printf '      - uses: actions/checkout@v4\n      - uses: ./.github/actions/local\n      - uses: "dorny/paths-filter@%s"  # v3\n      - uses: docker://alpine@sha256:%s\n' "$SHA40" "$SHA40$SHA40" >> .github/workflows/ci.yml && git add -A)
+[ "$(run_pins)" = 0 ] && ok || bad "pins: actions/*, a local action, a SHA-pinned ref (quoted, with # comment) and a docker digest must stay SILENT"
+(cd "$T/pins" && git commit -qm pinned && printf '      - uses: gitleaks/gitleaks-action@v2\n  reuse:\n    uses: org/repo/.github/workflows/x.yml@main\n' >> .github/workflows/ci.yml \
+   && printf 'jobs:\n  d:\n    steps:\n      - uses: docker://alpine:3\n' > .github/workflows/new.yaml && git add -A)
+rc=$(run_pins)
+[ "$rc" = 2 ] && grep -q "ci.yml:.*gitleaks/gitleaks-action@v2" "$T/pins.out" && grep -q "org/repo/.github/workflows/x.yml@main" "$T/pins.out" \
+   && grep -q "new.yaml:4  docker://alpine:3" "$T/pins.out" && grep -q "3 third-party" "$T/pins.out" \
+  && ok || bad "pins: an added tag-pinned action, a tag-pinned reusable workflow and an undigested docker ref must FIRE with file:line (got $rc)"
+(cd "$T/pins" && git commit -qm three && sed -i '/gitleaks-action@v2/d' .github/workflows/ci.yml && git add -A)
+[ "$(run_pins)" = 0 ] && ok || bad "pins: REMOVING an unpinned ref is a fix → SILENT"
+
 echo "=================================="
 echo "commit-scripts battery: $pass passed, $fail failed"
 [ "$fail" = 0 ]

@@ -3,7 +3,7 @@ name: gabe-commit
 description: "Commit quality gate — deterministic checks incl. the 800-line size budget and the checkpoint task-record trailer (Cases/Class on any Task:-footered message), interactive triage, evidence-triggered simplify pass; docs-audit mode for accumulated drift."
 when_to_use: "Commit, save, checkpoint, ship this work — any request to record completed work in git in a KDBP project."
 metadata:
-  version: 2.7.10
+  version: 2.8.0
 ---
 
 # Gabe Commit — commit quality gate
@@ -41,6 +41,7 @@ Deterministic commit quality gate. Runs checks (lint, types, tests, coverage, sh
 ## Evidence + docs discipline (runs with the gate, WARN-and-LOG stage)
 
 - `scripts/evidence-freshness.sh` (this skill): when the current phase carries a non-null `proof` (PLAN.json), the newest artifact under the manifest's `proof_root` must be at least as new as the newest staged source change — stale/missing evidence WARNs and appends one line to `.kdbp/archive/evidence-bypass.log`. Never blocks; promotion to blocking is a Wave-2 decision made from that log. Convention: `../gabe-docs/references/evidence-doctrine.md`.
+- `scripts/action-pins.sh` (this skill): WARN when a staged workflow change ADDS a third-party `uses:` ref on a mutable tag (`@v5`) instead of a 40-hex commit SHA — the tag runs whatever its owner pushes next, with the job's secrets. `actions/*`, local `./` actions and digest-pinned `docker://` refs are exempt; only added lines count. Never blocks.
 - `scripts/docs-budget.sh` (this skill): WARN on staged NEW `.md` files outside the allowed homes (`.kdbp/**`, files registered in `.kdbp/DOCS.md`) and on any new dated-name md (no dated throwaways — augment the living doc in place). Never blocks. Both WARNs enter triage like any other finding.
 
 ## Output contract (summary)
