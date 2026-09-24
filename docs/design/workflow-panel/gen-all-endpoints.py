@@ -460,8 +460,11 @@ def distill(L: dict, fj: dict, W: dict) -> dict:
         "hook": (F["frontend"].get("hook") or {}).get("piece", "").split("#")[-1] or None,
         "screens": len(L["widening"].get("screens") or []),
         "reasons": cap([[s.get("at"), s.get("branch"), s.get("does_state")] for s in rs]),
-        "alarms": [[f["id"], f.get("status"), ", ".join(str(d) for d in (f.get("details") or f.get("statuses") or []))[:80]] for f in (F.get("findings") or [])]
-                  + [[f["id"], None, a] for a, fs in (F.get("arm_findings") or {}).items() for f in fs],
+        # [id, status, its words, the statuses it names, the arm that found it] — the statuses and the arm ride apart so the code
+        # map draws each as a chip (D-043); the words keep the same text, so what the column is read to hold does not move
+        "alarms": [[f["id"], f.get("status"), ", ".join(str(d) for d in (f.get("details") or f.get("statuses") or []))[:80],
+                    [s for s in (f.get("statuses") or []) if isinstance(s, int)], None] for f in (F.get("findings") or [])]
+                  + [[f["id"], None, a, [], a] for a, fs in (F.get("arm_findings") or {}).items() for f in fs],
         "pieces": cap([[r["words"], r["n"], r["of"], r["word"]] for r in pc["rows"] if r["word"] in ("rare", "only here")]),
         "lacks": [[r["words"], r["n"], r["of"]] for r in pc["missing_norms"]],
     }
@@ -470,7 +473,13 @@ def distill(L: dict, fj: dict, W: dict) -> dict:
             "seg": path.strip("/").split("/")[0] or "/", "file": ident.get("file"), "line": ep.get("line"),
             "fn": (ep.get("handler") or "").split("::")[-1], "full": ep.get("full_path"), "declared": ident.get("status"),
             "labels": sorted({f"{stage_of(x)}:{x.get('status')}" for x in exits}),
-            "v": v, "k": k, "why": why, "u": u, "d": det}
+            "v": v, "k": k, "why": why, "u": u, "d": det,
+            # D-043: what the code map's chips need beside the detail lists, parallel to their items — kept OUT of `d`, so the words
+            # the gaps are read against (every string `d` holds) do not move: each path's kind of ending, and each piece's family and
+            # value from its key (a status, a method or a switch kind in a piece's own sentence is drawn as its chip)
+            "xd": {"fates": [p["kind"] for p in F["paths"]][:CAP],
+                   "pieces": [[x.get("family"), (x.get("key") or "").split(":", 1)[-1]] for x in pc["rows"] if x["word"] in ("rare", "only here")][:CAP],
+                   "lacks": [[x.get("family"), (x.get("key") or "").split(":", 1)[-1]] for x in pc["missing_norms"]]}}
 
 
 # ── 3 · ONE IDENTITY KEY SPACE (D-041) ─────────────────────────────────────────────────────────────────────────────
@@ -728,6 +737,92 @@ def all_keys(r: dict) -> set:
     return out
 
 
+# ── 4 · D-043: THE VALUE CHIPS' LOOKS, read from where they live ─────────────────────────────────────────────────────────
+# In ONE ENDPOINT's code-map column every action word and every value from a fixed set is a chip. A family the page already
+# draws keeps the page's tokens (the template's). The rest are READ here: cut out of the endpoint lab's own source and run under
+# node with the station's tokens (never retyped), the forms registries' own words for a finding and their own grouping of the
+# 422 rule types, the lab's channel-chip rule from its stylesheet. A family nobody draws yet is my proposal, in the words file.
+LAB_PANELS, LAB_CSS = HERE / "_lab-ep-panels.js", HERE / "_lab-ep.css"
+GENS = REPO / "templates" / "center" / "generators"
+ENC_CUT = (("CMDKIND", "var CMDKIND = {"), ("ALIVEW", "var ALIVEW = {"), ("ALIVEICO", "var ALIVEICO = {"), ("ALIVETONE", "var ALIVETONE = {"),
+           ("SCHDIR", "var SCHDIR = {"), ("ROLECHIP", "var ROLECHIP = {"), ("DOESSTATE", "var DOESSTATE = {"),
+           ("statusCol", "function statusCol(st, S)"))
+ENC_JS = r"""
+const vm=require('vm'),fs=require('fs'),path=require('path');const H=process.argv[1],C=JSON.parse(process.argv[2]);
+const win={};win.window=win;const ctx=vm.createContext(win);
+for(const f of ['_station.js','_lab-ep.js','_lab-ep-panels.js']) vm.runInContext(fs.readFileSync(path.join(H,f),'utf8'),ctx,{filename:f});
+const S=win.STATION,K=win.EPKIT,X={};for(const k of Object.keys(C)) X[k]=vm.runInContext('('+C[k]+')',ctx);
+const pick=(o,f)=>Object.fromEntries(Object.keys(o).map(k=>[k,f(o[k],k)]));
+const out={op:pick(K.RWC,(col,k)=>({chip:(/>([^<]+)</.exec(K.rwChip(k))||[])[1],col})),
+  kind:pick(X.CMDKIND,(v)=>({icon:v.ico,plain:v.plain})),
+  status:Object.fromEntries(['1','2','3','4','5'].map(c=>[c,X.statusCol(c+'00',S)])),
+  life:pick(X.ALIVETONE,(t)=>S.OPC[t]||null), ifk:pick(X.ALIVEICO,(ic,k)=>({icon:ic,plain:X.ALIVEW[k]||null})),
+  dir:pick(X.SCHDIR,(v)=>({chip:v.chip,icon:v.icon,col:v.col(S),plain:v.plain,long:v.long})),
+  role:pick(X.ROLECHIP,(chip,k)=>({chip,col:(S.BADGE_COL.role||{})[k]||null,plain:(S.BADGE_DESC.role||{})[k]||null})),
+  hrole:pick(S.BADGE_COL.hrole||{},(col,k)=>({col,plain:(S.BADGE_DESC.hrole||{})[k]||null})),
+  method:pick(S.BADGE_DESC.method||{},(plain)=>({plain})), does:X.DOESSTATE};
+process.stdout.write(JSON.stringify(out));"""
+
+
+def _registry(p: Path):
+    """A forms registry module (data only), loaded from its own file."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(p.stem, p)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def enc_lift(W: dict) -> tuple:
+    """(D.enc, the lifted CSS, the icon names the chips draw)."""
+    src = LAB_PANELS.read_text(encoding="utf-8")
+    cut = {k: (m + UNI._literal(src, m)) if m.startswith("function") else UNI._literal(src, m) for k, m in ENC_CUT}
+    r = subprocess.run(["node", "-e", ENC_JS, str(HERE), json.dumps(cut)], capture_output=True, text=True)
+    if r.returncode != 0:
+        die("the lab's encodings could not be read under node: " + r.stderr.strip()[-400:])
+    E = json.loads(r.stdout)
+    bad = [f"{f}.{k}" for f in ("op", "dir", "role", "hrole") for k, v in E[f].items() if not v.get("col")] + [c for c, v in E["status"].items() if not v]
+    if bad or any(not v.get("chip") for v in E["op"].values()):
+        die(f"lab encodings that name no colour or chip: {bad}")
+    jd = [" ".join(b.split()) for sel, b in UNI._css_rules(LAB_CSS.read_text(encoding="utf-8")) if sel == ".jdrw"]
+    if not jd:
+        die("the lab's stylesheet no longer has its .jdrw rule — the channel chip's look")
+    # the lab's chip reads --font-mono, a token the page's column does not set: it is the page's own monospace stack there
+    css = "#ocol-cm{ --font-mono: var(--af-stack); }\n" + "\n".join("#ocol-cm .jdrw{ " + b + " }" for b in jd)
+    # a finding's own words, and the 422 rule types grouped by the Field keyword or the model rule that makes each — the forms
+    # registries' tables, read; which keyword belongs to which group is the words file's (my proposal), a keyword none names stops
+    FR, SH = _registry(GENS / "_a3_forms.py"), _registry(GENS / "_a3_forms_short.py")
+    E["says"] = {k: v.get("says") for k, v in FR.FINDINGS.items()}
+    G = W["enc"]["fam"]["rule"]["groups"]
+    kw = {k: g for g, x in G.items() for k in x.get("keywords") or []}
+    lost = sorted(set(SH.PYDANTIC_ERRORS) - set(kw))
+    if lost:
+        die(f"422 rule keywords no group of enc.fam.rule names: {lost}")
+    rule = {t: kw[k] for k, by in SH.PYDANTIC_ERRORS.items() for t in by.values()}
+    rule[SH.DECIMAL_WHOLE_DIGITS] = kw["max_digits"]
+    rule.update({t: next(g for g, x in G.items() if x.get("table") == "MODEL_ERRORS") for t in SH.MODEL_ERRORS.values()})
+    rule.update({t: next(g for g, x in G.items() if x.get("table") == "RAISE_ERRORS") for t in SH.RAISE_ERRORS.values() if t})
+    E["rule"] = dict(sorted(rule.items()))
+    F = W["enc"]["fam"]
+    icons = {v["icon"] for v in E["kind"].values()} | {v["icon"] for v in E["ifk"].values()} | {v["icon"] for v in E["dir"].values()}
+    icons |= {x["icon"] for f in ("switch", "alarm", "arm", "branch", "does") for x in F[f]["vals"].values()} | {g["icon"] for g in G.values()} | {F[f]["icon"] for f in ("limit", "role", "hrole")}
+    return E, css, icons
+
+
+def roles_by_key(L: dict, r: dict) -> dict:
+    """{key: role} for the functions and the hook the code map names — the station's function role and hook role, read from the
+    lab's facts (the handler, the walk, the hook that fetches), joined on the same keys the page's items carry (D-041)."""
+    ro = {}
+    for f in [L["functions"].get("handler") or {}] + [p for lv in (L["functions"].get("walk") or []) for p in lv]:
+        if f.get("id") and f.get("role"):
+            ro["fn:" + f["id"].replace("#", "::")] = f["role"]
+    for h in L["widening"].get("fetched_by") or []:
+        if h.get("id") and h.get("hrole"):
+            ro[h["id"]] = h["hrole"]
+    want = [r["hk"]["handler"][0], r["dk"]["hook"]] + list(r["dk"]["deciders"]) + list(r["dk"]["gates"])
+    return {k: ro[k] for k in want if k and k in ro}
+
+
 def block_orders(sm: dict) -> dict:
     """card = the ruled tree's own order · stage = the brain map's stage order: a block by the first row of its authored
     stage list (EDGE first), a block with no stage last ("across the stages"), ties in the tree's order."""
@@ -807,6 +902,7 @@ def build(argv: list) -> tuple:
     X, CL = key_index(fj, json.loads(archmap.read_text(encoding="utf-8")), feeds), {}
     for L, r in zip(facts, rows):
         keyspace(r, L, fj["endpoints"]["endpoint:" + r["id"]], X, CL, spec["_look"]["lift"]["jReal"][0])
+        r["ro"] = roles_by_key(L, r)                                   # the roles the code map's chips wear (D-043)
     kinds = {k.split(":", 1)[0] for r in rows for k in all_keys(r)}
     # every kind a key has wears a word; on the whole feed every word names a kind a key has (a fixture of a few endpoints holds fewer)
     if kinds - set(W["el"]["kinds"]) or (not only and set(W["el"]["kinds"]) - kinds):
@@ -879,6 +975,8 @@ def build(argv: list) -> tuple:
     icon_names |= {x["icon"] for x in spec.values() if isinstance(x, dict) and x.get("icon")}
     icon_names |= {f["icon"] for f in spec["RISK"]["flags"].values()} | {c["icon"] for c in W["cols"].values()}
     icon_names |= {x["icon"] for grp in ("head", "details") for x in CM[grp].values()}
+    enc, enc_css, enc_icons = enc_lift(W)                             # the code map's value chips (D-043)
+    icon_names |= enc_icons
     got = UNI.harvest(icon_names, colour_refs, HERE)                  # + every lab part's own icon
     lab = UNI.lab_marks()
     marks = UNI.marks(blocks, got["parts"], W, lab)
@@ -908,7 +1006,7 @@ def build(argv: list) -> tuple:
     data = {"tok": tok, "partial": bool(only), "layouts": LAYOUTS, "rows": rows, "cols": cols, "blocks": blocks, "orders": orders, "families": families,
             "kinds5": list(KINDS5), "fates": list(FATES), "pieceWords": list(PIECE_WORDS), "words": W,
             "icons": got["icons"], "marks": marks, "uspec": uspec, "attrs": attrs, "attrOrder": order, "ulook": ulook,
-            "ucard": {k: spec["_card"][k] for k in ("more", "comp", "okState")}, "elLabels": dict(sorted(CL.items()))}
+            "ucard": {k: spec["_card"][k] for k in ("more", "comp", "okState")}, "elLabels": dict(sorted(CL.items())), "enc": enc}
 
     RUNTIME = set(W.get("_runtime") or [])
     left = set(TOKEN.findall(json.dumps({k2: v2 for k2, v2 in W.items() if not k2.startswith("_")}, ensure_ascii=False))) - {"{" + t + "}" for t in list(tok) + list(RUNTIME)}
@@ -932,6 +1030,7 @@ def build(argv: list) -> tuple:
     for mark, val in (("<!--__KIT1__-->", K["k1"]), ("<!--__KIT2__-->", K["k2"].strip()), ("<!--__KIT3__-->", K["k3"]),
                       ("<!--__EPSLUG__-->", "<script>\n" + EPSLUG_JS.read_text(encoding="utf-8").replace("</", "<\\/") + "</script>"),
                       ("<!--__UNILOOK__-->", '<style id="unilook">\n' + uni_css.replace("</", "<\\/") + "\n</style>"),
+                      ("<!--__ENCLOOK__-->", '<style id="enclook">\n' + enc_css.replace("</", "<\\/") + "\n</style>"),
                       ("/*__DATA__*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c"))):
         if mark not in html:
             die("template marker missing: " + mark)

@@ -3,6 +3,8 @@
 <!--__KIT1__-->
 <!-- the Gabe Universe's card look (D-040): its tokens and card rules, lifted from the station by _ae_universe.py, scoped to .ust -->
 <!--__UNILOOK__-->
+<!-- the endpoint lab's channel chip (.jdrw) for the code map's value chips (D-043), lifted from _lab-ep.css by gen-all-endpoints.py -->
+<!--__ENCLOOK__-->
 <style>
   /* ══ the page's own rules — the kit block above is pasted verbatim by gen-all-endpoints.py ══ */
   /* centred (his rule, 2026-09-17) and WIDE: the subject is a table of every endpoint, and every column saved is a row seen */
@@ -20,15 +22,16 @@
           --bz:color-mix(in srgb, var(--ink) 4%, var(--card));
           /* D-041: the element light's own colour — a highlighter yellow, apart from the accent (the heat), --alert (the strip
              light) and --sh (the Shared group) */
-          --el:#c48a00; }
+          --el:#c48a00;
+          --vcink:#fff; /* D-043: the ink on a filled kind chip — the slot's white on the light theme, dark on the dark theme's lighter fills */ }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --alert:#f0a35a; --alert-soft:#3b2914;
           --k-success:#5fc28e; --k-refusal:#e5b454; --k-framework:#94a3b8; --k-validation:#a78bfa; --k-uncaught:#f47272;
           --f-saved:#5fc28e; --f-maybe:#f2c94c; --f-rolled:#94a3b8; --f-unsaved:#f0955a; --f-after:#6fa8e8; --p-norm:#3b4658; --p-common:#64748b;
-          --m-GET:#6fa8e8; --m-POST:#5fc28e; --m-PUT:#e5b454; --m-PATCH:#b69cf0; --m-DELETE:#f47272; --sh:#f472b6; --shp:32%; --el:#facc15; } }
+          --m-GET:#6fa8e8; --m-POST:#5fc28e; --m-PUT:#e5b454; --m-PATCH:#b69cf0; --m-DELETE:#f47272; --sh:#f472b6; --shp:32%; --el:#facc15; --vcink:#0b0e13; } }
   :root[data-theme="dark"] { --alert:#f0a35a; --alert-soft:#3b2914;
           --k-success:#5fc28e; --k-refusal:#e5b454; --k-framework:#94a3b8; --k-validation:#a78bfa; --k-uncaught:#f47272;
           --f-saved:#5fc28e; --f-maybe:#f2c94c; --f-rolled:#94a3b8; --f-unsaved:#f0955a; --f-after:#6fa8e8; --p-norm:#3b4658; --p-common:#64748b;
-          --m-GET:#6fa8e8; --m-POST:#5fc28e; --m-PUT:#e5b454; --m-PATCH:#b69cf0; --m-DELETE:#f47272; --sh:#f472b6; --shp:32%; --el:#facc15; }
+          --m-GET:#6fa8e8; --m-POST:#5fc28e; --m-PUT:#e5b454; --m-PATCH:#b69cf0; --m-DELETE:#f47272; --sh:#f472b6; --shp:32%; --el:#facc15; --vcink:#0b0e13; }
   body { background: var(--ground); }
 
   .eyebrow { font-size: var(--fs-min); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 0; }
@@ -297,6 +300,45 @@
   .pair[data-gap="true"] .pk { color: var(--alert); }
   .pair[data-gap="part"] .pk { color: var(--alert); font-style: italic; }
   [data-lit-attr="true"] { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  /* ── D-043 · the code map's VALUE CHIPS: every action word and every value from a fixed set, a colour and/or an icon. Each
+     family's look is the one it already wears elsewhere (the JS block THE VALUE CHIPS names where); only the chip's frame is
+     here. A family with no look anywhere wears an icon from the station's set, never a new colour ── */
+  .vc { display: inline-flex; align-items: center; gap: 3px; vertical-align: middle; white-space: nowrap; font-size: var(--fs-min); line-height: 16px;
+        border-radius: 4px; padding: 0 5px; border: 1px solid transparent; box-sizing: border-box; color: var(--ink); cursor: help; }
+  .vc svg { width: 13px; height: 13px; flex: none; display: block; }
+  .vc .vn { color: var(--ink-soft); margin-left: 2px; font-variant-numeric: tabular-nums; }
+  .vcs { display: inline-flex; flex-wrap: wrap; gap: 3px 4px; margin-left: 6px; vertical-align: middle; }
+  .pair .pv .vcs.solo { margin-left: 0; }
+  #ocol-cm .vc.jdrw { display: inline-flex; gap: 3px; border: 0; }            /* the lab's channel chip: its own fill and ink */
+  #ocol-cm .vc.jdrw svg { width: 12px; height: 12px; }
+  .vc.slot { height: auto; min-width: 0; line-height: 16px; padding: 0 6px 0 4px; color: var(--vcink); }   /* the table's endings slot, a kind's glyph in it */
+  .vc-stage { border-color: var(--rule); padding-left: 3px; }
+  .vc-stage .spine { gap: 1px; margin-right: 2px; }
+  .vc-stage .spine i { width: 5px; height: 11px; }
+  .vc-stage .spine i.bay { margin-left: 2px; }
+  .vc-stage .spine i.on { background: var(--accent); border-color: var(--accent); }
+  .vc-stage b { font-weight: 650; letter-spacing: .02em; }
+  .vc-status { font-weight: 650; border-color: var(--vcc); background: color-mix(in srgb, var(--vcc) 18%, transparent); font-variant-numeric: tabular-nums; }
+  .vc .sw { width: 10px; height: 10px; border-radius: 2px; display: block; flex: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 16%, transparent); }
+  .vc .sw.dot { border-radius: 50%; }
+  .vc-fate, .vc-piece, .vc-ifk, .vc-switch, .vc-branch, .vc-limit, .vc-ent { border-color: var(--rule); }
+  .vc-ifk svg, .vc-switch svg, .vc-branch svg, .vc-limit svg, .vc-does svg, .vc-arm svg { color: var(--ink-soft); }
+  .vc-life { border-left: 3px solid var(--vcc); background: color-mix(in srgb, var(--vcc) 13%, transparent); border-radius: 2px 4px 4px 2px; }
+  .vc-method { font-weight: 700; color: var(--vcc); padding: 0 1px; }
+  .vc-alarm { border-color: color-mix(in srgb, var(--alert) 55%, var(--rule)); }
+  .vc-alarm svg { color: var(--alert); }
+  .vc-rule { border-color: color-mix(in srgb, var(--k-validation) 55%, var(--rule)); }
+  .vc-rule svg { color: var(--k-validation); }
+  .vc-does, .vc-arm { border: 1px dotted var(--ink-soft); }                 /* about how the map knows (D-017): dotted */
+  .pair table td.says { color: var(--ink-soft); }
+  /* the key to the chips, behind the section's info toggle (D-038): a family per line, its chips drawn, where each look is read */
+  .enckey { border-left: 3px solid var(--rule); padding: 2px 0 2px 10px; margin: 0 0 10px; display: grid; gap: 4px; }
+  .enckey .ekt { font-size: var(--fs-xs); color: var(--ink-soft); margin: 0 0 2px; }
+  .enckey .ekr { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr); gap: 0 10px; align-items: start; font-size: var(--fs-min); }
+  .enckey .ekn { color: var(--ink-soft); font-weight: 650; }
+  .enckey .ekv { display: flex; flex-wrap: wrap; gap: 3px 4px; align-items: center; }
+  .enckey .ekf { color: var(--muted); margin-left: 4px; }
+  .enckey .ekf.mine { border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0 6px; color: var(--ink-soft); }
 
   #more-body[hidden] { display: none; }
   #more-body p { font-size: var(--fs-xs); color: var(--ink-soft); max-width: 100ch; margin: 6px 0; }
@@ -412,6 +454,7 @@
   function baseOrder(a, b) { return a.p < b.p ? -1 : a.p > b.p ? 1 : METHODS.indexOf(a.m) - METHODS.indexOf(b.m); }
   var MAX = {}; D.cols.forEach(function (c) { var m = 0; ROWS.forEach(function (r) { var k = r.k[c.id]; if (typeof k === "number" && k > m) m = k; }); MAX[c.id] = m; });
   var SPINE = D.orders.stageRows.filter(function (s) { return D.orders.kinds[s] !== "screen"; });
+  var PTOK = { "the norm": "norm", "common": "common", "rare": "rare", "only here": "only" };   /* a piece's commonness → its --p-* token */
 
   /* ── which columns, under which block, in which order ── */
   function layout() {
@@ -516,7 +559,7 @@
     if (c.kind === "stack") { w.className = "stack"; var sb = el("span", "sb"), keys = c.id === "fate" ? D.fates : D.pieceWords, tot = 0;
       keys.forEach(function (x) { tot += v[x] || 0; });
       keys.forEach(function (x) { if (!v[x]) return; var i = el("i"); i.style.width = (100 * v[x] / tot) + "%"; i.setAttribute("data-s", x); i.setAttribute("data-n", String(v[x]));
-        i.style.background = c.id === "fate" ? "var(--f-" + x + ")" : "var(--p-" + ({ "the norm": "norm", "common": "common", "rare": "rare", "only here": "only" })[x] + ")"; sb.appendChild(i); });
+        i.style.background = c.id === "fate" ? "var(--f-" + x + ")" : "var(--p-" + PTOK[x] + ")"; sb.appendChild(i); });
       w.appendChild(sb); w.appendChild(el("span", "n" + (k ? "" : " z"), String(k))); return w; }
     if (c.kind === "ratio") { w.className = "ratio" + (v[0] ? "" : " z"); w.appendChild(el("span", null, v[0] + "/" + v[1]));
       var rb = el("span", "bar"), ri = el("i"); ri.style.width = (v[1] ? Math.round(100 * v[0] / v[1]) : 0) + "%"; rb.appendChild(ri); w.appendChild(rb); return w; }
@@ -728,45 +771,156 @@
     return String(v).replace(/\+/g, " · "); }
   function pairEl(key, attrs, icon, label, wide) { var pr = el("div", "pair" + (wide ? " wide" : "")); pr.setAttribute("data-k", key); pr.setAttribute("data-attr", attrs.join(" "));
     pr.setAttribute("data-tip", "pair"); pr.appendChild(el("span", "pi")); pr.firstChild.appendChild(svgOf(icon)); var box = el("div"); box.appendChild(el("div", "pk", label)); pr.appendChild(box); return { pr: pr, box: box }; }
+  /* ══ D-043 · THE VALUE CHIPS. In the code-map column every action word and every value from a fixed set is a chip that
+     carries a colour and/or an icon; its words are its aria-label and its hover. Each family's look is REUSED from where it
+     already lives, nothing typed here is a colour: the page's own (the endings slots --k-* with the lab's path-kind glyphs, the
+     stage spine, the fate stack --f-*, the pieces stack --p-*, the method colours --m-*, the alarm dots' --alert), the endpoint
+     lab's (D.enc, cut out of its source by the generator: the channel chip R · W · RW, the status rule, the in-flight glyphs
+     and lifetime tones, the direction chip, the role chip) and the station's (role and hook-role colours, the entity hue the
+     universe column lifts). A family nothing encodes yet wears MY PROPOSAL (W.enc.fam[f].ico = "mine"): an icon from the
+     station's own set, no new colour. A chip that stands for a keyed element carries that key (D-041); the rest carry none. ══ */
+  var EN = D.enc, EF = W.enc.fam;
+  function vc(fam, val, words, cls) { var c = el("span", "vc vc-" + fam + (cls ? " " + cls : "")); c.setAttribute("data-vc", fam); c.setAttribute("data-vv", String(val));
+    c.setAttribute("data-tip", "vc"); c.setAttribute("aria-label", words); return c; }
+  function vIco(c, name) { if (name && D.icons[name]) c.appendChild(svgOf(name)); return c; }
+  function vTxt(c, t, n) { c.appendChild(document.createTextNode(t)); if (n != null) c.appendChild(el("span", "vn", String(n))); return c; }
+  function cOp(rw) { var o = EN.op[rw]; if (!o) return document.createTextNode(String(rw)); var c = vc("op", rw, EF.op.vals[rw].name, "jdrw"); c.style.setProperty("--rwc", o.col); c.textContent = o.chip; return c; }
+  function cKind(k, n) { if (!W.kinds[k]) return el("span", null, String(k)); var c = vc("kind", k, W.kinds[k].name + (n != null ? " " + n : ""), "slot"); c.style.background = "var(--k-" + k + ")";
+    return vTxt(vIco(c, (EN.kind[k] || {}).icon), W.kinds[k].name, n); }
+  function cStage(s, n) { var c = vc("stage", s, s + (n != null ? " " + n : "")), sp = el("span", "spine");
+    SPINE.forEach(function (x) { sp.appendChild(el("i", (D.orders.kinds[x] === "bay" ? "bay" : "") + (x === s ? " on" : ""))); });
+    c.appendChild(sp); c.appendChild(el("b", null, s)); if (n != null) c.appendChild(el("span", "vn", String(n))); return c; }
+  /* a status by its class, the lab's rule; anything else (no status) stays words */
+  function cStatus(st) { var s = String(st == null ? "" : st), v = EF.status.vals[s.charAt(0)];
+    if (!/^[1-5]\d\d$/.test(s) || !v) return el("span", null, s);
+    var c = vc("status", s, s + " · " + v.name); c.style.setProperty("--vcc", EN.status[s.charAt(0)]); c.textContent = s; return c; }
+  function cFate(f, n) { if (!W.fates[f]) return el("span", null, String(f)); var c = vc("fate", f, W.fates[f].name + (n != null ? " " + n : "")), i = el("i", "sw"); i.style.background = "var(--f-" + f + ")"; c.appendChild(i); return vTxt(c, W.fates[f].name, n); }
+  function cPiece(w, n) { if (!W.pieceWords[w]) return el("span", null, String(w)); var c = vc("piece", w, W.pieceWords[w].name + (n != null ? " " + n : "")), i = el("i", "sw dot"); i.style.background = "var(--p-" + PTOK[w] + ")"; c.appendChild(i); return vTxt(c, W.pieceWords[w].name, n); }
+  function cIfk(k) { return vTxt(vIco(vc("ifk", k, k), (EN.ifk[k] || {}).icon || EF.alarm.vals._other.icon), k); }
+  function cLife(d) { var c = vc("life", d, d); c.style.setProperty("--vcc", EN.life[d] || "var(--muted)"); c.textContent = d; return c; }
+  function cDir(d) { var e = EN.dir[d], c = vc("dir", d, e.long, "jdrw"); c.style.setProperty("--rwc", e.col); return vTxt(vIco(c, e.icon), e.chip); }
+  /* a role chip wears the station's glyph of what plays the role (a function, a hook): the lab's filled chip is also the channel's
+     and the direction's, and a role shares a colour with a channel (GATE · RW) — the glyph tells them apart (D-043's revisit) */
+  function cRole(ro) { var e = EN.role[ro], c = vc("role", ro, ro, "jdrw"); c.style.setProperty("--rwc", e.col); return vTxt(vIco(c, EF.role.icon), e.chip); }
+  function cHrole(h) { var e = EN.hrole[h], c = vc("hrole", h, h, "jdrw"); c.style.setProperty("--rwc", e.col); return vTxt(vIco(c, EF.hrole.icon), h); }
+  /* the role a function or a hook plays, by the key its item carries — a chip after it, or nothing when the facts hold none */
+  function roleOf(r, key) { var ro = key && r.ro ? r.ro[key] : null; return !ro ? null : EN.role[ro] ? cRole(ro) : EN.hrole[ro] ? cHrole(ro) : null; }
+  function withRole(node, r, key) { var ch = roleOf(r, key); return ch ? frag(node, " ", ch) : node; }
+  function cMethod(m) { var c = vc("method", m, m); c.style.setProperty("--vcc", "var(--m-" + m + ")"); c.textContent = m; return c; }
+  function cEnt(e) { var c = vc("ent", e, e), ic = uIco(UL.faceIco); ic.style.color = UL.hue[e] || "var(--muted)"; c.appendChild(ic); return vTxt(c, e); }
+  /* a family of my proposal: its value's icon from the words file, the feed's own word as its text */
+  function cMine(f, v, text, n) { var x = EF[f].vals[v] || EF[f].vals._other; return vTxt(vIco(vc(f, v, text || v), x && x.icon), text || v, n); }
+  function cAlarm(id) { return cMine("alarm", id); }
+  function cRule(t, n) { var g = EF.rule.groups[EN.rule[t] || "other"]; return vTxt(vIco(vc("rule", t, t + " " + n), g.icon), t, n); }
+  function cLimit(l) { return vTxt(vIco(vc("limit", l[0], l[0]), EF.limit.icon), l[0] + " · " + fill(W.panel.limitWords, { v: l[1] }) + (l[2] != null ? " / " + l[2] + "s" : "")); }
+  /* a piece's own sentence (the pieces digest's words): the status, the method or the switch kind its key names is drawn as that
+     value's chip — in place when the sentence says it, else before it; any other piece stays its words */
+  var PIECE_CHIP = { status: cStatus, method: cMethod, "switch": function (v) { return cMine("switch", v); } };
+  function pieceWords(words, fk) { var s = el("span", "pw"), mk = fk && PIECE_CHIP[fk[0]], v = fk ? fk[1] : null;
+    if (!mk) { s.textContent = words; return s; }
+    var m = new RegExp("(^|[^\\w-])(" + v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")(?![\\w-])").exec(words);
+    if (!m) { s.appendChild(mk(v)); s.appendChild(document.createTextNode(" " + words)); return s; }
+    var at = m.index + m[1].length; s.appendChild(document.createTextNode(words.slice(0, at))); s.appendChild(mk(v)); s.appendChild(document.createTextNode(words.slice(at + v.length))); return s; }
+  function chips(list) { var w = el("span", "vcs solo"); list.forEach(function (c) { w.appendChild(c); }); return w; }
+  /* a composite cell's words, as chips: its stages, its fates or pieces, its alarm families (a state or a zero stays words) */
+  function pairChips(c, r) { var v = r.v[c.id];
+    if (stateOf(r, c) || c.kind === "ratio") return el("span", "pk", " " + pairText(c, r));
+    var cs = c.kind === "spine" ? SPINE.filter(function (x) { return v[x]; }).map(function (x) { return cStage(x, v[x]); })
+      : c.kind === "stack" ? (c.id === "fate" ? D.fates : D.pieceWords).filter(function (x) { return v[x]; }).map(function (x) { return c.id === "fate" ? cFate(x, v[x]) : cPiece(x, v[x]); })
+      : v.map(cAlarm);
+    if (!cs.length) return el("span", "pk", " 0");
+    var w = chips(cs); w.classList.remove("solo"); return w; }
+  /* the key to the chips (behind the section's info toggle): each family, its values drawn as chips, where its look is read */
+  function encKey() { var box = el("div", "enckey ainfo"); box.id = "enckey"; box.appendChild(el("p", "ekt", W.enc.plain));
+    var seen = function (f) { var o = {}; ROWS.forEach(function (r) { f(r).forEach(function (x) { o[x] = 1; }); }); return o; };
+    var ifk = seen(function (r) { return r.d.inflight.items.map(function (x) { return x[0]; }); }), life = seen(function (r) { return r.d.inflight.items.map(function (x) { return x[2]; }); });
+    var fams = [["op", ["r", "w", "rw"].map(cOp)], ["kind", D.kinds5.map(function (k) { return cKind(k); })], ["stage", SPINE.map(function (s) { return cStage(s); })],
+      ["status", ["1", "2", "3", "4", "5"].map(function (q) { var c = cStatus(q + "00"); c.textContent = q + "xx"; c.setAttribute("data-vv", q + "xx"); c.setAttribute("aria-label", EF.status.vals[q].name); return c; })],
+      ["fate", D.fates.map(function (f) { return cFate(f); })], ["piece", D.pieceWords.map(function (w) { return cPiece(w); })],
+      ["ifk", Object.keys(EN.ifk).filter(function (k) { return ifk[k]; }).map(cIfk)], ["life", Object.keys(EF.life.vals).filter(function (k) { return life[k]; }).map(cLife)],
+      ["dir", Object.keys(EN.dir).map(cDir)], ["role", Object.keys(EN.role).map(cRole)], ["hrole", Object.keys(EN.hrole).map(cHrole)],
+      ["method", METHODS.map(cMethod)], ["ent", Object.keys(UL.hue).map(cEnt)],
+      ["switch", Object.keys(EF.switch.vals).map(function (v) { return cMine("switch", v); })], ["alarm", D.families.map(cAlarm)],
+      ["arm", Object.keys(EF.arm.vals).filter(function (v) { return v !== "_other"; }).map(function (v) { return cMine("arm", v); })],
+      ["branch", Object.keys(EF.branch.vals).filter(function (v) { return v !== "_other"; }).map(function (v) { return cMine("branch", v); })],
+      ["does", Object.keys(EF.does.vals).filter(function (v) { return v !== "_other"; }).map(function (v) { return cMine("does", v); })],
+      ["rule", Object.keys(EF.rule.groups).map(function (g) { var c = vIco(vc("rule", "_" + g, EF.rule.groups[g].name), EF.rule.groups[g].icon); c.appendChild(document.createTextNode(g)); return c; })],
+      ["limit", [vTxt(vIco(vc("limit", "_", EF.limit.name), EF.limit.icon), EF.limit.name)]]];
+    fams.forEach(function (x) { var f = x[0], e = EF[f], row = el("div", "ekr"); row.setAttribute("data-fam", f);
+      row.appendChild(el("span", "ekn", e.name)); var vs = el("span", "ekv"); x[1].forEach(function (c) { vs.appendChild(c); });
+      var mine = e.ico === "mine" || e.col === "mine"; vs.appendChild(el("span", "ekf" + (mine ? " mine" : ""), lookWords(e))); row.appendChild(vs); box.appendChild(row); });
+    return box; }
+  function lookWords(e) { return ["col", "ico", "txt"].filter(function (x) { return e[x]; }).map(function (x) { return W.enc.look[x] + ": " + W.enc.from[e[x]]; }).join(" · "); }
+  function vcPlain(f, v) { var e = EF[f] || {}, s = String(v);
+    if (f === "kind") return (W.kinds[v] || {}).plain; if (f === "stage") return W.stages[v]; if (f === "fate") return (W.fates[v] || {}).plain;
+    if (f === "piece") return (W.pieceWords[v] || {}).plain; if (f === "status") return (e.vals[s.charAt(0)] || {}).plain;
+    if (f === "ifk" || f === "dir" || f === "role" || f === "hrole" || f === "method") return (EN[f][v] || {}).plain;
+    if (f === "alarm") return EN.says[v]; if (f === "ent" || f === "limit") return e.plain;
+    if (f === "rule") return s.charAt(0) === "_" ? null : (e.groups[EN.rule[v] || "other"] || {}).name;
+    if (f === "does") return ((e.vals || {})[v] || {}).plain || EN.does[v];
+    return ((e.vals || {})[v] || {}).plain || ((e.vals || {})._other || {}).plain; }
+
   /* every item carries its element's key (r.dk, parallel to the items — D-041): a click lights it, the light outlines it */
   function detailPair(k, r) { var d = r.d, dk = r.dk, P = W.panel, cm = W.codemap.details[k], wide = ["exits", "fates", "guards", "inflight", "reasons", "pieces", "tables", "alarms"].indexOf(k) >= 0;
     var o = pairEl("d:" + k, cm.attrs, cm.icon, P[k], wide), b = el("div", "pv"); o.box.appendChild(b);
+    /* D-043: every verb and every value from a fixed set below is a chip (THE VALUE CHIPS); a keyed element keeps its key on the
+       node it had, or on the chip that now stands for it */
     if (k === "exits") { var t = el("table"), th = el("tr"); P.exitCols.forEach(function (c) { th.appendChild(el("th", null, c)); }); t.appendChild(th);
-      d.exits.items.forEach(function (e, i) { var tr = el("tr"); [W.kinds[e[0]] ? W.kinds[e[0]].name : e[0], e[1], e[2], e[3], e[4]].forEach(function (v, j) { var td = el("td", null, v == null ? "" : String(v));
-        if (j === 2) kd(td, dk.exits[i][0]); if (j === 4) kd(td, dk.exits[i][1], false); tr.appendChild(td); }); t.appendChild(tr); });   /* the status lights; the test count holds its cases */
+      d.exits.items.forEach(function (e, i) { var tr = el("tr");
+        var tk = el("td"); tk.appendChild(cKind(e[0])); tr.appendChild(tk);
+        var tg = el("td"); if (e[1]) tg.appendChild(cStage(e[1])); tr.appendChild(tg);
+        var ts = kd(el("td"), dk.exits[i][0]); if (e[2] != null && e[2] !== "") ts.appendChild(cStatus(e[2])); tr.appendChild(ts);   /* the status lights */
+        tr.appendChild(el("td", "says", e[3] == null ? "" : String(e[3])));
+        tr.appendChild(kd(el("td", null, e[4] == null ? "" : String(e[4])), dk.exits[i][1], false));   /* the test count holds its cases */
+        t.appendChild(tr); });
       b.appendChild(t); more(b, d.exits); }
-    else if (k === "tables") { list(b, d.tables.items, function (t2) { return t2[0] + " · " + t2[1]; }, dk.tables); more(b, d.tables); }
-    else if (k === "gateWrites") keyedJoin(b, d.gateWrites, dk.gateWrites, ", ");
-    else if (k === "fates") { list(b, d.fates.items, function (f, i) { return frag(f[0] + " (", ksp(String(f[1]), dk.fates[i]), ") · " + W.fates[f[2]].name); }); more(b, d.fates); }
-    else if (k === "guards") { list(b, d.guards.items, function (g, i) { return frag(ksp(String(g[0]), dk.guards[i][2]), " · " + g[1]); }, dk.guards.map(function (x) { return [x[0]].concat(x[1]); })); more(b, d.guards); }
-    else if (k === "gates") keyedJoin(b, d.gates, dk.gates, ", ");
-    else if (k === "limits") keyedJoin(b, d.limits.map(function (l) { return frag(ksp(l[0], null), " " + fill(P.limitWords, { v: l[1] }) + (l[2] != null ? " / " + l[2] + "s" : "")); }).map(function (f) { var sp = el("span"); sp.appendChild(f); return sp; }), dk.limits, " · ");
-    else if (k === "request") { if (d.request) b.appendChild(frag(ksp(d.request[0], dk.request), " · " + d.request[1].join(", "))); else b.textContent = W.panel.none; }
-    else if (k === "response") { if (d.response) b.appendChild(frag(ksp(d.response[0], dk.response), " · " + d.response[1])); else b.textContent = W.panel.none; }
-    else if (k === "cases") b.textContent = Object.keys(d.cases).map(function (q) { return q + " " + d.cases[q]; }).join(" · ") || W.panel.none;
-    else if (k === "deciders") { list(b, d.deciders.items, function (f) { return f; }, dk.deciders); more(b, d.deciders); }
-    else if (k === "switches") keyedJoin(b, d.switches.items.map(function (x) { return x[0] + (x[1] ? " (" + x[1] + ")" : ""); }), dk.switches.map(function (x) { return [x[0]].concat(x[1]); }), " · ");
+    else if (k === "tables") { list(b, d.tables.items, function (t2) { return frag(t2[0] + " · ", cOp(t2[1])); }, dk.tables); more(b, d.tables); }
+    else if (k === "gateWrites") { if (!d.gateWrites.length) b.textContent = W.panel.none;   /* each a table the login check WRITES: the channel chip W */
+      d.gateWrites.forEach(function (t2, i) { if (i) b.appendChild(document.createTextNode(", ")); b.appendChild(ksp(t2, dk.gateWrites[i])); b.appendChild(document.createTextNode(" ")); b.appendChild(cOp("w")); }); }
+    else if (k === "fates") { list(b, d.fates.items, function (f, i) { var kn = r.xd.fates[i], kw = W.kinds[kn] ? W.kinds[kn].name : null, nm = String(f[0]);
+        /* each path leads with its kind of ending; the lab names a path by its kind when nothing better names it ("validation",
+           "json_invalid (framework)"), so that word moves into the chip rather than being said twice */
+        if (kw && nm === kw) nm = ""; else if (kw && nm.slice(-(kw.length + 3)) === " (" + kw + ")") nm = nm.slice(0, -(kw.length + 3));
+        return frag(kw ? cKind(kn) : null, nm ? " " + nm + " " : " ", kd(cStatus(f[1]), dk.fates[i]), " ", cFate(f[2])); }); more(b, d.fates); }
+    else if (k === "guards") { list(b, d.guards.items, function (g, i) { return frag(kd(cStatus(g[0]), dk.guards[i][2]), " · " + g[1]); }, dk.guards.map(function (x) { return [x[0]].concat(x[1]); })); more(b, d.guards); }
+    else if (k === "gates") keyedJoin(b, d.gates.map(function (g, i) { return withRole(ksp(g, dk.gates[i]), r, dk.gates[i]); }).map(function (f) { var sp = el("span"); sp.appendChild(f); return sp; }), [], ", ");
+    else if (k === "limits") keyedJoin(b, d.limits.map(cLimit), dk.limits, " ");
+    else if (k === "request") { if (d.request) b.appendChild(frag(cDir("in"), " ", ksp(d.request[0], dk.request), " · " + d.request[1].join(", "))); else b.textContent = W.panel.none; }
+    else if (k === "response") { if (d.response) b.appendChild(frag(cDir("out"), " ", ksp(d.response[0], dk.response), " · " + d.response[1])); else b.textContent = W.panel.none; }
+    else if (k === "cases") { var qs = Object.keys(d.cases); if (qs.length) b.appendChild(chips(qs.map(function (q) { return cRule(q, d.cases[q]); }))); else b.textContent = W.panel.none; }
+    else if (k === "deciders") { list(b, d.deciders.items, function (f, i) { return withRole(document.createTextNode(f), r, dk.deciders[i]); }, dk.deciders); more(b, d.deciders); }
+    else if (k === "switches") keyedJoin(b, d.switches.items.map(function (x) { var sp = el("span"); sp.appendChild(cMine("switch", x[0])); if (x[1]) sp.appendChild(document.createTextNode(" " + x[1])); return sp; }), dk.switches.map(function (x) { return [x[0]].concat(x[1]); }), " · ");
     else if (k === "behind") { b.textContent = d.behind[0] + " · " + d.behind[1]; kd(b, dk.behind, false); }   /* it counts the callees the card names (D-042) */
     else if (k === "proof") b.textContent = fill(P.proofWords, { n: d.proof.tested + "/" + d.proof.produced, v: d.proof.rank + (d.proof.rank_to !== d.proof.rank ? "–" + d.proof.rank_to : ""), of: d.proof.of });
-    else if (k === "inflight") { list(b, d.inflight.items, function (f) { return f[0] + " · " + f[1] + " · " + f[2]; }, dk.inflight); more(b, d.inflight); }
-    else if (k === "hook") { if (d.hook) b.appendChild(ksp(d.hook, dk.hook)); else b.textContent = W.panel.none; }
+    else if (k === "inflight") { list(b, d.inflight.items, function (f) { return frag(cIfk(f[0]), " " + f[1] + " ", cLife(f[2])); }, dk.inflight); more(b, d.inflight); }
+    else if (k === "hook") { if (d.hook) b.appendChild(withRole(ksp(d.hook, dk.hook), r, dk.hook)); else b.textContent = W.panel.none; }
     else if (k === "screens") b.textContent = String(d.screens);
     else if (k === "reasons") { list(b, d.reasons.items, function (x, i) { var at = String(x[0] || ""), c = at.lastIndexOf(":");   /* the site's file is its own element */
-        return frag(dk.reasons[i][1] && c > 0 ? ksp(at.slice(0, c), dk.reasons[i][1]) : at, dk.reasons[i][1] && c > 0 ? at.slice(c) : null, " · " + x[1] + " · " + x[2]); }, dk.reasons.map(function (x) { return x[0]; })); more(b, d.reasons); }
-    else if (k === "alarms") list(b, d.alarms, function (a) { return a[0] + (a[1] ? " " + a[1] : "") + (a[2] ? " · " + a[2] : ""); }, dk.alarms);
-    else if (k === "pieces") { list(b, d.pieces.items, function (x) { return x[0] + " · " + x[1] + "/" + x[2] + " · " + W.pieceWords[x[3]].name; }, dk.pieces); more(b, d.pieces); }
-    else if (k === "lacks") list(b, d.lacks, function (x) { return x[0] + " · " + x[1] + "/" + x[2]; });
+        return frag(dk.reasons[i][1] && c > 0 ? ksp(at.slice(0, c), dk.reasons[i][1]) : at, dk.reasons[i][1] && c > 0 ? at.slice(c) : null,
+          x[1] != null ? " · " : null, x[1] != null ? cMine("branch", x[1]) : null, x[2] != null ? " · " : null, x[2] != null ? cMine("does", x[2]) : null); }, dk.reasons.map(function (x) { return x[0]; })); more(b, d.reasons); }
+    else if (k === "alarms") list(b, d.alarms, function (a) { var f = frag(cAlarm(a[0]));
+      if (a[1] != null) f.appendChild(frag(" ", cStatus(a[1])));
+      if (a[4]) f.appendChild(frag(" · ", cMine("arm", a[4])));                                  /* the part of the map that found it */
+      else if ((a[3] || []).length) { f.appendChild(document.createTextNode(" · ")); a[3].forEach(function (q, j) { if (j) f.appendChild(document.createTextNode(" ")); f.appendChild(cStatus(q)); }); }
+      else if (a[2]) f.appendChild(document.createTextNode(" · " + a[2]));
+      return f; }, dk.alarms);
+    else if (k === "pieces") { list(b, d.pieces.items, function (x, i) { return frag(pieceWords(x[0], r.xd.pieces[i]), " · " + x[1] + "/" + x[2] + " ", cPiece(x[3])); }, dk.pieces); more(b, d.pieces); }
+    else if (k === "lacks") list(b, d.lacks, function (x, i) { return frag(pieceWords(x[0], r.xd.lacks[i]), " · " + x[1] + "/" + x[2]); });
     return o.pr; }
   function headPair(k, r) { var cm = W.codemap.head[k], P = W.panel, hk = r.hk[k];
     var val = k === "method" ? r.m + " " + r.p : k === "handler" ? r.fn + " · " + r.file + ":" + r.line : k === "entity" ? r.ent : k === "segment" ? r.seg : r.declared;
     var o = pairEl("h:" + k, cm.attrs, cm.icon, cm.label || P[k], false), pv = el("div", "pv", k === "handler" || val == null || val === "" ? null : String(val));
-    if (k === "handler") pv.appendChild(frag(ksp(r.fn, hk[0]), " · ", ksp(r.file, hk[1]), ":" + r.line));   /* the handler is a function and a file (D-041) */
-    else if (val == null || val === "") pv.textContent = W.panel.none; else kd(pv, hk);
+    if (k === "handler") pv.appendChild(frag(withRole(ksp(r.fn, hk[0]), r, hk[0]), " · ", ksp(r.file, hk[1]), ":" + r.line));   /* the handler is a function and a file (D-041) */
+    else if (val == null || val === "") pv.textContent = W.panel.none;
+    else { kd(pv, hk);                                          /* D-043: the method, the entity and the declared status as chips */
+      if (k === "method") { pv.textContent = ""; pv.appendChild(frag(cMethod(r.m), " " + r.p)); }
+      else if (k === "entity") { pv.textContent = ""; pv.appendChild(cEnt(r.ent)); }
+      else if (k === "declared") { pv.textContent = ""; pv.appendChild(cStatus(r.declared)); } }
     o.box.appendChild(pv); return o.pr; }
   function colPair(cs, r) { var c = cs[0], kinds = cs.length > 1;
     var o = pairEl("c:" + cs.map(function (x) { return x.id; }).join(","), [c.attr], W.cols[c.id].icon, kinds ? W.codemap.kinds : c.head, false), b = el("div", "pv");
     cs.forEach(function (x) { b.appendChild(cell(x, r)); });
-    if (!kinds && ["spine", "stack", "dots", "ratio"].indexOf(c.kind) >= 0) b.appendChild(el("span", "pk", " " + pairText(c, r)));
+    if (!kinds && ["spine", "stack", "dots", "ratio"].indexOf(c.kind) >= 0) b.appendChild(pairChips(c, r));   /* D-043: its words as chips */
     var zero = cs.every(function (x) { var k = r.k[x.id]; return stateOf(r, x) || !k; }); if (zero) b.classList.add("z");
     /* the pair counts what its columns count: it holds their keys, outlined when one is lit, never itself a click (D-041) */
     kd(o.pr, [].concat.apply([], cs.map(function (x) { return r.ck[x.id] || []; })), false);
@@ -898,6 +1052,7 @@
     if (r.uni.silent.length) U.appendChild(el("div", "usilent", fill(O.uni.silent, { rows: r.uni.silent.map(function (x) { return US[x].name; }).join(" · ") })));
     /* RIGHT · the code map: every pair the side panel held, under the block its attribute is homed in */
     var C = $("ocol-cm"); C.textContent = ""; C.setAttribute("data-ep", r.id); C.appendChild(colH(O.cm.title, "layers")); C.appendChild(elSay("el-cm")); C.appendChild(el("p", "plain ainfo", O.cm.plain));
+    C.appendChild(encKey());                                  /* D-043: the chips' key, behind the toggle */
     var byG = {}; function into(g, pr) { (byG[g] = byG[g] || []).push(pr); }
     Object.keys(W.codemap.head).forEach(function (k) { into(groupOfAttr(W.codemap.head[k].attrs[0]), headPair(k, r)); });
     var done = {};
@@ -1083,6 +1238,9 @@
       if (px) return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.partly) + "<span class=ln>" + esc(fill(W.one.gaps.partlyTip, { names: px[3].join(", "), n: px[1], of: px[2] })) + "</span><span class=pl>" + esc(at.plain) + "</span>";
       return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.shows) + "<span class=pl>" + esc(at.plain) + "</span>"; }
     if (kind === "copycmd") return esc(W.panel.copy);
+    /* D-043: a value chip — its words, its family, what it means, and where its look is read (an element's hover: a little richer) */
+    if (kind === "vc") { var vf = t.getAttribute("data-vc"), vv = t.getAttribute("data-vv"), ve = EF[vf], vp = vcPlain(vf, vv);
+      return "<b>" + esc(t.getAttribute("aria-label")) + "</b> · " + esc(ve.name) + (vp ? "<span class=pl>" + esc(vp) + "</span>" : "") + "<span class=pl>" + esc(lookWords(ve)) + "</span>"; }
     if (kind === "block") { var key = t.getAttribute("data-block"), b = key === "_shared" ? W.sharedBlock : BLK[key]; return "<b>" + esc(b.name) + "</b><span class=pl>" + esc(fill(b.plain)) + "</span><span class=pl>" + esc(markWords(key)) + "</span>"; }
     if (kind === "bin") { var bn = BINS[c.id].filter(function (x) { return x.key === t.getAttribute("data-bin"); })[0];
       return "<b>" + esc(c.head) + "</b> · " + esc(fill(W.strip, { n: bn.n, of: N, what: bn.what })) + "<span class=pl>" + esc(W.stripHint) + "</span>"; }

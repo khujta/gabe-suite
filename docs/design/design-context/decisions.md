@@ -557,3 +557,17 @@ typed per element — counted, not named (a field counts it without naming it) �
 that names another field links it: hovering or clicking the link lights that field. The reason vocabulary and which kinds map to
 which fields are the agent's reading, said on the page. Only the code-map column; the universe column's note stays as it is.
 Revisit if: a reason reads as an excuse for a gap he wants closed — then it is re-worded as a gap, not a reason.
+
+## D-043 — In the code map, every verb and every catalog value wears a visual encoding
+Date: 2026-09-24 · Input: his message.
+Decision, his: "in the code map section on the right side, in the one endpoint on all endpoint.html, let's look out for the verbs
+like read and write, or any other action. Let's make sure that all the verbs have some coloring label or icon associated with them.
+Also, if there is any catalog of anything like a type of function, type of schema, or something else, that also should be encoded
+with a visual aid like coloring or an icon."
+Consequence: in ONE ENDPOINT's code-map column, every action word (read · write · read-and-write · saved · rolled back · …) and every
+value drawn from a fixed catalog (kind of ending · stage · fate of a write · in-flight lifetime · switch kind · function role · schema
+kind · piece commonness · alarm family · …) is a chip with a colour and/or an icon, its words on hover. An encoding the page, the lab
+or the station already uses for the same catalog is REUSED, read from where it lives, never re-invented; a catalog with no encoding
+yet gets one small set, marked as the agent's proposal, its colours kept apart from the status and series colours. Only the code-map
+column changes.
+Revisit if: two catalogs end up wearing look-alike chips — then one of them switches to an icon-only encoding.

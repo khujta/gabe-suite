@@ -858,6 +858,26 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
     sayC: document.getElementById('el-cm').hidden ? null : [document.getElementById('el-cm').getAttribute('data-here'), document.getElementById('el-cm').textContent],
     open: window.__allep.state.open, out: document.getElementById('out').value, any: document.querySelectorAll('[data-el], [data-elcell], .elon').length }));
   await p.click('#board tr.row[data-ep="' + EP + '"] td.id'); await p.waitForTimeout(60);
+  /* D-043 · in the code-map column of POST /setup/complete every verb and every catalog value is a chip that carries a colour or an
+     icon and keeps its words (aria-label or text), every family the words file names is drawn, and no catalog word is left as
+     plain text outside a chip. The catalog words are read HERE from the words file and the lifted encodings; free text is not a
+     catalog slot (what an ending says, a piece's own sentence, the labels, the table's state words), nor is the key behind the toggle */
+  const enc = await p.evaluate(() => { const D = window.__allep.data, W = D.words, F = W.enc.fam, cm = document.getElementById('ocol-cm'), ink = getComputedStyle(document.body).color;
+    const chips = [...cm.querySelectorAll('.vc')].filter((c) => !c.closest('.ainfo')), bare = [], fams = new Set();
+    chips.forEach((c) => { fams.add(c.getAttribute('data-vc')); const cs = getComputedStyle(c), ico = !!c.querySelector('svg, .spine');
+      const fill = [c, ...c.querySelectorAll('i')].some((x) => !/^rgba\(0, 0, 0, 0\)$|^transparent$/.test(getComputedStyle(x).backgroundColor));
+      if (!(ico || fill || cs.color !== ink || parseFloat(cs.borderLeftWidth) >= 3) || !(c.getAttribute('aria-label') || c.textContent.trim())) bare.push(c.getAttribute('data-vc') + ':' + c.textContent); });
+    const words = [...Object.values(W.kinds).map((x) => x.name), ...D.orders.stageRows, ...Object.values(W.fates).map((x) => x.name), ...Object.values(W.pieceWords).map((x) => x.name),
+      ...Object.keys(D.enc.ifk), ...Object.keys(F.life.vals), ...Object.keys(F.switch.vals), ...D.families, ...Object.keys(D.enc.rule), ...Object.keys(D.enc.role), ...Object.keys(D.enc.hrole),
+      ...Object.keys(F.branch.vals), ...Object.keys(F.does.vals), ...Object.values(D.enc.op).map((o) => o.chip), 'rw', 'r', 'w', ...Object.values(D.enc.dir).map((o) => o.chip), 'GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+      .filter((w) => w && w[0] !== '_').sort((x, y) => y.length - x.length);
+    const rx = new RegExp('(?<![\\w-])(' + words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')(?![\\w-])'), st = /(?<![\w:./–-])[1-5]\d\d(?![\w/])/;
+    const plain = [], tw = document.createTreeWalker(cm, NodeFilter.SHOW_TEXT); let t;
+    while ((t = tw.nextNode())) { const x = t.textContent.trim(); if (!x || x === W.panel.none || t.parentElement.closest('.vc, .pk, .cbh, th, td.says, .pw, .ab, .ainfo, .elsay, h3')) continue;
+      const m = rx.exec(x) || st.exec(x); if (m) plain.push([(t.parentElement.closest('.pair') || {}).getAttribute && t.parentElement.closest('.pair').getAttribute('data-k'), m[0], x.slice(0, 50)]); }
+    return { n: chips.length, bare, plain, missing: Object.keys(F).filter((f) => !fams.has(f)) }; });
+  ok(enc.n > 100 && !enc.bare.length && !enc.missing.length && !enc.plain.length,
+    'D-043 · ' + EP + ' · every verb and catalog value in the code-map column is a chip carrying a colour or an icon and its words, every family is drawn, and no catalog word is left as plain text', { chips: enc.n, bare: enc.bare.slice(0, 4), missing: enc.missing, plain: enc.plain.slice(0, 4) });
   ok(!!CLS && uniOf(ROW[EP], 'CONNECTIONS').some((g) => g[5] === 'model' && g[3].includes(CLS)), 'the c4 graph names the model class of ' + T0 + ', and ' + EP + '\'s card draws it as a connection chip', CLS);
   await p.locator('#ocol-uni .urow[data-row="CONNECTIONS"] .pchip', { hasText: new RegExp('^' + CLS + '$') }).first().click(); await p.waitForTimeout(80);
   const a = await lit(), want = FEED.filter((ep) => holdsT(ROW[ep], T0)).sort();
@@ -869,6 +889,13 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
   ok(a.cm.some(([k, t]) => k === 'd:tables' && t.startsWith(T0 + ' ')) && a.cm.some(([k]) => k === 'c:tables') && a.uni.some(([rw, t]) => rw === 'ACCESSES' && t.endsWith('· ' + T0))
     && a.uni.filter(([rw, t]) => rw === 'CONNECTIONS' && t === CLS).length >= 1 && a.sayU[0] === 'true' && a.sayC[0] === 'true',
     'the same element lights in the code-map column (its tables pair and its list item) and wherever the universe card draws it (the access lines, the model chips)', { uni: a.uni, cm: a.cm });
+  /* D-043 · the light still lights the code map's "households · rw" item: the lit item of the tables pair is that table, and the
+     read-and-write it carries is now the channel chip inside it (its op read here from the row record) */
+  const rwWant = (ROW[EP].d.tables.items.find((x) => x[0] === T0) || [])[1];
+  const rwLit = await p.evaluate(() => [...document.querySelectorAll('#ocol-cm .pair[data-k="d:tables"] li.elon')].map((li) => { const c = li.querySelector('.vc[data-vc="op"]');
+    return [li.textContent.trim(), c ? c.getAttribute('data-vv') : null, c ? c.getAttribute('aria-label') : null]; }));
+  ok(rwWant === 'rw' && rwLit.length === 1 && rwLit[0][0].startsWith(T0 + ' ') && rwLit[0][1] === rwWant && !!rwLit[0][2],
+    'D-043 · the element light still lights the code map\'s "' + T0 + ' · rw" item, the RW chip inside it', rwLit);
   /* another endpoint, the light kept: a row that holds it, clicked in the table */
   const other = want.find((ep) => ep !== EP && ROW[ep].u.written && ROW[ep].u.written.includes(T0)) || want.find((ep) => ep !== EP);
   await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + other + '"] td.id'); await p.waitForTimeout(80);

@@ -142,6 +142,16 @@ await step('one-info-close', '#itog-one', 'the same toggle, again');
   const cb = await pageBox('#ocol-uni .urow[data-row="CONNECTIONS"]'); n++;
   await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-the-universe-connections.png'), clip: { x: Math.max(0, cb.x - 12), y: Math.max(0, cb.y - 12), width: cb.width + 24, height: cb.height + 24 }, fullPage: true });
   say('the universe column\'s connections', await p.$$eval('#ocol-uni .urow[data-row="CONNECTIONS"] .connbox > .sublbl', (ss) => ss.map((s) => s.innerText.replace(/\s+/g, ' ') + ' · ' + s.nextElementSibling.querySelectorAll('.pchip').length + ' chips'))); }
+{ // D-043: the code-map column wears its value chips — every verb and every catalog value a colour and/or an icon. One chip pointed
+  // at with the real mouse (its words on hover, logged), then the whole column photographed, POST /setup/complete
+  const rw = '#ocol-cm .pair[data-k="d:tables"] .vc[data-vv="rw"]';
+  await p.$eval(rw, (e) => e.scrollIntoView({ block: 'center' })); await wait(150);
+  const bx = await (await p.$(rw)).boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(250);
+  say('hover a value chip', { chip: await txt(rw), tip: await p.$eval('#tip', (t) => t.innerText.replace(/\s+/g, ' ')) });
+  await p.mouse.move(5, H - 10); await p.evaluate(() => { window.hoverHide && window.hoverHide(); window.scrollTo(0, 0); }); await wait(150);
+  say('the code map\'s chips, by family', await p.$$eval('#ocol-cm .vc', (cs) => { const o = {}; cs.filter((c) => !c.closest('.ainfo')).forEach((c) => { const f = c.getAttribute('data-vc'); o[f] = (o[f] || 0) + 1; }); return o; }));
+  const cmb = await p.$eval('#ocol-cm', (e) => { const r = e.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height }; }); n++;
+  await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-the-code-map-encoding.png'), clip: { x: Math.max(0, cmb.x - 8), y: Math.max(0, cmb.y - 8), width: cmb.width + 16, height: cmb.height + 16 }, fullPage: true }); }
 { // D-040: the gaps go both ways — the second square at the top of THE GAPS turns the list the other way, then the first turns it back
   say('gaps squares', await p.$$eval('#ocol-gaps .opt[data-gdir]', (os) => os.map((o) => (o.getAttribute('aria-checked') === 'true' ? '[' : '') + (getComputedStyle(o).borderTopStyle === 'dashed' ? '{' + o.getAttribute('aria-label') + '}' : o.getAttribute('aria-label')) + (o.getAttribute('aria-checked') === 'true' ? ']' : ''))));
   say('gaps, this way', { count: await txt('#ocol-gaps .gcount'), first: await p.$$eval('#ocol-gaps .gap', (gs) => gs.slice(0, 3).map((g) => g.textContent)) });

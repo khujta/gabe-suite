@@ -515,7 +515,7 @@
       953,
       53,
       935,
-      3183
+      3303
      ]
     ],
     "universe": [
@@ -617,6 +617,38 @@
    ]
   ],
   [
+   "hover a value chip",
+   {
+    "chip": "reads and writes",
+    "tip": "reads and writes · read or write, per table The endpoint reads this table and writes it. colour: as the endpoint lab draws it · chip: as the endpoint lab draws it"
+   }
+  ],
+  [
+   "the code map's chips, by family",
+   {
+    "stage": 18,
+    "kind": 26,
+    "status": 35,
+    "role": 4,
+    "dir": 2,
+    "limit": 2,
+    "fate": 18,
+    "op": 15,
+    "hrole": 1,
+    "branch": 1,
+    "does": 1,
+    "ifk": 11,
+    "life": 11,
+    "piece": 6,
+    "switch": 3,
+    "rule": 5,
+    "method": 1,
+    "ent": 1,
+    "alarm": 9,
+    "arm": 1
+   }
+  ],
+  [
    "gaps squares",
    [
     "[{in the code map, not in the universe}]",
@@ -635,7 +667,7 @@
    }
   ],
   [
-   "step 55 · gaps-the-other-way",
+   "step 56 · gaps-the-other-way",
    {
     "click": "in the universe, not in the code map",
     "at": [
@@ -668,7 +700,7 @@
    }
   ],
   [
-   "step 57 · gaps-back-this-way",
+   "step 58 · gaps-back-this-way",
    {
     "click": "in the code map, not in the universe",
     "at": [
@@ -683,7 +715,7 @@
    }
   ],
   [
-   "step 58 · light-household-in-the-universe",
+   "step 59 · light-household-in-the-universe",
    {
     "click": "Household",
     "at": [
@@ -712,14 +744,14 @@
     "cm": [
      "tables15",
      "writes12",
-     "households · rw"
+     "households · RW"
     ],
     "uniSays": "households (table) · 4 drawn here",
     "cmSays": "households (table) · 3 drawn here"
    }
   ],
   [
-   "step 61 · another-endpoint-light-on",
+   "step 62 · another-endpoint-light-on",
    {
     "click": "GET/",
     "at": [
@@ -743,14 +775,14 @@
     "uni": [],
     "cm": [
      "tables6",
-     "households · r"
+     "households · R"
     ],
     "uniSays": "households (table) — not in the universe card",
     "cmSays": "households (table) · 2 drawn here"
    }
   ],
   [
-   "step 63 · back-to-setup-complete",
+   "step 64 · back-to-setup-complete",
    {
     "click": "POST/setup/complete",
     "at": [
@@ -765,7 +797,7 @@
    }
   ],
   [
-   "step 64 · light-users-in-the-code-map",
+   "step 65 · light-users-in-the-code-map",
    {
     "click": "users",
     "at": [
@@ -788,7 +820,7 @@
     "uni": [],
     "cm": [
      "tables15",
-     "users · rw",
+     "users · RW",
      "users"
     ],
     "uniSays": "users (table) — not in the universe card",
@@ -796,7 +828,7 @@
    }
   ],
   [
-   "step 66 · clear-the-element-light",
+   "step 67 · clear-the-element-light",
    {
     "click": "clear",
     "at": [
@@ -823,7 +855,7 @@
    }
   ],
   [
-   "step 68 · light-a-case-the-code-map-counts",
+   "step 69 · light-a-case-the-code-map-counts",
    {
     "click": "C1048",
     "at": [
@@ -864,7 +896,7 @@
    }
   ],
   [
-   "step 71 · click-the-reason-link",
+   "step 72 · click-the-reason-link",
    {
     "click": "tests",
     "at": [
@@ -893,7 +925,7 @@
    }
   ],
   [
-   "step 73 · light-a-case-the-code-map-lacks",
+   "step 74 · light-a-case-the-code-map-lacks",
    {
     "click": "C1087",
     "at": [
@@ -919,7 +951,7 @@
    }
   ],
   [
-   "step 74 · click-not-carried",
+   "step 75 · click-not-carried",
    {
     "click": "the gaps: in the universe, not in the code map",
     "at": [
@@ -948,7 +980,7 @@
    }
   ],
   [
-   "step 76 · clear-the-light-again",
+   "step 77 · clear-the-light-again",
    {
     "click": "clear",
     "at": [
@@ -963,7 +995,7 @@
    }
   ],
   [
-   "step 77 · gaps-back-to-this-way",
+   "step 78 · gaps-back-to-this-way",
    {
     "click": "in the code map, not in the universe",
     "at": [
@@ -978,7 +1010,7 @@
    }
   ],
   [
-   "step 78 · open-in-the-lab",
+   "step 79 · open-in-the-lab",
    {
     "click": "open POST /setup/complete in the lab",
     "at": [
@@ -1007,7 +1039,7 @@
    }
   ],
   [
-   "step 80 · open-in-the-universe",
+   "step 81 · open-in-the-universe",
    {
     "click": "open POST /setup/complete in the Gabe Universe",
     "at": [
@@ -1037,7 +1069,7 @@
    }
   ],
   [
-   "step 82 · click-the-stream-row",
+   "step 83 · click-the-stream-row",
    {
     "click": "GET/recipe-creation/gustify/stream",
     "at": [
@@ -1104,7 +1136,7 @@
    }
   ],
   [
-   "step 85 · more-information",
+   "step 86 · more-information",
    {
     "click": "Show how the map knows this",
     "at": [

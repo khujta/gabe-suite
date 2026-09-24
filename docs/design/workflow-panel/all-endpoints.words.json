@@ -858,6 +858,77 @@
     },
     "kinds": "kinds of ending"
   },
+  "enc": {
+    "_about": "D-043: in ONE ENDPOINT's code-map column every action word and every value from a fixed set is a chip that carries a colour and/or an icon, its words its aria-label and its hover. REUSE FIRST — `col`/`ico`/`txt` name where a family's colour, icon and chip text are read: `table` = the page's own tokens and classes (the endings slots --k-*, the stage spine, the fate stack --f-*, the pieces stack --p-*, the method colours --m-*, the alarm dots' --alert, the validation slot's colour); `lab` = the endpoint lab's source, cut out of _lab-ep-panels.js and run under node with the station's tokens by gen-all-endpoints.py (the channel chip R · W · RW and its .jdrw rule in _lab-ep.css, the five path kinds' glyphs, the status colour rule — the lab colours a 3xx as it colours a 5xx, kept as the lab has it — the in-flight kinds' glyphs and lifetime tones, the direction chip IN · OUT, the function role chip ACC · CALL · GATE · PURE, the words for what a branch does); `station` = the Gabe Universe's tokens (_station.js: the role and hook-role badge colours and their words; the entity hue the universe column already lifts). A finding's hover words are the forms registry's own (_a3_forms.py FINDINGS). `mine` = MY PROPOSAL, for a family nothing encodes yet: an icon per value from the station's own icon set, and no new colour. `rule.groups[*].keywords` sorts the 422 rule types by the Field keyword that makes each (the short arm's PYDANTIC_ERRORS), `table` by the short arm's MODEL_ERRORS / RAISE_ERRORS — which group a keyword belongs to is my proposal; a keyword no group names stops the build.",
+    "title": "how the code map draws its values",
+    "plain": "Every action word and every value from a fixed set is a chip that carries a colour, an icon, or both. Point at one for its words. The looks, family by family, and where each is read from:",
+    "look": { "col": "colour", "ico": "icon", "txt": "chip" },
+    "from": { "table": "as the table draws it", "lab": "as the endpoint lab draws it", "station": "as the Gabe Universe draws it", "mine": "my proposal" },
+    "fam": {
+      "op": { "name": "read or write, per table", "col": "lab", "txt": "lab", "vals": {
+        "r": { "name": "reads", "plain": "The endpoint reads this table." },
+        "w": { "name": "writes", "plain": "The endpoint writes this table." },
+        "rw": { "name": "reads and writes", "plain": "The endpoint reads this table and writes it." } } },
+      "kind": { "name": "kind of ending", "col": "table", "ico": "lab" },
+      "stage": { "name": "stage", "ico": "table" },
+      "status": { "name": "status", "col": "lab", "vals": {
+        "1": { "name": "an informational status", "plain": "The server says it is still working on the request." },
+        "2": { "name": "a success status", "plain": "The request went right." },
+        "3": { "name": "a redirect status", "plain": "The caller is sent somewhere else." },
+        "4": { "name": "a client error status", "plain": "The request is refused; the caller can change it and try again." },
+        "5": { "name": "a server error status", "plain": "The server failed; nothing the caller changes fixes it." } } },
+      "fate": { "name": "fate of the writes", "col": "table" },
+      "piece": { "name": "how common the piece is", "col": "table" },
+      "ifk": { "name": "kind of in-flight value", "ico": "lab" },
+      "life": { "name": "how long it lives", "col": "lab", "vals": {
+        "with the answer": { "plain": "It is gone when the reply is sent: each request has its own." },
+        "with the server process": { "plain": "It stays while the server runs: every request shares it." },
+        "unknown": { "plain": "How long it lives is not read." } } },
+      "dir": { "name": "which way the shape travels", "col": "lab", "ico": "lab", "txt": "lab" },
+      "role": { "name": "function role", "col": "station", "txt": "lab", "ico": "station", "icon": "function" },
+      "hrole": { "name": "hook role", "col": "station", "ico": "station", "icon": "hook" },
+      "method": { "name": "method", "col": "table" },
+      "ent": { "name": "entity", "col": "station", "ico": "station", "plain": "The entity that claims this endpoint, in its colour in the Gabe Universe." },
+      "switch": { "name": "kind of switch", "ico": "mine", "vals": {
+        "binding": { "icon": "merge", "plain": "Which implementation is plugged in decides the way." },
+        "value": { "icon": "tint", "plain": "A setting's value decides the way." },
+        "flag": { "icon": "flag", "plain": "A flag turns a way on or off." } } },
+      "alarm": { "name": "alarm", "col": "table", "ico": "mine", "vals": {
+        "text-only": { "icon": "doc" }, "undeclared": { "icon": "file" }, "shared-status": { "icon": "both" }, "reason-lost": { "icon": "prompt" },
+        "reason-collapsed": { "icon": "prefix" }, "escape-500": { "icon": "nav" }, "race-500": { "icon": "swords" }, "refusal-writes": { "icon": "store" },
+        "safe-method-commits": { "icon": "wrap" }, "_other": { "icon": "alert" } } },
+      "arm": { "name": "the part of the map that found it", "ico": "mine", "vals": {
+        "effects": { "icon": "action", "plain": "The writes a path leaves, and what saves them." },
+        "contract": { "icon": "key", "plain": "What a caller must send and what it gets back." },
+        "kinds": { "icon": "layers", "plain": "The pieces around the handler: the middleware, the dependencies, what lives during a request." },
+        "short": { "icon": "bracket", "plain": "The rules a shape, a table or a setting holds." },
+        "tests": { "icon": "test", "plain": "What the tests prove." },
+        "frontend": { "icon": "screen", "plain": "What the screens do with the answer." },
+        "paths": { "icon": "journey", "plain": "The ways a request goes." },
+        "switches": { "icon": "config", "plain": "What outside the code decides the way." },
+        "_other": { "icon": "info", "plain": "A part of the map." } } },
+      "branch": { "name": "what the branch does with the reason", "ico": "mine", "vals": {
+        "reads": { "icon": "show", "plain": "The branch reads the reason the endpoint gives." },
+        "passed": { "icon": "suffix", "plain": "The branch hands the error to code that reads it." },
+        "value": { "icon": "sub", "plain": "The branch only picks a value." },
+        "none": { "icon": "skip", "plain": "The branch uses neither the reason nor the error." },
+        "unread": { "icon": "opacity", "plain": "What the branch does is not read: its condition is too long." },
+        "_other": { "icon": "info", "plain": "What the branch does with the reason." } } },
+      "does": { "name": "what the map read of the branch", "ico": "mine", "vals": {
+        "read": { "icon": "claim", "plain": "Read: the rows the branch runs are named." },
+        "mixed": { "icon": "derived", "plain": "More than one check on a line shares these rows." },
+        "empty": { "icon": "bubble" }, "beyond one level": { "icon": "drill" }, "no-rows": { "icon": "none" }, "unread": { "icon": "opacity" },
+        "_other": { "icon": "info", "plain": "What the map read of the branch." } } },
+      "rule": { "name": "kind of 422 rule", "col": "table", "ico": "mine", "groups": {
+        "length": { "icon": "radius", "name": "a length rule", "keywords": ["min_length", "max_length"] },
+        "bound": { "icon": "angle", "name": "a bound on a number", "keywords": ["gt", "ge", "lt", "le", "multiple_of", "max_digits", "decimal_places", "allow_inf_nan"] },
+        "pattern": { "icon": "case", "name": "a pattern the text must match", "keywords": ["pattern"] },
+        "model": { "icon": "polygon", "name": "a rule of the whole shape: a field required, a field not allowed, a value from a list", "table": "MODEL_ERRORS" },
+        "validator": { "icon": "function", "name": "a rule the app's own validator raises", "table": "RAISE_ERRORS" },
+        "other": { "icon": "info", "name": "a rule of another kind" } } },
+      "limit": { "name": "rate limiter", "ico": "mine", "icon": "middleware", "plain": "It lets this many requests through per window, then refuses." }
+    }
+  },
   "universe": {
     "_about": "The universe column: the Gabe Universe's endpoint card, row by row. Each row's icon and title are LIFTED from the station's source by _ae_universe.py. `say` holds the station card's own words (templates/center/shell/gabe-universe.html), lifted so the values read as the station writes them. `rows[*].attrs` is MY PROPOSAL: which attributes of the card's ruled inventory each station row shows, every id checked against the tree and inventory-endpoint.md; the gaps column is computed from it. `rows[*].attrs` holds for every endpoint; a few attributes are also read per endpoint from what the card draws (_ae_universe.read_here), which one.gaps.perEp says on the page.",
     "say": {
