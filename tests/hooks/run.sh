@@ -343,6 +343,56 @@ rm -f .kdbp/.push-gate-ok
 out=$(pgout '{"tool_input":{"command":"GABE_PUSH_EMERGENCY=1 git push origin origin/staging:main"}}'); rc=$?
 [ "$rc" = 0 ] && echo "$out" | grep -q 'GABE_PUSH_EMERGENCY' && ok || bad "push-gate: emergency escape must allow WITH a loud warning"
 [ "$(pg 'not json at all')" = 0 ] && ok || bad "push-gate: non-push stdin must stay SILENT"
+# ── PR merges are promotions (archie B1, 2026-09-24: `gh pr merge 43 --merge` promoted to main ungated).
+# A gh STUB on PATH answers `gh pr view <sel> --json baseRefName`: PR 43 → main · PR 7 → staging · else fails.
+GHSTUB=$(mktemp -d)
+cat > "$GHSTUB/gh" <<'GHEOF'
+#!/usr/bin/env bash
+[ "$1 $2" = "pr view" ] || exit 1
+case " $* " in *" 43 "*|*"/pull/43 "*) echo main ;; *" 7 "*) echo staging ;; *) exit 1 ;; esac
+GHEOF
+chmod +x "$GHSTUB/gh"
+trap 'rm -rf "$T" "$GHSTUB"' EXIT
+# pgc = pg over a RAW command string (JSON-encoded here, so heredocs and quotes ride verbatim), gh stub first on PATH
+pgc() { python3 -c 'import json,sys;print(json.dumps({"tool_input":{"command":sys.argv[1]}}))' "$1" | PATH="$GHSTUB:$PATH" bash "$PGG" >/dev/null 2>&1; echo $?; }
+rm -f .kdbp/.push-gate-ok
+[ "$(pgc 'gh pr merge 43 --merge')" = 2 ] && ok || bad "push-gate: gh pr merge into the terminal branch w/o marker must BLOCK (archie B1)"
+[ "$(pgc 'gh api -X PUT repos/{owner}/{repo}/pulls/43/merge')" = 2 ] && ok || bad "push-gate: REST merge (PUT …/pulls/43/merge) into terminal must BLOCK"
+[ "$(pgc "gh api graphql -f query='mutation{mergePullRequest(input:{pullRequestId:\"x\"}){clientMutationId}}'")" = 2 ] && ok || bad "push-gate: graphql merge mutation (base unresolvable) must BLOCK"
+[ "$(pgc 'gh pr merge 99')" = 2 ] && ok || bad "push-gate: merge whose base cannot be resolved must BLOCK (fail closed)"
+[ "$(pgc 'gh pr merge 43 -R other/repo')" = 2 ] && ok || bad "push-gate: merge in a repo other than origin must BLOCK (repo redirect)"
+[ "$(pgc '/usr/bin/gh pr merge 43')" = 2 ] && ok || bad "push-gate: a path-qualified gh is still gh"
+[ "$(pgc 'gh pr view 1&&gh pr merge 43')" = 2 ] && ok || bad "push-gate: an operator fused into a merge-mentioning gh segment must fail closed"
+[ "$(pgc 'git push origin HEAD:staging && gh pr merge 43')" = 2 ] && ok || bad "push-gate: a clean staging push chained to a terminal merge must BLOCK (second segment)"
+[ "$(pgc '/usr/bin/git push origin main')" = 2 ] && ok || bad "push-gate: a path-qualified git is still git (was an unlocated push verb → silent ALLOW)"
+[ "$(pgc 'gh pr merge 7 --merge')" = 0 ] && ok || bad "push-gate: gh pr merge into a NON-terminal base must stay SILENT"
+[ "$(pgc 'gh api repos/{owner}/{repo}/pulls/43/merge')" = 0 ] && ok || bad "push-gate: a GET of a PR's merge status merges nothing → SILENT"
+[ "$(pgc 'gh pr merge 43 --disable-auto')" = 0 ] && ok || bad "push-gate: --disable-auto turns auto-merge OFF → SILENT"
+[ "$(pgc 'gh pr list --search merge')" = 0 ] && ok || bad "push-gate: a gh command that only mentions merge must stay SILENT"
+[ "$(pgc 'git merge origin/staging')" = 0 ] && ok || bad "push-gate: a local git merge is not a promotion → SILENT"
+git remote add origin https://github.com/o/r.git
+[ "$(pgc 'gh pr merge 7 -R o/r')" = 0 ] && ok || bad "push-gate: -R naming origin's own repo resolves → non-terminal base stays SILENT"
+[ "$(pgc 'gh pr merge 43 -R github.com/o/r')" = 2 ] && ok || bad "push-gate: -R HOST/OWNER/REPO naming origin → terminal base still BLOCKs"
+git remote remove origin
+mkmarker
+[ "$(pgc 'gh pr merge 43 --merge')" = 0 ] && ok || bad "push-gate: marker whose sha == HEAD must authorize the terminal merge"
+rm -f .kdbp/.push-gate-ok
+# ── quoted heredoc bodies are data (archie A, 2026-09-24: /gabe-push's own Step 8.5 commit was blocked)
+[ "$(pgc $'git commit -F - <<\'EOF\'\nchore(kdbp): record push bookkeeping for P7\n\n- don\'t forget: the `git push` row, $(date)\nEOF')" = 0 ] && ok || bad "push-gate: bookkeeping commit via a QUOTED heredoc (backtick, apostrophe, \$( in body) must stay SILENT"
+[ "$(pgc $'git commit -m "$(cat <<\'EOF\'\nrecord push; git push done, it\'s fine\nEOF\n)"')" = 0 ] && ok || bad "push-gate: the \"\$(cat <<'EOF' … )\" commit form must stay SILENT"
+[ "$(pgc $'git commit -F - <<-\'EOF\'\n\tbody: push it\'s\n\tEOF')" = 0 ] && ok || bad "push-gate: <<-'EOF' (tab-stripped terminator) must stay SILENT"
+[ "$(pgc $'git commit -F - <<\\EOF\nbody: push it\'s\nEOF')" = 0 ] && ok || bad "push-gate: <<\\EOF (backslash-quoted) must stay SILENT"
+[ "$(pgc $'git add . && git commit -F - <<\'EOF\'\npush bookkeeping, it\'s done\nEOF')" = 0 ] && ok || bad "push-gate: \`git add .\` before a quoted-heredoc commit must not disable the strip"
+[ "$(pgc $'git commit -F - <<\'EOF\' && git push origin HEAD:staging\nbody: it\'s the push\nEOF')" = 0 ] && ok || bad "push-gate: quoted heredoc chained to a STAGING push must stay SILENT"
+[ "$(pgc $'cat <<EOF\n$(git push origin main)\nEOF')" = 2 ] && ok || bad "push-gate: an UNQUOTED heredoc body runs its \$( ) → must BLOCK"
+[ "$(pgc $'git commit -F - <<\'EOF\' && git push origin main\nbody with push\nEOF')" = 2 ] && ok || bad "push-gate: quoted heredoc chained to a TERMINAL push must BLOCK"
+[ "$(pgc $'bash <<\'EOF\'\ngit push origin main\nEOF')" = 2 ] && ok || bad "push-gate: a quoted heredoc fed to bash IS its script → must BLOCK"
+[ "$(pgc $'cat <<\'EOF\' | sh\ngit push origin main\nEOF')" = 2 ] && ok || bad "push-gate: a quoted heredoc piped into sh → must BLOCK"
+[ "$(pgc $'cat > x.sh <<\'EOF\'\ngit push origin main\nEOF\n. x.sh')" = 2 ] && ok || bad "push-gate: a heredoc written to a file then sourced → must BLOCK"
+[ "$(pgc $'echo "<<\'EOF\'"\ngit push origin main\nEOF')" = 2 ] && ok || bad "push-gate: a heredoc operator INSIDE quotes is not a heredoc → must BLOCK"
+[ "$(pgc $'# <<\'EOF\'\ngit push origin main\nEOF')" = 2 ] && ok || bad "push-gate: a heredoc operator inside a comment is not a heredoc → must BLOCK"
+[ "$(pgc $'echo $\'it\\\'s <<"X"\'\ngit push origin main\nX')" = 2 ] && ok || bad "push-gate: \$'…' ANSI quoting the scanner cannot follow → keep the body → BLOCK"
+[ "$(pgc $'git commit -F - <<\'EOF\'\nunterminated push, it\'s')" = 2 ] && ok || bad "push-gate: an unterminated heredoc keeps the old fail-closed parse"
 # bold / backticked keys (the file is hand-editable; markdown tables get prettified)
 cat > .kdbp/PUSH.md <<'PUSHEOF'
 ## Defaults
@@ -440,6 +490,7 @@ cat > .kdbp/PUSH.md <<'PUSHEOF'
 | promote_from | — |
 PUSHEOF
 [ "$(pg '{"tool_input":{"command":"git push origin main"}}')" = 0 ] && ok || bad "push-gate: single-env project must stay SILENT (gating OFF, ruling 2026-07-31)"
+[ "$(pgc 'gh pr merge 43 --merge')" = 0 ] && ok || bad "push-gate: single-env project — a PR merge stays SILENT too (gating OFF, ruling 2026-07-31, kept 2026-09-24)"
 # plain key:value env format (the gustify shape — caught by the real-data dry-run,
 # where the table-only parse silently ALLOWED the promotion)
 cat > .kdbp/PUSH.md <<'PUSHEOF'

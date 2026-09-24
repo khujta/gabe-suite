@@ -162,7 +162,8 @@ Ruled 2026-07-31 (operator: terminal-env + explicit override · ask-before-push)
    `printf '%s %s\n' "$(git rev-parse HEAD)" "<env.target_branch>" > .kdbp/.push-gate-ok` — the
    machine record that the gate ran, bound to the exact tree it scanned. The `push-gate-guard`
    PreToolUse hook (machine-wide, `scripts/hooks/kdbp/push-gate-guard.sh`, fixtures in
-   `tests/hooks/`) BLOCKS any `git push` it cannot prove targets only a non-terminal branch in a
+   `tests/hooks/`) BLOCKS any `git push` it cannot prove targets only a non-terminal branch — and any
+   `gh pr merge` / `gh api …/pulls/<n>/merge` whose PR base is terminal or unresolvable — in a
    multi-env project unless this marker's recorded HEAD sha equals the current HEAD — validated by
    **content, never mtime** (portable across macOS/Linux; a committed or cloned marker cannot
    authorize a foreign tree). **Any commit after the scan re-arms the gate** — the sha no longer
@@ -185,8 +186,8 @@ Ruled 2026-07-31 (operator: terminal-env + explicit override · ask-before-push)
    just offered (`[force-with-lease]`); consuming it here would block the suite's own offered
    recovery and train `GABE_PUSH_EMERGENCY=1` as the habit.
 3. Show: "Pushed <source_label> -> <env.target_branch> on [remote]."
-4. **Consume the gate marker on SUCCESS only:** `rm -f .kdbp/.push-gate-ok` after the push
-   succeeds — one authorized push per scan. (A lingering marker after an abandoned attempt is
+4. **Consume the gate marker on SUCCESS only:** `rm -f .kdbp/.push-gate-ok` after the push — or
+   the `gh pr merge` into the terminal branch — succeeds: one authorized promotion per scan. (A lingering marker after an abandoned attempt is
    harmless: it is gitignored, and the next commit's sha bump invalidates it anyway.)
 
 ### Step 5: Create or update PR
@@ -461,7 +462,10 @@ This step commits those writes automatically and returns the working tree to a c
    git commit -m "chore(kdbp): record push bookkeeping for P[N]"
    ```
 
-   Where `P[N]` is the deployment ID appended by Step 7.5. Commit body summarizes which files were written:
+   Where `P[N]` is the deployment ID appended by Step 7.5. Commit body summarizes which files were written.
+   A multi-line message goes in as `git commit -F - <<'EOF'` (delimiter QUOTED — push-gate-guard reads a
+   quoted heredoc body as data, so "push", backticks and apostrophes in it never block) or `-F <file>`;
+   never an unquoted `<<EOF`, whose body the shell expands:
 
    ```
    chore(kdbp): record push bookkeeping for P7

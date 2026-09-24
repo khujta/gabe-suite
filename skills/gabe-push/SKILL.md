@@ -3,7 +3,7 @@ name: gabe-push
 description: "Push, PR, CI watch, promotion — env-aware shipping via .kdbp/PUSH.md; detects remote drift, offers branch cleanup. Terminal-env and --epic pushes run the production gates: /gabe-health three-lens scan, findings presented, ONE blocking proceed/hold question that mints the gate marker the machine-wide push-gate-guard hook requires — a raw terminal push without it fails closed."
 when_to_use: "Push, deploy, promote, ship to staging/production, babysit a pipeline after committing."
 metadata:
-  version: 2.6.3
+  version: 2.6.4
 ---
 
 # Gabe Push — env-aware shipping workflow
