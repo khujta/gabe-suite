@@ -173,9 +173,9 @@
   [
    "header while the board scrolls",
    {
-    "head": 64,
-    "board": -161,
-    "scrolled": 905,
+    "head": 119,
+    "board": 79,
+    "scrolled": 1110,
     "onScreen": true
    }
   ],
@@ -184,8 +184,8 @@
    {
     "click": "tables",
     "at": [
-     376,
-     81
+     456,
+     137
     ],
     "size": [
      42,
@@ -196,26 +196,26 @@
   ],
   [
    "sorted says",
-   "in path order"
+   "sorted by tables ↑"
   ],
   [
    "step 23 · sort-again-reverses",
    {
-    "click": "tables",
+    "click": "tables ↑",
     "at": [
-     376,
-     81
+     456,
+     123
     ],
     "size": [
      42,
-     14
+     27
     ],
     "note": "the same header, again"
    }
   ],
   [
    "sorted says",
-   "in path order"
+   "sorted by tables ↓"
   ],
   [
    "step 24 · back-to-path-order",
@@ -223,10 +223,10 @@
     "click": "back to path order",
     "at": [
      36,
-     101
+     157
     ],
     "size": [
-     216,
+     296,
      14
     ],
     "note": "the corner of the header row"
@@ -237,7 +237,7 @@
    {
     "click": "",
     "at": [
-     651,
+     731,
      520
     ],
     "size": [
@@ -427,12 +427,12 @@
    {
     "click": "/",
     "at": [
-     101,
+     64,
      569
     ],
     "size": [
-     7,
-     19
+     148,
+     15
     ],
     "note": "the first card's path"
    }
@@ -478,13 +478,13 @@
   [
    "step 48 · click-a-row",
    {
-    "click": "POST/setup/complete",
+    "click": "/setup/completePOST",
     "at": [
      33,
-     529
+     530
     ],
     "size": [
-     224,
+     304,
      21
     ],
     "note": "the row POST /setup/complete"
@@ -688,7 +688,7 @@
     "groups": [
      "Guards: get_session",
      "evidence: home auth by its file claim · users say ",
-     "Code behind: _discard_claim | _load_setup_result | _lookup",
+     "Code behind: _discard_claimaccessor | _load_setup_resultaccessor | _lookupaccessor",
      "Tests: Cases | C1048 | C1049",
      "Journeys: Cases | C250 | 15 case(s)",
      "Identity: endpoints",
@@ -764,13 +764,13 @@
   [
    "step 63 · another-endpoint-light-on",
    {
-    "click": "GET/",
+    "click": "/GET",
     "at": [
      33,
-     567
+     568
     ],
     "size": [
-     224,
+     304,
      21
     ],
     "note": "a lit row: GET /"
@@ -795,13 +795,13 @@
   [
    "step 65 · back-to-setup-complete",
    {
-    "click": "POST/setup/complete",
+    "click": "/setup/completePOST",
     "at": [
      33,
-     529
+     530
     ],
     "size": [
-     224,
+     304,
      21
     ],
     "note": "the row POST /setup/complete"
@@ -816,7 +816,7 @@
      532
     ],
     "size": [
-     37,
+     54,
      15
     ],
     "note": "users, under \"the login check writes\", in the code map"
@@ -843,7 +843,7 @@
    {
     "click": "clear",
     "at": [
-     403,
+     420,
      401
     ],
     "size": [
@@ -1021,11 +1021,94 @@
    }
   ],
   [
-   "step 80 · open-in-the-lab",
+   "D-052 · the endpoint shown",
+   "POST /setup/complete"
+  ],
+  [
+   "code map · the station glyphs and labels",
+   {
+    "function": {
+     "n": 4,
+     "labels": {
+      "caller": 3,
+      "accessor": 1
+     }
+    },
+    "schema": {
+     "n": 2,
+     "labels": {}
+    },
+    "model": {
+     "n": 15,
+     "labels": {}
+    },
+    "hook": {
+     "n": 1,
+     "labels": {
+      "fetcher": 1
+     }
+    },
+    "endpoint": {
+     "n": 1,
+     "labels": {
+      "POST": 1
+     }
+    },
+    "entity": {
+     "n": 1,
+     "labels": {}
+    }
+   }
+  ],
+  [
+   "step 81 · gaps-the-universe-way",
+   {
+    "click": "in the universe, not in the code map",
+    "at": [
+     657,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the second square of THE GAPS"
+   }
+  ],
+  [
+   "the gaps · the station glyphs and labels",
+   {
+    "function": {
+     "n": 12,
+     "labels": {
+      "accessor": 8,
+      "pure": 2,
+      "caller": 2
+     }
+    }
+   }
+  ],
+  [
+   "step 83 · gaps-back-once-more",
+   {
+    "click": "in the code map, not in the universe",
+    "at": [
+     620,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the first square of THE GAPS, back to its default"
+   }
+  ],
+  [
+   "step 84 · open-in-the-lab",
    {
     "click": "open POST /setup/complete in the lab",
     "at": [
-     480,
+     520,
      435
     ],
     "size": [
@@ -1050,11 +1133,11 @@
    }
   ],
   [
-   "step 82 · open-in-the-universe",
+   "step 86 · open-in-the-universe",
    {
     "click": "open POST /setup/complete in the Gabe Universe",
     "at": [
-     554,
+     594,
      525
     ],
     "size": [
@@ -1080,16 +1163,16 @@
    }
   ],
   [
-   "step 84 · click-the-stream-row",
+   "step 88 · click-the-stream-row",
    {
-    "click": "GET/recipe-creation/gustify/stream",
+    "click": "/recipe-creation/gustify/streamGETstream",
     "at": [
      33,
-     834
+     846
     ],
     "size": [
-     224,
-     21
+     304,
+     32
     ],
     "note": "the row GET /recipe-creation/gustify/stream"
    }
@@ -1147,12 +1230,12 @@
    }
   ],
   [
-   "step 87 · more-information",
+   "step 91 · more-information",
    {
     "click": "Show how the map knows this",
     "at": [
      32,
-     995
+     994
     ],
     "size": [
      220,

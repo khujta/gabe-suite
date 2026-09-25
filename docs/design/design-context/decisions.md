@@ -648,3 +648,19 @@ always-written stub. Q6 (a) — done-card chips read PENDING by header with a po
 `load_ledger` order fix lands first, as its own commit. Q8 — the board seats mount through a generator token. Q9 — the pane keeps
 its dark ground for now. The suite centre's own shell fork (`docs/center/shell`) is out of this slice.
 Revisit if: he names any of these.
+
+## D-052 — Every element the page names wears the station's glyph and colour, and its subcategory as a label at the end
+Date: 2026-09-25 · Input: his message.
+Decision, his: "we can inherit more things from the Gabe universe. Whenever we mention something that is a component in the
+universe (whatever it is: a table, a function, an API endpoint, a store view, or any other kind of element that we put in the
+graph), we should put it with the icon that we are putting in the graph, at least. Ideally, also with the color … there are things
+that have subcategories, like functions, endpoints, and others. For those, we should find a way to be able to communicate both
+things: the color of the element used [and] the category, maybe with a label at the end."
+Consequence: on the all-endpoints page, every mention of a station element (a model/table, a function, an endpoint, a schema, a
+flag, a store, a view, a hook, a route, a module, a provider, an entity, …) is drawn with the station's glyph for its KIND in the
+station's KIND colour (KINDCOL); where the kind has subcategories — a function's role, an endpoint's method, a component's class, a
+hook's role, a module's class, a provider's class, delivery — a small label at the END names the subcategory in the station's badge
+colour (__BADGE_COL). All of it lifted from gabe-universe.html, never retyped (the drift guard of D-040). A mention whose kind the
+station does not draw (a setting, a test case, a status) keeps the page's own encoding and says so; the kind mapping is the agent's
+proposal where it is not one-to-one.
+Revisit if: a kind colour and a subcategory label read as one thing — then the label moves inside the chip's outline.

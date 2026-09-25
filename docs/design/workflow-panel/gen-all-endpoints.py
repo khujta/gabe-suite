@@ -805,8 +805,41 @@ def enc_lift(W: dict) -> tuple:
     E["rule"] = dict(sorted(rule.items()))
     F = W["enc"]["fam"]
     icons = {v["icon"] for v in E["kind"].values()} | {v["icon"] for v in E["ifk"].values()} | {v["icon"] for v in E["dir"].values()}
-    icons |= {x["icon"] for f in ("switch", "alarm", "arm", "branch", "does") for x in F[f]["vals"].values()} | {g["icon"] for g in G.values()} | {F[f]["icon"] for f in ("limit", "role", "hrole")}
+    icons |= {x["icon"] for f in ("switch", "alarm", "arm", "branch", "does") for x in F[f]["vals"].values()} | {g["icon"] for g in G.values()} | {F["limit"]["icon"]}
     return E, css, icons
+
+
+def station_marks(W: dict, rows: list, feeds: dict) -> tuple:
+    """D-052: (D.sk, its CSS). The station's glyph, kind colour and badge colours are lifted by _ae_universe.station_kinds; which
+    station kind each page key kind is drawn as is the words file's ONE table (station.map, my proposal where not the same),
+    checked here: every key kind has a row with its reason, every `to` is a kind the station's tables draw, and every badge family
+    the station hangs on a kind is a family the words file names (its hover reads the family's name there)."""
+    SK, SM = UNI.station_kinds(), W["station"]["map"]
+    odd = sorted(set(W["el"]["kinds"]) ^ set(SM))
+    if odd:
+        die(f"station.map and el.kinds name different key kinds: {odd}")
+    for k, x in SM.items():
+        if not x.get("why") or (x.get("to") not in (None, "fe") and x["to"] not in SK["kinds"]):
+            die(f"station.map.{k}: a reason, and `to` a kind the station's tables draw (or fe, or null) — not {x.get('to')!r}")
+    fams = sorted({f for fs in SK["on"].values() for f in fs})
+    lost = [f for f in fams if f not in W["enc"]["fam"]]
+    if lost:
+        die(f"badge families the station hangs on a kind that enc.fam does not name: {lost}")
+    roles = {}
+    for r in rows:
+        for k, v in r["ro"].items():
+            if roles.get(k, v) != v:
+                die(f"{k}: two rows read two roles for it")
+            roles[k] = v
+    keys, tally = UNI.sk_keys({k for r in rows for k in all_keys(r)}, SK, SM, feeds, roles)
+    ents = {v[2] for v in keys.values() if len(v) > 2} | {r["ent"] for r in rows if r.get("ent")}   # the table's entity groups too
+    # entities the station's map colours alike (its ENT = the c4 colours): said beside the entity glyphs, never re-coloured here
+    same = collections.defaultdict(list)
+    for e in sorted(ents):
+        same[(SK["ent"].get(e) or SK["fb"])[0].lower()].append(e)
+    return ({"kinds": {k: {"g": x["g"], "t": x["t"]} for k, x in SK["kinds"].items()}, "badge": {f: SK["badge"][f] for f in fams},
+             "desc": {f: SK["desc"].get(f) or {} for f in fams}, "on": SK["on"], "keys": keys, "tally": tally, "bg": SK["bg"],
+             "same": [g for g in same.values() if len(g) > 1]}, UNI.sk_css(SK, ents))
 
 
 def roles_by_key(L: dict, r: dict) -> dict:
@@ -973,13 +1006,17 @@ def build(argv: list) -> tuple:
         r["uni"].pop("_drawn")                                          # the generator's own reading, never drawn
     # D-044: every gap's reasons (D-042's rule) and its status line (one.gaps.status.table, my proposal), checked here
     n_st = UNI.gap_whys(rows, fj, W, W["el"]["why"]["table"], UNI.names_table(W, A, inv, FLD), A, FLD, bool(only))
-    for r in rows:
-        r["rgaps"] = [g[:4] for g in r["rgaps"]]                        # each name's key and selector served the hover's reading only
+    for r in rows:                                                      # each name's selector served the hover's reading only; its KEY
+        r["rgaps"] = [g[:4] + [[K for K, _sl in g[4]]] for g in r["rgaps"]]   # stays, so THE GAPS draws the name the station's way (D-052)
     icon_names, colour_refs = UNI.mark_refs(W)
     icon_names |= {x["icon"] for x in spec.values() if isinstance(x, dict) and x.get("icon")}
     icon_names |= {f["icon"] for f in spec["RISK"]["flags"].values()} | {c["icon"] for c in W["cols"].values()}
     icon_names |= {x["icon"] for grp in ("head", "details") for x in CM[grp].values()}
     enc, enc_css, enc_icons = enc_lift(W)                             # the code map's value chips (D-043)
+    sk, sk_css = station_marks(W, rows, feeds)                         # the station's glyph, colour and subcategory per element (D-052)
+    enc_css += "\n" + sk_css
+    for r in rows:
+        r.pop("ro")                                                     # the roles now ride the station's marks (D.sk.keys)
     icon_names |= enc_icons
     got = UNI.harvest(icon_names, colour_refs, HERE)                  # + every lab part's own icon
     lab = UNI.lab_marks()
@@ -1011,7 +1048,7 @@ def build(argv: list) -> tuple:
     data = {"tok": tok, "partial": bool(only), "layouts": LAYOUTS, "rows": rows, "cols": cols, "blocks": blocks, "orders": orders, "families": families,
             "kinds5": list(KINDS5), "fates": list(FATES), "pieceWords": list(PIECE_WORDS), "words": W,
             "icons": got["icons"], "marks": marks, "uspec": uspec, "attrs": attrs, "attrOrder": order, "ulook": ulook,
-            "ucard": {k: spec["_card"][k] for k in ("more", "comp", "okState")}, "elLabels": dict(sorted(CL.items())), "enc": enc}
+            "ucard": {k: spec["_card"][k] for k in ("more", "comp", "okState")}, "elLabels": dict(sorted(CL.items())), "enc": enc, "sk": sk}
 
     RUNTIME = set(W.get("_runtime") or [])
     left = set(TOKEN.findall(json.dumps({k2: v2 for k2, v2 in W.items() if not k2.startswith("_")}, ensure_ascii=False))) - {"{" + t + "}" for t in list(tok) + list(RUNTIME)}

@@ -943,7 +943,7 @@
     "kinds": "kinds of ending"
   },
   "enc": {
-    "_about": "D-043: in ONE ENDPOINT's code-map column every action word and every value from a fixed set is a chip that carries a colour and/or an icon, its words its aria-label and its hover. REUSE FIRST — `col`/`ico`/`txt` name where a family's colour, icon and chip text are read: `table` = the page's own tokens and classes (the endings slots --k-*, the stage spine, the fate stack --f-*, the pieces stack --p-*, the method colours --m-*, the alarm dots' --alert, the validation slot's colour); `lab` = the endpoint lab's source, cut out of _lab-ep-panels.js and run under node with the station's tokens by gen-all-endpoints.py (the channel chip R · W · RW and its .jdrw rule in _lab-ep.css, the five path kinds' glyphs, the status colour rule — the lab colours a 3xx as it colours a 5xx, kept as the lab has it — the in-flight kinds' glyphs and lifetime tones, the direction chip IN · OUT, the function role chip ACC · CALL · GATE · PURE, the words for what a branch does); `station` = the Gabe Universe's tokens (_station.js: the role and hook-role badge colours and their words; the entity hue the universe column already lifts). A finding's hover words are the forms registry's own (_a3_forms.py FINDINGS). `mine` = MY PROPOSAL, for a family nothing encodes yet: an icon per value from the station's own icon set, and no new colour. `rule.groups[*].keywords` sorts the 422 rule types by the Field keyword that makes each (the short arm's PYDANTIC_ERRORS), `table` by the short arm's MODEL_ERRORS / RAISE_ERRORS — which group a keyword belongs to is my proposal; a keyword no group names stops the build.",
+    "_about": "D-043: in ONE ENDPOINT's code-map column every action word and every value from a fixed set is a chip that carries a colour and/or an icon, its words its aria-label and its hover. REUSE FIRST — `col`/`ico`/`txt` name where a family's colour, icon and chip text are read: `table` = the page's own tokens and classes (the endings slots --k-*, the stage spine, the fate stack --f-*, the pieces stack --p-*, the method colours --m-*, the alarm dots' --alert, the validation slot's colour); `lab` = the endpoint lab's source, cut out of _lab-ep-panels.js and run under node with the station's tokens by gen-all-endpoints.py (the channel chip R · W · RW and its .jdrw rule in _lab-ep.css, the five path kinds' glyphs, the status colour rule — the lab colours a 3xx as it colours a 5xx, kept as the lab has it — the in-flight kinds' glyphs and lifetime tones, the direction chip IN · OUT, the words for what a branch does); `station` = the Gabe Universe's own encoding (D-052): a family an element wears as its subcategory (method · role · hook role · component, module and provider class · delivery) is the station's badge colour and word, lifted from gabe-universe.html by _ae_universe.station_kinds; the entity is the station's entity glyph in that entity's colour. A finding's hover words are the forms registry's own (_a3_forms.py FINDINGS). `mine` = MY PROPOSAL, for a family nothing encodes yet: an icon per value from the station's own icon set, and no new colour. `rule.groups[*].keywords` sorts the 422 rule types by the Field keyword that makes each (the short arm's PYDANTIC_ERRORS), `table` by the short arm's MODEL_ERRORS / RAISE_ERRORS — which group a keyword belongs to is my proposal; a keyword no group names stops the build.",
     "title": "how the code map draws its values",
     "plain": "Every action word and every value from a fixed set is a chip that carries a colour, an icon, or both. Point at one for its words. The looks, family by family, and where each is read from:",
     "look": { "col": "colour", "ico": "icon", "txt": "chip" },
@@ -969,10 +969,14 @@
         "with the server process": { "plain": "It stays while the server runs: every request shares it." },
         "unknown": { "plain": "How long it lives is not read." } } },
       "dir": { "name": "which way the shape travels", "col": "lab", "ico": "lab", "txt": "lab" },
-      "role": { "name": "function role", "col": "station", "txt": "lab", "ico": "station", "icon": "function" },
-      "hrole": { "name": "hook role", "col": "station", "ico": "station", "icon": "hook" },
-      "method": { "name": "method", "col": "table" },
-      "ent": { "name": "entity", "col": "station", "ico": "station", "plain": "The entity that claims this endpoint, in its colour in the Gabe Universe." },
+      "role": { "name": "function role", "col": "station", "txt": "station" },
+      "hrole": { "name": "hook role", "col": "station", "txt": "station" },
+      "method": { "name": "method", "col": "station", "txt": "station" },
+      "feclass": { "name": "component class", "col": "station", "txt": "station", "station": true },
+      "mclass": { "name": "module class", "col": "station", "txt": "station", "station": true },
+      "pclass": { "name": "provider class", "col": "station", "txt": "station", "station": true },
+      "delivery": { "name": "delivery", "col": "station", "txt": "station", "station": true },
+      "ent": { "name": "entity", "col": "station", "ico": "station", "plain": "The entity that claims this endpoint, with the entity glyph in its own colour, as the Gabe Universe draws an entity." },
       "switch": { "name": "kind of switch", "ico": "mine", "vals": {
         "binding": { "icon": "merge", "plain": "Which implementation is plugged in decides the way." },
         "value": { "icon": "tint", "plain": "A setting's value decides the way." },
@@ -1287,6 +1291,45 @@
         { "row": "TESTS", "sel": "file", "attrs": ["cases"] },
         { "row": "JOURNEYS", "sel": "journey", "attrs": ["cases"] }
       ]
+    }
+  },
+  "station": {
+    "_about": "D-052: every mention of an element the Gabe Universe draws as a node wears the station's glyph for its kind, in the station's kind colour, and, where the station hangs a badge on that kind, a small label at the END naming the subcategory in the badge's colour. Glyphs, colours, badge colours and their words are lifted from gabe-universe.html by _ae_universe.station_kinds (a table or a line that is gone stops the build). `map` is ONE table, MY PROPOSAL where a key's kind is not one of the station's node kinds (`mine`): `to` the station kind it is drawn as (`fe` = the piece's own kind in the station's frontend feed; `element` = only a file the station draws as an unclaimed-file node; null = the station draws no node for it, so it keeps the page's own look, D-043), `why` the reason. gen-all-endpoints.py checks every key kind has a row and every `to` is a kind the station's tables draw.",
+    "title": "what the Gabe Universe draws",
+    "plain": "An element the Gabe Universe draws as a node wears its glyph there, in its colour there; a label at the end names its subcategory, in the colour of the badge the station hangs on that node. Point at a glyph or a label for its words. Which of this page's kinds are drawn as which of the station's is my proposal where they are not the same:",
+    "drawn": "as the Gabe Universe draws its node",
+    "drawnEnt": "as the Gabe Universe names an entity",
+    "glyph": "The glyph and the colour this kind of element wears in the Gabe Universe.",
+    "mineTip": "My proposal: {why}",
+    "alias": "The Gabe Universe names this setting as one of the flag's aliases, so it is that flag and wears the flag's glyph.",
+    "card": "This is the node's look. The universe column copies the station's card, whose chips and entity faces use the card's own colours, so the same element can look different there: the station differs from itself.",
+    "nonode": "The Gabe Universe draws no node for this function, so it wears no glyph; its role is read from the endpoint's facts the way the station reads a role.",
+    "same": "The station's map gives these entities one colour: {v}.",
+    "mine": "my proposal",
+    "count": "{n} of {of} named here are nodes there",
+    "not": "Not drawn by the Gabe Universe as a node, so each keeps this page's own look: {v}.",
+    "map": {
+      "endpoint": { "to": "endpoint", "why": "The same: the station's endpoint node, its method and its delivery as labels." },
+      "fn": { "to": "function", "why": "The station's function node, where its function layer holds the function, its role read from that layer. A function it holds no node for wears no glyph; its role stays as a label." },
+      "schema": { "to": "schema", "why": "The station's schema node, where its map holds the schema. A schema named only inside a signature is no node, so it wears no glyph." },
+      "flag": { "to": "flag", "why": "The station's feature flag node, where its map holds the flag." },
+      "table": { "to": "model", "mine": true, "why": "A table and its model class are one element here (D-041); the station draws the model, where its map holds one for the table." },
+      "entity": { "to": "entity", "mine": true, "why": "The station draws an entity as the boundary round its pieces; where it names one (its panel, a search hit) it draws the entity glyph in that entity's own colour." },
+      "fe": { "to": "fe", "mine": true, "why": "A frontend piece is drawn as its own kind in the station's frontend feed; a component the station calls a view wears the screen glyph and the view colour." },
+      "file": { "to": "element", "mine": true, "why": "The station draws a file as a node only when no entity claims it; any other file is no node." },
+      "guard": { "to": null, "mine": true, "why": "An own guard is a condition inside the handler; the station draws the endpoint's gates as its Guards list, never as a node." },
+      "setting": { "to": null, "mine": true, "why": "A setting is a value a condition reads; the station draws a node only for a feature flag. A setting the station names as one of a flag's aliases is that flag, and wears the flag's glyph." },
+      "limiter": { "to": null, "mine": true, "why": "A rate limiter lives inside the rate-limit middleware, which the station draws as one node for every request." },
+      "case": { "to": null, "why": "A test case sits on the card's Tests row, not as a node." },
+      "status": { "to": null, "why": "A status is a value, not a node." },
+      "fork": { "to": null, "why": "A deciding branch is a place in the code, not a node." },
+      "catch": { "to": null, "why": "A catch is a place in the code, not a node." },
+      "switch": { "to": null, "why": "A switch is what decides a way; the station draws none." },
+      "reason": { "to": null, "why": "A reason site is a line of a screen, not a node." },
+      "rule": { "to": null, "why": "A validation rule sits on a field of a schema, not as a node." },
+      "inflight": { "to": null, "why": "A value alive during a request is not a node." },
+      "finding": { "to": null, "why": "A finding is a fact about the endpoint, not a node." },
+      "piece": { "to": null, "why": "A piece is how common a shape is across the endpoints, not a node." }
     }
   }
 }

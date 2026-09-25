@@ -297,7 +297,9 @@ ok(labSha() === LAB0, 'the lab\'s own facts file is untouched by the sample');
   const ep = 'POST /setup/complete'; await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(80);
   // CHANGED 2026-09-23 (D-036): the side panel is gone — a row click fills the ONE-ENDPOINT section below the table and the address
   ok(!(await p.$('#side, aside.side')), 'no side panel is drawn on the page');
-  const side = await p.evaluate(() => ({ h: document.querySelector('#onehead h3').textContent, n: document.querySelector('#onehead h3').textContent, search: window.location.search,
+  /* CHANGED 2026-09-25 (D-052): the title draws the endpoint the station's way (its glyph, its path, its method as the label at the end);
+     its words in their own order are its aria-label, read here */
+  const side = await p.evaluate(() => ({ h: document.querySelector('#onehead h3').getAttribute('aria-label'), n: document.querySelector('#onehead h3').getAttribute('aria-label'), search: window.location.search,
     cmd: (document.getElementById('labcmd') || {}).textContent || '', href: document.getElementById('lablink') ? document.getElementById('lablink').getAttribute('href') : '' }));
   const slugOf = require(path.join(HERE, '_ep-slug.js')).slug;
   ok(side.h.replace(/\s+/g, '') === ep.replace(/\s+/g, '') && side.n === ep, 'a row click fills the endpoint section with the row clicked', side);
@@ -545,13 +547,13 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
   ok(await p.evaluate(() => { const m = document.getElementById('sec-more'), all = [...document.querySelectorAll('.artifact-page *')];
     return all.filter((x) => x.offsetParent !== null && !m.contains(x) && (m.compareDocumentPosition(x) & Node.DOCUMENT_POSITION_FOLLOWING)).length === 0; }), 'nothing on the page is drawn after more information');
   /* a cold start shows the first row drawn */
-  const c9 = await p.evaluate(() => ({ first: document.querySelector('#board tr.row[data-ep]').getAttribute('data-ep'), open: window.__allep.state.open, n: document.querySelector('#onehead h3').textContent,
+  const c9 = await p.evaluate(() => ({ first: document.querySelector('#board tr.row[data-ep]').getAttribute('data-ep'), open: window.__allep.state.open, n: document.querySelector('#onehead h3').getAttribute('aria-label'),
     sel: [...document.querySelectorAll('#board tr.row[data-sel="true"]')].map((e) => e.getAttribute('data-ep')) }));
   ok(c9.open === c9.first && c9.n === c9.first && c9.sel.length === 1 && c9.sel[0] === c9.first, 'a cold start shows the table\'s first row in the endpoint section, and marks that row', c9);
   /* ?ep= on load picks that row; a slug the page does not hold says so and shows the first row */
   const ADDR = 'GET /recipe-creation/gustify/stream';
   await p.goto('file://' + PAGE + '?ep=' + slug9(ADDR)); await p.waitForFunction('window.__allep && window.__allep.ready');
-  const a9 = await p.evaluate(() => ({ open: window.__allep.state.open, n: document.querySelector('#onehead h3').textContent, sel: [...document.querySelectorAll('#board tr.row[data-sel="true"]')].map((e) => e.getAttribute('data-ep')),
+  const a9 = await p.evaluate(() => ({ open: window.__allep.state.open, n: document.querySelector('#onehead h3').getAttribute('aria-label'), sel: [...document.querySelectorAll('#board tr.row[data-sel="true"]')].map((e) => e.getAttribute('data-ep')),
     note: !document.getElementById('onenote').hidden }));
   ok(a9.open === ADDR && a9.n === ADDR && a9.sel.join() === ADDR && !a9.note, 'an address that names an endpoint opens the page on it', a9);
   await p.goto('file://' + PAGE + '?ep=no-such-endpoint'); await p.waitForFunction('window.__allep && window.__allep.ready');
@@ -690,7 +692,7 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
   const SAMPLE9 = ['POST /setup/complete', 'GET /recipes', 'GET /recipe-creation/gustify/stream', 'DELETE /', 'GET /healthz', 'PATCH /pantry/items/{item_id}'].filter((x) => FEED.includes(x));
   for (const ep of SAMPLE9) {
     await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(60);
-    const dom = await p.evaluate(() => ({ n: document.querySelector('#onehead h3').textContent, search: window.location.search,
+    const dom = await p.evaluate(() => ({ n: document.querySelector('#onehead h3').getAttribute('aria-label'), search: window.location.search,   /* D-052: the title's words, in order */
       /* changed 2026-09-24 (D-040): the column draws the station's card, so a row is read the way the station's card is read
          below — its header (icon, title, count), then the words it draws after the header; a key-value row by its value */
       uni: [...document.querySelectorAll('#ocol-uni .ust .urow')].map((u) => { const hd = u.querySelector(':scope > .sechd'), cnt = hd && hd.querySelector('.cnt'), kv = u.classList.contains('kv');
@@ -875,9 +877,60 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
     const plain = [], tw = document.createTreeWalker(cm, NodeFilter.SHOW_TEXT); let t;
     while ((t = tw.nextNode())) { const x = t.textContent.trim(); if (!x || x === W.panel.none || t.parentElement.closest('.vc, .pk, .cbh, th, td.says, .pw, .ab, .ainfo, .elsay, h3')) continue;
       const m = rx.exec(x) || st.exec(x); if (m) plain.push([(t.parentElement.closest('.pair') || {}).getAttribute && t.parentElement.closest('.pair').getAttribute('data-k'), m[0], x.slice(0, 50)]); }
-    return { n: chips.length, bare, plain, missing: Object.keys(F).filter((f) => !fams.has(f)) }; });
+    return { n: chips.length, bare, plain, missing: Object.keys(F).filter((f) => !F[f].station && !fams.has(f)) }; });   /* a station family (D-052) is drawn only where an element wears it */
   ok(enc.n > 100 && !enc.bare.length && !enc.missing.length && !enc.plain.length,
     'D-043 · ' + EP + ' · every verb and catalog value in the code-map column is a chip carrying a colour or an icon and its words, every family is drawn, and no catalog word is left as plain text', { chips: enc.n, bare: enc.bare.slice(0, 4), missing: enc.missing, plain: enc.plain.slice(0, 4) });
+  /* D-052 · on POST /setup/complete every code-map mention of an element the station draws as a node carries that kind's glyph in
+     its KINDCOL colour, and every mention whose kind has a subcategory in the station's feed carries that label in its __BADGE_COL
+     colour. Recomputed HERE from the station's own file and feeds (GLYPH · KINDCOL · VIEWCOL · ENT · inkCol · __BADGE_COL · the c4
+     graph · levels.json); the words file's station.map says which station kind a page key kind is drawn as (the agent's proposal) */
+  { const ST = fs.readFileSync(path.join(REPO, 'templates/center/shell/example/codebase-graph-station/gabe-universe.html'), 'utf8');
+    const lit = (m) => { const i = ST.indexOf(m), j = ST.indexOf('{', i); let d = 0, k = j, q = null;
+      for (; k < ST.length; k++) { const c = ST[k]; if (q) { if (c === '\\') k++; else if (c === q) q = null; continue; }
+        if (ST.startsWith('//', k)) { k = ST.indexOf('\n', k); continue; } if (ST.startsWith('/*', k)) { k = ST.indexOf('*/', k) + 1; continue; }   /* a comment's quote is no string */
+        if (c === '"' || c === "'") q = c; else if (c === '{') d++; else if (c === '}' && !--d) break; }
+      return ST.slice(j, k + 1); };
+    const vm = await import('node:vm'), ev = (x, ctx) => vm.runInNewContext('(' + x + ')', ctx || {});
+    const GL = ev(lit('var GLYPH={')); for (const [, g, v] of ST.matchAll(/(?<![\w.])GLYPH\.(\w+)\s*=\s*('(?:[^'\\]|\\.)*')/g)) if (!GL[g]) GL[g] = ev(v);
+    const KC = ev(lit('var KINDCOL={')); for (const [, k, c] of ST.matchAll(/(?<![\w.])KINDCOL\.(\w+)\s*=\s*"(#[0-9a-fA-F]+)"/g)) KC[k] = c;
+    const VIEW = /var VIEWCOL="(#[0-9a-fA-F]+)"/.exec(ST)[1], BC = ev(lit('window.__BADGE_COL={'));
+    const ink = vm.runInNewContext('(function(){ var window={__uniTheme:"light"}; return ' + ST.slice(ST.indexOf('function inkCol(hex)'), ST.indexOf('function onCol(')) + '})()');
+    const LVJ = JSON.parse(fs.readFileSync(path.join(REPO, 'templates/center/shell/example/codebase-graph-station/levels.json'), 'utf8'));
+    const ROLE = Object.fromEntries((LVJ.fn_nodes || []).map((f) => ['fn:' + f.id.replace('#', '::'), f.role]));
+    const NODE = {}; Object.values(C4.l2 || {}).forEach((e) => (e.nodes || []).forEach((n) => { NODE[n.id] = n; }));
+    const FEP = Object.fromEntries(((C4.fe || {}).pieces || []).map((x) => [x.id, x])), FK = { 'fe-type': 'type', 'fe-unknown': 'unknown' }, MAP = D.words.station.map;
+    const want = (K) => { const kind = K.slice(0, K.indexOf(':')), id = K.slice(K.indexOf(':') + 1), to = (MAP[kind] || {}).to; let sk = to, subs = [], ent = null;
+      if (to === 'fe') { const x = FEP[K]; if (!x) return null; sk = FK[x.kind] || x.kind;
+        if (sk === 'component' && x.feClass === 'view') sk = 'view'; else if (sk === 'component' && BC.feclass[x.feClass]) subs = [['feclass', x.feClass]];
+        else if (sk === 'hook' && BC.hrole[x.hrole]) subs = [['hrole', x.hrole]]; else if (sk === 'module' && BC.mclass[x.mclass]) subs = [['mclass', x.mclass]]; }
+      else if (to === 'element') { if (!NODE['element:' + id]) return null; }
+      else if (to === 'endpoint') { if (!NODE[K]) return null; const m = /^(GET|POST|PUT|PATCH|DELETE|BOOT|TASK)\b/.exec(NODE[K].label || id); if (m) subs.push(['method', m[1]]); if (NODE[K].stream) subs.push(['delivery', 'stream']); }
+      else if (to === 'function') { if (!(K in ROLE)) return null; if (BC.role[ROLE[K]]) subs = [['role', ROLE[K]]]; }   /* a node only where the station's function layer holds it (D-052 review F1) */
+      else if (to === 'model') { if (kind === 'table' && !Object.values(NODE).some((n) => n.kind === 'model' && n.table === id)) return null; }
+      else if (to === 'schema' || to === 'flag') { if (!NODE[K]) return null; }
+      else if (to === 'entity') ent = id;
+      else if (!to && kind === 'setting' && Object.values(NODE).some((n) => n.kind === 'flag' && ((n.det || {}).aliases || []).includes(id))) sk = 'flag';   /* the station's own alias (F2) */
+      if (!sk) return null;
+      const hex = sk === 'view' ? VIEW : ent ? (C4.colors || {})[ent] : KC[sk];
+      return { sk, glyph: GL[sk === 'view' ? 'screen' : sk], hex, subs: subs.map(([f, v]) => [f, v, BC[f][v]]) }; };
+    const got = await p.evaluate(() => { const dark = document.documentElement.getAttribute('data-theme') === 'dark' || (document.documentElement.getAttribute('data-theme') !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+      return { dark, m: [...document.querySelectorAll('#ocol-cm [data-key]')].filter((n) => !n.closest('.ainfo')).map((n) => { const g = n.querySelector(':scope > .skg:first-child, :scope > .vc-ent:first-child > .skg');   /* the entity's glyph sits in its chip */
+        return { K: n.getAttribute('data-key'), sk: g && g.getAttribute('data-sk'), svg: g ? g.querySelector('svg').innerHTML : null, col: g ? getComputedStyle(g).color : null,
+          subs: [...n.querySelectorAll(':scope > .sksub')].map((x) => [x.getAttribute('data-vc'), x.getAttribute('data-vv'), getComputedStyle(x).backgroundColor]),
+          discs: [...n.querySelectorAll(':scope > .sksub')].filter((x) => { const cv = x.querySelector(':scope > canvas.skd'); if (!cv) return true; const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; for (let i = 3; i < d.length; i += 4) if (d[i]) return false; return true; }).length }; }) }; });   /* F4: each label carries the station's painted disc */
+    const rgb = (h) => { h = h.replace('#', ''); if (h.length === 3) h = h.split('').map((c) => c + c).join(''); return 'rgb(' + [0, 2, 4].map((i) => parseInt(h.substr(i, 2), 16)).join(', ') + ')'; };
+    const norm = async (g) => p.evaluate((x) => { const t = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); t.innerHTML = x; return t.innerHTML; }, g);
+    const badG = [], badS = [], seen = { kinds: new Set(), subs: new Set() };
+    for (const x of got.m) { const w = want(x.K);
+      if (!w) { if (x.sk) badG.push([x.K, 'a glyph on a kind the station draws no node for']); continue; }
+      const hex = got.dark ? w.hex : ink(w.hex);
+      if (x.sk !== w.sk || x.svg !== await norm(w.glyph) || x.col !== rgb(hex)) badG.push([x.K, x.sk, w.sk, x.col, rgb(hex)]); else seen.kinds.add(w.sk);
+      const ws = JSON.stringify(w.subs.map(([f, v, c]) => [f, v, rgb(c)])); if (JSON.stringify(x.subs) !== ws || x.discs) badS.push([x.K, x.subs, ws, x.discs]); else w.subs.forEach(([f]) => seen.subs.add(f)); }
+    ok(got.m.length > 20 && !badG.length && ['endpoint', 'function', 'model', 'schema', 'entity', 'hook'].every((k) => seen.kinds.has(k)),
+      'D-052 · ' + EP + ' · every code-map mention with a station kind carries that kind\'s glyph in its KINDCOL colour (recomputed from the station file), and none without one does',
+      { n: got.m.length, bad: badG.slice(0, 4), kinds: [...seen.kinds] });
+    ok(!badS.length && ['method', 'role', 'hrole'].every((f) => seen.subs.has(f)),
+      'D-052 · ' + EP + ' · every code-map mention whose kind has a subcategory in the station\'s feed carries that label at its end, in the __BADGE_COL colour', { bad: badS.slice(0, 4), fams: [...seen.subs] }); }
   ok(!!CLS && uniOf(ROW[EP], 'CONNECTIONS').some((g) => g[5] === 'model' && g[3].includes(CLS)), 'the c4 graph names the model class of ' + T0 + ', and ' + EP + '\'s card draws it as a connection chip', CLS);
   await p.locator('#ocol-uni .urow[data-row="CONNECTIONS"] .pchip', { hasText: new RegExp('^' + CLS + '$') }).first().click(); await p.waitForTimeout(80);
   const a = await lit(), want = FEED.filter((ep) => holdsT(ROW[ep], T0)).sort();

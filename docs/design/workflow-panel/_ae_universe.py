@@ -1214,3 +1214,174 @@ def ulook(spec: dict, unis: list) -> tuple:
         "casesMore": lf["casesMore"][0], "fileCov": lf["fileCov"], "fileChip": lf["fileChip"], "jReal": lf["jReal"][0], "sig": lf["sig"],
         "above": [lf["aboveCore"][0], lf["aboveEnt"][0], lf["aboveAll"][0], lf["aboveAll"][1], lf["dirUp"][0]],
         "connCap": card["connCap"], "behindCap": card["behindCap"], "fnOff": card["tiers"][card["bootTier"]]["fnOff"]}
+
+
+# ── D-052 · EVERY ELEMENT THE PAGE NAMES WEARS THE STATION'S GLYPH AND COLOUR, AND ITS SUBCATEGORY AS A LABEL AT THE END. The
+# station draws a node with GLYPH[_dispGlyph(n)] in its kind colour (KINDS[kind].col = KINDCOL[kind]; a view component wears the
+# screen glyph and VIEWCOL; the light theme darkens it through inkCol), and hangs one badge per kind on it (buildNode): an
+# endpoint its method (and, streaming, its delivery), a function its role, a component its class, a module its class, a hook its
+# role, a provider its class — each a disc in __BADGE_COL with a dark glyph. All of it is LIFTED here from the station's source and
+# run under node; a table, a pattern or a badge line that is gone stops the build (the drift guard of D-040).
+BADGE_ON = (("endpoint", "method", 'if(n.kind==="endpoint" && n.m && n.m.method){ try{ grp.add(methodBadge(n.m.method'),
+            ("function", "role", 'else if(n.kind==="function" && n.role){ try{ grp.add(roleBadge(n.role))'),
+            ("component", "feclass", 'else if(n.kind==="component" && (n.feClass==="'),
+            ("module", "mclass", 'else if(n.kind==="module" && n.mclass){ try{ grp.add(feclassBadge(n.mclass,"mclass"))'),
+            ("hook", "hrole", 'else if(n.kind==="hook" && n.hrole){ try{ grp.add(feclassBadge(n.hrole,"hrole"))'),
+            ("provider", "pclass", 'if(n.kind==="provider" && n.pclass){ try{ grp.add(feclassBadge(n.pclass,"pclass"))'),
+            ("endpoint", "delivery", 'if(n.kind==="endpoint" && n.stream){ try{ var _sb=feclassBadge("stream","delivery")'))
+SK_LIFT = {
+    "kcx": r'(?<![\w.])KINDCOL\.(\w+)\s*=\s*"(#[0-9a-fA-F]{3,8})"',
+    "ktx": r'KINDS\.(\w+)=\{ col:"[^"]*", form:"\w+", label:"[^"]*", type:"([^"]*)"',
+    "viewCol": r'var VIEWCOL="(#[0-9a-fA-F]{3,8})";',
+    "viewGlyph": r'function _dispGlyph\(n\)\{ return _isView\(n\)\?"(\w+)":n\.kind; \}',
+    "viewType": r'return Object\.assign\(\{\}, K, \{col:VIEWCOL, type:"([^"]+)"',
+    "viewIs": r'function _isView\(n\)\{ return !!\(n && n\.kind==="(\w+)" && n\.feClass==="(\w+)"\); \}',
+    "feclassOn": r'n\.kind==="component" && \(((?:n\.feClass==="\w+"\|\|)*n\.feClass==="\w+")\)',
+    "badgeInk": r"window\.__badgeGlyph=function\(c, kind, key\)\{[\s\S]*?c\.strokeStyle='(#[0-9a-fA-F]{3,8})'",
+    "methOf": r'function _methOf\(label\)\{ var m=/(.+?)/\.exec\(label\|\|""\); return m\?m\[1\]:null; \}',
+    "stream": r'feclassBadge\("(\w+)","delivery"\)',
+}
+
+
+def station_kinds() -> dict:
+    """The station's kind encoding, lifted: {kinds: {kind: {g, c, l, t}}, badge, desc, ink, on: {kind: [families]}, feclass,
+    view, methOf, stream, feKind}. `g` the glyph's inner markup, `c` the kind colour, `l` its light-theme ink, `t` the station's
+    own type word. The view is a kind of its own here ("view"), as the station draws it."""
+    src = STATION_HTML.read_text(encoding="utf-8")
+    for kind, fam, line in BADGE_ON:
+        if line not in src:
+            die(f"the station no longer hangs the {fam} badge on a {kind} (buildNode) — re-read gabe-universe.html")
+    lf = {}
+    for k, rx in SK_LIFT.items():
+        m = re.findall(rx, src) if k in ("kcx", "ktx") else re.search(rx, src)
+        if not m:
+            die(f"kind encoding {k}: the station's source no longer matches {rx[:90]}")
+        lf[k] = m if k in ("kcx", "ktx") else m.groups()
+    look = station_look(src)
+    J = look["js"]
+    code = r"""
+const I=JSON.parse(process.argv[1]); const window={}; const out={kinds:{},ent:{}};
+const GLYPH=eval('('+I.glyph+')'); for(const [n,lit,g] of I.gx){ if(g && GLYPH[n]) continue; GLYPH[n]=eval(lit); }
+for(const [a,b] of I.galias){ if(!GLYPH[a]) GLYPH[a]=GLYPH[b]; }
+const KINDCOL=eval('('+I.kindcol+')'); for(const [k,c] of I.kcx) KINDCOL[k]=c;
+const KINDS=eval('('+I.kinds+')'); for(const [k,t] of I.ktx){ KINDS[k]=KINDS[k]||{}; KINDS[k].type=t; }
+const inkCol=eval('('+I.ink+')'); window.__uniTheme='light';
+const B=eval('('+I.badge+')'), BD=eval('('+I.desc+')');
+for(const k of Object.keys(KINDCOL)){ if(!GLYPH[k] || !KINDS[k]) continue; out.kinds[k]={g:GLYPH[k], c:KINDCOL[k], l:inkCol(KINDCOL[k]), t:KINDS[k].type}; }
+out.kinds.view={g:GLYPH[I.viewGlyph], c:I.viewCol, l:inkCol(I.viewCol), t:I.viewType};
+for(const [e,c] of Object.entries(I.ents)) out.ent[e]=[c, inkCol(c)]; out.fb=[I.fb, inkCol(I.fb)];
+out.badge=B; out.desc=BD; process.stdout.write(JSON.stringify(out));"""
+    ents = dict((station_feeds()["graph"].get("colors") or {}))
+    arg = dict(J, kcx=lf["kcx"], ktx=lf["ktx"], kinds=_literal(src, "var KINDS={"), badge=_literal(src, "window.__BADGE_COL={"),
+               desc=_literal(src, "window.__BADGE_DESC={"), viewGlyph=lf["viewGlyph"][0], viewCol=lf["viewCol"][0], viewType=lf["viewType"][0], ents=ents, fb=look["lift"]["entFallback"][0])
+    r = subprocess.run(["node", "-e", code, json.dumps(arg)], capture_output=True, text=True)
+    if r.returncode != 0:
+        die("the station's kind encoding could not run under node: " + r.stderr.strip()[-400:])
+    out = json.loads(r.stdout)
+    on = {}
+    for kind, fam, _ in BADGE_ON:
+        if kind not in out["kinds"] or fam not in out["badge"]:
+            die(f"the station hangs the {fam} badge on a {kind}, but its kind table or __BADGE_COL lacks it")
+        on.setdefault(kind, []).append(fam)
+    fc = re.findall(r'n\.feClass==="(\w+)"', lf["feclassOn"][0])
+    if set(fc) - set(out["badge"]["feclass"]) or lf["stream"][0] not in out["badge"]["delivery"]:
+        die("the component classes or the delivery the station badges are not all in __BADGE_COL")
+    # the badge painter itself (the station's disc + its dark glyph, one canvas call), carried as its body — the page paints the
+    # label's disc with it, never a retyped glyph (F4 of the D-052 review: a colour alone made POST, caller and fetcher one pill)
+    bg = _literal(src, "window.__badgeGlyph=function(c, kind, key){")
+    if "window.__BADGE_COL" not in bg or "c.stroke()" not in bg:
+        die("the station's __badgeGlyph no longer reads __BADGE_COL and strokes its glyph — re-read gabe-universe.html")
+    out.update(bg=bg, ink=lf["badgeInk"][0], on=on, feclass=fc, view=list(lf["viewIs"]), methOf=lf["methOf"][0], stream=lf["stream"][0])
+    return out
+
+
+def sk_keys(keys: set, SK: dict, M: dict, feeds: dict, roles: dict) -> tuple:
+    """{key: [the station kind the page draws it as (a key of SK.kinds) or None, [[badge family, value], …], the entity it is when
+    it is one]} for every key the station draws as a NODE, and {page kind: [how many keys, how many drawn]} for the key. The kind
+    comes from the words file's mapping (station.map, my proposal where it is not one-to-one), and a key wears it only when the
+    station's own feeds hold its node — the c4 graph's l2 nodes (endpoint · schema · flag · a model by its table · an unclaimed
+    file), its frontend pieces, the levels map's functions; a mapping is never a promise the station keeps. A setting the station
+    names as a flag's alias (the flag node's det.aliases) IS that flag. The subcategory is read from the same feeds; only a value
+    __BADGE_COL colours is a label. A function the station holds no node for wears no glyph, but keeps its role as a label (None
+    kind): D-043's role chip, read the station's way from the lab's facts (`roles`)."""
+    G, LV = feeds["graph"], json.loads((EX / "levels.json").read_text(encoding="utf-8"))
+    nodes = {p["id"]: p for e in (G.get("l2") or {}).values() for p in e.get("nodes") or []}
+    t2m = {p["table"]: p for p in nodes.values() if p.get("kind") == "model" and p.get("table")}
+    alias = {a: p["id"] for p in nodes.values() if p.get("kind") == "flag"
+             for a in (((p.get("det") or {}) if isinstance(p.get("det"), dict) else {}).get("aliases") or [])}
+    fe = {p["id"]: p for p in ((G.get("fe") or {}).get("pieces") or [])}
+    fnr = {f["id"].replace("#", "::"): f.get("role") for f in LV.get("fn_nodes") or []}
+    fk = {**{"fe-type": "type", "fe-unknown": "unknown"}, **(station_spec()["_card"]["feKind"])}
+    meth = re.compile(SK["methOf"])
+    B, out, tally = SK["badge"], {}, {}
+    def sub(fam, v):
+        return [[fam, v]] if v and v in (B.get(fam) or {}) else []
+    for K in sorted(keys):
+        kind, ident = K.split(":", 1)
+        row = M.get(kind) or die(f"station.map has no row for the key kind {kind!r}")
+        to, subs, ent = row.get("to"), [], None
+        if to == "fe":
+            p = fe.get(K)
+            if not p:
+                to = None
+            else:
+                to = fk.get(p["kind"], p["kind"])
+                if to == SK["view"][0] and p.get("feClass") == SK["view"][1]:
+                    to = "view"
+                elif to == "component" and p.get("feClass") in SK["feclass"]:
+                    subs = sub("feclass", p["feClass"])
+                elif to == "hook":
+                    subs = sub("hrole", p.get("hrole"))
+                elif to == "module":
+                    subs = sub("mclass", p.get("mclass"))
+        elif to == "element":
+            to = "element" if ("element:" + ident) in nodes else None
+        elif to == "endpoint":
+            n = nodes.get(K)
+            if not n:
+                to = None
+            else:
+                m = meth.match(n.get("label") or ident)
+                subs = sub("method", m.group(1) if m else None) + (sub("delivery", SK["stream"]) if n.get("stream") else [])
+        elif to == "function":
+            if ident in fnr:
+                subs = sub("role", fnr[ident])
+            else:                                                        # no node: no glyph, the role label stays (D-043)
+                to, subs = None, sub("role", roles.get(K))
+        elif to == "model":
+            to = "model" if kind != "table" or ident in t2m else None
+        elif to in ("schema", "flag"):
+            to = to if K in nodes else None
+        elif to == "provider":
+            to, subs = ("provider", sub("pclass", nodes[K].get("pclass"))) if K in nodes else (None, [])
+        elif to == "entity":
+            ent = ident
+        elif to is None and kind == "setting" and ident in alias:        # the station's own reading: this setting IS the flag
+            to = "flag"
+        t = tally.setdefault(kind, [0, 0])
+        t[0] += 1
+        if to and to not in SK["kinds"]:
+            die(f"station.map sends {kind} to {to!r}, a kind the station's tables do not draw")
+        if to:
+            t[1] += 1
+        if to or subs:
+            out[K] = [to, subs] + ([ent] if ent else [])
+    return out, tally
+
+
+def sk_css(SK: dict, ents: set) -> str:
+    """The glyph colours per kind and per entity, per theme, the way the page's theme rules run (light first, then dark by the
+    system or by the toggle) — the station's colours, never retyped."""
+    rules = {"light": [], "dark": []}
+    for k, x in SK["kinds"].items():
+        rules["light"].append(f'.skg[data-sk="{k}"]{{ color:{x["l"]}; }}')
+        rules["dark"].append(f'.skg[data-sk="{k}"]{{ color:{x["c"]}; }}')
+    for e in sorted(ents):
+        c = SK["ent"].get(e) or SK["fb"]                                  # ENT[e] = the c4 colour, else the station's fallback
+        rules["light"].append(f'.skg[data-sk="entity"][data-ent="{e}"]{{ color:{c[1]}; }}')
+        rules["dark"].append(f'.skg[data-sk="entity"][data-ent="{e}"]{{ color:{c[0]}; }}')
+    dark = " ".join(rules["dark"])
+    return "\n".join(["/* D-052 · THE STATION'S KIND COLOURS — lifted from gabe-universe.html by _ae_universe.station_kinds: KINDCOL (light: inkCol),",
+                      "   VIEWCOL, the entity colours ENT (c4 colors). Never edit here. */", f":root{{ --skt:{SK['ink']}; }}"] + rules["light"]
+                     + ['@media (prefers-color-scheme: dark){ ' + " ".join(':root:not([data-theme="light"]) ' + r for r in rules["dark"]) + " }",
+                        " ".join(':root[data-theme="dark"] ' + r for r in rules["dark"])])

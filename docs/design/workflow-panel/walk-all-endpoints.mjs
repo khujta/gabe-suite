@@ -235,6 +235,21 @@ await step('one-info-close', '#itog-one', 'the same toggle, again');
   await step('clear-the-light-again', '#elclear', 'the clear link on the lit chip above the table');
   await center('#ocol-gaps .opt[data-gdir="cm"]');
   await step('gaps-back-to-this-way', '#ocol-gaps .opt[data-gdir="cm"]', 'the first square of THE GAPS, back to its default'); }
+{ // D-052: every element the code map and THE GAPS name wears the station's glyph in its kind colour, and its subcategory as a label at the end
+  const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
+  const marks = (col) => p.$$eval(col + ' .skg', (gs) => { const o = {}; gs.filter((g) => !g.closest('.ainfo')).forEach((g) => { const k = g.getAttribute('data-sk'), l = [...g.parentElement.querySelectorAll(':scope > .sksub')].map((x) => x.textContent);
+    o[k] = o[k] || { n: 0, labels: {} }; o[k].n++; l.forEach((x) => { o[k].labels[x] = (o[k].labels[x] || 0) + 1; }); }); return o; });
+  say('D-052 · the endpoint shown', await p.evaluate(() => window.__allep.state.open));
+  await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(150);
+  n++; await (await p.$('#ocol-cm')).screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-code-map-station-marks.png') });
+  say('code map · the station glyphs and labels', await marks('#ocol-cm'));
+  await center('#ocol-gaps .opt[data-gdir="uni"]');
+  await step('gaps-the-universe-way', '#ocol-gaps .opt[data-gdir="uni"]', 'the second square of THE GAPS');
+  await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(150);
+  n++; await (await p.$('#ocol-gaps')).screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-gaps-station-marks.png') });
+  say('the gaps · the station glyphs and labels', await marks('#ocol-gaps'));
+  await center('#ocol-gaps .opt[data-gdir="cm"]');
+  await step('gaps-back-once-more', '#ocol-gaps .opt[data-gdir="cm"]', 'the first square of THE GAPS, back to its default'); }
 { // the lab link: a real click opens the lab on this endpoint, then back
   await step('open-in-the-lab', '#lablink', 'the open-in-the-lab link');
   await p.waitForLoadState('load'); await wait(1500);

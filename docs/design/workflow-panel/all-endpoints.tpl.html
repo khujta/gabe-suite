@@ -150,9 +150,9 @@
   tr.grow td.id { white-space: normal; max-width: 226px; line-height: 1.3; padding: 3px 4px; }
   tr.grow .gn { color: var(--ink); } tr.grow .gc { color: var(--muted); font-weight: 400; margin-left: 8px; }
   tr.grow td .agg { color: var(--muted); font-weight: 400; }
-  .idc { display: flex; align-items: center; gap: 6px; max-width: 220px; }
+  .idc { display: flex; align-items: center; gap: 6px; max-width: 300px; }
   .mth { font-weight: 700; font-size: var(--fs-min); width: 4.4em; flex: none; letter-spacing: .02em; }
-  .pth { overflow: hidden; text-overflow: ellipsis; color: var(--ink); }
+  .pth { color: var(--ink); white-space: normal; min-width: 12em; line-height: 1.25; }   /* wraps after a slash (pathEl), never an ellipsis */
 
   /* ── cells ── */
   .z { color: var(--muted); }
@@ -325,6 +325,19 @@
   .vc-ifk svg, .vc-switch svg, .vc-branch svg, .vc-limit svg, .vc-does svg, .vc-arm svg { color: var(--ink-soft); }
   .vc-life { border-left: 3px solid var(--vcc); background: color-mix(in srgb, var(--vcc) 13%, transparent); border-radius: 2px 4px 4px 2px; }
   .vc-method { font-weight: 700; color: var(--vcc); padding: 0 1px; }
+  /* ── D-052 · an element the Gabe Universe draws: its glyph in its kind colour (the colours per kind and per theme are the
+     generated block under THE STATION'S KIND COLOURS), and its subcategory as a label at the END, the station's badge colour
+     filled under the station's badge ink — the station's own disc, as a word ── */
+  .skg { display: inline-flex; vertical-align: -2px; margin-right: 3px; flex: none; cursor: help; }
+  .skg svg { width: 14px; height: 14px; display: block; }
+  .vc.sksub { background: var(--skb); color: var(--skt); border: 0; font-weight: 650; border-radius: 8px; padding: 0 6px 0 2px; margin-left: 4px; gap: 2px; }
+  .vc.sksub canvas.skd { width: 14px; height: 14px; display: block; flex: none; }   /* the station's own badge glyph, painted by its __badgeGlyph */
+  .skn { white-space: nowrap; }
+  .skkey { margin: 0 0 10px; }
+  .skkey .skr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: var(--fs-xs); padding: 2px 0; border-top: 1px dotted var(--rule); }
+  .skkey .skr .skt2 { font-weight: 650; }
+  .skkey .skr .skw { color: var(--ink-soft); flex: 1 1 100%; padding-left: 20px; }
+  .skkey .sknot { font-size: var(--fs-xs); color: var(--ink-soft); margin: 6px 0 0; }
   .vc-alarm { border-color: color-mix(in srgb, var(--alert) 55%, var(--rule)); }
   .vc-alarm svg { color: var(--alert); }
   .vc-rule { border-color: color-mix(in srgb, var(--k-validation) 55%, var(--rule)); }
@@ -454,6 +467,40 @@
   var BLK = {}; D.blocks.forEach(function (b) { BLK[b.key] = b; });
   var ROWS = D.rows, N = ROWS.length;
   var BYID = {}; ROWS.forEach(function (r) { BYID[r.id] = r; });
+  /* ══ D-052 · WHAT THE GABE UNIVERSE DRAWS, DRAWN ITS WAY. Every mention of an element the station draws as a node wears the
+     station's glyph for its kind in its kind colour, and — where the station hangs a badge on that kind — a label at the END
+     naming the subcategory, filled in the badge's colour. D.sk holds what the generator LIFTED from gabe-universe.html (the glyphs,
+     the badge colours and words) and read from the station's feeds per key ([kind, [[family, value], …], entity]); the colours
+     per kind are the generated CSS. Nothing here is a colour or a glyph. A key the station draws no node for is left alone. ══ */
+  var SK = D.sk;
+  /* `pk` the page's kind of the element (its key's prefix): the hover says when drawing it as this station kind is my proposal */
+  function skGlyph(kid, ent, pk) { var t = document.createElement("span"), U = D.ulook.inline;
+    t.innerHTML = U[0] + "14" + '" height="14' + U[1] + "currentColor" + U[2] + SK.kinds[kid].g + "</svg>";
+    var g = el("span", "skg"); g.setAttribute("data-sk", kid); if (ent) g.setAttribute("data-ent", ent); if (pk) g.setAttribute("data-pk", pk); g.setAttribute("data-tip", "sk");
+    t.firstChild.setAttribute("aria-hidden", "true"); g.appendChild(t.firstChild); return g; }
+  /* the station's badge painter, LIFTED by the generator (its body, run against the badge colours it reads) — the label's disc is
+     the station's disc: its colour and its dark glyph, so two families that share a colour still differ by the glyph */
+  var skPaint = (function () { try { return new Function("window", "c", "kind", "key", SK.bg.slice(1, -1)); } catch (e) { return null; } })(), SKW = { __BADGE_COL: SK.badge };
+  function skDisc(fam, v) { var cv = document.createElement("canvas"); cv.className = "skd"; cv.width = cv.height = 28; cv.setAttribute("aria-hidden", "true");
+    try { var c = cv.getContext("2d"); c.scale(28 / 128, 28 / 128); skPaint(SKW, c, fam, v); } catch (e) {} return cv; }
+  function skSub(fam, v, nonode) { var c = vc(fam, v, W.enc.fam[fam].name + " " + v, "sksub"); c.style.setProperty("--skb", SK.badge[fam][v]);
+    c.appendChild(skDisc(fam, v)); c.appendChild(document.createTextNode(v)); if (nonode) c.setAttribute("data-nonode", "true"); return c; }
+  /* a node that names an element: the glyph first, the labels last — inside it, so a click anywhere on it still lights it (D-041).
+     A function the station holds no node for (kind null) wears no glyph, only its role label */
+  function skDeco(n, K) { var s = K && SK.keys[K]; if (!s || n.querySelector(".skg") || n.querySelector(":scope > .sksub")) return n;
+    if (s[0]) n.insertBefore(skGlyph(s[0], s[2], K.slice(0, K.indexOf(":"))), n.firstChild); s[1].forEach(function (x) { n.appendChild(skSub(x[0], x[1], !s[0])); }); return n; }
+  function skAll(root) { root.querySelectorAll("[data-key]").forEach(function (n) { if (n.closest(".ainfo")) return; var K = n.getAttribute("data-key"); if (SK.keys[K]) skDeco(n, K); else skIn(n); }); }
+  /* a line whose own element the station draws no node for (a guard, a switch, a fork …) but whose words NAME one it does — a flag
+     its condition reads, a function it calls: that name, where the line's text says it, drawn the station's way (its other keys) */
+  function skIn(n) { (n.getAttribute("data-keys") || "").split("\n").slice(1).forEach(function (K) { var s = SK.keys[K]; if (!s || !s[0]) return;
+    var nm = K.slice(K.indexOf(":") + 1).split("::").pop(), rx = new RegExp("(^|[^\\w])(" + nm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")(?!\\w)"), tw = document.createTreeWalker(n, NodeFilter.SHOW_TEXT), t;
+    while ((t = tw.nextNode())) { var p = t.parentNode; if (p.closest(".skg, .sksub, .skn, .vc") || p.closest("[data-key]") !== n) continue;
+      var m = rx.exec(t.nodeValue); if (!m) continue; var at = m.index + m[1].length, rest = t.splitText(at); rest.splitText(nm.length);
+      var sp = el("span", "skn"); rest.parentNode.replaceChild(sp, rest); sp.appendChild(rest); skDeco(sp, K); return; } }); }
+  /* a line that names an element in its words ({name}): the name drawn the station's way, the rest as words */
+  function skSay(box, tpl, x, K) { box.textContent = ""; var s = fill(tpl, Object.assign({}, x, { name: "\u0000" })), i = s.indexOf("\u0000");
+    if (i < 0 || !SK.keys[K]) { box.textContent = fill(tpl, x); return box; }
+    box.appendChild(document.createTextNode(s.slice(0, i))); box.appendChild(skDeco(el("span", "skn", x.name), K)); box.appendChild(document.createTextNode(s.slice(i + 1))); return box; }
   /* ── a block's mark (D-036): its part's icon and colour, or my pick (dashed) — the generator read both, nothing typed here ── */
   function svgOf(name) { var t = document.createElement("span"); t.innerHTML = D.icons[name] || ""; var sv = t.firstChild; if (sv && sv.setAttribute) { sv.removeAttribute("width"); sv.removeAttribute("height"); sv.setAttribute("aria-hidden", "true"); } return sv || document.createTextNode(""); }
   function markEl(key) { var m = D.marks[key]; var sp = el("span", "bm"); if (!m) return sp; sp.appendChild(svgOf(m.icon));
@@ -619,14 +666,22 @@
   function shCls(g, ci) { return g.key !== "_shared" ? "" : " sh" + (ci === 0 ? " shf" : "") + (ci === g.cols.length - 1 ? " shl" : ""); }
   function litTest() { if (!S.lit) return null; var c = COL[S.lit.col], b = BINS[S.lit.col].filter(function (x) { return x.key === S.lit.bin; })[0];
     return b ? function (r) { return b.state ? stateOf(r, c) === b.state : b.test(r.k[S.lit.col]); } : null; }
-  function idCell(r) { var d = el("div", "idc"); var m = el("span", "mth", r.m); m.style.color = "var(--m-" + r.m + ")"; d.appendChild(m);
-    var p = el("span", "pth", r.p); d.appendChild(p); d.setAttribute("data-tip", "id"); d.setAttribute("data-ep", r.id); return d; }
+  /* the endpoint as the station draws it (D-052): its glyph in its kind colour, its path, its method (and delivery) as the label at
+     the end; its words in their own order for a screen reader */
+  function skEp(n, r) { if (SK.keys["endpoint:" + r.id]) return skDeco(n, "endpoint:" + r.id);        /* a node the station lacks: the method as before */
+    var m = el("span", "mth", r.m); m.style.color = "var(--m-" + r.m + ")"; n.insertBefore(m, n.firstChild); return n; }
+  /* a group's name; grouped by entity (his default, D-034) it is an entity the station draws — its glyph in its colour (D-052) */
+  function grpName(g, tag, cls) { var n = el(tag, cls, g.name); if (S.grp === "entity" && g.rows.length && g.rows.every(function (r) { return r.ent === g.key; })) n.insertBefore(skGlyph("entity", g.key, "entity"), n.firstChild); return n; }
+  /* the path breaks only after a slash, so the whole path stays readable beside its glyph and its labels (no ellipsis) */
+  function pathEl(p) { var s = el("span", "pth"); String(p).split("/").forEach(function (x, i, a) { s.appendChild(document.createTextNode(x + (i < a.length - 1 ? "/" : ""))); if (i < a.length - 1) s.appendChild(document.createElement("wbr")); }); return s; }
+  function idCell(r) { var d = el("div", "idc"); d.appendChild(pathEl(r.p)); skEp(d, r); d.setAttribute("aria-label", r.id);
+    d.setAttribute("data-tip", "id"); d.setAttribute("data-ep", r.id); return d; }
 
   function renderTable(L, GS, lit) {
     var t = el("table", "grid"); t.appendChild(headRows(L)); var tb = el("tbody");
     GS.forEach(function (g) {
       if (S.grp !== "flat") { var gr = el("tr", "grow"); gr.setAttribute("data-group", g.key);
-        var gi = el("td", "id"); gi.appendChild(el("span", "gn", g.name)); gi.appendChild(el("span", "gc", nEp(g.rows.length))); gr.appendChild(gi);
+        var gi = el("td", "id"); gi.appendChild(grpName(g, "span", "gn")); gi.appendChild(el("span", "gc", nEp(g.rows.length))); gr.appendChild(gi);
         L.forEach(function (bl, bi) { bl.cols.forEach(function (c, ci) { var td = el("td", (ci === 0 ? "bstart" : "") + (bi % 2 ? " bz" : "") + shCls(bl, ci)); td.appendChild(el("span", "agg", aggOf(c, g.rows))); if (c.agg) td.setAttribute("data-tip", "agg"); td.setAttribute("data-col", c.id); gr.appendChild(td); }); });
         tb.appendChild(gr); }
       g.rows.forEach(function (r) {
@@ -642,7 +697,7 @@
     var wrap = el("div"); var kt = el("div", "keytable"); var t = el("table", "grid"); t.appendChild(headRows(L)); kt.appendChild(t); wrap.appendChild(kt);
     var cs = el("div", "cards"); cs.setAttribute("data-n", String(n));
     GS.forEach(function (g) {
-      if (S.grp !== "flat") { var gh = el("div", "ghead", g.name); gh.setAttribute("data-group", g.key); gh.appendChild(el("span", "gc", nEp(g.rows.length))); cs.appendChild(gh); }
+      if (S.grp !== "flat") { var gh = grpName(g, "div", "ghead"); gh.setAttribute("data-group", g.key); gh.appendChild(el("span", "gc", nEp(g.rows.length))); cs.appendChild(gh); }
       g.rows.forEach(function (r) {
         var cd = el("div", "card"); cd.setAttribute("data-ep", r.id); if (S.open === r.id) cd.setAttribute("data-sel", "true"); if (lit && !lit(r)) cd.setAttribute("data-dim", "true");
         cd.appendChild(idCell(r)); var cbs = el("div", "cbs");
@@ -809,15 +864,11 @@
   function cIfk(k) { return vTxt(vIco(vc("ifk", k, k), (EN.ifk[k] || {}).icon || EF.alarm.vals._other.icon), k); }
   function cLife(d) { var c = vc("life", d, d); c.style.setProperty("--vcc", EN.life[d] || "var(--muted)"); c.textContent = d; return c; }
   function cDir(d) { var e = EN.dir[d], c = vc("dir", d, e.long, "jdrw"); c.style.setProperty("--rwc", e.col); return vTxt(vIco(c, e.icon), e.chip); }
-  /* a role chip wears the station's glyph of what plays the role (a function, a hook): the lab's filled chip is also the channel's
-     and the direction's, and a role shares a colour with a channel (GATE · RW) — the glyph tells them apart (D-043's revisit) */
-  function cRole(ro) { var e = EN.role[ro], c = vc("role", ro, ro, "jdrw"); c.style.setProperty("--rwc", e.col); return vTxt(vIco(c, EF.role.icon), e.chip); }
-  function cHrole(h) { var e = EN.hrole[h], c = vc("hrole", h, h, "jdrw"); c.style.setProperty("--rwc", e.col); return vTxt(vIco(c, EF.hrole.icon), h); }
-  /* the role a function or a hook plays, by the key its item carries — a chip after it, or nothing when the facts hold none */
-  function roleOf(r, key) { var ro = key && r.ro ? r.ro[key] : null; return !ro ? null : EN.role[ro] ? cRole(ro) : EN.hrole[ro] ? cHrole(ro) : null; }
-  function withRole(node, r, key) { var ch = roleOf(r, key); return ch ? frag(node, " ", ch) : node; }
-  function cMethod(m) { var c = vc("method", m, m); c.style.setProperty("--vcc", "var(--m-" + m + ")"); c.textContent = m; return c; }
-  function cEnt(e) { var c = vc("ent", e, e), ic = uIco(UL.faceIco); ic.style.color = UL.hue[e] || "var(--muted)"; c.appendChild(ic); return vTxt(c, e); }
+  /* D-052: a function's role, a hook's role and an endpoint's method are no longer chips of their own — each is the station's label
+     at the end of the element that wears it (skDeco, one glyph + one label, never drawn twice). A method a piece's sentence names
+     is the same label; the entity is the station's entity glyph in that entity's own colour */
+  function cMethod(m) { return SK.badge.method && SK.badge.method[m] ? skSub("method", m) : el("span", null, m); }
+  function cEnt(e) { var c = vc("ent", e, e); c.appendChild(skGlyph("entity", e)); return vTxt(c, e); }
   /* a family of my proposal: its value's icon from the words file, the feed's own word as its text */
   function cMine(f, v, text, n) { var x = EF[f].vals[v] || EF[f].vals._other; return vTxt(vIco(vc(f, v, text || v), x && x.icon), text || v, n); }
   function cAlarm(id) { return cMine("alarm", id); }
@@ -848,8 +899,7 @@
       ["status", ["1", "2", "3", "4", "5"].map(function (q) { var c = cStatus(q + "00"); c.textContent = q + "xx"; c.setAttribute("data-vv", q + "xx"); c.setAttribute("aria-label", EF.status.vals[q].name); return c; })],
       ["fate", D.fates.map(function (f) { return cFate(f); })], ["piece", D.pieceWords.map(function (w) { return cPiece(w); })],
       ["ifk", Object.keys(EN.ifk).filter(function (k) { return ifk[k]; }).map(cIfk)], ["life", Object.keys(EF.life.vals).filter(function (k) { return life[k]; }).map(cLife)],
-      ["dir", Object.keys(EN.dir).map(cDir)], ["role", Object.keys(EN.role).map(cRole)], ["hrole", Object.keys(EN.hrole).map(cHrole)],
-      ["method", METHODS.map(cMethod)], ["ent", Object.keys(UL.hue).map(cEnt)],
+      ["dir", Object.keys(EN.dir).map(cDir)], ["ent", ROWS.map(function (r) { return r.ent; }).filter(function (e, i, a) { return e && a.indexOf(e) === i; }).sort().map(cEnt)],
       ["switch", Object.keys(EF.switch.vals).map(function (v) { return cMine("switch", v); })], ["alarm", D.families.map(cAlarm)],
       ["arm", Object.keys(EF.arm.vals).filter(function (v) { return v !== "_other"; }).map(function (v) { return cMine("arm", v); })],
       ["branch", Object.keys(EF.branch.vals).filter(function (v) { return v !== "_other"; }).map(function (v) { return cMine("branch", v); })],
@@ -859,12 +909,31 @@
     fams.forEach(function (x) { var f = x[0], e = EF[f], row = el("div", "ekr"); row.setAttribute("data-fam", f);
       row.appendChild(el("span", "ekn", e.name)); var vs = el("span", "ekv"); x[1].forEach(function (c) { vs.appendChild(c); });
       var mine = e.ico === "mine" || e.col === "mine"; vs.appendChild(el("span", "ekf" + (mine ? " mine" : ""), lookWords(e))); row.appendChild(vs); box.appendChild(row); });
+    box.insertBefore(skKey(), box.children[1]);             /* D-052: what the station draws, first */
     return box; }
+  /* D-052's key: each of this page's kinds the station draws, its glyph and the station's word for it, the labels its kind can wear,
+     how many this page names, and the reason where the mapping is my proposal; then the kinds the station draws no node for */
+  function skKey() { var box = el("div", "skkey"); box.id = "skkey"; var ST = W.station; box.appendChild(el("p", "ekt", ST.plain)); var not = [];
+    Object.keys(ST.map).forEach(function (pk) { var m = ST.map[pk], t = SK.tally[pk] || [0, 0];
+      /* the station kinds this page kind's keys ARE drawn as (a fixed kind, the frontend's own kinds, or a setting that is a flag's alias) */
+      var sks = m.to && m.to !== "fe" ? [m.to] : Object.keys(SK.kinds).filter(function (k) { return Object.keys(SK.keys).some(function (K) { return K.indexOf(pk + ":") === 0 && SK.keys[K][0] === k; }); });
+      if (!sks.length) { not.push(W.el.kinds[pk] || pk); return; }
+      var row = el("div", "skr"); row.setAttribute("data-kind", pk);
+      var ents = m.to === "entity" ? Object.keys(SK.keys).filter(function (K) { return SK.keys[K][2]; }).map(function (K) { return SK.keys[K][2]; }).sort() : [null];
+      sks.forEach(function (k) { ents.forEach(function (e) { row.appendChild(skGlyph(k, e, pk)); }); row.appendChild(el("span", "skt2", SK.kinds[k].t));   /* an entity: its glyph in each entity's colour */
+        (SK.on[k === "view" ? "" : k] || []).forEach(function (f) { Object.keys(SK.badge[f]).forEach(function (v) { row.appendChild(skSub(f, v)); }); }); });
+      row.appendChild(el("span", null, "← " + (W.el.kinds[pk] || pk) + " · " + fill(ST.count, { n: t[1], of: t[0] })));
+      if (m.mine) { var mk = el("span", "mine", ST.mine); row.appendChild(mk); }
+      row.appendChild(el("span", "skw", m.why));
+      if (m.to === "entity" && SK.same.length) row.appendChild(el("span", "skw", fill(ST.same, { v: SK.same.map(function (g) { return g.join(" = "); }).join(" · ") })));
+      box.appendChild(row); });
+    box.appendChild(el("p", "sknot", ST.card));
+    box.appendChild(el("p", "sknot", fill(ST.not, { v: not.join(" · ") }))); return box; }
   function lookWords(e) { return ["col", "ico", "txt"].filter(function (x) { return e[x]; }).map(function (x) { return W.enc.look[x] + ": " + W.enc.from[e[x]]; }).join(" · "); }
-  function vcPlain(f, v) { var e = EF[f] || {}, s = String(v);
+  function vcPlain(f, v) { var e = EF[f] || {}, s = String(v); if (SK.desc[f] && SK.desc[f][v]) return SK.desc[f][v];   /* a station label: the station's own words */
     if (f === "kind") return (W.kinds[v] || {}).plain; if (f === "stage") return W.stages[v]; if (f === "fate") return (W.fates[v] || {}).plain;
     if (f === "piece") return (W.pieceWords[v] || {}).plain; if (f === "status") return (e.vals[s.charAt(0)] || {}).plain;
-    if (f === "ifk" || f === "dir" || f === "role" || f === "hrole" || f === "method") return (EN[f][v] || {}).plain;
+    if (f === "ifk" || f === "dir") return (EN[f][v] || {}).plain;
     if (f === "alarm") return EN.says[v]; if (f === "ent" || f === "limit") return e.plain;
     if (f === "rule") return s.charAt(0) === "_" ? null : (e.groups[EN.rule[v] || "other"] || {}).name;
     if (f === "does") return ((e.vals || {})[v] || {}).plain || EN.does[v];
@@ -893,17 +962,17 @@
         if (kw && nm === kw) nm = ""; else if (kw && nm.slice(-(kw.length + 3)) === " (" + kw + ")") nm = nm.slice(0, -(kw.length + 3));
         return frag(kw ? cKind(kn) : null, nm ? " " + nm + " " : " ", kd(cStatus(f[1]), dk.fates[i]), " ", cFate(f[2])); }); more(b, d.fates); }
     else if (k === "guards") { list(b, d.guards.items, function (g, i) { return frag(kd(cStatus(g[0]), dk.guards[i][2]), " · " + g[1]); }, dk.guards.map(function (x) { return [x[0]].concat(x[1]); })); more(b, d.guards); }
-    else if (k === "gates") keyedJoin(b, d.gates.map(function (g, i) { return withRole(ksp(g, dk.gates[i]), r, dk.gates[i]); }).map(function (f) { var sp = el("span"); sp.appendChild(f); return sp; }), [], ", ");
+    else if (k === "gates") keyedJoin(b, d.gates, dk.gates, ", ");
     else if (k === "limits") keyedJoin(b, d.limits.map(cLimit), dk.limits, " ");
     else if (k === "request") { if (d.request) b.appendChild(frag(cDir("in"), " ", ksp(d.request[0], dk.request), " · " + d.request[1].join(", "))); else b.textContent = W.panel.none; }
     else if (k === "response") { if (d.response) b.appendChild(frag(cDir("out"), " ", ksp(d.response[0], dk.response), " · " + d.response[1])); else b.textContent = W.panel.none; }
     else if (k === "cases") { var qs = Object.keys(d.cases); if (qs.length) b.appendChild(chips(qs.map(function (q) { return cRule(q, d.cases[q]); }))); else b.textContent = W.panel.none; }
-    else if (k === "deciders") { list(b, d.deciders.items, function (f, i) { return withRole(document.createTextNode(f), r, dk.deciders[i]); }, dk.deciders); more(b, d.deciders); }
+    else if (k === "deciders") { list(b, d.deciders.items, function (f) { return f; }, dk.deciders); more(b, d.deciders); }
     else if (k === "switches") keyedJoin(b, d.switches.items.map(function (x) { var sp = el("span"); sp.appendChild(cMine("switch", x[0])); if (x[1]) sp.appendChild(document.createTextNode(" " + x[1])); return sp; }), dk.switches.map(function (x) { return [x[0]].concat(x[1]); }), " · ");
     else if (k === "behind") { b.textContent = d.behind[0] + " · " + d.behind[1]; kd(b, dk.behind, false); }   /* it counts the callees the card names (D-042) */
     else if (k === "proof") b.textContent = fill(P.proofWords, { n: d.proof.tested + "/" + d.proof.produced, v: d.proof.rank + (d.proof.rank_to !== d.proof.rank ? "–" + d.proof.rank_to : ""), of: d.proof.of });
     else if (k === "inflight") { list(b, d.inflight.items, function (f) { return frag(cIfk(f[0]), " " + f[1] + " ", cLife(f[2])); }, dk.inflight); more(b, d.inflight); }
-    else if (k === "hook") { if (d.hook) b.appendChild(withRole(ksp(d.hook, dk.hook), r, dk.hook)); else b.textContent = W.panel.none; }
+    else if (k === "hook") { if (d.hook) b.appendChild(ksp(d.hook, dk.hook)); else b.textContent = W.panel.none; }
     else if (k === "screens") b.textContent = String(d.screens);
     else if (k === "reasons") { list(b, d.reasons.items, function (x, i) { var at = String(x[0] || ""), c = at.lastIndexOf(":");   /* the site's file is its own element */
         return frag(dk.reasons[i][1] && c > 0 ? ksp(at.slice(0, c), dk.reasons[i][1]) : at, dk.reasons[i][1] && c > 0 ? at.slice(c) : null,
@@ -920,10 +989,10 @@
   function headPair(k, r) { var cm = W.codemap.head[k], P = W.panel, hk = r.hk[k];
     var val = k === "method" ? r.m + " " + r.p : k === "handler" ? r.fn + " · " + r.file + ":" + r.line : k === "entity" ? r.ent : k === "segment" ? r.seg : r.declared;
     var o = pairEl("h:" + k, cm.attrs, cm.icon, cm.label || P[k], false), pv = el("div", "pv", k === "handler" || val == null || val === "" ? null : String(val));
-    if (k === "handler") pv.appendChild(frag(withRole(ksp(r.fn, hk[0]), r, hk[0]), " · ", ksp(r.file, hk[1]), ":" + r.line));   /* the handler is a function and a file (D-041) */
+    if (k === "handler") pv.appendChild(frag(ksp(r.fn, hk[0]), " · ", ksp(r.file, hk[1]), ":" + r.line));   /* the handler is a function and a file (D-041) */
     else if (val == null || val === "") pv.textContent = W.panel.none;
     else { kd(pv, hk);                                          /* D-043: the method, the entity and the declared status as chips */
-      if (k === "method") { pv.textContent = ""; pv.appendChild(frag(cMethod(r.m), " " + r.p)); }
+      if (k === "method") pv.textContent = r.p;                 /* D-052: the endpoint's glyph and its method label come from skAll */
       else if (k === "entity") { pv.textContent = ""; pv.appendChild(cEnt(r.ent)); }
       else if (k === "declared") { pv.textContent = ""; pv.appendChild(cStatus(r.declared)); } }
     o.box.appendChild(pv); return o.pr; }
@@ -1037,7 +1106,7 @@
   function renderOne() {
     var r = BYID[S.open]; if (!r) return; var P = W.panel, O = W.one;
     /* the face (D-038): which endpoint, and the two places to see it drawn — the lab and the Gabe Universe */
-    var hd = $("onehead"); hd.textContent = ""; var h = el("h3"); var m = el("span", "mth", r.m); m.style.color = "var(--m-" + r.m + ")"; h.appendChild(m); h.appendChild(document.createTextNode(" ")); h.appendChild(el("span", null, r.p)); hd.appendChild(h);
+    var hd = $("onehead"); hd.textContent = ""; var h = el("h3"); h.appendChild(el("span", null, r.p)); skEp(h, r); h.setAttribute("aria-label", r.id); hd.appendChild(h);   /* D-052 */
     hd.appendChild(linkBtn("lablink", "endpoint-lab.html?ep=" + slugOf(r.id), LABICON, P.labShort, fill(P.open, { ep: r.id }), "lablink"));
     var ul = linkBtn("unilink", uniHref(r), UNIICON, P.uniShort, fill(P.openUni, { ep: r.id }), "unilink");
     if (r.nu) { ul.setAttribute("aria-disabled", "true"); ul.removeAttribute("href"); }
@@ -1074,6 +1143,7 @@
       var ps = el("div", "pairs"); byG[g].forEach(function (pr) { var gs = pr.getAttribute("data-attr").split(" ").map(function (a) { return gapSet[a]; });
         if (gs.indexOf("true") >= 0) pr.setAttribute("data-gap", "true"); else if (gs.indexOf("part") >= 0) pr.setAttribute("data-gap", "part"); ps.appendChild(pr); });
       bx.appendChild(ps); C.appendChild(bx); });
+    skAll(C);                                                 /* D-052: every element the code map names, drawn the station's way */
     /* MIDDLE · the gaps, my reading, in the direction chosen at its top (D-040) */
     var G = $("ocol-gaps"); G.textContent = ""; G.setAttribute("data-ep", r.id); G.setAttribute("data-dir", GD); var gh = colH(O.gaps.title, "skip"); var mine = el("span", "mine", O.gaps.mine); mine.setAttribute("data-tip", "mine"); gh.appendChild(mine); G.appendChild(gh);
     var dr = el("div", "opts gdir"); dr.setAttribute("role", "radiogroup"); dr.setAttribute("aria-label", O.gaps.dir.label);
@@ -1105,7 +1175,8 @@
       if (g[2]) { var um = el("div", "gap gunm", O.gaps.unmapped); um.setAttribute("data-row", g[0]); um.setAttribute("data-tip", "rgap"); um.setAttribute("data-gw", "b|" + gi + "|u"); bx.appendChild(um); }
       g[1].forEach(function (a, i) { var it = el("div", "gap", D.attrs[a].label); it.setAttribute("data-attr", a); it.setAttribute("data-row", g[0]); it.setAttribute("data-tip", "rgap"); it.setAttribute("data-gw", "b|" + gi + "|a|" + i); bx.appendChild(it); });
       if (g[3].length) { var fs = el("div", "gfacts");
-        g[3].forEach(function (f, i) { var c = el("span", "gfact", f); c.setAttribute("data-fact", f); c.setAttribute("data-row", g[0]); c.setAttribute("data-tip", "rfact"); c.setAttribute("data-gw", "b|" + gi + "|f|" + i); if (i >= FCAP) c.hidden = true; fs.appendChild(c); });
+        g[3].forEach(function (f, i) { var c = skDeco(el("span", "gfact", f), (g[4] || [])[i]); c.setAttribute("data-fact", f);   /* D-052: its station glyph and label, */
+          [].forEach.call(c.querySelectorAll("[data-tip]"), function (x) { x.removeAttribute("data-tip"); });              /* under the gap's own hover (D-044) */ c.setAttribute("data-row", g[0]); c.setAttribute("data-tip", "rfact"); c.setAttribute("data-gw", "b|" + gi + "|f|" + i); if (i >= FCAP) c.hidden = true; fs.appendChild(c); });
         if (g[3].length > FCAP) { var mb = el("button", "gfmore", fill(O.gaps.rmore, { n: g[3].length - FCAP })); mb.type = "button";
           mb.addEventListener("click", function () { [].forEach.call(fs.querySelectorAll(".gfact[hidden]"), function (x) { x.hidden = false; }); mb.remove(); }); fs.appendChild(mb); }
         bx.appendChild(fs); }
@@ -1146,7 +1217,7 @@
       (rowKeys(r).T[K] || []).forEach(function (c) { var t = c === "id" ? (e.querySelector("td.id") || e.querySelector(".idc")) : e.querySelector('[data-col="' + c + '"]');
         if (t && c !== "id") t = t.closest("td") || t.closest(".cc") || t; if (t) t.setAttribute("data-elcell", "true"); }); });
     $("elchip").hidden = !K;
-    if (K) $("elsays").textContent = fill(W.el.says, { name: elName(K), kind: elKind(K), n: n }) + (nCol ? "" : " · " + W.el.noCol);
+    if (K) { skSay($("elsays"), W.el.says, { name: elName(K), kind: elKind(K), n: n }, K); if (!nCol) $("elsays").appendChild(document.createTextNode(" · " + W.el.noCol)); }
     /* THE TWO COLUMNS: what is hidden behind a "+N more" or another tab is shown first, then every node that IS it is outlined */
     [["ocol-uni", "el-uni", "uni"], ["ocol-cm", "el-cm", "cm"]].forEach(function (x) { var col = $(x[0]), say = $(x[1]); if (!col) return;
       col.querySelectorAll(".elon").forEach(function (e) { e.classList.remove("elon"); });
@@ -1159,14 +1230,14 @@
          it (D-041) but does not name it — then the line says why, from the reasons the generator read (r.nr) */
       if (x[2] === "cm") { var named = hits.filter(function (e) { return e.getAttribute("data-key") === K; }).length;
         say.setAttribute("data-here", named ? "true" : "false");
-        if (named) say.textContent = fill(W.el.here, { name: elName(K), kind: elKind(K), n: hits.length }); else elWhy(say, BYID[S.open], K); return; }
+        if (named) skSay(say, W.el.here, { name: elName(K), kind: elKind(K), n: hits.length }, K); else elWhy(say, BYID[S.open], K); return; }
       say.setAttribute("data-here", hits.length ? "true" : "false");
-      say.textContent = hits.length ? fill(W.el.here, { name: elName(K), kind: elKind(K), n: hits.length }) : fill(W.el.not, { name: elName(K), kind: elKind(K), place: W.el.places[x[2]] }); });
+      skSay(say, hits.length ? W.el.here : W.el.not, { name: elName(K), kind: elKind(K), n: hits.length, place: W.el.places[x[2]] }, K); });
     REFH.m = REFH.f = null; elPins();          /* the line was drawn again: its links are new */
   }
   /* the reasons, each a word (its hover says what it means) and, where it names a code-map field, a link to that field (D-042) */
   function elWhy(say, r, K) { var WY = W.el.why, nr = r && r.nr ? r.nr[K] : null;
-    say.textContent = fill(WY.head, { name: elName(K), kind: elKind(K) });
+    skSay(say, WY.head, { name: elName(K), kind: elKind(K) }, K);
     (nr || (r && elHeld(r, K) ? [] : [["none", []]])).forEach(function (x) { var seg = el("span", "elwhy"), nm = el("b", null, WY.codes[x[0]].name);
       seg.setAttribute("data-why", x[0]); nm.setAttribute("data-tip", "elwhy"); nm.setAttribute("data-why", x[0]); seg.appendChild(nm);
       if (x[0] === "cnt" || x[0] === "alt") x[1].forEach(function (ref) { var t = refTarget(ref), b = el("button", "elref", t && t.querySelector(".pk") ? t.querySelector(".pk").textContent : ref);
@@ -1273,9 +1344,13 @@
       if (px) return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.partly) + "<span class=ln>" + esc(fill(W.one.gaps.partlyTip, { names: px[3].join(", "), n: px[1], of: px[2] })) + "</span>" + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>";
       return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.shows) + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>"; }
     if (kind === "copycmd") return esc(W.panel.copy);
+    if (kind === "sk") { var sk0 = t.getAttribute("data-sk"), sx = SK.kinds[sk0] || {}, pk0 = t.getAttribute("data-pk"), sm = pk0 && W.station.map[pk0];
+      var own = sm && pk0 === "setting" && sk0 === "flag" ? W.station.alias : sm && sm.mine ? fill(W.station.mineTip, { why: sm.why }) : null;   /* where the pairing is not the station's own, say whose it is */
+      return "<b>" + esc(sx.t) + "</b> · " + esc(sk0 === "entity" ? W.station.drawnEnt : W.station.drawn) + "<span class=pl>" + esc(W.station.glyph) + "</span>" + (own ? "<span class=pl>" + esc(own) + "</span>" : "") + "<span class=pl>" + esc(W.station.card) + "</span>"; }
     /* D-043: a value chip — its words, its family, what it means, and where its look is read (an element's hover: a little richer) */
     if (kind === "vc") { var vf = t.getAttribute("data-vc"), vv = t.getAttribute("data-vv"), ve = EF[vf], vp = vcPlain(vf, vv);
-      return "<b>" + esc(t.getAttribute("aria-label")) + "</b> · " + esc(ve.name) + (vp ? "<span class=pl>" + esc(vp) + "</span>" : "") + "<span class=pl>" + esc(lookWords(ve)) + "</span>"; }
+      return "<b>" + esc(t.getAttribute("aria-label")) + "</b> · " + esc(ve.name) + (vp ? "<span class=pl>" + esc(vp) + "</span>" : "") + "<span class=pl>" + esc(lookWords(ve)) + "</span>"
+        + (t.getAttribute("data-nonode") === "true" ? "<span class=pl>" + esc(W.station.nonode) + "</span>" : ""); }
     if (kind === "block") { var key = t.getAttribute("data-block"), b = key === "_shared" ? W.sharedBlock : BLK[key]; return "<b>" + esc(b.name) + "</b><span class=pl>" + esc(fill(b.plain)) + "</span><span class=pl>" + esc(markWords(key)) + "</span>"; }
     if (kind === "bin") { var bn = BINS[c.id].filter(function (x) { return x.key === t.getAttribute("data-bin"); })[0];
       return "<b>" + esc(c.head) + "</b> · " + esc(fill(W.strip, { n: bn.n, of: N, what: bn.what })) + "<span class=pl>" + esc(W.stripHint) + "</span>"; }
