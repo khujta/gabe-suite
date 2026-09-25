@@ -4,6 +4,9 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Board · {{PROJECT_NAME}} Command Center</title>
 <link rel="stylesheet" href="assets/a3.css">
+<link rel="stylesheet" href="assets/_pane.css">
+<link rel="stylesheet" href="assets/_pane-console.css">
+<link rel="stylesheet" href="assets/seats.css">
 <!-- the in-flight projection (write-inflight.py, E8 beat tail) — a script sibling
      because file:// kills fetch(); missing file = silent 404. Loaded BEFORE board.js
      so board.js's load-time current-beat banner (renderNow) sees window.GABE_INFLIGHT
@@ -14,6 +17,21 @@
 <script src="assets/a3-lightbox.js" defer></script>
 <script src="assets/rowclick.js" defer></script>
 <script src="assets/board.js" defer></script>
+<!-- the SEATS (D-043 · D-046): the feeds, the pane runtime in its load order (_grammar before _slice,
+     which captures it; _pane-console after _pane, which it wraps), then the boot. All deferred and
+     AFTER board.js, so the cards are interactive before ~3 MB of picture parses; a missing file is a
+     silent 404 that seats.js names in the seat head. One pane per seat = one WebGL context. -->
+<script src="c4-graph.js" defer></script>
+<script src="commits.js" defer></script>
+<script src="workflows.js" defer></script>
+<script src="spine.js" defer></script>
+<script src="assets/3d-bundle.js" defer></script>
+<script src="assets/_grammar.js" defer></script>
+<script src="assets/_slice.js" defer></script>
+<script src="assets/_uni-grammar.js" defer></script>
+<script src="assets/_pane.js" defer></script>
+<script src="assets/_pane-console.js" defer></script>
+<script src="assets/seats.js" defer></script>
 </head>
 <body>
 <!-- STATION: Board — every OPEN move in the project as a card, re-columned six ways,
@@ -21,9 +39,12 @@
      when the files move, nothing is draggable, nothing is stored (operator ruling
      2026-07-25). Generators fill {{BOARD_KPIS}} · {{PHASE_STRIP}} + {{PHASE_JSON}} (the
      click-for-detail payload) · {{BOARD_MODES}} · {{BOARD_FILTERS}} · {{BOARD_BOARDS}}
-     (one .bboard per framing; assets/board.js shows one and filters across all).
+     (one .bboard per framing; assets/board.js shows one and filters across all) ·
+     {{BOARD_SEATS}} (the spine strip + the commit picker, markup only — _a3_seats; the data
+     rides commits.js + spine.js, the boot assets/seats.js).
      SOURCES: .kdbp/PLAN.md · PENDING.md + archive/PENDING-resolved_*.md · LEDGER.md ·
-     walks.jsonl · SCOPE.md §Phases | ROADMAP.md · adoption.json · archmap.json. -->
+     walks.jsonl · SCOPE.md §Phases | ROADMAP.md · adoption.json · archmap.json · the seats:
+     git log (commits.js) + LEDGER.md and archive/LEDGER*.md (spine.js). -->
 <div class="app">
 
 <!-- ============ SIDEBAR — the STATION SET is invariant and ships here (colored groups +
@@ -80,6 +101,7 @@
     <div class="subjecthead">
       <div class="pagehead">
         <h1>{{BOARD_TITLE}}</h1>
+        {{BOARD_SEATS}}
         <p>{{BOARD_LEDE}}</p>
       </div>
       <div class="kpis">{{BOARD_KPIS}}</div>  <!-- phases done/total · current phase · owed cells by kind -->

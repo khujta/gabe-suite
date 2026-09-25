@@ -1,0 +1,39 @@
+/* seats.css — the board's SEATS (D-043): the labelled strip, the commit picker in its head, the spine grid.
+   On the centre's own tokens (a3.css), so the strip follows [data-theme="dark"]; the pane inside keeps its
+   dark ground (Q9 — _pane.css / _pane-console.css, tokens on .seat .pn, .seat .pnc, never on .seat). */
+.seats{ display:flex; flex-direction:column; gap:14px; margin:14px 0 16px; }
+.seat{ padding:12px 14px 14px; border:1px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius:var(--radius); background:color-mix(in srgb, var(--accent) 5%, var(--surface)); color:var(--ink); }
+.seat .seat-hd{ display:flex; align-items:baseline; gap:10px; margin-bottom:10px; font:12px/1.3 ui-monospace, Menlo, monospace; }
+.seat .seat-hd b{ font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); white-space:nowrap; }
+.seat .seat-hd span{ color:var(--ink-2); min-width:0; }
+.seat .seat-row{ display:block; font:12px/1.45 ui-monospace, Menlo, monospace; color:var(--ink-2); }
+.seat .seat-hd select.seat-pick{ margin-left:auto; max-width:min(60%, 520px); font:12px/1.3 ui-monospace, Menlo, monospace;
+  padding:4px 8px; border-radius:6px; border:1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+  background:var(--surface); color:var(--ink); cursor:pointer; }
+.seat .seat-hd select.seat-pick:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+.seat.flash{ box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 55%, transparent); transition:box-shadow .2s; }
+
+/* THE SPINE STRIP: red · execute · review · commit · push — each column one beat's ledger, newest first */
+.seat[data-seat="spine"] .seat-row{ display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:10px; }
+.sp-col{ --bc:var(--accent); min-width:0; border:1px solid color-mix(in srgb, var(--bc) 45%, var(--line)); border-radius:8px;
+  background:var(--surface); padding:8px 10px 9px; display:flex; flex-direction:column; gap:6px; }
+.sp-col[data-beat="RED"]{ --bc:var(--bad); }
+.sp-col[data-beat="EXECUTE"]{ --bc:#0d6e78; }
+[data-theme="dark"] .sp-col[data-beat="EXECUTE"]{ --bc:#2dd4bf; }
+.sp-col[data-beat="REVIEW"]{ --bc:var(--warn); }
+.sp-col[data-beat="COMMIT"]{ --bc:var(--accent); }
+.sp-col[data-beat="PUSH"]{ --bc:var(--good); }
+.sp-col .sp-hd{ display:flex; align-items:baseline; gap:6px; font:700 11px/1.2 ui-monospace, Menlo, monospace; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--bc); }
+.sp-col .sp-hd .n{ margin-left:auto; font-weight:600; font-size:10px; color:var(--muted); letter-spacing:0; text-transform:none; }
+.sp-col select{ width:100%; font:11px/1.3 ui-monospace, Menlo, monospace; padding:4px 6px; border-radius:6px; border:1px solid var(--line);
+  background:var(--surface); color:var(--ink); cursor:pointer; }
+.sp-col .sp-fact{ font:11px/1.45 ui-sans-serif, system-ui, sans-serif; color:var(--ink-2); min-height:2.9em; }
+.sp-col .sp-fact b{ font-family:ui-monospace, Menlo, monospace; color:var(--ink); }
+.sp-col .sp-fact i{ display:block; font-style:normal; color:var(--muted); font-size:10.5px; margin-top:2px; }
+.sp-col .sp-live{ font:700 9.5px/1 ui-monospace, Menlo, monospace; letter-spacing:.06em; padding:2px 6px; border-radius:999px; align-self:flex-start; }
+.sp-col .sp-live.on{ color:var(--good); border:1px solid color-mix(in srgb, var(--good) 60%, transparent); }
+.sp-col .sp-live.off{ color:var(--muted); border:1px dashed var(--line); }
+.sp-col.empty{ opacity:.55; }
+@media (max-width:900px){ .seat[data-seat="spine"] .seat-row{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }

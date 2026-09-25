@@ -47,6 +47,7 @@ import _a3_homing  # noqa: E402  (the membership EVIDENCE — file · users · d
 import _a3_models  # noqa: E402  (the four entity models — claim · seeded · derived · proposed — views over the claim; nothing re-homes)
 import _a3_sim  # noqa: E402  (the live change-simulation projection — window.GABE_SIM)
 import _a3_commits  # noqa: E402  (recent git commits → the elements they touched — window.GABE_COMMITS)
+import _a3_seats  # noqa: E402  (the board's seats — the spine strip + the commit picker, markup only)
 import _a3_web  # noqa: E402  (the web→API bridge extractor — the fetch arm)
 import _a3_fe  # noqa: E402  (the frontend STRUCTURE arm — compiler-proven pieces + edges)
 import _a3_paths  # noqa: E402  (element FORMS — what each endpoint decides: refusals · declared vs produced exits · guards)
@@ -647,6 +648,9 @@ def render_board(archmap: dict) -> dict:
     strip, seq_json = _a3_board.phase_strip(plan)
     return {
         "{{BOARD_TITLE}}": "Board",
+        # the seats carry markup only; the data rides commits.js + spine.js (one refresh_feeds step),
+        # so this token is the board's alone — never SHARED, or every page would seat a pane
+        "{{BOARD_SEATS}}": _a3_seats.board_seats(cap=_a3_commits.N),
         "{{BOARD_LEDE}}": (
             f"Every open move in the project on one surface — so \u201cwhat\u2019s "
             f"next?\u201d is a choice instead of a question. {n_open} open cards "

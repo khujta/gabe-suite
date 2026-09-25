@@ -2746,6 +2746,122 @@ grep -q 'EvidenceNav.mount' "$WGP" \
 grep -qE 'census step\(s\)|census capture\(s\)|workflow census not captured|workflow census present but unreadable' "$WGP" \
   && bad "census-rows clean: an all-running census with shots on disk must mint ZERO census rows" || ok
 
+# --- the board SEATS (D-043 · D-046): the spine strip + the commit picker, mounted by {{BOARD_SEATS}} -----
+# MARKUP from _a3_seats, BEHAVIOUR from assets/seats.js, DATA from commits.js + spine.js. The browser half (what
+# the seats DO) is tests/embed-pane/seats.mjs; this half proves what a regen WRITES. Each predicate below is the
+# one its FIRE turns red on a mutated copy (a checker that cannot fail is non-evidence).
+seats_only_board() {  # $1 = centre dir: one spine seat + one commit seat on board.html; no other page seats a pane
+  [ "$(grep -o '<div class="seat" data-seat="commits"' "$1/board.html" | wc -l)" = 1 ] \
+    && [ "$(grep -o '<div class="seat" data-seat="spine"' "$1/board.html" | wc -l)" = 1 ] \
+    && ! grep -l 'class="seat"\|_pane\.js' $(ls "$1"/*.html | grep -v '/board\.html$') >/dev/null 2>&1
+}
+board_clean() { ! grep -q '{{' "$1/board.html" && ! grep -q 'file:///' "$1/board.html"; }  # no slot left, no machine path
+seat_assets() {  # the boot, its skin and the seven runtime files ship beside the board
+  for f in seats.js seats.css _grammar.js _slice.js _uni-grammar.js _pane.js _pane-console.js _pane.css _pane-console.css; do
+    [ -f "$1/assets/$f" ] || return 1
+  done
+}
+# EMPTY half, on FIX (no git, no .kdbp — both feeds are stubs): the board still carries both seats, whole
+FC4="$FIX/docs/site/center"
+seats_only_board "$FC4" && ok || bad "SEATS: board.html carries one spine + one commit seat, and no other page a seat or the pane runtime"
+board_clean "$FC4" && ok || bad "SEATS: board.html carries no {{TOKEN}} and no file:/// path"
+seat_assets "$FC4" && ok || bad "SEATS: seats.js, seats.css and the seven pane-runtime files ship in assets/"
+[ "$(gate "$FIX")" = 0 ] && ok || { bad "SEATS: the crawl gate must pass on the seated board (every src it loads resolves)"; tail -5 "$T/gate.out"; }
+if command -v node >/dev/null 2>&1; then
+  node "$GEN/verify_center_chrome.mjs" "$FC4" >"$T/chrome-fix.out" 2>&1 \
+    && ok || { bad "SEATS: the chrome harness must pass on the built centre"; grep '^FAIL' "$T/chrome-fix.out" | head -5; }
+else bad "SEATS: node is not on PATH — the chrome harness DID NOT RUN on the built centre"; fi
+# FIRE — a seated board whose boot never shipped: the crawl gate and the harness both NAME the file; the asset check fires
+NBF="$T/noboot"; rm -rf "$NBF"; cp -r "$FIX" "$NBF"; rm "$NBF/docs/site/center/assets/seats.js"
+[ "$(gate "$NBF")" != 0 ] && grep -q 'board.html: assets/seats.js' "$T/gate.out" \
+  && ok || { bad "SEATS FIRE: the crawl gate must name a missing assets/seats.js"; tail -5 "$T/gate.out"; }
+node "$GEN/verify_center_chrome.mjs" "$NBF/docs/site/center" >"$T/chrome-nb.out" 2>&1; _rc=$?
+[ "$_rc" = 1 ] && grep -q 'FAIL · board.html · asset resolves: assets/seats.js' "$T/chrome-nb.out" \
+  && ok || { bad "SEATS FIRE: the chrome harness must name a missing assets/seats.js (rc $_rc)"; grep '^FAIL' "$T/chrome-nb.out" | head -3; }
+seat_assets "$NBF/docs/site/center" && bad "SEATS FIRE: a centre missing assets/seats.js must fail the asset check" || ok
+# FIRE — the seats in a SHARED slot every page carries (the token itself lives on board.html alone, so moving
+# only the key into SHARED changes no byte): every page seats a pane, and the board-only check must say so
+GSH="$T/gen-shared"; rm -rf "$GSH"; cp -r "$GEN" "$GSH"
+python3 - "$GSH/build_center_a3.py" <<'PY'
+import sys; p = sys.argv[1]; s = open(p).read(); old = '    "{{SIDEBAR_LEAF}}": sidebar_leaf,\n'
+assert s.count(old) == 1, "the SHARED mutation anchor moved"
+open(p, "w").write(s.replace(old, '    "{{SIDEBAR_LEAF}}": sidebar_leaf + _a3_seats.board_seats(cap=_a3_commits.N),\n'))
+PY
+SHF="$T/fix-shared"; rm -rf "$SHF"; cp -r "$FIX" "$SHF"
+_rc=$(cd "$T" && GABE_REPO_ROOT="$SHF" GABE_SHELL_SRC="$SHELL_SRC" python3 "$GSH/build_center_a3.py" >"$T/build-shared.out" 2>&1; echo $?)
+[ "$_rc" = 0 ] && ! seats_only_board "$SHF/docs/site/center" \
+  && ok || { bad "SEATS FIRE: seats filled into a SHARED slot must seat every page — and be caught (build rc $_rc)"; tail -3 "$T/build-shared.out"; }
+# FIRE — a slot left unfilled / a machine path on the board
+BCF="$T/board-dirty"; rm -rf "$BCF"; mkdir -p "$BCF"; sed 's#<div class="seats"#{{BOARD_SEATS}}<div class="seats"#' "$FC4/board.html" >"$BCF/board.html"
+board_clean "$BCF" && bad "SEATS FIRE: a board with {{BOARD_SEATS}} left must fail the clean check" || ok
+sed 's#assets/seats.js#file:///home/x/seats.js#' "$FC4/board.html" >"$BCF/board.html"
+board_clean "$BCF" && bad "SEATS FIRE: a board loading a file:/// path must fail the clean check" || ok
+
+# FULL half — SEATFIX: mk_fixture + a git history (tests/embed-pane/seatfix.py: three commits touching src/api.py,
+# a LEDGER oldest-first and headerless with EXEC · EXECUTE · a duplicate · a `—` REVIEW proven by green@ · a
+# 7-char token · a token that is an inner piece of a sha · an archive row), at core.abbrev 8 and 7 — so `short` is 8
+# on one board and 7 on the other. Built under a HOSTILE global core.abbrev (12): the fixture pins its own, so a
+# machine whose ~/.gitconfig sets one builds the same two boards
+spine_ok() {  # spine_ok <centre dir> <short length> — exit 3 = the check failed (a traceback is NOT a fire)
+  python3 - "$1" "$2" <<'PY'
+import json, sys
+from pathlib import Path
+c, want = Path(sys.argv[1]), int(sys.argv[2])
+def need(cond, msg):
+    if not cond: print("    " + msg); sys.exit(3)
+cj = (c / "commits.js").read_text(encoding="utf-8"); sj = (c / "spine.js").read_text(encoding="utf-8")
+cs = json.loads(cj[len("window.GABE_COMMITS = "):-2]); sp = json.loads(sj[len("window.GABE_SPINE = "):-2])
+need(len(cs) == 3 and {len(x["short"]) for x in cs} == {want}, f"commits.js: 3 commits with a {want}-char short — {[x['short'] for x in cs]}")
+for b, es in sp["beats"].items():
+    ds = [e["date"] for e in es]
+    need(ds == sorted(ds, reverse=True), f"{b}: dates must never rise down the column — {ds}")
+    keys = [s[:7] for e in es for s in e["shas"]]
+    need(len(keys) == len(set(keys)), f"{b}: a commit sits in one entry per beat — {keys}")
+need(any(e["via"] == "gates" and e["sha"] for e in sp["beats"]["REVIEW"]), "REVIEW: the `—` row proven by green@<sha> must be kept")
+need(any("/archive/LEDGER-x.md:" in e["src"] for es in sp["beats"].values() for e in es), "the archive LEDGER's row must be read")
+need(len(sp["beats"]["EXECUTE"]) == 2, "EXEC and EXECUTE are one beat: two entries")
+need(len(sp["beats"]["PUSH"]) == 3, "PUSH: the ghost, the inner-piece token and the archived push — three entries")
+need([e["rows"] for e in sp["beats"]["COMMIT"]] == [2], "the commit logged twice (7 and 8 chars) folds into ONE entry of 2 rows")
+PY
+}
+HOSTILE="$T/gitconfig-abbrev12"; printf '[core]\n\tabbrev = 12\n' >"$HOSTILE"
+for _ab in 8 7; do
+  SF="$T/seatfix$_ab"; mk_fixture "$SF"
+  GIT_CONFIG_GLOBAL="$HOSTILE" python3 "$REPO/tests/embed-pane/seatfix.py" "$SF" --history --abbrev "$_ab" >/dev/null \
+    && [ "$(GIT_CONFIG_GLOBAL="$HOSTILE" build "$SF" "$SHELL_SRC")" = 0 ] && ok || { bad "SEATS (abbrev $_ab): the SEATFIX must build"; tail -5 "$T/build.out"; continue; }
+  grep -q "wrote docs/site/center/commits.js — 3 commit(s)" "$T/build.out" && grep -q "wrote docs/site/center/spine.js — 8 pinned commit(s)" "$T/build.out" \
+    && ok || { bad "SEATS (abbrev $_ab): the build log counts 3 commits and 8 spine entries"; grep "commits.js\|spine.js" "$T/build.out"; }
+  seats_only_board "$SF/docs/site/center" && board_clean "$SF/docs/site/center" && ok || bad "SEATS (abbrev $_ab): the seated board is whole"
+  [ "$(gate "$SF")" = 0 ] && ok || { bad "SEATS (abbrev $_ab): the crawl gate passes"; tail -3 "$T/gate.out"; }
+  node "$GEN/verify_center_chrome.mjs" "$SF/docs/site/center" >"$T/chrome-sf.out" 2>&1 && ok || { bad "SEATS (abbrev $_ab): the chrome harness passes"; grep '^FAIL' "$T/chrome-sf.out" | head -3; }
+  spine_ok "$SF/docs/site/center" "$_ab" && ok || bad "SEATS (abbrev $_ab): spine.js — newest first, one entry per commit per beat, green@ kept, archive read"
+done
+# FIRE — each spine rule on a mutated copy of the abbrev-8 feeds (must fail FOR ITS OWN REASON: exit 3 + its message)
+SPF="$T/spine-fire"
+spine_fire() {  # spine_fire <label> <expect> <python that edits `sp`>
+  rm -rf "$SPF"; mkdir -p "$SPF"; cp "$T/seatfix8/docs/site/center/commits.js" "$SPF/"
+  python3 - "$T/seatfix8/docs/site/center/spine.js" "$SPF/spine.js" "$3" <<'PY'
+import json, sys
+src, dst, edit = sys.argv[1:4]; head = "window.GABE_SPINE = "
+t = open(src, encoding="utf-8").read(); sp = json.loads(t[len(head):-2]); exec(edit)
+open(dst, "w", encoding="utf-8").write(head + json.dumps(sp) + ";\n")
+PY
+  spine_ok "$SPF" 8 >"$T/spine-fire.out" 2>&1; _rc=$?
+  [ "$_rc" = 3 ] && grep -qF -- "$2" "$T/spine-fire.out" && ok || { bad "SEATS spine FIRE $1 (rc $_rc)"; cat "$T/spine-fire.out"; }
+}
+spine_fire "a column read oldest first"   "dates must never rise"      'sp["beats"]["PUSH"].reverse()'
+spine_fire "one commit in two entries"    "a commit sits in one entry" 'sp["beats"]["COMMIT"].append(dict(sp["beats"]["COMMIT"][0], rows=1))'
+spine_fire "the green@ REVIEW dropped"    "proven by green@"           'sp["beats"]["REVIEW"] = []'
+spine_fire "the archive not read"         "archive LEDGER"             '[es.remove(e) for es in sp["beats"].values() for e in list(es) if "/archive/" in e["src"]]'
+spine_fire "the inner-piece token lost"   "three entries"              '[sp["beats"]["PUSH"].remove(e) for e in list(sp["beats"]["PUSH"]) if "mangled" in e["label"]]'
+# ...and the two boards really differ: the abbrev-7 feed read as abbrev 8 fails the short-length check
+spine_ok "$T/seatfix7/docs/site/center" 8 >"$T/spine-fire.out" 2>&1; _rc=$?
+[ "$_rc" = 3 ] && grep -q "8-char short" "$T/spine-fire.out" && ok || { bad "SEATS spine FIRE: the abbrev-7 feed must fail an 8-char short check (rc $_rc)"; cat "$T/spine-fire.out"; }
+# ...and the hostile global is real: the abbrev-7 fixture with its own pin removed writes git's %h at 12 — so the two
+# boards above read 8 and 7 because seatfix.py pins them, not because this machine has no global core.abbrev
+_h=$(cd "$T/seatfix7" && git config --unset core.abbrev && GIT_CONFIG_GLOBAL="$HOSTILE" git log -1 --format=%h; git config core.abbrev 7)
+[ "${#_h}" = 12 ] && ok || bad "SEATS FIRE: a fixture with no core.abbrev of its own must read the hostile global's 12 (got '$_h')"
+
 echo
 echo "center battery: $pass passed, $fail failed"
 [ "$fail" = 0 ] || exit 1

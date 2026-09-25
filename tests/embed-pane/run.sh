@@ -11,6 +11,14 @@
 #   HEADLESS (a real browser, tests/embed-pane/destroy.mjs over harness.html): the destroy contract —
 #     context lost (even when the dispose throws), canvases gone, nothing redraws after — and its FIRE:
 #     a no-op destroy turns the canvas and context asserts red.
+#   SEATS (a real browser, tests/embed-pane/seats.mjs over BUILT centres): the board's two seats on
+#     seatfix.py projects — git history at core.abbrev 8 and at 7, the plain project (no git: honest-empty),
+#     a copy without assets/3d-bundle.js (the seat names it), a copy whose commits.js is the empty stub
+#     beside a populated LEDGER — and its FIRE: one mutated copy per assert, all in ONE browser pass, each
+#     turning ITS assert red (a join on `short` · a substring join · the oldest preselected · the undrawable
+#     wording lost · the head never restored · the seats folded · a failed embed marked drawn · a spine head
+#     that invites a pick nothing can draw · no boot · the empty guard dropped · empty columns vanishing ·
+#     the spine bailing with the runtime).
 # No chrome or no Playwright is RED, not a skip: a checker that cannot run is not evidence (O14).
 # Exit 0 = all pass.
 set -u
@@ -129,8 +137,86 @@ if [ -x "$CHROME" ] && [ "$PW" = 1 ]; then
   if [ "$RC" != 0 ] && grep -q 'FAIL  D2' "$T/fire.out" && grep -q 'FAIL  D3' "$T/fire.out" && grep -q 'FAIL  D8' "$T/fire.out"; then ok
   else bad "headless FIRE: a no-op destroy must turn D2 (canvases), D3 and D8 (context lost) red (rc $RC)"; cat "$T/fire.out"; fi
   echo "  headless FIRE (no-op destroy): $(grep -c '  FAIL  ' "$T/fire.out") case(s) red — $(grep -o 'FAIL  D[0-9]' "$T/fire.out" | cut -c7- | tr '\n' ' ')"
+
+  # ── SEATS: the board's two seats on built centres (one browser, the pages in turn) ──
+  GEN="$REPO/templates/center/generators"
+  seatbuild() {   # seatbuild <name> <seatfix.py flags…> → a built centre at $T/<name>/docs/site/center
+    mkdir -p "$T/$1" && python3 "$HERE/seatfix.py" "$T/$1" "${@:2}" >/dev/null \
+      && (cd "$T" && GABE_REPO_ROOT="$T/$1" GABE_SHELL_SRC="$REPO/templates/center/shell" GABE_GRAFT_BUILD=0 \
+            python3 "$GEN/build_center_a3.py" >"$T/$1.build.out" 2>&1)
+  }
+  if seatbuild sf8 --project --history --abbrev 8 && seatbuild sf7 --project --history --abbrev 7 && seatbuild plain --project; then
+    ok
+    SF8="$T/sf8/docs/site/center"
+    cp -r "$SF8" "$T/nobundle"; rm "$T/nobundle/assets/3d-bundle.js"
+    cp -r "$SF8" "$T/stub"; cp "$T/plain/docs/site/center/commits.js" "$T/stub/commits.js"   # the honest-empty stub, the LEDGER kept
+    timeout 300 node "$HERE/seats.mjs" full="$SF8/board.html" full="$T/sf7/docs/site/center/board.html" \
+      empty="$T/plain/docs/site/center/board.html" missing="$T/nobundle/board.html" stub="$T/stub/board.html" >"$T/seats.out" 2>&1; RC=$?
+    cat "$T/seats.out"
+    [ "$RC" = 0 ] && ok || bad "seats: the board's seats failed on the built fixtures (rc $RC)"
+
+    # FIRE — one mutated copy per assert (never the source), all in one browser pass: each must turn ITS assert red
+    mutant() {   # mutant <tag> <base centre> <file in the copy> <old> <new> [<old> <new> …] — exact replacements, each once
+      rm -rf "$T/m-$1"; cp -r "$2" "$T/m-$1"
+      python3 - "$T/m-$1/$3" "${@:4}" <<'PY' || bad "fixture: the $1 mutation did not apply"
+import sys
+f, pairs = sys.argv[1], sys.argv[2:]
+s = open(f, encoding="utf-8").read()
+for old, new in zip(pairs[::2], pairs[1::2]):
+    if s.count(old) != 1: sys.exit(1)
+    s = s.replace(old, new)
+open(f, "w", encoding="utf-8").write(s)
+PY
+    }
+    PLAIN="$T/plain/docs/site/center"; HP_OLD='(live && !missing.length ? live + " drawable — pick a ● to draw it below" : "none drawable — " + why)'
+    mutant exact    "$SF8" assets/seats.js 'if (String(C[i].sha || "").toLowerCase().lastIndexOf(s, 0) !== 0) continue;' 'if (String(C[i].short || "").toLowerCase() !== s) continue;'
+    mutant substr   "$SF8" assets/seats.js '.toLowerCase().lastIndexOf(s, 0) !== 0) continue;' '.toLowerCase().indexOf(s) < 0) continue;'
+    mutant oldest   "$SF8" assets/seats.js '      pick(0, false);' '      pick(rows.length - 1, false);'
+    mutant wording  "$SF8" assets/seats.js '"in the feed" : "not in the feed";' '"in the feed" : "the feed stops";'
+    mutant nohead   "$SF8" assets/seats.js $'    function show(i) {\n      say(host, base);\n' $'    function show(i) {\n'
+    mutant fold     "$SF8" assets/a3.css '.desc-min .kpis{display:none}' '.desc-min .kpis{display:none} .desc-min .seats{display:none}'
+    mutant noretry  "$SF8" assets/seats.js 'cur = null; at = -1; row.innerHTML = ""; host.removeAttribute("data-picked");' \
+                                           'cur = null; at = i; row.innerHTML = ""; host.setAttribute("data-picked", cs[i].short);' \
+                                           $'        cur = null; at = -1; host.removeAttribute("data-picked");\n' ''
+    mutant headpick "$SF8" assets/seats.js "$HP_OLD" '"pick one to draw it below"'
+    mutant hpmiss   "$T/nobundle" assets/seats.js "$HP_OLD" '"pick one to draw it below"'
+    mutant hpstub   "$T/stub" assets/seats.js "$HP_OLD" '"pick one to draw it below"'
+    mutant noboot   "$PLAIN" assets/seats.js $'(function () {\n  var W = window;' $'(function () { return;\n  var W = window;'
+    mutant noguard  "$PLAIN" assets/seats.js '    if (!cs.length) {' '    if (false) {'
+    mutant vanish   "$PLAIN" assets/seats.js '    order.forEach(function (beat) {' '    order.filter(function (b) { return (S.beats[b] || []).length; }).forEach(function (beat) {'
+    mutant bail     "$T/nobundle" assets/seats.js '  if (sp) boot(sp, spine);' '  if (sp && !missing.length) boot(sp, spine);'
+    timeout 900 node "$HERE/seats.mjs" full@exact="$T/m-exact/board.html" full@substr="$T/m-substr/board.html" \
+      full@oldest="$T/m-oldest/board.html" full@wording="$T/m-wording/board.html" full@nohead="$T/m-nohead/board.html" \
+      full@fold="$T/m-fold/board.html" full@noretry="$T/m-noretry/board.html" full@headpick="$T/m-headpick/board.html" \
+      missing@hpmiss="$T/m-hpmiss/board.html" stub@hpstub="$T/m-hpstub/board.html" empty@noboot="$T/m-noboot/board.html" \
+      empty@noguard="$T/m-noguard/board.html" empty@vanish="$T/m-vanish/board.html" missing@bail="$T/m-bail/board.html" \
+      >"$T/seats-fire.out" 2>&1; RC=$?
+    fired() {    # fired <run> <assert prefix> <what the mutant did> — that run's assert is red
+      grep -qF "  FAIL  $1 $2" "$T/seats-fire.out" && ok || bad "seats FIRE ($1): $3 must turn '$2' red"
+    }
+    [ "$RC" != 0 ] && ok || bad "seats FIRE: the mutated copies must fail the run (rc $RC)"
+    fired full@exact    "S5 a ledger token of another length"          "a join on \`short\`"
+    grep -qF '  PASS  full@exact S2' "$T/seats-fire.out" && ok || bad "seats FIRE (full@exact): the page must still boot and draw — S5 red for its own reason"
+    fired full@substr   "S5 every spine ●/○ equals the prefix join"     "a SUBSTRING join (the inner-piece token lit)"
+    fired full@oldest   "S4 the spine holds GABE_SPINE.order"           "the oldest entry preselected"
+    fired full@wording  "S6 an undrawable spine pick"                   "the 'not in the feed' wording lost"
+    fired full@nohead   "S6 the changes picker restores its own head"   "a show() that never restores its head"
+    fired full@fold     "S7 folding the intro"                          "the seats folded with the intro"
+    fired full@noretry  "S8 an embed that throws"                       "a failed embed recorded as drawn"
+    fired full@noretry  "S8 picking the same commit again"              "a failed embed recorded as drawn"
+    fired full@headpick "S5 the spine head counts the drawable"         "a spine head that never counts"
+    fired missing@hpmiss "M3 the spine head says none is drawable"      "a spine head inviting a pick the runtime cannot draw"
+    fired stub@hpstub   "T2 the spine lists every entry"                "a spine head inviting a pick commits.js cannot draw"
+    fired empty@noboot  "S0 the seats booted"                           "a seats.js that never boots"
+    fired empty@noguard "E1 \"commits.js carries no commits\""          "the empty guard dropped"
+    fired empty@vanish  "E2 the spine keeps its five columns"           "empty columns vanishing"
+    fired missing@bail  "M2 the spine still renders every beat"         "a spine that bails with the runtime"
+    echo "  seats FIRE (one pass, $(grep -c '  ── ' "$T/seats-fire.out") mutated copies): $(grep -c '  FAIL  ' "$T/seats-fire.out") case(s) red — $(grep -o 'FAIL  [a-z]*@[a-z]* [A-Z][0-9]' "$T/seats-fire.out" | cut -c7- | sort -u | tr '\n' ' ')"
+  else
+    bad "seats: a seat fixture did not build"; tail -5 "$T"/*.build.out
+  fi
 else
-  bad "headless: RED — the destroy contract DID NOT RUN (chrome at $CHROME: $([ -x "$CHROME" ] && echo yes || echo no) · playwright: $([ "$PW" = 1 ] && echo yes || echo no))"
+  bad "headless: RED — the destroy contract and the seats DID NOT RUN (chrome at $CHROME: $([ -x "$CHROME" ] && echo yes || echo no) · playwright: $([ "$PW" = 1 ] && echo yes || echo no))"
   echo "         provision: a system chrome (or GABE_CHROME_BIN) + playwright: mkdir -p docs/design/graft-adoption/spike/_build && (cd \$_ && npm i playwright-core), then GABE_PW_DIR=<that>/node_modules/playwright-core (see tests/gabe-universe/run.sh)"
 fi
 
