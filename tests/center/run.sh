@@ -323,6 +323,45 @@ gate() { # $1 = fixture root; echoes exit code
 FIX="$T/fix"; mk_fixture "$FIX"
 [ "$(build "$FIX" "$SHELL_SRC")" = 0 ] && ok || { bad "builder: happy fixture must build (see $T/build.out)"; cat "$T/build.out"; }
 [ -f "$FIX/docs/site/center/feature-gadget.html" ] && ok || bad "builder: feature page written for carded entity"
+# COMMITS + SPINE feeds (_a3_commits.refresh_feeds): the fixture has no git and no .kdbp, so BOTH feeds are the stub — each
+# naming its reason, in the file and in the build log (an empty commits.js once went silent: one text for every cause).
+grep -q "⚠ commits.js honest-empty — no git" "$T/build.out" && grep -q "⚠ spine.js honest-empty — no .kdbp/LEDGER.md" "$T/build.out" \
+  && ok || { bad "FEEDS: the build log names why commits.js and spine.js are empty"; grep -i "commits.js\|spine.js" "$T/build.out"; }
+python3 - "$FIX/docs/site/center" <<'PY' && ok || bad "FEEDS: commits.js stub names 'no git'; spine.js is the stub (five empty beats + reason)"
+import json, sys; from pathlib import Path
+c = Path(sys.argv[1]); cj = (c / "commits.js").read_text(encoding="utf-8"); sj = (c / "spine.js").read_text(encoding="utf-8")
+assert cj.startswith("// commits honest-empty — no git") and cj.endswith("\nwindow.GABE_COMMITS = [];\n"), cj
+assert sj.startswith("window.GABE_SPINE = ") and sj.endswith(";\n"), sj
+sp = json.loads(sj[len("window.GABE_SPINE = "):-2])
+assert sp["reason"] == "no .kdbp/LEDGER.md" and sp["beats"] == {b: [] for b in ("RED", "EXECUTE", "REVIEW", "COMMIT", "PUSH")}, sp
+PY
+# ...and when the c4 derivation itself fails, the commits stub says THAT (not 'no git', not a NameError) and the build still exits 0
+GB="$T/gboom"; rm -rf "$GB"; cp -r "$FIX" "$GB"
+_gb=$(cd "$T" && GABE_REPO_ROOT="$GB" GABE_SHELL_SRC="$SHELL_SRC" python3 - "$GEN" >"$T/build-gboom.out" 2>&1 <<'PY'
+import sys, runpy; gen = sys.argv[1]; sys.path.insert(0, gen)
+import _a3_graph
+def boom(*a, **k): raise RuntimeError("c4 boom")
+_a3_graph.build_c4_graph = boom               # the graph never binds — the commits feed must still name why
+sys.argv = [gen + "/build_center_a3.py"]; runpy.run_path(gen + "/build_center_a3.py", run_name="__main__")
+PY
+echo $?)
+[ "$_gb" = 0 ] && grep -q "⚠ commits.js honest-empty — no graph (the c4 derivation failed)" "$T/build-gboom.out" \
+  && head -1 "$GB/docs/site/center/commits.js" | grep -qx "// commits honest-empty — no graph (the c4 derivation failed)" \
+  && ok || { bad "FEEDS: a failed c4 derivation reads 'no graph' in the log and the stub (exit $_gb)"; grep -i "commits.js\|c4-graph\|Traceback" "$T/build-gboom.out" | head; }
+# ...and should refresh_feeds ever break its never-raise contract, the build's belt-and-braces branch still writes BOTH stubs
+FB="$T/fboom"; rm -rf "$FB"; cp -r "$FIX" "$FB"
+_fb=$(cd "$T" && GABE_REPO_ROOT="$FB" GABE_SHELL_SRC="$SHELL_SRC" python3 - "$GEN" >"$T/build-fboom.out" 2>&1 <<'PY'
+import sys, runpy; gen = sys.argv[1]; sys.path.insert(0, gen)
+import _a3_commits
+def boom(*a, **k): raise RuntimeError("feeds boom")
+_a3_commits.refresh_feeds = boom              # the contract broken — the build must still leave two readable stubs
+sys.argv = [gen + "/build_center_a3.py"]; runpy.run_path(gen + "/build_center_a3.py", run_name="__main__")
+PY
+echo $?)
+[ "$_fb" = 0 ] && grep -q "⚠ commits.js + spine.js honest-empty (derivation skipped): feeds boom" "$T/build-fboom.out" \
+  && head -1 "$FB/docs/site/center/commits.js" | grep -qx "// commits honest-empty — commits derivation error: feeds boom" \
+  && grep -q '"reason":"spine derivation error: feeds boom"' "$FB/docs/site/center/spine.js" \
+  && ok || { bad "FEEDS: a raising refresh_feeds leaves both stubs naming the error (exit $_fb)"; grep -i "commits.js\|spine.js\|Traceback" "$T/build-fboom.out" | head; }
 # A9 (entity models, 2026-09-06): the build WIRES the four models — the report line names every view, the c4 block and the
 # levels slice share the head, the slice names what it dropped; a derivation error leaves BOTH files written with the honest
 # absence (stats.models.present False + the reason, no half-attached block) and the build still exits 0.
@@ -938,7 +977,7 @@ r = Path(sys.argv[1]); cfg = json.loads((r / "docs/site/center/center.config.jso
 assert cfg["project"] == {"name": "demo", "display_name": "Demo App", "lang": "en"}, cfg["project"]
 assert cfg["entities"] == {} and "_bootstrap" in cfg
 assert not (r / "docs/site/center/adoption.json").exists()
-gi = (r / ".gitignore").read_text(); assert "docs/site/center/sim.data.js" in gi and "scripts/__pycache__/" in gi
+gi = (r / ".gitignore").read_text().splitlines(); assert "docs/site/center/sim.data.js" in gi and "docs/site/center/spine.js" in gi and "scripts/__pycache__/" in gi
 PY
 python3 - "$BS" <<'PY'
 import json, sys; from pathlib import Path

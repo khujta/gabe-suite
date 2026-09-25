@@ -30,9 +30,9 @@ HONEST PROVENANCE — DERIVED vs left EMPTY (the station degrades per-field):
             invent them.
 
 DETERMINISM: byte-identical on an unchanged tree — no wallclock, sorted keys, git
-numbers are a function of (tree, head). sim.data.js is a beat-tail artifact, gitignored
-like inflight.{json,js}; the build seeds ``window.GABE_SIM = null`` when there is no
-change in flight.
+numbers are a function of (tree, head). sim.data.js is a regen-time projection (the
+build writes it; the beat tail never does), gitignored like inflight.{json,js}; the build
+seeds ``window.GABE_SIM = null`` when there is no change in flight.
 """
 from __future__ import annotations
 

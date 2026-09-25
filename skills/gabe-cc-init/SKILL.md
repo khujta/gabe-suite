@@ -4,7 +4,7 @@ description: "Brownfield command-center adoption — archive-never-delete init, 
 when_to_use: "An existing codebase needs a Testing Command Center, or /gabe-cc-update stopped you with its bootstrap pointer. NOT for a freshly shipped phase (/gabe-cc-update) or doc pages (/gabe-docsite)."
 disable-model-invocation: true
 metadata:
-  version: 1.4.1
+  version: 1.4.2
 ---
 
 # Gabe Adopt — the back-catalog, at human speed
@@ -35,7 +35,7 @@ This skill runs under the suite execution contract — E1 EVIDENCE · E2 RUN-BEF
 | Entity-model drafter (the `rank` third lens) | `~/.claude/skills/gabe-cc-update/scripts/draft-entities.py <root> [--json] [--model proposed\|derived] [--min N] [--naming <strategy>]` — projects the committed c4 `models` block into `docs/site/center/entities.draft.json` (a verdict per declared entity + named candidates + coverage); honest-empty ×4 |
 | URL-domain lens (the `rank` second lens) | `mcp__gabe-map__entity_shape`, fallback `~/.claude/skills/gabe-pulse/scripts/entity_shape.py .` |
 | The registry edit acceptance lands in | `docs/site/center/center.config.json` `entities.<slug>` — this skill has no scripts dir and gains none |
-| The init mode's bootstrap | `templates/center/generators/bootstrap_center.sh <repo>` (installed: `~/.claude/templates/gabe/center/generators/bootstrap_center.sh`) — archive-never-delete init: generators → `scripts/`, shell, `center.config.json` skeleton, the nine `.gitignore` seeds |
+| The init mode's bootstrap | `templates/center/generators/bootstrap_center.sh <repo>` (installed: `~/.claude/templates/gabe/center/generators/bootstrap_center.sh`) — archive-never-delete init: generators → `scripts/`, shell, `center.config.json` skeleton, the ten `.gitignore` seeds |
 
 ## Procedure
 

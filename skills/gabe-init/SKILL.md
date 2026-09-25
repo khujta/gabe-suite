@@ -4,7 +4,7 @@ description: "Project setup — creates .kdbp/, installs hooks, configures by pr
 when_to_use: "Set up KDBP, initialize the Gabe stack — human-initiated only; never auto-invoke."
 disable-model-invocation: true
 metadata:
-  version: 2.3.8
+  version: 2.3.9
 ---
 
 # Gabe Init — KDBP project scaffolder
@@ -26,7 +26,7 @@ One-command project setup wrapping three operations: (1) creates `.kdbp/` — BE
 3. If `.kdbp/` already exists, show where the project stands (`mcp__gabe-kdbp__kdbp_snapshot` — branch, phase table, open PENDING, last LEDGER rows; the `.kdbp/` files themselves when no server is registered), ask reset / update / skip and follow the mode routing table (each mode runs a fixed step sequence — reset: full create → CLAUDE.md → .gitignore seed → hooks → project type → readiness report; update: scan-missing → schema migration → hooks → condensed Update Report, skipping the full create/project-type steps).
 4. On create/reset: interview for project name, one-sentence domain, maturity, project type, tech stack; render `.kdbp/` files and root `CLAUDE.md` from the templates, substituting the interview answers; never overwrite existing user content.
 5. On update: diff the existing `.kdbp/` against the expected file/dir set, report present/missing/unrecognized, and on confirm create ONLY the missing items — never touch `BEHAVIOR.md`, `VALUES.md`, or any file with existing content. (The `~/.claude/gabe-arch/` lazy bootstrap is retired — gabe-arch is archived; existing user state is left untouched.)
-6. Seed `.gitignore` with the NINE step-1.8 entries (init-spec §1.8, the same list `bootstrap_center.sh` seeds): `.kdbp/reviews-archive/`, `.kdbp/.push-gate-ok`, `.kdbp/PULSE.jsonl`, `.kdbp/map-deltas.jsonl`, `.kdbp/map-deltas-rollup.jsonl`, `docs/site/center/inflight.json`, `docs/site/center/inflight.js`, `docs/site/center/sim.data.js`, `docs/site/center/commits.js` (idempotent, grep-before-append per entry) — local-only runtime artifacts (the three `center/` files are beat-tail projections whose `head`/newest-sha churns every commit; the two `map-deltas` files are the map↔grep delta accumulator emitted at red/execute/review and its swept rollup) that must never ride a commit.
+6. Seed `.gitignore` with the TEN step-1.8 entries (init-spec §1.8, the same list `bootstrap_center.sh` seeds): `.kdbp/reviews-archive/`, `.kdbp/.push-gate-ok`, `.kdbp/PULSE.jsonl`, `.kdbp/map-deltas.jsonl`, `.kdbp/map-deltas-rollup.jsonl`, `docs/site/center/inflight.json`, `docs/site/center/inflight.js`, `docs/site/center/sim.data.js`, `docs/site/center/commits.js`, `docs/site/center/spine.js` (idempotent, grep-before-append per entry) — local-only runtime artifacts (the five `center/` files are machine projections whose `head`, newest sha or newest LEDGER row churns every commit — inflight, commits and spine are refreshed at the beat tail, sim.data at regen; the two `map-deltas` files are the map↔grep delta accumulator emitted at red/execute/review and its swept rollup) that must never ride a commit.
 7. Check the 9 KDBP hooks in `~/.claude/settings.json`; install any missing ones from `~/.claude/templates/gabe/hooks.json` verbatim after a Y/n prompt — never compose hook JSON from memory.
 8. Create project-type-appropriate doc stubs (architecture.md, AGENTS_USE.md, SCALING.md, architecture-patterns.md, api.md, or README.md sections depending on agent-app / web-app / CLI / library), each carrying the `gabe-docs` standards-reference marker.
 9. Print the readiness report (reset/create) or Update Report (update mode).

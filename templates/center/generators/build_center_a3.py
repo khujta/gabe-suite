@@ -2223,6 +2223,7 @@ def main() -> int:
     # up; a deterministic build-time layout stamps x/y so the no-runtime-layout
     # render path needs no graph library under strict-CSP/file://. A derivation
     # bug must NOT blank the whole center, so it degrades LOUD (E3), never silent.
+    _graph = None                               # bound inside the try — the commits feed reads it after
     try:
         _gcolors = {s: R_MARKS.entity_color(s)
                     for s, c in amap.get("entities", {}).items() if c}
@@ -2412,9 +2413,10 @@ def main() -> int:
     # graph — DERIVED LIVE (_a3_sim, C2): when a change is in flight (inflight.json
     # active) it derives touched/blast/pieces/stages from inflight + archmap + git +
     # junit + PENDING; otherwise window.GABE_SIM=null and the station degrades to the
-    # plain map. sim.data.js is a beat-tail artifact, gitignored like inflight.{json,js}
-    # (gabe-init seeds it), so the derivation from the churny tree never dirties a
-    # commit. A derivation error degrades to honest-empty, never blanks the center.
+    # plain map. sim.data.js is a regen-time projection (written here, never at the beat
+    # tail), gitignored like inflight.{json,js} (gabe-init seeds it), so the derivation
+    # from the churny tree never dirties a commit. A derivation error degrades to
+    # honest-empty, never blanks the center.
     _simf = CENTER_OUT / "sim.data.js"
     _sim = None
     _inflight = None
@@ -2447,20 +2449,28 @@ def main() -> int:
         print(f"    ⚠ sim.data.js honest-empty (derivation skipped): {_e}")
 
     # Recent COMMITS as journeys (_a3_commits, C2 mirror): each commit → the graph
-    # elements it touched, walkable in the picker's "commits" kind. Derived from git +
-    # the built graph's file→node index; honest-empty without git. commits.js is a
-    # beat-tail artifact, gitignored like sim.data.js (gabe-init seeds it) — churns per commit.
+    # elements it touched, walkable in the picker's "commits" kind — and the LEDGER SPINE
+    # (the five beats, each row pinned to its commit) beside it, written in the SAME step
+    # so the two feeds a board seat joins cannot drift. Derived from git + the built
+    # graph's file→node index + .kdbp/LEDGER*.md. Both are written at regen and refreshed
+    # by the E8 tail, gitignored like sim.data.js (gabe-init seeds them) — they churn per
+    # commit and per LEDGER row. Either one empty says WHY, here and in its stub.
     try:
-        _g = locals().get("_graph")
-        _commits = _a3_commits.build_commits(REPO_ROOT, _g) if _g else None
-        _a3_commits.emit(_commits, CENTER_OUT)
-        if _commits:
-            print(f"    wrote docs/site/center/commits.js — {len(_commits)} commit(s); "
-                  f"latest touches {_commits[0]['nTouched']} element(s)")
-    except Exception as _ce:  # noqa: BLE001 — honest-empty on any error
+        _res = _a3_commits.refresh_feeds(REPO_ROOT, CENTER_OUT, D.KDBP, graph=_graph or {})
+        for _feed, _unit in (("commits", "commit(s)"), ("spine", "pinned commit(s) across the five beats")):
+            # state 'wrote', or 'unchanged' (the file already held these bytes — _put kept its mtime);
+            # 'failed' = the write itself raised, and the reason carries its error
+            _st, _n, _why = _res.get(_feed) or ("failed", 0, "not written")
+            print(f"    ⚠ {_feed}.js not written — {_why}" if _st == "failed"
+                  else f"    {_st} docs/site/center/{_feed}.js — {_n} {_unit}" if _n
+                  else f"    ⚠ {_feed}.js honest-empty — {_why}")
+    except Exception as _ce:  # noqa: BLE001 — belt and braces: refresh_feeds never raises by
+        # contract, so this runs only if that contract breaks — and then BOTH feeds read honest-empty
         (CENTER_OUT / "commits.js").write_text(
-            "// commit journeys honest-empty (derivation error)\nwindow.GABE_COMMITS = [];\n")
-        print(f"    ⚠ commits.js honest-empty (derivation skipped): {_ce}")
+            _a3_commits.render(None, f"commits derivation error: {_ce}"), encoding="utf-8")
+        (CENTER_OUT / "spine.js").write_text(
+            _a3_commits.render_spine(None, f"spine derivation error: {_ce}"), encoding="utf-8")
+        print(f"    ⚠ commits.js + spine.js honest-empty (derivation skipped): {_ce}")
 
     # The curated USER-WORKFLOWS feed for the Universe station's journeys picker
     # (window.GABE_WORKFLOWS — the operator's user stories as ordered endpoints). CURATED

@@ -66,7 +66,7 @@ PY
 
 echo "── .gitignore seeds (local-only runtime artifacts)"
 GI="$REPO/.gitignore"; touch "$GI"; added=0
-for s in ".kdbp/reviews-archive/" ".kdbp/.push-gate-ok" ".kdbp/PULSE.jsonl" ".kdbp/map-deltas.jsonl" ".kdbp/map-deltas-rollup.jsonl" "docs/site/center/inflight.json" "docs/site/center/inflight.js" "docs/site/center/sim.data.js" "docs/site/center/commits.js" "scripts/__pycache__/"; do   # the NINE gabe-init step-1.8 seeds (init-spec §1.8) + the generators cache — one list, three places (review 2026-09-10)
+for s in ".kdbp/reviews-archive/" ".kdbp/.push-gate-ok" ".kdbp/PULSE.jsonl" ".kdbp/map-deltas.jsonl" ".kdbp/map-deltas-rollup.jsonl" "docs/site/center/inflight.json" "docs/site/center/inflight.js" "docs/site/center/sim.data.js" "docs/site/center/commits.js" "docs/site/center/spine.js" "scripts/__pycache__/"; do   # the TEN gabe-init step-1.8 seeds (init-spec §1.8) + the generators cache — one list, three places (review 2026-09-10)
   grep -qxF "$s" "$GI" || { [ $added = 0 ] && printf '\n# gabe suite — local-only runtime artifacts (gabe-init step 1.8)\n' >> "$GI"; echo "$s" >> "$GI"; added=$((added+1)); }
 done; echo "  $added line(s) added"
 
