@@ -67,9 +67,11 @@ def _day_order(dates: list[str]) -> list[int]:
 
 
 def _dated(path: Path) -> list[tuple[str, int, list[str]]]:
-    """(date, line number, cells) for every row whose first cell is a real date, in file order."""
+    """(date, line number, cells) for every row whose first cell is a real date, in file order. Read as UTF-8, never
+    the locale's default, so the bytes a feed carries are the same on every host; a stray non-UTF-8 byte reads as
+    U+FFFD in its cell instead of failing the whole file."""
     out = []
-    for n, line in enumerate(path.read_text().splitlines(), 1):
+    for n, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
         m = LEDGER_ROW_RX.match(line)
         if not m:
             continue

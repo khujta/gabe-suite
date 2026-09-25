@@ -70,6 +70,8 @@ gustify map resolves honest-empty. The twin has both halves at one head.
 - **The twin's `commits.js` is staler than its ledger.** The ledger's latest change is `d0904f57`;
   `commits.js` stops at `fed71a2b`. Seat 3 degrades to the newest commit it has and says so on the
   strip. `commits.js` is landed at regen time, the ledger is not — a freshness gap the seat exposed.
+  Closed for the board (Q4 b): the E8 beat tail now refreshes `commits.js` and `spine.js` after
+  every beat (`write-inflight.py` → `_a3_commits.refresh_feeds`), so the feed follows the ledger.
 
 ## The round trip, all four scopes (2026-09-10)
 

@@ -120,8 +120,13 @@ SILENCE — a missing source never prints filler.
    gate.** Only when `docs/site/center/center.config.json` exists — first run
    `python3 ${ECC_ROOT:-$HOME/.claude}/skills/gabe-cc-update/scripts/write-inflight.py .`
    (deterministic, zero LLM: projects PLAN.json + git into `docs/site/center/inflight.json`,
-   which the board and chrome pill read at view time; silent no-op when nothing changed —
-   battery at `tests/inflight/run.sh`), then print:
+   which the board and chrome pill read at view time; when the center has a committed
+   `c4-graph.json` the script also rebuilds the gitignored `commits.js` and `spine.js` from
+   git plus LEDGER through the suite's own `_a3_commits` (WS-2 — never the project's
+   `scripts/`), the regen's writer — the regen's bytes once the project's `scripts/` copy is at
+   the suite's version; a feed git does not ignore is never written, and a failed git keeps the
+   last good `commits.js`; silent no-op when nothing changed — batteries at
+   `tests/inflight/run.sh` + `tests/commits/run.sh`), then print:
    ```
    CENTER: docs/site/center/ — inflight.json carries this beat's state (phase · declared vs touched entities)
    ```

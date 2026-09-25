@@ -16,10 +16,14 @@
 #     no map-touching commit) on ONE comment line, proven with a PATH git shim; an unchanged feed is
 #     not rewritten; no map (no c4-graph.json) writes neither feed; the tail's keep_last keeps the last
 #     good commits.js over a failed git; a write that raises reads 'failed' and the other feed still lands.
+#   * THE TAIL == THE REGEN: refresh_feeds(graph=None) over the c4-graph.json _a3_graph.emit writes gives the
+#     regen's bytes for both feeds; only=() (the tail's gate found no ignored feed) writes nothing.
 #   * THE SPINE (spine.js): the LEDGER's five beats, newest first whatever order the file keeps,
 #     each commit ONCE per beat — in the newest row naming it, 7- and 8-char spellings folded to the
 #     longer, a summary row re-listing its tasks' shas never doubling one — green@ in Gates as the
 #     fallback, archives read, Commits read by position, the sha tokenizer's FIRE and SILENT sets.
+#   * ENCODING: the LEDGER is read as UTF-8 whatever the locale (an ASCII-locale run gives the host's bytes);
+#     a stray Latin-1 byte reads as U+FFFD in its cell and its row still lands.
 # FIRE and SILENT both exercised (mutation-proven). Exit 0 = all pass.
 set -u
 REPO="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -29,7 +33,7 @@ python3 - "$GEN" <<'PY'
 import sys, json, tempfile, subprocess, pathlib, os, shutil, time
 gen = sys.argv[1]
 sys.path.insert(0, gen)
-import _a3_commits, _a3_sim, _kdbp_ledger
+import _a3_commits, _a3_graph, _a3_sim, _kdbp_ledger
 
 pass_ = 0; fail = 0
 def check(cond, msg):
@@ -263,6 +267,20 @@ with tempfile.TemporaryDirectory() as td:
     check(bad2.get("spine", ("",))[0] == "failed" and str(bad2["spine"][2]).startswith("spine write error: ")
           and bad2.get("commits") == ("wrote", 3, None),
           f"a spine.js that cannot be written reads 'failed' + its error, and commits.js is written — got {bad2}")
+    # ── (d2) THE TAIL == THE REGEN: the E8 tail (write-inflight.py) calls refresh_feeds with graph=None, so it reads the
+    # committed c4-graph.json as _a3_graph.emit writes it (indent=1, sort_keys) — its feeds must be the regen's to the byte
+    site = root / "docs/site/center"; site.mkdir(parents=True)
+    _a3_graph.emit(GRAPH, site)
+    tail = _a3_commits.refresh_feeds(root, site, kd, keep_last=True)
+    check(tail == {"commits": ("wrote", 3, None), "spine": ("wrote", 1, None)}
+          and (site / "commits.js").read_bytes() == _a3_commits.render(_a3_commits.build_commits(root, GRAPH)).encode("utf-8")
+          and (site / "spine.js").read_bytes() == _a3_commits.render_spine(_a3_commits.build_spine(root, kd)).encode("utf-8"),
+          f"the tail's feeds (graph=None, the committed c4-graph.json) == the regen's render(build_commits(root, GRAPH)) — got {tail}")
+    # only=() — the tail's gate found no ignored feed — writes nothing and returns {}
+    none_ = root / "center-none"; none_.mkdir(); _a3_graph.emit(GRAPH, none_)
+    check(_a3_commits.refresh_feeds(root, none_, kd, only=()) == {}
+          and not (none_ / "commits.js").exists() and not (none_ / "spine.js").exists(),
+          "only=() writes neither feed")
 
 # HONEST-EMPTY: a non-git dir → None; emit(None) → the empty stub
 with tempfile.TemporaryDirectory() as td2:
@@ -389,6 +407,24 @@ p = spine_of([("2026-09-23", "EXEC", "phase complete", "aaaaaaa1 ccccccc3", "ok"
               ("2026-09-22", "EXEC", "task 1", "aaaaaaa1", "ok")])
 check(ent(p, "EXECUTE") == [("aaaaaaa1", ["aaaaaaa1", "ccccccc3"], 3)],
       f"task rows whose commits a newer summary holds fold into it, rows summed — got {ent(p, 'EXECUTE')}")
+
+# ENCODING: the LEDGER is read as UTF-8, never the locale's default — spine.js carries the same bytes under an ASCII
+# locale as under this host's, and a stray Latin-1 byte degrades its own cell (U+FFFD), never the whole feed
+with tempfile.TemporaryDirectory() as t:
+    k = pathlib.Path(t) / ".kdbp"; k.mkdir()
+    (k / "LEDGER.md").write_bytes(line(("2026-09-24", "COMMIT", "café — fixed", "aaaaaaa1", "ok")).encode("utf-8")
+                                  + b"| 2026-09-23 | COMMIT | caf\xe9 latin | bbbbbbb2 | ok |\n")
+    probe = ("import sys, pathlib; sys.path.insert(0, sys.argv[1]); import _a3_commits as c; t = pathlib.Path(sys.argv[2]); "
+             "sys.stdout.buffer.write(c.render_spine(c.build_spine(t, t / '.kdbp')).encode('utf-8'))")
+    runs = {}
+    for tag, loc in (("host", {}), ("ascii", {"LC_ALL": "C", "PYTHONUTF8": "0", "PYTHONCOERCECLOCALE": "0"})):
+        pr = subprocess.run([sys.executable, "-B", "-c", probe, gen, t], capture_output=True, env={**os.environ, **loc})
+        runs[tag] = (pr.returncode, pr.stdout, pr.stderr.decode("utf-8", "replace").strip()[-160:])
+    check(runs["host"][0] == 0 and runs["ascii"] == runs["host"],
+          f"spine.js bytes do not depend on the host's locale — host {runs['host'][0]} {runs['host'][2]!r}, ascii {runs['ascii'][0]} {runs['ascii'][2]!r}")
+    head = b"window.GABE_SPINE = "
+    got = [e["label"] for e in json.loads(runs["host"][1][len(head):-2])["beats"]["COMMIT"]] if runs["host"][1].startswith(head) else None
+    check(got == ["café — fixed", "caf� latin"], f"a Latin-1 byte reads as U+FFFD in its cell, its row still lands — got {got}")
 
 print(f"commits battery: {pass_} passed, {fail} failed")
 sys.exit(1 if fail else 0)

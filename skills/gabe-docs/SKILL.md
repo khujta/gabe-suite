@@ -4,7 +4,7 @@ description: "Documentation standards + Mermaid diagram library + the suite exec
 when_to_use: "Background standards — doc structure, diagram selection, and the execution contract (references/execution-contract.md)."
 user-invocable: false
 metadata:
-  version: 1.4.4
+  version: 1.4.5
 ---
 
 # Gabe Docs — Documentation Standards
