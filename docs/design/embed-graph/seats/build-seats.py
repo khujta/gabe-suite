@@ -12,9 +12,11 @@ to the twin, so the demo navigates like the real centre and only the injected se
   seat 3  ledger.html          under the KPIs COMMIT pane  (panel)  — the latest change's touched pieces
   seat 4  tests.html           under the KPIs TEST panes  (card)   — the three most-covering cases
 
-THROWAWAY BY DESIGN: this is the look, for a yes/no. The real wiring is a generator change
-(_a3_feature / _a3_ledger / _a3_tests emitting the mount + build_center_a3 shipping the assets), and
-that is the step that forces D2 — the pane assets into templates/center/shell/assets/.
+THROWAWAY BY DESIGN: this is the look, for a yes/no. The board's two seats (10 · the changes, 11 · the
+spine) and its done-card chips are wired for real (D-043 · D-046): build_center_a3.render_board fills
+{{BOARD_SEATS}} from _a3_seats.board_seats, _a3_board.card_html emits each done card's .bc-sha chip,
+and shell/assets/seats.js boots all three from commits.js + spine.js, over the pane runtime shipped in
+templates/center/shell/assets/ (D-045). Seats 1-4 below stay a demo — no generator emits them.
 
   python3 build-seats.py            # writes seats/*.html
   GABE_TWIN_CENTER=<dir>            # default /home/khujta/projects/apps/gustify/docs/site/center

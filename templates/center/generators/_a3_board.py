@@ -475,6 +475,7 @@ def build_cards(*, plan, sections, archmap, adoption, labels, entity_href,
             detail=trunc(r["impact"], 200),
             state=("done" if r["closed"] else "blocked" if gate else "ready"),
             done=r["closed"], closed=(r["closed_on"] or None),
+            shas=(r["shas"] if r["closed"] else []),
             created=r["date"], priority=pri, gate=gate, file=r["file"],
             deferred=ndefer, ripe=ripe,
             ripe_why=(f"one cited file ({biggest} lines), never deferred, no "
@@ -595,6 +596,15 @@ def card_html(c: dict, labels: dict) -> str:
                            "last ledger entry naming this phase"))
 
     ripe = (_chip("bc-ripe", "◆ ripe", c["ripe_why"]) if c["ripe"] else "")
+    # the commit a DONE row names, Status first (never .bchip: board.js reads
+    # those as filters); seats.js marks it ●/○ against commits.js and a click
+    # on a ● draws it in the changes seat
+    sha = ""
+    if c["done"] and c.get("shas"):
+        s0 = c["shas"][0]
+        sha = (f'<button type="button" class="bc-sha" data-sha="{E(s0)}" '
+               f'data-shas="{E(" ".join(c["shas"]))}" data-id="{E(c["id"])}" '
+               f'title="resolved @ {E(s0)}">{E(s0)}</button>')
 
     rail = ""
     if c.get("cells"):
@@ -633,7 +643,7 @@ def card_html(c: dict, labels: dict) -> str:
         f'data-ripe="{"1" if c["ripe"] else "0"}" '
         f'data-closed30="{closed30}" data-aged="{aged}" '
         f'style="--tc:{tcol}">'
-        f'<div class="bc-top">{"".join(chips)}{ripe}</div>'
+        f'<div class="bc-top">{"".join(chips)}{ripe}{sha}</div>'
         f'<h4>{E(c["title"])}</h4><p>{E(c["detail"])}</p>'
         f'{rail}{prog}{nxt}'
         f'<div class="bc-src">{E(c["source"])}{inf}</div></article>')

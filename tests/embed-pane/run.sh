@@ -11,14 +11,16 @@
 #   HEADLESS (a real browser, tests/embed-pane/destroy.mjs over harness.html): the destroy contract —
 #     context lost (even when the dispose throws), canvases gone, nothing redraws after — and its FIRE:
 #     a no-op destroy turns the canvas and context asserts red.
-#   SEATS (a real browser, tests/embed-pane/seats.mjs over BUILT centres): the board's two seats on
-#     seatfix.py projects — git history at core.abbrev 8 and at 7, the plain project (no git: honest-empty),
-#     a copy without assets/3d-bundle.js (the seat names it), a copy whose commits.js is the empty stub
-#     beside a populated LEDGER — and its FIRE: one mutated copy per assert, all in ONE browser pass, each
-#     turning ITS assert red (a join on `short` · a substring join · the oldest preselected · the undrawable
-#     wording lost · the head never restored · the seats folded · a failed embed marked drawn · a spine head
-#     that invites a pick nothing can draw · no boot · the empty guard dropped · empty columns vanishing ·
-#     the spine bailing with the runtime).
+#   SEATS (a real browser, tests/embed-pane/seats.mjs over BUILT centres): the board's two seats and its
+#     done-card sha chips on seatfix.py projects — git history at core.abbrev 8 and at 7, the plain project
+#     (no git: honest-empty), a copy without assets/3d-bundle.js (the seat names it), a copy whose commits.js
+#     is the empty stub beside a populated LEDGER, a copy whose picker is capped below the feed (a chip past
+#     it) — and its FIRE: one mutated copy per assert, all in ONE browser pass, each turning ITS assert red (a
+#     join on `short` · a substring join · the oldest preselected · the undrawable wording lost · the head
+#     never restored · the seats folded · a failed embed marked drawn · a spine head that invites a pick
+#     nothing can draw · no boot · the empty guard dropped · empty columns vanishing · the spine bailing with
+#     the runtime · a chip joined by its first sha only · a chip click that never draws · a chip click that
+#     reaches the card · a chip past the picker called 'not in the feed' · the chips run where no cap bites).
 # No chrome or no Playwright is RED, not a skip: a checker that cannot run is not evidence (O14).
 # Exit 0 = all pass.
 set -u
@@ -150,8 +152,12 @@ if [ -x "$CHROME" ] && [ "$PW" = 1 ]; then
     SF8="$T/sf8/docs/site/center"
     cp -r "$SF8" "$T/nobundle"; rm "$T/nobundle/assets/3d-bundle.js"
     cp -r "$SF8" "$T/stub"; cp "$T/plain/docs/site/center/commits.js" "$T/stub/commits.js"   # the honest-empty stub, the LEDGER kept
+    # the picker capped below the feed (3 commits): the chip naming the OLDEST commit sits in the feed, past the picker
+    cp -r "$SF8" "$T/capped"; sed -i -E 's/ data-cap="[0-9]+"/ data-cap="2"/' "$T/capped/board.html"
+    grep -q ' data-cap="2"' "$T/capped/board.html" && ok || bad "fixture: the capped copy's data-cap did not apply"
     timeout 300 node "$HERE/seats.mjs" full="$SF8/board.html" full="$T/sf7/docs/site/center/board.html" \
-      empty="$T/plain/docs/site/center/board.html" missing="$T/nobundle/board.html" stub="$T/stub/board.html" >"$T/seats.out" 2>&1; RC=$?
+      empty="$T/plain/docs/site/center/board.html" missing="$T/nobundle/board.html" stub="$T/stub/board.html" \
+      chips="$T/capped/board.html" >"$T/seats.out" 2>&1; RC=$?
     cat "$T/seats.out"
     [ "$RC" = 0 ] && ok || bad "seats: the board's seats failed on the built fixtures (rc $RC)"
 
@@ -185,11 +191,17 @@ PY
     mutant noguard  "$PLAIN" assets/seats.js '    if (!cs.length) {' '    if (false) {'
     mutant vanish   "$PLAIN" assets/seats.js '    order.forEach(function (beat) {' '    order.filter(function (b) { return (S.beats[b] || []).length; }).forEach(function (beat) {'
     mutant bail     "$T/nobundle" assets/seats.js '  if (sp) boot(sp, spine);' '  if (sp && !missing.length) boot(sp, spine);'
+    mutant chipone  "$SF8" assets/seats.js 'var k = pickOf({ sha: shas[0], shas: shas });' 'var k = pickOf({ sha: shas[0], shas: [shas[0]] });'
+    mutant chipdead "$SF8" assets/seats.js '        if (k >= 0) toChanges(k, shas[0], "done card");' ''
+    mutant chipleak "$SF8" assets/seats.js '        ev.stopPropagation();' ''
+    mutant pastlie  "$T/capped" assets/seats.js '(k < 0 ? (fed ? " — in the feed, past the "' '(k < 0 ? (false ? " — in the feed, past the "'
     timeout 900 node "$HERE/seats.mjs" full@exact="$T/m-exact/board.html" full@substr="$T/m-substr/board.html" \
       full@oldest="$T/m-oldest/board.html" full@wording="$T/m-wording/board.html" full@nohead="$T/m-nohead/board.html" \
       full@fold="$T/m-fold/board.html" full@noretry="$T/m-noretry/board.html" full@headpick="$T/m-headpick/board.html" \
       missing@hpmiss="$T/m-hpmiss/board.html" stub@hpstub="$T/m-hpstub/board.html" empty@noboot="$T/m-noboot/board.html" \
       empty@noguard="$T/m-noguard/board.html" empty@vanish="$T/m-vanish/board.html" missing@bail="$T/m-bail/board.html" \
+      full@chipone="$T/m-chipone/board.html" full@chipdead="$T/m-chipdead/board.html" full@chipleak="$T/m-chipleak/board.html" \
+      chips@pastlie="$T/m-pastlie/board.html" chips@uncapped="$SF8/board.html" \
       >"$T/seats-fire.out" 2>&1; RC=$?
     fired() {    # fired <run> <assert prefix> <what the mutant did> — that run's assert is red
       grep -qF "  FAIL  $1 $2" "$T/seats-fire.out" && ok || bad "seats FIRE ($1): $3 must turn '$2' red"
@@ -211,6 +223,12 @@ PY
     fired empty@noguard "E1 \"commits.js carries no commits\""          "the empty guard dropped"
     fired empty@vanish  "E2 the spine keeps its five columns"           "empty columns vanishing"
     fired missing@bail  "M2 the spine still renders every beat"         "a spine that bails with the runtime"
+    fired full@chipone  "S9 every done-card chip"                       "a chip joined by its first sha only"
+    fired full@chipdead "S9 a click on a ● chip"                        "a chip click that never draws"
+    fired full@chipleak "S9 a click on a ● chip"                        "a chip click that reaches the card"
+    fired full@chipleak "S9 a click on a ○ chip"                        "a chip click that reaches the card"
+    fired chips@pastlie "S9 every done-card chip"                       "a ○ past the picker's cap called 'not in the feed'"
+    fired chips@uncapped "S9 a chip whose commit the feed carries past" "the chips run on a copy the cap does not bite"
     echo "  seats FIRE (one pass, $(grep -c '  ── ' "$T/seats-fire.out") mutated copies): $(grep -c '  FAIL  ' "$T/seats-fire.out") case(s) red — $(grep -o 'FAIL  [a-z]*@[a-z]* [A-Z][0-9]' "$T/seats-fire.out" | cut -c7- | sort -u | tr '\n' ' ')"
   else
     bad "seats: a seat fixture did not build"; tail -5 "$T"/*.build.out

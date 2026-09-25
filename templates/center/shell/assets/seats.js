@@ -10,6 +10,10 @@
  *   the spine    [data-seat="spine"]  GABE_SPINE's five beats as columns, each a picker over the commits that
  *                beat recorded, newest first. A pick commits.js carries selects it in the changes seat; one it
  *                does not carry keeps the ledger's own facts and says 'not in the feed'. It draws nothing.
+ *   the chips    .bc-sha on a DONE card: the commit a closed PENDING row names (_a3_board, Status first). The
+ *                boot marks each ● (the picker lists one of its data-shas) or ○, its title saying why ('not in
+ *                the feed', or in the feed past the picker's data-cap); a click on a ● selects it in the changes
+ *                seat as a spine pick does, and never reaches the card.
  *
  * THE JOIN. A LEDGER writes a sha at 7 or 8 characters, and commits.js `short` is git's %h, which grows with
  * the repo (7 in the suite, 8 in the twins) — so nothing joins on `short`. `feedIdx` matches a token (7 or
@@ -17,7 +21,8 @@
  * and reads as none, never a guess. The pane is still drawn by `short`: the slice keys its commits by it.
  *
  * Hooks tests/embed-pane/seats.mjs keys on: [data-seat] · data-mode="pick" · select.seat-pick · .seat-row ·
- * .seat-hd > span · the host's data-picked · .sp-col[data-beat][data-sha][data-live] · .sp-live. A seat that
+ * .seat-hd > span · the host's data-picked · .sp-col[data-beat][data-sha][data-live] · .sp-live ·
+ * .bc-sha[data-shas][data-live]. A seat that
  * throws writes 'seat failed: <message>' into its row; a pane whose embed throws says it in the head too, and
  * holds no data-picked, so picking it again retries.
  */
@@ -63,6 +68,18 @@
     var shas = r.shas && r.shas.length ? r.shas : [r.sha];
     for (var j = 0; j < shas.length; j++) { var k = feedIdx(shas[j]); if (k >= 0 && k < cs.length) return k; }
     return -1;
+  }
+
+  /* a spine pick or a chip click, in the changes seat: picker index k drawn, or 'not in the feed' said while
+     the pane keeps what it holds. `what` names where the pick came from */
+  function toChanges(k, sha, what) {
+    if (!seat10) return;
+    var pk = seat10.__pick;
+    if (k >= 0 && pk) { if (pk.sel) pk.sel.value = String(k); pk.show(k); }
+    else if (k < 0 && pk) say(seat10, "commits.js does not carry " + sha + " (" + what + ") — not in the feed · "
+                                + (seat10.getAttribute("data-picked") ? "the pane keeps " + seat10.getAttribute("data-picked") : "no pane is drawn"));
+    seat10.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    flash(seat10);
   }
 
   /* ── the changes: one pane, a picker in the head ── */
@@ -157,13 +174,7 @@
         pill.className = "sp-live " + (k >= 0 ? "on" : "off");
         pill.textContent = k >= 0 ? "in the feed" : "not in the feed";
         col.setAttribute("data-sha", r.sha); col.setAttribute("data-live", k >= 0 ? "1" : "0");
-        if (!drive || !seat10) return;
-        var pk = seat10.__pick;
-        if (k >= 0 && pk) { if (pk.sel) pk.sel.value = String(k); pk.show(k); }
-        else if (k < 0 && pk) say(seat10, "commits.js does not carry " + r.sha + " (" + word + ", " + r.date + ") — not in the feed · "
-                                    + (seat10.getAttribute("data-picked") ? "the pane keeps " + seat10.getAttribute("data-picked") : "no pane is drawn"));
-        seat10.scrollIntoView({ block: "nearest", behavior: "smooth" });
-        flash(seat10);
+        if (drive) toChanges(k, r.sha, word + ", " + r.date);
       }
       sel.onchange = function () { try { pick(+sel.value, true); } catch (e) { say(host, "seat failed: " + (e && e.message)); } };
       col.appendChild(sel); col.appendChild(pill); col.appendChild(fact);
@@ -179,6 +190,26 @@
                        + (none ? " · " + none + " ledger rows name no commit" : ""));
   }
 
+  /* ── the chips: every done card's commit, ●/○ by the same join as the spine ── */
+  function chips() {
+    [].forEach.call(document.querySelectorAll(".bc-sha"), function (b) {
+      var shas = String(b.getAttribute("data-shas") || b.getAttribute("data-sha") || "").split(/\s+/).filter(Boolean);
+      var k = pickOf({ sha: shas[0], shas: shas });
+      /* a ○ has two reasons: commits.js does not carry the commit, or carries it past the picker's data-cap */
+      var fed = k >= 0 || shas.some(function (s) { return feedIdx(s) >= 0; });
+      b.setAttribute("data-live", k >= 0 ? "1" : "0");
+      b.textContent = (k >= 0 ? "● " : "○ ") + shas[0];
+      b.title = "resolved @ " + shas.join(" · ") + (k < 0 ? (fed ? " — in the feed, past the " + cs.length + " commits the picker lists"
+                                                                  : " — not in the feed")
+        : (cs[k].sha.toLowerCase().lastIndexOf(shas[0].toLowerCase(), 0) === 0 ? "" : " — draws " + cs[k].short)
+          + (missing.length ? " — in the feed, but the pane cannot draw: not loaded: " + missing.join(", ") : " — click to draw it in the changes seat"));
+      b.addEventListener("click", function (ev) {
+        ev.stopPropagation();   /* a chip is not the card: no board filter, no row toggle */
+        if (k >= 0) toChanges(k, shas[0], "done card");   /* a ○ stays put: its title already says why */
+      });
+    });
+  }
+
   function boot(host, fn) {
     var row = host.querySelector(".seat-row");
     try { fn(host, row); } catch (e) { row.textContent = "seat failed: " + (e && e.message); }
@@ -186,4 +217,5 @@
   if (seat10) boot(seat10, changes);   /* first: the spine drives its picker */
   var sp = document.querySelector('[data-seat="spine"]');
   if (sp) boot(sp, spine);
+  try { chips(); } catch (e) { if (seat10) say(seat10, "seat failed: chips: " + (e && e.message)); }
 })();

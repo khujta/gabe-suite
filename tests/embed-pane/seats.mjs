@@ -18,6 +18,13 @@
  *     S7  folding the board intro (the ▾ by the title) never hides the seats
  *     S8  an embed that throws says 'seat failed' in the head and the row and marks nothing drawn; picking
  *         the same commit again RETRIES and draws it
+ *     S9  the done-card sha chips (the fixture's PENDING): every ●/○ equals the prefix join recomputed over the
+ *         chip's data-shas — one reads ● by its SECOND sha, the first being a commit the repo never held — and
+ *         a ○'s title says why ('not in the feed', or in the feed past the picker's data-cap); a real click on
+ *         a ● draws that commit in the changes seat and never reaches the document (no board filter, no row
+ *         toggle); a click on a ○ moves nothing
+ *   chips    a copy of a full fixture whose data-cap sits below the feed: S9's ●/○ scan, and a chip naming a
+ *            commit the feed carries PAST the picker reads ○ 'in the feed, past the N' — never 'not in the feed'
  *   empty    a fixture with no git: the changes seat says 'commits.js carries no commits' in head AND row,
  *            no canvas; the spine keeps its five columns and says why it is empty
  *   missing  a copy with assets/3d-bundle.js removed: the changes seat NAMES the file, the spine still renders
@@ -34,8 +41,8 @@ import path from 'path';
 const { chromium } = await import('../../skills/gabe-docsite/tools/_playwright.mjs');   // the suite's portable resolver
 const runs = process.argv.slice(2).map((a) => { const i = a.indexOf('=');
   return { mode: a.slice(0, i).split('@')[0], name: a.slice(0, i), file: path.resolve(a.slice(i + 1)) }; });
-if (!runs.length || runs.some((r) => !['full', 'empty', 'missing', 'stub', 'measure'].includes(r.mode))) {
-  console.error('usage: node seats.mjs <full|empty|missing|stub|measure>[@<tag>]=<board.html> …'); process.exit(2);
+if (!runs.length || runs.some((r) => !['full', 'chips', 'empty', 'missing', 'stub', 'measure'].includes(r.mode))) {
+  console.error('usage: node seats.mjs <full|chips|empty|missing|stub|measure>[@<tag>]=<board.html> …'); process.exit(2);
 }
 let pass = 0, fail = 0;
 const t = (name, cond, extra = '') => {
@@ -75,6 +82,38 @@ const INIT = (preswitch) => `(() => {
 const JOIN = `(tok, C, cap) => { const s = String(tok || '').toLowerCase(); if (s.length < 7) return -1;
   const hits = C.map((c, i) => String(c.sha).toLowerCase().startsWith(s) ? i : -1).filter((i) => i >= 0);
   return hits.length === 1 && hits[0] < cap ? hits[0] : -1; }`;
+
+/* S9's scan, on the Done framing (the only one that shows closed cards): every chip's ●/○ against the join
+   recomputed over its data-shas, and a ○'s title against WHY — 'in the feed, past the <cap> commits the picker
+   lists' when commits.js carries one of its commits beyond data-cap, 'not in the feed' only when it carries none.
+   `move` (full) marks a ● and a ○ to click and moves the pane OFF the ●'s commit, so its click has something to
+   change */
+const chipScan = async (pg, move) => {
+  await pg.click('.bmodes button[data-m="done"]');
+  return pg.evaluate(([JOIN, move]) => {
+    const join = eval(JOIN), C = window.GABE_COMMITS, host = document.querySelector('[data-seat="commits"]');
+    const cap = Math.min(+host.getAttribute('data-cap'), C.length);
+    const out = { n: 0, lit: 0, second: 0, past: 0, cap, feed: C.length, bad: [], live: null, dead: null };
+    window.__chipBubbled = 0;
+    document.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('.bc-sha')) window.__chipBubbled++; });
+    for (const b of document.querySelectorAll('.bboard[data-mode="done"] .bc-sha')) {
+      const shas = b.getAttribute('data-shas').split(' '), ks = shas.map((x) => join(x, C, cap));
+      const k = ks.find((x) => x >= 0), on = k !== undefined, fed = shas.some((x) => join(x, C, C.length) >= 0);
+      out.n++; if (on) out.lit++; if (on && ks[0] < 0) out.second++; if (!on && fed) out.past++;
+      const why = on || (fed ? b.title.includes(' — in the feed, past the ' + cap + ' commits the picker lists') && !/not in the feed/.test(b.title)
+                             : /not in the feed/.test(b.title));
+      if ((b.getAttribute('data-live') === '1') !== on || !b.textContent.startsWith(on ? '● ' : '○ ') || !why) out.bad.push(b.getAttribute('data-sha'));
+      if (!move) continue;
+      if (on && ks[0] >= 0 && !out.live) { b.setAttribute('data-probe', 'live'); out.live = { sha: b.getAttribute('data-sha'), k, want: C[k].short }; }
+      if (!on && !out.dead) { b.setAttribute('data-probe', 'dead'); out.dead = b.getAttribute('data-sha'); }
+    }
+    if (out.live) {
+      const sel = host.querySelector('select.seat-pick');
+      sel.value = String((out.live.k + 1) % sel.options.length); sel.dispatchEvent(new Event('change'));
+    }
+    return out;
+  }, [JOIN, move]);
+};
 
 const b = await chromium.launch({
   executablePath: process.env.GABE_CHROME_BIN || '/usr/bin/google-chrome-stable',
@@ -241,6 +280,39 @@ try {
       t(N + ' S8 an embed that throws says "seat failed" in the head AND the row, and marks nothing drawn',
         /seat failed: probe/.test(s8.failed.head) && /seat failed: probe/.test(s8.failed.row) && s8.failed.picked === null && s8.failed.canvases === 0, JSON.stringify(s8));
       t(N + ' S8 picking the same commit again retries it, and it draws', s8.drew && s8.picked === s8.want && s8.canvases === 1 && !/seat failed/.test(s8.head), JSON.stringify(s8));
+
+      /* S9 — the done-card chips, on the Done framing (the only one that shows closed cards): every ●/○ against the
+         recomputed join; then REAL clicks — a ● after the picker moved off its commit, a ○ after that */
+      const s9 = await chipScan(pg, true);
+      const seat = () => pg.evaluate(() => { const h = document.querySelector('[data-seat="commits"]');
+        return { picked: h.getAttribute('data-picked'), drew: !!(h.__pick.pane() || {}).Graph, canvases: h.querySelectorAll('canvas').length, bubbled: window.__chipBubbled }; });
+      const drawn = (want) => pg.waitForFunction((w) => { const h = document.querySelector('[data-seat="commits"]');
+        return (!w || h.getAttribute('data-picked') === w) && !!(h.__pick.pane() || {}).Graph; }, want, { timeout: 15000 }).catch(() => {});
+      if (s9.live) {
+        await drawn(null); s9.moved = (await seat()).picked;
+        await pg.click('[data-probe="live"]'); await drawn(s9.live.want); s9.afterLive = await seat();
+      }
+      if (s9.dead) {
+        s9.kept = (await seat()).picked;
+        await pg.click('[data-probe="dead"]'); await sleep(300); s9.afterDead = await seat();
+      }
+      t(N + ' S9 every done-card chip ●/○ equals the prefix join over its data-shas, one lit by its second sha, a ○ saying why',
+        s9.bad.length === 0 && s9.n > 0 && s9.lit > 0 && s9.lit < s9.n && s9.second > 0, JSON.stringify(s9));
+      t(N + ' S9 a click on a ● chip draws its commit in the changes seat, and never reaches the document',
+        !!s9.live && !!s9.afterLive && s9.moved !== s9.live.want && s9.afterLive.picked === s9.live.want && s9.afterLive.drew
+        && s9.afterLive.canvases === 1 && s9.afterLive.bubbled === 0, JSON.stringify(s9));
+      t(N + ' S9 a click on a ○ chip moves nothing, and never reaches the document',
+        !!s9.dead && !!s9.afterDead && s9.afterDead.picked === s9.kept && s9.afterDead.bubbled === 0, JSON.stringify(s9));
+    }
+
+    if (mode === 'chips') {
+      /* a copy whose data-cap sits below the feed: a chip naming a commit commits.js carries PAST the picker is ○, and
+         its title says where it is — never "not in the feed", which would be a lie */
+      const s9 = await chipScan(pg, false);
+      t(N + ' S9 every done-card chip ●/○ equals the prefix join over its data-shas, one lit by its second sha, a ○ saying why',
+        s9.bad.length === 0 && s9.n > 0 && s9.lit > 0 && s9.lit < s9.n && s9.second > 0, JSON.stringify(s9));
+      t(N + ' S9 a chip whose commit the feed carries past the picker\'s data-cap reads ○ "in the feed, past the N" — never "not in the feed"',
+        s9.cap < s9.feed && s9.past > 0, JSON.stringify(s9));
     }
 
     if (mode === 'empty') {

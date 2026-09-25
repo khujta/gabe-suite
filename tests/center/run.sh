@@ -2050,7 +2050,8 @@ def prow(**kw):
     row = {"num": "1", "date": "2026-01-01", "source": "review",
            "finding": "f", "file": "", "scale": "mvp", "priority": "low",
            "impact": "", "deferred": "0", "status": "OPEN", "verified": "",
-           "gate": "", "open": True, "closed": False, "closed_on": "",
+           "gate": "", "shas": [], "sha": "", "shift": 0,
+           "open": True, "closed": False, "closed_on": "",
            "parked": False, "origin_file": ".kdbp/PENDING.md"}
     row.update(kw)
     return row
@@ -2209,7 +2210,7 @@ got = D.load_ledger(8)
 assert got == [["2026-09-24", "COMMIT", "pipe", "abc1234", "echo | grep"],
                ["2026-09-23", "COMMIT", "tail", "abc1234", "ends with |"]], got
 got = D.pick_table("| # | Note |\n|---|---|\n| 1 | a \\| b \\|\n", "#", "Note")
-assert got == [{"#": "1", "Note": "a | b |"}], got
+assert got == [{"#": "1", "Note": "a | b |", "_cells": ["1", "a | b |"]}], got
 (D.KDBP / "PLAN.md").write_text(
     "| # | Phase | Tier | Complexity | Exec | Review | Commit | Push | Description |\n"
     "|---|---|---|---|---|---|---|---|---|\n"
@@ -2253,6 +2254,125 @@ assert got == ["kdbp/LEDGER.md"], got
 sys.exit(0)
 LEDPY
 ) >"$T/ledger-order.out" 2>&1; then ok; else bad "LEDGER order: newest first by date in every file shape (see below)"; cat "$T/ledger-order.out"; fi
+
+# --- done-card sha chips (Q6): a closed PENDING row's commit, read BY POSITION ---
+# tests/center/fixtures/chips/: a gustify-shaped PENDING (gate index table, 11 columns with Verified, #N ids, an
+# archive, one row a raw pipe shifted with its Verified) and a gastify-shaped one (10 columns, P ids, a sha in an
+# undeclared 11th cell, rows a raw pipe shifted — one whose count was left blank).
+# chips_ok collects EVERY failure, so a mutated copy is judged on its own message (exit 3), never on the first one
+# the run happened to hit; a traceback is not a fire.
+CHIPS_FX="$REPO/tests/center/fixtures/chips"
+chips_ok() {  # chips_ok <generator dir>
+  python3 - "$1" "$CHIPS_FX" <<'CHIPPY'
+import re, sys
+from pathlib import Path
+gen, fx = sys.argv[1], Path(sys.argv[2])
+sys.path.insert(0, gen)
+import _center_data as D
+import _a3_board as B
+fails = []
+def need(cond, msg):
+    if not cond: fails.append(msg)
+CHIP = re.compile(r'<button type="button" class="bc-sha" data-sha="([^"]*)" data-shas="([^"]*)" data-id="([^"]*)" title="resolved @ ([^"]*)">([^<]*)</button>')
+
+def board(kdbp):
+    D.KDBP = kdbp
+    rows = D.load_pending_rows()
+    cards = B.build_cards(plan={"phases": []}, sections=[], archmap={"entities": {}}, adoption={},
+                          labels={}, entity_href=lambda s: s, pending=rows)
+    html = {c["id"].split(":", 1)[1]: B.card_html(c, {}) for c in cards if c["track"] == "debt"}
+    chips = {n: CHIP.findall(h) for n, h in html.items()}
+    return {r["num"]: r for r in rows}, html, {n: m for n, m in chips.items() if m}
+
+# gustify: Status FIRST (#101's Verified is an older reconcile), the archive read, 7 and 8 characters one commit,
+# an all-digit sha kept, a CI run id dropped, an open row with a sha chipless
+row, html, chips = board(fx / "gustify")
+need(chips.get("101") == [("19f1e220", "19f1e220 e37dccc5", "debt:101", "19f1e220", "19f1e220")],
+     "gustify #101: the chip names the RESOLVING commit, Status first — 19f1e220 then e37dccc5 — got %s" % chips.get("101"))
+need(chips.get("112") == [("612daf07", "612daf07 e37dccc5", "debt:112", "612daf07", "612daf07")],
+     "gustify #112: an ARCHIVED closed row wears its chip — got %s" % chips.get("112"))
+need(chips.get("140") == [("569cd070", "569cd070", "debt:140", "569cd070", "569cd070")],
+     "gustify #140: 569cd07 (Status) and 569cd070 (Verified) are ONE commit, at its longest — got %s" % chips.get("140"))
+need(chips.get("150") == [("14543567", "14543567", "debt:150", "14543567", "14543567")],
+     "gustify #150: an all-digit sha of 8 is a commit — got %s" % chips.get("150"))
+need(row["151"]["closed"] and "151" not in chips, "gustify #151: closed, and a CI run id (29794005974) is no chip")
+need(row["130"]["open"] and row["130"]["shas"] == ["e37dccc5"] and "130" not in chips,
+     "gustify #130: an OPEN row naming a sha wears no chip — got %s" % chips.get("130"))
+r160 = row["160"]
+need(r160["shift"] == 1 and r160["verified"].startswith("5e6f7a8b") and r160["closed"]
+     and chips.get("160") == [("a1b2c3d4", "a1b2c3d4 5e6f7a8b", "debt:160", "a1b2c3d4", "a1b2c3d4")],
+     "gustify #160: a raw pipe moved Status AND Verified by 1 — both read by position, a1b2c3d4 then 5e6f7a8b — "
+     "got shift %s, verified %r, %s" % (r160["shift"], r160["verified"], chips.get("160")))
+need(r160["closed_on"] == "2026-07-30", "gustify #160: closed_on keeps the HEADER read of Verified (O7) — the "
+     "displaced Status's date, 2026-07-30 — got %r" % r160["closed_on"])
+need(sorted(chips) == ["101", "112", "140", "150", "160"], "gustify: chips on #101 #112 #140 #150 #160 only — got %s" % sorted(chips))
+h = html.get("101", "")
+need(0 <= h.find('class="bc-top"') < h.find('class="bc-sha"') < h.find("<h4>"), "gustify #101: the chip sits in .bc-top, before the title")
+need("bchip" not in "".join(html.values()), "the chip is never a .bchip (board.js reads those as filters)")
+
+# gastify: no Verified column, the sha in an undeclared 11th cell, Status displaced by a raw pipe
+row, html, chips = board(fx / "gastify")
+need(chips.get("P61") == [("2c035f2", "2c035f2", "debt:P61", "2c035f2", "2c035f2")],
+     "gastify P61: the sha in the 11th cell is read — got %s" % chips.get("P61"))
+need(chips.get("P176") == [("e1c5558f", "e1c5558f", "debt:P176", "e1c5558f", "e1c5558f")],
+     "gastify P176: '@e1c5558f' is a sha — got %s" % chips.get("P176"))
+need(sorted(chips) == ["P176", "P61"], "gastify: chips on P61 and P176 only — got %s" % sorted(chips))
+need(row["P175"]["open"] and "P175" not in chips, "gastify P175: open, no chip")
+p97 = row["P97"]
+need(p97["shift"] == 2 and p97["status"] == "resolved" and p97["closed"] and "P97" not in chips,
+     "gastify P97: Status displaced by 2 reads 'resolved' — closed, no chip — got shift %s, %r, closed %s"
+     % (p97["shift"], p97["status"], p97["closed"]))
+p87 = row["P87"]
+need(p87["shift"] == 1 and p87["status"] == "open" and p87["open"],
+     "gastify P87: displaced by 1, still open — got shift %s, %r" % (p87["shift"], p87["status"]))
+need(row["P109"]["closed"] and row["P109"]["status"] == "deferred" and "P109" not in chips,
+     "gastify P109: closed by its comment, 'deferred' kept, and the comment's sha is not read (no chip)")
+need(row["P151"]["closed"] and "P151" not in chips, "gastify P151: a CI run id in the 11th cell is no chip")
+p160 = row["P160"]
+need(p160["shift"] == 1 and p160["status"] == "resolved" and p160["closed"] and "P160" not in chips,
+     "gastify P160: a shifted row whose count was left BLANK anchors on that blank — displaced by 1, 'resolved', "
+     "closed — got shift %s, %r, closed %s" % (p160["shift"], p160["status"], p160["closed"]))
+p217 = [r for r in D.pick_table((fx / "gastify" / "PENDING.md").read_text(), "#", "Finding", "Priority") if r["#"] == "P217"]
+need(len(p217) == 1 and len(p217[0]["_cells"]) == 10 and row["P217"]["shift"] == 0 and row["P217"]["open"],
+     "gastify P217: an escaped pipe stays inside its cell — 10 cells, no shift")
+for f in fails:
+    print("    " + f)
+sys.exit(3 if fails else 0)
+CHIPPY
+}
+chips_ok "$GEN" >"$T/chips.out" 2>&1 && ok || { bad "CHIPS: the done-card sha chips over the gustify + gastify fixtures (see below)"; cat "$T/chips.out"; }
+# FIRE — each rule on a mutated COPY of the generators (exact replacements, each once): it must fail FOR ITS OWN REASON
+chips_fire() {  # chips_fire <label> <expect> <file> <old> <new> [<old> <new> …]
+  local cg="$T/gen-chips"; rm -rf "$cg"; cp -r "$GEN" "$cg"
+  python3 - "$cg/$3" "${@:4}" <<'PY' || { bad "CHIPS FIRE $1: the mutation did not apply"; return; }
+import sys
+f, pairs = sys.argv[1], sys.argv[2:]
+s = open(f, encoding="utf-8").read()
+for old, new in zip(pairs[::2], pairs[1::2]):
+    if s.count(old) != 1: sys.exit(1)
+    s = s.replace(old, new)
+open(f, "w", encoding="utf-8").write(s)
+PY
+  chips_ok "$cg" >"$T/chips-fire.out" 2>&1; local rc=$?
+  [ "$rc" = 3 ] && grep -qF -- "$2" "$T/chips-fire.out" && ok || { bad "CHIPS FIRE $1 (rc $rc)"; cat "$T/chips-fire.out"; }
+}
+chips_fire "Verified read first"       "gustify #101: the chip names the RESOLVING commit" _center_data.py \
+  '_sha_tokens(" ".join([status, verified] + overflow))' '_sha_tokens(" ".join([verified, status] + overflow))'
+chips_fire "no shift detection"        "gastify P97: Status displaced by 2"                _center_data.py \
+  'shift = j - i_def if j is not None else 0' 'shift = 0'
+chips_fire "a header-only read"        "gastify: chips on P61 and P176 only — got []"      _center_data.py \
+  'status, verified, shift, shas = _positional(r)' \
+  'status, verified, shift, shas = col(r, "Status"), col(r, "Verified"), 0, _sha_tokens(col(r, "Status") + " " + col(r, "Verified"))'
+chips_fire "all-digit shas dropped"    "gustify #150: an all-digit sha of 8"               _kdbp_ledger.py \
+  '(t.isdigit() and len(t) > 8)' 't.isdigit()'
+chips_fire "an open row chipped"       "gustify #130: an OPEN row naming a sha"            _a3_board.py \
+  'shas=(r["shas"] if r["closed"] else []),' 'shas=r["shas"],' 'if c["done"] and c.get("shas"):' 'if c.get("shas"):'
+chips_fire "the escaped pipe split"    "gastify P217: an escaped pipe stays inside"        _kdbp_ledger.py \
+  '.replace("\\|", "\x00")' ''
+chips_fire "Verified read by header"   "gustify #160: a raw pipe moved Status AND Verified" _center_data.py \
+  'status, verified = at(i_st), at(i_ver)' 'status, verified = at(i_st), col(r, "Verified")'
+chips_fire "the blank-count anchor"    "gastify P160: a shifted row whose count was left BLANK" _center_data.py \
+  'if j is None and len(cells) > len(hdr) and cells[i_def]:' 'if False:'
 
 # --- GUARD lens (2026-07-25): used-but-unguarded, and the by_endpoint trap ---
 if (cd "$GEN" && python3 - <<'GUARDPY'

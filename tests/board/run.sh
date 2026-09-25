@@ -15,7 +15,9 @@
 # The board SEATS (D-043 · D-046) ride the same contract: the skeleton mounts
 # {{BOARD_SEATS}} and loads the pane runtime in its one working order, render_board
 # fills the token, and seats.js joins a ledger sha by PREFIX and tears a pane down
-# through GabePane.destroy. What the seats DO is proven in a browser by
+# through GabePane.destroy. The done-card sha chip too: card_html emits it only on
+# a done card that names a commit, and seats.css styles the class it emits (its
+# keyboard focus ring kept). What the seats DO is proven in a browser by
 # tests/embed-pane/seats.mjs; what a regen WRITES, by tests/center.
 set -u
 REPO="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -25,6 +27,7 @@ CSS="$REPO/templates/center/shell/assets/a3.css"
 SHELL_BOARD="$REPO/templates/center/shell/board.html"
 BUILD="$REPO/templates/center/generators/build_center_a3.py"
 SEATS_JS="$REPO/templates/center/shell/assets/seats.js"
+SEATS_CSS="$REPO/templates/center/shell/assets/seats.css"
 # the SEATS' scripts, in the one order that works: the feeds, the 3D bundle, _grammar before _slice (which
 # captures it at load), _pane before _pane-console (which wraps it), the boot last — all after board.js
 SEAT_SRCS="c4-graph.js commits.js workflows.js spine.js assets/3d-bundle.js assets/_grammar.js assets/_slice.js assets/_uni-grammar.js assets/_pane.js assets/_pane-console.js assets/seats.js"
@@ -63,6 +66,17 @@ seats_ok() {  # seats.js joins by PREFIX on the full sha (a position-0 test — 
     && ! grep -q '_destructor' "$1" && ! grep -q 'HAVE\[c\.short\]' "$1" && ! grep -q 'newer than the landed feed' "$1"
 }
 
+chip_ok() {   # card_html emits the sha chip — a button of its OWN class (never .bchip, which board.js filters on) —
+              # only on a DONE card that names a commit; the debt loop hands a card its shas only when the row closed
+  grep -q '    if c\["done"\] and c.get("shas"):$' "$1" && grep -q '<button type="button" class="bc-sha" ' "$1" \
+    && grep -q '<div class="bc-top">{"".join(chips)}{ripe}{sha}</div>' "$1" \
+    && grep -q 'shas=(r\["shas"\] if r\["closed"\] else \[\]),' "$1"
+}
+chipcss_ok() {  # seats.css styles the chip the generator emits, ● and ○ apart, and keeps a keyboard focus ring on it
+  grep -q '^\.bc-sha{' "$1" && grep -q '^\.bc-sha\[data-live="1"\]{' "$1" \
+    && grep -q '^\.bc-sha:focus-visible{ outline:2px solid var(--accent);' "$1" && ! grep -q '^\.bc-sha.*outline:none' "$1"
+}
+
 # --- SILENT: the shipped sources satisfy the contract ----------------------
 gen_ok "$GEN" && ok || bad "silent: generator must emit data-closed30 + data-aged"
 js_ok  "$JS"  && ok || bad "silent: board.js must carry/apply/wire closed30+aged and build the spine rail"
@@ -82,6 +96,8 @@ grep -q '\.bnow-graph' "$CSS" && ok || bad "silent: CSS must style the ▶ NOW�
 shell_ok  "$SHELL_BOARD" && ok || bad "silent: board.html must mount {{BOARD_SEATS}} between the title and the lede, link the seat skin, and load the seats' scripts in order after board.js"
 render_ok "$BUILD"       && ok || bad "silent: render_board must fill {{BOARD_SEATS}} from _a3_seats, capped by _a3_commits.N"
 seats_ok  "$SEATS_JS"    && ok || bad "silent: seats.js must join by prefix on the full sha and tear down through GabePane.destroy"
+chip_ok    "$GEN"        && ok || bad "silent: card_html must emit the .bc-sha chip on a done card that names a commit, and only there"
+chipcss_ok "$SEATS_CSS"  && ok || bad "silent: seats.css must style .bc-sha, ● apart from ○"
 
 # --- FIRE: drift on EITHER half is caught ----------------------------------
 T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
@@ -116,6 +132,19 @@ grep -q 'cur.Graph._destructor()' "$T/seats-h.js" && ! seats_ok "$T/seats-h.js" 
 # i) a SUBSTRING join — a ledger token found anywhere inside a sha, not at its start, would draw the wrong commit
 sed 's/\.toLowerCase()\.lastIndexOf(s, 0) !== 0) continue;/.toLowerCase().indexOf(s) < 0) continue;/' "$SEATS_JS" > "$T/seats-i.js"
 grep -q 'indexOf(s) < 0) continue;' "$T/seats-i.js" && ! seats_ok "$T/seats-i.js" && ok || bad "fire: a seats.js joining by SUBSTRING (indexOf(s) < 0) must be caught"
+
+# j) the chip branch dropped — no done card wears its commit, silently
+sed 's/^    if c\["done"\] and c.get("shas"):$/    if False:/' "$GEN" > "$T/gen-j.py"
+grep -q '^    if False:$' "$T/gen-j.py" && ! chip_ok "$T/gen-j.py" && ok || bad "fire: a card_html that never emits the chip must be caught"
+# k) the done guard dropped — an open card would wear a sha as if it were resolved
+sed 's/^    if c\["done"\] and c.get("shas"):$/    if c.get("shas"):/' "$GEN" > "$T/gen-k.py"
+grep -q '^    if c.get("shas"):$' "$T/gen-k.py" && ! chip_ok "$T/gen-k.py" && ok || bad "fire: a chip emitted without the done guard must be caught"
+# l) the chip left unstyled
+grep -v '^\.bc-sha' "$SEATS_CSS" > "$T/seats-l.css"
+chipcss_ok "$T/seats-l.css" && bad "fire: a seats.css without the .bc-sha rules must be caught" || ok
+# m) the focus ring removed — a Tab onto a ○ chip shows nothing
+sed 's/^\(\.bc-sha\[data-live="1"\]:hover, \.bc-sha:focus-visible{ .*\) }$/\1 outline:none; }/' "$SEATS_CSS" > "$T/seats-m.css"
+grep -q 'outline:none; }$' "$T/seats-m.css" && ! chipcss_ok "$T/seats-m.css" && ok || bad "fire: a .bc-sha rule that drops the focus ring (outline:none) must be caught"
 
 echo "=================================="
 echo "board battery: $pass passed, $fail failed"

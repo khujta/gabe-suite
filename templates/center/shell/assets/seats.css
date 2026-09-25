@@ -1,4 +1,5 @@
-/* seats.css — the board's SEATS (D-043): the labelled strip, the commit picker in its head, the spine grid.
+/* seats.css — the board's SEATS (D-043): the labelled strip, the commit picker in its head, the spine grid, the
+   done-card chip.
    On the centre's own tokens (a3.css), so the strip follows [data-theme="dark"]; the pane inside keeps its
    dark ground (Q9 — _pane.css / _pane-console.css, tokens on .seat .pn, .seat .pnc, never on .seat). */
 .seats{ display:flex; flex-direction:column; gap:14px; margin:14px 0 16px; }
@@ -37,3 +38,12 @@
 .sp-col .sp-live.off{ color:var(--muted); border:1px dashed var(--line); }
 .sp-col.empty{ opacity:.55; }
 @media (max-width:900px){ .seat[data-seat="spine"] .seat-row{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+
+/* THE DONE-CARD CHIP: the commit a closed PENDING row names (_a3_board), ● in the picker's feed or ○ not (seats.js).
+   A button, never a .bchip (board.js reads those as filters); only a ● draws */
+.bc-sha{ margin-left:auto; font:700 .6rem/1.5 ui-monospace, Menlo, monospace; letter-spacing:.02em; padding:1px 7px; border-radius:20px;
+  white-space:nowrap; border:1px dashed var(--line); background:var(--surface); color:var(--muted); cursor:default; }
+.bc-sha[data-live="1"]{ border-style:solid; border-color:color-mix(in srgb, var(--accent) 55%, var(--line)); color:var(--accent); cursor:pointer; }
+.bc-sha[data-live="1"]:hover, .bc-sha:focus-visible{ background:color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+/* a real button Tab reaches: its focus ring is the keyboard's one cue (a ○ has no other), on the centre's --accent */
+.bc-sha:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }

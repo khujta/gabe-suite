@@ -25,8 +25,10 @@ import re
 from pathlib import Path
 
 # pure: takes the kdbp dir, reads nothing at import; split_row is the ONE guarded
-# row split md_tables, load_plan and the LEDGER all read through
-from _kdbp_ledger import ledger_rows as _ledger_rows, split_row as _split_row
+# row split md_tables, load_plan and the LEDGER all read through, sha_tokens the
+# ONE sha tokenizer the spine and the done-card chips share
+from _kdbp_ledger import (ledger_rows as _ledger_rows, sha_tokens as _sha_tokens,
+                          split_row as _split_row)
 
 # --------------------------------------------------------------------------- #
 # Config + path resolution — the ONE place project bindings enter the loaders.
@@ -143,7 +145,12 @@ def md_tables(text: str) -> list[tuple[list[str], list[dict]]]:
             continue
         if hdr is None:
             continue
-        rows.append(dict(zip(hdr, cells + [""] * (len(hdr) - len(cells)))))
+        d = dict(zip(hdr, cells + [""] * (len(hdr) - len(cells))))
+        # zip drops every cell past the header; `_cells` keeps the raw split for a
+        # POSITIONAL reader (a PENDING row whose Status a raw pipe displaced). No
+        # header is spelled `_cells`, so col() never selects it.
+        d["_cells"] = cells
+        rows.append(d)
     if hdr:
         tables.append((hdr, rows))
     return tables
@@ -381,6 +388,43 @@ def _verdict_closed(status: str) -> bool:
     return "OPEN" not in su and any(t in su for t in _CLOSERS)
 
 
+def _positional(r: dict) -> tuple[str, str, int, list[str]]:
+    """A PENDING row's Status and Verified read BY POSITION, and the shas it names.
+
+    A raw pipe inside a code span ends its cell there (only `\\|` stays inside),
+    so every cell after it — Status included — sits one or two to the right,
+    and a header read takes an Impact or a Times Deferred for the verdict.
+    Times Deferred is a count, so it anchors the row: when its header cell
+    holds something else, the next number before the last cell is where it
+    went, and Status moved by the same `shift`. A count left BLANK is still
+    the count's position: with no number to find, the first empty cell there
+    is the anchor — only when the count's header cell holds something and the
+    row is longer than its header, so a blank count in place, or a `—` on a
+    row of header length, moves nothing. Cells past the header are kept
+    too (a Verified the header never declared), then the shas, Status FIRST —
+    it names the commit that closed the row, a Verified is often an older
+    reconcile — Verified next, the overflow last; `sha_tokens` spells each
+    commit once. A closure comment's sha is not read."""
+    cells, hdr = r["_cells"], [k for k in r if k != "_cells"]
+    idx = {h.strip().lower(): i for i, h in enumerate(hdr)}
+    i_def, i_st, i_ver = (idx.get(k) for k in ("times deferred", "status", "verified"))
+    shift = 0
+    if i_def is not None and not re.fullmatch(r"\d+", cells[i_def] if i_def < len(cells) else ""):
+        rest = range(i_def + 1, len(cells) - 1)
+        j = next((k for k in rest if re.fullmatch(r"\d+", cells[k])), None)
+        if j is None and len(cells) > len(hdr) and cells[i_def]:
+            j = next((k for k in rest if not cells[k]), None)   # the moved count, left blank
+        shift = j - i_def if j is not None else 0
+
+    def at(i: int | None) -> str:
+        return cells[i + shift] if i is not None and i + shift < len(cells) else ""
+
+    status, verified = at(i_st), at(i_ver)
+    last = max(x for x in (i_st, i_ver, len(hdr) - 1) if x is not None)
+    overflow = [c for c in cells[last + shift + 1:] if c]
+    return status, verified, shift, _sha_tokens(" ".join([status, verified] + overflow))
+
+
 def load_pending_rows(include_archive: bool = True) -> list[dict]:
     """Every deferred-finding row the project keeps — OPEN and CLOSED alike.
 
@@ -393,6 +437,13 @@ def load_pending_rows(include_archive: bool = True) -> list[dict]:
     Resolved rows are lifted out of the live file into
     `.kdbp/archive/PENDING-resolved_*.md`, so reading only the live file
     undercounts finished work badly — one twin showed 11 closed instead of 64.
+
+    Status and Verified are read BY POSITION (`_positional`), so a row a raw
+    pipe shifted is judged on its own verdict; `shas` (Status first) and `sha`
+    feed the board's done-card chips, `shift` says how far the row moved.
+    `closed_on` keeps the HEADER read of Verified (O7, by plan): on a shifted
+    row that cell holds the displaced Status or count, so the date comes from
+    the Status (its next fallback), never from the moved Verified.
     """
     out: list[dict] = []
     seen: set[str] = set()
@@ -413,7 +464,7 @@ def load_pending_rows(include_archive: bool = True) -> list[dict]:
             if not re.match(r"^[A-Za-z]?\d+$", num) or num in seen:
                 continue
             seen.add(num)
-            status = col(r, "Status")
+            status, verified, shift, shas = _positional(r)
             closed = bool(archived or num in resolved
                           or _verdict_closed(status))
             closed_on = (as_date(col(r, "Verified")) if closed else None) \
@@ -426,7 +477,8 @@ def load_pending_rows(include_archive: bool = True) -> list[dict]:
                 "scale": col(r, "Scale"), "priority": col(r, "Priority").lower(),
                 "impact": col(r, "Impact"),
                 "deferred": col(r, "Times Deferred"), "status": status,
-                "verified": col(r, "Verified"), "gate": gates.get(num, ""),
+                "verified": verified, "gate": gates.get(num, ""),
+                "shas": shas, "sha": shas[0] if shas else "", "shift": shift,
                 "open": not closed, "closed": closed,
                 "closed_on": closed_on.isoformat() if closed_on else "",
                 "parked": "parked" in status.lower() or "far" in status.lower(),
