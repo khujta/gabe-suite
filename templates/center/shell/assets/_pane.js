@@ -414,7 +414,7 @@ window.GabePane = (function () {
     };
     pane.hl = HL;
 
-    /* TEARDOWN (D-045). A seat that switches subjects mounts a new pane; the old one must give its WebGL
+    /* TEARDOWN (D-047). A seat that switches subjects mounts a new pane; the old one must give its WebGL
        context back, or about sixteen switches in the browser drops the OLDEST live context — a pane still
        on screen goes blank. force-graph's _destructor disposes the renderer but never loses the context,
        which then lives until the collector finds it; so it is lost here, last, the three.js way (dispose,

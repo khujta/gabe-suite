@@ -1,4 +1,4 @@
-/* destroy.mjs — GabePane.destroy, measured in a real browser against the SHIPPED runtime (D-045).
+/* destroy.mjs — GabePane.destroy, measured in a real browser against the SHIPPED runtime (D-047).
  *
  * A seat that switches subjects mounts a new pane and destroys the old one. The browser keeps about
  * sixteen live WebGL contexts and then drops the OLDEST — a pane still on screen goes blank — so a

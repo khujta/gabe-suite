@@ -1,4 +1,4 @@
-/* seats.css — the board's SEATS (D-043): the labelled strip, the commit picker in its head, the spine grid, the
+/* seats.css — the board's SEATS (D-045): the labelled strip, the commit picker in its head, the spine grid, the
    done-card chip.
    On the centre's own tokens (a3.css), so the strip follows [data-theme="dark"]; the pane inside keeps its
    dark ground (Q9 — _pane.css / _pane-console.css, tokens on .seat .pn, .seat .pnc, never on .seat). */

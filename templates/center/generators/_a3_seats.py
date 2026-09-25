@@ -1,4 +1,4 @@
-"""The board's SEATS — a picture of the code, mounted on a centre page (D-043 · D-046).
+"""The board's SEATS — a picture of the code, mounted on a centre page (D-045 · D-048).
 
 A seat is a labelled strip that holds a mini universe of ONE subject (the pane runtime in
 shell/assets/: `_pane.js` and its siblings). The board carries two, in this order:

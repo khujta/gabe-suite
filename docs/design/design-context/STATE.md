@@ -14,13 +14,13 @@ The consolidation (D-024) is built: the brain map folded into the endpoint lab �
 groupings, Keep only, the moves and the three placements, with a FIELD layer that lights what the panels draw — and one page
 shows every endpoint of gustify. The brain map's own page, the review page and three other closed files are records now
 (`records/`). What is left is the display half — M3, the gallery, the tests. Nothing propagates to the twins (D-023): every
-page reads the frozen lab feed. The one lift is the board seats (D-043 … D-049), built on branch `center/seats`.
+page reads the frozen lab feed. The one lift is the board seats (D-045 … D-051), built on branch `center/seats`.
 
 ## Rules in force
 
 | rule | where |
 |---|---|
-| No propagation; pages read the frozen feed — lifted for the board seats only (gustify by the suite, gastify by itself) | D-023, D-047 |
+| No propagation; pages read the frozen feed — lifted for the board seats only (gustify by the suite, gastify by itself) | D-023, D-049 |
 | Display is decided by seeing built options; generation comes first | D-025.1 |
 | A choice made alone is a rail option, the agent's pick marked | D-025.2 |
 | Facts are generated, never typed | D-025.3 |

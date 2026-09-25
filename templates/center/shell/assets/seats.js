@@ -1,4 +1,4 @@
-/* seats.js — the board's SEATS, booted (D-043 · D-046): the spine strip and the commit picker.
+/* seats.js — the board's SEATS, booted (D-045 · D-048): the spine strip and the commit picker.
  *
  * The LAST deferred script on board.html: when it runs, every feed and runtime file before it has run — or
  * 404ed, which leaves its global undefined; this file names the file instead of going quiet.

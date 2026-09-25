@@ -12,7 +12,7 @@
 # time by playwright against a real twin's board (the lab-driver read-only
 # build); this battery keeps the two source halves from drifting apart after.
 #
-# The board SEATS (D-043 · D-046) ride the same contract: the skeleton mounts
+# The board SEATS (D-045 · D-048) ride the same contract: the skeleton mounts
 # {{BOARD_SEATS}} and loads the pane runtime in its one working order, render_board
 # fills the token, and seats.js joins a ledger sha by PREFIX and tears a pane down
 # through GabePane.destroy. The done-card sha chip too: card_html emits it only on
@@ -92,7 +92,7 @@ grep -q '\.bnow-lab' "$CSS"        && ok || bad "silent: CSS must style the bann
 grep -q 'href="gabe-universe.html"' "$JS" && grep -q 'bnow-graph' "$JS" \
   && ok || bad "silent: the ▶ NOW banner must link to gabe-universe.html (.bnow-graph)"
 grep -q '\.bnow-graph' "$CSS" && ok || bad "silent: CSS must style the ▶ NOW→graph link (.bnow-graph)"
-# the SEATS (D-043 · D-046): the mount, the render, the boot
+# the SEATS (D-045 · D-048): the mount, the render, the boot
 shell_ok  "$SHELL_BOARD" && ok || bad "silent: board.html must mount {{BOARD_SEATS}} between the title and the lede, link the seat skin, and load the seats' scripts in order after board.js"
 render_ok "$BUILD"       && ok || bad "silent: render_board must fill {{BOARD_SEATS}} from _a3_seats, capped by _a3_commits.N"
 seats_ok  "$SEATS_JS"    && ok || bad "silent: seats.js must join by prefix on the full sha and tear down through GabePane.destroy"

@@ -1,4 +1,4 @@
-/* seats.mjs — the board's two SEATS, measured in a real browser on a BUILT centre (D-043 · D-046).
+/* seats.mjs — the board's two SEATS, measured in a real browser on a BUILT centre (D-045 · D-048).
  *
  * usage: node seats.mjs <mode>[@<tag>]=<board.html> …   (one browser, the pages in turn; a tag names a run in every
  *        line it prints — `full@exact S5 …` — so one pass can carry several mutated copies)
@@ -31,7 +31,7 @@
  *            and its head says nothing can be drawn, and why — never 'pick'
  *   stub     a copy whose commits.js is the honest-empty stub beside a populated LEDGER: every spine entry ○,
  *            the spine head says none is drawable because commits.js carries no commits — never 'pick'
- *   measure  load-to-ready on a real centre, reported and never judged (D-043's revisit trigger)
+ *   measure  load-to-ready on a real centre, reported and never judged (D-045's revisit trigger)
  *
  * Every count is read from the page (GABE_COMMITS · GABE_SPINE · data-cap), never a number written here. Heavy
  * (WebGL on swiftshader): run alone.

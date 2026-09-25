@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""promote.py — ship the pane runtime into templates/center/shell/assets/, generated, never hand-copied (D-045).
+"""promote.py — ship the pane runtime into templates/center/shell/assets/, generated, never hand-copied (D-047).
 
     python3 docs/design/embed-graph/promote.py                  # write every output
     python3 docs/design/embed-graph/promote.py --check          # 0 in sync · 1 DRIFT · 2 a band marker is gone
@@ -20,7 +20,7 @@ a copy by hand:
   _grammar.js · _slice.js · _pane.js · _pane-console.js · _pane-console.css
                      copies of the lab files, byte for byte under a GENERATED header.
 
-The station itself is NOT edited (D-045): it keeps its private copies. `--check` is the drift guard —
+The station itself is NOT edited (D-047): it keeps its private copies. `--check` is the drift guard —
 tests/gabe-universe (11c) runs it, and it fires the moment a band of the station or a lab file moves
 without a re-run. Every header here says GENERATED and carries no line number and no sha, so the only
 thing that can trip the check is a real change in what ships.
@@ -258,7 +258,7 @@ def first_diff(a: str, b: str) -> int:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="promote the pane runtime into the shell assets (D-045)")
+    ap = argparse.ArgumentParser(description="promote the pane runtime into the shell assets (D-047)")
     ap.add_argument("--check", action="store_true", help="compare, write nothing")
     ap.add_argument("--station", default=str(REPO / STATION_REL), help="the station page to extract from")
     a = ap.parse_args()

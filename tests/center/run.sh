@@ -1724,7 +1724,7 @@ grep -q "Gabe Center" "$FIX/docs/site/center/index.html" \
   && ok || bad "brand: the subtitle must read Gabe Center"
 [ -f "$FIX/docs/site/center/assets/gabe-icon.png" ] \
   && ok || bad "brand: gabe-icon.png must copy with the shell assets"
-# The PANE RUNTIME (D-045) rides the same wholesale assets/ copy — no list to edit, so a center
+# The PANE RUNTIME (D-047) rides the same wholesale assets/ copy — no list to edit, so a center
 # regen ships all seven files or the seats have nothing to mount.
 for f in _grammar.js _slice.js _uni-grammar.js _pane.js _pane-console.js _pane.css _pane-console.css; do
   [ -f "$FIX/docs/site/center/assets/$f" ] \
@@ -2866,7 +2866,7 @@ grep -q 'EvidenceNav.mount' "$WGP" \
 grep -qE 'census step\(s\)|census capture\(s\)|workflow census not captured|workflow census present but unreadable' "$WGP" \
   && bad "census-rows clean: an all-running census with shots on disk must mint ZERO census rows" || ok
 
-# --- the board SEATS (D-043 · D-046): the spine strip + the commit picker, mounted by {{BOARD_SEATS}} -----
+# --- the board SEATS (D-045 · D-048): the spine strip + the commit picker, mounted by {{BOARD_SEATS}} -----
 # MARKUP from _a3_seats, BEHAVIOUR from assets/seats.js, DATA from commits.js + spine.js. The browser half (what
 # the seats DO) is tests/embed-pane/seats.mjs; this half proves what a regen WRITES. Each predicate below is the
 # one its FIRE turns red on a mutated copy (a checker that cannot fail is non-evidence).

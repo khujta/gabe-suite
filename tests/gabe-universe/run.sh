@@ -1482,7 +1482,7 @@ check(not detached, "page carries tokens the glob build cannot fill on every pag
 for href in ('href="index.html"', 'href="tests.html"', 'href="entity-index.html"'):
     check(href in page, "station nav missing a sibling backlink: "+href)
 
-# ── 11c. PANE RUNTIME PARITY (D-045): the pane runtime in assets/ is a FRESH extract of THIS station ──
+# ── 11c. PANE RUNTIME PARITY (D-047): the pane runtime in assets/ is a FRESH extract of THIS station ──
 #    The station keeps its private copies (it is not cut over), so nothing else notices when the shipped
 #    _uni-grammar.js falls behind it. promote.py re-extracts every band BY MARKER and byte-compares all its
 #    outputs (the lab copies too). FIRE: one band byte. SILENT: every band's line numbers shift. MARKER: rc 2.
