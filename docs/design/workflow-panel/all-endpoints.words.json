@@ -1,6 +1,7 @@
 {
   "_about": "Authored words for all-endpoints.html — the only strings on the page that are not facts. gen-all-endpoints.py refuses to build when a line here types a number (a {token} the generator or the page fills instead) or says a word D-018 took out. Tokens the generator fills are listed in its `tok`; the ones the page fills while it runs are listed in _runtime.",
   "_runtime": [
+    "via",
     "cards",
     "n",
     "of",
@@ -57,7 +58,18 @@
     "covered",
     "fields",
     "left",
-    "empty"
+    "empty",
+    "w",
+    "k",
+    "scheme",
+    "header",
+    "carrier",
+    "lines",
+    "ret",
+    "cons",
+    "cols",
+    "tbl",
+    "st"
   ],
   "eyebrow": "every endpoint of one app, side by side",
   "h1": "All {nRows} endpoints of {app}, one row each",
@@ -608,8 +620,22 @@
     "proof": "the lab's proof rank",
     "proofWords": "{n} of its refusals named by a test, a test that fits several counted for each · rank {v} of {of}",
     "inflight": "in flight",
-    "hook": "the hook that calls it",
-    "screens": "screens above that hook",
+    "hook": "what sends it",
+    "screens": "screens above them",
+    "hookFile": "a file, not a hook or component inside it",
+    "arranged": "arranges {n} other cases",
+    "arrangedHelper": "through a helper",
+    "arrangedBoth": "itself and through a helper",
+    "arrangedPlain": "A case that calls this endpoint only to set another test up. It proves no ending here, but it falls when this endpoint changes.",
+    "behindDepth": "depth {n}",
+    "behindExtra": "depth not known",
+    "behindExtraPlain": "Behind the handler by the Gabe Universe's count, reached through no call the map draws, so how deep is not known.",
+    "behindNoname": "+{n} by name only",
+    "behindNonamePlain": "The Gabe Universe names these behind the handler, and no single function in the code carries each name, so they are counted, not named.",
+    "nestedIn": "inside it",
+    "nestedParent": "in {v}",
+    "headers": "headers per ending",
+    "headersPlain": "The headers an ending sends beside its body.",
     "reasons": "reason sites",
     "alarms": "alarms",
     "pieces": "its rare pieces",
@@ -751,7 +777,8 @@
       "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs inside. A check stands where it is evaluated, on every path that makes the call it sits in; its ending stands where the request leaves. A check the map ties only to a catch stands where that catch raises its ending. A test has no time inside the request: it rides the ending it proves. What the map does not place is left in the band below, with its reason.",
       "A step is placed once for each path it is on: with the dependencies when a dependency runs it, else at the call that path makes. So one step can stand at more than one moment: the login dependency reads a table, and a handler call reads it again. When a path's own chain names no call reaching the step, it stands at the calls the endpoint's other paths make to its function, never after that path has left.",
       "The path: every path at once, or the path to one ending. Each ending is a code, in the order they happen, a small gap between the moments they leave at; its hover says the moment, what the ending says, its limiter, and whether it is the path in force. A picked path keeps only the moments it passes and the elements it passes there; an ending it passes by without leaving is kept.",
-      "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it names one) and the class its except takes; the checks say so; the work names the first function it calls, and how many more; saving names what the handler's own step does there. Its full name, where the catch stands, its lines and its stage are in its hover."
+      "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it names one) and the class its except takes; the checks say so; the work names the first function it calls, and how many more; saving names what the handler's own step does there. Its full name, where the catch stands, its lines and its stage are in its hover.",
+      "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An ending's status is drawn hollow when the endpoint does not declare it. A test whose status fits endings at several moments rides each of them, its chip hollow and dashed. A function behind the handler stands at the handler call that reaches it, the arrow saying how many calls below the handler it is; one the map reaches through no call stands in the band."
     ],
     "covHead": "Across the {nRows} endpoints, what each block places:",
     "cov": "{block}: {placed} with a moment, {un} with none, of {total}.",
@@ -830,7 +857,9 @@
       "pathsonly": { "name": "paths only", "plain": "The map says which paths it is on, but not where on them." },
       "fnnone": { "name": "no call reaches it", "plain": "The map names the function, but records no handler call that reaches it." },
       "swmoves": { "name": "moves with the path", "plain": "Its paths place it at different moments." },
-      "nopath": { "name": "on no path", "plain": "The endpoint lists it, but none of its paths passes it, so no path can be followed to it." }
+      "nopath": { "name": "on no path", "plain": "The endpoint lists it, but none of its paths passes it, so no path can be followed to it." },
+      "noname": { "name": "by name only", "plain": "It is named behind the handler, and no single function carries the name, so no call can be followed to it." },
+      "arranged": { "name": "sets another test up", "plain": "The case calls this endpoint only to set another test up. A test has no time inside the request, and this one proves no ending here." }
     },
     "empty": "nothing here at this moment",
     "proves": "proves",
@@ -838,7 +867,36 @@
     "scrolls": "The columns do not fit this width: the box scrolls sideways for the rest.",
     "handler": "the handler starts here",
     "body": "the body",
-    "tip": "{name} · {block}"
+    "tip": "{name} · {block}",
+    "x": {
+      "_about": "D-056: what each element's hover adds, read off the feed (the operator's twelve adds, his ruling \"agree with your recommendations\").",
+      "depth": "depth {n}",
+      "depthPlain": "How many calls below the handler it is reached.",
+      "callPaths": "on every path that calls {via}",
+      "callPathsPlain": "It runs inside {via}, and a path may leave {via} before it runs, so a path picked here may not reach it.",
+      "fate": "on this path: {v}",
+      "fatePlain": "With one path picked, a write wears what the path does with it.",
+      "race": "a race on {cons}",
+      "raceShort": "race",
+      "racePlain": "A first call and its retry with the same key both pass the check before this step; the later one breaks the unique key ({cols}) of {tbl} here, nothing catches it, and it ends in the uncaught {st}.",
+      "headers": "sends {v}",
+      "declared": "declared",
+      "undeclared": "not declared",
+      "declaredPlain": "The endpoint declares this status: the decorator's success status, a declared refusal, or the 422 FastAPI declares for every endpoint it checks.",
+      "undeclaredPlain": "The endpoint does not declare this status; a client reading its contract does not expect it.",
+      "stream": "streams its answer",
+      "limit": "{n} per {w} seconds, keyed {k}",
+      "auth": "{scheme} reads the {header} {carrier}",
+      "asserts": "asserts status {v}",
+      "assertsDetail": "and the detail {v}",
+      "assertsCode": "and the code {v}",
+      "assertsAttrs": "and asserts on the body ({n})",
+      "assertsNone": "asserts no status",
+      "hollow": "fits {n} endings; this is one of them",
+      "hollowPlain": "Its status fits endings at several moments, so it rides each of them, drawn hollow: it proves one of them, not which.",
+      "inside": "inside {v}",
+      "file": "a file, not a hook or component inside it"
+    }
   },
   "carry": {
     "_about": "D-055: his ask 2026-09-26, a switch in the code map that dims or hides every field BY MOMENT already carries, to see what else is there. Its three looks and the default (show all) are my proposal (D-025.2): the default is my pick, dashed. What counts as carried is read by gen-all-endpoints.py (carried) and proven there.",
@@ -922,13 +980,9 @@
         "count": "Across the page's endpoints: {nStSolved} gaps solved elsewhere · {nStNot} not solving · {nStOpen} open.",
         "tableHead": ["which way", "at", "first reason", "split by", "status", "line"],
         "table": [
-          { "dir": "b", "at": "fn @ GUARDS", "why": "alt", "status": "solved", "line": "The code map holds this dependency as the value it hands the handler: an in-flight value, in the field linked here." },
-          { "dir": "b", "at": "fn @ CODE BEHIND", "why": "cnt", "status": "solved", "line": "The code map counts this function in the fields linked here; it does not list the functions behind the handler by name." },
           { "dir": "b", "at": "callee @ CODE BEHIND", "why": "cnt", "status": "solved", "line": "The code map counts this callee among the functions behind the handler, linked here. The feeds hold no single function for the name, so it cannot be named on its own." },
           { "dir": "b", "at": "case @ TESTS", "why": "cnt", "status": "solved", "line": "The code map counts this case in the fields linked here — the calls that act on this endpoint and, where a call proves an ending, that ending — without naming it." },
           { "dir": "b", "at": "case @ JOURNEYS", "why": "cnt", "status": "solved", "line": "The code map counts this journey's case in the fields linked here — the calls that act on this endpoint and, where a call proves an ending, that ending — without naming it." },
-          { "dir": "b", "at": "case @ TESTS", "why": "gap", "q": "arranged", "status": "open", "line": "This case calls the endpoint only to set another test up. forms.json already lists it in the endpoint's tests.arranged_by; carrying it needs the code map to read that list beside the cases that act (gen-all-endpoints' row record)." },
-          { "dir": "b", "at": "case @ JOURNEYS", "why": "gap", "q": "arranged", "status": "open", "line": "This journey's case calls the endpoint only to set another test up. forms.json already lists it in the endpoint's tests.arranged_by; carrying it needs the code map to read that list beside the cases that act (gen-all-endpoints' row record)." },
           { "dir": "b", "at": "case @ TESTS", "why": "gap", "q": "other", "status": "open", "line": "The tests arm read this case's calls, and none of them reaches this endpoint (forms.json test_cases, each call's endpoint); the station credits the case here from its test ledger (the station graph's det.cases, by the handler or its route). Which reading holds is not measured yet: the measurement owed is whether the case reaches the endpoint through a call the extractor does not follow." },
           { "dir": "b", "at": "case @ JOURNEYS", "why": "gap", "q": "other", "status": "open", "line": "The tests arm read this journey's calls, and none of them reaches this endpoint (forms.json test_cases, each call's endpoint); the station credits it here from its test ledger (the station graph's det.cases). Which reading holds is not measured yet: the measurement owed is whether the case reaches the endpoint through a call the extractor does not follow." },
           { "dir": "b", "at": "case @ TESTS", "why": "gap", "q": "no calls", "status": "open", "line": "The tests arm read no call in this case (its forms.json record lists none), so nothing joins it to an ending. Carrying it needs the test extractor of the tests arm to read the call the case makes; which call shape it misses is not measured yet." },
@@ -939,17 +993,12 @@
           { "dir": "b", "at": "cases @ JOURNEYS", "why": "gap", "q": "drawn", "status": "open", "line": "None of the journeys the card names here makes a call that acts on this endpoint, and the code map counts act calls only. Each journey below carries its own status: where it is held, and what carrying it needs." },
           { "dir": "b", "at": "file @ TESTS", "why": "gap", "status": "open", "line": "A test file of a corpus the tests arm does not read names this route (the tests arm reads pytest junit only); the station counts its cases by that file, the test ledger's route credit (the station graph's det.case_files). Carrying it needs the tests arm to read that corpus's report, or the code map to take the same route credit." },
           { "dir": "b", "at": "journey @ JOURNEYS", "why": "gap", "status": "open", "line": "A journey of a corpus the tests arm does not read (it reads pytest junit only); the station takes it from its test ledger. Carrying it needs the tests arm to read that corpus's report, or the code map to take the ledger's credit as the station does." },
-          { "dir": "b", "at": "schema @ CONNECTIONS", "why": "gap", "q": "nested", "status": "open", "line": "The code map names only the top model of the reply and of the body; this schema sits inside one of them. forms.json holds every schema's fields with their types (schemas{}); naming it needs the code map to follow those types down from the top model." },
           { "dir": "b", "at": "schema @ CONNECTIONS", "why": "gap", "q": "other", "status": "open", "line": "It is neither the body nor the reply nor inside them, so forms.json does not tie it to this endpoint; the station draws the handler's structural touches edge to it (the station's graph feed). Which use that edge reads is not measured yet: that is the measurement owed." },
-          { "dir": "b", "at": "fe @ CONNECTIONS", "why": "cnt", "status": "solved", "line": "The code map counts this frontend piece among the ones that fetch the endpoint, in the field linked here." },
-          { "dir": "b", "at": "fe @ CONNECTIONS", "why": "gap", "status": "open", "line": "The station's bridge edge ends at the fetching file, not at a piece inside it. The lab's facts keep a fetcher only when it is a piece (gen-endpoint-facts, fetched_by), so the code map counts none; carrying it needs them to keep the file itself as the fetcher." },
           { "dir": "b", "at": "table @ CONNECTIONS", "why": "gap", "status": "open", "line": "The code map's tables are the endpoint's access.ops in the station's graph feed, and this model's table is not among them; the station's Connections draw an inferred reads_from edge to it. Which reading holds is not measured yet: the measurement owed is where that edge comes from." },
           { "dir": "b", "at": "tables-touched @ CONNECTIONS", "why": "gap", "q": "none drawn", "status": "not", "line": "Nothing to solve here: the card's Connections draw no table and the code map holds none. The item comes from reading the row as showing tables on every endpoint, the gaps' own proposal (D-040)." },
           { "dir": "b", "at": "operation-per-table @ CONNECTIONS", "why": "gap", "q": "none drawn", "status": "not", "line": "Nothing to solve here: the card's Connections draw no table and the code map holds none. The item comes from reading the row as showing tables on every endpoint, the gaps' own proposal (D-040)." },
           { "dir": "b", "at": "who-fetches-it @ CONNECTIONS", "why": "gap", "q": "none drawn", "status": "not", "line": "Nothing to solve here: the card's Connections draw no fetcher and the code map counts none. The item comes from reading the row as showing who fetches the endpoint on every endpoint, the gaps' own proposal (D-040)." },
-          { "dir": "b", "at": "who-fetches-it @ CONNECTIONS", "why": "gap", "q": "drawn", "status": "open", "line": "The card draws a fetching file the code map does not count (named below): the station's bridge edge ends at the file, not at a piece inside it. Carrying it needs the lab's facts to keep the file itself as the fetcher (gen-endpoint-facts, fetched_by)." },
           { "dir": "b", "at": "who-fetches-it @ USAGE", "why": "gap", "q": "none drawn", "status": "open", "line": "The card's Usage counts the handler's callers (api and internal, the station graph's det.usage from the function insight); the code map counts the frontend pieces that fetch the endpoint, and finds none here. Carrying the card's count needs the code map to read det.usage, which the lab's facts already hold (identity.usage)." },
-          { "dir": "b", "at": "signature @ SIGNATURE", "why": "gap", "status": "open", "line": "The code map does not carry the handler's outline. The lab's facts already hold it, identity.sig (async, lines, returns) and identity.gsig (the text), both from the station's graph feed; gen-all-endpoints' row record drops them, so carrying it is one more pair from them." },
           { "dir": "b", "at": "where-this-endpoint-sits-in-the-app @ ABOVE", "why": "gap", "status": "open", "line": "No field of the code map is filed under this attribute; the nearest it holds is the place for one measure, coverage, as a rank in the proof pair. Carrying the place for every measure needs a rank per column over the feed's endpoints; the table above already sorts each column." },
           { "dir": "b", "at": "risk-flag @ RISK", "why": "gap", "q": "none drawn", "status": "not", "line": "A flag is a verdict read from facts, and the code map draws facts, not verdicts (D-025, analysis not diagnosis): each flag below says which field holds the facts it is read from." },
           { "dir": "b", "at": "untested @ RISK", "why": "alt", "status": "solved", "line": "The flag reads the case counts the station holds for this endpoint; the code map holds its own reading of the same fact, the endings a test proves of all, in the field linked here." },
@@ -959,9 +1008,8 @@
           { "dir": "b", "at": "layer @ IDENTITY", "why": "low", "status": "not", "line": "Rated {rLow} of {rTop} (D-020), and the layer word is how the station files the node: a fact about the map, not the code (D-017)." },
           { "dir": "b", "at": "value @ EVIDENCE", "why": "low", "status": "not", "line": "Rated {rLow} of {rTop} (D-020): the homing evidence says why the map files the endpoint under its entity, a fact about the map, not the code (D-017)." },
           { "dir": "b", "at": "cluster @ ABOVE", "why": "low", "status": "not", "line": "Rated {rLow} of {rTop} (D-020): the cluster is the group the map files the endpoint in, a fact about the map, not the code (D-017)." },
-          { "dir": "b", "at": "DOCSTRING", "why": "gap", "status": "not", "line": "No attribute of the card's ruled inventory is the handler's docstring, and the inventory is ruled (D-020). The lab's facts carry the text (identity.doc) should an attribute be added." },
-          { "dir": "b", "at": "delivery @ DELIVERY", "why": "gap", "status": "open", "line": "The code map does not say how the answer travels. The lab's facts already hold it (security.stream, the endpoint node's stream flag); gen-all-endpoints' row record drops it, so carrying it is one pair from that flag." },
-          { "dir": "b", "at": "value @ DELIVERY", "why": "gap", "status": "open", "line": "The code map does not say how the answer travels. The lab's facts already hold it (security.stream, the endpoint node's stream flag); gen-all-endpoints' row record drops it, so carrying it is one pair from that flag." },
+          { "dir": "b", "at": "DOCSTRING", "why": "gap", "status": "not", "line": "No attribute of the card's ruled inventory is the handler's docstring, and the inventory is ruled (D-020). The code map shows the text in the handler pair's hover (D-056), filed under no attribute." },
+          { "dir": "b", "at": "value @ DELIVERY", "why": "alt", "status": "solved", "line": "The code map's endings table marks the success ending with the Gabe Universe's stream badge, in the field linked here." },
           { "dir": "a", "at": "kinds-of-ending", "why": "gap", "status": "open", "line": "The station's card would draw it from forms.json, where the code map reads it: each ending of the endpoint's produced[], returns[] and framework_exits[], by its kind." },
           { "dir": "a", "at": "the-endings", "why": "gap", "status": "open", "line": "The station's card would draw it from forms.json, where the code map reads it: the endpoint's produced[], returns[] and framework_exits[] (the endpoint pass and the paths arm)." },
           { "dir": "a", "at": "the-stage-an-ending-leaves-from", "why": "gap", "status": "open", "line": "The station's card would draw it from forms.json, where the code map reads it: each ending's phase in produced[] and framework_exits[]; a success leaves at the answer." },
@@ -980,7 +1028,7 @@
           { "dir": "a", "at": "data-touching-functions", "why": "gap", "status": "open", "line": "The station's card would draw it from forms.json, where the code map reads it: the functions of the handler's own steps in each path's effects (the effects arm)." },
           { "dir": "a", "at": "coverage-per-condition", "why": "gap", "status": "open", "line": "The station's card would draw it from forms.json, where the code map reads it: each ending's tests refs (the tests arm)." },
           { "dir": "a", "at": "what-the-case-asserts-on-this-condition", "why": "gap", "status": "open", "line": "The station's card would draw it from forms.json, where the code map reads it: each test ref's conf: the status, and the detail or code where the case asserts them (the tests arm)." },
-          { "dir": "a", "at": "case-role-on-this-endpoint", "why": "gap", "status": "open", "line": "The station's card would draw it from forms.json, where the code map reads it: the endpoint's tests.act, the calls that act on it (the tests arm); tests.arranged_by, which the code map does not read yet, holds the cases that only set up." },
+          { "dir": "a", "at": "case-role-on-this-endpoint", "why": "gap", "status": "open", "line": "The station's card would draw it from forms.json, where the code map reads it: the endpoint's tests.act, the calls that act on it (the tests arm); and tests.arranged_by, the cases that only set up through it, which the code map names beside them." },
           { "dir": "a", "at": "how-common-this-piece-is", "why": "gap", "status": "open", "line": "The station's card would draw it from the lab's tally of the form's pieces over this app's endpoints (_ep_pieces.py over forms.json), the same tally the code map reads." },
           { "dir": "a", "at": "what-the-screen-does-on-this-ending", "why": "gap", "status": "open", "line": "The station's card would draw it from forms.json, where the code map reads it: frontend.reason_sites joined to this endpoint (the frontend arm, reason part)." },
           { "dir": "a", "at": "response-shape-per-ending", "why": "gap", "status": "open", "line": "The station draws its Payload row only when the station's graph feed carries the reply's payload (det.payload), and here it does not. It would draw it from forms.json's responses{}: each ending's media type and body (the contract arm)." },
@@ -1008,7 +1056,8 @@
       "handler": {
         "attrs": [
           "the-handler",
-          "file-line"
+          "file-line",
+          "signature"
         ],
         "icon": "function"
       },
@@ -1119,6 +1168,12 @@
         ],
         "icon": "test"
       },
+      "arranged": {
+        "attrs": [
+          "case-role-on-this-endpoint"
+        ],
+        "icon": "test"
+      },
       "inflight": {
         "attrs": [
           "in-flight-values"
@@ -1162,7 +1217,16 @@
         "icon": "skip"
       }
     },
-    "kinds": "kinds of ending"
+    "kinds": "kinds of ending",
+    "sig": {
+      "_about": "D-056 (11): the handler pair's hover — its outline and its docstring, read from the lab's facts (identity.sig, identity.gsig, identity.doc).",
+      "async": "async",
+      "sync": "not async",
+      "lines": "{lines} lines",
+      "returns": "returns {ret}",
+      "doc": "its docstring: {v}",
+      "noDoc": "no docstring"
+    }
   },
   "enc": {
     "_about": "D-043: in ONE ENDPOINT's code-map column every action word and every value from a fixed set is a chip that carries a colour and/or an icon, its words its aria-label and its hover. REUSE FIRST — `col`/`ico`/`txt` name where a family's colour, icon and chip text are read: `table` = the page's own tokens and classes (the endings slots --k-*, the stage spine, the fate stack --f-*, the pieces stack --p-*, the method colours --m-*, the alarm dots' --alert, the validation slot's colour); `lab` = the endpoint lab's source, cut out of _lab-ep-panels.js and run under node with the station's tokens by gen-all-endpoints.py (the channel chip R · W · RW and its .jdrw rule in _lab-ep.css, the five path kinds' glyphs, the status colour rule — the lab colours a 3xx as it colours a 5xx, kept as the lab has it — the in-flight kinds' glyphs and lifetime tones, the direction chip IN · OUT, the words for what a branch does); `station` = the Gabe Universe's own encoding (D-052): a family an element wears as its subcategory (method · role · hook role · component, module and provider class · delivery) is the station's badge colour and word, lifted from gabe-universe.html by _ae_universe.station_kinds; the entity is the station's entity glyph in that entity's colour. A finding's hover words are the forms registry's own (_a3_forms.py FINDINGS). `mine` = MY PROPOSAL, for a family nothing encodes yet: an icon per value from the station's own icon set, and no new colour. `rule.groups[*].keywords` sorts the 422 rule types by the Field keyword that makes each (the short arm's PYDANTIC_ERRORS), `table` by the short arm's MODEL_ERRORS / RAISE_ERRORS — which group a keyword belongs to is my proposal; a keyword no group names stops the build.",
@@ -1506,9 +1570,8 @@
         { "row": "CODE BEHIND", "sel": "callee", "attrs": ["functions-behind-walk-levels"], "fields": ["c:behind", "d:behind"], "hold": "cnt" },
         { "row": "IDENTITY", "sel": "layer", "attrs": ["entity-cluster"], "about": "map" },
         { "row": "EVIDENCE", "sel": "value", "attrs": ["entity-cluster"], "about": "map" },
-        { "row": "DELIVERY", "sel": "value", "attrs": ["delivery"] },
+        { "row": "DELIVERY", "sel": "value", "attrs": ["delivery"], "fields": ["d:exits"], "hold": "alt" },
         { "row": "ABOVE", "sel": "cluster", "attrs": ["entity-cluster"], "about": "map" },
-        { "row": "SIGNATURE", "sel": "signature", "attrs": ["signature"] },
         { "row": "RISK", "sel": "untested", "attrs": ["risk-flag"], "fields": ["c:proof"], "hold": "alt" },
         { "row": "RISK", "sel": "conflict", "attrs": ["risk-flag"], "fields": ["c:behind", "d:behind"], "hold": "alt" },
         { "row": "TESTS", "sel": "file", "attrs": ["cases"] },

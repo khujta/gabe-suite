@@ -421,6 +421,16 @@
   .mc .mq { color: var(--muted); font-style: italic; }
   .mc .mpv { color: var(--muted); }
   .mcount { display: inline-block; min-width: 18px; font-weight: 650; font-variant-numeric: tabular-nums; }
+  /* D-056 · the twelve adds, drawn: a status the endpoint does not declare is hollow (its frame, no fill); a test that fits endings at
+     several moments rides each, its chip hollow and dashed; a function's depth, a race and a nested schema's mark ride inside the chip */
+  .vc-status[data-decl="0"] { background: transparent; color: var(--vcc); }   /* hollow: its frame and its figure in the status colour, no fill (D-043) */
+  .mc.hol { border-style: dashed; background: transparent; }
+  .mc .mdp { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .mc .mrc { display: inline-flex; gap: 2px; align-items: center; color: var(--alert); font-weight: 650; }
+  .mc .mnest { color: var(--muted); }
+  .pair .bhl { margin-top: 2px; display: flex; flex-wrap: wrap; gap: 0 8px; align-items: baseline; } .pair .bhd, .pair .hlp, .pair .nsl { color: var(--muted); }
+  #ocol-cm[data-carry="hide"] .bhl.bh:not(:has(> [data-ci]:not([data-cv="1"]))) { display: none; }   /* a level whose every function BY MOMENT carries (the behind levels only: another .bhl holds no per-item flags) */
+  .pair .hdl { display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: center; margin-top: 2px; }
   .mcount.z { color: var(--muted); font-weight: 400; }
   /* D-055 · a moment's head says at most two things, on at most two lines (the rest rides its hover): the stage glyph before the
      first. A handler head's lines never wrap, a long one is cut with its words whole in the hover; another moment's name may wrap once */
@@ -1170,7 +1180,8 @@
       if (e[1]) { var sc = cStage(e[1]); if (mw) { sc.appendChild(el("span", "mw", EW.mom[momKey(m)].name)); sc.setAttribute("aria-label", e[1] + " · " + mw); } tg.appendChild(sc); }
       else if (mw) { var sw = vc("stage", "", mw); sw.appendChild(el("span", "mw", EW.mom[momKey(m)].name)); tg.appendChild(sw); }
       tr.appendChild(tg);
-      var ts = kd(el("td"), dk.exits[i][0]); if (e[2] != null && e[2] !== "") ts.appendChild(cStatus(e[2])); tr.appendChild(ts);   /* the status lights */
+      var ts = kd(el("td"), dk.exits[i][0]); if (e[2] != null && e[2] !== "") ts.appendChild(declMark(cStatus(e[2]), xe[5], xe[6])); tr.appendChild(ts);   /* the status lights */
+      if (e[0] === "success" && r.stream && SK.badge.delivery) ts.appendChild(skSub("delivery", "stream"));                          /* D-056 (12) */
       var sy = el("td", "says" + (e[0] ? "" : " unpl"), e[0] ? (e[3] == null ? "" : String(e[3])) : fill(EW.unplaced, { call: xe[4] || "" })); tr.appendChild(sy);
       var cks = checkEls(r, i);
       if (col) { var tc = el("td", "chk"); cks.forEach(function (c) { tc.appendChild(c); }); tr.appendChild(tc); }
@@ -1178,9 +1189,17 @@
       tr.appendChild(kd(el("td", null, e[4] == null ? "" : String(e[4])), dk.exits[i][1], false));   /* the test count holds its cases */
       t.appendChild(tr); });
     b.appendChild(t); }
+  /* D-056 (8): the schemas inside the body or the reply, each by its key, on a line of their own under the top model; one that sits
+     inside another nested schema (not in the top's own fields) says which */
+  function nestLine(b, names, keys, pars, top) { if (!names || !names.length) return; var ln = el("div", "bhl"); ln.appendChild(el("span", "nsl", W.panel.nestedIn + " · "));
+    names.forEach(function (nm, i) { if (i) ln.appendChild(document.createTextNode(", ")); ln.appendChild(ksp(nm, keys[i]));
+      if (pars && pars[i] && pars[i] !== top) ln.appendChild(el("span", "nsl", " " + fill(W.panel.nestedParent, { v: pars[i] }))); }); b.appendChild(ln); }
+  /* D-056 (3) · (7): an ending's status chip says whether the endpoint declares it (hollow when not) and the headers it sends */
+  function declMark(c, flag, hd) { if (flag != null) { c.setAttribute("data-decl", flag ? "1" : "0"); c.setAttribute("aria-label", c.getAttribute("aria-label") + " · " + (flag ? W.mo.x.declared : W.mo.x.undeclared)); }
+    if (hd && hd.length) c.setAttribute("data-hd", hd.map(function (q) { return q[0] + ": " + q[1]; }).join(" · ")); return c; }
   /* every item carries its element's key (r.dk, parallel to the items — D-041): a click lights it, the light outlines it */
   function detailPair(k, r) { var d = r.d, dk = r.dk, P = W.panel, cm = W.codemap.details[k], wide = ["exits", "fates", "guards", "inflight", "reasons", "pieces", "tables", "alarms"].indexOf(k) >= 0;
-    var o = pairEl("d:" + k, cm.attrs, cm.icon, P[k], wide), b = el("div", "pv"); o.box.appendChild(b);
+    var o = pairEl("d:" + k, cm.attrs, cm.icon, k === "arranged" ? fill(P.arranged, { n: d.arranged.length }) : P[k], wide), b = el("div", "pv"); o.box.appendChild(b);   /* D-056 (2): "arranges n other cases" */
     /* D-043: every verb and every value from a fixed set below is a chip (THE VALUE CHIPS); a keyed element keeps its key on the
        node it had, or on the chip that now stands for it */
     if (k === "exits") endings(b, r);                         /* D-053: the endings and the own checks, one table in time order */
@@ -1194,16 +1213,31 @@
         return frag(kw ? cKind(kn) : null, nm ? " " + nm + " " : " ", kd(cStatus(f[1]), dk.fates[i]), " ", cFate(f[2])); }); more(b, d.fates); }
     else if (k === "gates") keyedJoin(b, d.gates, dk.gates, ", ");                   /* joined items: their field set below */
     else if (k === "limits") keyedJoin(b, d.limits.map(cLimit), dk.limits, " ");
-    else if (k === "request") { if (d.request) b.appendChild(frag(cDir("in"), " ", ksp(d.request[0], dk.request), " · " + d.request[1].join(", "))); else b.textContent = W.panel.none; }
-    else if (k === "response") { if (d.response) b.appendChild(frag(cDir("out"), " ", ksp(d.response[0], dk.response), " · " + d.response[1])); else b.textContent = W.panel.none; }
+    else if (k === "request") { if (d.request) { b.appendChild(frag(cDir("in"), " ", ksp(d.request[0], dk.request), " · " + d.request[1].join(", "))); nestLine(b, d.request[2], dk.reqNest, d.request[3], d.request[0]); } else b.textContent = W.panel.none; }
+    else if (k === "response") { if (d.response) { b.appendChild(frag(cDir("out"), " ", ksp(d.response[0], dk.response), " · " + d.response[1])); nestLine(b, d.response[2], dk.repNest, d.response[3], d.response[0]); }
+      /* D-056 (7): the headers each ending sends beside its body, each ending by its status (declared or not, as in the endings) */
+      if (r.xd.hdr.length) { var hl = el("div", "hdl"); hl.appendChild(el("span", "nsl", P.headers + ":")); hl.setAttribute("data-tip", "hdrs");
+        r.xd.hdr.forEach(function (h) { var sp = el("span"), xi = r.xd.exits.findIndex(function (q) { return q[2] === h[3]; }); sp.appendChild(declMark(cStatus(h[0]), xi >= 0 ? r.xd.exits[xi][5] : null, h[2]));
+          sp.appendChild(document.createTextNode(" " + h[2].map(function (q) { return q[0] + ": " + q[1]; }).join(" · "))); hl.appendChild(sp); }); b.appendChild(hl); }
+      else if (!d.response) b.textContent = W.panel.none; }
+    else if (k === "arranged") { if (!d.arranged.length) b.textContent = W.panel.none;   /* D-056 (2): the cases that only set another test up through it */
+      else { d.arranged.forEach(function (x, i) { if (i) b.appendChild(document.createTextNode(" "));
+        var c = cvItem(ksp(x[0], dk.arranged[i]), "d:arranged", i); if (x[1].indexOf("h") >= 0) { c.setAttribute("data-tip", "arrh"); c.appendChild(el("span", "hlp", " " + (x[1] === "ah" ? P.arrangedBoth : P.arrangedHelper))); } b.appendChild(c); }); } }
     else if (k === "cases") { var qs = Object.keys(d.cases); if (qs.length) b.appendChild(chips(qs.map(function (q) { return cRule(q, d.cases[q]); }))); else b.textContent = W.panel.none; }
     else if (k === "deciders") { list(b, d.deciders.items, function (f) { return f; }, dk.deciders); more(b, d.deciders); }
     else if (k === "switches") keyedJoin(b, d.switches.items.map(function (x) { var sp = el("span"); sp.appendChild(cMine("switch", x[0])); if (x[1]) sp.appendChild(document.createTextNode(" " + x[1])); return sp; }), dk.switches.map(function (x) { return [x[0]].concat(x[1]); }), " · ");
-    else if (k === "behind") { b.textContent = d.behind[0] + " · " + d.behind[1]; kd(b, dk.behind, false); }   /* it counts the callees the card names (D-042) */
+    /* D-056 (1): how many behind and how deep, then every function behind BY NAME, level by level (its depth), then the card's other
+       callees (depth not known); a name no single function carries stays a count */
+    else if (k === "behind") { var bh = d.behind, bi = 0; b.appendChild(el("div", null, bh[0] + " · " + bh[1]));
+      (bh[2] || []).map(function (lv, li) { return [fill(P.behindDepth, { n: li + 1 }), lv]; }).concat(bh[3] && bh[3].length ? [[P.behindExtra, bh[3]]] : []).forEach(function (x) {
+        var ln = el("div", "bhl bh"); ln.appendChild(el("span", "bhd", x[0]));
+        x[1].forEach(function (nm) { ln.appendChild(cvItem(ksp(nm, dk.behind[bi]), "d:behind", bi)); bi++; }); b.appendChild(ln); });
+      if (bh[4]) { var nn = el("div", "bhd", fill(P.behindNoname, { n: bh[4] })); nn.setAttribute("data-tip", "bhn"); b.appendChild(nn); } }
     else if (k === "proof") b.textContent = fill(P.proofWords, { n: d.proof.tested + "/" + d.proof.produced, v: d.proof.rank + (d.proof.rank_to !== d.proof.rank ? "–" + d.proof.rank_to : ""), of: d.proof.of });
     else if (k === "inflight") { list(b, d.inflight.items, function (f) { return frag(cIfk(f[0]), " " + f[1] + " ", cLife(f[2])); }, dk.inflight); more(b, d.inflight); }
-    else if (k === "hook") { if (d.hook) b.appendChild(ksp(d.hook, dk.hook)); else b.textContent = W.panel.none; }
-    else if (k === "screens") b.textContent = String(d.screens);
+    /* D-056 (9): every piece that sends it and every FILE the station's bridge edge ends at; every screen above them — by name */
+    else if (k === "hook") { if (d.hook) keyedJoin(b, d.hook.map(function (nm, i) { var sp = el("span", null, nm); if (dk.hook[i].indexOf("#") < 0) sp.setAttribute("data-tip", "hookfile"); return sp; }), dk.hook, ", "); else b.textContent = W.panel.none; }
+    else if (k === "screens") { if (d.screens.length) keyedJoin(b, d.screens, dk.screens, ", "); else b.textContent = W.panel.none; }
     else if (k === "reasons") { list(b, d.reasons.items, function (x, i) { var at = String(x[0] || ""), c = at.lastIndexOf(":");   /* the site's file is its own element */
         return frag(dk.reasons[i][1] && c > 0 ? ksp(at.slice(0, c), dk.reasons[i][1]) : at, dk.reasons[i][1] && c > 0 ? at.slice(c) : null,
           x[1] != null ? " · " : null, x[1] != null ? cMine("branch", x[1]) : null, x[2] != null ? " · " : null, x[2] != null ? cMine("does", x[2]) : null); }, dk.reasons.map(function (x) { return x[0]; })); more(b, d.reasons); }
@@ -1478,10 +1512,32 @@
     return Math.max(FL, (g + f[0].length <= 14 ? g + f[0].length : Math.max(g, f[0].length)) + 2); }
   /* a name's break points: after each _ . / (a <wbr>, so the text a probe or a copy reads is unchanged) */
   function moTxt(s, t) { t.split(/(?<=[_./])/).forEach(function (p, i) { if (i) s.appendChild(document.createElement("wbr")); s.appendChild(document.createTextNode(p)); }); return s; }
-  function moChip(e) { var f = e[0], ch = e[4] || [], c = el("span", "mc"); c.setAttribute("data-f", f); c.setAttribute("data-tip", "mochip");
+  /* D-056: an element's extras (e[7]) — a function's depth, a write's fate on the picked path, a race, an ending's declared mark,
+     headers and stream badge, a limiter's numbers, the login check's scheme, what a test asserts, a hollow test, a nested schema, a
+     file that sends it. Drawn inside the chip where they are a fact of the element; the rest ride its hover (c._x) */
+  /* D-056: the hover lines an element's extras add (their words the words file's mo.x) */
+  function moExtra(X, t) { var XW = W.mo.x, h = "", ln = function (s) { h += "<span class=ln>" + esc(s) + "</span>"; }, pl = function (s) { h += "<span class=pl>" + esc(s) + "</span>"; };
+    if (X.dp) { ln(fill(XW.depth, { n: X.dp })); pl(XW.depthPlain); }
+    if (X.cp) { ln(fill(XW.callPaths, { via: X.cp })); pl(fill(XW.callPathsPlain, { via: X.cp })); }   /* F3: on the call's paths, an upper bound */
+    if (X.fa && MPATH.i != null && X.fa[MPATH.i]) { ln(fill(XW.fate, { v: X.fa[MPATH.i].map(function (f) { return W.fates[f].name; }).join(" · ") })); pl(XW.fatePlain); }
+    if (X.rc) { var rm = BYID[S.open].mo.ex[X.rc[3]]; ln(fill(XW.race, { cons: X.rc[0] })); pl(fill(XW.racePlain, { cols: X.rc[2].join(", "), tbl: X.rc[1], st: rm[1] })); }
+    if (X.hd) ln(fill(XW.headers, { v: X.hd.map(function (q) { return q[0] + ": " + q[1]; }).join(" · ") }));
+    var dc = t.querySelector(".vc-status[data-decl]"); if (dc && t.getAttribute("data-f") === "end") { ln(dc.getAttribute("data-decl") === "1" ? XW.declared : XW.undeclared); pl(dc.getAttribute("data-decl") === "1" ? XW.declaredPlain : XW.undeclaredPlain); }
+    if (X.st) ln(XW.stream);
+    if (X.lm) ln(fill(XW.limit, { n: X.lm[0], w: X.lm[1], k: X.lm[2] }));
+    if (X.au) X.au.forEach(function (a) { ln(fill(XW.auth, { scheme: a[0], header: a[2], carrier: a[1] })); });
+    if (X.as) { ln((X.as[0].length ? fill(XW.asserts, { v: X.as[0].join(" · ") }) : XW.assertsNone) + (X.as[1].length ? " " + fill(XW.assertsDetail, { v: X.as[1].join(" · ") }) : "")
+      + (X.as[2].length ? " " + fill(XW.assertsCode, { v: X.as[2].join(" · ") }) : "") + (X.as[3] ? " " + fill(XW.assertsAttrs, { n: X.as[3] }) : "")); }
+    if (X.ho) { ln(fill(XW.hollow, { n: X.ho })); pl(XW.hollowPlain); }
+    if (X.in) ln(fill(XW.inside, { v: X.in }));
+    if (X.fl) ln(XW.file);
+    return h; }
+  function moChip(e) { var f = e[0], ch = e[4] || [], c = el("span", "mc"), X = e[7] || {}; c.setAttribute("data-f", f); c.setAttribute("data-tip", "mochip"); c._x = X;
     if (e[6] != null) c.setAttribute("data-hint", String(e[6])); var ks = moK(e[2]); if (ks.length) kd(c, ks);
     var txt = function (t, cls) { if (t) c.appendChild(moTxt(el("span", cls || "mt"), String(t))); };
-    if (ch[0] === "end") { c.appendChild(cKind(ch[1])); c.appendChild(cStatus(ch[2])); }
+    if (X.ho) { c.classList.add("hol"); c.setAttribute("data-ho", String(X.ho)); }
+    if (X.in) c.appendChild(el("span", "mnest", "\u21b3"));
+    if (ch[0] === "end") { c.appendChild(cKind(ch[1])); c.appendChild(declMark(cStatus(ch[2]), ch[3], X.hd)); if (X.st && SK.badge.delivery) c.appendChild(skSub("delivery", "stream")); }
     else if (f === "proof") { txt(e[3]); c.appendChild(el("span", "mpv", MW.proves)); if (ch[0] === "status") c.appendChild(cStatus(ch[1]));
       else if (ch[0] === "statuses") ch[1].forEach(function (st) { c.appendChild(cStatus(st)); }); }
     else if (ch[0] === "status") { c.appendChild(cStatus(ch[1])); txt(e[3]); if (ch[2] === "raise") c.setAttribute("data-hint", (e[6] != null ? e[6] + " · " : "") + MW.atRaise); }
@@ -1493,6 +1549,9 @@
     else if (ch[0] === "rule") { txt(e[3]); c.appendChild(cRule(ch[1], "")); }
     else if (ch[0] === "does" && ch[1] != null) { txt(e[3]); c.appendChild(cMine("does", ch[1])); }
     else { txt(e[3]); if (ch[1] != null) c.appendChild(el("span", "mq", String(ch[1]))); }
+    if (X.dp) c.appendChild(el("span", "mdp", "\u2193" + X.dp));                     /* D-056 (1): how many calls below the handler */
+    if (X.fa && MPATH.i != null && X.fa[MPATH.i]) X.fa[MPATH.i].forEach(function (fa) { c.appendChild(cFate(fa)); });   /* D-056 (4): this path's verdict */
+    if (X.rc) { var rc = el("span", "mrc", MW.x.raceShort), rm = BYID[S.open].mo.ex[X.rc[3]], rs = cStatus(rm[1]); kd(rs, ["status:" + rm[1]]); rc.appendChild(rs); c.appendChild(rc); }   /* D-056 (5) */
     return c; }
   function moOpts(bar) { ["lay", "cell"].forEach(function (g) { var R = MW.opt[g], grp = el("div", "mgrp"), o = el("div", "opts"); grp.appendChild(el("span", "rl", R.label));
     o.setAttribute("role", "radiogroup"); o.setAttribute("aria-label", R.label);
@@ -1746,7 +1805,10 @@
       return "<b>" + esc(u.title || us.name) + "</b> · " + esc(W.one.uni.title) + "<span class=ln>" + esc(u.value) + "</span><span class=pl>" + esc(fill(W.one.attrOf, { v: us.attrs.map(function (a) { return D.attrs[a].label; }).join(" · ") || W.panel.none })) + " · " + esc(W.one.gaps.mine) + "</span>"; }
     if (kind === "pair") { var as = t.getAttribute("data-attr").split(" ");
       var cvr = BYID[S.open] && BYID[S.open].cv ? BYID[S.open].cv[t.getAttribute("data-k")] : null;   /* D-055: what BY MOMENT carries of it */
-      return "<b>" + esc(t.querySelector(".pk").textContent) + "</b>" + as.map(function (a) { return "<span class=ln>" + esc(fill(W.one.attrOf, { v: D.attrs[a].label })) + "</span>"; }).join("") + "<span class=pl>" + esc(D.attrs[as[0]].plain) + "</span>"
+      var sg = t.getAttribute("data-k") === "h:handler" && BYID[S.open] ? BYID[S.open].sig : null, SW = W.codemap.sig;   /* D-056 (11): its outline and docstring */
+      return "<b>" + esc(t.querySelector(".pk").textContent) + "</b>"
+        + (sg ? "<span class=ln>" + esc([sg[0] ? SW.async : SW.sync, fill(SW.lines, { lines: sg[1] }), fill(SW.returns, { ret: sg[2] })].join(" · ")) + "</span>"
+          + (sg[3] ? "<span class=ln><code>" + esc(sg[3]) + "</code></span>" : "") + "<span class=ln>" + esc(sg[4] ? fill(SW.doc, { v: sg[4] }) : SW.noDoc) + "</span>" : "") + as.map(function (a) { return "<span class=ln>" + esc(fill(W.one.attrOf, { v: D.attrs[a].label })) + "</span>"; }).join("") + "<span class=pl>" + esc(D.attrs[as[0]].plain) + "</span>"
         + (t.getAttribute("data-gap") === "true" ? "<span class=pl>" + esc(W.one.gaps.shows) + "</span>" : "")
         + (cvr && (cvr[0] === "c" || (cvr[0] === "x" && cvr[3])) ? "<span class=pl>" + esc(W.carry.tipAll) + "</span>" : cvr && cvr[0] === "p" ? "<span class=pl>" + esc(fill(W.carry.tipPart, { n: cvr[2], of: cvr[3] })) + "</span>"
           : cvr && cvr[0] === "e" ? "<span class=pl>" + esc(W.carry.tipEmpty) + "</span>" : "")
@@ -1755,6 +1817,10 @@
       if (px) return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.partly) + "<span class=ln>" + esc(fill(W.one.gaps.partlyTip, { names: px[3].join(", "), n: px[1], of: px[2] })) + "</span>" + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>";
       return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.shows) + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>"; }
     if (kind === "copycmd") return esc(W.panel.copy);
+    if (kind === "hookfile") return "<b>" + esc(t.textContent.trim()) + "</b><span class=pl>" + esc(W.panel.hookFile) + "</span>";   /* D-056 (9) */
+    if (kind === "bhn") return "<b>" + esc(t.textContent.trim()) + "</b><span class=pl>" + esc(W.panel.behindNonamePlain) + "</span>";   /* D-056 (1) */
+    if (kind === "arrh") return "<b>" + esc(t.textContent.trim()) + "</b><span class=pl>" + esc(W.panel.arrangedPlain) + "</span>";   /* D-056 (2) */
+    if (kind === "hdrs") return "<b>" + esc(W.panel.headers) + "</b><span class=pl>" + esc(W.panel.headersPlain) + "</span>";   /* D-056 (7) */
     if (kind === "cmcopy") return "<b>" + esc(W.copy.cm) + "</b><span class=pl>" + esc(W.copy.cmPlain) + "</span>";
     if (kind === "mopt") { var mg = t.getAttribute("data-mopt"), mo = W.mo.opt[mg], mk3 = t.getAttribute("data-v"); return "<b>" + esc(mo.opts[mk3].name) + "</b>" + (mo.pick === mk3 ? " · " + esc(mo.ruled ? W.ruledMark : W.pickMark) : "") + "<span class=pl>" + esc(mo.opts[mk3].plain) + "</span>"; }
     if (kind === "copt") { var cw = W.carry, cv3 = t.getAttribute("data-carry"); return "<b>" + esc(cw.opts[cv3].name) + "</b>" + (cw.pick === cv3 ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(cw.opts[cv3].plain) + "</span>"; }
@@ -1773,13 +1839,15 @@
     if (kind === "mowhy") { var mw = W.mo.why[t.getAttribute("data-why")]; return "<b>" + esc(mw.name) + "</b> · " + esc(W.mo.band.title) + "<span class=pl>" + esc(mw.plain) + "</span>"; }
     if (kind === "mochip") { var mf = t.getAttribute("data-f"), mb = BLK[D.mo.fam[mf]], mks = keysOf(t), mh = t.getAttribute("data-hint");
       return "<b>" + esc(fill(W.mo.tip, { name: mks.length ? elName(mks[0]) : t.textContent.trim(), block: mb.name })) + "</b>" + (mh ? "<span class=ln>" + esc(mh) + "</span>" : "")
-        + mks.slice(1).map(function (k) { return "<span class=ln>" + esc(elKind(k) + " · " + elName(k)) + "</span>"; }).join("") + "<span class=pl>" + esc(mb.plain) + "</span>"; }
+        + mks.slice(1).map(function (k) { return "<span class=ln>" + esc(elKind(k) + " · " + elName(k)) + "</span>"; }).join("") + moExtra(t._x || {}, t) + "<span class=pl>" + esc(mb.plain) + "</span>"; }
     if (kind === "sk") { var sk0 = t.getAttribute("data-sk"), sx = SK.kinds[sk0] || {}, pk0 = t.getAttribute("data-pk"), sm = pk0 && W.station.map[pk0];
       var own = sm && pk0 === "setting" && sk0 === "flag" ? W.station.alias : sm && sm.mine ? fill(W.station.mineTip, { why: sm.why }) : null;   /* where the pairing is not the station's own, say whose it is */
       return "<b>" + esc(sx.t) + "</b> · " + esc(sk0 === "entity" ? W.station.drawnEnt : W.station.drawn) + "<span class=pl>" + esc(W.station.glyph) + "</span>" + (own ? "<span class=pl>" + esc(own) + "</span>" : "") + "<span class=pl>" + esc(W.station.card) + "</span>"; }
     /* D-043: a value chip — its words, its family, what it means, and where its look is read (an element's hover: a little richer) */
-    if (kind === "vc") { var vf = t.getAttribute("data-vc"), vv = t.getAttribute("data-vv"), ve = EF[vf], vp = vcPlain(vf, vv);
-      return "<b>" + esc(t.getAttribute("aria-label")) + "</b> · " + esc(ve.name) + (vp ? "<span class=pl>" + esc(vp) + "</span>" : "") + "<span class=pl>" + esc(lookWords(ve)) + "</span>"
+    if (kind === "vc") { var vf = t.getAttribute("data-vc"), vv = t.getAttribute("data-vv"), ve = EF[vf], vp = vcPlain(vf, vv), vd = t.getAttribute("data-decl"), vh = t.getAttribute("data-hd");
+      return "<b>" + esc(t.getAttribute("aria-label")) + "</b> · " + esc(ve.name) + (vh ? "<span class=ln>" + esc(fill(W.mo.x.headers, { v: vh })) + "</span>" : "")
+        + (vd != null ? "<span class=pl>" + esc(vd === "1" ? W.mo.x.declaredPlain : W.mo.x.undeclaredPlain) + "</span>" : "")
+        + (vp ? "<span class=pl>" + esc(vp) + "</span>" : "") + "<span class=pl>" + esc(lookWords(ve)) + "</span>"
         + (t.getAttribute("data-nonode") === "true" ? "<span class=pl>" + esc(W.station.nonode) + "</span>" : ""); }
     if (kind === "block") { var key = t.getAttribute("data-block"), b = key === "_shared" ? W.sharedBlock : BLK[key]; return "<b>" + esc(b.name) + "</b><span class=pl>" + esc(fill(b.plain)) + "</span><span class=pl>" + esc(markWords(key)) + "</span>"; }
     if (kind === "bin") { var bn = BINS[c.id].filter(function (x) { return x.key === t.getAttribute("data-bin"); })[0];

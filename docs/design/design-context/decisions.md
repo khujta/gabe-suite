@@ -715,3 +715,19 @@ EXCEPT class caught and the FUNCTION that raised (his words were dictated; his t
 gaps (what the universe shows and the code map does not, and what the code map shows with no moment) are evaluated one by one with a
 recommendation each; nothing is added before he rules on that list.
 Revisit if: dimming hides a field he needs to read while comparing — then dim becomes an outline on the covered elements instead.
+
+## D-056 — The gap list: twelve adds built on the page, the reach fix deferred
+Date: 2026-09-26 · Input: the agent's gap evaluation on D-055 (33 rows, one recommendation each) and its recommendation to accept
+1–12 (page-only) and defer 13 (generation work).
+Decision, his: "agree with your recommendations".
+Consequence: built on the all-endpoints page, each where the evaluation placed it — (1) the functions behind the handler by name,
+at the call that reaches them · (2) the tests that arrange this endpoint, in Proof, no moment · (3) declared vs undeclared on each
+ending · (4) the fate of the writes on a picked path, on the write chips · (5) the race on a unique key, on the flush chip with its
+500 · (6) a test that fits several endings rides each, hollow · (7) response headers per ending, in its hover · (8) nested schemas
+under the top schema · (9) who fetches it when it is a file or a piece the code map missed, at "the screen sends it" · (10) the
+limiter's numbers, the auth scheme and what a case asserts, in the hovers · (11) the handler's signature and docstring, in its
+hover · (12) the stream delivery badge on the answer. The twenty rows marked shown another way, not needed or timeless stay as they
+are.
+Deferred, with its trigger: (13) the reach fix — the map misses imports made inside a function, so UserDietaryProfile, two more
+tables and five functions on POST /cooking/sessions have no recorded step — waits until generation work reopens (D-023 lifted);
+it changes the forms generators, so it takes the full proof regime, not D-037's.

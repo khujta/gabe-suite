@@ -781,7 +781,7 @@ def reverse_gaps(row: dict, uni: dict, U: dict, carried_attrs: set) -> list:
     for its hover — D-044)]. The column's words are the values it draws (the head, every cell, every detail); a name is held
     when one of its names is a whole word there, any case. A connection's model counts as held by its table when the card's
     own Accesses pair them."""
-    hay = " │ ".join(_strings([row[k] for k in ("m", "p", "fn", "file", "line", "ent", "seg", "declared")] + [row["v"], row["d"]]))
+    hay = " │ ".join(_strings([row[k] for k in ("m", "p", "fn", "file", "line", "ent", "seg", "declared")] + [row["v"], row["d"], (row.get("sig") or [None] * 4)[3]]))   # D-056 (11): the def text
     table_of = {}
     for o in next((u["items"] for u in uni["rows"] if u["row"] == "ACCESSES"), []):
         table_of.setdefault(o[1], []).append(o[2])
@@ -843,6 +843,8 @@ def carried(row: dict, cols: list, CM: dict) -> dict:
             x = [f for f in (x or {}).get("items") or [] if f[2] != "none"]
         if _has(x):
             put(spec["attrs"], "d:" + k)
+            if k == "exits" and row.get("stream"):   # D-056 (12): the endings table marks a streamed answer with the station's badge
+                put(["delivery"], "d:exits")
     return out
 
 
@@ -893,8 +895,11 @@ def cm_named(r: dict) -> dict:
         put(dk["request"], "d:request")
     if d.get("response"):
         put(dk["response"], "d:response")
-    if d.get("hook"):
-        put(dk["hook"], "d:hook")
+    # D-056: the functions behind by name (1), every piece or file that sends it and every screen above (9), the cases it arranges
+    # (2), the schemas inside the body and the reply (8) — each drawn as itself, so named
+    for k, f in (("behind", "d:behind"), ("hook", "d:hook"), ("screens", "d:screens"), ("arranged", "d:arranged"), ("reqNest", "d:request"), ("repNest", "d:response")):
+        for x in dk.get(k) or []:
+            put(x, f)
     return out
 
 

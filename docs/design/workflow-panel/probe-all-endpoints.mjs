@@ -667,9 +667,12 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
     const d = r.d, len = (x) => (x && x.items ? x.items.length : (x || []).length);
     const H = { exits: len(d.exits), tables: len(d.tables), gateWrites: d.gateWrites.length, fates: d.fates.items.some((f) => f[2] !== 'none'), guards: len(d.guards), gates: d.gates.length, limits: d.limits.length,
       request: d.request != null, response: d.response != null, cases: Object.keys(d.cases).length, deciders: len(d.deciders), switches: len(d.switches), behind: d.behind[0] > 0,
-      proof: (d.proof.produced || 0) > 0, inflight: len(d.inflight), hook: !!d.hook, screens: d.screens > 0, reasons: len(d.reasons), alarms: d.alarms.length, pieces: len(d.pieces), lacks: d.lacks.length };
+      // CHANGED 2026-09-26 (D-056): the screens pair names the screens (a list, no longer a count); the new pair: the cases it arranges
+      proof: (d.proof.produced || 0) > 0, inflight: len(d.inflight), hook: !!d.hook, screens: (d.screens || []).length > 0, reasons: len(d.reasons), alarms: d.alarms.length, pieces: len(d.pieces), lacks: d.lacks.length,
+      arranged: (d.arranged || []).length };
     if (JSON.stringify(Object.keys(H).sort()) !== JSON.stringify(Object.keys(DET).sort())) throw new Error('the recomputation does not read every code-map pair the words name');
     for (const k of Object.keys(H)) if (H[k]) add(DET[k].attrs);
+    if (r.stream && H.exits) add(['delivery']);   /* D-056 (12): a streamed answer's badge on the endings table carries delivery */
     return out; };
   /* changed 2026-09-23 (review findings 3 and 4): the gaps were "held less the rows' fixed attributes"; a few attributes are now
      read per endpoint off the STATION's card: request shape is shown when a Connections chip or the signature names the request
@@ -1009,20 +1012,24 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
     && h1 && h1.elref.length === 1 && h1.elref[0][0] === 'c:acts' && h1.elref[0][1] === 'hover',
     'a case that acts on ' + EP + ' (the feed\'s act calls, ' + actCalls + ', are the tests column\'s count): the code map says "counted, not named" with a link to the tests field, and pointing at the link lights exactly that field',
     { K1, drawn: R1, feed: actCalls, why: e1 && e1.why, lit: h1 && h1.elref });
-  // (2) a callee of Code behind that touches no data: its attribute is rated at the bottom of the inventory — low priority
-  const lowR = invRate('functions behind · walk levels'), fns2 = new Set([...(ROW[EP].u.datafns || []), ...(ROW[EP].u.deciders || [])].map((q) => q.split('::').pop()));
+  // (2) a callee of Code behind that touches no data — CHANGED 2026-09-26 (D-056 (1)): the code map's behind pair now names every
+  // function behind the handler, so the callee is NAMED there (it said "low priority, counted, not named" before)
+  const fns2 = new Set([...(ROW[EP].u.datafns || []), ...(ROW[EP].u.deciders || [])].map((q) => q.split('::').pop()));
   const cb = ROW[EP].uni.rows.find((u) => u.row === 'CODE BEHIND'), i2 = cb.items.findIndex((nm, i) => cb.keys[i] && !fns2.has(nm)), K2 = i2 >= 0 ? cb.keys[i2] : null;
-  let e2 = null; if (K2) { await p.evaluate(() => window.scrollTo(0, 0)); if (await lightVisible(K2)) e2 = await whyOf(); }
-  ok(!!K2 && lowR === Math.min(...Object.values(D.attrs).map((a) => a.r)) && e2 && e2.here === 'false' && e2.why.some(([w, , at]) => w === 'low' && at === D.attrs['functions-behind-walk-levels'].label),
-    'a Code behind callee that touches no data (' + (K2 || '').split('::').pop() + '): the inventory rates functions behind ' + lowR + ', and the code map says "low priority"', { K2, lowR, why: e2 && e2.why });
-  // (3) a case that only ARRANGES through this endpoint: nothing in the code map holds it — "not carried", and its link turns THE GAPS
+  let e2 = null, b2 = []; if (K2) { await p.evaluate(() => window.scrollTo(0, 0)); if (await lightVisible(K2)) e2 = await whyOf();
+    b2 = await p.$$eval('#ocol-cm .pair[data-k="d:behind"] [data-key]', (cs) => cs.map((c) => c.getAttribute('data-key'))); }
+  ok(!!K2 && e2 && e2.here === 'true' && b2.includes(K2) && JSON.stringify(b2) === JSON.stringify(ROW[EP].dk.behind),
+    'D-056 · a Code behind callee that touches no data (' + (K2 || '').split('::').pop() + ') is named by the code map\'s behind pair, which names every function behind by name (' + b2.length + ')', { K2, here: e2 && e2.here, n: b2.length });
+  // (3) a case that only ARRANGES through this endpoint
   const arr = new Set(((FJ.endpoints[EPK] || {}).tests || {}).arranged_by || []), inExits = new Set(ROW[EP].d.exits.items.length ? ROW[EP].dk.exits.flatMap((x) => x[1]) : []);
-  const K3 = cardCases.find((cid) => arr.has(cid) && !callsOn(cid, 'act') && !inExits.has('case:' + cid)); let e3 = null, g3 = null;
-  if (K3) { await p.evaluate(() => window.scrollTo(0, 0)); if (await lightVisible('case:' + K3)) { e3 = await whyOf();
-    await p.$eval('#el-cm .elref[data-ref="gap"]', (x) => x.scrollIntoView({ block: 'center' })).catch(() => {}); await p.click('#el-cm .elref[data-ref="gap"]').catch(() => {}); await p.waitForTimeout(80);
-    g3 = Object.assign({ dir: await p.$eval('#ocol-gaps', (x) => x.getAttribute('data-dir')) }, await whyOf()); } }
-  ok(!!K3 && e3 && e3.here === 'false' && e3.why.length === 1 && e3.why[0][0] === 'gap' && g3 && g3.dir === 'uni' && g3.elref.some(([k, how]) => k === K3 && how === 'pin'),
-    'a case that only arranges through ' + EP + ' (' + K3 + '): the code map says "not carried", and its link turns THE GAPS to the universe side, where the case is lit', { K3, why: e3 && e3.why, after: g3 && [g3.dir, g3.elref] });
+  const K3 = cardCases.find((cid) => arr.has(cid) && !callsOn(cid, 'act') && !inExits.has('case:' + cid)); let e3 = null;
+  if (K3) { await p.evaluate(() => window.scrollTo(0, 0)); if (await lightVisible('case:' + K3)) e3 = await whyOf(); }
+  // CHANGED 2026-09-26 (D-056 (2)): the code map's pair "arranges other cases" names every case the feed lists in tests.arranged_by and
+  // helper_arranged — the case that only arranges is NAMED there now (it said "not carried", with a link to THE GAPS, before)
+  const arr3 = await p.$$eval('#ocol-cm .pair[data-k="d:arranged"] [data-key]', (cs) => cs.map((c) => c.getAttribute('data-key')));
+  const want3 = [...new Set([...(((FJ.endpoints[EPK] || {}).tests || {}).arranged_by || []), ...(((FJ.endpoints[EPK] || {}).tests || {}).helper_arranged || [])])].map((c) => 'case:' + c);   /* review F1: one per case */
+  ok(!!K3 && e3 && e3.here === 'true' && arr3.includes('case:' + K3) && JSON.stringify(arr3) === JSON.stringify(want3),
+    'D-056 · a case that only arranges through ' + EP + ' (' + K3 + ') is named by the code map\'s "' + D.words.panel.arranged.replace('{n}', want3.length) + '" pair, which lists exactly the feed\'s ' + want3.length + ' arranging cases', { K3, here: e3 && e3.here, arr3: arr3.length, want: want3.length });
   await p.click('#elclear').catch(() => {}); await p.click('#ocol-gaps .opt[data-gdir="cm"]').catch(() => {}); await p.waitForTimeout(60); }
 /* 12 · D-044: a gap's hover says WHY the gap exists (D-042's reasons) and a STATUS (my proposal): solved elsewhere · not solving · open.
    On POST /setup/complete, the gaps the other way: every item's hover carries a reason in D-042's words and one of the three statuses;
@@ -1455,10 +1462,185 @@ ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
        && cs.count === fillW(CW.count, { covered: cs.whole, fields: cs.fields, left: cs.fields - cs.whole - cs.empty, empty: cs.empty }) + ' · ' + fillW(CW.beyondCount, { n: want.length }),
       'B1 · ' + ES + ': BY MOMENT touches ' + want.join(', ') + ', which the code map does not list — both tables fields stay in hide, say "' + note + '", name them in their hover, and the header counts them',
       { want, xnotes: cs.xnotes, count: cs.count, tip: tips[1].slice(0, 200) }); }
+  /* review F6: in hide, the rule that hides a behind level whose every function BY MOMENT carries reaches the behind levels only — a
+     nested-schema line (its names carry no per-item flag) stays drawn wherever its pair stays. On this feed every pair holding one is
+     carried whole, so the pair's own flag is lifted for the reading and put back */
+  { const EN = 'GET /cooking/active'; await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + EN + '"] td.id'); await p.waitForTimeout(150);
+    const f6 = await p.evaluate(() => { const pr = document.querySelector('#ocol-cm .pair[data-k="d:response"]'), ln = pr && pr.querySelector('.bhl:not(.bh)'); if (!ln) return null;
+      const was = pr.getAttribute('data-cv'); pr.removeAttribute('data-cv'); const shown = getComputedStyle(ln).display !== 'none', flags = ln.querySelectorAll('[data-ci]').length;
+      if (was != null) pr.setAttribute('data-cv', was); const bh = [...document.querySelectorAll('#ocol-cm .bhl.bh')].map((l) => [getComputedStyle(l).display, [...l.querySelectorAll(':scope > [data-ci]')].every((c) => c.getAttribute('data-cv') === '1')]);
+      return { shown, flags, carry: document.getElementById('ocol-cm').getAttribute('data-carry'), bh }; });
+    ok(f6 && f6.carry === 'hide' && f6.shown && f6.flags === 0 && f6.bh.every(([dsp, all]) => (dsp === 'none') === all),
+      'review F6 · hide: ' + EN + '\'s "inside it" line stays drawn when its pair stays (the hide rule reaches the behind levels only), and each behind level hides exactly when BY MOMENT carries its every function', f6); }
   await p.click('#ocol-cm .opt[data-carry="all"]'); await p.waitForTimeout(120);
   ok((await readC()).carry === 'all', 'D-055 · show all brings the code map back whole');
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-055 checks', errs);
+
+/* 16 · D-056 (his ruling "agree with your recommendations", 2026-09-26): the twelve adds from the gap evaluation, each read back on
+   POST /cooking/sessions where the row's example is there (else on the endpoint the row names), every expected value recomputed HERE
+   from forms.json, the lab's facts (gen-endpoint-facts.py, run here) or the station's feeds — never from the page's own record:
+   (1) the behind pair names the walk's functions level by level, the card's other callees apart, the names no function carries counted;
+       BY MOMENT stands each walk function at the handler call that reaches it, with its depth, the rest in the band;
+   (2) "arranges other cases" names exactly the feed's arranging cases; they stand at no moment (the band only where Proof's unplaced are);
+   (3) each ending's status is filled when the endpoint declares it, hollow when not — the hollow statuses are the undeclared alarm's;
+   (4) a picked path's write chips wear the feed's bucket for that path's step; all paths, none;
+   (5) the flush the race-500 alarm names wears the race, joined to the uncaught 500;
+   (6) a test whose status fits endings at several moments rides each of them, hollow and dashed, at each one's moment;
+   (7) the headers an ending sends ride its hover and the code map's reply pair;
+   (8) a schema inside the reply (or the body) stands under its top model, in BY MOMENT and the code map;
+   (9) a FILE that fetches it and every hook, component and screen are named: at "the screen sends it" and in the hook and screens pairs;
+   (10) the limiter's numbers, the login check's scheme and carrier, what a case asserts — in their hovers;
+   (11) the handler pair's hover says async, its lines, what it returns, the def text and the docstring;
+   (12) the stream's success wears the station's delivery:stream label, and no other endpoint's does. Real clicks and real hovers. */
+{ const fillW = (s0, x) => String(s0).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  const E = 'POST /cooking/sessions', EK = 'endpoint:' + E, R = ROW[E], FE = FJ.endpoints[EK], MX = D.words.mo.x, PW = D.words.panel, MK = D.mo.keys;
+  const L56 = facts(E), C4w = {}; (await import('node:vm')).runInNewContext(fs.readFileSync(path.join(REPO, 'templates/center/shell/example/codebase-graph-station/c4-graph.js'), 'utf8'), { window: C4w });
+  const C4 = C4w.GABE_C4;   /* the station's own feed, run as the station runs it */
+  const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
+  const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
+    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+  const cell = (mom, f) => p.$$eval('#mogrid td[data-mom="' + mom + '"][data-f="' + f + '"] .mc', (cs) => cs.map((c) => ({ keys: (c.getAttribute('data-keys') || '').split('\n'), t: c.innerText.replace(/\s+/g, ' ').trim(),
+    hol: c.classList.contains('hol'), dash: getComputedStyle(c).borderTopStyle, st: [...c.querySelectorAll('.vc-status')].map((v) => [v.textContent, v.getAttribute('data-decl'), getComputedStyle(v).backgroundColor]),
+    fate: [...c.querySelectorAll('.vc-fate')].map((v) => v.getAttribute('data-vv')), race: !!c.querySelector('.mrc'), sub: [...c.querySelectorAll('.sksub')].map((v) => v.getAttribute('data-vc') + ':' + v.getAttribute('data-vv')), hint: c.getAttribute('data-hint') })));
+  await open(PAGE); await openEp(E);
+  /* (1) the functions behind, by name */
+  const walk = (L56.functions.walk || []).map((lv) => lv.map((q) => q.name)), wids = (L56.functions.walk || []).flat().map((q) => 'fn:' + q.id.replace('#', '::'));
+  const bh = await p.$$eval('#ocol-cm .pair[data-k="d:behind"] .bhl', (ls) => ls.map((l) => ({ head: l.querySelector('.bhd').textContent, names: [...l.querySelectorAll('[data-key]')].map((c) => [c.getAttribute('data-key'), [...c.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('')]) })));
+  const bhN = await p.$eval('#ocol-cm .pair[data-k="d:behind"]', (e) => { const n = e.querySelector('[data-tip="bhn"]'); return n ? n.textContent : null; });
+  const card = R.uni.rows.find((u) => u.row === 'CODE BEHIND'), cn = card.items.concat(card.rest || []), wn = new Set(walk.flat());
+  const extra = cn.filter((n, i) => card.keys[i] && !wids.includes(card.keys[i])), noname = cn.filter((n, i) => !card.keys[i] && !wn.has(n));
+  const bhWant = walk.map((lv, i) => [fillW(PW.behindDepth, { n: i + 1 }), lv]).concat(extra.length ? [[PW.behindExtra, extra]] : []);
+  ok(JSON.stringify(bh.map((l) => [l.head, l.names.map((x) => x[1])])) === JSON.stringify(bhWant) && bhN === fillW(PW.behindNoname, { n: noname.length }) && noname.length === 2 && extra.length === 3,
+    'D-056 (1) · ' + E + ' · the behind pair names the ' + wn.size + ' functions the lab\'s walk reaches, level by level, then the card\'s ' + extra.join(', ') + ' (depth not known), and counts ' + noname.join(', ') + ' by name only',
+    { page: bh.map((l) => [l.head, l.names.length]), want: bhWant.map((x) => [x[0], x[1].length]), bhN });
+  const work = await cell('work', 'fn'), gate = await cell('gate', 'fn');
+  const wantWork = ['seed_stage_schedule', 'assert_recipe_allergen_safe', '_schedule_next'].map((n) => { const lv = walk.findIndex((l) => l.includes(n)); return [n, lv + 1]; });
+  const dW = (n) => { const c = work.find((x) => x.keys.some((k) => k.endsWith('::' + n))); return c ? +((c.t.match(/↓(\d+)/) || [])[1]) : null; };
+  const band1 = await p.$$eval('#moband .mbb[data-f="fn"] .mbr', (rs) => rs.map((r) => [r.getAttribute('data-why'), [...r.querySelectorAll('.mc')].map((c) => c.innerText.replace(/\s+/g, ' ').trim())]));
+  ok(wantWork.every(([n, d]) => d > 1 && dW(n) === d) && gate.some((c) => c.keys.some((k) => k.endsWith('::build_auth_context')))
+     && band1.some(([w, cs]) => w === 'nolink' && ['_hold_hours', '_label', '_stages'].every((n) => cs.some((t) => t.startsWith(n))))
+     && band1.some(([w, cs]) => w === 'noname' && noname.every((n) => cs.includes(n))),
+    'D-056 (1) · BY MOMENT stands ' + wantWork.map(([n, d]) => n + ' ↓' + d).join(', ') + ' at the work (the call inside start_session reaches them), the login check\'s own at the dependencies; the card\'s other callees and the names no function carries in the band',
+    { work: work.map((c) => c.t), band: band1 });
+  /* review F3: a function two calls down stands on the paths of the handler call that reaches it — an upper bound, since a path may
+     leave start_session before it runs (the 404 raises at services/cooking.py:140, before seed_stage_schedule): its hover says so.
+     count_active_sessions, whose own steps name the paths it runs on, stands on those paths only (not the replay 201) and says nothing */
+  const tSeed = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc[data-keys="fn:apps/api/services/long_prep.py::seed_stage_schedule"] .mt');
+  const tCount = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc[data-keys="fn:apps/api/services/cooking.py::count_active_sessions"] .mt');
+  const eCount = R.mo.el.find((e) => e[0] === 'fn' && e[2].some((ki) => MK[ki] === 'fn:apps/api/services/cooking.py::count_active_sessions'));
+  const pathsCount = FE.paths.filter((q) => (q.effects.steps || []).some((e) => (STEPS[e.step] || {}).fn === 'apps/api/services/cooking.py::count_active_sessions')).map((q) => q.exit.id);
+  const onCount = R.mo.ex.map((x, i) => [x[0], eCount[5] == null || !!((eCount[5] >> i) & 1)]).filter(([, on]) => on).map(([x]) => x);
+  ok(tSeed && tSeed.includes(fillW(MX.callPaths, { via: 'start_session' })) && tCount && !tCount.includes(fillW(MX.callPaths, { via: 'start_session' }))
+     && JSON.stringify([...new Set(pathsCount)].sort()) === JSON.stringify([...new Set(onCount)].sort()),
+    'review F3 · ' + E + ' · seed_stage_schedule\'s hover says it stands "' + fillW(MX.callPaths, { via: 'start_session' }) + '" (a path may leave before it runs); count_active_sessions stands on exactly the endings its own steps are on', { tSeed: (tSeed || '').slice(0, 160), onCount, pathsCount });
+  /* (2) the cases it arranges */
+  const arrWant = [...new Set([...(FE.tests.arranged_by || []), ...(FE.tests.helper_arranged || [])])], arrPage = await p.$$eval('#ocol-cm .pair[data-k="d:arranged"] [data-key]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
+  const arrTxt = await p.$eval('#ocol-cm .pair[data-k="d:arranged"] .pk', (e) => e.textContent), inGrid = await p.$$eval('#mogrid [data-keys]', (cs) => cs.flatMap((c) => c.getAttribute('data-keys').split('\n')));
+  const moBandP = await p.$$eval('#moband .mbb[data-f="proof"] .mbr', (rs) => rs.map((r) => r.getAttribute('data-why')));
+  ok(arrTxt === fillW(PW.arranged, { n: arrWant.length }) && JSON.stringify(arrPage) === JSON.stringify(arrWant) && arrWant.every((c) => !inGrid.includes('case:' + c)) && !moBandP.includes('arranged'),
+    'D-056 (2) · ' + E + ' · "' + fillW(PW.arranged, { n: arrWant.length }) + '" names the ' + arrWant.length + ' cases the feed lists (' + arrWant.join(' ') + '); none stands at a moment, and the band holds no Proof row to join', { arrPage, moBandP });
+  const EB = FEED.find((ep) => ROW[ep].mo.un.some((u) => u[0] === 'proof' && u[3] !== 'arranged') && ROW[ep].d.arranged.length);
+  if (EB) { await openEp(EB); const bb = await p.$$eval('#moband .mbb[data-f="proof"] .mbr[data-why="arranged"] .mc', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
+    /* review F2: a case the band already holds under another reason (an acting call proving no ending) is not drawn there twice */
+    const held = new Set(await p.$$eval('#moband .mbb[data-f="proof"] .mbr:not([data-why="arranged"]) .mc', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5))));
+    const want2 = ROW[EB].d.arranged.map((x) => x[0]).filter((c) => !held.has(c));
+    ok(JSON.stringify(bb) === JSON.stringify(want2) && bb.every((c) => !held.has(c)), 'D-056 (2) · ' + EB + ' · where the band already lists Proof\'s unplaced, the arranging cases join it, "' + D.words.mo.why.arranged.name + '" — each once, never beside the same case under another reason (' + [...held].filter((c) => ROW[EB].d.arranged.some((x) => x[0] === c)).join(' ') + ' already there)', { bb, want2 });
+    await openEp(E); }
+  /* review F1: a case the feed lists as arranging both ways (arranged_by and helper_arranged) is ONE item, counted once */
+  const EA = FEED.find((ep) => { const t = (FJ.endpoints['endpoint:' + ep] || {}).tests || {}; return (t.arranged_by || []).some((c) => (t.helper_arranged || []).includes(c)); });
+  if (EA) { await openEp(EA); const tA = FJ.endpoints['endpoint:' + EA].tests, uA = [...new Set([...(tA.arranged_by || []), ...(tA.helper_arranged || [])])], both = uA.filter((c) => tA.arranged_by.includes(c) && tA.helper_arranged.includes(c));
+    const pA = await p.$$eval('#ocol-cm .pair[data-k="d:arranged"] [data-key]', (cs) => cs.map((c) => [c.getAttribute('data-key').slice(5), (c.querySelector('.hlp') || {}).textContent || ''])), nA = await p.$eval('#ocol-cm .pair[data-k="d:arranged"] .pk', (e) => e.textContent);
+    ok(JSON.stringify(pA.map((x) => x[0])) === JSON.stringify(uA) && nA === fillW(PW.arranged, { n: uA.length }) && both.every((c) => pA.find((x) => x[0] === c)[1].trim() === PW.arrangedBoth),
+      'D-056 (2) · ' + EA + ' · ' + both.join(' ') + ', listed both ways by the feed, is one item ("' + PW.arrangedBoth + '"), and the pair counts ' + uA.length + ' cases', { pA: pA.length, uA: uA.length });
+    await openEp(E); }
+  /* (3) declared or not */
+  const dset = new Set([422, FE.declared.success.status, ...(FE.declared.refusals || [])]);
+  const ends = await p.$$eval('#mogrid td[data-f="end"] .mc .vc-status', (cs) => cs.map((v) => [v.textContent, v.getAttribute('data-decl'), getComputedStyle(v).backgroundColor]));
+  const und = (FE.findings.find((f) => f.id === 'undeclared') || {}).statuses || [];
+  const cmSt = await p.$$eval('#ocol-cm .pair[data-k="d:exits"] tr.erow .vc-status', (cs) => cs.map((v) => [v.textContent, v.getAttribute('data-decl')]));
+  const hollowBg = ends.filter(([, d]) => d === '0').map(([, , bg]) => bg), fillBg = ends.filter(([, d]) => d === '1').map(([, , bg]) => bg);
+  ok(ends.length === R.mo.ex.length && ends.every(([s0, d]) => (s0 === '500' ? d === null : d === (dset.has(+s0) ? '1' : '0')))
+     && JSON.stringify([...new Set(ends.filter(([, d]) => d === '0').map(([s0]) => +s0))].sort()) === JSON.stringify([...und].sort())
+     && JSON.stringify(cmSt) === JSON.stringify(ends.map(([s0, d]) => [s0, d])) && hollowBg.every((bg) => /rgba\(0, 0, 0, 0\)|transparent/.test(bg)) && fillBg.every((bg) => !/rgba\(0, 0, 0, 0\)/.test(bg)),
+    'D-056 (3) · ' + E + ' · each ending declared (' + [...new Set(ends.filter(([, d]) => d === '1').map(([s0]) => s0))].join(' ') + ') is filled, each not (' + und.join(' ') + ', the undeclared alarm) hollow, the uncaught unmarked — in BY MOMENT and the endings table',
+    { ends: ends.map(([s0, d]) => s0 + ':' + d).join(' '), und });
+  /* (4) the fate of the writes on a picked path */
+  const bucketOf = (pid, sid) => { const ef = FE.paths.find((q) => q.id === pid).effects; return ({ committed: 'saved', maybe_committed: 'maybe', rolled_back: 'rolled', uncommitted: 'unsaved' })[['committed', 'maybe_committed', 'rolled_back', 'uncommitted'].find((b0) => (ef[b0] || []).includes(sid))]; };
+  const addSt = (pid) => (FE.paths.find((q) => q.id === pid).effects.steps || []).map((e) => e.step).find((sid) => STEPS[sid].table === 'cooking_sessions' && STEPS[sid].op === 'add');
+  const fateAt = async (xid) => { const i = R.mo.ex.findIndex((x) => x[0] === xid); await p.click('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(120);
+    const c = (await cell('work', 'data')).find((q) => q.keys.includes('table:cooking_sessions') && /\bW\b/.test(q.t)); return c ? c.fate : null; };
+  const X201 = FE.returns.find((x) => x.status === 201).id, X403 = FE.produced.find((x) => x.status === 403).id;
+  const w201 = [...new Set(FE.paths.filter((q) => q.exit.id === X201 && addSt(q.id)).map((q) => bucketOf(q.id, addSt(q.id))))], w403 = [...new Set(FE.paths.filter((q) => q.exit.id === X403 && addSt(q.id)).map((q) => bucketOf(q.id, addSt(q.id))))];
+  const f201 = await fateAt(X201), f403 = await fateAt(X403);
+  await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(120); const fAll = await p.$$eval('#mogrid .vc-fate', (cs) => cs.length);
+  ok(JSON.stringify(f201) === JSON.stringify(w201) && JSON.stringify(f403) === JSON.stringify(w403) && w201[0] === 'saved' && w403[0] === 'unsaved' && fAll === 0,
+    'D-056 (4) · ' + E + ' · the add to cooking_sessions wears "' + D.words.fates.saved.name + '" on the path to the 201 and "' + D.words.fates.unsaved.name + '" on the path to the 403 (the feed\'s buckets); all paths, no fate', { f201, f403, fAll });
+  /* (5) the race */
+  const r500 = ((FE.arm_findings || {}).contract || []).filter((f) => f.id === 'race-500'), rc = (await cell('work', 'data')).filter((c) => c.race);
+  const rcTip = await tipAt('#mogrid td[data-mom="work"][data-f="data"] .mc:has(.mrc) .mt'), claim = FE.repeat.claims.find((c) => c.race === 'uncaught');
+  ok(r500.length === 1 && rc.length === 1 && rc[0].hint === r500[0].race_at.split('/').pop() && rc[0].t.includes('500') && rcTip && rcTip.includes(fillW(MX.race, { cons: claim.constraint })) && rcTip.includes(claim.unique.join(', ')),
+    'D-056 (5) · ' + E + ' · the flush at ' + (r500[0] || {}).race_at + ' (the race-500 alarm\'s) wears the race on ' + claim.constraint + ', joined to the uncaught 500', { rc: rc.map((c) => c.t), rcTip: (rcTip || '').slice(0, 160) });
+  /* (6) a test that fits endings at several moments */
+  const C237 = Object.values(FJ.test_cases.C237.calls).find((c) => c.endpoint === EK), xs237 = C237.refs.map((q) => q.exit);
+  const momOf = (xid) => R.mo.sp[R.mo.ex.find((x) => x[0] === xid)[3]][0], pc = [];
+  for (const m of [...new Set(R.mo.sp.map((x) => x[0]))]) for (const c of await cell(m, 'proof')) if (c.keys.includes('case:C237')) pc.push([m, c.st[0][0], c.hol, c.dash]);
+  const want237 = xs237.map((xid) => [momOf(xid), String((FE.produced.concat(FE.framework_exits)).find((x) => x.id === xid).status)]).sort().map((x) => x.join(' '));
+  ok(JSON.stringify(pc.map((x) => x[0] + ' ' + x[1]).sort()) === JSON.stringify(want237) && pc.every((x) => x[2] && x[3] === 'dashed') && !(await p.$$eval('#moband .mbr[data-why="spans"] .mc', (cs) => cs.map((c) => c.textContent))).some((t) => t.includes('C237')),
+    'D-056 (6) · ' + E + ' · C237 asserts a status four endings share: it rides each (' + want237.join(' · ') + '), hollow and dashed, and no longer stands in the band', pc);
+  /* (7) the headers per ending */
+  const hdrs = Object.entries(FE.responses).filter(([, r0]) => r0.headers).map(([xid, r0]) => [xid, r0.status, Object.entries(r0.headers).map(([h, v]) => h + ': ' + v).join(' · ')]);
+  const cmH = await p.$eval('#ocol-cm .pair[data-k="d:response"] .hdl', (e) => e.innerText.replace(/\s+/g, ' ').trim()).catch(() => '');
+  const t429 = await tipAt('#mogrid td[data-mom="edge"][data-f="end"] .mc .vc-status'), t401 = await tipAt('#mogrid td[data-mom="gate"][data-f="end"] .mc .vc-status');
+  ok(hdrs.length === 3 && hdrs.every(([, st, h]) => cmH.includes(st + ' ' + h)) && t429 && t429.includes(fillW(MX.headers, { v: 'Retry-After: …' })) && t401 && t401.includes('WWW-Authenticate: Bearer'),
+    'D-056 (7) · ' + E + ' · Retry-After on both 429s and WWW-Authenticate on the 401 ride their chips\' hovers and the code map\'s reply pair', { cmH, t429: (t429 || '').slice(0, 120) });
+  /* (8) the schemas inside the reply */
+  const S8 = FJ.schemas, nest = (top) => { const seen = new Set(), out = [], todo = [top]; while (todo.length) { const n = todo.shift(); if (seen.has(n)) continue; seen.add(n); if (n !== top) out.push(n);
+    for (const f of ((S8['schema:' + n] || {}).fields || [])) for (const w of String(f.annotation).match(/[A-Za-z_][A-Za-z0-9_]*/g) || []) if (S8['schema:' + w]) todo.push(w); } return out; };
+  const n8 = nest(FE.declared.response_model.name), ans = await cell('answer', 'shape'), cmN = await p.$$eval('#ocol-cm .pair[data-k="d:response"] .bhl [data-key]', (cs) => cs.map((c) => c.getAttribute('data-key')));
+  ok(n8.length > 0 && n8.every((n) => ans.some((c) => c.keys.includes('schema:' + n) && c.t.startsWith('↳'))) && JSON.stringify(cmN) === JSON.stringify(n8.map((n) => 'schema:' + n)),
+    'D-056 (8) · ' + E + ' · ' + n8.join(', ') + ', inside ' + FE.declared.response_model.name + ' (schemas{}), stands under it at the answer and in the code map\'s reply pair', { ans: ans.map((c) => c.t), cmN });
+  const E8 = 'GET /cooking/active', n8b = nest(FJ.endpoints['endpoint:' + E8].declared.response_model.name); await openEp(E8);
+  const ans8 = await cell('answer', 'shape');
+  ok(n8b.includes('CookingSessionResponse') && n8b.includes('CookingPhotoRef') && n8b.every((n) => ans8.some((c) => c.keys.includes('schema:' + n))), 'D-056 (8) · ' + E8 + ' · the row\'s example: ' + n8b.join(', ') + ' stand under the reply at the answer', ans8.map((c) => c.t));
+  /* review F4: a schema two levels down names the schema it sits in, not the top — read off schemas{} here */
+  const parOf = (n) => Object.entries(S8).find(([k0, v0]) => (v0.fields || []).some((f) => (String(f.annotation).match(/[A-Za-z_][A-Za-z0-9_]*/g) || []).includes(n)) && n8b.concat([FJ.endpoints['endpoint:' + E8].declared.response_model.name]).includes(k0.slice(7)))[0].slice(7);
+  const tPhoto = await tipAt('#mogrid td[data-mom="answer"][data-f="shape"] .mc[data-keys="schema:CookingPhotoRef"] .mt'), cmPar = await p.$eval('#ocol-cm .pair[data-k="d:response"] .bhl', (e) => e.innerText.replace(/\s+/g, ' ').trim());
+  ok(parOf('CookingPhotoRef') === 'CookingSessionResponse' && tPhoto && tPhoto.includes(fillW(MX.inside, { v: 'CookingSessionResponse' })) && !tPhoto.includes(fillW(MX.inside, { v: 'ActiveCookingResponse' }))
+     && cmPar.includes('CookingPhotoRef ' + fillW(PW.nestedParent, { v: 'CookingSessionResponse' })),
+    'D-056 (8) · ' + E8 + ' · CookingPhotoRef sits inside CookingSessionResponse (its photos field), and its hover and the reply pair say so — not the top', { tPhoto: (tPhoto || '').slice(0, 120), cmPar });
+  /* (9) who fetches it */
+  const bridge = (ep) => { const out = []; (C4.cross_edges || []).forEach((e0) => { if (e0.kind === 'bridge' && e0.to === 'endpoint:' + ep) out.push(e0); }); return out; };
+  const E9 = 'GET /account/export'; await openEp(E9);
+  const hk9 = await p.$$eval('#ocol-cm .pair[data-k="d:hook"] [data-key]', (cs) => cs.map((c) => [c.getAttribute('data-key'), c.getAttribute('data-tip')]));
+  const send9 = await cell('send', 'client');
+  ok(bridge(E9).length === 1 && hk9.length === 1 && /accountExport\.ts$/.test(hk9[0][0]) && hk9[0][1] === 'hookfile' && send9.some((c) => c.keys.includes(hk9[0][0])),
+    'D-056 (9) · ' + E9 + ' · the file its bridge edge ends at (accountExport) is named in the hook pair and at "the screen sends it"', { hk9, send9: send9.map((c) => c.t) });
+  const E9b = 'PATCH /settings/preferences', L9b = facts(E9b); await openEp(E9b);
+  const hk9b = await p.$$eval('#ocol-cm .pair[data-k="d:hook"] [data-key]', (cs) => cs.map((c) => c.getAttribute('data-key'))), sc9b = await p.$$eval('#ocol-cm .pair[data-k="d:screens"] [data-key]', (cs) => cs.map((c) => c.getAttribute('data-key')));
+  ok(JSON.stringify(hk9b) === JSON.stringify(L9b.widening.fetched_by.map((q) => q.id)) && JSON.stringify(sc9b) === JSON.stringify(L9b.widening.screens.map((q) => q.id)) && hk9b[0].endsWith('#useRedoSetup'),
+    'D-056 (9) · ' + E9b + ' · the hook pair names useRedoSetup and the screens pair its screen, by name (the lab\'s fetched_by and screens), no longer a bare count', { hk9b, sc9b });
+  await openEp(E);
+  /* (10) the hovers of the limiter, the login check and a case */
+  const lim = FE.rate.limits.find((l) => l.limiter === '_sensitive'), av = (l, q) => l.args.find((a) => a.param === q).value;
+  const tL = await tipAt('#mogrid .mc[data-keys="limiter:sensitive"] .mt'), tA = await tipAt('#mogrid td[data-mom="gate"][data-f="gate"] .mc[data-key^="fn:"] .mt'), tC = await tipAt('#mogrid .mc[data-f="proof"][data-keys="case:C267"] .mt');
+  const sch = FE.auth.schemes[0], c267 = FJ.test_cases.C267.calls.find((c) => c.endpoint === EK && c.role === 'act');
+  ok(tL && tL.includes(fillW(MX.limit, { n: av(lim, 'limit'), w: av(lim, 'window_seconds'), k: lim.key })) && tA && tA.includes(fillW(MX.auth, { scheme: sch.scheme, header: sch.header, carrier: sch.carrier }))
+     && tC && tC.includes(fillW(MX.asserts, { v: c267.asserts.status.join(' · ') })),
+    'D-056 (10) · ' + E + ' · the limiter\'s hover says ' + av(lim, 'limit') + ' per ' + av(lim, 'window_seconds') + ' s keyed ' + lim.key + '; the login check\'s, ' + sch.scheme + ' reads the ' + sch.header + ' ' + sch.carrier + '; C267\'s, what it asserts', { tL: (tL || '').slice(0, 140), tA: (tA || '').slice(0, 140), tC: (tC || '').slice(0, 140) });
+  /* (11) the handler pair's hover */
+  const sg = L56.identity.sig, tH = await tipAt('#ocol-cm .pair[data-k="h:handler"] .pk'), SW = D.words.codemap.sig;
+  ok(tH && tH.includes([sg.async ? SW.async : SW.sync, fillW(SW.lines, { lines: sg.lines }), fillW(SW.returns, { ret: sg.returns })].join(' · ')) && tH.includes(L56.identity.gsig) && tH.includes(L56.identity.doc ? fillW(SW.doc, { v: L56.identity.doc }) : SW.noDoc),
+    'D-056 (11) · ' + E + ' · the handler pair\'s hover: ' + (sg.async ? 'async' : 'not async') + ' · ' + sg.lines + ' lines · returns ' + sg.returns + ', the def text, ' + (L56.identity.doc ? 'its docstring' : 'no docstring'), (tH || '').slice(0, 200));
+  /* (12) a streamed answer */
+  const streams = Object.values(C4.l2 || {}).flatMap((e0) => e0.nodes || []).filter((n) => n.kind === 'endpoint' && n.stream).map((n) => n.id.replace(/^endpoint:/, ''));
+  const E12 = streams[0]; await openEp(E12);
+  const ok12 = await cell('answer', 'end'), cm12 = await p.$$eval('#ocol-cm .pair[data-k="d:exits"] tr.erow .sksub', (cs) => cs.map((v) => v.getAttribute('data-vc') + ':' + v.getAttribute('data-vv')));
+  const others = FEED.filter((ep) => !streams.includes(ep) && ROW[ep].stream);
+  ok(streams.length === 1 && ok12.length === 1 && ok12[0].sub.includes('delivery:stream') && cm12.includes('delivery:stream') && !others.length,
+    'D-056 (12) · ' + E12 + ' · the success wears the station\'s delivery:stream label in BY MOMENT and the endings table; no other endpoint streams', { ok12: ok12.map((c) => c.sub), cm12 });
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the D-056 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));

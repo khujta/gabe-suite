@@ -162,14 +162,15 @@ await step('one-info-close', '#itog-one', 'the same toggle, again');
     const gb = await p.$eval('#ocol-gaps', (e) => { const r = e.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height }; });
     await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-the-gaps-the-other-way.png'), clip: { x: Math.max(0, gb.x - 8), y: Math.max(0, gb.y - 8), width: gb.width + 16, height: Math.min(1800, gb.height + 16) }, fullPage: true }); }
   { // D-044: point at a gap the other way with the real mouse — the hover says WHY the gap exists (D-042's reasons) and its STATUS
-    // (my proposal); a "solved elsewhere" gap names the field that holds it as a link. The Guards row's first name the code map lacks
-    const gs = '#ocol-gaps .gfact[data-row="GUARDS"]', g = await p.$(gs);
+    // (my proposal); a "solved elsewhere" gap names the field that holds it as a link. CHANGED 2026-09-26 (D-056 (11)): the Guards row's
+    // names are held now (the handler's def text in its pair names them), so the Tests row's first name the code map lacks
+    const gs = '#ocol-gaps .gfact[data-row="TESTS"]', g = await p.$(gs);
     if (g) { await g.evaluate((e) => e.scrollIntoView({ block: 'center' })); await wait(120); const bx = await g.boundingBox();
       await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(300);
       say('pointing at a gap the other way', { gap: await txt(gs), status: await p.$eval('#tip', (t) => (t.querySelector('.gs') || {}).getAttribute ? t.querySelector('.gs').getAttribute('data-st') : null),
         links: await p.$$eval('#tip .elref[data-gref]', (ls) => ls.map((l) => l.textContent)), tip: await p.$eval('#tip', (t) => t.innerText.replace(/\s+/g, ' ')) });
       await pic('hover-a-gap-the-other-way'); await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120); }
-    else say('MISSING a gap the other way in the Guards row', gs); }
+    else say('MISSING a gap the other way in the Tests row', gs); }
   await step('gaps-back-this-way', '#ocol-gaps .opt[data-gdir="cm"]', 'the first square: in the code map, not in the universe'); }
 { // D-041: click an element in the universe column and it lights in the three places — the Household chip on POST /setup/complete
   const lit = async () => p.evaluate(() => ({ chip: document.getElementById('elchip').hidden ? null : document.getElementById('elsays').textContent,
@@ -222,15 +223,13 @@ await step('one-info-close', '#itog-one', 'the same toggle, again');
   say('clicked the reason link', Object.assign({ fieldTop: await p.evaluate(() => { const f = document.querySelector('[data-elref="pin"]'); return f ? Math.round(f.getBoundingClientRect().top) : null; }) }, await why()));
   await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120);
   await pic('the-field-kept-lit');
-  // one the code map does not carry: C1087, a case that only sets something up through this endpoint — its journey id, clicked
+  // CHANGED 2026-09-26 (D-056 (2)): C1087, a case that only sets something up through this endpoint, is no longer missing from the code
+  // map — its pair "arranges other cases" names it: its journey id, clicked, and the code map says it is there
   const C2 = '#ocol-uni .urow[data-row="JOURNEYS"] [data-key="case:C1087"]';
   await center(C2);
-  await step('light-a-case-the-code-map-lacks', C2, 'the journey C1087, in the universe column');
-  say('lit: C1087, the code map says', await why());
-  await center('#el-cm .elref[data-ref="gap"]');
-  await step('click-not-carried', '#el-cm .elref[data-ref="gap"]', 'the link of "not carried"');
-  say('the gaps turned', Object.assign({ dir: await p.$eval('#ocol-gaps', (e) => e.getAttribute('data-dir')) }, await why()));
-  await onePic('the-gaps-turned-to-the-case');
+  await step('light-a-case-the-code-map-now-names', C2, 'the journey C1087, in the universe column');
+  say('lit: C1087, the code map says', Object.assign({ inArranged: await p.$$eval('#ocol-cm .pair[data-k="d:arranged"] .elon', (es) => es.map((e) => e.textContent)) }, await why()));
+  await onePic('the-arranging-case-named');
   await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
   await step('clear-the-light-again', '#elclear', 'the clear link on the lit chip above the table');
   await center('#ocol-gaps .opt[data-gdir="cm"]');
@@ -439,6 +438,79 @@ await pic('more-information-open');
   await step('back-to-cooking-sessions', '#board tr.row[data-ep="POST /cooking/sessions"] td.id', 'the row POST /cooking/sessions');
   await center('#ocol-cm .opt[data-carry="all"]'); await step('carry-show-all', '#ocol-cm .opt[data-carry="all"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="all"]')) + '" (my pick)');
   await cvSay('D-055 · the code map, show all again'); }
+{ // D-056 (his ruling "agree with your recommendations"), LAST: the twelve adds, on POST /cooking/sessions (his example), then the file
+  // that fetches GET /account/export and the stream's success — each read off the page after a real click or a real hover
+  const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
+  const clipOf = async (sel, maxH) => p.$eval(sel, (e, mh) => { const r = e.getBoundingClientRect(); return { x: Math.max(0, r.left + scrollX - 8), y: Math.max(0, r.top + scrollY - 8), width: r.width + 16, height: Math.min(mh, r.height + 16) }; }, maxH);
+  const shotOf = async (name, sel, maxH) => { await p.mouse.move(5, H - 10); await p.evaluate(() => { window.hoverHide && window.hoverHide(); window.scrollTo(0, 0); }); await wait(200); n++;
+    const bx = await clipOf(sel, maxH || 8000); await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + name + '.png'), clip: { ...bx, width: Math.min(W - bx.x, bx.width) }, fullPage: true }); };
+  const hoverSay = async (label, sel) => { const e = await p.$(sel); if (!e) { say('MISSING ' + label, sel); return; } await e.scrollIntoViewIfNeeded(); const bx = await e.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(250);
+    say(label, await p.$eval('#tip', (t) => t.innerText.replace(/\n+/g, ' ┆ '))); n++;
+    const tb = await p.$eval('#tip', (t) => { const r = t.getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; });
+    const x0 = Math.max(0, Math.min(bx.x, tb.x) - 10), y0 = Math.max(0, Math.min(bx.y, tb.y) - 10);
+    await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + label.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 40) + '.png'),
+      clip: { x: x0, y: y0, width: Math.min(W - x0, Math.max(bx.x + bx.width, tb.x + tb.width) - x0 + 10), height: Math.min(H - y0, Math.max(bx.y + bx.height, tb.y + tb.height) - y0 + 10) } });
+    await p.mouse.move(5, H - 10); await wait(100); };
+  const pair = (k) => p.$eval('#ocol-cm .pair[data-k="' + k + '"]', (e) => e.innerText.replace(/\s+/g, ' ').trim()).catch(() => null);
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('d056-open-cooking-sessions', '#board tr.row[data-ep="POST /cooking/sessions"] td.id', 'the row POST /cooking/sessions');
+  for (const k of ['d:behind', 'd:arranged', 'd:hook', 'd:screens', 'd:response']) say('D-056 · the code map, ' + k, await pair(k));
+  await shotOf('d056-code-map-cooking-sessions', '#ocol-cm');
+  await hoverSay('d056 hover the handler pair', '#ocol-cm .pair[data-k="h:handler"] .pk');
+  await hoverSay('d056 hover a not-declared 409', '#ocol-cm .pair[data-k="d:exits"] tr.erow[data-mom="checks"] .vc-status');
+  await center('#sec-mo'); await shotOf('d056-by-moment-all-paths', '#sec-mo');
+  await hoverSay('d056 hover a function behind', '#mogrid .mc[data-keys="fn:apps/api/services/long_prep.py::seed_stage_schedule"] .mt');
+  await hoverSay('d056 hover the race', '#mogrid td[data-mom="work"][data-f="data"] .mc:has(.mrc) .mt');
+  await hoverSay('d056 hover the first 429', '#mogrid td[data-mom="edge"][data-f="end"] .mc .vc-status');
+  await hoverSay('d056 hover the limiter', '#mogrid .mc[data-keys="limiter:sensitive"] .mt');
+  await hoverSay('d056 hover the login check', '#mogrid td[data-mom="gate"][data-f="gate"] .mc[data-key^="fn:"] .mt');
+  await hoverSay('d056 hover C237 hollow', '#mogrid .mc.hol .mt');
+  await hoverSay('d056 hover C267', '#mogrid .mc[data-f="proof"][data-keys="case:C267"] .mt');
+  const fates = () => p.$$eval('#mogrid .mc:has(.vc-fate)', (cs) => cs.map((c) => c.innerText.replace(/\s+/g, ' ').trim()));
+  for (const st of [201, 403]) { const i = await p.evaluate((s0) => window.AE_DATA.rows.find((q) => q.id === 'POST /cooking/sessions').mo.ex.findIndex((x) => x[1] === s0), st);
+    const sel = '#mobar .mopath[data-path="' + i + '"]'; await center('#mobar'); await step('d056-path-to-the-' + st, sel, 'the code "' + (await txt(sel)) + '"');
+    say('D-056 · the writes on the path to the ' + st, await fates()); await shotOf('d056-by-moment-path-to-the-' + st, '#sec-mo'); }
+  await center('#mobar'); await step('d056-all-paths-again', '#mobar .mopath[data-path="all"]', 'the square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"');
+  say('D-056 · all paths, writes wearing a fate', (await fates()).length);
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('d056-open-account-export', '#board tr.row[data-ep="GET /account/export"] td.id', 'the row GET /account/export');
+  say('D-056 · GET /account/export, what sends it', await pair('d:hook'));
+  await hoverSay('d056 hover the file that sends it', '#ocol-cm .pair[data-k="d:hook"] [data-tip="hookfile"]');
+  say('D-056 · GET /account/export, the screen sends it', await p.$$eval('#mogrid td[data-mom="send"][data-f="client"] .mc', (cs) => cs.map((c) => c.innerText.replace(/\s+/g, ' ').trim())));
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('d056-open-the-stream', '#board tr.row[data-ep="GET /recipe-creation/gustify/stream"] td.id', 'the row GET /recipe-creation/gustify/stream');
+  say('D-056 · the stream, its answer', await p.$$eval('#mogrid td[data-mom="answer"][data-f="end"] .mc', (cs) => cs.map((c) => c.innerText.replace(/\s+/g, ' ').trim())));
+  await center('#mogrid td[data-mom="answer"][data-f="end"]'); await shotOf('d056-the-stream-by-moment', '#sec-mo');
+  // after the review's fixes (F1–F6): the six things he looks at, each by a real click or a real hover, each photographed from the
+  // top of its section (a section taller than 8,000 px in 8,000 px pieces)
+  const shotPieces = async (name, sel) => { await p.mouse.move(5, H - 10); await p.evaluate(() => { window.hoverHide && window.hoverHide(); window.scrollTo(0, 0); }); await wait(200);
+    const r = await p.$eval(sel, (e) => { const q = e.getBoundingClientRect(); return { x: Math.max(0, q.left + scrollX - 8), y: Math.max(0, q.top + scrollY - 8), width: q.width + 16, height: q.height + 16 }; });
+    const k = Math.max(1, Math.ceil(r.height / 8000));
+    for (let i = 0; i < k; i++) { n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + name + (k > 1 ? '-piece-' + (i + 1) : '') + '.png'),
+      clip: { x: r.x, y: r.y + i * 8000, width: Math.min(W - r.x, r.width), height: Math.min(8000, r.height - i * 8000) }, fullPage: true }); }
+    say('picture · ' + name, { pieces: k, height: Math.round(r.height) }); };
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('review-open-cooking-sessions', '#board tr.row[data-ep="POST /cooking/sessions"] td.id', 'the row POST /cooking/sessions');
+  say('review · the behind pair, by name', await pair('d:behind'));
+  await shotPieces('review-behind-pair-by-name', '#ocol-cm .pair[data-k="d:behind"]');
+  await hoverSay('review hover the handler signature and docstring', '#ocol-cm .pair[data-k="h:handler"] .pk');
+  { const i201 = await p.evaluate(() => window.AE_DATA.rows.find((q) => q.id === 'POST /cooking/sessions').mo.ex.findIndex((x) => x[1] === 201)), sel = '#mobar .mopath[data-path="' + i201 + '"]';
+    await center('#mobar'); await step('review-path-to-the-201', sel, 'the code "' + (await txt(sel)) + '"');
+    say('review · the writes on the path to the 201, each with its fate', await fates());
+    await hoverSay('review hover seed_stage_schedule on the 201 path', '#mogrid .mc[data-keys="fn:apps/api/services/long_prep.py::seed_stage_schedule"] .mt');
+    await shotPieces('review-by-moment-path-to-the-201', '#sec-mo');
+    await center('#mobar'); await step('review-all-paths-again', '#mobar .mopath[data-path="all"]', 'the square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"'); }
+  await hoverSay('review hover the 401 declared or not with its header', '#mogrid td[data-mom="gate"][data-f="end"] .mc .vc-status');
+  say('review · the arranges pair', await pair('d:arranged'));
+  await shotPieces('review-the-arranges-pair', '#ocol-cm .pair[data-k="d:arranged"]');
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('review-open-cooking-active', '#board tr.row[data-ep="GET /cooking/active"] td.id', 'the row GET /cooking/active');
+  say('review · GET /cooking/active, the reply pair', await pair('d:response'));
+  await hoverSay('review hover CookingPhotoRef, inside CookingSessionResponse', '#mogrid td[data-mom="answer"][data-f="shape"] .mc[data-keys="schema:CookingPhotoRef"] .mt');
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('review-open-the-stream', '#board tr.row[data-ep="GET /recipe-creation/gustify/stream"] td.id', 'the row GET /recipe-creation/gustify/stream');
+  say('review · the stream, its answer', await p.$$eval('#mogrid td[data-mom="answer"][data-f="end"] .mc', (cs) => cs.map((c) => c.innerText.replace(/\s+/g, ' ').trim() + ' [' + [...c.querySelectorAll('.sksub')].map((v) => v.getAttribute('data-vc') + ':' + v.getAttribute('data-vv')).join(' ') + ']')));
+  await shotPieces('review-the-stream-answer', '#sec-mo'); }
 say('rows at the end', await rows());
 say('page errors', errs);
 fs.writeFileSync(path.join(OUT, 'walk.json'), JSON.stringify({ viewport: [W, H], log }, null, 1));

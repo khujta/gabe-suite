@@ -515,7 +515,7 @@
       953,
       53,
       935,
-      3423
+      6422
      ]
     ],
     "universe": [
@@ -629,8 +629,8 @@
    {
     "stage": 18,
     "kind": 26,
-    "status": 32,
-    "role": 5,
+    "status": 35,
+    "role": 33,
     "dir": 2,
     "limit": 2,
     "fate": 18,
@@ -685,15 +685,12 @@
   [
    "gaps, the other way",
    {
-    "count": "5 attributes · 51 names",
+    "count": "4 attributes · 18 names",
     "groups": [
-     "Guards: get_session",
      "evidence: home auth by its file claim · users say ",
-     "Code behind: _discard_claimaccessor | _load_setup_resultaccessor | _lookupaccessor",
      "Tests: Cases | C1048 | C1049",
-     "Journeys: Cases | C250 | 15 case(s)",
+     "Journeys: Cases | 15 case(s)",
      "Identity: endpoints",
-     "Signature: Signature | async def setup_complete(request: Reques",
      "Source: apps/api/api/setup.py:254",
      "risk flags: Risk flag | conflict · large surface",
      "Above: Where this endpoint sits in the app"
@@ -703,12 +700,15 @@
   [
    "pointing at a gap the other way",
    {
-    "gap": "get_session",
+    "gap": "C1048",
     "status": "solved",
     "links": [
-     "in flight"
+     "tests",
+     "beyond",
+     "proven",
+     "the endings"
     ],
-    "tip": "Guards get_session the universe card draws it; the code-map column never names it WHY shown another way — in flight STATUS solved elsewhere — The code map holds this dependency as the value it hands the handler: an in-flight value, in the field linked here. my proposal in flight"
+    "tip": "Tests C1048 the universe card draws it; the code-map column never names it WHY counted, not named — tests · beyond · proven · the endings STATUS solved elsewhere — The code map counts this case in the fields linked here — the calls that act on this endpoint and, where a call proves an ending, that ending — without naming it. my proposal tests beyond proven the endings"
    }
   ],
   [
@@ -717,7 +717,7 @@
     "click": "in the code map, not in the universe",
     "at": [
      620,
-     442
+     368
     ],
     "size": [
      32,
@@ -925,7 +925,7 @@
   [
    "clicked the reason link",
    {
-    "fieldTop": 522,
+    "fieldTop": -394,
     "here": "false",
     "line": "C1048 (test case) — not named in the code map · counted, not namedtestsbeyondproventhe endings",
     "reasons": [
@@ -937,7 +937,7 @@
    }
   ],
   [
-   "step 75 · light-a-case-the-code-map-lacks",
+   "step 75 · light-a-case-the-code-map-now-names",
    {
     "click": "C1087",
     "at": [
@@ -954,45 +954,17 @@
   [
    "lit: C1087, the code map says",
    {
-    "here": "false",
-    "line": "C1087 (test case) — not named in the code map · not carriedthe gaps: in the universe, not in the code map",
-    "reasons": [
-     "gap: not carried | the gaps: in the universe, not in the code map → gap"
+    "inArranged": [
+     "C1087"
     ],
+    "here": "true",
+    "line": "C1087 (test case) · 1 drawn here",
+    "reasons": [],
     "fieldsLit": []
    }
   ],
   [
-   "step 76 · click-not-carried",
-   {
-    "click": "the gaps: in the universe, not in the code map",
-    "at": [
-     1414,
-     530
-    ],
-    "size": [
-     361,
-     20
-    ],
-    "note": "the link of \"not carried\""
-   }
-  ],
-  [
-   "the gaps turned",
-   {
-    "dir": "uni",
-    "here": "false",
-    "line": "C1087 (test case) — not named in the code map · not carriedthe gaps: in the universe, not in the code map",
-    "reasons": [
-     "gap: not carried | the gaps: in the universe, not in the code map → gap"
-    ],
-    "fieldsLit": [
-     "C1087 · pin"
-    ]
-   }
-  ],
-  [
-   "step 78 · clear-the-light-again",
+   "step 77 · clear-the-light-again",
    {
     "click": "clear",
     "at": [
@@ -1007,7 +979,7 @@
    }
   ],
   [
-   "step 79 · gaps-back-to-this-way",
+   "step 78 · gaps-back-to-this-way",
    {
     "click": "in the code map, not in the universe",
     "at": [
@@ -1029,14 +1001,16 @@
    "code map · the station glyphs and labels",
    {
     "function": {
-     "n": 5,
+     "n": 33,
      "labels": {
-      "caller": 4,
-      "accessor": 1
+      "caller": 8,
+      "accessor": 20,
+      "pure": 4,
+      "gate": 1
      }
     },
     "schema": {
-     "n": 2,
+     "n": 19,
      "labels": {}
     },
     "model": {
@@ -1048,6 +1022,10 @@
      "labels": {
       "fetcher": 1
      }
+    },
+    "view": {
+     "n": 1,
+     "labels": {}
     },
     "endpoint": {
      "n": 1,
@@ -1062,7 +1040,7 @@
    }
   ],
   [
-   "step 81 · gaps-the-universe-way",
+   "step 80 · gaps-the-universe-way",
    {
     "click": "in the universe, not in the code map",
     "at": [
@@ -1078,19 +1056,10 @@
   ],
   [
    "the gaps · the station glyphs and labels",
-   {
-    "function": {
-     "n": 12,
-     "labels": {
-      "accessor": 8,
-      "pure": 2,
-      "caller": 2
-     }
-    }
-   }
+   {}
   ],
   [
-   "step 83 · gaps-back-once-more",
+   "step 82 · gaps-back-once-more",
    {
     "click": "in the code map, not in the universe",
     "at": [
@@ -1105,7 +1074,7 @@
    }
   ],
   [
-   "step 84 · open-in-the-lab",
+   "step 83 · open-in-the-lab",
    {
     "click": "open POST /setup/complete in the lab",
     "at": [
@@ -1134,7 +1103,7 @@
    }
   ],
   [
-   "step 86 · open-in-the-universe",
+   "step 85 · open-in-the-universe",
    {
     "click": "open POST /setup/complete in the Gabe Universe",
     "at": [
@@ -1164,7 +1133,7 @@
    }
   ],
   [
-   "step 88 · click-the-stream-row",
+   "step 87 · click-the-stream-row",
    {
     "click": "/recipe-creation/gustify/streamGETstream",
     "at": [
@@ -1231,12 +1200,12 @@
    }
   ],
   [
-   "step 91 · more-information",
+   "step 90 · more-information",
    {
     "click": "Show how the map knows this",
     "at": [
      32,
-     995
+     994
     ],
     "size": [
      220,
@@ -1246,7 +1215,7 @@
    }
   ],
   [
-   "step 93 · open-gustify-from-the-table",
+   "step 92 · open-gustify-from-the-table",
    {
     "click": "/recipe-creation/gustifyPOST",
     "at": [
@@ -1291,7 +1260,7 @@
    ]
   ],
   [
-   "step 95 · moments-as-a-word-in-the-stage-chip",
+   "step 94 · moments-as-a-word-in-the-stage-chip",
    {
     "click": "moments inside the stage chip",
     "at": [
@@ -1332,7 +1301,7 @@
    ]
   ],
   [
-   "step 97 · moments-back-to-header-rows",
+   "step 96 · moments-back-to-header-rows",
    {
     "click": "moments as header rows",
     "at": [
@@ -1347,7 +1316,7 @@
    }
   ],
   [
-   "step 98 · check-as-a-line-under-the-words",
+   "step 97 · check-as-a-line-under-the-words",
    {
     "click": "the check as a line under the ending's words",
     "at": [
@@ -1392,7 +1361,7 @@
    ]
   ],
   [
-   "step 100 · check-back-to-its-column",
+   "step 99 · check-back-to-its-column",
    {
     "click": "the check as its own column",
     "at": [
@@ -1407,7 +1376,7 @@
    }
   ],
   [
-   "step 101 · light-one-own-check",
+   "step 100 · light-one-own-check",
    {
     "click": "not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) · re",
     "at": [
@@ -1442,7 +1411,7 @@
    }
   ],
   [
-   "step 103 · clear-the-check-light",
+   "step 102 · clear-the-check-light",
    {
     "click": "clear",
     "at": [
@@ -1457,7 +1426,7 @@
    }
   ],
   [
-   "step 104 · open-get-recipes-from-the-table",
+   "step 103 · open-get-recipes-from-the-table",
    {
     "click": "/recipesGET",
     "at": [
@@ -1509,7 +1478,7 @@
    }
   ],
   [
-   "step 106 · open-gustify-for-by-moment",
+   "step 105 · open-gustify-for-by-moment",
    {
     "click": "/recipe-creation/gustifyPOST",
     "at": [
@@ -1524,7 +1493,7 @@
    }
   ],
   [
-   "step 107 · copy-the-code-map-settings",
+   "step 106 · copy-the-code-map-settings",
    {
     "click": "copy the settings",
     "at": [
@@ -1551,11 +1520,11 @@
    [
     "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
     "Endings refusal 429 refusal 429 framework 422 framework 400 refusal 401 refusal 401 validation 422 refusal 403 refusal 409 refusal 400 refusal 400 refusal 429 refusal 429",
-    "Proof C83 proves 422 C971 proves 403 C80 proves 402 C81 proves 402 C87 proves 502 C88 proves 502 C88 proves 502 C75 proves 201 C76 proves 201 C77 proves 201 C77 proves 20",
+    "Proof C79 proves 429 C79 proves 429 C73 proves 400 C74 proves 400 C72 proves 401 C72 proves 401 C83 proves 422 C971 proves 403 C72 proves 403 C73 proves 400 C74 proves 40",
     "Gates and decisions sensitive global get_auth_context caller context.py:98 · translate 403 not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) 409 self.hous",
     "Data effects users R users W flush resolve_or_create_user accessor commit build_auth_context caller memberships R households R locations R recipe_creation_requests R cano",
-    "Functions post_create_gustify caller AuthContext.require_household gate get_idempotency_key build_cooked_ledger accessor load_resolution_snapshot assert_credits_available",
-    "Structures IN GustifyCreateRequest mode model_tier OUT GustifyCreationResponse · 7 ",
+    "Functions get_auth_context ↓1 caller build_auth_context ↓2 caller FirebaseTokenVerifier.verify ↓3 pure MockTokenVerifier.verify ↓3 pure load_household_context ↓3 accessor",
+    "Structures IN GustifyCreateRequest mode model_tier OUT GustifyCreationResponse · 7 ↳ CreationRequestResponse ↳ GeneratedCandidateOut ↳ GustifyUsage ↳ ResolvedIngredientOu",
     "Client ",
     "In-flight state setting-once rate_limit_active setting-once trusted_proxy_hops built-once _sensitive setting-once rate_limit_sensitive_per_minute setting-once rate_limit_",
     "Standard or specialist flag environment, rate_limit_enabled binding TokenVerifier can answer 403 flag not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) re",
@@ -1572,10 +1541,10 @@
   ],
   [
    "BY MOMENT · no moment",
-   "NO MOMENT Overview and risk no time Proof 4 with no moment several moments C72 proves C73 proves C74 proves C79 proves"
+   "NO MOMENT Overview and risk no time Functions 7 with no moment no link to a call GeminiConfig.from_settings allowance_for build_candidate_resolutions by name only ResolutionSnapshot.resolve Settings.ai_timeout_for Settings.gemini_model_for _strip_port"
   ],
   [
-   "step 110 · by-moment-info-open",
+   "step 109 · by-moment-info-open",
    {
     "click": "show what this section is",
     "at": [
@@ -1599,15 +1568,16 @@
     "A step is placed once for each path it is on: with the dependencies when a dependency runs it, else at the call that pat",
     "The path: every path at once, or the path to one ending. Each ending is a code, in the order they happen, a small gap be",
     "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it name",
+    "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An end",
     "Across the 80 endpoints, what each block places:",
     "Endings: 727 with a moment, 1 with none, of 728.",
     "Gates and decisions: 531 with a moment, 0 with none, of 531.",
     "Data effects: 1337 with a moment, 29 with none, of 1366.",
-    "Functions: 477 with a moment, 14 with none, of 491.",
-    "Structures: 219 with a moment, 0 with none, of 219.",
-    "Client: 172 with a moment, 0 with none, of 172.",
+    "Functions: 1048 with a moment, 185 with none, of 1233.",
+    "Structures: 339 with a moment, 0 with none, of 339.",
+    "Client: 174 with a moment, 0 with none, of 174.",
     "In-flight state: 696 with a moment, 10 with none, of 706.",
-    "Proof: 341 with a moment, 48 with none, of 389.",
+    "Proof: 367 with a moment, 33 with none, of 400.",
     "Stages and order: 442 with a moment, 0 with none, of 442.",
     "Standard or specialist: 223 with a moment, 15 with none, of 238.",
     "Overview and risk: 0 with a moment, 0 with none, of 0.",
@@ -1617,7 +1587,7 @@
    ]
   ],
   [
-   "step 112 · by-moment-info-close",
+   "step 111 · by-moment-info-close",
    {
     "click": "hide what this section is",
     "at": [
@@ -1650,7 +1620,7 @@
    ]
   ],
   [
-   "step 113 · moments-as-rows",
+   "step 112 · moments-as-rows",
    {
     "click": "moments as rows",
     "at": [
@@ -1690,7 +1660,7 @@
    }
   ],
   [
-   "step 115 · moments-back-to-columns",
+   "step 114 · moments-back-to-columns",
    {
     "click": "moments as columns",
     "at": [
@@ -1705,7 +1675,7 @@
    }
   ],
   [
-   "step 116 · cells-as-counts",
+   "step 115 · cells-as-counts",
    {
     "click": "cells as counts",
     "at": [
@@ -1724,11 +1694,11 @@
    [
     "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
     "Endings 2 2 2 1 3 8 1 1",
-    "Proof 1 1 5 11 ",
+    "Proof 2 2 2 1 4 10 11 ",
     "Gates and decisions 2 2 3 5 9 ",
     "Data effects 7 31 1 ",
-    "Functions 3 16 1 1 ",
-    "Structures 1 2 1 ",
+    "Functions 7 3 17 1 1 ",
+    "Structures 1 2 5 ",
     "Client ",
     "In-flight state 7 1 3 ",
     "Standard or specialist 1 1 3 4 3 ",
@@ -1736,7 +1706,7 @@
    ]
   ],
   [
-   "step 118 · cells-back-to-chips",
+   "step 117 · cells-back-to-chips",
    {
     "click": "cells as chips",
     "at": [
@@ -1751,7 +1721,7 @@
    }
   ],
   [
-   "step 119 · path-to-the-402",
+   "step 118 · path-to-the-402",
    {
     "click": "the path to 402 · refusal · after a call failed — generate_gustify_rec",
     "at": [
@@ -1772,8 +1742,8 @@
     "Endings refusal 429 refusal 429 framework 422 framework 400 refusal 401 refusal 401 validation 422 refusal 403 refusal 409 refusal 400 refusal 400 refusal 429 refusal 429",
     "Proof C80 proves 402 C81 proves 402 ",
     "Gates and decisions sensitive global get_auth_context caller 403 not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) 409 self.household is None 400 key is N",
-    "Data effects users R users W flush resolve_or_create_user accessor commit build_auth_context caller memberships R households R locations R recipe_creation_requests R cano",
-    "Functions post_create_gustify caller AuthContext.require_household gate get_idempotency_key build_cooked_ledger accessor load_resolution_snapshot assert_credits_available",
+    "Data effects users R users W saved flush resolve_or_create_user accessor commit build_auth_context caller memberships R households R locations R recipe_creation_requests ",
+    "Functions get_auth_context ↓1 caller build_auth_context ↓2 caller FirebaseTokenVerifier.verify ↓3 pure MockTokenVerifier.verify ↓3 pure load_household_context ↓3 accessor",
     "Structures IN GustifyCreateRequest mode model_tier ",
     "Client ",
     "In-flight state setting-once rate_limit_active setting-once trusted_proxy_hops built-once _sensitive setting-once rate_limit_sensitive_per_minute setting-once rate_limit_",
@@ -1782,7 +1752,7 @@
    ]
   ],
   [
-   "step 121 · all-paths-again",
+   "step 120 · all-paths-again",
    {
     "click": "all paths",
     "at": [
@@ -1797,7 +1767,7 @@
    }
   ],
   [
-   "step 122 · light-households-in-by-moment",
+   "step 121 · light-households-in-by-moment",
    {
     "click": "householdsR",
     "at": [
@@ -1827,7 +1797,7 @@
    }
   ],
   [
-   "step 124 · open-setup-complete-light-on",
+   "step 123 · open-setup-complete-light-on",
    {
     "click": "/setup/completePOST",
     "at": [
@@ -1881,7 +1851,7 @@
    "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 400 │ fail: 409 │ fail: 409 │ answer: 200 │ uncaught: 500"
   ],
   [
-   "step 126 · clear-the-by-moment-light",
+   "step 125 · clear-the-by-moment-light",
    {
     "click": "clear",
     "at": [
@@ -1896,7 +1866,7 @@
    }
   ],
   [
-   "step 127 · open-cooking-sessions",
+   "step 126 · open-cooking-sessions",
    {
     "click": "/cooking/sessionsPOST",
     "at": [
@@ -1947,7 +1917,7 @@
    "429 · global · refusal ┆ moment: at the edge ┆ says: Rate limit exceeded. Try again shortly. ┆ limiter: global ┆ click to follow only this path"
   ],
   [
-   "step 132 · path-code-404",
+   "step 131 · path-code-404",
    {
     "click": "the path to 404 · refusal · after a call failed — start_session raised",
     "at": [
@@ -1966,7 +1936,7 @@
    "404 · refusal ┆ moment: after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) ┆ says: Recipe not found ┆ the path in force now"
   ],
   [
-   "step 135 · path-all-again",
+   "step 134 · path-all-again",
    {
     "click": "all paths",
     "at": [
@@ -1991,12 +1961,12 @@
   [
    "D-055 · the code map, show all",
    {
-    "count": "34 of 55 fields carried by BY MOMENT · 18 left · 3 with nothing here",
+    "count": "36 of 56 fields carried by BY MOMENT · 17 left · 3 with nothing here",
     "carry": "all",
     "left": [
      "tables (part)",
      "declared success",
-     "tests (part)",
+     "arranges 7 other cases",
      "writes (part)",
      "fate",
      "the tables (part)",
@@ -2006,7 +1976,6 @@
      "method and path",
      "entity",
      "first URL segment",
-     "proven (part)",
      "alarms",
      "behind (part)",
      "functions behind, and how deep (part)",
@@ -2026,7 +1995,7 @@
    "dim what BY MOMENT carries ┆ An element BY MOMENT places at a moment fades; a field whose elements it places, every one, fades with its name. Pointing at one brings it back. A field with nothing on this endpoint fades too, less; a field that lists fewer tables than BY MOMENT's steps touch stays and says how many more."
   ],
   [
-   "step 139 · carry-dim",
+   "step 138 · carry-dim",
    {
     "click": "dim what BY MOMENT carries",
     "at": [
@@ -2043,12 +2012,12 @@
   [
    "D-055 · the code map, dim",
    {
-    "count": "34 of 55 fields carried by BY MOMENT · 18 left · 3 with nothing here",
+    "count": "36 of 56 fields carried by BY MOMENT · 17 left · 3 with nothing here",
     "carry": "dim",
     "left": [
      "tables (part)",
      "declared success",
-     "tests (part)",
+     "arranges 7 other cases",
      "writes (part)",
      "fate",
      "the tables (part)",
@@ -2058,7 +2027,6 @@
      "method and path",
      "entity",
      "first URL segment",
-     "proven (part)",
      "alarms",
      "behind (part)",
      "functions behind, and how deep (part)",
@@ -2074,7 +2042,7 @@
    }
   ],
   [
-   "step 141 · carry-hide",
+   "step 140 · carry-hide",
    {
     "click": "hide what BY MOMENT carries",
     "at": [
@@ -2091,12 +2059,12 @@
   [
    "D-055 · the code map, hide",
    {
-    "count": "34 of 55 fields carried by BY MOMENT · 18 left · 3 with nothing here",
+    "count": "36 of 56 fields carried by BY MOMENT · 17 left · 3 with nothing here",
     "carry": "hide",
     "left": [
      "tables (part)",
      "declared success",
-     "tests (part)",
+     "arranges 7 other cases",
      "writes (part)",
      "fate",
      "the tables (part)",
@@ -2106,7 +2074,6 @@
      "method and path",
      "entity",
      "first URL segment",
-     "proven (part)",
      "alarms",
      "behind (part)",
      "functions behind, and how deep (part)",
@@ -2121,17 +2088,15 @@
     "notes": [
      "+8 in BY MOMENT",
      "+1 in BY MOMENT",
-     "+1 in BY MOMENT",
      "+8 in BY MOMENT",
      "+1 in BY MOMENT",
-     "+9 in BY MOMENT",
-     "+5 in BY MOMENT",
-     "+5 in BY MOMENT"
+     "+18 in BY MOMENT",
+     "+18 in BY MOMENT"
     ]
    }
   ],
   [
-   "step 143 · copy-the-settings-with-hide",
+   "step 142 · copy-the-settings-with-hide",
    {
     "click": "copy the settings",
     "at": [
@@ -2150,7 +2115,7 @@
    "page: all-endpoints · gustify @ 05007957\nendpoint: POST /cooking/sessions\nthe code map · the moments: moments as header rows (my pick)\nthe code map · the checks: the check as its own column (my pick)\nthe code map · what BY MOMENT carries: hide what BY MOMENT carries (your choice)\n\nyour words:\n"
   ],
   [
-   "step 144 · open-the-stream-endpoint-in-hide",
+   "step 143 · open-the-stream-endpoint-in-hide",
    {
     "click": "/recipe-creation/gustify/streamGETstream",
     "at": [
@@ -2167,7 +2132,7 @@
   [
    "D-055 · GET /recipe-creation/gustify/stream, hide",
    {
-    "count": "26 of 55 fields carried by BY MOMENT · 17 left · 12 with nothing here · 3 tables only in BY MOMENT",
+    "count": "28 of 56 fields carried by BY MOMENT · 17 left · 11 with nothing here · 3 tables only in BY MOMENT",
     "carry": "hide",
     "left": [
      "tables (BY MOMENT holds more)",
@@ -2190,24 +2155,23 @@
     ],
     "nothingHere": [
      "reply",
-     "reply body",
      "beyond",
+     "arranges 0 other cases",
      "forks",
      "data fns",
      "fields",
      "request body",
      "screen",
      "reads",
-     "the hook that calls it",
-     "screens above that hook",
+     "screens above them",
      "reason sites"
     ],
     "notes": [
      "+3 tables only in BY MOMENT",
      "+3 tables only in BY MOMENT",
      "+1 in BY MOMENT",
-     "+2 in BY MOMENT",
-     "+2 in BY MOMENT"
+     "+19 in BY MOMENT",
+     "+19 in BY MOMENT"
     ]
    }
   ],
@@ -2216,7 +2180,7 @@
    "the tables ┆ attribute: Operation per table ┆ The kind of touch each table gets — read, add, update or delete. ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there. ┆ BY MOMENT's steps also touch 3 tables this field does not list: canonical_ingredients, ingredient_aliases, ingredient_restrictions. The code map is short of them."
   ],
   [
-   "step 147 · back-to-cooking-sessions",
+   "step 146 · back-to-cooking-sessions",
    {
     "click": "/cooking/sessionsPOST",
     "at": [
@@ -2231,7 +2195,7 @@
    }
   ],
   [
-   "step 148 · carry-show-all",
+   "step 147 · carry-show-all",
    {
     "click": "show all",
     "at": [
@@ -2248,12 +2212,12 @@
   [
    "D-055 · the code map, show all again",
    {
-    "count": "34 of 55 fields carried by BY MOMENT · 18 left · 3 with nothing here",
+    "count": "36 of 56 fields carried by BY MOMENT · 17 left · 3 with nothing here",
     "carry": "all",
     "left": [
      "tables (part)",
      "declared success",
-     "tests (part)",
+     "arranges 7 other cases",
      "writes (part)",
      "fate",
      "the tables (part)",
@@ -2263,7 +2227,6 @@
      "method and path",
      "entity",
      "first URL segment",
-     "proven (part)",
      "alarms",
      "behind (part)",
      "functions behind, and how deep (part)",
@@ -2276,6 +2239,334 @@
      "norms it lacks"
     ],
     "notes": []
+   }
+  ],
+  [
+   "step 148 · d056-open-cooking-sessions",
+   {
+    "click": "/cooking/sessionsPOST",
+    "at": [
+     33,
+     958
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /cooking/sessions"
+   }
+  ],
+  [
+   "D-056 · the code map, d:behind",
+   "functions behind, and how deep 18 · 4 depth 1 AuthContext.require_household gate get_auth_context caller _attach_photos caller concurrent_cook_cap_for_tier pure start_session accessor subscription_tier_for accessor depth 2 build_auth_context caller _recipe_titles accessor list_photo_refs accessor count_active_sessions accessor seed_stage_schedule accessor assert_recipe_allergen_safe gate depth 3 FirebaseTokenVerifier.verify pure MockTokenVerifier.verify pure load_household_context accessor resolve_or_create_user accessor _schedule_next accessor depth 4 get_principal_location accessor depth not known _hold_hours _label _stages pure +2 by name only"
+  ],
+  [
+   "D-056 · the code map, d:arranged",
+   "arranges 7 other cases C1087 C250 C283 C284 C555 C675 C266 through a helper"
+  ],
+  [
+   "D-056 · the code map, d:hook",
+   "what sends it useStartCooking fetcher"
+  ],
+  [
+   "D-056 · the code map, d:screens",
+   "screens above them RecipeBrowseContainer"
+  ],
+  [
+   "D-056 · the code map, d:response",
+   "reply body OUT CookingSessionResponse · 18 inside it · CookingPhotoRef headers per ending: 429 Retry-After: … 429 Retry-After: … 401 WWW-Authenticate: Bearer"
+  ],
+  [
+   "d056 hover the handler pair",
+   "handler ┆ async · 53 lines · returns CookingSessionResponse ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ no docstring ┆ attribute: The handler ┆ attribute: File:line ┆ attribute: Signature ┆ The function that faces the API and receives the request. ┆ BY MOMENT carries 1 of its 2 elements."
+  ],
+  [
+   "d056 hover a not-declared 409",
+   "409 · a client error status · not declared · status ┆ The endpoint does not declare this status; a client reading its contract does not expect it. ┆ The request is refused; the caller can change it and try again. ┆ colour: as the endpoint lab draws it"
+  ],
+  [
+   "d056 hover a function behind",
+   "seed_stage_schedule · Functions ┆ depth 2 ┆ How many calls below the handler it is reached. ┆ on every path that calls start_session ┆ It runs inside start_session, and a path may leave start_session before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+  ],
+  [
+   "d056 hover the race",
+   "start_session · Data effects ┆ cooking.py:166 ┆ a race on uq_cooking_sessions_hh_key ┆ A first call and its retry with the same key both pass the check before this step; the later one breaks the unique key (household_id, idempotency_key) of cooking_sessions here, nothing catches it, and it ends in the uncaught 500. ┆ The rows the endpoint touches, the moment it touches them, and the fate of each change."
+  ],
+  [
+   "d056 hover the first 429",
+   "429 · a client error status · not declared · status ┆ sends Retry-After: … ┆ The endpoint does not declare this status; a client reading its contract does not expect it. ┆ The request is refused; the caller can change it and try again. ┆ colour: as the endpoint lab draws it"
+  ],
+  [
+   "d056 hover the limiter",
+   "sensitive · Gates and decisions ┆ rate_limit.py:117 ┆ 20 per 60 seconds, keyed f'{ip}:sensitive' ┆ The checks that stop a request and the forks that decide its ending."
+  ],
+  [
+   "d056 hover the login check",
+   "get_auth_context · Gates and decisions ┆ HTTPBearer ┆ HTTPBearer reads the Authorization header ┆ The checks that stop a request and the forks that decide its ending."
+  ],
+  [
+   "d056 hover C237 hollow",
+   "C237 · Proof ┆ 378 · setup required · str(exc) · There was an error parsing the body · Idempotency-Key required for cooking session ┆ asserts status 400 · 409 ┆ fits 4 endings; this is one of them ┆ Its status fits endings at several moments, so it rides each of them, drawn hollow: it proves one of them, not which. ┆ The conditions a test proves, and the ones nothing reaches."
+  ],
+  [
+   "d056 hover C267",
+   "C267 · Proof ┆ 367 ┆ asserts status 201 and asserts on the body (1) ┆ The conditions a test proves, and the ones nothing reaches."
+  ],
+  [
+   "step 160 · d056-path-to-the-201",
+   {
+    "click": "the path to 201 · success · the answer",
+    "at": [
+     721,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 201 · success · the answer\""
+   }
+  ],
+  [
+   "D-056 · the writes on the path to the 201",
+   [
+    "users W saved",
+    "cooking_sessions W saved"
+   ]
+  ],
+  [
+   "step 162 · d056-path-to-the-403",
+   {
+    "click": "the path to 403 · refusal · after a call failed — caught at cooking.py",
+    "at": [
+     617,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 403 · refusal · after a call failed — caught at cooking.py:159 (except AllergenConflictError) · Recipe contains your allergen restrictions\""
+   }
+  ],
+  [
+   "D-056 · the writes on the path to the 403",
+   [
+    "users W saved",
+    "cooking_sessions W left unsaved"
+   ]
+  ],
+  [
+   "step 164 · d056-all-paths-again",
+   {
+    "click": "all paths",
+    "at": [
+     32,
+     536
+    ],
+    "size": [
+     81,
+     26
+    ],
+    "note": "the square \"all paths\""
+   }
+  ],
+  [
+   "D-056 · all paths, writes wearing a fate",
+   0
+  ],
+  [
+   "step 165 · d056-open-account-export",
+   {
+    "click": "/account/exportGET",
+    "at": [
+     33,
+     530
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row GET /account/export"
+   }
+  ],
+  [
+   "D-056 · GET /account/export, what sends it",
+   "what sends it accountExport api"
+  ],
+  [
+   "d056 hover the file that sends it",
+   "accountExportapi ┆ a file, not a hook or component inside it"
+  ],
+  [
+   "D-056 · GET /account/export, the screen sends it",
+   [
+    "accountExport api"
+   ]
+  ],
+  [
+   "step 167 · d056-open-the-stream",
+   {
+    "click": "/recipe-creation/gustify/streamGETstream",
+    "at": [
+     33,
+     846
+    ],
+    "size": [
+     304,
+     32
+    ],
+    "note": "the row GET /recipe-creation/gustify/stream"
+   }
+  ],
+  [
+   "D-056 · the stream, its answer",
+   [
+    "success 200 stream"
+   ]
+  ],
+  [
+   "step 169 · review-open-cooking-sessions",
+   {
+    "click": "/cooking/sessionsPOST",
+    "at": [
+     33,
+     968
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /cooking/sessions"
+   }
+  ],
+  [
+   "review · the behind pair, by name",
+   "functions behind, and how deep 18 · 4 depth 1 AuthContext.require_household gate get_auth_context caller _attach_photos caller concurrent_cook_cap_for_tier pure start_session accessor subscription_tier_for accessor depth 2 build_auth_context caller _recipe_titles accessor list_photo_refs accessor count_active_sessions accessor seed_stage_schedule accessor assert_recipe_allergen_safe gate depth 3 FirebaseTokenVerifier.verify pure MockTokenVerifier.verify pure load_household_context accessor resolve_or_create_user accessor _schedule_next accessor depth 4 get_principal_location accessor depth not known _hold_hours _label _stages pure +2 by name only"
+  ],
+  [
+   "picture · review-behind-pair-by-name",
+   {
+    "pieces": 1,
+    "height": 627
+   }
+  ],
+  [
+   "review hover the handler signature and docstring",
+   "handler ┆ async · 53 lines · returns CookingSessionResponse ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ no docstring ┆ attribute: The handler ┆ attribute: File:line ┆ attribute: Signature ┆ The function that faces the API and receives the request. ┆ BY MOMENT carries 1 of its 2 elements."
+  ],
+  [
+   "step 172 · review-path-to-the-201",
+   {
+    "click": "the path to 201 · success · the answer",
+    "at": [
+     721,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 201 · success · the answer\""
+   }
+  ],
+  [
+   "review · the writes on the path to the 201, each with its fate",
+   [
+    "users W saved",
+    "cooking_sessions W saved"
+   ]
+  ],
+  [
+   "review hover seed_stage_schedule on the 201 path",
+   "seed_stage_schedule · Functions ┆ depth 2 ┆ How many calls below the handler it is reached. ┆ on every path that calls start_session ┆ It runs inside start_session, and a path may leave start_session before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+  ],
+  [
+   "picture · review-by-moment-path-to-the-201",
+   {
+    "pieces": 1,
+    "height": 2246
+   }
+  ],
+  [
+   "step 175 · review-all-paths-again",
+   {
+    "click": "all paths",
+    "at": [
+     32,
+     536
+    ],
+    "size": [
+     81,
+     26
+    ],
+    "note": "the square \"all paths\""
+   }
+  ],
+  [
+   "review hover the 401 declared or not with its header",
+   "401 · a client error status · not declared · status ┆ sends WWW-Authenticate: Bearer ┆ The endpoint does not declare this status; a client reading its contract does not expect it. ┆ The request is refused; the caller can change it and try again. ┆ colour: as the endpoint lab draws it"
+  ],
+  [
+   "review · the arranges pair",
+   "arranges 7 other cases C1087 C250 C283 C284 C555 C675 C266 through a helper"
+  ],
+  [
+   "picture · review-the-arranges-pair",
+   {
+    "pieces": 1,
+    "height": 76
+   }
+  ],
+  [
+   "step 178 · review-open-cooking-active",
+   {
+    "click": "/cooking/activeGET",
+    "at": [
+     33,
+     916
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row GET /cooking/active"
+   }
+  ],
+  [
+   "review · GET /cooking/active, the reply pair",
+   "reply body OUT ActiveCookingResponse · 2 inside it · CookingSessionResponse , CookingPhotoRef in CookingSessionResponse headers per ending: 429 Retry-After: … 401 WWW-Authenticate: Bearer"
+  ],
+  [
+   "review hover CookingPhotoRef, inside CookingSessionResponse",
+   "CookingPhotoRef · Structures ┆ inside CookingSessionResponse ┆ The shapes of the body that comes in and the body that goes out."
+  ],
+  [
+   "step 180 · review-open-the-stream",
+   {
+    "click": "/recipe-creation/gustify/streamGETstream",
+    "at": [
+     33,
+     846
+    ],
+    "size": [
+     304,
+     32
+    ],
+    "note": "the row GET /recipe-creation/gustify/stream"
+   }
+  ],
+  [
+   "review · the stream, its answer",
+   [
+    "success 200 stream [delivery:stream]"
+   ]
+  ],
+  [
+   "picture · review-the-stream-answer",
+   {
+    "pieces": 1,
+    "height": 4462
    }
   ],
   [
