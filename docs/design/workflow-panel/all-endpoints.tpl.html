@@ -297,8 +297,25 @@
   .pair table { border-collapse: collapse; font-size: var(--fs-min); width: 100%; margin-top: 2px; }
   .pair table td, .pair table th { text-align: left; padding: 1px 6px 1px 0; vertical-align: top; }
   .pair table th { color: var(--muted); font-weight: 400; }
-  .pair[data-gap="true"] .pk { color: var(--alert); }
-  .pair[data-gap="part"] .pk { color: var(--alert); font-style: italic; }
+  .pair[data-gap="true"] > div > .pk, .pair [data-sub][data-gap="true"] .pk { color: var(--alert); }
+  .pair[data-gap="part"] > div > .pk, .pair [data-sub][data-gap="part"] .pk { color: var(--alert); font-style: italic; }
+  /* ── D-053 · the endings in the order they happen: one table, the own check on its ending's row, the moments as header rows (or
+     inside the stage chip), shared code named apart, muted and dashed — never drawn as an own check ── */
+  .eopts { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 2px 0 4px; }
+  .eplain p { margin: 0 0 4px; color: var(--ink-soft); font-size: var(--fs-min); max-width: 110ch; }
+  .pair table.etab tr.mom th { padding: 6px 6px 1px 0; color: var(--ink-soft); font-weight: 650; border-top: 1px solid var(--rule-soft); white-space: normal; }
+  .pair table.etab tr.mom[data-mom="failed"] th { color: var(--ink); }
+  .pair table.etab td.chk { min-width: 12em; }
+  .etab .ck { display: block; color: var(--ink); }
+  .etab .ckp { color: var(--muted); }
+  .etab .shd { color: var(--muted); display: block; }
+  .etab .ck.ckm { color: var(--muted); }
+  .etab .shm { font-size: var(--fs-min); border: 1px dashed var(--rule); border-radius: 4px; padding: 0 4px; margin-right: 1px; }
+  .etab td.says .ckl { color: var(--ink); margin-top: 1px; }
+  .etab td.says.unpl { font-style: italic; color: var(--muted); }
+  .etab .mw { font-weight: 400; margin-left: 4px; color: var(--ink-soft); white-space: nowrap; }
+  .etab th.chkh .pk { color: var(--muted); }
+  .pair table.etab tr:first-child th { white-space: nowrap; }
   [data-lit-attr="true"] { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
   /* ── D-043 · the code map's VALUE CHIPS: every action word and every value from a fixed set, a colour and/or an icon. Each
      family's look is the one it already wears elsewhere (the JS block THE VALUE CHIPS names where); only the chip's frame is
@@ -939,20 +956,75 @@
     if (f === "does") return ((e.vals || {})[v] || {}).plain || EN.does[v];
     return ((e.vals || {})[v] || {}).plain || ((e.vals || {})._other || {}).plain; }
 
+  /* ══ D-053 · THE ENDINGS IN THE ORDER THEY HAPPEN. One table: every ending in time order (the generator derived the order from
+     the paths' chains and proved it), the endpoint's own check on its ending's row, who decides it where shared code does, the
+     INPUT and HANDLER rows in their moments (r.xd.exits: [moment, checks, id, the framework's own code, the call a check of its own row
+     sits inside]). Two looks are my picks (D-025.2), switched by icon
+     squares like THE GAPS', remembered per viewer: the moments as header rows or inside the stage chip; the check as its own column
+     or as a line under the ending's words. The check's head is the field "its own checks" (d:guards, `data-sub`): the D-042 links
+     and a gap's hover find it there, and a guard lit anywhere lights its check on its row (D-041). ══ */
+  var EKEY = "gabe:allep:endings:v1", EW = W.endings, EM = { mom: EW.opt.mom.pick, chk: EW.opt.chk.pick };
+  try { var ev = JSON.parse(window.localStorage.getItem(EKEY) || "null"); if (ev) Object.keys(EM).forEach(function (g) { if (ev[g] && EW.opt[g].opts[ev[g]]) EM[g] = ev[g]; }); } catch (e) {}
+  /* their squares: a list under a header bar · a pill with a word in it · a table with a column of its own · lines with lines under them */
+  var EICON = { mom: { rows: '<rect x="3" y="3" width="18" height="5" rx="1.2"/><path d="M6 12h15M6 16h15M6 20h15"/>', chip: '<rect x="2.5" y="8" width="19" height="8" rx="4"/><path d="M7 12h2M12 12h6"/>' },
+                chk: { col: '<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M14 4v16M3 9h18M3 14h18"/>', line: '<path d="M4 5h16M8 9h11M4 15h16M8 19h11"/>' } };
+  function momKey(m) { return typeof m === "number" ? "failed" : m; }
+  /* a moment's words: its name; a failure group's name then what raised and the catch that caught it, all read from the chain */
+  function momName(m, d) { if (typeof m !== "number") return EW.mom[m].name; var g = d.exits.moms[m];
+    return EW.mom.failed.name + " — " + fill(g[2].length ? EW.caught : EW.caughtBare, { calls: g[2].join(" · "), at: g[0], cls: g[1] }); }
+  function subField(extra) { var cm = W.codemap.details.guards, th = el("th", "chkh"); th.setAttribute("data-sub", "true"); th.setAttribute("data-k", "d:guards");
+    th.setAttribute("data-attr", cm.attrs.join(" ")); th.setAttribute("data-tip", "pair"); if (extra) th.appendChild(document.createTextNode(extra + " · ")); th.appendChild(el("span", "pk", W.panel.guards)); return th; }
+  /* a row's check: who decides it first, when shared code does (a dependency function is its own key; the framework's own code for it
+     rides the hover), then each check on the row, keyed as the checks list keyed it (the guard, then the names its condition reads),
+     with where it stands — muted on a shared row: a check a dependency makes is not one the endpoint wrote */
+  function checkEls(r, i) { var d = r.d, dk = r.dk, e = d.exits.items[i], out = [];
+    if (e[5]) { var s = el("span", "shd"); s.setAttribute("data-tip", "shared"); if (r.xd.exits[i][3]) s.setAttribute("data-src", r.xd.exits[i][3]);
+      s.appendChild(el("span", "shm", EW.shared)); s.appendChild(document.createTextNode(" "));
+      s.appendChild(dk.exits[i][2] ? ksp(e[5], dk.exits[i][2]) : el("span", null, e[5])); out.push(s); }
+    r.xd.exits[i][1].forEach(function (gi) { var g = d.guards.items[gi], k = dk.guards[gi], c = kd(el("span", e[5] ? "ck ckm" : "ck"), [k[0]].concat(k[1]));
+      c.appendChild(document.createTextNode(g[1])); if (g[2]) c.appendChild(el("span", "ckp", " · " + g[2])); out.push(c); });
+    return out; }
+  function endings(b, r) { var d = r.d, dk = r.dk, P = W.panel, bar = el("div", "eopts");
+    ["mom", "chk"].forEach(function (g) { var R = EW.opt[g], grp = el("div", "opts eopt"); grp.setAttribute("role", "radiogroup"); grp.setAttribute("aria-label", R.label);
+      Object.keys(R.opts).forEach(function (v) { var bt = el("button", "opt"); bt.type = "button"; bt.setAttribute("role", "radio"); bt.setAttribute("data-eopt", g); bt.setAttribute("data-v", v);
+        bt.setAttribute("aria-checked", EM[g] === v ? "true" : "false"); bt.setAttribute("aria-label", R.opts[v].name); bt.setAttribute("data-tip", "eopt");
+        if (R.pick === v) bt.setAttribute("data-pick", "true");                         /* my pick: dashed (D-025.2) */
+        var ic = document.createElementNS("http://www.w3.org/2000/svg", "svg"); ic.setAttribute("viewBox", "0 0 24 24"); ic.setAttribute("aria-hidden", "true"); ic.innerHTML = EICON[g][v]; bt.appendChild(ic);
+        bt.addEventListener("click", function () { EM[g] = v; try { window.localStorage.setItem(EKEY, JSON.stringify(EM)); } catch (x) {} tipOff(); renderOne(); applyEl(); }); grp.appendChild(bt); });
+      bar.appendChild(grp); });
+    b.appendChild(bar);
+    /* D-038: what the order rests on, behind the info toggle — the INPUT lines only where this endpoint's rows show them (r.xd.en) */
+    var en = r.xd.en || [], inf = el("div", "ainfo eplain");
+    [EW.plain, en.indexOf("twice") >= 0 ? EW.plainInput : null, en.indexOf("first") >= 0 ? EW.plainInputFirst : null, EW.plainChecks,
+     en.indexOf("unplaced") >= 0 ? EW.plainUnplaced : null].forEach(function (s) { if (s) inf.appendChild(el("p", null, s)); }); b.appendChild(inf);
+    var col = EM.chk === "col", t = el("table", "etab"), hd = el("tr"), nc = P.exitCols.length + (col ? 1 : 0), prev = null;
+    t.setAttribute("data-mom", EM.mom); t.setAttribute("data-chk", EM.chk);
+    P.exitCols.forEach(function (c, ci) { if (ci === 3 && !col) hd.appendChild(subField(c)); else hd.appendChild(el("th", null, c)); if (ci === 3 && col) hd.appendChild(subField()); });
+    t.appendChild(hd);
+    d.exits.items.forEach(function (e, i) { var xe = r.xd.exits[i], m = xe[0];
+      /* a run of rows at one moment: a header row before it, whenever the moment changes — runs are never reordered to meet */
+      if (EM.mom === "rows" && m != null && m !== prev) { var hr = el("tr", "mom"); hr.setAttribute("data-mom", momKey(m)); var hc = el("th", null, momName(m, d)); hc.colSpan = nc; hc.setAttribute("data-tip", "mom"); hr.appendChild(hc); t.appendChild(hr); }
+      prev = m;
+      var tr = el("tr", "erow"); tr.setAttribute("data-x", xe[2]); if (m != null) tr.setAttribute("data-mom", momKey(m));
+      var tk = el("td"); if (e[0]) tk.appendChild(cKind(e[0])); tr.appendChild(tk);
+      var tg = el("td"), mw = m != null && EM.mom === "chip" ? momName(m, d) : null;
+      if (e[1]) { var sc = cStage(e[1]); if (mw) { sc.appendChild(el("span", "mw", EW.mom[momKey(m)].name)); sc.setAttribute("aria-label", e[1] + " · " + mw); } tg.appendChild(sc); }
+      else if (mw) { var sw = vc("stage", "", mw); sw.appendChild(el("span", "mw", EW.mom[momKey(m)].name)); tg.appendChild(sw); }
+      tr.appendChild(tg);
+      var ts = kd(el("td"), dk.exits[i][0]); if (e[2] != null && e[2] !== "") ts.appendChild(cStatus(e[2])); tr.appendChild(ts);   /* the status lights */
+      var sy = el("td", "says" + (e[0] ? "" : " unpl"), e[0] ? (e[3] == null ? "" : String(e[3])) : fill(EW.unplaced, { call: xe[4] || "" })); tr.appendChild(sy);
+      var cks = checkEls(r, i);
+      if (col) { var tc = el("td", "chk"); cks.forEach(function (c) { tc.appendChild(c); }); tr.appendChild(tc); }
+      else cks.forEach(function (c) { var ln = el("div", "ckl"); ln.appendChild(c); sy.appendChild(ln); });
+      tr.appendChild(kd(el("td", null, e[4] == null ? "" : String(e[4])), dk.exits[i][1], false));   /* the test count holds its cases */
+      t.appendChild(tr); });
+    b.appendChild(t); }
   /* every item carries its element's key (r.dk, parallel to the items — D-041): a click lights it, the light outlines it */
   function detailPair(k, r) { var d = r.d, dk = r.dk, P = W.panel, cm = W.codemap.details[k], wide = ["exits", "fates", "guards", "inflight", "reasons", "pieces", "tables", "alarms"].indexOf(k) >= 0;
     var o = pairEl("d:" + k, cm.attrs, cm.icon, P[k], wide), b = el("div", "pv"); o.box.appendChild(b);
     /* D-043: every verb and every value from a fixed set below is a chip (THE VALUE CHIPS); a keyed element keeps its key on the
        node it had, or on the chip that now stands for it */
-    if (k === "exits") { var t = el("table"), th = el("tr"); P.exitCols.forEach(function (c) { th.appendChild(el("th", null, c)); }); t.appendChild(th);
-      d.exits.items.forEach(function (e, i) { var tr = el("tr");
-        var tk = el("td"); tk.appendChild(cKind(e[0])); tr.appendChild(tk);
-        var tg = el("td"); if (e[1]) tg.appendChild(cStage(e[1])); tr.appendChild(tg);
-        var ts = kd(el("td"), dk.exits[i][0]); if (e[2] != null && e[2] !== "") ts.appendChild(cStatus(e[2])); tr.appendChild(ts);   /* the status lights */
-        tr.appendChild(el("td", "says", e[3] == null ? "" : String(e[3])));
-        tr.appendChild(kd(el("td", null, e[4] == null ? "" : String(e[4])), dk.exits[i][1], false));   /* the test count holds its cases */
-        t.appendChild(tr); });
-      b.appendChild(t); more(b, d.exits); }
+    if (k === "exits") endings(b, r);                         /* D-053: the endings and the own checks, one table in time order */
     else if (k === "tables") { list(b, d.tables.items, function (t2) { return frag(t2[0] + " · ", cOp(t2[1])); }, dk.tables); more(b, d.tables); }
     else if (k === "gateWrites") { if (!d.gateWrites.length) b.textContent = W.panel.none;   /* each a table the login check WRITES: the channel chip W */
       d.gateWrites.forEach(function (t2, i) { if (i) b.appendChild(document.createTextNode(", ")); b.appendChild(ksp(t2, dk.gateWrites[i])); b.appendChild(document.createTextNode(" ")); b.appendChild(cOp("w")); }); }
@@ -961,7 +1033,6 @@
            "json_invalid (framework)"), so that word moves into the chip rather than being said twice */
         if (kw && nm === kw) nm = ""; else if (kw && nm.slice(-(kw.length + 3)) === " (" + kw + ")") nm = nm.slice(0, -(kw.length + 3));
         return frag(kw ? cKind(kn) : null, nm ? " " + nm + " " : " ", kd(cStatus(f[1]), dk.fates[i]), " ", cFate(f[2])); }); more(b, d.fates); }
-    else if (k === "guards") { list(b, d.guards.items, function (g, i) { return frag(kd(cStatus(g[0]), dk.guards[i][2]), " · " + g[1]); }, dk.guards.map(function (x) { return [x[0]].concat(x[1]); })); more(b, d.guards); }
     else if (k === "gates") keyedJoin(b, d.gates, dk.gates, ", ");
     else if (k === "limits") keyedJoin(b, d.limits.map(cLimit), dk.limits, " ");
     else if (k === "request") { if (d.request) b.appendChild(frag(cDir("in"), " ", ksp(d.request[0], dk.request), " · " + d.request[1].join(", "))); else b.textContent = W.panel.none; }
@@ -1136,12 +1207,16 @@
     Object.keys(W.codemap.head).forEach(function (k) { into(groupOfAttr(W.codemap.head[k].attrs[0]), headPair(k, r)); });
     var done = {};
     D.cols.forEach(function (c) { if (done[c.id]) return; var cs = c.kind === "slot" ? D.cols.filter(function (x) { return x.kind === "slot"; }) : [c]; cs.forEach(function (x) { done[x.id] = 1; }); into(groupOfAttr(c.attr), colPair(cs, r)); });
-    Object.keys(W.codemap.details).forEach(function (k) { into(groupOfAttr(W.codemap.details[k].attrs[0]), detailPair(k, r)); });
+    /* a field drawn INSIDE another pair (D-053: its own checks, on their endings' rows) is not a pair of its own */
+    Object.keys(W.codemap.details).forEach(function (k) { if (!W.codemap.details[k].in) into(groupOfAttr(W.codemap.details[k].attrs[0]), detailPair(k, r)); });
     groupOrder().forEach(function (g) { if (!byG[g]) return; var bx = el("div", "cmb" + (g === "_shared" ? " sh" : "")); bx.setAttribute("data-block", g);
       var bh = el("div", "cbh"); bh.appendChild(markEl(g)); bh.appendChild(document.createTextNode(groupName(g))); if (D.marks[g] && D.marks[g].col) bh.style.setProperty("--bc", D.marks[g].col);
       bh.setAttribute("data-tip", "block"); bh.setAttribute("data-block", g); bx.appendChild(bh);
       var ps = el("div", "pairs"); byG[g].forEach(function (pr) { var gs = pr.getAttribute("data-attr").split(" ").map(function (a) { return gapSet[a]; });
-        if (gs.indexOf("true") >= 0) pr.setAttribute("data-gap", "true"); else if (gs.indexOf("part") >= 0) pr.setAttribute("data-gap", "part"); ps.appendChild(pr); });
+        if (gs.indexOf("true") >= 0) pr.setAttribute("data-gap", "true"); else if (gs.indexOf("part") >= 0) pr.setAttribute("data-gap", "part");
+        pr.querySelectorAll("[data-sub][data-attr]").forEach(function (sb) { var s2 = sb.getAttribute("data-attr").split(" ").map(function (a) { return gapSet[a]; });   /* a field inside a pair, the same way */
+          if (s2.indexOf("true") >= 0) sb.setAttribute("data-gap", "true"); else if (s2.indexOf("part") >= 0) sb.setAttribute("data-gap", "part"); });
+        ps.appendChild(pr); });
       bx.appendChild(ps); C.appendChild(bx); });
     skAll(C);                                                 /* D-052: every element the code map names, drawn the station's way */
     /* MIDDLE · the gaps, my reading, in the direction chosen at its top (D-040) */
@@ -1187,7 +1262,7 @@
     if (!g) return;
     if (g.hasAttribute("data-row")) { var ur = document.querySelector('#ocol-uni .urow[data-row="' + g.getAttribute("data-row") + '"]'); if (ur) ur.setAttribute("data-lit-attr", "true"); return; }
     var a = g.getAttribute("data-attr");
-    document.querySelectorAll("#ocol-cm .pair[data-attr]").forEach(function (x) { if (x.getAttribute("data-attr").split(" ").indexOf(a) >= 0) x.setAttribute("data-lit-attr", "true"); }); });
+    document.querySelectorAll("#ocol-cm .pair[data-attr], #ocol-cm [data-sub][data-attr]").forEach(function (x) { if (x.getAttribute("data-attr").split(" ").indexOf(a) >= 0) x.setAttribute("data-lit-attr", "true"); }); });
 
   /* ══ D-041 · THE ELEMENT LIGHT. A click on an element in the universe column or the code-map column lights it in all three
      places: the table's rows whose endpoint holds it (the rest dim) and the cells of the columns that count it, the pinned row
@@ -1247,7 +1322,7 @@
       say.appendChild(document.createTextNode(" · ")); say.appendChild(seg); }); }
   /* what a reason's link points at: a code-map pair by its data-k; "gap" = THE GAPS' second square, or, once turned, the name there */
   function refTarget(ref) { if (ref === "gap") return document.querySelector('#ocol-gaps .opt[data-gdir="uni"]');
-    return [].filter.call(document.querySelectorAll("#ocol-cm .pair[data-k]"), function (p) { return p.getAttribute("data-k") === ref; })[0] || null; }
+    return [].filter.call(document.querySelectorAll("#ocol-cm .pair[data-k], #ocol-cm [data-sub][data-k]"), function (p) { return p.getAttribute("data-k") === ref; })[0] || null; }   /* D-053: a field inside a pair too */
   function gapFact(K) { var nm = elName(K), f = [].filter.call(document.querySelectorAll("#ocol-gaps .gfact[data-fact]"), function (e) { return e.getAttribute("data-fact") === nm; })[0];
     if (f && f.hidden) f.hidden = false; return f || null; }
   /* a pinned link (a click) keeps its field lit until the element light goes out, or until another endpoint's reasons stop naming it */
@@ -1331,6 +1406,10 @@
     if (kind === "mine") return esc(W.one.gaps.minePlain);
     if (kind === "elwhy") { var wc = W.el.why.codes[t.getAttribute("data-why")]; return "<b>" + esc(wc.name) + "</b> · " + esc(W.one.gaps.mine) + "<span class=pl>" + esc(fill(wc.plain)) + "</span>"; }
     if (kind === "elref") { var rf = t.getAttribute("data-ref"); return "<b>" + esc(t.textContent) + "</b>" + "<span class=pl>" + esc(rf === "gap" ? W.one.gaps.dir.opts.uni.plain : W.el.why.refTip) + "</span>"; }
+    if (kind === "eopt") { var eg = t.getAttribute("data-eopt"), eo = W.endings.opt[eg], ek = t.getAttribute("data-v"); return "<b>" + esc(eo.opts[ek].name) + "</b>" + (eo.pick === ek ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(eo.opts[ek].plain) + "</span>"; }
+    if (kind === "mom") { var mk2 = t.closest("tr").getAttribute("data-mom"); return "<b>" + esc(t.textContent) + "</b><span class=pl>" + esc(W.endings.mom[mk2].plain) + "</span>"; }
+    if (kind === "shared") { var sr = t.getAttribute("data-src"); return "<b>" + esc(W.endings.shared) + "</b><span class=pl>" + esc(W.endings.sharedPlain) + "</span>"
+      + (sr ? "<span class=pl>" + esc(fill(W.endings.sharedSource, { at: sr })) + "</span>" : ""); }
     if (kind === "gdir") { var gk = t.getAttribute("data-gdir"), gw = W.one.gaps.dir; return "<b>" + esc(gw.opts[gk].name) + "</b>" + (gw.pick === gk ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(gw.opts[gk].plain) + "</span>"; }
     if (kind === "rgap") { var ra = t.getAttribute("data-attr"), rr2 = US[t.getAttribute("data-row")];
       return "<b>" + esc(ra ? D.attrs[ra].label : rr2.name) + "</b> · " + esc(rr2.title || rr2.name) + "<span class=ln>" + esc(ra ? W.one.gaps.rshows : W.one.gaps.unmapped) + "</span>" + gwHtml(t, r) + (ra ? "<span class=pl>" + esc(D.attrs[ra].plain) + "</span>" : ""); }

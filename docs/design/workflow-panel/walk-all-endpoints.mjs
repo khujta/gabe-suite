@@ -250,6 +250,9 @@ await step('one-info-close', '#itog-one', 'the same toggle, again');
   say('the gaps · the station glyphs and labels', await marks('#ocol-gaps'));
   await center('#ocol-gaps .opt[data-gdir="cm"]');
   await step('gaps-back-once-more', '#ocol-gaps .opt[data-gdir="cm"]', 'the first square of THE GAPS, back to its default'); }
+// the row's click scrolls ONE ENDPOINT's head to the top, under the pinned row, where a click at the lab link's centre lands on the
+// pin (found by the walk, 2026-09-25): the page back to its top first, so the next step scrolls the link into open view
+await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
 { // the lab link: a real click opens the lab on this endpoint, then back
   await step('open-in-the-lab', '#lablink', 'the open-in-the-lab link');
   await p.waitForLoadState('load'); await wait(1500);
@@ -277,6 +280,45 @@ await step('one-info-close', '#itog-one', 'the same toggle, again');
     await pic('point-at-a-gap-shown-in-part'); } else say('MISSING a gap shown in part', '#ocol-gaps .gap[data-part]'); }
 await step('more-information', '#more-btn', 'the more information button, at the end of the page');
 await pic('more-information-open');
+{ // D-053, LAST: the endings and the own checks as ONE table, in the order they happen — POST /recipe-creation/gustify (the operator's
+  // screenshot endpoint) opened from the table; each look switched by its square and back; one own check lit, photographed where it
+  // lands; then GET /recipes, the longest table. The table is photographed on its own after every change; the words are read off it
+  const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
+  const EX = '#ocol-cm .pair[data-k="d:exits"]';
+  // the table photographed from the page's top, as a clip of the full page: scrolled to it, the pinned row would sit over its first rows
+  const endPic = async (name) => { await p.mouse.move(5, H - 10); await p.evaluate(() => { window.hoverHide && window.hoverHide(); window.scrollTo(0, 0); }); await wait(200); n++;
+    const bx = await p.$eval(EX, (e) => { const r = e.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height }; });
+    await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + name + '.png'), clip: { x: Math.max(0, bx.x - 8), y: Math.max(0, bx.y - 8), width: bx.width + 16, height: bx.height + 16 }, fullPage: true }); };
+  const table = () => p.$$eval(EX + ' table.etab tr', (trs) => trs.map((tr) => (tr.classList.contains('mom') ? '── ' : '') + tr.innerText.replace(/\s+/g, ' ').slice(0, 150)));
+  const sq = async (g, v) => { const s2 = EX + ' .opt[data-eopt="' + g + '"][data-v="' + v + '"]'; await center(s2); return s2; };
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('open-gustify-from-the-table', '#board tr.row[data-ep="POST /recipe-creation/gustify"] td.id', 'the row POST /recipe-creation/gustify');
+  say('D-053 · the endings, in time order', await table());
+  await center(EX); await endPic('endings-in-time');
+  // (a) the moments: a word inside the stage chip, then back to header rows (my pick)
+  let s2 = await sq('mom', 'chip'); await step('moments-as-a-word-in-the-stage-chip', s2, 'the square "' + (await txt(s2)) + '"');
+  say('D-053 · moments inside the stage chip', await table()); await center(EX); await endPic('endings-moments-in-the-stage-chip');
+  s2 = await sq('mom', 'rows'); await step('moments-back-to-header-rows', s2, 'the square "' + (await txt(s2)) + '" (my pick)');
+  // (b) the check: a line under the ending's words, then back to its own column (my pick)
+  s2 = await sq('chk', 'line'); await step('check-as-a-line-under-the-words', s2, 'the square "' + (await txt(s2)) + '"');
+  say('D-053 · the check as a line', await table()); await center(EX); await endPic('endings-check-as-a-line');
+  s2 = await sq('chk', 'col'); await step('check-back-to-its-column', s2, 'the square "' + (await txt(s2)) + '" (my pick)');
+  // one own check lit: the first HANDLER row that carries one — which row it is is read from the page's data, the click is the mouse's
+  const X1 = await p.evaluate(() => { const r = window.AE_DATA.rows.find((q) => q.id === 'POST /recipe-creation/gustify'); const i = r.xd.exits.findIndex((x) => x[0] === 'checks' && x[1].length); return r.xd.exits[i][2]; });
+  const CK = EX + ' tr.erow[data-x="' + X1 + '"] td.chk .ck';
+  await center(CK);
+  await step('light-one-own-check', CK, 'the check "' + (await txt(CK)).slice(0, 60) + '"');
+  say('D-053 · a check lit', await p.evaluate(() => ({ chip: document.getElementById('elchip').hidden ? null : document.getElementById('elsays').textContent,
+    rowsLit: document.querySelectorAll('#board tr.row[data-el="on"]').length,
+    landsOn: [...document.querySelectorAll('#ocol-cm .elon')].map((e) => [e.closest('tr.erow') ? e.closest('tr.erow').getAttribute('data-x') : null, e.closest('td') ? e.closest('td').className : null, e.textContent.trim().slice(0, 60)]),
+    cmSays: document.getElementById('el-cm').textContent })));
+  await center(CK); await endPic('endings-own-check-lit');
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('clear-the-check-light', '#elclear', 'the clear link on the lit chip above the table');
+  // the longest table: GET /recipes, opened from the table
+  await step('open-get-recipes-from-the-table', '#board tr.row[data-ep="GET /recipes"] td.id', 'the row GET /recipes');
+  const t2 = await table(); say('D-053 · GET /recipes, the endings in time order', { rows: t2.filter((x) => !x.startsWith('── ')).length - 1, table: t2 });
+  await center(EX); await endPic('endings-longest-table-get-recipes'); }
 say('rows at the end', await rows());
 say('page errors', errs);
 fs.writeFileSync(path.join(OUT, 'walk.json'), JSON.stringify({ viewport: [W, H], log }, null, 1));

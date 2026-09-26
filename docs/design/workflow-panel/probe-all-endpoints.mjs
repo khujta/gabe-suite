@@ -712,7 +712,9 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
       states: [...document.querySelectorAll('#ocol-uni .urow[data-row="TESTS"] .pchip[class*="st-"]')].filter((x) => x.offsetParent !== null).map((x) => [x.textContent.trim(), (x.className.match(/\bst-(\w+)/) || [])[1]]),
       testsOk: !!document.querySelector('#ocol-uni .urow[data-row="TESTS"] .sechd .cnt.ok'),
       plain: (document.querySelector('#ocol-uni .plain') || {}).textContent || '',
-      pairs: [...document.querySelectorAll('#ocol-cm .pair[data-attr]')].map((x) => ({ k: x.getAttribute('data-k'), attrs: x.getAttribute('data-attr').split(' ') })),
+      /* changed 2026-09-25 (D-053): "its own checks" is no longer a pair of its own — it is the endings table's check column, a field
+         drawn INSIDE the endings pair (data-sub), so it is read with the pairs */
+      pairs: [...document.querySelectorAll('#ocol-cm .pair[data-attr], #ocol-cm [data-sub][data-attr]')].map((x) => ({ k: x.getAttribute('data-k'), attrs: x.getAttribute('data-attr').split(' ') })),
       lab: !!document.getElementById('lablink') && !!document.getElementById('labcmd') }));
     const r = ROW[ep], st = cards[ep];
     ok(dom.n === ep && dom.search === '?ep=' + slug9(ep), ep + ' · a click fills the section and the address', { n: dom.n, search: dom.search });
@@ -1041,6 +1043,146 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
   ok(!!ref && l1 && l1.length === 1 && l1[0][0] === ref && l1[0][1] === 'hover' && l2 && l2.length === 1 && l2[0][0] === ref && l2[0][1] === 'pin' && l3 && !l3.length,
     'a "solved elsewhere" gap (' + solvedAt + ') links the field it names: pointing at the link lights ' + ref + ' in the code map, a click keeps it lit, Escape puts it out', { ref, l1, l2, l3 });
   await p.mouse.move(5, 5); await p.click('#ocol-gaps .opt[data-gdir="cm"]').catch(() => {}); await p.waitForTimeout(40); }
+/* 13 · D-053: ONE endings table, its rows in the order the endings happen. On POST /recipe-creation/gustify the rows are read off
+   the page and held against the order the operator verified from the chain, the source and FastAPI: the edge's two limiters, FastAPI
+   reading the body, the login, FastAPI checking the fields, the handler's own checks, the pipeline's failures in the order of their
+   isinstance lines, the success, the uncaught. Each row's identity is told apart HERE from forms.json (a limiter by the key its
+   condition reads, a check by its line or the handler line it sits inside). The body read keeps the chain's order: FastAPI's
+   `except JSONDecodeError` (422) is met before its `except Exception` (400). Every own check sits on the row of the ending the
+   feed says it produces; the moment headers are the chain's, recomputed here — a failure group names a call only when the feed shows
+   it raising into the catch (the ending's own check inside it, its raise translated into the ending, or a raise of the caught class
+   in a function reached from it), for every group on every endpoint; the fates end where the endings end; a check a dependency makes
+   is drawn under the dependency that makes it; both looks switch and are remembered; a guard lit lands on its row's check. Real clicks. */
+{ const E13 = 'POST /recipe-creation/gustify', FE = FJ.endpoints['endpoint:' + E13], EW = D.words.endings, X = {};
+  [...(FE.produced || []), ...(FE.framework_exits || []), ...(FE.returns || [])].forEach((x) => { X[x.id] = x; });
+  await open(PAGE); await p.click('#board tr.row[data-ep="' + E13 + '"] td.id'); await p.waitForTimeout(80);
+  const readE = () => p.evaluate(() => { const t = document.querySelector('#ocol-cm .pair[data-k="d:exits"] table.etab');
+    return { mom: t.getAttribute('data-mom'), chk: t.getAttribute('data-chk'), guardsPair: document.querySelectorAll('#ocol-cm .pair[data-k="d:guards"]').length,
+      sub: document.querySelectorAll('#ocol-cm .pair[data-k="d:exits"] th[data-sub][data-k="d:guards"]').length,
+      rows: [...t.querySelectorAll('tr')].map((tr) => tr.classList.contains('mom') ? { head: tr.getAttribute('data-mom'), text: tr.textContent.replace(/\s+/g, ' ').trim() }
+        : tr.classList.contains('erow') ? { x: tr.getAttribute('data-x'), mom: tr.getAttribute('data-mom'), stage: (tr.querySelector('.vc-stage b') || {}).textContent || null,
+            chip: (tr.querySelector('.vc-stage .mw') || {}).textContent || null, status: (tr.querySelector('.vc-status') || {}).textContent || null,
+            checks: [...tr.querySelectorAll('.ck')].map((c) => c.getAttribute('data-key')), line: !!tr.querySelector('td.says .ckl .ck'), col: !!tr.querySelector('td.chk'),
+            shared: !!tr.querySelector('.shd') } : null).filter(Boolean),
+      fates: [...document.querySelectorAll('#ocol-cm .pair[data-k="d:fates"] li .vc-status')].map((c) => c.textContent),
+      squares: [...document.querySelectorAll('#ocol-cm .opt[data-eopt]')].map((o) => [o.getAttribute('data-eopt'), o.getAttribute('data-v'), o.getAttribute('aria-checked'), getComputedStyle(o).borderTopStyle, o.getAttribute('aria-label')]) }; });
+  const L13 = (x) => +((String(x.at || '').match(/:(\d+)/) || [])[1] || 0), V13 = (x) => +((String(x.via || '').match(/^call .+ @ .+:(\d+)$/) || [])[1] || 0);
+  const want = [['EDGE', 429, (x) => /_sensitive/.test(x.pred || '')], ['EDGE', 429, (x) => /_global/.test(x.pred || '')],
+    ['INPUT', 422, (x) => x.phase === 'body-parse' && x.code === 'json_invalid'], ['INPUT', 400, (x) => x.phase === 'body-parse'],
+    ['GATE', 401, (x) => x.phase === 'security'], ['GATE', 401, (x) => x.phase === 'dependency'], ['INPUT', 422, (x) => x.phase === 'validation'],
+    ['HANDLER', 403, (x) => L13(x) === 236], ['HANDLER', 409, (x) => V13(x) === 240], ['HANDLER', 400, (x) => L13(x) === 243],
+    ...[[166, 400], [168, 429], [175, 429], [184, 402], [188, 503], [194, 429], [200, 502], [207, 502]].map(([ln, st]) => ['HANDLER', st, (x) => V13(x) === 259 && L13(x) === ln]),
+    ['ANSWER', 201, (x) => x.phase == null || x.phase === 'handler'], ['UNCAUGHT', 500, (x) => x.phase === 'uncaught']];
+  const e0 = await readE(), er = e0.rows.filter((x) => x.x), bad13 = [];
+  if (er.length !== want.length) bad13.push(['rows', er.length, want.length]);
+  er.forEach((r, i) => { const w = want[i], x = X[r.x]; if (!w || !x || r.stage !== w[0] || x.status !== w[1] || r.status !== String(w[1]) || !w[2](x)) bad13.push([i, r.x, r.stage, r.status, w && w[0], w && w[1]]); });
+  ok(!bad13.length, 'D-053 · ' + E13 + ' · the endings read in the order they happen — limiters, body read, login, field check, own checks, the failures by line, success, uncaught (' + want.length + ' rows, no cap)', bad13.slice(0, 4));
+  /* the 11 own checks, one on each HANDLER row, each on the row of the ending the feed ties it to; shared code named on the rows it decides */
+  const PRE = FE.preconditions || [], hand = er.filter((r) => r.stage === 'HANDLER'), onRow = er.flatMap((r) => r.checks.map((k) => [k, r.x]));
+  const off13 = PRE.filter((g) => !onRow.some(([k, x]) => k === 'guard:' + g.id && x === g.exit)).map((g) => g.id);
+  ok(PRE.length === 11 && hand.length === 11 && hand.every((r) => r.checks.length === 1) && onRow.length === PRE.length && !off13.length && e0.guardsPair === 0 && e0.sub === 1,
+    'D-053 · the 11 own checks sit one on each of the 11 HANDLER rows, on the row of the ending the feed says each produces; no separate list of checks is left, its field is the table\'s check column',
+    { pre: PRE.length, hand: hand.length, placed: onRow.length, off: off13, guardsPair: e0.guardsPair, sub: e0.sub });
+  ok(er.filter((r) => ['EDGE', 'GATE', 'INPUT'].includes(r.stage)).every((r) => r.shared && !r.checks.length) && er.filter((r) => ['ANSWER', 'UNCAUGHT'].includes(r.stage)).every((r) => !r.shared && !r.checks.length),
+    'D-053 · a row shared code decides names who decides it, apart; the success and the uncaught carry no check', er.map((r) => [r.stage, r.shared, r.checks.length]));
+  /* the moment headers, recomputed from the chain here: INPUT's two, then the handler's checks, then the failure group — the catch
+     its paths pass after the handler starts, and the calls listed between the last check before it and it, on lines above it */
+  /* the calls a failure group names, recomputed from forms.json: between the handler's last gate before the catch (a gate in the
+     catch's file) and the catch, in its file, above its line — each only when the feed shows it raising into the catch */
+  const F13 = (a) => String(a || '').replace(/:\d+(-\d+)?$/, ''), PREPH = ['middleware', 'body-parse', 'security', 'dependency', 'validation'];
+  const raisers = (ep, xid) => { const E = 'endpoint:' + ep, F0 = FJ.endpoints[E], XS = {}, out = {}; let cat = null;
+    [...(F0.produced || []), ...(F0.framework_exits || []), ...(F0.returns || [])].forEach((x) => { XS[x.id] = x; });
+    const reach = (site) => Object.values(FJ.functions || {}).filter((f) => (f.reached_by || []).some((b) => b.root === E && b.root_site === site)).flatMap((f) => f.raises || []);
+    (F0.paths || []).filter((q) => q.exit.id === xid).forEach((q) => { const ch = q.chain;
+      let lb = -1; ch.forEach((s, i) => { if (PREPH.includes(s.phase)) lb = i; });
+      const cs = ch.map((s, i) => (s.kind === 'catch' && i > lb ? i : -1)).filter((i) => i >= 0); if (!cs.length) return;
+      const ci = cs[cs.length - 1], c = ch[ci], cf = F13(c.at), cl = L13(c), cls = String(c.cls || '').split(/[|,]/).map((t) => t.trim()).filter(Boolean);
+      cat = c; let pg = -1; ch.forEach((s, i) => { if (i < ci && s.kind === 'gate' && XS[s.ref] && s.ref !== xid && F13(s.at) === cf) pg = i; });
+      for (let j = pg + 1; j < ci; j++) { const s = ch[j]; if (!(s.kind === 'call' || s.kind === 'collapsed') || F13(s.at) !== cf || !(L13(s) < cl)) continue;
+        let nx = ci; for (let k = j + 1; k < ci; k++) if (ch[k].at && F13(ch[k].at) === cf) { nx = k; break; }
+        const rs = reach(s.at), own = ch.slice(j + 1, nx).some((t) => t.kind === 'gate' && t.ref === xid);
+        if (own || rs.some((r) => (r.translated_by || []).some((t) => t.endpoint === E && t.exit === xid)) || rs.some((r) => cls.some((k) => k === 'Exception' || k === 'BaseException') || cls.includes(r.cls))) out[s.call] = L13(s); } });
+    return { cat, calls: out }; };
+  const fl = er.find((r) => r.mom === 'failed'), R13 = raisers(E13, fl.x), cat = R13.cat || {};
+  const calls = Object.keys(R13.calls).sort((a, b) => R13.calls[a] - R13.calls[b]);
+  const failHead = EW.mom.failed.name + ' — ' + EW.caught.replace('{calls}', calls.join(' · ')).replace('{at}', String(cat.at).split('/').pop()).replace('{cls}', cat.cls);
+  const heads = e0.rows.filter((x) => x.head), runOf = (h) => { const i = e0.rows.indexOf(h), out = []; for (let j = i + 1; j < e0.rows.length && !e0.rows[j].head; j++) if (e0.rows[j].mom === h.head) out.push(e0.rows[j].stage); return out; };
+  ok(JSON.stringify(heads.map((h) => h.head)) === JSON.stringify(['body', 'fields', 'checks', 'failed'])
+    && heads[0].text === EW.mom.body.name && heads[1].text === EW.mom.fields.name && heads[2].text === EW.mom.checks.name && heads[3].text === failHead
+    && JSON.stringify(calls) === JSON.stringify(['generate_gustify_recipe']) && cat.at === 'apps/api/api/recipe_creation.py:258' && cat.cls === 'Exception'
+    && JSON.stringify(heads.map((h) => runOf(h).length)) === JSON.stringify([2, 1, 3, 8]),
+    'D-053 · the moment headers read as the chain has them — reads the body (2) · checks the fields (1) · checks (3) · after a call failed, naming the call the feed shows raising into it (generate_gustify_recipe; client_ip only runs inside the try) and the catch (8)', heads.map((h) => [h.head, h.text.slice(0, 120), runOf(h).length]).concat([[failHead]]));
+  { /* every failure group on every endpoint names exactly the calls recomputed here, in line order */
+    const badG = [];
+    for (const ep of FEED) { const R = ROW[ep], groups = {};
+      R.xd.exits.forEach((xe, i) => { if (typeof xe[0] !== 'number') return; const g = groups[xe[0]] = groups[xe[0]] || {}; Object.assign(g, raisers(ep, xe[2]).calls); });
+      (R.d.exits.moms || []).forEach((m, gi) => { const g = groups[gi] || {}, want = Object.keys(g).sort((a, b) => g[a] - g[b] || (a < b ? -1 : 1));
+        if (JSON.stringify(m[2]) !== JSON.stringify(want)) badG.push([ep, m[0], m[2], want]); }); }
+    ok(!badG.length && FEED.reduce((n, ep) => n + (ROW[ep].d.exits.moms || []).length, 0) === 64, 'D-053 · on all ' + FEED.length + ' endpoints every failure group names exactly the calls the feed shows raising into its catch', badG.slice(0, 4)); }
+  /* the fates: every path, in the endings' order, never capped — the list ends where the endings table ends */
+  const fWant = er.flatMap((r) => (FE.paths || []).filter((q) => q.exit.id === r.x).map((q) => String(q.status)));
+  ok(JSON.stringify(e0.fates) === JSON.stringify(fWant) && fWant.includes('201') && fWant[fWant.length - 1] === er[er.length - 1].status && FEED.every((ep) => ROW[ep].d.fates.more === 0 && ROW[ep].d.fates.items.length === (FJ.endpoints['endpoint:' + ep].paths || []).length),
+    'D-053 · each path\'s fate follows the endings\' order and is never capped: on ' + E13 + ' the success is in the list and it ends where the endings end, and every endpoint lists every path', { fates: e0.fates, want: fWant });
+  /* the info text says INPUT appears twice only where the rows show it, and the field check above the login only where it stands there */
+  const eTexts = await p.$$eval('#ocol-cm .pair[data-k="d:exits"] .eplain p', (ps) => ps.map((x) => x.textContent));
+  const runsIn = (ep) => { const st = ROW[ep].d.exits.items.map((e) => e[1]); return st.filter((s2, i) => s2 === 'INPUT' && st[i - 1] !== 'INPUT').length; };
+  const aboveGate = (ep) => { const R = ROW[ep], f = R.xd.exits.map((x, i) => (x[0] === 'fields' ? i : -1)).filter((i) => i >= 0), g = R.d.exits.items.map((e, i) => (e[1] === 'GATE' ? i : -1)).filter((i) => i >= 0); return !!(f.length && g.length && Math.min(...f) < Math.max(...g)); };
+  const enBad = FEED.filter((ep) => (ROW[ep].xd.en.includes('twice') !== (runsIn(ep) >= 2)) || (ROW[ep].xd.en.includes('first') !== aboveGate(ep)));
+  ok(JSON.stringify(eTexts) === JSON.stringify([EW.plain, EW.plainInput, EW.plainChecks]) && !enBad.length && FEED.filter((ep) => ROW[ep].xd.en.includes('first')).join() === 'GET /recipe-creation/gustify/stream',
+    'D-053 · the info text says INPUT appears twice only on the endpoints whose rows show it (' + FEED.filter((ep) => runsIn(ep) >= 2).length + '), and says a field check stands above the login check only on the stream, where it does', { eTexts: eTexts.length, enBad: enBad.slice(0, 3) });
+  /* the two looks: my picks pressed and dashed on a cold start; each switches the table; both are remembered for this viewer */
+  const sq0 = e0.squares, pick0 = (g) => EW.opt[g].pick;
+  ok(sq0.length === 4 && sq0.every(([g, v, on, dash, lab]) => (on === 'true') === (v === pick0(g)) && (dash === 'dashed') === (v === pick0(g)) && lab === EW.opt[g].opts[v].name) && e0.mom === 'rows' && e0.chk === 'col',
+    'D-053 · two looks on icon squares, my picks (moments as header rows, the check as its own column) pressed and dashed on a cold start', sq0);
+  await p.$eval('#ocol-cm .opt[data-eopt="mom"][data-v="chip"]', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#ocol-cm .opt[data-eopt="mom"][data-v="chip"]'); await p.waitForTimeout(80);
+  const e1 = await readE(), er1 = e1.rows.filter((x) => x.x);
+  ok(e1.mom === 'chip' && !e1.rows.some((x) => x.head) && er1.filter((r) => r.mom).length === 14 && er1.every((r) => r.mom ? r.chip === EW.mom[r.mom].name : !r.chip) && JSON.stringify(er1.map((r) => r.x)) === JSON.stringify(er.map((r) => r.x)),
+    'D-053 · moments inside the stage chip: no header rows, each INPUT and HANDLER row\'s stage chip carries its moment, the order unchanged', er1.map((r) => [r.stage, r.chip]).slice(0, 12));
+  await p.$eval('#ocol-cm .opt[data-eopt="chk"][data-v="line"]', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#ocol-cm .opt[data-eopt="chk"][data-v="line"]'); await p.waitForTimeout(80);
+  const e2 = await readE(), er2 = e2.rows.filter((x) => x.x);
+  ok(e2.chk === 'line' && er2.every((r) => !r.col) && er2.filter((r) => r.checks.length).length === 11 && er2.filter((r) => r.checks.length).every((r) => r.line) && e2.sub === 1,
+    'D-053 · the check as a line under the ending\'s words: no check column, each check under its ending\'s words, the field still found at the words\' head', { rows: er2.length, sub: e2.sub });
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.waitForTimeout(80);
+  const e3 = await readE();
+  ok(e3.mom === 'chip' && e3.chk === 'line' && e3.squares.filter(([, , on]) => on === 'true').map(([g, v]) => g + ':' + v).sort().join(' ') === 'chk:line mom:chip', 'D-053 · both looks are remembered for this viewer', [e3.mom, e3.chk]);
+  await p.$eval('#ocol-cm .opt[data-eopt="mom"][data-v="rows"]', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#ocol-cm .opt[data-eopt="mom"][data-v="rows"]'); await p.waitForTimeout(60);
+  await p.$eval('#ocol-cm .opt[data-eopt="chk"][data-v="col"]', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#ocol-cm .opt[data-eopt="chk"][data-v="col"]'); await p.waitForTimeout(80);
+  const e4 = await readE();
+  ok(e4.mom === 'rows' && e4.chk === 'col' && JSON.stringify(e4.rows) === JSON.stringify(e0.rows), 'D-053 · the first squares bring back my picks, the table as it was', [e4.mom, e4.chk]);
+  /* D-041 · a guard lit lands on its row's check: the login check's household guard, which many endpoints share — the rows lit are
+     the endpoints whose feed record holds it, recomputed here; in the code map, the check on the 409 row */
+  const G13 = PRE.find((g) => g.exit && V13(g) === 240), GK = 'guard:' + (G13 || {}).id, sel13 = '#ocol-cm tr.erow[data-x="' + (G13 || {}).exit + '"] .ck[data-key="' + GK + '"]';
+  await p.$eval(sel13, (e) => e.scrollIntoView({ block: 'center' })); await p.waitForTimeout(60); await p.click(sel13); await p.waitForTimeout(100);
+  const g13 = await p.evaluate((K) => ({ on: [...document.querySelectorAll('#board tr.row[data-el="on"]')].map((e) => e.getAttribute('data-ep')).sort(),
+    cells: [...document.querySelectorAll('#board tr.row[data-el="on"] [data-elcell]')].map((c) => (c.querySelector('[data-col]') || c).getAttribute('data-col')).filter(Boolean),
+    cm: [...document.querySelectorAll('#ocol-cm .elon')].filter((e) => e.getAttribute('data-key') === K).map((e) => [e.closest('tr.erow') ? e.closest('tr.erow').getAttribute('data-x') : null, e.getAttribute('data-key')]),
+    col: !!document.querySelector('#ocol-cm .pair.elon[data-k="c:guards"]'),
+    here: document.getElementById('el-cm').getAttribute('data-here') }), GK);
+  const want13 = FEED.filter((ep) => ((FJ.endpoints['endpoint:' + ep] || {}).preconditions || []).some((g) => g.id === G13.id)).sort();
+  ok(!!G13 && JSON.stringify(g13.on) === JSON.stringify(want13) && g13.cm.length === 1 && g13.cm[0][0] === G13.exit && g13.cm[0][1] === GK && g13.here === 'true' && g13.col && g13.cells.length === want13.length && g13.cells.every((c) => c === 'guards'),
+    'D-053 · a guard lit from its check lands on its row: the check on the 409 row named and outlined (the guards count lights with it), the ' + want13.length + ' endpoints that hold it lit, their guards cells outlined', { lit: g13.on.length, want: want13.length, cm: g13.cm, cells: g13.cells.slice(0, 3) });
+  await p.click('#elclear'); await p.waitForTimeout(40);
+  /* a check the feed ties to no ending joins the ending its sibling raise of the same class is caught into: no row of its own is left,
+     and on PATCH …/stage both stage checks sit on the one 409 row, below the 404 raised before them inside update_stage */
+  const E14 = 'PATCH /cooking/sessions/{session_id}/stage', PS = FJ.endpoints['endpoint:' + E14].preconditions || [];
+  const odd14 = FEED.flatMap((ep) => (FJ.endpoints['endpoint:' + ep].preconditions || []).map((g, i) => [ep, g, i]).filter(([, g]) => g.exit == null));
+  const st14 = ROW[E14], at14 = (id) => st14.xd.exits.findIndex((x) => x[2] === id), g409 = PS.filter((g) => g.status === 409 && /update_stage/.test(g.via || ''));
+  const row409 = st14.xd.exits.find((x) => x[1].some((i) => PS[i] === g409[0]));
+  ok(odd14.length === 4 && FEED.every((ep) => ROW[ep].xd.exits.every((x) => x[0] !== 'unplaced')) && odd14.every(([ep, , i]) => ROW[ep].xd.exits.some((x) => x[1].includes(i) && x[2].startsWith('x:')))
+     && g409.length === 2 && row409 && g409.every((g) => row409[1].includes(PS.indexOf(g))) && at14('x:951dde791f') < at14(row409[2]),
+    'D-053 · the four checks the feed ties to no ending sit on the ending their sibling raise is caught into; PATCH …/stage draws one 409 row with both stage checks, below the 404', { odd: odd14.length, row409 });
+  /* POST /_e2e/seed: the 404 its dependency's check makes is a shared row — the dependency named, its check muted beside it; FastAPI
+     named on the body and field rows, its own code in the hover */
+  const E15 = 'POST /_e2e/seed';
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E15 + '"] td.id'); await p.waitForTimeout(80);
+  const e15 = await p.$$eval('#ocol-cm .pair[data-k="d:exits"] table.etab tr.erow', (trs) => trs.map((tr) => ({ stage: (tr.querySelector('.vc-stage b') || {}).textContent || null,
+    who: (tr.querySelector('.shd') || {}).textContent || null, src: tr.querySelector('.shd') ? tr.querySelector('.shd').getAttribute('data-src') : null,
+    muted: [...tr.querySelectorAll('.ck')].map((c) => c.classList.contains('ckm')) })));
+  const dep15 = e15.find((r) => r.stage === 'GATE' && r.muted.length);
+  const allIn = FEED.every((ep) => ROW[ep].d.exits.items.every((e, i) => e[1] !== 'INPUT' || (e[5] === 'FastAPI' && /^fastapi\//.test(ROW[ep].xd.exits[i][3] || ''))));
+  ok(!!dep15 && /_require_seed_controls/.test(dep15.who) && dep15.muted.every(Boolean) && e15.filter((r) => r.stage === 'HANDLER').every((r) => r.muted.every((m) => !m)) && allIn,
+    'D-053 · a check a dependency makes sits on its GATE row under the dependency that makes it, muted; every INPUT row on every endpoint names FastAPI, its own code in the hover', { dep15, allIn });
+  await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-041 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */

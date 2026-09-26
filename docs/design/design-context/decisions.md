@@ -664,3 +664,20 @@ colour (__BADGE_COL). All of it lifted from gabe-universe.html, never retyped (t
 station does not draw (a setting, a test case, a status) keeps the page's own encoding and says so; the kind mapping is the agent's
 proposal where it is not one-to-one.
 Revisit if: a kind colour and a subcategory label read as one thing — then the label moves inside the chip's outline.
+
+## D-053 — The endings and the own checks are one table, in the order they happen
+Date: 2026-09-25 · Input: his question on the code map ("Can you explain to me the difference between the endings and its own
+checks? Does it happen at a different moment … maybe create a stage 0"), the agent's answer, and his reply.
+Decision, his: "Build it and also consider the time dimension. Order it in the order that they happen." — "it" being the agent's
+proposal: the two lists repeat each other (every own check names the ending it produces; POST /recipe-creation/gustify's 11 own
+checks ARE its 11 HANDLER endings), so merge them, and split HANDLER into its real moments instead of a stage 0 (eight of that
+endpoint's eleven checks run only after the main call has failed).
+Consequence: on the all-endpoints page's code map, "the endings" and "its own checks" become ONE table. Each own check sits on the
+row of the ending it produces; a row decided by shared code (the rate limiter, the login check, FastAPI) names who decides it. The
+rows run in the order a request meets them, DERIVED from the feed's path chains (never typed), with UNCAUGHT last; "each path's
+fate" follows the same order. INPUT splits into reads the body · checks the fields, and HANDLER into checks · after a call failed
+(one group per catch). A fact the time order exposes, shown rather than hidden: FastAPI reads the body BEFORE the login check, so
+INPUT appears on both sides of GATE — the D-001 spine is a reading order, not always the time order. How the moments and the
+check are drawn are the agent's picks, built as options (D-025.2).
+Revisit if: a request's real order is not a single line (the moments of two branches read as one sequence and mislead) — then the
+table draws the branches side by side.

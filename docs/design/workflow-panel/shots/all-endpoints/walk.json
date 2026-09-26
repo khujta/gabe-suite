@@ -515,7 +515,7 @@
       953,
       53,
       935,
-      3303
+      3423
      ]
     ],
     "universe": [
@@ -602,7 +602,8 @@
     "gap": "The endings",
     "lit": [
      "endings",
-     "the endings"
+     "the endings",
+     "its own checks"
     ],
     "tip": "The endings · shown by no universe rowwhy not drawnstatus open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's produced[], returns[] and framework_exits[] (the endpoint pass and the paths arm). my proposalEvery distinct way a request to the endpoint can end."
    }
@@ -628,8 +629,8 @@
    {
     "stage": 18,
     "kind": 26,
-    "status": 35,
-    "role": 4,
+    "status": 32,
+    "role": 5,
     "dir": 2,
     "limit": 2,
     "fate": 18,
@@ -813,7 +814,7 @@
     "click": "users",
     "at": [
      990,
-     532
+     533
     ],
     "size": [
      54,
@@ -1028,9 +1029,9 @@
    "code map · the station glyphs and labels",
    {
     "function": {
-     "n": 4,
+     "n": 5,
      "labels": {
-      "caller": 3,
+      "caller": 4,
       "accessor": 1
      }
     },
@@ -1109,7 +1110,7 @@
     "click": "open POST /setup/complete in the lab",
     "at": [
      520,
-     435
+     525
     ],
     "size": [
      64,
@@ -1235,13 +1236,276 @@
     "click": "Show how the map knows this",
     "at": [
      32,
-     994
+     995
     ],
     "size": [
      220,
      30
     ],
     "note": "the more information button, at the end of the page"
+   }
+  ],
+  [
+   "step 93 · open-gustify-from-the-table",
+   {
+    "click": "/recipe-creation/gustifyPOST",
+    "at": [
+     33,
+     836
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /recipe-creation/gustify"
+   }
+  ],
+  [
+   "D-053 · the endings, in time order",
+   [
+    "kind stage status what it says its own checks tests",
+    "refusal EDGE 429 Rate limit exceeded. Try again shortly. shared code RateLimitMiddleware 1",
+    "refusal EDGE 429 Rate limit exceeded. Try again shortly. shared code RateLimitMiddleware 1",
+    "── reads the body",
+    "framework INPUT 422 JSON decode error shared code FastAPI 0",
+    "framework INPUT 400 There was an error parsing the body shared code FastAPI 2",
+    "refusal GATE 401 Not authenticated shared code HTTPBearer bearer_scheme 1",
+    "refusal GATE 401 invalid token shared code get_auth_context caller 1",
+    "── checks the fields",
+    "validation INPUT 422 pydantic error type shared code FastAPI 1",
+    "── checks",
+    "refusal HANDLER 403 recipe creation is disabled not ( RECIPE_CREATION_ENABLED or settings. recipe_creation_enabled) · recipe_creation.py:236 2",
+    "refusal HANDLER 409 setup required self.household is None · AuthContext.require_household @ recipe_creation.py:240 0",
+    "refusal HANDLER 400 Idempotency-Key required for recipe creation key is None · recipe_creation.py:243 2",
+    "── after a call failed — generate_gustify_recipe raised — caught at recipe_creation.py:258 (except Exception)",
+    "refusal HANDLER 400 str(exc) isinstance(exc, InvalidRequestError) · _raise_for_pipeline_error @ recipe_creation.py:259 2",
+    "refusal HANDLER 429 AI rate limit exceeded. Try again shortly. isinstance(exc, RateLimitExceededError) · _raise_for_pipeline_error @ recipe_creation.p",
+    "refusal HANDLER 429 AI budget reached. Try again later. isinstance(exc, SpendCapExceededError) · _raise_for_pipeline_error @ recipe_creation.py:259 1",
+    "refusal HANDLER 402 insufficient_credits isinstance(exc, InsufficientCreditsError) · _raise_for_pipeline_error @ recipe_creation.py:259 2",
+    "refusal HANDLER 503 El proveedor de IA no está disponible por ahora. Intenta más tarde. isinstance(exc, CircuitOpenError) · _raise_for_pipeline_error ",
+    "refusal HANDLER 429 AI capacity reached. Try again shortly. isinstance(exc, GeminiQuotaError) · _raise_for_pipeline_error @ recipe_creation.py:259 1",
+    "refusal HANDLER 502 El proveedor de IA devolvió un resultado inválido. Intenta de nuevo. isinstance(exc, (OutputParseError, GeminiBadOutputError)) · _",
+    "refusal HANDLER 502 Error del proveedor de IA. Intenta de nuevo en unos momentos. isinstance(exc, (GeminiAuthError, GeminiTransientError)) · _raise_fo",
+    "success ANSWER 201 11",
+    "uncaught UNCAUGHT 500 0"
+   ]
+  ],
+  [
+   "step 95 · moments-as-a-word-in-the-stage-chip",
+   {
+    "click": "moments inside the stage chip",
+    "at": [
+     1027,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"moments inside the stage chip\""
+   }
+  ],
+  [
+   "D-053 · moments inside the stage chip",
+   [
+    "kind stage status what it says its own checks tests",
+    "refusal EDGE 429 Rate limit exceeded. Try again shortly. shared code RateLimitMiddleware 1",
+    "refusal EDGE 429 Rate limit exceeded. Try again shortly. shared code RateLimitMiddleware 1",
+    "framework INPUT reads the body 422 JSON decode error shared code FastAPI 0",
+    "framework INPUT reads the body 400 There was an error parsing the body shared code FastAPI 2",
+    "refusal GATE 401 Not authenticated shared code HTTPBearer bearer_scheme 1",
+    "refusal GATE 401 invalid token shared code get_auth_context caller 1",
+    "validation INPUT checks the fields 422 pydantic error type shared code FastAPI 1",
+    "refusal HANDLER checks 403 recipe creation is disabled not ( RECIPE_CREATION_ENABLED or settings. recipe_creation_enabled) · recipe_creation.py:236 2",
+    "refusal HANDLER checks 409 setup required self.household is None · AuthContext.require_household @ recipe_creation.py:240 0",
+    "refusal HANDLER checks 400 Idempotency-Key required for recipe creation key is None · recipe_creation.py:243 2",
+    "refusal HANDLER after a call failed 400 str(exc) isinstance(exc, InvalidRequestError) · _raise_for_pipeline_error @ recipe_creation.py:259 2",
+    "refusal HANDLER after a call failed 429 AI rate limit exceeded. Try again shortly. isinstance(exc, RateLimitExceededError) · _raise_for_pipeline_error",
+    "refusal HANDLER after a call failed 429 AI budget reached. Try again later. isinstance(exc, SpendCapExceededError) · _raise_for_pipeline_error @ recip",
+    "refusal HANDLER after a call failed 402 insufficient_credits isinstance(exc, InsufficientCreditsError) · _raise_for_pipeline_error @ recipe_creation.p",
+    "refusal HANDLER after a call failed 503 El proveedor de IA no está disponible por ahora. Intenta más tarde. isinstance(exc, CircuitOpenError) · _raise",
+    "refusal HANDLER after a call failed 429 AI capacity reached. Try again shortly. isinstance(exc, GeminiQuotaError) · _raise_for_pipeline_error @ recipe",
+    "refusal HANDLER after a call failed 502 El proveedor de IA devolvió un resultado inválido. Intenta de nuevo. isinstance(exc, (OutputParseError, Gemini",
+    "refusal HANDLER after a call failed 502 Error del proveedor de IA. Intenta de nuevo en unos momentos. isinstance(exc, (GeminiAuthError, GeminiTransien",
+    "success ANSWER 201 11",
+    "uncaught UNCAUGHT 500 0"
+   ]
+  ],
+  [
+   "step 97 · moments-back-to-header-rows",
+   {
+    "click": "moments as header rows",
+    "at": [
+     990,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"moments as header rows\" (my pick)"
+   }
+  ],
+  [
+   "step 98 · check-as-a-line-under-the-words",
+   {
+    "click": "the check as a line under the ending's words",
+    "at": [
+     1108,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"the check as a line under the ending's words\""
+   }
+  ],
+  [
+   "D-053 · the check as a line",
+   [
+    "kind stage status what it says · its own checks tests",
+    "refusal EDGE 429 Rate limit exceeded. Try again shortly. shared code RateLimitMiddleware 1",
+    "refusal EDGE 429 Rate limit exceeded. Try again shortly. shared code RateLimitMiddleware 1",
+    "── reads the body",
+    "framework INPUT 422 JSON decode error shared code FastAPI 0",
+    "framework INPUT 400 There was an error parsing the body shared code FastAPI 2",
+    "refusal GATE 401 Not authenticated shared code HTTPBearer bearer_scheme 1",
+    "refusal GATE 401 invalid token shared code get_auth_context caller 1",
+    "── checks the fields",
+    "validation INPUT 422 pydantic error type shared code FastAPI 1",
+    "── checks",
+    "refusal HANDLER 403 recipe creation is disabled not ( RECIPE_CREATION_ENABLED or settings. recipe_creation_enabled) · recipe_creation.py:236 2",
+    "refusal HANDLER 409 setup required self.household is None · AuthContext.require_household @ recipe_creation.py:240 0",
+    "refusal HANDLER 400 Idempotency-Key required for recipe creation key is None · recipe_creation.py:243 2",
+    "── after a call failed — generate_gustify_recipe raised — caught at recipe_creation.py:258 (except Exception)",
+    "refusal HANDLER 400 str(exc) isinstance(exc, InvalidRequestError) · _raise_for_pipeline_error @ recipe_creation.py:259 2",
+    "refusal HANDLER 429 AI rate limit exceeded. Try again shortly. isinstance(exc, RateLimitExceededError) · _raise_for_pipeline_error @ recipe_creation.p",
+    "refusal HANDLER 429 AI budget reached. Try again later. isinstance(exc, SpendCapExceededError) · _raise_for_pipeline_error @ recipe_creation.py:259 1",
+    "refusal HANDLER 402 insufficient_credits isinstance(exc, InsufficientCreditsError) · _raise_for_pipeline_error @ recipe_creation.py:259 2",
+    "refusal HANDLER 503 El proveedor de IA no está disponible por ahora. Intenta más tarde. isinstance(exc, CircuitOpenError) · _raise_for_pipeline_error ",
+    "refusal HANDLER 429 AI capacity reached. Try again shortly. isinstance(exc, GeminiQuotaError) · _raise_for_pipeline_error @ recipe_creation.py:259 1",
+    "refusal HANDLER 502 El proveedor de IA devolvió un resultado inválido. Intenta de nuevo. isinstance(exc, (OutputParseError, GeminiBadOutputError)) · _",
+    "refusal HANDLER 502 Error del proveedor de IA. Intenta de nuevo en unos momentos. isinstance(exc, (GeminiAuthError, GeminiTransientError)) · _raise_fo",
+    "success ANSWER 201 11",
+    "uncaught UNCAUGHT 500 0"
+   ]
+  ],
+  [
+   "step 100 · check-back-to-its-column",
+   {
+    "click": "the check as its own column",
+    "at": [
+     1071,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"the check as its own column\" (my pick)"
+   }
+  ],
+  [
+   "step 101 · light-one-own-check",
+   {
+    "click": "not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) · re",
+    "at": [
+     1476,
+     518
+    ],
+    "size": [
+     352,
+     44
+    ],
+    "note": "the check \"not (RECIPE_CREATION_ENABLED or settings.recipe_creation_ena\""
+   }
+  ],
+  [
+   "D-053 · a check lit",
+   {
+    "chip": "lit: 403 · not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) (own guard) · 1 endpoints",
+    "rowsLit": 1,
+    "landsOn": [
+     [
+      null,
+      null,
+      "guards11"
+     ],
+     [
+      "x:81c0e80409",
+      "chk",
+      "not (RECIPE_CREATION_ENABLED or settings.recipe_creation_ena"
+     ]
+    ],
+    "cmSays": "403 · not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) (own guard) · 2 drawn here"
+   }
+  ],
+  [
+   "step 103 · clear-the-check-light",
+   {
+    "click": "clear",
+    "at": [
+     909,
+     401
+    ],
+    "size": [
+     37,
+     19
+    ],
+    "note": "the clear link on the lit chip above the table"
+   }
+  ],
+  [
+   "step 104 · open-get-recipes-from-the-table",
+   {
+    "click": "/recipesGET",
+    "at": [
+     33,
+     1015
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row GET /recipes"
+   }
+  ],
+  [
+   "D-053 · GET /recipes, the endings in time order",
+   {
+    "rows": 22,
+    "table": [
+     "kind stage status what it says its own checks tests",
+     "refusal EDGE 429 Rate limit exceeded. Try again shortly. shared code RateLimitMiddleware 0",
+     "refusal GATE 401 Not authenticated shared code HTTPBearer bearer_scheme 1",
+     "refusal GATE 401 invalid token shared code get_auth_context caller 1",
+     "── checks the fields",
+     "validation INPUT 422 pydantic error type shared code FastAPI 3",
+     "── checks",
+     "refusal HANDLER 400 f\"Invalid allergen_safe code '{allergen_safe}'. Valid: {', '.join(sort allergen_safe is not None and allergen_safe not in allergen",
+     "refusal HANDLER 400 f\"Invalid diet code '{diet}'. Valid: {', '.join(sorted(preference_code diet is not None and diet not in preference_codes() · recip",
+     "refusal HANDLER 400 f\"Invalid technique code '{technique}'. Valid: {', '.join(sorted(curio technique is not None and technique not in curiosity_techni",
+     "refusal HANDLER 400 f\"Invalid mode '{mode}'. Valid: {', '.join(SCORING_MODES)}\" mode is not None and mode not in SCORING_MODES · recipes.py:363 8",
+     "refusal HANDLER 400 f\"Invalid exclude_equipment code '{raw_code}'. Valid: {', '.join(sorte exclude_equipment and norm not in valid_equipment · recipes",
+     "refusal HANDLER 400 f\"Invalid exclude_techniques code '{raw_code}'. Valid: {', '.join(sort exclude_techniques and norm not in valid_techniques · recip",
+     "refusal HANDLER 400 f\"Invalid taste axis '{axis}'. Valid: {', '.join(sorted(valid_axes))}\" taste and axis not in valid_axes · recipes.py:424 8",
+     "── after a call failed — caught at recipes.py:430 (except ValueError)",
+     "refusal HANDLER 400 f\"Invalid taste threshold '{raw_min}' for '{axis}' (expected an intege taste · recipes.py:431 9",
+     "── checks",
+     "refusal HANDLER 400 f\"taste threshold for '{axis}' must be 1-5, got {minimum}.\" taste and not 1 <= minimum <= 5 · recipes.py:436 9",
+     "refusal HANDLER 400 f\"Invalid texture code '{raw_code}'. Valid: {', '.join(sorted(valid_te textures and norm not in valid_textures · recipes.py:453 8",
+     "refusal HANDLER 400 f\"Invalid temperature code '{temperature}'. Valid: {', '.join(sorted(t temperature is not None and temperature not in temperature_",
+     "refusal HANDLER 400 f\"Invalid texture code '{raw_code}'. Valid: {', '.join(sorted(valid_te exclude_textures and norm not in valid_textures · recipes.p",
+     "refusal HANDLER 400 f\"Invalid temperature code '{exclude_temperature}'. Valid: {', '.join( exclude_temperature is not None and exclude_temperature not",
+     "refusal HANDLER 400 f\"Invalid taste axis '{axis}'. Valid: {', '.join(sorted(valid_cap_axes taste_max and axis not in valid_cap_axes · recipes.py:514 8",
+     "── after a call failed — caught at recipes.py:520 (except ValueError)",
+     "refusal HANDLER 400 f\"Invalid taste cap '{raw_max}' for '{axis}' (expected an integer 1-5) taste_max · recipes.py:521 9",
+     "── checks",
+     "refusal HANDLER 400 f\"taste cap for '{axis}' must be 1-5, got {maximum}.\" taste_max and not 1 <= maximum <= 5 · recipes.py:526 9",
+     "success ANSWER 200 19",
+     "uncaught UNCAUGHT 500 0"
+    ]
    }
   ],
   [

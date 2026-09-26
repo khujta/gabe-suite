@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import collections
 import hashlib
+import heapq
 import json
 import os
 import re
@@ -178,6 +179,259 @@ FATES = ("saved", "maybe", "rolled", "unsaved", "after", "none")
 PIECE_WORDS = ("the norm", "common", "rare", "only here")
 LAYOUTS = {"rows": 1, "two": 2, "three": 3}                                      # the page's layouts: endpoints per row
 CAP = 14                                                                         # rows a side-panel list shows before "+n more"
+
+
+# ── 2b · D-053: THE ENDINGS IN THE ORDER THEY HAPPEN ───────────────────────────────────────────────────────────────────
+# One endings table, its rows in TIME order, derived from the paths' chains and never typed. Within a chain every ending it checks
+# (a gate) or ends at (its exit) comes before the ones it checks later; an ending one chain checks twice sits at the first (the
+# stream's 422 is checked before its login dependency and after it). Kahn's order over those edges, a tie broken by the phase the
+# chains show first · the handler line that reaches the ending (one raised inside a call sits at the call's line) · its own line ·
+# its id; the uncaught ending last (it can happen at any moment). A check the feed ties to no ending (`exit: null`) joins the ending its
+# sibling raise of the same class, in the same function reached from the same handler call, is caught into — the class decides which
+# `except` takes a raise, so the two raises share it; a check that cannot be joined stands on a row of its own, among the endings a
+# catch makes of the same call by where each is raised inside it, else at its call site in the handler. INPUT and HANDLER rows carry their MOMENT: the body read or the field check; the handler's own checks, or what
+# follows a call that raised, one group per catch. A failure group NAMES a call only when the feed shows it raising into that catch:
+# the ending's own check inside the call, the call's raise translated into the ending, or a raise of the class the catch takes (any
+# class, for a catch of every error) in a function the feed reaches from that call — a call that merely runs before the catch is not
+# named. Proven below: the order is a linear extension of every chain, every ending sits on one row, every check on one row.
+VIA_CALL = re.compile(r"^call (.+) @ (.+):(\d+)$")
+PRE_HANDLER = {"middleware", "body-parse", "security", "dependency", "validation"}   # the phases before the handler's own code
+NOLINE = 10 ** 9                                                                     # an ending with no line sorts after the lined ones
+BROAD = {"Exception", "BaseException"}                                               # a catch that takes every error
+
+
+def _line(at) -> int | None:
+    m = re.search(r":(\d+)(?:-\d+)?$", str(at or ""))
+    return int(m.group(1)) if m else None
+
+
+def _file(at) -> str:
+    return re.sub(r":\d+(?:-\d+)?$", "", str(at or ""))
+
+
+def _short(at) -> str:
+    """apps/api/api/recipe_creation.py:258 → recipe_creation.py:258"""
+    return str(at or "").rsplit("/", 1)[-1]
+
+
+def time_order(F: dict, fep: dict, fj: dict, ident: dict, EW: dict) -> dict:
+    """{rows: [{x | pre, checks: [precondition index], mom, who}], moms: [[at, class, calls]], paths: [path, in time order],
+    runs: {moment: runs}, notes: [the INPUT facts the info text says]} for one endpoint — see the section head."""
+    lab = ident["label"]
+    E = "endpoint:" + lab
+    X = {x["id"]: x for x in F["exits"]}
+    P = {p["id"]: p for p in F["paths"]}
+    pre = F.get("preconditions") or []
+    frec = {x["id"]: x for x in (fep.get("produced") or []) + (fep.get("framework_exits") or [])}
+    fns = fj.get("functions") or {}
+    # the raises the feed reaches from each handler call site of this endpoint (the kinds arm's functions, joined by root_site)
+    reach = collections.defaultdict(list)
+    for f in fns.values():
+        for rb in f.get("reached_by") or []:
+            if rb.get("root") == E and rb.get("root_site"):
+                reach[rb["root_site"]] += f.get("raises") or []
+    # the phases in the order the chains show them: every step's phase as the chains meet it, then the path's own; a phase no
+    # chain shows falls in after them, in the facts' own phase list
+    seen = []
+    for p in F["paths"]:
+        for ph in [s.get("phase") for s in p["chain"]] + [p.get("phase")]:
+            if ph and ph not in seen:
+                seen.append(ph)
+    seen += [ph for ph in F.get("phases") or [] if ph not in seen]
+    rank = lambda ph: seen.index(ph) if ph in seen else len(seen)
+    for i, g in enumerate(pre):
+        if g.get("exit") is not None and g["exit"] not in X:
+            die(f"{lab}: check {g['id']} names ending {g['exit']}, which is not one of the endpoint's endings")
+    # a check with no ending: joined to the ending its sibling raise is caught into (see the section head), else a row of its own
+    joined = {}
+    for i, g in enumerate(pre):
+        m = VIA_CALL.match(str(g.get("via") or ""))
+        if g.get("exit") is not None or not m:
+            continue
+        site = m.group(2) + ":" + m.group(3)
+        for f in fns.values():
+            r = next((q for q in f.get("raises") or [] if q.get("at") == g.get("at")), None)
+            if r is None or r.get("through") or not any(rb.get("root") == E and rb.get("root_site") == site for rb in f.get("reached_by") or []):
+                continue
+            xs = {t["exit"] for q in f["raises"] if q is not r and q.get("cls") == r.get("cls") for t in q.get("translated_by") or [] if t.get("endpoint") == E}
+            if len(xs) == 1 and next(iter(xs)) in X and X[next(iter(xs))].get("status") == g.get("status"):
+                joined[i] = next(iter(xs))
+    odd = [i for i, g in enumerate(pre) if g.get("exit") is None and i not in joined]
+    for i in odd:
+        m = VIA_CALL.match(str(pre[i].get("via") or ""))
+        if not ((m and m.group(2) == ident.get("file")) or (not pre[i].get("via") and _file(pre[i].get("at")) == ident.get("file"))):
+            die(f"{lab}: check {pre[i]['id']} names no ending and no call site in the handler's file — its moment cannot be read")
+
+    # the moments: INPUT by what FastAPI does · HANDLER by the catch the ending's own path passes after the handler starts (after
+    # the chain's last step of a phase before it), the last one before the ending; a catch a dependency owns never counts
+    deps = set(fj.get("dependencies") or {})
+
+    def catch_of(x):
+        """(the catch, the calls the feed shows raising into it) for one handler ending — see the section head"""
+        got, named = set(), {}
+        for pid in x.get("paths") or []:
+            ch = P[pid]["chain"]
+            lb = max([i for i, s in enumerate(ch) if s.get("phase") in PRE_HANDLER], default=-1)
+            cs = [i for i, s in enumerate(ch) if s["kind"] == "catch" and i > lb]
+            if any(ch[i].get("fn") in deps for i in cs):
+                die(f"{lab} {pid}: a catch after the handler starts belongs to a dependency — the handler's boundary is misread")
+            if not cs:
+                got.add(None)
+                continue
+            ci = cs[-1]
+            c = ch[ci]
+            got.add((c.get("at"), c.get("label")))
+            cf, cl = _file(c.get("at")), _line(c.get("at")) or 0
+            cls = {t.strip() for t in re.split(r"[|,]", str(c.get("label") or "")) if t.strip()}
+            # the calls between the last point the HANDLER decided another ending before the catch (a gate in the catch's file: a gate
+            # inside a callee is part of the call that raised) and the catch, in its file, on a line above it — each named only when
+            # the feed shows it raising into the catch
+            pg = max([i for i in range(ci) if ch[i]["kind"] == "gate" and ch[i].get("ref") in X and ch[i]["ref"] != x["id"]
+                      and _file(ch[i].get("at")) == cf], default=-1)
+            for j in range(pg + 1, ci):
+                s = ch[j]
+                if s["kind"] not in ("call", "collapsed") or _file(s.get("at")) != cf or (_line(s.get("at")) or NOLINE) >= cl:
+                    continue
+                nxt = next((k for k in range(j + 1, ci) if ch[k].get("at") and _file(ch[k].get("at")) == cf), ci)
+                rs = reach.get(s.get("at")) or []
+                if (any(ch[k]["kind"] == "gate" and ch[k].get("ref") == x["id"] for k in range(j + 1, nxt))
+                        or any(t.get("endpoint") == E and t.get("exit") == x["id"] for q in rs for t in q.get("translated_by") or [])
+                        or any(cls & BROAD or q.get("cls") in cls for q in rs)):
+                    named[s.get("label")] = _line(s.get("at"))
+        if len(got) > 1:
+            die(f"{lab} {x['id']}: its paths reach it through different catches {sorted(got, key=str)}")
+        return (next(iter(got)) if got else None), named
+
+    cat = {n: catch_of(x) for n, x in X.items() if x["kind"] != "success" and x.get("phase") == "handler"}
+
+    def key(n):
+        if n in X:
+            x = X[n]
+            ph, via, at = x.get("phase"), x.get("via"), x.get("at")
+        else:
+            g = pre[int(n[1:])]
+            ph, via, at = "handler", g.get("via"), g.get("at")
+        m = VIA_CALL.match(str(via or ""))
+        own = _line(at)
+        site = int(m.group(3)) if m else own
+        if n not in X and m:
+            # a check on a row of its own, raised inside a call: it stands among the endings a catch makes of the SAME call by
+            # where each is raised inside it — just before the first one raised after it, else just after the last one before it
+            sib = sorted((_line((frec.get(y) or {}).get("raised_at")), y) for y, c in cat.items() if c[0] and int(m.group(3)) in c[1].values()
+                         and _file((frec.get(y) or {}).get("raised_at")) == _file(at) and _line((frec.get(y) or {}).get("raised_at")))
+            nxt = [y for ln, y in sib if ln > (own or 0)]
+            if nxt:
+                return key(nxt[0])[:3] + (n,)                       # "#…" sorts before the ending's own id
+            if sib:
+                return key(sib[-1][1])[:3] + ("~" + n,)            # "~…" sorts after it
+        return (rank(ph), NOLINE if site is None else site, NOLINE if own is None else own, n)
+
+    # precedence: every chain's endings in the order it meets them (first meeting), each before the next
+    chains, succ = [], collections.defaultdict(set)
+    for p in F["paths"]:
+        refs = list(dict.fromkeys(s["ref"] for s in p["chain"] if s["kind"] in ("gate", "exit") and s.get("ref") in X))
+        chains.append((p["id"], refs))
+        for a, b in zip(refs, refs[1:]):
+            succ[a].add(b)
+    nodes = list(X) + ["#" + str(i) for i in odd]
+    unc = sorted((n for n in X if X[n]["kind"] == "uncaught"), key=key)
+    indeg = collections.Counter(b for a in succ for b in succ[a])
+    heap = [(key(n), n) for n in nodes if not indeg[n] and n not in unc]
+    heapq.heapify(heap)
+    order = []
+    while heap:
+        _k, n = heapq.heappop(heap)
+        order.append(n)
+        for b in sorted(succ.get(n) or ()):
+            indeg[b] -= 1
+            if not indeg[b] and b not in unc:
+                heapq.heappush(heap, (key(b), b))
+    order += unc
+    # PROOF: every ending once, every check-only row once, and every chain's order kept
+    if sorted(order) != sorted(nodes) or len(set(order)) != len(order):
+        die(f"{lab}: the time order does not hold every ending once — the chains order the endings in a circle: {sorted(set(nodes) - set(order))}")
+    pos = {n: i for i, n in enumerate(order)}
+    for pid, refs in chains:
+        if any(pos[a] >= pos[b] for a, b in zip(refs, refs[1:])):
+            die(f"{lab} {pid}: the time order breaks the chain's own order of its endings")
+
+    moms, mom_of = [], {}
+    rows = []
+    at_of = {}
+    for i, g in enumerate(pre):
+        if g.get("exit") is not None or i in joined:
+            at_of.setdefault(g.get("exit") or joined[i], []).append(i)
+    ckey = lambda i: ((lambda m: int(m.group(3)) if m else (_line(pre[i].get("at")) or NOLINE))(VIA_CALL.match(str(pre[i].get("via") or ""))),
+                      _line(pre[i].get("at")) or NOLINE, i)      # the checks on one row, in the order they run
+    for n in order:
+        if n not in X:
+            gi = int(n[1:])
+            m = VIA_CALL.match(str(pre[gi].get("via") or ""))
+            rows.append({"x": None, "pre": pre[gi], "checks": [gi], "mom": "unplaced", "who": None, "id": pre[gi]["id"],
+                         "call": m.group(1) if m else None})
+            continue
+        x = X[n]
+        st = "ANSWER" if x["kind"] == "success" else PHASE_STAGE[x["phase"]]
+        mom = None
+        if st == "INPUT":
+            mom = {"body-parse": "body", "validation": "fields"}[x["phase"]]
+        elif st == "HANDLER":
+            c, named = cat[n]
+            if c is None:
+                mom = "checks"
+            else:
+                if c not in mom_of:
+                    mom_of[c] = len(moms)
+                    moms.append([_short(c[0]), c[1], {}])
+                mom = mom_of[c]
+                moms[mom][2].update(named)
+        checks = sorted(at_of.get(n, []), key=ckey)
+        # who decides an ending shared code makes — a check a dependency carries is the dependency's, not the endpoint's own
+        who = None
+        if x["kind"] not in ("success", "uncaught") and x.get("phase") in PRE_HANDLER:
+            fr = frec.get(n) or {}
+            ph = x["phase"]
+            dep = fr.get("dep") or next((pre[i].get("dep") for i in checks if pre[i].get("dep")), None)
+            if dep:
+                who = [dep.split("::")[-1], "fn:" + dep, None]
+            elif ph in ("body-parse", "validation"):
+                fw = (fj.get("framework") or {}).get("name")
+                if fw not in (EW.get("frameworks") or {}):
+                    die(f"{lab} {n}: FastAPI decides this ending, and the words file names no framework {fw!r}")
+                who = [EW["frameworks"][fw], None, fr.get("source")]
+            else:
+                w = fr.get("via") or (_short(_file(fr.get("at"))) if fr.get("at") else None)
+                who = [w, None, None] if w else None
+            if not who:
+                die(f"{lab} {n}: an ending shared code decides, and the feed names no one who decides it")
+        rows.append({"x": x, "pre": None, "checks": checks, "mom": mom, "who": who, "id": n})
+    for g in moms:                                                  # the calls a group names, in the order the handler makes them
+        g[2] = [c for c, _ln in sorted(g[2].items(), key=lambda kv: (kv[1] or NOLINE, kv[0]))]
+    # PROOF: every check sits on exactly one row
+    placed = collections.Counter(i for r in rows for i in r["checks"])
+    if sorted(placed) != list(range(len(pre))) or any(v != 1 for v in placed.values()):
+        die(f"{lab}: {len(pre)} checks, placed {dict(placed)} — every check must sit on exactly one row")
+    # the runs: a moment's rows are contiguous in time or they are drawn as several runs, never reordered
+    runs, prev = collections.Counter(), object()
+    for r in rows:
+        if r["mom"] is not None and r["mom"] != prev:
+            runs[r["mom"]] += 1
+        prev = r["mom"]
+    # what the info text says about INPUT, from these rows: the stage reads INPUT in two runs (FastAPI reads the body before the
+    # login check and checks the fields after it) · a field check stands above a GATE row, which only a dependency's own
+    # parameters explain (FastAPI checks them before it runs the dependency) — proven from the chains, else the build stops
+    stg = [("ANSWER" if r["x"]["kind"] == "success" else PHASE_STAGE[r["x"]["phase"]]) if r["x"] else None for r in rows]
+    in_runs = sum(1 for i, s2 in enumerate(stg) if s2 == "INPUT" and (i == 0 or stg[i - 1] != "INPUT"))
+    fld = [i for i, r in enumerate(rows) if r["mom"] == "fields"]
+    gat = [i for i, s2 in enumerate(stg) if s2 == "GATE"]
+    first = bool(fld and gat and min(fld) < max(gat))
+    if first and not any(s.get("split") == "dependency-params" for p in fep.get("paths") or [] for s in p.get("chain") or []
+                         if s.get("kind") == "gate" and s.get("phase") == "validation"):
+        die(f"{lab}: a field check stands above the login check, and no chain checks a dependency's own parameters — the info text would not hold")
+    notes = [k for k, on in (("twice", in_runs >= 2), ("first", first), ("unplaced", bool(odd))) if on]
+    # each path's fate follows its ending's place in time (paths to one ending keep the facts' order)
+    paths = sorted(F["paths"], key=lambda p: (pos.get((p.get("exit") or {}).get("id"), len(pos)), F["paths"].index(p)))
+    return {"rows": rows, "moms": moms, "paths": paths, "runs": dict(runs), "notes": notes, "joined": len(joined)}
 
 
 def run_facts(target: str, forms: Path, archmap: Path, tmp: Path, cache: Path | None, key: str) -> dict:
@@ -436,13 +690,24 @@ def distill(L: dict, fj: dict, W: dict) -> dict:
     fsw = {w.get("id"): w for w in ((fep or {}).get("switches") or [])}
     def cap(xs):
         return {"items": xs[:CAP], "more": max(0, len(xs) - CAP)}
+    TO = time_order(F, fep, fj, ident, W["endings"])                    # D-053: the endings in the order they happen
+    says = lambda x: (x.get("detail") or x.get("code") or x.get("via") or x.get("reason") or "")[:70]
+    def place(g):                                                       # where a check stands: the handler's call it sits in, else its own line
+        m = VIA_CALL.match(str(g.get("via") or ""))
+        return f"{m.group(1)} @ {_short(m.group(2))}:{m.group(3)}" if m else _short(g.get("at"))
     det = {
-        "exits": cap([[x["kind"], stage_of(x), x.get("status"), (x.get("detail") or x.get("code") or x.get("via") or x.get("reason") or "")[:70],
-                       len(x.get("tests") or [])] for x in exits]),
+        # D-053: ONE endings table, every ending in time order and never capped (a cap would cut the end of the story), each own
+        # check on its ending's row (xd.exits says which), a check the feed ties to no ending on a row of its own:
+        # [kind, stage, status, what it says, tests, who decides it when shared code does] · moms: [catch at, class caught, calls]
+        "exits": {"items": [[x["kind"], stage_of(x), x.get("status"), says(x), len(x.get("tests") or []), (t["who"] or [None])[0]] if x
+                            else [None, None, t["pre"].get("status"), None, None, None] for t in TO["rows"] for x in [t["x"]]],
+                  "more": 0, "moms": TO["moms"]},
         "tables": cap([[t["table"], t["rw"]] for t in tables]),
-        "fates": cap([[p["names"]["drawn"], p.get("status"), fate_of(p, after_all[p["id"]])] for p in F["paths"]]),
+        # each path's fate, in the endings' time order and never capped either: the two lists end at the same place (D-053)
+        "fates": {"items": [[p["names"]["drawn"], p.get("status"), fate_of(p, after_all[p["id"]])] for p in TO["paths"]], "more": 0},
         "gateWrites": sorted(gate_only),
-        "guards": cap([[g.get("status"), (g.get("pred") or "")[:80]] for g in (F.get("preconditions") or [])]),
+        # every check, drawn on its ending's row (so never capped either): [status, its condition, where it stands]
+        "guards": {"items": [[g.get("status"), (g.get("pred") or "")[:80], place(g)] for g in pre], "more": 0},
         "gates": [g.get("name") for g in ((F.get("auth") or {}).get("gates") or [])],
         "limits": [[str(l.get("limiter") or "").lstrip("_"), next((a.get("value") for a in (l.get("args") or []) if a.get("param") == "limit"), None),
                     next((a.get("value") for a in (l.get("args") or []) if a.get("param") == "window_seconds"), None)] for l in ((F.get("rate") or {}).get("limits") or [])],
@@ -477,7 +742,13 @@ def distill(L: dict, fj: dict, W: dict) -> dict:
             # D-043: what the code map's chips need beside the detail lists, parallel to their items — kept OUT of `d`, so the words
             # the gaps are read against (every string `d` holds) do not move: each path's kind of ending, and each piece's family and
             # value from its key (a status, a method or a switch kind in a piece's own sentence is drawn as its chip)
-            "xd": {"fates": [p["kind"] for p in F["paths"]][:CAP],
+            # D-053: per endings row [its moment, the checks on it (indices into d.guards), the ending's id — or the check's, on a row
+            # of its own —, the framework's own code for it (the hover), the call a check of its own row sits inside]; `en` the INPUT
+            # facts the info text says for this endpoint; kept out of `d` like the rest of xd: the moment words are the words file's
+            "_to": TO,
+            "xd": {"exits": [[t["mom"], t["checks"], t["id"], (t["who"] or [None, None, None])[2], t.get("call")] for t in TO["rows"]],
+                   "en": TO["notes"],
+                   "fates": [p["kind"] for p in TO["paths"]],
                    "pieces": [[x.get("family"), (x.get("key") or "").split(":", 1)[-1]] for x in pc["rows"] if x["word"] in ("rare", "only here")][:CAP],
                    "lacks": [[x.get("family"), (x.get("key") or "").split(":", 1)[-1]] for x in pc["missing_norms"]]}}
 
@@ -642,11 +913,15 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
     for p in prow:
         lab("piece:" + p["key"], p["words"])
     cap = lambda xs: xs[:CAP]
-    dk = {"exits": [[stat(x.get("status")), sorted({"case:" + t["case"] for t in x.get("tests") or [] if t.get("case")})] for x in cap(exits)],
+    TO = r["_to"]
+    # D-053: the endings rows in time order, uncapped — [the status, the cases its tests are, who decides it when shared code does];
+    # a check's own row keys its status as the check's list did
+    dk = {"exits": [[stat(x.get("status")), sorted({"case:" + t["case"] for t in x.get("tests") or [] if t.get("case")}), (t0["who"] or [None, None])[1]] if x
+                     else [stat(t0["pre"].get("status")), [], None] for t0 in TO["rows"] for x in [t0["x"]]],
           "tables": ["table:" + t["table"] for t in cap(L["data"]["tables"])],
           "gateWrites": ["table:" + t for t in d["gateWrites"]],
-          "fates": [stat(p.get("status")) for p in cap(F["paths"])],
-          "guards": [["guard:" + g["id"], ks, stat(g.get("status"))] for g, ks in cap(list(zip(pre, gk)))],
+          "fates": [stat(p.get("status")) for p in TO["paths"]],
+          "guards": [["guard:" + g["id"], ks, stat(g.get("status"))] for g, ks in zip(pre, gk)],
           "gates": [fkey(g.get("fn")) for g in au.get("gates") or []],
           "limits": ["limiter:" + n for n in lims],
           "request": tkey((d.get("request") or [None])[0]), "response": tkey((d.get("response") or [None])[0]),
@@ -979,6 +1254,16 @@ def build(argv: list) -> tuple:
             die(f"rail {r_id}: its default {R.get('pick')!r} is not one of its options")
         if "ruled" in R and not re.fullmatch(r"D-\d{3}", str(R["ruled"])):
             die(f"rail {r_id}: `ruled` must name the ruling (D-nnn), not {R['ruled']!r}")
+    # D-053's two looks (D-025.2): each default one of its options; every moment a row can carry has its words; a field drawn inside
+    # another pair names a pair the code map draws
+    for o_id, O in W["endings"]["opt"].items():
+        if O.get("pick") not in (O.get("opts") or {}):
+            die(f"endings.opt.{o_id}: its default {O.get('pick')!r} is not one of its options")
+    if sorted(W["endings"]["mom"]) != sorted(("body", "fields", "checks", "failed", "unplaced")):
+        die(f"endings.mom names {sorted(W['endings']['mom'])}, not the moments a row can carry")
+    for k, x in W["codemap"]["details"].items():
+        if x.get("in") and (x["in"] not in W["codemap"]["details"] or W["codemap"]["details"][x["in"]].get("in")):
+            die(f"codemap.details.{k}: it is drawn inside {x['in']!r}, which is not a pair the code map draws")
     blocks = [{"key": b["key"], "sig": b["sig"], "name": b["name"], "plain": b["plain"], "kind": b["join"]["kind"], "act": (b["join"].get("act") or {}).get("kind") or "none",
                "surface": b["join"].get("surface_key") or "none", "surfaceWords": b["join"].get("surface")} for b in sm["blocks"]]
     # every attribute id the words file ties to a universe row or a code-map pair is a row of the ruled tree AND of the inventory
@@ -994,8 +1279,15 @@ def build(argv: list) -> tuple:
     # D-042: why the code map lacks a lit element — read from each row's keys and ONE authored table (my proposal), checked here
     FLD = UNI.cm_fields(cols, CM)
     UNI.cm_reasons(rows, facts, UNI.why_table(W, A, inv, FLD, W["el"]["kinds"]), A, FLD, bool(only))
+    # D-053's counts, said in the build line: endings placed · checks on their ending's row · checks on a row of their own · failure
+    # groups (one per catch per endpoint) · endpoints whose moments come in several runs · the longest endings table
+    d53 = collections.Counter()
     for r in rows:
-        r.pop("_cd"); r.pop("_cv")
+        r.pop("_cd"); r.pop("_cv"); TO = r.pop("_to")
+        d53["endings"] += sum(1 for t in TO["rows"] if t["x"]); d53["checks"] += sum(len(t["checks"]) for t in TO["rows"] if t["x"])
+        d53["alone"] += sum(1 for t in TO["rows"] if not t["x"]); d53["groups"] += len(TO["moms"])
+        d53["runs"] += any(n > 1 for n in TO["runs"].values()); d53["rows"] = max(d53["rows"], len(TO["rows"]))
+        d53["joined"] += TO["joined"]; d53["named"] += sum(1 for g in TO["moms"] if g[2])
     order = list(A)
     for r in rows:
         r["has"] = UNI.carried(r, cols, CM)
@@ -1078,7 +1370,10 @@ def build(argv: list) -> tuple:
             die("template marker missing: " + mark)
         html = html.replace(mark, val)
     summary = (f"{out.name} · {tok['app']} @ {head} · {len(rows)} of {len(keys)} endpoints · {len(cols)} columns ({tok['nR3']} rated {tok['rTop']}) "
-               f"under {len(blocks)} blocks · alarm families {len(families)} · forms {tok['formsSha']} · {len(html)} bytes")
+               f"under {len(blocks)} blocks · alarm families {len(families)} · forms {tok['formsSha']} · {len(html)} bytes"
+               f"\nD-053 · {d53['endings']} endings in time order · {d53['checks']} checks on their ending's row ({d53['joined']} joined by the class"
+               f" their sibling raise is caught by), {d53['alone']} on a row of their own · {d53['named']} of the failure groups name what raised"
+               f" · {d53['groups']} failure groups · {d53['runs']} endpoints whose moments come in several runs · longest table {d53['rows']} rows")
     return html, summary, out, check
 
 

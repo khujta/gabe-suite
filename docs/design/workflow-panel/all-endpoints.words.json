@@ -30,7 +30,11 @@
     "names",
     "name",
     "place",
-    "dir"
+    "dir",
+    "calls",
+    "at",
+    "cls",
+    "call"
   ],
   "eyebrow": "every endpoint of one app, side by side",
   "h1": "All {nRows} endpoints of {app}, one row each",
@@ -601,6 +605,75 @@
     "copied": "copied",
     "gateWrites": "the login check writes"
   },
+  "endings": {
+    "_about": "D-053: the endings and the endpoint's own checks as ONE table, its rows in the order they happen, derived from the paths' chains. The moments and the two options are my picks where the ruling left the look open (D-025.2).",
+    "plain": "The endings in the order they happen, read off the paths' chains: on every path an ending it checks earlier stands above one it checks later, and an ending a path checks twice stands where it is first checked. Where no path orders a pair of endings, the stage the chains show first comes first, then the handler line that reaches the ending (one raised inside a call stands at the line of that call), then its own line. The uncaught ending stands last: an error nobody catches can escape at any moment, so it has no place of its own in time.",
+    "plainInput": "INPUT appears twice here. FastAPI reads the body before the login check runs, so a body it cannot read ends above the gate; it checks the endpoint's own fields after the login check, so a field that does not fit ends below it.",
+    "plainInputFirst": "Here a field check stands above the login check: FastAPI checks a dependency's own parameters before it runs that dependency, and does not run it when one does not fit. The endpoint's own fields are checked after the login check; an ending checked at both moments stands where it is first checked.",
+    "plainChecks": "Each of the endpoint's own checks stands on the row of the ending it produces. A row that shared code decides (the app band, the login check, FastAPI) names who decides it, drawn apart: it is not a check the endpoint wrote, and a check a dependency makes is drawn muted beside it. A success carries no check, because it is what is left when every check passed; an uncaught ending carries none either, because no check makes it. The handler's rows split into the moments they happen at: its own checks, and what follows when a call it made raised, one group for each catch that caught it. A group names the calls that raise into its catch; a call that only runs before the catch is not named, and a group that names none still says where the error was caught.",
+    "plainUnplaced": "A row that starts with a check inside a call holds a check whose ending the map does not name; it stands at the line where the handler makes that call.",
+    "shared": "shared code",
+    "sharedPlain": "Decided by code the endpoint shares with others, not by a check of its own.",
+    "sharedSource": "In the framework's own code: {at}",
+    "frameworks": {
+      "fastapi": "FastAPI"
+    },
+    "unplaced": "a check inside {call}",
+    "caught": "{calls} raised — caught at {at} (except {cls})",
+    "caughtBare": "caught at {at} (except {cls})",
+    "mom": {
+      "body": {
+        "name": "reads the body",
+        "plain": "FastAPI reads the request's body before any dependency runs; a body it cannot read ends here."
+      },
+      "fields": {
+        "name": "checks the fields",
+        "plain": "FastAPI checks the parameters and the body's fields against their types; a value that does not fit ends here. It checks a dependency's own parameters before it runs that dependency, and the endpoint's own after every dependency has run."
+      },
+      "checks": {
+        "name": "checks",
+        "plain": "The handler's own checks, in the order its code runs them."
+      },
+      "failed": {
+        "name": "after a call failed",
+        "plain": "The handler called something that raised; its catch turned the error into these endings."
+      },
+      "unplaced": {
+        "name": "a check inside a call",
+        "plain": "A check the handler reaches inside a call it makes; it stands at the line of that call."
+      }
+    },
+    "opt": {
+      "mom": {
+        "label": "the moments",
+        "pick": "rows",
+        "opts": {
+          "rows": {
+            "name": "moments as header rows",
+            "plain": "A header row names each run of rows that happen at one moment."
+          },
+          "chip": {
+            "name": "moments inside the stage chip",
+            "plain": "Each row's stage chip carries its moment as a word; no header rows."
+          }
+        }
+      },
+      "chk": {
+        "label": "the checks",
+        "pick": "col",
+        "opts": {
+          "col": {
+            "name": "the check as its own column",
+            "plain": "Each row's own check, or who decides it, in a column of its own."
+          },
+          "line": {
+            "name": "the check as a line under the ending's words",
+            "plain": "Each row's own check, or who decides it, as a line under what the ending says."
+          }
+        }
+      }
+    }
+  },
   "more": {
     "show": "Show how the map knows this",
     "hide": "Hide it again",
@@ -841,7 +914,8 @@
           "own-guards",
           "the-predicate-per-decision-point"
         ],
-        "icon": "shield"
+        "icon": "shield",
+        "in": "exits"
       },
       "gates": {
         "attrs": [
