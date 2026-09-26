@@ -385,15 +385,20 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
      line — the one rail on the copy text he has not ruled; everything else must be his paste, line for line and in order */
   // CHANGED 2026-09-23 (D-036): the page always shows one endpoint below the table, and the copy text names it on its own line
   // (the first row on a cold start) — set aside beside the Shared treatment's line; his paste is still compared line for line
+  // CHANGED 2026-09-26 (his ask): the copy text also carries the code map's settings and BY MOMENT's, each on its own line after the
+  // endpoint's (the code map's two looks, BY MOMENT's two looks, the path) — set aside too; his paste is still compared line for line
   const CL = W8.copy.lines, isSlook = (l) => l.startsWith(CL.slook + ': '), isEp = (l) => l.startsWith(CL.open + ': ');
-  const asPaste = (out) => { const blk = out.slice(0, out.indexOf('')), his = blk.filter((l) => !isSlook(l) && !isEp(l));
+  const isSet = (l) => l.startsWith(CL.cm + ' · ') || l.startsWith(CL.mo + ' · ');
+  const asPaste = (out) => { const blk = out.slice(0, out.indexOf('')), his = blk.filter((l) => !isSlook(l) && !isEp(l) && !isSet(l));
     return { blk, his, same: his.length === paste.length && his[0] === 'page: all-endpoints · ' + D.tok.app + ' @ ' + D.tok.head && JSON.stringify(his.slice(1)) === JSON.stringify(paste.slice(1)) }; };
   await open(PAGE);
   const c0 = await cold(), a0 = asPaste(c0.out);
   ok(a0.same, 'a cold start\'s copy text is his paste line for line, with the Shared treatment\'s and the endpoint\'s lines set aside', { page: a0.his, his: paste });
   const sl = a0.blk.filter(isSlook), colsAt = a0.blk.findIndex((l) => l.startsWith(CL.cols + ': ')), el0 = a0.blk.filter(isEp);
   ok(sl.length === 1 && a0.blk.indexOf(sl[0]) === colsAt + 1, 'the copy text puts the Shared treatment\'s line right under the columns line', a0.blk);
-  ok(el0.length === 1 && a0.blk.length === paste.length + 2 && a0.blk[a0.blk.length - 1] === el0[0], 'the copy text adds one more line, the endpoint shown, last', a0.blk);
+  const set0 = a0.blk.filter(isSet);
+  ok(el0.length === 1 && set0.length === 5 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-6)) === JSON.stringify([el0[0]].concat(set0)),
+    'the copy text adds the endpoint shown, then the code map\'s and BY MOMENT\'s settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
   const OLD = { lay: 'three', grp: 'method', alone: 'own', gord: 'name', shared: 'first', bord: 'card', cols: 'top', heat: 'plain', norm: 'full', sort: { col: 'tables', dir: -1 } };
@@ -543,7 +548,8 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
   const W9 = D.words, slug9 = require(path.join(HERE, '_ep-slug.js')).slug;
   /* the page's sections, in order: the endpoints, one endpoint, the copy text, and more information LAST */
   const secs = await p.evaluate(() => [...document.querySelectorAll('section')].map((s) => s.id));
-  ok(JSON.stringify(secs) === JSON.stringify(['sec-board', 'sec-one', 'sec-copy', 'sec-more']), 'the page is the endpoints, then one endpoint, then the copy text, then more information', secs);
+  /* CHANGED 2026-09-26 (his ask): BY MOMENT stands right after ONE ENDPOINT, the endpoint it follows */
+  ok(JSON.stringify(secs) === JSON.stringify(['sec-board', 'sec-one', 'sec-mo', 'sec-copy', 'sec-more']), 'the page is the endpoints, then one endpoint, then by moment, then the copy text, then more information', secs);
   ok(await p.evaluate(() => { const m = document.getElementById('sec-more'), all = [...document.querySelectorAll('.artifact-page *')];
     return all.filter((x) => x.offsetParent !== null && !m.contains(x) && (m.compareDocumentPosition(x) & Node.DOCUMENT_POSITION_FOLLOWING)).length === 0; }), 'nothing on the page is drawn after more information');
   /* a cold start shows the first row drawn */
@@ -1184,6 +1190,148 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
     'D-053 · a check a dependency makes sits on its GATE row under the dependency that makes it, muted; every INPUT row on every endpoint names FastAPI, its own code in the hover', { dep15, allIn });
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-041 checks', errs);
+
+/* 14 · BY MOMENT (his ask 2026-09-26) and the code map's copy button. Real clicks. On POST /recipe-creation/gustify:
+   (a) the code map's copy button (beside its options) copies the page, the endpoint, every option of the code map with its value and
+       whose pick it is, then "your words:" — read off a stubbed clipboard; the page's own copy text carries the same option lines;
+   (b) the moments read top to bottom as recomputed HERE from forms.json: the fixed ones, then the handler's runs by line — its own checks
+       (their lines, a check inside a call at the call's line), the work (the chain's calls after them and before the catch), the catch
+       the handler's failures pass (with the call its except body makes), the handler's own commit — then the answer, after it, escapes;
+   (c) the columns are the blocks in the page's block order, less Overview and risk, which stands in the band with its reason; the Endings
+       column holds D-053's endings in the code map's own order, and the catch's row holds exactly its group's eight;
+   (d) the path to the 403 keeps the moments its chain passes (recomputed from its chain here) and fewer chips, the 403 among them and
+       no 402; all paths brings every moment back;
+   (e) both looks switch, are remembered across a reload, my picks dashed on a cold start, and come back;
+   (f) a chip clicked in the matrix lights everywhere: the table rows that hold it, and its outline here; every chip whose element the
+       station draws wears the station's glyph (D-052);
+   (g) the review's fixes, read back: the matrix fits its box at this width in both looks, no chip cut; the path picker groups the
+       endings under the moment each leaves at, in time order, two of one status there told apart by their own words; a test proving
+       two endings of one status says it; the untimed block says "no time" with its reason behind the info toggle; POST /setup/complete
+       draws the login dependency's read at the dependencies AND the handler's own read at the work, and the path to its 422 does not
+       pass the work (recomputed from the feed: each occurrence's `dependency`); GET /healthz offers no path to the 429 no path ends
+       at and puts it in the band, on no path. */
+{ const fillW = (s, x) => String(s).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  const E14 = 'POST /recipe-creation/gustify', FE = FJ.endpoints['endpoint:' + E14], MW = D.words.mo, EW = D.words.endings, CL = D.words.copy.lines;
+  await open(PAGE); await p.click('#board tr.row[data-ep="' + E14 + '"] td.id'); await p.waitForTimeout(120);
+  /* (a) the code map's copy */
+  await p.evaluate(() => { window.__copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (s) => { window.__copied = s; return Promise.resolve(); } } }); });
+  await p.$eval('#cmcopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#cmcopy'); await p.waitForTimeout(80);
+  const optL = (R, v) => R.label + ': ' + R.opts[v].name + ' (' + (v === R.pick ? D.words.copy.pick : D.words.copy.his) + ')';
+  const wantCopy = [CL.page + ': all-endpoints · ' + D.tok.app + ' @ ' + D.tok.head, CL.open + ': ' + E14, CL.cm + ' · ' + optL(EW.opt.mom, 'rows'), CL.cm + ' · ' + optL(EW.opt.chk, 'col'), '', CL.your, ''].join('\n');
+  const got14 = await p.evaluate(() => window.__copied);
+  ok(got14 === wantCopy, 'the code map\'s copy button copies the page, the endpoint, each of its options with whose pick it is, then room for your words', got14);
+  await p.click('#ocol-cm .opt[data-eopt="chk"][data-v="line"]'); await p.waitForTimeout(80); await p.click('#cmcopy'); await p.waitForTimeout(80);
+  const got14b = await p.evaluate(() => window.__copied), out14 = await p.$eval('#out', (e) => e.value);
+  ok(got14b && got14b.includes(CL.cm + ' · ' + optL(EW.opt.chk, 'line')) && out14.includes(CL.cm + ' · ' + optL(EW.opt.chk, 'line')) && out14.includes(CL.mo + ' · ' + optL(MW.opt.lay, 'rows'))
+     && out14.includes(CL.mo + ' · ' + CL.path + ': ' + MW.path.all), 'an option he changed is copied as his choice, and the page\'s copy text carries the code map\'s and BY MOMENT\'s settings', got14b);
+  await p.click('#ocol-cm .opt[data-eopt="chk"][data-v="col"]'); await p.waitForTimeout(80);
+  /* (b) the moments in time order, recomputed from the feed */
+  const H = FE.handler, HF = FE.file, L14 = (at) => +((String(at || '').match(/:(\d+)$/) || [])[1] || 0), inF = (at) => String(at || '').replace(/:\d+$/, '') === HF;
+  const cat = (FE.failure.catches || []).find((c) => c.fn === H), cL = L14(cat.at);
+  const own = (g) => { const m = /^call .+ @ (.+):(\d+)$/.exec(g.via || ''); return m ? (m[1] === HF ? +m[2] : 0) : (inF(g.at) ? L14(g.at) : 0); };
+  const chk = (FE.preconditions || []).map(own).filter((q) => q && q < cL), work = [...new Set(FE.paths.flatMap((q) => q.chain).filter((s) => (s.kind === 'collapsed' || s.kind === 'call') && inF(s.at)).map((s) => L14(s.at)))].filter((q) => q > Math.max(...chk) && q < cL);
+  const failL = [cL].concat((cat.actions || []).filter((a) => a.op === 'call').map((a) => a.at)), save = Object.values(STEPS).filter((s) => s.fn === H && s.op === 'commit').map((s) => L14(s.at));
+  const span = (qs) => fillW(Math.min(...qs) === Math.max(...qs) ? MW.line : MW.lines, { lo: Math.min(...qs), hi: Math.max(...qs) });
+  const want14 = [['start'], ['send'], ['edge'], ['body'], ['gate'], ['fields'], ['checks', span(chk)], ['work', span(work)], ['fail', span(failL)], ['save', span(save)], ['answer'], ['after'], ['uncaught']];
+  const readM = () => p.evaluate(() => { const t = document.querySelector('#mogrid table.motab'); return { lay: t.getAttribute('data-lay'), cell: t.getAttribute('data-cell'),
+    rows: [...t.querySelectorAll('tbody tr')].map((tr) => { const h = tr.querySelector('th.mom'); return h ? [h.getAttribute('data-mom'), (h.querySelector('.ml') || {}).textContent || null] : [tr.getAttribute('data-f')]; }),
+    heads: [...t.querySelectorAll('thead th[data-block]')].map((h) => h.textContent.trim()), momHeads: [...t.querySelectorAll('thead th.mom')].map((h) => h.getAttribute('data-mom')),
+    ends: [...t.querySelectorAll('tbody tr')].map((tr) => [...tr.querySelectorAll('td[data-f="end"] .vc-status')].map((c) => c.textContent)),
+    chips: t.querySelectorAll('.mc').length, counts: t.querySelectorAll('.mcount').length,
+    band: [...document.querySelectorAll('#moband .mbb')].map((b) => [b.getAttribute('data-f'), b.textContent.slice(0, 80)]),
+    squares: [...document.querySelectorAll('#mobar .opt[data-mopt]')].map((o) => [o.getAttribute('data-mopt'), o.getAttribute('data-v'), o.getAttribute('aria-checked'), getComputedStyle(o).borderTopStyle]) }; });
+  await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' })); await p.waitForTimeout(60);
+  const m0 = await readM(), rowsW = m0.rows.map((r) => r[1] ? r : [r[0]]);
+  ok(JSON.stringify(rowsW) === JSON.stringify(want14.map((w) => (w[1] ? w : [w[0]]))), 'BY MOMENT · ' + E14 + ' · the moments read top to bottom as the feed has them: before any request, the screen, the edge, the body, the login, the fields, then the handler\'s checks (' + span(chk) + '), the work (' + span(work) + '), the catch (' + span(failL) + '), saving (' + span(save) + '), the answer, after it, escapes', { page: m0.rows, want: want14 });
+  /* (c) the columns, the band, the Endings column against the code map's own endings table */
+  const byB = {}; Object.entries(D.mo.fam).forEach(([f, b0]) => { byB[b0] = f; }); const ov = D.blocks.find((b0) => byB[b0.key] === 'over');
+  const wantHeads = D.orders[D.words.rail.bord.pick].filter((k) => k !== ov.key).map((k) => D.blocks.find((b0) => b0.key === k).name);
+  const cmEnds = await p.$$eval('#ocol-cm .pair[data-k="d:exits"] table.etab tr.erow .vc-status', (cs) => cs.map((c) => c.textContent));
+  const failRow = m0.rows.findIndex((r) => r[0] === 'fail'), grp = ROW[E14].xd.exits.map((x, i) => [x, ROW[E14].d.exits.items[i]]).filter(([x]) => typeof x[0] === 'number').map(([, e]) => String(e[2]));
+  ok(JSON.stringify(m0.heads) === JSON.stringify(wantHeads) && m0.band.some(([f, t]) => f === 'over' && t.includes(ov.name) && t.includes(MW.band.untimed.over.slice(0, 30)))
+     && JSON.stringify(m0.ends.flat()) === JSON.stringify(cmEnds) && JSON.stringify(m0.ends[failRow]) === JSON.stringify(grp) && grp.length === 8,
+    'BY MOMENT · the columns are the blocks in the page\'s order less Overview and risk, which stands in the band with its reason; the Endings column is the code map\'s endings in its own order, the catch\'s row its eight', { heads: m0.heads, want: wantHeads, ends: m0.ends.flat().length, cm: cmEnds.length, fail: m0.ends[failRow] });
+  /* (d) the path to the 403: the moments its chain passes, recomputed from that chain; fewer chips; the 403 there, no 402 */
+  const X403 = (FE.produced || []).find((x) => x.status === 403), P403 = FE.paths.find((q) => q.exit.id === X403.id);
+  const PH = { middleware: 'edge', 'body-parse': 'body', security: 'gate', dependency: 'gate', validation: 'fields', handler: 'checks' };
+  const want403 = ['start', 'send', ...new Set(P403.chain.map((s) => PH[s.phase]).filter(Boolean)), 'after'];
+  const i403 = ROW[E14].mo.ex.findIndex((x) => x[0] === X403.id);
+  await p.click('#mobar .mopath[data-path="' + i403 + '"]'); await p.waitForTimeout(100);
+  const m1 = await readM();
+  ok(JSON.stringify(m1.rows.map((r) => r[0])) === JSON.stringify(want403) && m1.chips < m0.chips && m1.ends.flat().includes('403') && !m1.ends.flat().includes('402')
+     && await p.$eval('#mobar .mopath[data-path="' + i403 + '"]', (e) => e.getAttribute('aria-checked')) === 'true',
+    'BY MOMENT · the path to the 403 keeps only the moments its chain passes (' + want403.join(' · ') + ') and fewer chips — the 403 among them, no 402', { rows: m1.rows.map((r) => r[0]), chips: [m1.chips, m0.chips] });
+  await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(100);
+  const m2 = await readM();
+  ok(JSON.stringify(m2.rows) === JSON.stringify(m0.rows) && m2.chips === m0.chips, 'BY MOMENT · all paths brings every moment and every chip back', [m2.rows.length, m2.chips]);
+  /* (e) the two looks: my picks pressed and dashed on a cold start; each switches the grid; both remembered; back to my picks */
+  const pk = (g) => MW.opt[g].pick;
+  ok(m0.lay === 'rows' && m0.cell === 'chips' && m0.squares.length === 4 && m0.squares.every(([g, v, on, dash]) => (on === 'true') === (v === pk(g)) && (dash === 'dashed') === (v === pk(g))),
+    'BY MOMENT · two looks on icon squares, my picks (moments as rows, cells as chips) pressed and dashed on a cold start', m0.squares);
+  await p.click('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(80);
+  const m3 = await readM();
+  ok(m3.lay === 'cols' && JSON.stringify(m3.momHeads) === JSON.stringify(m0.rows.map((r) => r[0])) && m3.rows.length === m0.heads.length, 'BY MOMENT · moments as columns: the moments across the top in the same order, a row per block', { heads: m3.momHeads.length, rows: m3.rows.length });
+  await p.click('#mobar .opt[data-mopt="cell"][data-v="counts"]'); await p.waitForTimeout(80);
+  const m4 = await readM();
+  ok(m4.cell === 'counts' && !m4.chips && m4.counts > 0, 'BY MOMENT · cells as counts: a number in each cell, no chips', { counts: m4.counts, chips: m4.chips });
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E14); await p.waitForTimeout(100);
+  const m5 = await readM();
+  ok(m5.lay === 'cols' && m5.cell === 'counts' && m5.squares.filter(([, , on]) => on === 'true').map(([g, v]) => g + ':' + v).sort().join(' ') === 'cell:counts lay:cols', 'BY MOMENT · both looks are remembered for this viewer', [m5.lay, m5.cell]);
+  await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' }));
+  await p.click('#mobar .opt[data-mopt="lay"][data-v="rows"]'); await p.waitForTimeout(60); await p.click('#mobar .opt[data-mopt="cell"][data-v="chips"]'); await p.waitForTimeout(80);
+  const m6 = await readM();
+  ok(m6.lay === 'rows' && m6.cell === 'chips' && JSON.stringify(m6.rows) === JSON.stringify(m0.rows) && m6.chips === m0.chips, 'BY MOMENT · the first squares bring back my picks, the grid as it was', [m6.lay, m6.cell]);
+  /* (f) a chip lit in the matrix lights everywhere; the station's glyph on every chip whose element it draws */
+  const K14 = 'table:users', sel14 = '#mogrid tr[data-mom="gate"] td[data-f="data"] .mc[data-key="' + K14 + '"]';
+  await p.$eval(sel14, (e) => e.scrollIntoView({ block: 'center' })); await p.waitForTimeout(60); await p.click(sel14); await p.waitForTimeout(120);
+  const l14 = await p.evaluate((K) => ({ el: window.__allep.state.el, chip: !document.getElementById('elchip').hidden, here: document.getElementById('el-mo').getAttribute('data-here'),
+    on: [...document.querySelectorAll('#board tr.row[data-el="on"]')].map((e) => e.getAttribute('data-ep')).sort(),
+    want: window.__allep.data.rows.filter((r) => { const ks = window.__allep.rowKeys(r); return ks.U[K] || ks.C[K]; }).map((r) => r.id).sort(),
+    mo: [...document.querySelectorAll('#sec-mo .elon')].map((e) => (e.getAttribute('data-keys') || '').split('\n').includes(K)) }), K14);
+  ok(l14.el === K14 && l14.chip && l14.here === 'true' && l14.on.length && JSON.stringify(l14.on) === JSON.stringify(l14.want) && l14.mo.length >= 1 && l14.mo.every(Boolean),
+    'BY MOMENT · a chip clicked in the matrix lights everywhere: the ' + l14.want.length + ' table rows that hold it, and every place the matrix draws it', { on: l14.on.length, want: l14.want.length, mo: l14.mo.length });
+  await p.click('#elclear'); await p.waitForTimeout(40);
+  const g14 = await p.evaluate(() => { const SKK = window.__allep.data.sk.keys, bad = [], n = [0, 0];
+    document.querySelectorAll('#mogrid [data-key]').forEach((c) => { const K = c.getAttribute('data-key'), s = SKK[K]; if (!s || !s[0]) return; n[0]++;
+      const g = c.querySelector('.skg'); if (!g || g.getAttribute('data-sk') !== s[0]) bad.push(K); else n[1]++; }); return { bad, n }; });
+  ok(!g14.bad.length && g14.n[0] > 0, 'BY MOMENT · every chip whose element the Gabe Universe draws wears the station\'s glyph for its kind (' + g14.n[1] + ' chips)', g14.bad.slice(0, 4));
+  /* (g) the review's fixes */
+  const fit = async () => p.evaluate(() => { const G = document.getElementById('mogrid'); return { over: G.scrollWidth - G.clientWidth, note: !document.getElementById('moscroll').hidden,
+    cut: [...G.querySelectorAll('.mc')].filter((c) => c.scrollWidth > c.clientWidth + 1).length }; });
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E14 + '"] td.id'); await p.waitForTimeout(120);
+  const g0 = await fit(); await p.click('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(80); const g1 = await fit();
+  await p.click('#mobar .opt[data-mopt="lay"][data-v="rows"]'); await p.waitForTimeout(80);
+  ok(g0.over <= 1 && g1.over <= 1 && !g0.cut && !g1.cut && !g0.note && !g1.note, 'BY MOMENT · at 1920 px the matrix fits its box in both looks and no chip is cut: chips wrap inside their cells', { rows: g0, cols: g1 });
+  const pk14 = await p.$$eval('#mobar .mopg', (gs) => gs.map((g) => [g.getAttribute('data-mom'), [...g.querySelectorAll('.mopath')].map((b) => [+b.getAttribute('data-path'), b.innerText.replace(/\s+/g, ' ').trim()])]));
+  const M14 = ROW[E14].mo, flat = pk14.flatMap((g) => g[1].map((x) => x[0])), live14 = M14.ex.map((x, i) => i).filter((i) => M14.ex[i][4]);
+  ok(JSON.stringify(flat) === JSON.stringify(live14) && pk14.every(([m, bs]) => bs.every(([i]) => M14.sp[M14.ex[i][3]][0] === m) && new Set(bs.map((b) => b[1])).size === bs.length)
+     && pk14.some(([m, bs]) => m === 'edge' && bs.length === 2),
+    'BY MOMENT · the path picker: the endings in time order under the moment each leaves at, two of one status there told apart by their own words (the edge\'s two 429s by their limiter)', pk14.map(([m, bs]) => m + ': ' + bs.map((b) => b[1]).join(' | ')));
+  const p87 = await p.$$eval('#mogrid td[data-f="proof"] .mc', (cs) => cs.filter((c) => /^C87/.test(c.textContent.trim())).map((c) => [...c.querySelectorAll('.vc-status')].map((x) => x.textContent)));
+  const ubox = await p.$eval('#moband .mbb[data-f="over"]', (b) => { const inf = b.querySelector('.ainfo'); return { word: b.querySelector('b').textContent, infoHidden: inf ? getComputedStyle(inf).display === 'none' : null, info: inf ? inf.textContent : '' }; });
+  ok(p87.length === 1 && p87[0].length >= 1 && p87[0].every((x) => x === '502') && ubox.word === MW.band.noTime && ubox.infoHidden === true && ubox.info.includes(MW.band.untimed.over.slice(0, 30)),
+    'BY MOMENT · a test proving two endings of one status says it (C87 proves 502); the untimed block says "' + MW.band.noTime + '", its reason behind the info toggle', { p87, ubox });
+  const E16 = 'POST /setup/complete', FE16 = FJ.endpoints['endpoint:' + E16];
+  const readMem = (sid) => { const at = new Set(); FE16.paths.forEach((q) => (q.effects.steps || []).forEach((e) => { if (e.step === sid) at.add(e.dependency ? 'gate' : 'handler'); })); return at; };
+  const memSid = Object.keys(STEPS).find((k) => STEPS[k].table === 'memberships' && STEPS[k].op === 'read' && /load_household_context$/.test(STEPS[k].fn));
+  const want16 = readMem(memSid), P422 = FE16.paths.find((q) => q.exit.id && (FE16.produced || []).concat(FE16.framework_exits || []).some((x) => x.id === q.exit.id && x.status === 422 && x.phase === 'validation'));
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E16 + '"] td.id'); await p.waitForTimeout(120);
+  const memAt = await p.$$eval('#mogrid td[data-f="data"] .mc[data-key="table:memberships"]', (cs) => [...new Set(cs.map((c) => c.closest('td').getAttribute('data-mom')))]);
+  const i422 = ROW[E16].mo.ex.findIndex((x) => x[0] === P422.exit.id);
+  await p.click('#mobar .mopath[data-path="' + i422 + '"]'); await p.waitForTimeout(100);
+  const rows422 = await p.$$eval('#mogrid tbody tr', (trs) => trs.map((tr) => tr.getAttribute('data-mom')));
+  await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(80);
+  ok(want16.has('gate') && want16.has('handler') && memAt.includes('gate') && memAt.includes('work') && !rows422.includes('work') && !rows422.includes('checks'),
+    'BY MOMENT · ' + E16 + ': the memberships read the feed lists once as the login dependency\'s and once as the handler\'s stands at the dependencies AND at the work; the path to its 422 leaves before the handler and passes neither', { feed: [...want16], page: memAt, rows422 });
+  const E17 = 'GET /healthz', FE17 = FJ.endpoints['endpoint:' + E17];
+  const dead17 = (FE17.produced || []).filter((x) => !FE17.paths.some((q) => q.exit.id === x.id)).map((x) => x.id);
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E17 + '"] td.id'); await p.waitForTimeout(120);
+  const pk17 = await p.$$eval('#mobar .mopath[data-x]', (bs) => bs.map((b) => b.getAttribute('data-x')));
+  const band17 = await p.$$eval('#moband .mbb[data-f="end"] .mbr', (rs) => rs.map((r) => [r.getAttribute('data-why'), r.querySelectorAll('.mc').length]));
+  ok(dead17.length === 1 && !pk17.includes(dead17[0]) && pk17.length === new Set(FE17.paths.map((q) => q.exit.id)).size && JSON.stringify(band17) === JSON.stringify([['nopath', 1]]),
+    'BY MOMENT · ' + E17 + ': the 429 the feed lists but no path ends at is not offered as a path, and stands in the band, on no path', { dead17, pk17, band17 });
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));

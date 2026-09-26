@@ -681,3 +681,19 @@ INPUT appears on both sides of GATE — the D-001 spine is a reading order, not 
 check are drawn are the agent's picks, built as options (D-025.2).
 Revisit if: a request's real order is not a single line (the moments of two branches read as one sequence and mislead) — then the
 table draws the branches side by side.
+
+## D-054 — The moments are a dimension every section can wear: explore a moment × section view, and copy the code map's settings
+Date: 2026-09-26 · Input: his message on the D-053 build, with a screenshot of POST /cooking/sessions.
+Decision, his: "we have some configuration there, but I don't have a button to copy it. Let's make sure that the code map has a
+button to copy it" — and: "are these moments universal or something that we can apply to all the other sections … In the data
+effects, in the function structures, in clients, and all the other sections, can we apply the same thing? I think that this is a
+very nice dimension to have. That probably will be moved also in the middle panel. Maybe everything can be shown as this kind of
+dimension, and we can group them by them and assign columns to each one of these dimensions. Let's explore that option."
+Consequence: the code map gets a Copy button for its own settings, and the page's bottom text carries them too. The exploration is
+measured first — per block, whether the feed records WHEN each element acts — and then built as a full-width BY MOMENT section on
+the all-endpoints page (the agent's call: see it here before it moves into the lab's middle panel): moments in time order × the
+timed blocks, a path choice (all paths or one ending — his WHAT × PATH × TIME of 2026-09-17), and the untimed blocks in a band of
+their own with the reason. It is the TIME half of that model made finer: the stage spine (D-001) stays the coarse axis, the moments
+are its inner grain, derived per endpoint from the code.
+Revisit if: a block's elements can only be placed by guessing — then that block stays out of the matrix and the gap is named, never
+filled.

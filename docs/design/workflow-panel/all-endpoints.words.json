@@ -34,7 +34,26 @@
     "calls",
     "at",
     "cls",
-    "call"
+    "call",
+    "placed",
+    "total",
+    "un",
+    "status",
+    "lo",
+    "hi",
+    "own",
+    "chain",
+    "reached",
+    "edges",
+    "order",
+    "gate",
+    "after",
+    "none",
+    "off",
+    "wide",
+    "offocc",
+    "occ",
+    "mom"
   ],
   "eyebrow": "every endpoint of one app, side by side",
   "h1": "All {nRows} endpoints of {app}, one row each",
@@ -51,7 +70,8 @@
     "board": "the endpoints",
     "one": "one endpoint",
     "more": "more information",
-    "copy": "what I am looking at"
+    "copy": "what I am looking at",
+    "mo": "by moment"
   },
   "rail": {
     "lay": {
@@ -708,8 +728,105 @@
       "cols": "columns",
       "your": "your words:",
       "slook": "shared marked by",
-      "el": "element lit"
-    }
+      "el": "element lit",
+      "cm": "the code map",
+      "mo": "by moment",
+      "path": "the path"
+    },
+    "pick": "my pick",
+    "his": "your choice",
+    "cm": "copy the settings",
+    "cmPlain": "Copy the code map's settings for this endpoint as text, to paste back with your words under them."
+  },
+  "mo": {
+    "_about": "His ask 2026-09-26: are the moments universal, can every block be read on them. The spine, the moment words, the reasons and the two looks are my proposals (D-025.2); where each element stands is read off the feed by gen-all-endpoints.py (by_moment) and proven there.",
+    "lede": "One endpoint's time, top to bottom, with every block that happens in time as a column. A row is a moment of the request; a cell holds that block's elements acting at that moment. Pick an ending to follow only the path to it.",
+    "how": [
+      "The moments are D-053's, extended. Before the handler they are fixed: the server starting (before any request), the screen sending the request, the app's edge, FastAPI reading the body, the dependencies (the login check among them), FastAPI checking the fields. Inside the handler they are read from its own lines: its checks, and what it does among them; the work, the calls it makes after a check and before its next check, catch or commit; one moment for each catch that turns a failure into an ending; saving, its own commit. Then the answer, what happens after it, and the uncaught error last, because it can escape at any moment.",
+      "A handler moment that happens twice (checks, then a catch, then more checks) is drawn twice, in the order it happens, never merged. The arms of one if and else are drawn the same way, as runs in line order, though a request passes only one of them: pick its ending to see which. A fixed moment the endpoint does not have is drawn empty where it would stand.",
+      "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs inside. A check stands where it is evaluated, on every path that makes the call it sits in; its ending stands where the request leaves. A check the map ties only to a catch stands where that catch raises its ending. A test has no time inside the request: it rides the ending it proves. What the map does not place is left in the band below, with its reason.",
+      "A step is placed once for each path it is on: with the dependencies when a dependency runs it, else at the call that path makes. So one step can stand at more than one moment: the login dependency reads a table, and a handler call reads it again. When a path's own chain names no call reaching the step, it stands at the calls the endpoint's other paths make to its function, never after that path has left.",
+      "The path: every path at once, or the path to one ending, picked from the endings in the order they happen, under the moment each one leaves at. A picked path keeps only the moments it passes and the elements it passes there; an ending it passes by without leaving is kept."
+    ],
+    "covHead": "Across the {nRows} endpoints, what each block places:",
+    "cov": "{block}: {placed} with a moment, {un} with none, of {total}.",
+    "src": "Data effects, how each step was placed on each path it is on ({occ} in all): {own} on the handler's own line, {chain} inside a call the path's chain names, {reached} inside a call the map traces back to the handler on that path, {edges} through the Gabe Universe's call edges from the path's own calls, {wide} at the calls the endpoint's other paths make (the path's chain names none), {order} from the order the path records its steps in, {gate} as a dependency's work, {after} after the answer, {none} with none.",
+    "off": "{off} times a chain lists a call inside a catch its path never passes; that call is left off that path.",
+    "offocc": "{offocc} times a path lists a step that no call of its own reaches while another path places it; it is left off that path.",
+    "moms": {
+      "start": { "name": "before any request", "plain": "Values the server builds once, when it starts; every request then reads them." },
+      "send": { "name": "the screen sends it", "plain": "The screen and the hook that send the request, before it reaches the server. Their order is the screen's structure, not time." },
+      "edge": { "name": "at the edge", "plain": "The app's middleware, before the endpoint is reached." },
+      "body": { "name": "reads the body", "plain": "FastAPI reads the request's body before any dependency runs." },
+      "gate": { "name": "the dependencies", "plain": "FastAPI runs the endpoint's dependencies (the login check, the database session, the settings), with the work each does." },
+      "fields": { "name": "checks the fields", "plain": "FastAPI checks the parameters and the body's fields against their types, after every dependency has run." },
+      "checks": { "name": "checks", "plain": "The handler's own checks, and what it does among them." },
+      "work": { "name": "the work", "plain": "The calls the handler makes after its checks, and what they read and write inside." },
+      "fail": { "name": "after a call failed", "plain": "A call raised; this catch turned the error into these endings." },
+      "save": { "name": "saving", "plain": "The handler's own commit (or rollback)." },
+      "answer": { "name": "the answer", "plain": "The handler returns; FastAPI checks the reply against its model and sends it." },
+      "after": { "name": "after the answer", "plain": "What runs once the answer has left: a stream's own code, and what the screen does with the answer." },
+      "uncaught": { "name": "escapes", "plain": "An error nobody catches can escape at any moment, so it stands last." }
+    },
+    "lines": "lines {lo} to {hi}",
+    "line": "line {lo}",
+    "path": {
+      "label": "the path",
+      "all": "all paths",
+      "allPlain": "Every path at once: each element wherever it acts.",
+      "one": "the path to {status}",
+      "onePlain": "Only the moments the path to this ending passes ({kind}, it leaves at {mom}), and only the elements it passes there."
+    },
+    "opt": {
+      "lay": {
+        "label": "the moments",
+        "pick": "rows",
+        "opts": {
+          "rows": { "name": "moments as rows", "plain": "Time runs top to bottom; each block is a column." },
+          "cols": { "name": "moments as columns", "plain": "Time runs left to right; each block is a row." }
+        }
+      },
+      "cell": {
+        "label": "the cells",
+        "pick": "chips",
+        "opts": {
+          "chips": { "name": "cells as chips", "plain": "Each cell names its elements, each one a chip that lights where it appears." },
+          "counts": { "name": "cells as counts", "plain": "Each cell says how many elements act there." }
+        }
+      }
+    },
+    "band": {
+      "title": "no moment",
+      "plain": "Blocks that do not happen in time, and the elements of a timed block the map places at no moment, each with its reason.",
+      "untimed": {
+        "over": "It sums the whole endpoint up: sizes, ratios, ranks and alarms. Its members are the other columns' elements, each already at its moment."
+      },
+      "noTime": "no time",
+      "count": "{n} with no moment",
+      "all": "every element here has a moment"
+    },
+    "why": {
+      "nolink": { "name": "no link to a call", "plain": "The map records no link from it to a call the handler makes, so where it happens inside the request is not known." },
+      "twomom": { "name": "calls at different moments", "plain": "It is reached from handler calls that stand at different moments." },
+      "notable": { "name": "no step", "plain": "The map says the endpoint touches this table, but no step it records says when." },
+      "firstcall": { "name": "filled on a first call", "plain": "Its value is built by whichever request calls it first, and no one can say which." },
+      "spans": { "name": "several moments", "plain": "The endings it stands for leave at several moments, so it has no single one." },
+      "member": { "name": "a member has no moment", "plain": "It stands for endings or catches, and one of them has no moment of its own." },
+      "noend": { "name": "proves no ending", "plain": "The test sends the request but none of its assertions fits an ending." },
+      "timeless": { "name": "timeless", "plain": "It names what the endpoint is (its method, its login, its limit), not something that acts, so there is no moment." },
+      "nosite": { "name": "outside the handler", "plain": "It stands at a line outside the handler's own code, and no call of the handler is recorded for it." },
+      "pathsonly": { "name": "paths only", "plain": "The map says which paths it is on, but not where on them." },
+      "fnnone": { "name": "no call reaches it", "plain": "The map names the function, but records no handler call that reaches it." },
+      "swmoves": { "name": "moves with the path", "plain": "Its paths place it at different moments." },
+      "nopath": { "name": "on no path", "plain": "The endpoint lists it, but none of its paths passes it, so no path can be followed to it." }
+    },
+    "empty": "nothing here at this moment",
+    "proves": "proves",
+    "atRaise": "where its ending is raised",
+    "scrolls": "The columns do not fit this width: the box scrolls sideways for the rest.",
+    "handler": "the handler starts here",
+    "body": "the body",
+    "tip": "{name} · {block}"
   },
   "authNoScheme": "own check",
   "authNoSchemePlain": "It asks for a login through its own check, with no declared scheme: the check reads the token itself, not from the usual header.",
@@ -1285,7 +1402,8 @@
     "not": "{name} ({kind}) — not in {place}",
     "places": {
       "uni": "the universe card",
-      "cm": "the code map"
+      "cm": "the code map",
+      "mo": "by moment"
     },
     "plain": "Click an element in either column (a chip, a pair, a list item, a name) and it lights everywhere it appears: the table rows whose endpoint holds it (the rest dim), the cells of the columns that count it, and every place either column draws it. A column that does not hold it says so at its top. Click it again, press Escape or clear to put it out; choosing another endpoint keeps it lit.",
     "alias": "Which things are one element is my reading. Every element carries one key ({nKeys} on this page). A model class and its database table are one element, joined by the station graph's model-to-table map and the forms feed's models ({nAlias} classes). A function is its file and qualified name; a callee name for which the feeds hold no single function carries no key and cannot be lit ({nUnkeyed} of {nNames} names). A name a condition reads is a setting of the forms feed, else a flag; a guard, a switch or an in-flight value holds the settings and flags its condition reads. A row is lit when its endpoint holds the element anywhere on this page: in the table, its universe card or its code map.",
