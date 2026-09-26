@@ -370,9 +370,9 @@
   .enckey .ekf { color: var(--muted); margin-left: 4px; }
   .enckey .ekf.mine { border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0 6px; color: var(--ink-soft); }
 
-  /* ── BY MOMENT (his ask 2026-09-26): one endpoint's moments × the blocks that happen in time. A row is a moment (time top to
-     bottom, his suit), a column a block, a cell that block's elements acting then; the path picker keeps one ending's path.
-     Every look here is my proposal (D-025.2): the two looks sit on icon squares, my pick dashed ── */
+  /* ── BY MOMENT (his ask 2026-09-26): one endpoint's moments × the blocks that happen in time. A column is a moment (his default,
+     D-055: time left to right), a row a block, a cell that block's elements acting then; the path picker keeps one ending's path.
+     The two looks sit on icon squares — his defaults ruled, no dash; the rest of the look is my proposal (D-025.2) ── */
   #sec-mo [data-key] { cursor: pointer; }
   #sec-mo [data-key]:hover { text-decoration: underline dotted; text-underline-offset: 2px; }
   .mohead { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; min-width: 0; flex: 1 1 auto; }
@@ -398,14 +398,12 @@
   table.motab { border-collapse: separate; border-spacing: 0; font-size: var(--fs-min); width: 100%; table-layout: fixed; }
   table.motab col.mhc { width: 11em; }
   table.motab[data-lay="cols"] col.mhc { width: 9.5em; }
+  table.motab[data-lay="cols"] td { padding: 3px 4px; }   /* moFloor's room: the cell's own padding is 8px across in the columns look */
   .moscroll { font-size: var(--fs-min); color: var(--muted); margin: 0 0 4px; }
   table.motab th, table.motab td { border-bottom: 1px solid var(--rule-soft); border-left: 1px solid var(--rule-soft); padding: 4px 6px; vertical-align: top; text-align: left; }
   table.motab thead th { background: var(--card); font-weight: 650; color: var(--ink-soft); border-bottom: 2px solid var(--rule); white-space: normal; overflow-wrap: anywhere; vertical-align: bottom; }
   table.motab thead th[data-block] { box-shadow: inset 0 3px 0 var(--bc, transparent); }
   table.motab th.mom { white-space: normal; overflow-wrap: anywhere; background: var(--raised); font-weight: 400; }
-  table.motab th.mom .mn { display: block; font-weight: 650; color: var(--ink); margin-top: 2px; }
-  table.motab th.mom .ml { display: block; color: var(--muted); }
-  table.motab th.mom[data-mom="fail"] .mn { font-weight: 600; }
   table.motab td.mo0 { background: color-mix(in srgb, var(--ink) 2%, var(--card)); }
   table.motab tr[data-lit="true"] > th.mom { box-shadow: inset 4px 0 0 var(--accent); }
   /* an open slot (D-012's rule): a fixed moment nothing acts at is drawn, empty and dashed */
@@ -416,10 +414,52 @@
   .mc .mt { min-width: 0; overflow-wrap: anywhere; }
   #mogrid .mc > *, #moband .mc > * { min-width: 0; max-width: 100%; }
   #mogrid .mc, #mogrid .mc *, #moband .mc * { white-space: normal !important; overflow-wrap: anywhere; }
+  /* a badge word never breaks ("refus al"): a value chip keeps its own no-wrap, and its column's floor is its widest badge (moFloor);
+     a name breaks after its _ . / instead (moTxt's <wbr>), and only past that anywhere */
+  #mogrid .mc .vc, #mogrid .mc .vc *, #moband .mc .vc, #moband .mc .vc * { white-space: nowrap !important; overflow-wrap: normal !important; }
+  #mogrid .mc .vc, #moband .mc .vc { max-width: none; flex: none; }   /* its own width, so moFloor measures the word, not the chip */
   .mc .mq { color: var(--muted); font-style: italic; }
   .mc .mpv { color: var(--muted); }
   .mcount { display: inline-block; min-width: 18px; font-weight: 650; font-variant-numeric: tabular-nums; }
   .mcount.z { color: var(--muted); font-weight: 400; }
+  /* D-055 · a moment's head says at most two things, on at most two lines (the rest rides its hover): the stage glyph before the
+     first. A handler head's lines never wrap, a long one is cut with its words whole in the hover; another moment's name may wrap once */
+  table.motab th.mom { font-weight: 400; }
+  table.motab th.mom .mh1, table.motab th.mom .mh2 { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; }
+  table.motab th.mom .mh1.wrap { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  /* a one-thing handler head: its words stay whole on one line, beside the glyph when they fit there, else under it */
+  table.motab th.mom .mh1.one { white-space: normal; overflow: visible; }
+  table.motab th.mom .mh1.one .mn { display: inline-block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: top; }
+  table.motab th.mom .mn { display: inline; font-weight: 650; color: var(--ink); }
+  table.motab th.mom .mh2 { color: var(--ink); font-weight: 650; }
+  table.motab th.mom .mn.mfn { font-weight: 500; color: var(--ink-soft); }            /* the function that raised, above the class its except takes */
+  .mstg { display: inline-flex; gap: 1px; margin-right: 4px; vertical-align: -1px; }
+  table.motab th.mom .mstg i { width: 4px; height: 10px; border-radius: 1px; border: 1px solid var(--rule); box-sizing: border-box; display: block; }
+  table.motab th.mom .mstg i.on { background: var(--accent); border-color: var(--accent); }
+  table.motab th.mom .mstg i.bay { margin-left: 2px; border-style: dashed; }
+  /* D-055 · the path row: "all paths", then one status code per ending in time order; a small gap between moments, no words */
+  .mopaths { flex-wrap: wrap; gap: 4px 0; align-items: center; }
+  .mopaths > .mopath { margin-right: 10px; }
+  .mopg { display: inline-flex; flex-wrap: nowrap; gap: 3px; align-items: center; margin-right: 10px; padding: 0; border: 0; }
+  .mopath.mcode { padding: 1px 3px; min-height: 24px; }
+  .mopath[aria-checked="true"] { background: color-mix(in srgb, var(--accent) 22%, var(--raised)); box-shadow: 0 0 0 2px var(--accent); }
+  /* D-055 · WHAT BY MOMENT CARRIES in the code map: show all · dim · hide, acting on the elements BY MOMENT places (data-cv) */
+  .cvopt { display: inline-flex; align-items: center; gap: 5px; }
+  .cvopt > .rl { font-size: var(--fs-min); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-right: 2px; }
+  .cvc { font-size: var(--fs-min); letter-spacing: 0; text-transform: none; font-weight: 400; color: var(--ink-soft); margin-left: 4px; }
+  #ocol-cm[data-carry="dim"] [data-cv="1"] { opacity: .3; transition: opacity .12s; }
+  #ocol-cm[data-carry="dim"] [data-cv="1"]:hover, #ocol-cm[data-carry="dim"] [data-cv="1"]:focus-within,
+  #ocol-cm[data-carry="dim"] [data-cv="1"].elon, #ocol-cm[data-carry="dim"] [data-cv="1"]:has(.elon) { opacity: 1; }
+  #ocol-cm[data-carry="hide"] [data-cv="1"] { display: none !important; }
+  .cvn { display: none; font-size: var(--fs-min); color: var(--ink-soft); border: 1px dashed var(--rule); border-radius: 5px; padding: 0 5px; margin-left: 6px; white-space: nowrap; }
+  #ocol-cm[data-carry="hide"] .cvn { display: inline-block; }
+  /* a field with nothing on this endpoint (e): nothing carried, nothing left out — quieter than what is left, in dim and hide */
+  #ocol-cm[data-carry="dim"] [data-cve="1"], #ocol-cm[data-carry="hide"] [data-cve="1"] { opacity: .45; transition: opacity .12s; }
+  #ocol-cm[data-carry="dim"] [data-cve="1"]:hover, #ocol-cm[data-carry="hide"] [data-cve="1"]:hover { opacity: 1; }
+  /* a field BY MOMENT holds MORE of than it lists (x): it stays in every look, and in dim and hide says how many only BY MOMENT holds */
+  .cvx { display: none; font-size: var(--fs-min); color: var(--ink); border: 1px solid var(--accent); border-radius: 5px; padding: 0 5px; margin-left: 6px; white-space: nowrap; }
+  #ocol-cm[data-carry="dim"] .cvx, #ocol-cm[data-carry="hide"] .cvx { display: inline-block; }
+  .pair > div > .cvn { margin: 1px 0 2px; }
   .moband { margin-top: 10px; border: 1px dashed var(--rule); border-radius: var(--radius, 10px); padding: 8px 12px; }
   .moband > h3 { margin: 0 0 4px; font-size: var(--fs-sm); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
   .mbb { border-top: 1px solid var(--rule-soft); padding: 5px 0; display: grid; grid-template-columns: minmax(0, 16em) minmax(0, 1fr); gap: 2px 12px; align-items: start; font-size: var(--fs-xs); }
@@ -899,7 +939,9 @@
   function list(b, items, fmt, keys) { if (!items.length) { b.appendChild(el("span", "z", W.panel.none)); return; } var u = el("ul");
     items.forEach(function (x, i) { var f = fmt(x, i), li = el("li", null, typeof f === "string" ? f : null); if (typeof f !== "string") li.appendChild(f); if (keys) kd(li, keys[i]); u.appendChild(li); }); b.appendChild(u); }
   function frag() { var f = document.createDocumentFragment(); [].slice.call(arguments).forEach(function (x) { if (x != null) f.appendChild(typeof x === "string" ? document.createTextNode(x) : x); }); return f; }
-  function keyedJoin(b, names, keys, sep) { if (!names.length) { b.textContent = W.panel.none; return; } names.forEach(function (n, i) { if (i) b.appendChild(document.createTextNode(sep)); b.appendChild(typeof n === "string" ? ksp(n, keys[i]) : kd(n, keys[i])); }); }
+  function keyedJoin(b, names, keys, sep) { if (!names.length) { b.textContent = W.panel.none; return; } names.forEach(function (n, i) { if (i) b.appendChild(document.createTextNode(sep)); b.appendChild(cvItem(typeof n === "string" ? ksp(n, keys[i]) : kd(n, keys[i]), "", i)); }); }
+  /* D-055: an item of a code-map field — `cf` the field (a joined list takes its pair's key when the pair is drawn), `ci` its place */
+  function cvItem(n, cf, i) { if (cf) n.setAttribute("data-cf", cf); n.setAttribute("data-ci", String(i)); return n; }
   function more(b, lst) { if (lst.more) b.appendChild(el("div", "z", fill(W.panel.more, { more: lst.more }))); }
   function slugOf(id) { return window.EPSLUG.slug(id); }
   function setAddress(id) { try { var u = new URL(window.location.href); u.searchParams.set("ep", slugOf(id)); window.history.replaceState(null, "", u.pathname + "?" + u.searchParams.toString() + u.hash); } catch (e) {} }
@@ -1039,6 +1081,40 @@
   /* their squares: a list under a header bar · a pill with a word in it · a table with a column of its own · lines with lines under them */
   var EICON = { mom: { rows: '<rect x="3" y="3" width="18" height="5" rx="1.2"/><path d="M6 12h15M6 16h15M6 20h15"/>', chip: '<rect x="2.5" y="8" width="19" height="8" rx="4"/><path d="M7 12h2M12 12h6"/>' },
                 chk: { col: '<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M14 4v16M3 9h18M3 14h18"/>', line: '<path d="M4 5h16M8 9h11M4 15h16M8 19h11"/>' } };
+  /* ══ D-055 · WHAT BY MOMENT CARRIES. A switch beside the code map's copy button: every field as it is (my pick, dashed), or the
+     elements BY MOMENT places at a moment (on any path) dimmed, or hidden. The generator read which (r.cv: per field [state c|p|b|e|x,
+     the flags of its drawn items, carried, of, the tables only BY MOMENT holds]) through the records BY MOMENT's build check joins, and
+     proved it; nothing is decided here. A field it carries whole goes whole, its name too — the endings keep their option bar, the
+     switch lives there; a field it carries in part says, hidden, how many of its elements BY MOMENT holds; a field with nothing on this
+     endpoint (e) fades in dim and hide and is counted apart; a field BY MOMENT holds more of than it lists (x) stays, and says how many
+     only BY MOMENT holds (B1: a gap in the code map, not a footnote). Remembered per viewer. ══ */
+  var CKEY = "gabe:allep:carry:v1", CV = W.carry.pick;
+  try { var cvv = window.localStorage.getItem(CKEY); if (cvv && W.carry.opts[cvv]) CV = cvv; } catch (e) {}
+  /* their squares: an eye · half a disc · an eye struck through */
+  var CICON = { all: '<path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/>',
+                dim: '<circle cx="12" cy="12" r="9.5"/><path class="fl" d="M12 2.5a9.5 9.5 0 0 1 0 19z"/>',
+                hide: '<path d="M10.73 5.08A10.4 10.4 0 0 1 12 5c7 0 10 7 10 7a13.2 13.2 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3 7 10 7a9.7 9.7 0 0 0 5.39-1.61"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="m2 2 20 20"/>' };
+  function cvPair(C, k) { return [].filter.call(C.querySelectorAll(".pair[data-k], [data-sub][data-k]"), function (p) { return p.getAttribute("data-k") === k; })[0] || null; }
+  function applyCarry(C, r) { C.setAttribute("data-carry", CV); if (!r.cv) return;
+    var mark = function (n) { if (n) n.setAttribute("data-cv", "1"); };
+    Object.keys(r.cv).forEach(function (k) { var v = r.cv[k], pr = cvPair(C, k); if (!pr) return; pr.setAttribute("data-cvs", v[0]);
+      if (v[1]) C.querySelectorAll('[data-cf="' + k + '"][data-ci]').forEach(function (it) { if (v[1][+it.getAttribute("data-ci")]) mark(it); });
+      if (v[0] === "e") pr.setAttribute("data-cve", "1");
+      if (v[4] && v[4].length) { var xt = el("span", "cvx", fill(W.carry.beyond, { n: v[4].length })), xl = pr.querySelector(":scope > div > .pk");
+        if (pr.hasAttribute("data-sub")) pr.appendChild(xt); else if (xl) xl.parentNode.insertBefore(xt, xl.nextSibling); }
+      if (v[0] === "c") {
+        if (pr.hasAttribute("data-sub")) { if (pr.classList.contains("chkh") && pr.closest("table").getAttribute("data-chk") === "col") { mark(pr); pr.closest("table").querySelectorAll("td.chk").forEach(mark); } }
+        else if (pr.querySelector(".eopts")) { mark(pr.querySelector(":scope > div > .pk")); mark(pr.querySelector("table.etab")); }   /* its icon stays, beside the bar */
+        else mark(pr); }
+      else if (v[0] === "p") { var nt = el("span", "cvn", fill(W.carry.more, { n: v[2] })), lb = pr.querySelector(":scope > div > .pk");   /* beside the name, never inside it: */
+        if (pr.hasAttribute("data-sub")) pr.appendChild(nt); else if (lb) lb.parentNode.insertBefore(nt, lb.nextSibling); } });                 /* the D-042 links read the name */
+    /* a moment's header row goes with its rows, when BY MOMENT carries every one of them */
+    C.querySelectorAll("table.etab tr.mom").forEach(function (hr) { var n = hr.nextElementSibling, all = true, any = false;
+      while (n && !n.classList.contains("mom")) { any = true; if (n.getAttribute("data-cv") !== "1") all = false; n = n.nextElementSibling; }
+      if (any && all) mark(hr); });
+    /* a block every field of which BY MOMENT carries goes with them, its name too */
+    C.querySelectorAll(".cmb").forEach(function (bx) { var ps = bx.querySelectorAll(":scope > .pairs > .pair");
+      if (ps.length && [].every.call(ps, function (q) { return q.getAttribute("data-cv") === "1"; })) mark(bx); }); }
   function momKey(m) { return typeof m === "number" ? "failed" : m; }
   /* a moment's words: its name; a failure group's name then what raised and the catch that caught it, all read from the chain */
   function momName(m, d) { if (typeof m !== "number") return EW.mom[m].name; var g = d.exits.moms[m];
@@ -1052,7 +1128,7 @@
     if (e[5]) { var s = el("span", "shd"); s.setAttribute("data-tip", "shared"); if (r.xd.exits[i][3]) s.setAttribute("data-src", r.xd.exits[i][3]);
       s.appendChild(el("span", "shm", EW.shared)); s.appendChild(document.createTextNode(" "));
       s.appendChild(dk.exits[i][2] ? ksp(e[5], dk.exits[i][2]) : el("span", null, e[5])); out.push(s); }
-    r.xd.exits[i][1].forEach(function (gi) { var g = d.guards.items[gi], k = dk.guards[gi], c = kd(el("span", e[5] ? "ck ckm" : "ck"), [k[0]].concat(k[1]));
+    r.xd.exits[i][1].forEach(function (gi) { var g = d.guards.items[gi], k = dk.guards[gi], c = kd(el("span", e[5] ? "ck ckm" : "ck"), [k[0]].concat(k[1])); cvItem(c, "d:guards", gi);
       c.appendChild(document.createTextNode(g[1])); if (g[2]) c.appendChild(el("span", "ckp", " · " + g[2])); out.push(c); });
     return out; }
   function endings(b, r) { var d = r.d, dk = r.dk, P = W.panel, bar = el("div", "eopts");
@@ -1063,6 +1139,15 @@
         var ic = document.createElementNS("http://www.w3.org/2000/svg", "svg"); ic.setAttribute("viewBox", "0 0 24 24"); ic.setAttribute("aria-hidden", "true"); ic.innerHTML = EICON[g][v]; bt.appendChild(ic);
         bt.addEventListener("click", function () { EM[g] = v; try { window.localStorage.setItem(EKEY, JSON.stringify(EM)); } catch (x) {} tipOff(); renderOne(); applyEl(); writeOut(LAST.L, LAST.GS); }); grp.appendChild(bt); });
       bar.appendChild(grp); });
+    /* D-055: what BY MOMENT carries — every field as it is, the elements BY MOMENT places dimmed, or hidden — beside the copy */
+    var CW = W.carry, cg = el("div", "cvopt"), co = el("div", "opts"); cg.appendChild(el("span", "rl", CW.label)); co.setAttribute("role", "radiogroup"); co.setAttribute("aria-label", CW.label);
+    Object.keys(CW.opts).forEach(function (v) { var bt = el("button", "opt"); bt.type = "button"; bt.setAttribute("role", "radio"); bt.setAttribute("data-carry", v);
+      bt.setAttribute("aria-checked", CV === v ? "true" : "false"); bt.setAttribute("aria-label", CW.opts[v].name); bt.setAttribute("data-tip", "copt");
+      if (CW.pick === v) bt.setAttribute("data-pick", "true");                         /* my pick: dashed (D-025.2) */
+      var ic = document.createElementNS("http://www.w3.org/2000/svg", "svg"); ic.setAttribute("viewBox", "0 0 24 24"); ic.setAttribute("aria-hidden", "true"); ic.innerHTML = CICON[v]; bt.appendChild(ic);
+      bt.addEventListener("click", function () { CV = v; try { window.localStorage.setItem(CKEY, v); } catch (x) {} tipOff(); renderOne(); applyEl(); writeOut(LAST.L, LAST.GS);
+        var back = document.querySelector('#ocol-cm .opt[data-carry="' + v + '"]'); if (back) back.focus({ preventScroll: true }); }); co.appendChild(bt); });
+    cg.appendChild(co); bar.appendChild(cg);
     /* his ask 2026-09-26: the code map's settings, copied as text to paste back — beside the options they name */
     var cp = el("button", "btn quiet", W.copy.cm), cs = el("span", "said"); cp.type = "button"; cp.id = "cmcopy"; cp.setAttribute("data-tip", "cmcopy"); cs.id = "cmsaid"; cs.setAttribute("aria-live", "polite");
     cp.addEventListener("click", function () { copyText(cmText(r), cs, W.copy.copied); }); bar.appendChild(cp); bar.appendChild(cs);
@@ -1079,7 +1164,7 @@
       /* a run of rows at one moment: a header row before it, whenever the moment changes — runs are never reordered to meet */
       if (EM.mom === "rows" && m != null && m !== prev) { var hr = el("tr", "mom"); hr.setAttribute("data-mom", momKey(m)); var hc = el("th", null, momName(m, d)); hc.colSpan = nc; hc.setAttribute("data-tip", "mom"); hr.appendChild(hc); t.appendChild(hr); }
       prev = m;
-      var tr = el("tr", "erow"); tr.setAttribute("data-x", xe[2]); if (m != null) tr.setAttribute("data-mom", momKey(m));
+      var tr = cvItem(el("tr", "erow"), "d:exits", i); tr.setAttribute("data-x", xe[2]); if (m != null) tr.setAttribute("data-mom", momKey(m));
       var tk = el("td"); if (e[0]) tk.appendChild(cKind(e[0])); tr.appendChild(tk);
       var tg = el("td"), mw = m != null && EM.mom === "chip" ? momName(m, d) : null;
       if (e[1]) { var sc = cStage(e[1]); if (mw) { sc.appendChild(el("span", "mw", EW.mom[momKey(m)].name)); sc.setAttribute("aria-label", e[1] + " · " + mw); } tg.appendChild(sc); }
@@ -1101,13 +1186,13 @@
     if (k === "exits") endings(b, r);                         /* D-053: the endings and the own checks, one table in time order */
     else if (k === "tables") { list(b, d.tables.items, function (t2) { return frag(t2[0] + " · ", cOp(t2[1])); }, dk.tables); more(b, d.tables); }
     else if (k === "gateWrites") { if (!d.gateWrites.length) b.textContent = W.panel.none;   /* each a table the login check WRITES: the channel chip W */
-      d.gateWrites.forEach(function (t2, i) { if (i) b.appendChild(document.createTextNode(", ")); b.appendChild(ksp(t2, dk.gateWrites[i])); b.appendChild(document.createTextNode(" ")); b.appendChild(cOp("w")); }); }
+      d.gateWrites.forEach(function (t2, i) { if (i) b.appendChild(document.createTextNode(", ")); var gw = cvItem(el("span"), "d:gateWrites", i); gw.appendChild(ksp(t2, dk.gateWrites[i])); gw.appendChild(document.createTextNode(" ")); gw.appendChild(cOp("w")); b.appendChild(gw); }); }
     else if (k === "fates") { list(b, d.fates.items, function (f, i) { var kn = r.xd.fates[i], kw = W.kinds[kn] ? W.kinds[kn].name : null, nm = String(f[0]);
         /* each path leads with its kind of ending; the lab names a path by its kind when nothing better names it ("validation",
            "json_invalid (framework)"), so that word moves into the chip rather than being said twice */
         if (kw && nm === kw) nm = ""; else if (kw && nm.slice(-(kw.length + 3)) === " (" + kw + ")") nm = nm.slice(0, -(kw.length + 3));
         return frag(kw ? cKind(kn) : null, nm ? " " + nm + " " : " ", kd(cStatus(f[1]), dk.fates[i]), " ", cFate(f[2])); }); more(b, d.fates); }
-    else if (k === "gates") keyedJoin(b, d.gates, dk.gates, ", ");
+    else if (k === "gates") keyedJoin(b, d.gates, dk.gates, ", ");                   /* joined items: their field set below */
     else if (k === "limits") keyedJoin(b, d.limits.map(cLimit), dk.limits, " ");
     else if (k === "request") { if (d.request) b.appendChild(frag(cDir("in"), " ", ksp(d.request[0], dk.request), " · " + d.request[1].join(", "))); else b.textContent = W.panel.none; }
     else if (k === "response") { if (d.response) b.appendChild(frag(cDir("out"), " ", ksp(d.response[0], dk.response), " · " + d.response[1])); else b.textContent = W.panel.none; }
@@ -1130,11 +1215,14 @@
       return f; }, dk.alarms);
     else if (k === "pieces") { list(b, d.pieces.items, function (x, i) { return frag(pieceWords(x[0], r.xd.pieces[i]), " · " + x[1] + "/" + x[2] + " ", cPiece(x[3])); }, dk.pieces); more(b, d.pieces); }
     else if (k === "lacks") list(b, d.lacks, function (x, i) { return frag(pieceWords(x[0], r.xd.lacks[i]), " · " + x[1] + "/" + x[2]); });
+    /* D-055: a list's items, in the order drawn, are the field's items (what BY MOMENT carries is read per item) */
+    b.querySelectorAll(":scope > ul > li").forEach(function (li, i) { cvItem(li, "d:" + k, i); });
+    b.querySelectorAll(":scope > [data-ci]:not([data-cf])").forEach(function (n) { n.setAttribute("data-cf", "d:" + k); });
     return o.pr; }
   function headPair(k, r) { var cm = W.codemap.head[k], P = W.panel, hk = r.hk[k];
     var val = k === "method" ? r.m + " " + r.p : k === "handler" ? r.fn + " · " + r.file + ":" + r.line : k === "entity" ? r.ent : k === "segment" ? r.seg : r.declared;
     var o = pairEl("h:" + k, cm.attrs, cm.icon, cm.label || P[k], false), pv = el("div", "pv", k === "handler" || val == null || val === "" ? null : String(val));
-    if (k === "handler") pv.appendChild(frag(ksp(r.fn, hk[0]), " · ", ksp(r.file, hk[1]), ":" + r.line));   /* the handler is a function and a file (D-041) */
+    if (k === "handler") pv.appendChild(frag(cvItem(ksp(r.fn, hk[0]), "h:handler", 0), " · ", cvItem(ksp(r.file, hk[1]), "h:handler", 1), ":" + r.line));   /* the handler is a function and a file (D-041) */
     else if (val == null || val === "") pv.textContent = W.panel.none;
     else { kd(pv, hk);                                          /* D-043: the method, the entity and the declared status as chips */
       if (k === "method") pv.textContent = r.p;                 /* D-052: the endpoint's glyph and its method label come from skAll */
@@ -1277,6 +1365,10 @@
     if (r.uni.silent.length) U.appendChild(el("div", "usilent", fill(O.uni.silent, { rows: r.uni.silent.map(function (x) { return US[x].name; }).join(" · ") })));
     /* RIGHT · the code map: every pair the side panel held, under the block its attribute is homed in */
     var C = $("ocol-cm"); C.textContent = ""; C.setAttribute("data-ep", r.id); C.appendChild(colH(O.cm.title, "layers")); C.appendChild(elSay("el-cm")); C.appendChild(el("p", "plain ainfo", O.cm.plain));
+    /* D-055: how many of the code map's fields BY MOMENT carries whole, in its header; what "carried" means behind the toggle */
+    var cvc = el("span", "cvc", fill(W.carry.count, { covered: r.cvn[0], fields: r.cvn[1], left: r.cvn[1] - r.cvn[0] - r.cvn[2], empty: r.cvn[2] })
+      + (r.cvn[3] ? " · " + fill(W.carry.beyondCount, { n: r.cvn[3] }) : "")); cvc.id = "cvcount"; C.querySelector("h3").appendChild(cvc);
+    C.appendChild(el("p", "plain ainfo", W.carry.plain)); C.lastChild.id = "cv-plain";
     C.appendChild(encKey());                                  /* D-043: the chips' key, behind the toggle */
     var byG = {}; function into(g, pr) { (byG[g] = byG[g] || []).push(pr); }
     Object.keys(W.codemap.head).forEach(function (k) { into(groupOfAttr(W.codemap.head[k].attrs[0]), headPair(k, r)); });
@@ -1294,6 +1386,7 @@
         ps.appendChild(pr); });
       bx.appendChild(ps); C.appendChild(bx); });
     skAll(C);                                                 /* D-052: every element the code map names, drawn the station's way */
+    applyCarry(C, r);                                         /* D-055: what BY MOMENT carries, dimmed or hidden as the switch says */
     /* MIDDLE · the gaps, my reading, in the direction chosen at its top (D-040) */
     var G = $("ocol-gaps"); G.textContent = ""; G.setAttribute("data-ep", r.id); G.setAttribute("data-dir", GD); var gh = colH(O.gaps.title, "skip"); var mine = el("span", "mine", O.gaps.mine); mine.setAttribute("data-tip", "mine"); gh.appendChild(mine); G.appendChild(gh);
     var dr = el("div", "opts gdir"); dr.setAttribute("role", "radiogroup"); dr.setAttribute("aria-label", O.gaps.dir.label);
@@ -1338,8 +1431,10 @@
      the page's block order). A cell holds that block's elements acting at that moment (r.mo.el: [family, moment, keys, words, chip,
      the endings it is on as bits, hint]), each keyed (D-041) and drawn the station's way (D-052). The path picker keeps one
      ending's path: the moments it passes (r.mo.pass) and the elements on it. What has no moment is in the band below, with its
-     reason. The two looks are my picks (D-025.2), remembered per viewer. ══ */
-  var MW = W.mo, MO = D.mo, MKEY = "gabe:allep:moments:v1", MS = { lay: MW.opt.lay.pick, cell: MW.opt.cell.pick }, MPATH = { ep: null, i: null };
+     reason. The two looks' defaults are his (D-055: moments as columns, cells as chips), remembered per viewer; a look remembered before
+     his ruling must not override it, so the old key is dropped. ══ */
+  var MW = W.mo, MO = D.mo, MKEY = "gabe:allep:moments:v2", MS = { lay: MW.opt.lay.pick, cell: MW.opt.cell.pick }, MPATH = { ep: null, i: null };
+  try { window.localStorage.removeItem("gabe:allep:moments:v1"); } catch (e) {}
   try { var mv = JSON.parse(window.localStorage.getItem(MKEY) || "null"); if (mv) Object.keys(MS).forEach(function (g) { if (mv[g] && MW.opt[g].opts[mv[g]]) MS[g] = mv[g]; }); } catch (e) {}
   /* their squares: a list of bars (rows) · the same bars standing (columns) · a cell of chips · a cell with a number */
   var MICON = { lay: { rows: '<rect x="3" y="3" width="6" height="18" rx="1.2"/><path d="M12 6h9M12 12h9M12 18h9"/>', cols: '<rect x="3" y="3" width="18" height="6" rx="1.2"/><path d="M6 12v9M12 12v9M18 12v9"/>' },
@@ -1353,13 +1448,39 @@
   function moName(r, x) { if (x[0] !== "fail") return MW.moms[x[0]].name; var g = r.d.exits.moms[x[1]];
     return MW.moms.fail.name + " — " + fill(g[2].length ? W.endings.caught : W.endings.caughtBare, { calls: g[2].join(" · "), at: g[0], cls: g[1] }); }
   function moLines(x) { return x[2] == null ? "" : fill(x[2] === x[3] ? MW.line : MW.lines, { lo: x[2], hi: x[3] }); }
-  /* the picker's group label: the moment's name, and a handler run's lines (a catch's full words ride its buttons' hover) */
-  function moShort(x) { var ln = moLines(x); return MW.moms[x[0]].name + (ln ? " · " + ln : ""); }
-  function moHead(r, x, tag) { var h = el(tag, "mom"); h.setAttribute("data-mom", x[0]); h.setAttribute("data-tip", "momrow");
-    if (MSTAGE[x[0]]) h.appendChild(cStage(MSTAGE[x[0]])); h.appendChild(el("span", "mn", moName(r, x))); var ln = moLines(x); if (ln) h.appendChild(el("span", "ml", ln)); return h; }
+  /* D-055 · a moment's head says at most two things; its full name, the catch's place, its lines and its stage ride the hover. After
+     a call failed: the function the feed shows raising (when it names one) and the class its except takes; the checks; the work, the
+     first function its run calls (+ how many more); saving, what the handler's own step does there. Any other moment: its short name */
+  function moFace(r, x) { var m = x[0], xe = x[4] || [[], []], first = function (a) { return a.length ? a[0] + (a.length > 1 ? " +" + (a.length - 1) : "") : null; };
+    if (m === "fail") { var g = r.d.exits.moms[x[1]], f = first(g[2]); return f ? [f, g[1]] : [g[1]]; }
+    if (m === "work") return [first(xe[0]) || MW.moms.work.name];
+    if (m === "save") return [xe[1].length ? xe[1].join(" · ") : MW.moms.save.name];
+    return [MW.moms[m].name]; }
+  function moWraps(x) { return !/^(fail|work|save)$/.test(x[0]); }
+  /* the stage glyph: the station's spine, the moment's stage lit — its word is in the hover */
+  function stageGlyph(st) { var sp = el("span", "mstg"); sp.setAttribute("aria-hidden", "true");
+    SPINE.forEach(function (x) { sp.appendChild(el("i", (D.orders.kinds[x] === "bay" ? "bay" : "") + (x === st ? " on" : ""))); }); return sp; }
+  function moHead(r, x, tag, si) { var h = el(tag, "mom"), f = moFace(r, x), ln = moLines(x);
+    h.setAttribute("data-mom", x[0]); h.setAttribute("data-tip", "momrow"); h.setAttribute("data-si", String(si)); h.setAttribute("data-face", f.join(" · "));
+    if (ln) h.setAttribute("data-lines", ln); h.setAttribute("aria-label", moName(r, x) + (ln ? " · " + ln : ""));
+    var l1 = el("span", "mh1" + (moWraps(x) ? " wrap" : f.length === 1 ? " one" : "")); if (MSTAGE[x[0]]) l1.appendChild(stageGlyph(MSTAGE[x[0]]));
+    l1.appendChild(el("span", "mn" + (f.length > 1 ? " mfn" : ""), f[0])); h.appendChild(l1); if (f[1]) h.appendChild(el("span", "mh2", f[1])); return h; }
+  /* how wide a head needs to be, in characters (+2 for its padding): the narrowest width at which it stands on two lines — a name that
+     may wrap, word by word after the glyph; a head of two things, the glyph and the first on one line, the second on the next; a head of
+     one thing, beside the glyph when that is short, else under it */
+  var MG = 5;
+  function moNeed(r, x) { var f = moFace(r, x), g = MSTAGE[x[0]] ? MG : 0, FL = 12;   /* FL: a column's floor, so a cell's chips keep their words */
+    if (moWraps(x)) { var ws = f[0].split(" "), fits = function (w) { var ln = 1, at = g;      /* `at`: the characters line `ln` holds so far */
+        for (var i = 0; i < ws.length; i++) { var len = ws[i].length, nx = at ? at + 1 + len : len; if (len > w) return false;
+          if (nx > w) { ln++; at = len; } else at = nx; } return ln <= 2; };
+      for (var w = 4; w < 60; w++) if (fits(w)) return Math.max(FL, w + 2); return 60; }
+    if (f.length > 1) return Math.max(FL, Math.max(g + f[0].length, f[1].length) + 2);
+    return Math.max(FL, (g + f[0].length <= 14 ? g + f[0].length : Math.max(g, f[0].length)) + 2); }
+  /* a name's break points: after each _ . / (a <wbr>, so the text a probe or a copy reads is unchanged) */
+  function moTxt(s, t) { t.split(/(?<=[_./])/).forEach(function (p, i) { if (i) s.appendChild(document.createElement("wbr")); s.appendChild(document.createTextNode(p)); }); return s; }
   function moChip(e) { var f = e[0], ch = e[4] || [], c = el("span", "mc"); c.setAttribute("data-f", f); c.setAttribute("data-tip", "mochip");
     if (e[6] != null) c.setAttribute("data-hint", String(e[6])); var ks = moK(e[2]); if (ks.length) kd(c, ks);
-    var txt = function (t, cls) { if (t) c.appendChild(el("span", cls || "mt", t)); };
+    var txt = function (t, cls) { if (t) c.appendChild(moTxt(el("span", cls || "mt"), String(t))); };
     if (ch[0] === "end") { c.appendChild(cKind(ch[1])); c.appendChild(cStatus(ch[2])); }
     else if (f === "proof") { txt(e[3]); c.appendChild(el("span", "mpv", MW.proves)); if (ch[0] === "status") c.appendChild(cStatus(ch[1]));
       else if (ch[0] === "statuses") ch[1].forEach(function (st) { c.appendChild(cStatus(st)); }); }
@@ -1377,7 +1498,7 @@
     o.setAttribute("role", "radiogroup"); o.setAttribute("aria-label", R.label);
     Object.keys(R.opts).forEach(function (v) { var bt = el("button", "opt"); bt.type = "button"; bt.setAttribute("role", "radio"); bt.setAttribute("data-mopt", g); bt.setAttribute("data-v", v);
       bt.setAttribute("aria-checked", MS[g] === v ? "true" : "false"); bt.setAttribute("aria-label", R.opts[v].name); bt.setAttribute("data-tip", "mopt");
-      if (R.pick === v) bt.setAttribute("data-pick", "true");                           /* my pick: dashed (D-025.2) */
+      if (R.pick === v) bt.setAttribute(R.ruled ? "data-ruled" : "data-pick", "true");   /* his default wears no dash (D-055); my pick would */
       var ic = document.createElementNS("http://www.w3.org/2000/svg", "svg"); ic.setAttribute("viewBox", "0 0 24 24"); ic.setAttribute("aria-hidden", "true"); ic.innerHTML = MICON[g][v]; bt.appendChild(ic);
       bt.addEventListener("click", function () { MS[g] = v; try { window.localStorage.setItem(MKEY, JSON.stringify(MS)); } catch (x) {} tipOff(); renderMo(); applyEl(); writeOut(LAST.L, LAST.GS); }); o.appendChild(bt); });
     grp.appendChild(o); bar.appendChild(grp); }); }
@@ -1393,15 +1514,19 @@
     /* the bar: the path, then the two looks */
     var bar = $("mobar"); bar.textContent = ""; var pg = el("div", "mgrp"), ps = el("div", "mopaths"); pg.appendChild(el("span", "rl", MW.path.label));
     ps.setAttribute("role", "radiogroup"); ps.setAttribute("aria-label", MW.path.label);
-    /* an ending no path ends at (the feed lists it, no path reaches it) is not offered: it stands in the band, on no path */
+    /* D-055 · ONE ROW: "all paths", then each ending a status code in time order, a small gap between the moments they leave at, no
+       words — the moment, what the ending says, its limiter and whether it is the path in force are its hover. An ending no path ends at
+       (the feed lists it, no path reaches it) is not offered: it stands in the band, on no path */
     var at = ps, lastSi = null;
-    [null].concat(M.ex.map(function (x, i) { return i; }).filter(function (i) { return M.ex[i][4]; })).forEach(function (i) { var b = el("button", "mopath"); b.type = "button"; b.setAttribute("role", "radio");
+    [null].concat(M.ex.map(function (x, i) { return i; }).filter(function (i) { return M.ex[i][4]; })).forEach(function (i) { var b = el("button", "mopath" + (i == null ? "" : " mcode")); b.type = "button"; b.setAttribute("role", "radio");
       b.setAttribute("data-path", i == null ? "all" : String(i)); b.setAttribute("aria-checked", MPATH.i === i ? "true" : "false"); b.setAttribute("data-tip", "mopath");
       if (i == null) { b.textContent = MW.path.all; b.setAttribute("aria-label", MW.path.all); }
-      else { var x = M.ex[i]; if (x[3] !== lastSi) { at = el("span", "mopg"); at.setAttribute("data-mom", M.sp[x[3]][0]); at.appendChild(el("span", "mopgl", moShort(M.sp[x[3]]))); ps.appendChild(at); lastSi = x[3]; }
-        b.appendChild(cStatus(x[1])); if (x[5]) b.appendChild(el("span", "mpf", x[5])); [].forEach.call(b.querySelectorAll("[data-tip]"), function (n) { n.removeAttribute("data-tip"); });
-        b.setAttribute("aria-label", fill(MW.path.one, { status: x[1] }) + (x[5] ? " · " + x[5] : "") + " · " + (W.kinds[x[2]] || {}).name + " · " + moName(r, M.sp[x[3]])); b.setAttribute("data-x", x[0]); }
-      b.addEventListener("click", function () { MPATH.i = i; tipOff(); renderMo(); applyEl(); writeOut(LAST.L, LAST.GS); }); (i == null ? ps : at).appendChild(b); });
+      else { var x = M.ex[i]; if (x[3] !== lastSi) { at = el("span", "mopg"); at.setAttribute("data-mom", M.sp[x[3]][0]); at.setAttribute("data-si", String(x[3])); ps.appendChild(at); lastSi = x[3]; }
+        b.appendChild(cStatus(x[1])); [].forEach.call(b.querySelectorAll("[data-tip]"), function (n) { n.removeAttribute("data-tip"); });
+        b.setAttribute("aria-label", fill(MW.path.one, { status: x[1] }) + (x[5] ? " · " + x[5] : "") + " · " + (W.kinds[x[2]] || {}).name + " · " + moName(r, M.sp[x[3]]) + (x[6] ? " · " + x[6] : "")); b.setAttribute("data-x", x[0]); }
+      b.addEventListener("click", function () { MPATH.i = i; tipOff(); renderMo(); applyEl(); writeOut(LAST.L, LAST.GS);
+        var nb = document.querySelector('#mobar .mopath[data-path="' + (i == null ? "all" : i) + '"]'); if (nb) nb.focus({ preventScroll: true }); });   /* the keyboard keeps its place */
+      (i == null ? ps : at).appendChild(b); });
     pg.appendChild(ps); bar.appendChild(pg); moOpts(bar);
     /* the grid: the moments this path passes (every moment on all paths), each block's elements on this path, in the order read */
     var rowsOn = MPATH.i == null ? M.sp.map(function (x, i) { return i; }) : M.pass[MPATH.i];
@@ -1414,14 +1539,35 @@
       if (D.marks[b] && D.marks[b].col) th.style.setProperty("--bc", D.marks[b].col); return th; }
     var G = $("mogrid"); G.textContent = ""; var t = el("table", "motab"), th = el("thead"), hr = el("tr"), tb = el("tbody"), cg = el("colgroup");
     t.setAttribute("data-lay", MS.lay); t.setAttribute("data-cell", MS.cell); t.setAttribute("data-path", MPATH.i == null ? "all" : String(MPATH.i));
-    var nData = MS.lay === "rows" ? fams.length : rowsOn.length; cg.appendChild(el("col", "mhc")); for (var ci = 0; ci < nData; ci++) cg.appendChild(el("col"));
+    var nData = MS.lay === "rows" ? fams.length : rowsOn.length, dcs = []; cg.appendChild(el("col", "mhc")); for (var cj = 0; cj < nData; cj++) dcs.push(cg.appendChild(el("col")));
     t.appendChild(cg); t.style.minWidth = "calc(" + (MS.lay === "rows" ? 11 : 9.5) + "em + " + nData + " * 6.5em)";   /* a column's floor */
-    if (MS.lay === "rows") { hr.appendChild(el("th", null, MW.opt.lay.label)); fams.forEach(function (f) { hr.appendChild(blockHead(f, "th")); });
-      rowsOn.forEach(function (si) { var tr = el("tr"); tr.setAttribute("data-mom", M.sp[si][0]); tr.setAttribute("data-si", String(si)); tr.appendChild(moHead(r, M.sp[si], "th"));
+    var need = rowsOn.map(function (si) { return moNeed(r, M.sp[si]); });
+    if (MS.lay === "rows") { cg.firstChild.style.width = "max(11em, " + Math.max.apply(null, need.concat([0])) + "ch)";   /* the heads' column: its longest head */
+      hr.appendChild(el("th", null, MW.opt.lay.label)); fams.forEach(function (f) { hr.appendChild(blockHead(f, "th")); });
+      rowsOn.forEach(function (si) { var tr = el("tr"); tr.setAttribute("data-mom", M.sp[si][0]); tr.setAttribute("data-si", String(si)); tr.appendChild(moHead(r, M.sp[si], "th", si));
         fams.forEach(function (f) { tr.appendChild(td(si, f)); }); tb.appendChild(tr); }); }
-    else { hr.appendChild(el("th", null, W.sec.mo)); rowsOn.forEach(function (si) { var h2 = moHead(r, M.sp[si], "th"); h2.setAttribute("data-si", String(si)); hr.appendChild(h2); });
+    else { hr.appendChild(el("th", null, W.sec.mo)); rowsOn.forEach(function (si) { hr.appendChild(moHead(r, M.sp[si], "th", si)); });
       fams.forEach(function (f) { var tr = el("tr"); tr.setAttribute("data-f", f); tr.appendChild(blockHead(f, "th")); rowsOn.forEach(function (si) { tr.appendChild(td(si, f)); }); tb.appendChild(tr); }); }
     th.appendChild(hr); t.appendChild(th); t.appendChild(tb); G.appendChild(t);
+    skAll(G);                                                   /* D-052 marks before the widths: moFloor measures the labels too */
+    /* moments as columns: each column's share of the box follows what its head needs (D-055), so the heads' two lines fit where the box
+       allows; the box is shared out, never overrun, above the columns' floor */
+    if (MS.lay !== "rows") { var h0 = hr.firstChild, cm0 = el("span", null, "0000000000"); cm0.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;font-weight:650"; h0.appendChild(cm0);
+      var chPx = cm0.getBoundingClientRect().width / 10; cm0.remove();
+      var avail = G.clientWidth - h0.getBoundingClientRect().width - 2, tot = need.reduce(function (a, b) { return a + b; }, 0) * chPx;
+      if (chPx > 0 && tot > 0) dcs.forEach(function (c, j) { c.style.width = Math.floor(need[j] * chPx * avail / tot) + "px"; }); }
+    /* moFloor: no column is narrower than its widest badge plus the cell's and the chip's padding — past the box, the box scrolls and
+       says so (moscroll), a badge word is never broken to fit */
+    var fl = dcs.map(function () { return 0; });
+    tb.querySelectorAll("tr").forEach(function (tr) { for (var j = 1; j < tr.children.length; j++) tr.children[j].querySelectorAll(".mc .vc").forEach(function (v) { fl[j - 1] = Math.max(fl[j - 1], v.getBoundingClientRect().width, v.scrollWidth); }); });
+    dcs.forEach(function (c, j) { var cur = parseFloat(c.style.width) || (tb.rows[0] && tb.rows[0].children[j + 1] ? tb.rows[0].children[j + 1].getBoundingClientRect().width : 0), fw = Math.ceil(fl[j] + (MS.lay === "rows" ? 12 : 8) + 18);   /* + the cell's padding + the chip's 12 + a label's 4px margin + 2 */
+      if (fl[j] > 0 && fw > cur) c.style.width = fw + "px"; });
+    /* the floors may push the columns past the box: the excess comes back from the columns above their floor (a wide head's share),
+       in proportion to that room — no column under its floor, so past that the box scrolls and says so */
+    if (MS.lay !== "rows" && dcs.length) { var em = parseFloat(getComputedStyle(t).fontSize) || 12, flo = dcs.map(function (c, j) { return Math.max(fl[j] > 0 ? Math.ceil(fl[j] + 26) : 0, 6.5 * em, chPx > 0 ? Math.ceil(need[j] * chPx) + 8 : 0); }),   /* its badge · the column floor · its head on two lines (moNeed) */
+        ww = dcs.map(function (c) { return parseFloat(c.style.width) || 0; }), room = G.clientWidth - hr.firstChild.getBoundingClientRect().width - 2,
+        over = ww.reduce(function (a, b) { return a + b; }, 0) - room, slack = ww.map(function (w, j) { return Math.max(0, w - flo[j]); }), sl = slack.reduce(function (a, b) { return a + b; }, 0);
+      if (over > 0 && sl > 0) dcs.forEach(function (c, j) { c.style.width = Math.floor(ww[j] - Math.min(slack[j], over * slack[j] / sl)) + "px"; }); }
     var sc = $("moscroll"); sc.hidden = !(G.scrollWidth > G.clientWidth + 2);
     /* the band: the blocks that happen in no time, then each timed block's elements with no moment here, by reason, counted */
     var B = $("moband"); B.textContent = ""; B.appendChild(el("h3", null, MW.band.title)); B.appendChild(el("p", "plain ainfo", MW.band.plain));
@@ -1436,7 +1582,7 @@
         by[w].forEach(function (u) { ln.appendChild(moChip([u[0], null, u[1], u[2], null, null, null])); }); box.appendChild(ln); });
       row.appendChild(box); B.appendChild(row); });
     if (!any) B.appendChild(el("p", "mball", MW.band.all));
-    skAll(G); skAll(B);                                        /* D-052: every element named here, drawn the station's way */
+    skAll(B);                                                  /* D-052: every element named here, drawn the station's way (the grid's, above) */
   }
   /* pointing at a gap lights where it is: in (a) the code-map pairs that carry its attribute, in (b) the universe row it is in */
   document.addEventListener("mouseover", function (e) { var g = e.target.closest && e.target.closest("#ocol-gaps .gap[data-attr], #ocol-gaps [data-row]");
@@ -1599,17 +1745,31 @@
     if (kind === "uni" && r) { var u = r.uni.rows.filter(function (x) { return x.row === t.getAttribute("data-row"); })[0], us = D.uspec.filter(function (x) { return x.row === u.row; })[0];
       return "<b>" + esc(u.title || us.name) + "</b> · " + esc(W.one.uni.title) + "<span class=ln>" + esc(u.value) + "</span><span class=pl>" + esc(fill(W.one.attrOf, { v: us.attrs.map(function (a) { return D.attrs[a].label; }).join(" · ") || W.panel.none })) + " · " + esc(W.one.gaps.mine) + "</span>"; }
     if (kind === "pair") { var as = t.getAttribute("data-attr").split(" ");
+      var cvr = BYID[S.open] && BYID[S.open].cv ? BYID[S.open].cv[t.getAttribute("data-k")] : null;   /* D-055: what BY MOMENT carries of it */
       return "<b>" + esc(t.querySelector(".pk").textContent) + "</b>" + as.map(function (a) { return "<span class=ln>" + esc(fill(W.one.attrOf, { v: D.attrs[a].label })) + "</span>"; }).join("") + "<span class=pl>" + esc(D.attrs[as[0]].plain) + "</span>"
-        + (t.getAttribute("data-gap") === "true" ? "<span class=pl>" + esc(W.one.gaps.shows) + "</span>" : ""); }
+        + (t.getAttribute("data-gap") === "true" ? "<span class=pl>" + esc(W.one.gaps.shows) + "</span>" : "")
+        + (cvr && (cvr[0] === "c" || (cvr[0] === "x" && cvr[3])) ? "<span class=pl>" + esc(W.carry.tipAll) + "</span>" : cvr && cvr[0] === "p" ? "<span class=pl>" + esc(fill(W.carry.tipPart, { n: cvr[2], of: cvr[3] })) + "</span>"
+          : cvr && cvr[0] === "e" ? "<span class=pl>" + esc(W.carry.tipEmpty) + "</span>" : "")
+        + (cvr && cvr[4] && cvr[4].length ? "<span class=pl>" + esc(fill(W.carry.tipBeyond, { n: cvr[4].length, names: cvr[4].join(", ") })) + "</span>" : ""); }
     if (kind === "gap") { var ga = t.getAttribute("data-attr"), at = D.attrs[ga], px = r && t.hasAttribute("data-part") ? r.partly.filter(function (x) { return x[0] === ga; })[0] : null;
       if (px) return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.partly) + "<span class=ln>" + esc(fill(W.one.gaps.partlyTip, { names: px[3].join(", "), n: px[1], of: px[2] })) + "</span>" + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>";
       return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.shows) + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>"; }
     if (kind === "copycmd") return esc(W.panel.copy);
     if (kind === "cmcopy") return "<b>" + esc(W.copy.cm) + "</b><span class=pl>" + esc(W.copy.cmPlain) + "</span>";
-    if (kind === "mopt") { var mg = t.getAttribute("data-mopt"), mo = W.mo.opt[mg], mk3 = t.getAttribute("data-v"); return "<b>" + esc(mo.opts[mk3].name) + "</b>" + (mo.pick === mk3 ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(mo.opts[mk3].plain) + "</span>"; }
-    if (kind === "mopath") { var pa = t.getAttribute("data-path"), rm = BYID[S.open]; if (pa === "all") return "<b>" + esc(W.mo.path.all) + "</b><span class=pl>" + esc(W.mo.path.allPlain) + "</span>";
-      var xx = rm.mo.ex[+pa]; return "<b>" + esc(fill(W.mo.path.one, { status: xx[1] }) + (xx[5] ? " · " + xx[5] : "")) + "</b><span class=pl>" + esc(fill(W.mo.path.onePlain, { kind: (W.kinds[xx[2]] || {}).name, mom: moName(rm, rm.mo.sp[xx[3]]) })) + "</span>"; }
-    if (kind === "momrow") { var mm = t.getAttribute("data-mom"); return "<b>" + esc(t.querySelector(".mn").textContent) + "</b>" + (t.querySelector(".ml") ? " · " + esc(t.querySelector(".ml").textContent) : "") + "<span class=pl>" + esc(W.mo.moms[mm].plain) + "</span>"; }
+    if (kind === "mopt") { var mg = t.getAttribute("data-mopt"), mo = W.mo.opt[mg], mk3 = t.getAttribute("data-v"); return "<b>" + esc(mo.opts[mk3].name) + "</b>" + (mo.pick === mk3 ? " · " + esc(mo.ruled ? W.ruledMark : W.pickMark) : "") + "<span class=pl>" + esc(mo.opts[mk3].plain) + "</span>"; }
+    if (kind === "copt") { var cw = W.carry, cv3 = t.getAttribute("data-carry"); return "<b>" + esc(cw.opts[cv3].name) + "</b>" + (cw.pick === cv3 ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(cw.opts[cv3].plain) + "</span>"; }
+    /* D-055: a path code's hover — its status (and what tells it from another of its status there), its kind; the moment it leaves at;
+       what it says; its limiter; whether it is the path in force */
+    if (kind === "mopath") { var pa = t.getAttribute("data-path"), rm = BYID[S.open], pon = t.getAttribute("aria-checked") === "true", pf = "<span class=pl>" + esc(pon ? W.mo.path.inForce : W.mo.path.pickIt) + "</span>";
+      if (pa === "all") return "<b>" + esc(W.mo.path.all) + "</b><span class=pl>" + esc(W.mo.path.allPlain) + "</span>" + pf;
+      var xx = rm.mo.ex[+pa]; return "<b>" + esc(xx[1] + (xx[5] ? " · " + xx[5] : "") + " · " + ((W.kinds[xx[2]] || {}).name || xx[2])) + "</b>"
+        + "<span class=ln>" + esc(fill(W.mo.path.mom, { mom: moName(rm, rm.mo.sp[xx[3]]) })) + "</span>"
+        + (xx[6] ? "<span class=ln>" + esc(fill(W.mo.path.says, { v: xx[6] })) + "</span>" : "") + (xx[7] ? "<span class=ln>" + esc(fill(W.mo.path.lim, { v: xx[7] })) + "</span>" : "") + pf; }
+    /* D-055: a moment head's hover — its full name (a catch's: what raised, where it was caught, the class), its lines, its stage, the calls its run makes */
+    if (kind === "momrow") { var rr0 = BYID[S.open], x0 = rr0.mo.sp[+t.getAttribute("data-si")], st0 = MSTAGE[x0[0]], cl0 = (x0[4] || [[]])[0];
+      return "<b>" + esc(moName(rr0, x0)) + "</b>" + (t.getAttribute("data-lines") ? "<span class=ln>" + esc(t.getAttribute("data-lines")) + "</span>" : "")
+        + (st0 ? "<span class=ln>" + esc(fill(W.mo.head.stage, { v: st0 })) + (W.stages[st0] ? " — " + esc(W.stages[st0]) : "") + "</span>" : "")
+        + (cl0.length ? "<span class=ln>" + esc(fill(W.mo.head.calls, { v: cl0.join(" · ") })) + "</span>" : "") + "<span class=pl>" + esc(W.mo.moms[x0[0]].plain) + "</span>"; }
     if (kind === "mowhy") { var mw = W.mo.why[t.getAttribute("data-why")]; return "<b>" + esc(mw.name) + "</b> · " + esc(W.mo.band.title) + "<span class=pl>" + esc(mw.plain) + "</span>"; }
     if (kind === "mochip") { var mf = t.getAttribute("data-f"), mb = BLK[D.mo.fam[mf]], mks = keysOf(t), mh = t.getAttribute("data-hint");
       return "<b>" + esc(fill(W.mo.tip, { name: mks.length ? elName(mks[0]) : t.textContent.trim(), block: mb.name })) + "</b>" + (mh ? "<span class=ln>" + esc(mh) + "</span>" : "")
@@ -1652,7 +1812,7 @@
     var bx = t.getBoundingClientRect(), tw = tip.offsetWidth, thh = tip.offsetHeight;
     var x = Math.min(window.innerWidth - tw - 8, Math.max(8, bx.left)), y = bx.bottom + gp; if (y + thh > window.innerHeight - 4) y = Math.max(4, bx.top - thh - gp);
     tip.style.left = x + "px"; tip.style.top = y + "px"; tip.setAttribute("data-live", live ? "true" : "false"); tip.setAttribute("data-show", "true"); TIPAT = t; });
-  document.addEventListener("focusin", function (e) { var t = e.target.closest && e.target.closest(".opt[data-tip]"); if (!t || !t.matches(":focus-visible")) return;   /* a keyboard focus, not a mouse press */
+  document.addEventListener("focusin", function (e) { var t = e.target.closest && e.target.closest(".opt[data-tip], .mopath[data-tip]"); if (!t || !t.matches(":focus-visible")) return;   /* a keyboard focus, not a mouse press */
     var h = tipFor(t); if (!h) return; tip.innerHTML = h; var bx = t.getBoundingClientRect();
     tip.style.left = Math.min(window.innerWidth - tip.offsetWidth - 8, Math.max(8, bx.left)) + "px"; tip.style.top = (bx.bottom + 6) + "px"; tip.setAttribute("data-show", "true"); });
   document.addEventListener("focusout", function (e) { if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest("#tip")) return; tipOff(); });
@@ -1663,12 +1823,13 @@
     var done = function () { said.textContent = word; setTimeout(function () { said.textContent = ""; }, 1600); };
     try { navigator.clipboard.writeText(s).then(done, function () { fallback(); }); } catch (e) { fallback(); }
     function fallback() { var ta = el("textarea"); ta.value = s; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (e2) {} ta.remove(); done(); } }
-  /* an option's line: where it sits, its words, and whether it is my pick or his choice */
-  function optLine(where, R, v) { return where + " · " + R.label + ": " + R.opts[v].name + " (" + (v === R.pick ? W.copy.pick : W.copy.his) + ")"; }
-  function cmLines() { var C = W.copy.lines; return [optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.mo, W.mo.opt.lay, MS.lay), optLine(C.mo, W.mo.opt.cell, MS.cell)]; }
+  /* an option's line: where it sits, its words, and whether it is my pick, his ruled default (D-055) or his choice */
+  function optLine(where, R, v) { return where + " · " + R.label + ": " + R.opts[v].name + " (" + (v === R.pick ? (R.ruled ? W.ruledMark : W.copy.pick) : W.copy.his) + ")"; }
+  function cmLines() { var C = W.copy.lines; return [optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),
+    optLine(C.mo, W.mo.opt.lay, MS.lay), optLine(C.mo, W.mo.opt.cell, MS.cell)]; }
   /* the code map's own copy (his ask 2026-09-26): the page, the endpoint, every option of the code map, then room for his words */
   function cmText(r) { var C = W.copy.lines; return [C.page + ": all-endpoints · " + T.app + " @ " + T.head, C.open + ": " + r.id,
-    optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), "", C.your, ""].join("\n"); }
+    optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV), "", C.your, ""].join("\n"); }
   function writeOut(L, GS) {
     var C = W.copy.lines, lines = [C.page + ": all-endpoints · " + T.app + " @ " + T.head,
       C.layout + ": " + fill(W.rail.lay.opts[S.lay].name, { cards: D.layouts[S.lay] }), C.group + ": " + W.rail.grp.opts[S.grp].name + (S.grp !== "flat" ? " (" + GS.length + ")" : ""),
@@ -1696,7 +1857,8 @@
   $("stamp").textContent = fill(W.stamp); $("keys").textContent = fill(W.keys);
   if (D.partial) { $("partial").hidden = false; $("partial").textContent = fill(W.partial); }
   $("t-board").textContent = W.sec.board; $("t-one").textContent = W.sec.one; $("t-more").textContent = W.sec.more; $("t-copy").textContent = W.sec.copy; $("t-mo").textContent = W.sec.mo; $("moscroll").textContent = W.mo.scrolls;
-  window.addEventListener("resize", function () { var G = $("mogrid"), sc = $("moscroll"); if (G && sc && G.firstChild) sc.hidden = !(G.scrollWidth > G.clientWidth + 2); });
+  /* the columns' shares are measured against the box (D-055): a new width draws BY MOMENT again */
+  window.addEventListener("resize", function () { var G = $("mogrid"); if (G && G.firstChild) { renderMo(); applyEl(); } });
   /* the toggle beside each title (D-038): closed by default, remembered per viewer (a convenience — the page draws the same without it) */
   var IKEY = "gabe:allep:info:v1", INFO = { board: false, one: false, mo: false };
   try { var ir = window.localStorage.getItem(IKEY); if (ir) { var io = JSON.parse(ir); Object.keys(INFO).forEach(function (k) { INFO[k] = io[k] === true; }); } } catch (e) {}
@@ -1751,6 +1913,6 @@
     if (hit) S.open = hit.id; else { $("onenote").hidden = false; $("onenote").textContent = fill(W.one.notFound, { ep: window.EPSLUG.valid(want) ? want : "?" }); } })();
   render();
   window.__allep = { ready: true, key: KEY, rails: RAILS, icons: ICON, data: D, state: S, render: render, bins: BINS, layout: layout, groups: groups, cellWords: cellWords, aggOf: aggOf, pick: pick, slug: slugOf, groupOfAttr: groupOfAttr, rowKeys: rowKeys, elName: elName,
-    mo: { key: MKEY, looks: MS, path: MPATH, fams: moFams } };
+    mo: { key: MKEY, looks: MS, path: MPATH, fams: moFams, face: moFace }, carry: { key: CKEY, get: function () { return CV; } } };
 })();
 </script>

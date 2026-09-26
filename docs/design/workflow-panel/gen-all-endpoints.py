@@ -880,6 +880,16 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         return H0 + hit[0]
     fail_si = {g: H0 + next(i for i, x in enumerate(seg) if x[0] == f"fail:{g}") for g in range(len(TO["gat"]))}
     first_checks = H0 + next(i for i, x in enumerate(seg) if x[0] == "checks")
+    # D-055: a handler moment's own words — the functions its run calls (the chains' own call sites on its lines, in line order) and,
+    # in a saving run, what the handler's own step there does (commit, rollback). The head shows the first; the hover all of them
+    for i, x in enumerate(seg):
+        if x[1] is None:
+            sp[H0 + i].append([[], []])
+            continue
+        cl = sorted({(q, nm(f)) for d in pcall.values() for q, fs in d.items() if x[1] <= q <= x[2] and hsi(q) == H0 + i for f in fs})
+        ops = [steps[s]["op"] for s in sids if s in in_steps and steps.get(s, {}).get("fn") == H and inh(steps[s].get("at"))
+               and steps[s].get("op") in ("commit", "rollback") and hsi(_line(steps[s]["at"])) == H0 + i]
+        sp[H0 + i].append([list(dict.fromkeys(n for _q, n in cl)), list(dict.fromkeys(ops))])
     x_si = {}
 
     def si_of(e):
@@ -1205,11 +1215,192 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             tally["faces"] += fc is None
             for i, f2 in zip(ids, fc or [None] * len(ids)):
                 ex[i][5] = f2
+    for x in ex:                                                  # D-055: what a path code's hover says — the ending's own words, its limiter
+        x.append(says(XS[x[0]]) or None); x.append(lim.get(x[0]) or None)
     pas = [sorted(set().union(*[seen[p] for p in PIDS if EXIT[p] == x[0]])) if x[4] else [] for x in ex]
-    return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "n": {f: [len(rp[f]), len(ru[f])] for f, _a in MO_FAM if rp[f] or ru[f]}}
+    # D-055: the code-map members BY MOMENT places, read through the RECORDS the build check above joins (each placed element's
+    # records, turned into the member the code map names: an ending, a guard, a table a step touches, a function …); the members of
+    # the records that check counts as the code map's own (want · sub); and the keys every placed element is drawn with
+    def mem(f, rec, k0):
+        p, _c, v = rec.partition(":")
+        if f == "end":
+            return [("end", rec)]
+        if f == "gate":
+            return [({"g": "guard", "b": "fork", "c": "catch", "a": "gate", "l": "limiter"}[p], v)]
+        if f == "data":
+            t = (steps.get(v) or {}).get("table") if p == "s" else v
+            return [("table", t)] if t else []
+        if f == "fn":
+            return [("fn", v)]
+        if f == "shape":
+            return [("body",)] if rec == "q:body" else [("reply",)] if rec == "r:reply" else [("field", v)]
+        if f == "client":                                         # a cache write ("o:") is BY MOMENT's own reading: no field names it
+            return [("sender", k0)] if p == "h" else [("screen", v)] if p == "v" else [("reason", v)] if p == "s" else []
+        if f == "inf":
+            return [("inflight", v)]
+        if f == "proof":
+            cid = (rec[:-len(":raises")] if rec.endswith(":raises") else rec)[2:].rsplit(":", 1)[0]
+            return [("case", cid)] + ([] if rec.endswith(":raises") else [("act", rec)])
+        if f == "stage":                                          # the middleware ("m:") is the chain's own step: no field names it
+            return [("rule", v)] if p == "k" else []
+        if f == "std":
+            return [("switch", v)] if p == "w" else [("piece", v)]
+        return []
+    PM, KM, byrec = set(), set(), {}
+    for x in el:                                                  # the placed elements, as drawn (keys, text) — their records are rp
+        KM.update(x[2])
+    for f in rp:
+        for rec in rp[f]:
+            k0 = next((e["keys"][0] for e in els if rec in e["rec"] and e["f"] == f and e["keys"]), None) if f == "client" else None
+            byrec[(f, rec)] = mem(f, rec, k0)
+            PM.update(byrec[(f, rec)])
+    PW = {m for f in rp for rec in rp[f] if rec in (want.get(f, set()) | sub.get(f, set())) for m in byrec[(f, rec)]}
+    return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "n": {f: [len(rp[f]), len(ru[f])] for f, _a in MO_FAM if rp[f] or ru[f]},
+            "_P": PM, "_Pw": PW, "_K": KM}
 
 
 MO_ORDER = [f for f, _a in MO_FAM]
+
+
+# ── 2d · D-055: WHAT BY MOMENT CARRIES OF THE CODE MAP ─────────────────────────────────────────────────────────────────
+# His ask 2026-09-26: a switch that dims or hides every field of the code map BY MOMENT already carries, to see what is left. Every
+# field the code map draws (its head pairs, its column pairs, its detail pairs and the own checks inside the endings) is read here as
+# its MEMBERS — the code map's own identities (the row record's `u`, its detail items, D-053's rows), never the page's words — and a
+# member is carried when BY MOMENT places it at a moment on any path (by_moment's _P, read through the records its build check joins).
+# An item field (a list, a table's rows) carries each drawn item apart; a count carries all its members or part of them. A field no
+# member of which BY MOMENT places (its fates, its alarms, the file, a count of chain steps) stays bright.
+#     PROVEN per endpoint: (A) every member BY MOMENT places is drawn there under the key the code map draws it with; (B) a member not
+# placed is never drawn there under a key of its own; (C) every record BY MOMENT places that its build check counts as the code map's
+# own (want · sub) is a member a code-map field names — so the switch can hide nothing BY MOMENT does not hold, and miss nothing it does.
+# The one exception is the data block's: its records are the effects' steps, and a step on a table the code map does not list is
+# BY MOMENT holding MORE than the code map, not less — a gap in the code map, said on the page: the tables fields keep their names in
+# every look and say how many tables only BY MOMENT holds (state x), and the header counts them.
+# Per field: [state, the drawn items' flags, carried, of, the tables only BY MOMENT holds (state x, or p with some)]; states c · p · b,
+# e = the field holds nothing on this endpoint (nothing to carry, nothing left out — counted apart, never "left"), x = every element it
+# lists is carried AND BY MOMENT holds more of its kind. Three fields hold nothing BY MOMENT could place by construction (a path's
+# fate, the chain's length, the proof rank): they are never e, they are what BY MOMENT leaves out.
+CV_KINDLESS = ("c:fate", "c:chain", "d:proof")
+CV_TABLES = ("c:tables", "d:tables")
+
+
+def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
+    mo, F, U, d, dk, v = r["mo"], L["forms"], r["u"], r["d"], r["dk"], r["v"]
+    P, PW, K = mo.pop("_P"), mo.pop("_Pw"), mo.pop("_K")
+    XS = {x["id"]: x for x in F["exits"]}
+    pre, TO = F.get("preconditions") or [], r["_to"]
+    un = lambda k0, pfx: k0[len(pfx):] if isinstance(k0, str) and k0.startswith(pfx) else None
+    ends = [("end", i) for i in XS]
+    live = lambda cid: v.get(cid) != "absent"
+    uu = lambda cid, kind: [(kind, m) for m in U.get(cid) or []] if live(cid) else []
+    _rb, _rn, req_fields = body_schema(fep, fj.get("schemas") or {})
+    E = "endpoint:" + r["id"]
+    acts = [("act", "p:" + cid + ":" + str(c.get("line"))) for cid, tc in sorted((fj.get("test_cases") or {}).items())
+            for c in tc.get("calls") or [] if c.get("endpoint") == E and c.get("role") == "act"]
+    cases = lambda plus: [("case", t["case"]) for x in F["exits"] for t in x.get("tests") or [] if t.get("case") and (not plus or "+" in str(t.get("conf") or ""))]
+    gates = [("gate", str(g.get("fn"))) for g in (F.get("auth") or {}).get("gates") or []]
+    lims = [("limiter", str(l0.get("limiter") or l0.get("class") or "?").lstrip("_")) for l0 in (F.get("rate") or {}).get("limits") or []]
+    pieces = [("piece", p["key"]) for p in L["feedwide"]["pieces"]["rows"] if p["word"] in ("rare", "only here")]
+    fields = [("field", f) for f in req_fields or []] if d.get("request") else []
+    # ── every field, as (key, "n" count over members | "i" one entry per drawn item, members) ──
+    spec = [("h:method", "n", [("endpoint", r["id"])]),
+            ("h:handler", "i", [[("fn", fep.get("handler") or "")], [("file", r.get("file"))]]),
+            ("h:entity", "n", [("entity", r["ent"])] if r.get("ent") else []),
+            ("h:segment", "n", [("segment", r["seg"])]),
+            ("h:declared", "n", [("declared", r["declared"])] if r.get("declared") not in (None, "") else [])]
+    COLM = {"all": ends, "stage": ends if live("stage") else [], "tables": uu("tables", "table"), "written": uu("written", "table"), "guards": uu("guards", "guard"),
+            "auth": gates if live("auth") else [], "response": [("reply",)] if d.get("response") else [], "acts": acts if live("acts") else [],
+            "asserted": cases(True) if live("asserted") else [], "proof": cases(False) if live("proof") else [],
+            "branches": uu("branches", "fork"), "catches": uu("catches", "catch"), "rate": lims if live("rate") else [], "fate": [],
+            "deciders": uu("deciders", "fn"), "datafns": uu("datafns", "fn"), "request": fields,
+            "fetched": [("sender", fb.get("id")) for fb in L["widening"]["fetched_by"]] if live("fetched") else [],
+            "reasons": uu("reasons", "reason"), "chain": [], "cases422": uu("cases422", "rule"),
+            "inf_answer": uu("inf_answer", "inflight"), "inf_server": uu("inf_server", "inflight"),
+            "alarms": [("finding", a) for a in (v["alarms"] if isinstance(v["alarms"], list) else [])],
+            "behind": [("fn", un(k0, "fn:")) for k0 in dk.get("behind") or []], "switches": uu("switches", "switch"),
+            "pieces": pieces if live("pieces") else [], "lacks": [("lack", x[0]) for x in d["lacks"]]}
+    slots = [c[0] for c in COLS if c[2] == "slot"]
+    for cid, _a, kind, _arm, _g in COLS:
+        if kind == "slot" and cid != slots[0]:
+            continue
+        if cid not in COLM and kind != "slot":
+            die(f"D-055: column {cid} names no members — the switch would not know what it carries")
+        spec.append(("c:" + ",".join(slots) if kind == "slot" else "c:" + cid, "n", ends if kind == "slot" else COLM[cid]))
+    one = lambda m: [m] if m[-1] else []
+    DET = {"exits": [[("end", t["x"]["id"])] if t["x"] is not None else [("guard", t["pre"]["id"])] for t in TO["rows"]],
+           "guards": [[("guard", g["id"])] for g in pre],
+           "tables": [[("table", t[0])] for t in d["tables"]["items"]], "gateWrites": [[("table", t)] for t in d["gateWrites"]],
+           "fates": [[] for _x in d["fates"]["items"]], "gates": [one(m) for m in gates], "limits": [[m] for m in lims],
+           "request": ([("body",)] + fields) if d.get("request") else [], "response": [("reply",)] if d.get("response") else [],
+           "cases": uu("cases422", "rule"), "deciders": [one(("fn", un(k0, "fn:"))) for k0 in dk["deciders"]],
+           "switches": [[("switch", un(x[0], "switch:"))] for x in dk["switches"]], "behind": COLM["behind"], "proof": [],
+           "inflight": [[("inflight", un(k0, "inflight:"))] for k0 in dk["inflight"]], "hook": one(("sender", dk.get("hook"))),
+           "screens": [("screen", s.get("id")) for s in L["widening"].get("screens") or []],
+           "reasons": [[("reason", un(x[0], "reason:"))] for x in dk["reasons"]], "alarms": [[("finding", a[0])] for a in d["alarms"]],
+           "pieces": [[("piece", un(k0, "piece:"))] for k0 in dk["pieces"]], "lacks": [[("lack", x[0])] for x in d["lacks"]]}
+    ITEMS = {"exits", "guards", "tables", "gateWrites", "fates", "gates", "limits", "deciders", "switches", "inflight", "reasons", "alarms", "pieces", "lacks"}
+    if sorted(DET) != sorted(W["codemap"]["details"]):
+        die(f"D-055: the code map's pairs and the fields the switch reads differ: {sorted(set(DET) ^ set(W['codemap']['details']))}")
+    if [k0 for k0, _t, _m in spec[:5]] != ["h:" + k0 for k0 in W["codemap"]["head"]]:
+        die("D-055: the code map's head pairs and the fields the switch reads differ")
+    spec += [("d:" + k0, "i" if k0 in ITEMS else "n", DET[k0]) for k0 in W["codemap"]["details"]]
+    # ── the key a member is drawn with (D-041), for the proofs ──
+    def key(m):
+        k0, i = m[0], (m[1] if len(m) > 1 else None)
+        if k0 == "end":
+            s = XS[i].get("status")
+            return None if s in (None, "") else "status:" + str(s)
+        if k0 in ("gate", "fn"):
+            return "fn:" + i.replace("#", "::") if i else None
+        if k0 in ("body", "field"):
+            return dk.get("request")
+        if k0 == "reply":
+            return dk.get("response")
+        if k0 in ("sender", "screen"):
+            return i
+        if k0 == "act":
+            return "case:" + i[2:].rsplit(":", 1)[0]
+        pfx = {"table": "table", "guard": "guard", "fork": "fork", "catch": "catch", "limiter": "limiter", "reason": "reason",
+               "inflight": "inflight", "case": "case", "rule": "rule", "switch": "switch", "piece": "piece"}.get(k0)
+        return pfx + ":" + str(i) if pfx and i is not None else None
+    allm = {m for _k, t, ms in spec for m in ([x for it in ms for x in it] if t == "i" else ms)}
+    # PROOF (A) · (B) · (C) — see the section head
+    for m in sorted(P & allm, key=str):
+        if key(m) and key(m) not in K:
+            die(f"{r['id']}: D-055 — BY MOMENT places {m} by its records, but draws no element under its key {key(m)}")
+    pk = {key(m) for m in P if key(m)}
+    for m in sorted(allm - P, key=str):
+        if key(m) in K and key(m) not in pk:
+            die(f"{r['id']}: D-055 — BY MOMENT draws {key(m)} at a moment, but its records place no member of the code map under it ({m})")
+    lost = sorted((m for m in PW - allm if m[0] != "table"), key=str)
+    extra = sorted({m[1] for m in PW - allm if m[0] == "table"})           # tables BY MOMENT's steps touch that the code map does not list
+    if lost:
+        die(f"{r['id']}: D-055 — BY MOMENT places members its build check counts as the code map's, which no code-map field names: {lost[:4]}")
+    for t in extra:                                                        # said on the page as BY MOMENT's: it must draw each one
+        if "table:" + t not in K:
+            die(f"{r['id']}: D-055 — the code map lacks table {t}, which BY MOMENT's steps touch, yet BY MOMENT draws it under no key")
+    if [k0 for k0 in CV_KINDLESS + CV_TABLES if k0 not in {s0[0] for s0 in spec}]:
+        die("D-055: a field the switch names apart is not a field the code map draws")
+    cv, nc, ne = {}, 0, 0
+    for k0, t, ms in spec:
+        if t == "i":
+            fl = [1 if it and all(m in P for m in it) else 0 for it in ms]
+            a, n = sum(fl), len(fl)
+        else:
+            ms = list(dict.fromkeys(ms)); fl = None
+            a, n = sum(1 for m in ms if m in P), len(ms)
+        st = "c" if n and a == n else "p" if a else "b"
+        if k0 in CV_KINDLESS:
+            if n:
+                die(f"{r['id']}: D-055 — {k0} was read as holding nothing BY MOMENT could place, yet names {n} members")
+        elif not n:
+            st = "e"
+        cv[k0] = [st, fl, a, n]
+        if extra and k0 in CV_TABLES:
+            cv[k0][0] = "x" if st in ("c", "e") else st
+            cv[k0].append(extra)
+        nc += cv[k0][0] == "c"
+        ne += cv[k0][0] == "e"
+    r["cv"], r["cvn"] = cv, [nc, len(spec), ne, len(extra)]
 
 
 def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Counter) -> dict:
@@ -1239,6 +1430,8 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
     for g, O in MW["opt"].items():
         if O.get("pick") not in (O.get("opts") or {}):
             die(f"mo.opt.{g}: its default {O.get('pick')!r} is not one of its options")
+        if "ruled" in O and not re.fullmatch(r"D-\d{3}", str(O["ruled"])):           # his default names the ruling (D-055), like a rail's
+            die(f"mo.opt.{g}: `ruled` must name the ruling (D-nnn), not {O['ruled']!r}")
     KT = {}
     for r in rows:
         for x in r["mo"]["el"]:
@@ -2041,6 +2234,15 @@ def build(argv: list) -> tuple:
     ADJ, MEMO, MOT = fn_adj(json.loads((UNI.EX / "levels.json").read_text(encoding="utf-8"))), {}, collections.Counter()
     for L, r in zip(facts, rows):
         r["mo"] = by_moment(L, fj, fj["endpoints"]["endpoint:" + r["id"]], r, X, ADJ, MEMO, MOT)
+        carried(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], W)      # D-055: what BY MOMENT carries of the code map, proven
+    # D-055: the switch's words, and per code-map field, across the feed, how many endpoints leave it bright (whole, or in part)
+    CW = W["carry"]
+    if CW.get("pick") not in (CW.get("opts") or {}) or "ruled" in CW:
+        die(f"carry: its default {CW.get('pick')!r} must be one of its options, and it is my pick (no ruling names it)")
+    cv_left, cv_beyond = {}, sum(r["cvn"][3] for r in rows)
+    for r in rows:
+        for k0, x in r["cv"].items():                                    # per field: endpoints where it is b · p · c · e · x
+            cv_left.setdefault(k0, [0, 0, 0, 0, 0])["bpcex".index(x[0])] += 1
     kinds = {k.split(":", 1)[0] for r in rows for k in all_keys(r)}
     # every kind a key has wears a word; on the whole feed every word names a kind a key has (a fixture of a few endpoints holds fewer)
     if kinds - set(W["el"]["kinds"]) or (not only and set(W["el"]["kinds"]) - kinds):
@@ -2171,7 +2373,8 @@ def build(argv: list) -> tuple:
     data = {"tok": tok, "partial": bool(only), "layouts": LAYOUTS, "rows": rows, "cols": cols, "blocks": blocks, "orders": orders, "families": families,
             "kinds5": list(KINDS5), "fates": list(FATES), "pieceWords": list(PIECE_WORDS), "words": W,
             "icons": got["icons"], "marks": marks, "uspec": uspec, "attrs": attrs, "attrOrder": order, "ulook": ulook,
-            "ucard": {k: spec["_card"][k] for k in ("more", "comp", "okState")}, "elLabels": dict(sorted(CL.items())), "enc": enc, "sk": sk, "mo": MO}
+            "ucard": {k: spec["_card"][k] for k in ("more", "comp", "okState")}, "elLabels": dict(sorted(CL.items())), "enc": enc, "sk": sk, "mo": MO,
+            "cvLeft": cv_left}
 
     RUNTIME = set(W.get("_runtime") or [])
     left = set(TOKEN.findall(json.dumps({k2: v2 for k2, v2 in W.items() if not k2.startswith("_")}, ensure_ascii=False))) - {"{" + t + "}" for t in list(tok) + list(RUNTIME)}
@@ -2208,7 +2411,11 @@ def build(argv: list) -> tuple:
                f"\nBY MOMENT · " + " · ".join(f"{f} {MO['cov'][f][0]}/{sum(MO['cov'][f])}" for f in MO['timed']) + f" · untimed {', '.join(MO['untimed'])}"
                f" · longest spine {max(len(r['mo']['sp']) for r in rows)} moments · {MO['off']} calls left off a path they never enter"
                f" · {MO['occ']} step occurrences ({MO['src']['wide']} at other paths' calls, {MO['offocc']} left off a path, {MO['src']['none']} with none)"
-               f" · {len(MO['keys'])} keys")
+               f" · {len(MO['keys'])} keys"
+               f"\nD-055 · the code map's {rows[0]['cvn'][1]} fields: BY MOMENT carries {min(r['cvn'][0] for r in rows)}–{max(r['cvn'][0] for r in rows)} whole per endpoint"
+               f" · {sum(1 for x in cv_left.values() if not x[2])} fields it carries whole on no endpoint · {sum(1 for x in cv_left.values() if x[2] == len(rows))} on every one"
+               f" · {cv_beyond} tables its steps touch that the code map does not list (on {sum(1 for r in rows if r['cvn'][3])} of the endpoints)"
+               f" · {sum(r['cvn'][2] for r in rows)} fields with nothing on their endpoint, counted apart from what is left")
     return html, summary, out, check
 
 

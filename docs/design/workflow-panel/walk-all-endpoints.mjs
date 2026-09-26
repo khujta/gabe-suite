@@ -320,7 +320,7 @@ await pic('more-information-open');
   const t2 = await table(); say('D-053 · GET /recipes, the endings in time order', { rows: t2.filter((x) => !x.startsWith('── ')).length - 1, table: t2 });
   await center(EX); await endPic('endings-longest-table-get-recipes'); }
 { // BY MOMENT (his ask 2026-09-26), LAST: the code map's copy button, then the section below ONE ENDPOINT — the endpoint's moments
-  // as rows, its timed blocks as columns — on POST /recipe-creation/gustify: its info; each look switched and back; the path to the
+  // as columns (his default, D-055), its timed blocks as rows — on POST /recipe-creation/gustify: its info; each look switched and back; the path to the
   // 402 and back; one table lit from the grid, then POST /setup/complete opened with the light still on (the login dependency reads
   // that table, and the handler's call reads it again: two moments). The section is photographed from the page's top as a clip of the
   // full page after every change (scrolled to it, the pinned row would sit over its first rows); its words are read off it
@@ -333,11 +333,12 @@ await pic('more-information-open');
     for (let k = 0; k * TILE < hAll; k++) await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + name + (k ? '-continued' + (k > 1 ? '-' + k : '') : '') + '.png'),
       clip: { x: Math.max(0, bx.x - 8), y: y0 + k * TILE, width: Math.min(W, bx.width + 16), height: Math.min(TILE, hAll - k * TILE) }, fullPage: true }); };
   const grid = () => p.$$eval('#mogrid table.motab tr', (trs) => trs.map((tr) => tr.innerText.replace(/\s+/g, ' ').slice(0, 170)));
-  const paths = () => p.$$eval('#mobar .mopaths > *', (gs) => gs.map((g) => g.classList.contains('mopg') ? g.querySelector('.mopgl').textContent + ': ' + [...g.querySelectorAll('.mopath')].map((x) => x.innerText.replace(/\s+/g, ' ').trim()).join(' | ') : g.innerText.trim()));
+  // D-055: the path row is one line of codes — each group is a moment (its data-mom), each code a status; the words are the hover's
+  const paths = () => p.$$eval('#mobar .mopaths > *', (gs) => gs.map((g) => g.classList.contains('mopg') ? g.getAttribute('data-mom') + ': ' + [...g.querySelectorAll('.mopath')].map((x) => x.innerText.replace(/\s+/g, ' ').trim()).join(' ') : g.innerText.trim()).join(' │ '));
   const fits = () => p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, scrollsSideways: !document.getElementById('moscroll').hidden }; });
   const lands = () => p.evaluate(() => ({ chip: document.getElementById('elchip').hidden ? null : document.getElementById('elsays').textContent,
     rowsLit: document.querySelectorAll('#board tr.row[data-el="on"]').length, says: document.getElementById('el-mo').textContent,
-    inGrid: [...document.querySelectorAll('#mogrid .elon')].map((e) => { const td = e.closest('td'), tr = e.closest('tr'); return [(tr.querySelector('th.mom .mn') || {}).textContent || null, td ? td.getAttribute('data-f') : null, e.textContent.trim().slice(0, 40)]; }) }));
+    inGrid: [...document.querySelectorAll('#mogrid .elon')].map((e) => { const td = e.closest('td'); return [td ? td.getAttribute('data-mom') : null, td ? td.getAttribute('data-f') : null, e.textContent.trim().slice(0, 40)]; }) }));
   await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
   await step('open-gustify-for-by-moment', '#board tr.row[data-ep="POST /recipe-creation/gustify"] td.id', 'the row POST /recipe-creation/gustify');
   // the code map's copy button, beside its options: what it copies is read off a stubbed clipboard (the page cannot be asked)
@@ -352,14 +353,15 @@ await pic('more-information-open');
   await center('#itog-mo'); await step('by-moment-info-open', '#itog-mo', 'the info toggle beside BY MOMENT');
   say('BY MOMENT · its info', await p.$$eval('#info-mo p', (ps) => ps.map((e) => e.textContent.slice(0, 120)))); await moPic('by-moment-info-shown');
   await center('#itog-mo'); await step('by-moment-info-close', '#itog-mo', 'the same toggle, again');
-  // the two looks: each switched, photographed, and back to my pick
-  let s3 = '#mobar .opt[data-mopt="lay"][data-v="cols"]'; await center(s3); await step('moments-as-columns', s3, 'the square "' + (await txt(s3)) + '"');
-  say('BY MOMENT · moments as columns', { fits: await fits(), heads: await p.$$eval('#mogrid thead th.mom .mn', (hs) => hs.map((h) => h.textContent)) });
-  await moPic('by-moment-moments-as-columns');
-  s3 = '#mobar .opt[data-mopt="lay"][data-v="rows"]'; await center(s3); await step('moments-back-to-rows', s3, 'the square "' + (await txt(s3)) + '" (my pick)');
+  // the two looks: each switched, photographed, and back to his default (D-055)
+  say('BY MOMENT · the heads (moments as columns, his default)', await p.$$eval('#mogrid th.mom', (hs) => hs.map((h) => h.getAttribute('data-face'))));
+  let s3 = '#mobar .opt[data-mopt="lay"][data-v="rows"]'; await center(s3); await step('moments-as-rows', s3, 'the square "' + (await txt(s3)) + '"');
+  say('BY MOMENT · moments as rows', { fits: await fits(), heads: await p.$$eval('#mogrid th.mom', (hs) => hs.map((h) => h.getAttribute('data-face'))) });
+  await moPic('by-moment-moments-as-rows');
+  s3 = '#mobar .opt[data-mopt="lay"][data-v="cols"]'; await center(s3); await step('moments-back-to-columns', s3, 'the square "' + (await txt(s3)) + '" (his default)');
   s3 = '#mobar .opt[data-mopt="cell"][data-v="counts"]'; await center(s3); await step('cells-as-counts', s3, 'the square "' + (await txt(s3)) + '"');
   say('BY MOMENT · cells as counts', await grid()); await moPic('by-moment-cells-as-counts');
-  s3 = '#mobar .opt[data-mopt="cell"][data-v="chips"]'; await center(s3); await step('cells-back-to-chips', s3, 'the square "' + (await txt(s3)) + '" (my pick)');
+  s3 = '#mobar .opt[data-mopt="cell"][data-v="chips"]'; await center(s3); await step('cells-back-to-chips', s3, 'the square "' + (await txt(s3)) + '" (his default)');
   // the path: the 402 (which square it is is read from the page's data; the click is the mouse's), then all paths again
   const i402 = await p.evaluate(() => window.AE_DATA.rows.find((q) => q.id === 'POST /recipe-creation/gustify').mo.ex.findIndex((x) => x[1] === 402));
   const P402 = '#mobar .mopath[data-path="' + i402 + '"]';
@@ -367,8 +369,8 @@ await pic('more-information-open');
   say('BY MOMENT · the path to the 402', await grid()); await moPic('by-moment-path-to-the-402');
   await center('#mobar .mopath[data-path="all"]'); await step('all-paths-again', '#mobar .mopath[data-path="all"]', 'the path square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"');
   // one table lit from the grid: households, which the login dependency reads (the dependencies' row, Data effects)
-  const CH = '#mogrid tr[data-mom="gate"] td[data-f="data"] .mc[data-key="table:households"]';
-  await center(CH); await step('light-households-in-by-moment', CH, 'the chip "' + (await txt(CH)).slice(0, 40) + '" in the dependencies\' row, Data effects');
+  const CH = '#mogrid td[data-mom="gate"][data-f="data"] .mc[data-key="table:households"]';
+  await center(CH); await step('light-households-in-by-moment', CH, 'the chip "' + (await txt(CH)).slice(0, 40) + '" in the dependencies\' column, Data effects');
   say('BY MOMENT · households lit, where the light lands', await lands());
   await moPic('by-moment-households-lit');
   // another endpoint with the light on: POST /setup/complete, clicked in the table — the same table read at two moments
@@ -379,6 +381,64 @@ await pic('more-information-open');
   await moPic('by-moment-setup-complete-households-lit');
   await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
   await step('clear-the-by-moment-light', '#elclear', 'the clear link on the lit chip above the table'); }
+{ // D-055 (his ruling 2026-09-26), LAST: POST /cooking/sessions, his example — the path row's codes and their hovers, the handler heads and
+  // one's hover, then the code map's switch "what BY MOMENT carries": dim, hide, and back to show all, the code map photographed each time
+  const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
+  const paths = () => p.$$eval('#mobar .mopaths > *', (gs) => gs.map((g) => g.classList.contains('mopg') ? g.getAttribute('data-mom') + ': ' + [...g.querySelectorAll('.mopath')].map((x) => x.innerText.trim()).join(' ') : g.innerText.trim()).join(' │ '));
+  const clipOf = async (sel, maxH) => p.$eval(sel, (e, mh) => { const r = e.getBoundingClientRect(); return { x: Math.max(0, r.left + scrollX - 8), y: Math.max(0, r.top + scrollY - 8), width: r.width + 16, height: Math.min(mh, r.height + 16) }; }, maxH);
+  // photographed from the section's top, whole: a tall section in 8,000 px pieces (…-continued, …-continued-2)
+  const shotOf = async (name, sel) => { await p.mouse.move(5, H - 10); await p.evaluate(() => { window.hoverHide && window.hoverHide(); window.scrollTo(0, 0); }); await wait(200); n++;
+    const bx = await clipOf(sel, 1e9), TILE = 8000;
+    for (let k = 0; k * TILE < bx.height; k++) await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + name + (k ? '-continued' + (k > 1 ? '-' + k : '') : '') + '.png'),
+      clip: { x: bx.x, y: bx.y + k * TILE, width: Math.min(W - bx.x, bx.width), height: Math.min(TILE, bx.height - k * TILE) }, fullPage: true }); };
+  const hoverSay = async (label, sel) => { const e = await p.$(sel); await e.scrollIntoViewIfNeeded(); const bx = await e.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(250);
+    say(label, await p.$eval('#tip', (t) => t.innerText.replace(/\n+/g, ' ┆ '))); n++;
+    const tb = await p.$eval('#tip', (t) => { const r = t.getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; });
+    const x0 = Math.max(0, Math.min(bx.x, tb.x) - 10), y0 = Math.max(0, Math.min(bx.y, tb.y) - 10);
+    await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + label.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 40) + '.png'),
+      clip: { x: x0, y: y0, width: Math.min(W - x0, Math.max(bx.x + bx.width, tb.x + tb.width) - x0 + 10), height: Math.min(H - y0, Math.max(bx.y + bx.height, tb.y + tb.height) - y0 + 10) } });
+    await p.mouse.move(5, H - 10); await wait(100); };
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('open-cooking-sessions', '#board tr.row[data-ep="POST /cooking/sessions"] td.id', 'the row POST /cooking/sessions');
+  await center('#sec-mo'); say('D-055 · the path row', await paths());
+  say('D-055 · the heads', await p.$$eval('#mogrid th.mom', (hs) => hs.map((h) => h.getAttribute('data-face'))));
+  await shotOf('d055-by-moment-cooking-sessions', '#sec-mo');
+  // his defaults (D-055): the two pressed squares, and the hover of one saying it is his
+  await hoverSay('hover the moments-as-columns square', '#mobar .opt[data-mopt="lay"][data-v="cols"]');
+  const i429 = await p.evaluate(() => window.AE_DATA.rows.find((q) => q.id === 'POST /cooking/sessions').mo.ex.findIndex((x) => x[1] === 429));
+  await hoverSay('hover the first 429 code', '#mobar .mopath[data-path="' + i429 + '"]');
+  await hoverSay('hover the second 429 code', '#mobar .mopath[data-path="' + (i429 + 1) + '"]');
+  const i404 = await p.evaluate(() => window.AE_DATA.rows.find((q) => q.id === 'POST /cooking/sessions').mo.ex.findIndex((x) => x[1] === 404));
+  await center('#mobar'); await step('path-code-404', '#mobar .mopath[data-path="' + i404 + '"]', 'the code "' + (await txt('#mobar .mopath[data-path="' + i404 + '"]')) + '"');
+  await hoverSay('hover the chosen 404 code', '#mobar .mopath[data-path="' + i404 + '"]');
+  await shotOf('d055-path-to-the-404', '#sec-mo');
+  await center('#mobar'); await step('path-all-again', '#mobar .mopath[data-path="all"]', 'the square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"');
+  await hoverSay('hover a failure head', '#mogrid th.mom[data-mom="fail"]');
+  await hoverSay('hover the work head', '#mogrid th.mom[data-mom="work"]');
+  // the switch: its words read off the squares; the count read off the code map's header after each press
+  const cvSay = async (label) => say(label, await p.evaluate(() => { const fs = [...document.querySelectorAll('#ocol-cm .pair[data-k]')].filter((e) => e.offsetParent), nm = (e) => (e.querySelector('.pk') || {}).textContent;
+    return { count: document.getElementById('cvcount').textContent, carry: document.getElementById('ocol-cm').getAttribute('data-carry'),
+      left: fs.filter((e) => !/^[ce]$/.test(e.getAttribute('data-cvs'))).map((e) => nm(e) + ({ p: ' (part)', x: ' (BY MOMENT holds more)' }[e.getAttribute('data-cvs')] || '')),
+      nothingHere: fs.filter((e) => e.getAttribute('data-cvs') === 'e').map(nm),
+      notes: [...document.querySelectorAll('#ocol-cm .cvn, #ocol-cm .cvx')].filter((e) => e.offsetParent).map((e) => e.textContent) }; }));
+  await cvSay('D-055 · the code map, show all');
+  await hoverSay('hover the dim square', '#ocol-cm .opt[data-carry="dim"]');
+  await center('#ocol-cm .opt[data-carry="dim"]'); await step('carry-dim', '#ocol-cm .opt[data-carry="dim"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="dim"]')) + '"');
+  await cvSay('D-055 · the code map, dim'); await shotOf('d055-code-map-dim', '#ocol-cm');
+  await center('#ocol-cm .opt[data-carry="hide"]'); await step('carry-hide', '#ocol-cm .opt[data-carry="hide"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="hide"]')) + '"');
+  await cvSay('D-055 · the code map, hide'); await shotOf('d055-code-map-hide', '#ocol-cm');
+  await p.evaluate(() => { window.__copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (s) => { window.__copied = s; return Promise.resolve(); } } }); });
+  await center('#cmcopy'); await step('copy-the-settings-with-hide', '#cmcopy', 'the button "' + (await txt('#cmcopy')) + '"');
+  say('D-055 · the code map\'s copy', await p.evaluate(() => window.__copied));
+  // review B1: an endpoint whose steps touch tables the code map does not list — opened in the table, hide still on
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('open-the-stream-endpoint-in-hide', '#board tr.row[data-ep="GET /recipe-creation/gustify/stream"] td.id', 'the row GET /recipe-creation/gustify/stream');
+  await cvSay('D-055 · GET /recipe-creation/gustify/stream, hide'); await shotOf('d055-stream-code-map-hide', '#ocol-cm');
+  await hoverSay('hover the stream tables note', '#ocol-cm .pair[data-k="d:tables"] .cvx');
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('back-to-cooking-sessions', '#board tr.row[data-ep="POST /cooking/sessions"] td.id', 'the row POST /cooking/sessions');
+  await center('#ocol-cm .opt[data-carry="all"]'); await step('carry-show-all', '#ocol-cm .opt[data-carry="all"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="all"]')) + '" (my pick)');
+  await cvSay('D-055 · the code map, show all again'); }
 say('rows at the end', await rows());
 say('page errors', errs);
 fs.writeFileSync(path.join(OUT, 'walk.json'), JSON.stringify({ viewport: [W, H], log }, null, 1));

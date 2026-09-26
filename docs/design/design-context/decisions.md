@@ -697,3 +697,21 @@ their own with the reason. It is the TIME half of that model made finer: the sta
 are its inner grain, derived per endpoint from the code.
 Revisit if: a block's elements can only be placed by guessing — then that block stays out of the matrix and the gap is named, never
 filled.
+
+## D-055 — BY MOMENT reads as columns of chips; the code map can dim what BY MOMENT already carries; the path row is codes only
+Date: 2026-09-26 · Input: his message on the D-054 build, with a screenshot of POST /cooking/sessions.
+Decision, his: "this table by moment is wonderful. Definitely, I ordered the moments as columns and the cells as chips." — "in the
+code map [I want] a switch where we hide or dim down all the fields that we have in the code map that are already covered in the by
+moment table, to see if we are missing something else … address the gaps that we have in the code map to see if we really need them
+put in or surfaced in the code map. If so, we can add them, and that may impact the time moment table too." — "compress the path
+section, which is using two rows right now. Put only the codes, like 429, 429, 422, 400, all paths, and so on. If I hover over it,
+it will tell me the information about it." — "In the column names for the by moment column, in the handler, the important
+information to have is the `accept` and the `functioning` boolean. Those two. All the other information … can be encoded in the
+hover window."
+Consequence: BY MOMENT's defaults are his (moments as columns · cells as chips), marked ruled. The code map gets a switch — show
+all · dim · hide — over every element BY MOMENT places, so what is left bright is what has no moment. The path choice is one row of
+status codes in time order, the rest in each code's hover. A HANDLER column's header carries two things — read by the agent as the
+EXCEPT class caught and the FUNCTION that raised (his words were dictated; his to correct) — the rest in the header's hover. The
+gaps (what the universe shows and the code map does not, and what the code map shows with no moment) are evaluated one by one with a
+recommendation each; nothing is added before he rules on that list.
+Revisit if: dimming hides a field he needs to read while comparing — then dim becomes an outline on the covered elements instead.

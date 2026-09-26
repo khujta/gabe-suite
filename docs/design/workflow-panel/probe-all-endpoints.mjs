@@ -387,6 +387,7 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   // (the first row on a cold start) — set aside beside the Shared treatment's line; his paste is still compared line for line
   // CHANGED 2026-09-26 (his ask): the copy text also carries the code map's settings and BY MOMENT's, each on its own line after the
   // endpoint's (the code map's two looks, BY MOMENT's two looks, the path) — set aside too; his paste is still compared line for line
+  // CHANGED 2026-09-26 (D-055): the code map's switch "what BY MOMENT carries" adds its line among the code map's settings — six lines now
   const CL = W8.copy.lines, isSlook = (l) => l.startsWith(CL.slook + ': '), isEp = (l) => l.startsWith(CL.open + ': ');
   const isSet = (l) => l.startsWith(CL.cm + ' · ') || l.startsWith(CL.mo + ' · ');
   const asPaste = (out) => { const blk = out.slice(0, out.indexOf('')), his = blk.filter((l) => !isSlook(l) && !isEp(l) && !isSet(l));
@@ -397,7 +398,7 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   const sl = a0.blk.filter(isSlook), colsAt = a0.blk.findIndex((l) => l.startsWith(CL.cols + ': ')), el0 = a0.blk.filter(isEp);
   ok(sl.length === 1 && a0.blk.indexOf(sl[0]) === colsAt + 1, 'the copy text puts the Shared treatment\'s line right under the columns line', a0.blk);
   const set0 = a0.blk.filter(isSet);
-  ok(el0.length === 1 && set0.length === 5 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-6)) === JSON.stringify([el0[0]].concat(set0)),
+  ok(el0.length === 1 && set0.length === 6 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-7)) === JSON.stringify([el0[0]].concat(set0)),
     'the copy text adds the endpoint shown, then the code map\'s and BY MOMENT\'s settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -1216,13 +1217,15 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   /* (a) the code map's copy */
   await p.evaluate(() => { window.__copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (s) => { window.__copied = s; return Promise.resolve(); } } }); });
   await p.$eval('#cmcopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#cmcopy'); await p.waitForTimeout(80);
-  const optL = (R, v) => R.label + ': ' + R.opts[v].name + ' (' + (v === R.pick ? D.words.copy.pick : D.words.copy.his) + ')';
-  const wantCopy = [CL.page + ': all-endpoints · ' + D.tok.app + ' @ ' + D.tok.head, CL.open + ': ' + E14, CL.cm + ' · ' + optL(EW.opt.mom, 'rows'), CL.cm + ' · ' + optL(EW.opt.chk, 'col'), '', CL.your, ''].join('\n');
+  // CHANGED 2026-09-26 (D-055): a ruled default is copied as his default; the code map's switch adds its own line
+  const optL = (R, v) => R.label + ': ' + R.opts[v].name + ' (' + (v === R.pick ? (R.ruled ? D.words.ruledMark : D.words.copy.pick) : D.words.copy.his) + ')';
+  const wantCopy = [CL.page + ': all-endpoints · ' + D.tok.app + ' @ ' + D.tok.head, CL.open + ': ' + E14, CL.cm + ' · ' + optL(EW.opt.mom, 'rows'), CL.cm + ' · ' + optL(EW.opt.chk, 'col'),
+    CL.cm + ' · ' + optL(D.words.carry, 'all'), '', CL.your, ''].join('\n');
   const got14 = await p.evaluate(() => window.__copied);
   ok(got14 === wantCopy, 'the code map\'s copy button copies the page, the endpoint, each of its options with whose pick it is, then room for your words', got14);
   await p.click('#ocol-cm .opt[data-eopt="chk"][data-v="line"]'); await p.waitForTimeout(80); await p.click('#cmcopy'); await p.waitForTimeout(80);
   const got14b = await p.evaluate(() => window.__copied), out14 = await p.$eval('#out', (e) => e.value);
-  ok(got14b && got14b.includes(CL.cm + ' · ' + optL(EW.opt.chk, 'line')) && out14.includes(CL.cm + ' · ' + optL(EW.opt.chk, 'line')) && out14.includes(CL.mo + ' · ' + optL(MW.opt.lay, 'rows'))
+  ok(got14b && got14b.includes(CL.cm + ' · ' + optL(EW.opt.chk, 'line')) && out14.includes(CL.cm + ' · ' + optL(EW.opt.chk, 'line')) && out14.includes(CL.mo + ' · ' + optL(MW.opt.lay, 'cols'))
      && out14.includes(CL.mo + ' · ' + CL.path + ': ' + MW.path.all), 'an option he changed is copied as his choice, and the page\'s copy text carries the code map\'s and BY MOMENT\'s settings', got14b);
   await p.click('#ocol-cm .opt[data-eopt="chk"][data-v="col"]'); await p.waitForTimeout(80);
   /* (b) the moments in time order, recomputed from the feed */
@@ -1234,12 +1237,14 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   const span = (qs) => fillW(Math.min(...qs) === Math.max(...qs) ? MW.line : MW.lines, { lo: Math.min(...qs), hi: Math.max(...qs) });
   const want14 = [['start'], ['send'], ['edge'], ['body'], ['gate'], ['fields'], ['checks', span(chk)], ['work', span(work)], ['fail', span(failL)], ['save', span(save)], ['answer'], ['after'], ['uncaught']];
   const readM = () => p.evaluate(() => { const t = document.querySelector('#mogrid table.motab'); return { lay: t.getAttribute('data-lay'), cell: t.getAttribute('data-cell'),
-    rows: [...t.querySelectorAll('tbody tr')].map((tr) => { const h = tr.querySelector('th.mom'); return h ? [h.getAttribute('data-mom'), (h.querySelector('.ml') || {}).textContent || null] : [tr.getAttribute('data-f')]; }),
-    heads: [...t.querySelectorAll('thead th[data-block]')].map((h) => h.textContent.trim()), momHeads: [...t.querySelectorAll('thead th.mom')].map((h) => h.getAttribute('data-mom')),
-    ends: [...t.querySelectorAll('tbody tr')].map((tr) => [...tr.querySelectorAll('td[data-f="end"] .vc-status')].map((c) => c.textContent)),
+    // CHANGED 2026-09-26 (D-055): moments as columns is his default — the moments, the blocks and the Endings cells are read in DOM
+    // order, which is time order in both looks; a head's lines are its hover's now (data-lines)
+    rows: [...t.querySelectorAll('th.mom')].map((h) => [h.getAttribute('data-mom'), h.getAttribute('data-lines')]),
+    heads: [...t.querySelectorAll('th[data-block]')].map((h) => h.textContent.trim()), bodyRows: t.querySelectorAll('tbody tr').length,
+    ends: [...t.querySelectorAll('td[data-f="end"]')].map((td) => [...td.querySelectorAll('.vc-status')].map((c) => c.textContent)),
     chips: t.querySelectorAll('.mc').length, counts: t.querySelectorAll('.mcount').length,
     band: [...document.querySelectorAll('#moband .mbb')].map((b) => [b.getAttribute('data-f'), b.textContent.slice(0, 80)]),
-    squares: [...document.querySelectorAll('#mobar .opt[data-mopt]')].map((o) => [o.getAttribute('data-mopt'), o.getAttribute('data-v'), o.getAttribute('aria-checked'), getComputedStyle(o).borderTopStyle]) }; });
+    squares: [...document.querySelectorAll('#mobar .opt[data-mopt]')].map((o) => [o.getAttribute('data-mopt'), o.getAttribute('data-v'), o.getAttribute('aria-checked'), getComputedStyle(o).borderTopStyle, o.getAttribute('data-ruled')]) }; });
   await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' })); await p.waitForTimeout(60);
   const m0 = await readM(), rowsW = m0.rows.map((r) => r[1] ? r : [r[0]]);
   ok(JSON.stringify(rowsW) === JSON.stringify(want14.map((w) => (w[1] ? w : [w[0]]))), 'BY MOMENT · ' + E14 + ' · the moments read top to bottom as the feed has them: before any request, the screen, the edge, the body, the login, the fields, then the handler\'s checks (' + span(chk) + '), the work (' + span(work) + '), the catch (' + span(failL) + '), saving (' + span(save) + '), the answer, after it, escapes', { page: m0.rows, want: want14 });
@@ -1264,25 +1269,30 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(100);
   const m2 = await readM();
   ok(JSON.stringify(m2.rows) === JSON.stringify(m0.rows) && m2.chips === m0.chips, 'BY MOMENT · all paths brings every moment and every chip back', [m2.rows.length, m2.chips]);
-  /* (e) the two looks: my picks pressed and dashed on a cold start; each switches the grid; both remembered; back to my picks */
+  /* (e) the two looks: HIS defaults (D-055: moments as columns, cells as chips) pressed on a cold start, marked ruled, no dash; each
+     switches the grid; both remembered; back to his defaults */
   const pk = (g) => MW.opt[g].pick;
-  ok(m0.lay === 'rows' && m0.cell === 'chips' && m0.squares.length === 4 && m0.squares.every(([g, v, on, dash]) => (on === 'true') === (v === pk(g)) && (dash === 'dashed') === (v === pk(g))),
-    'BY MOMENT · two looks on icon squares, my picks (moments as rows, cells as chips) pressed and dashed on a cold start', m0.squares);
-  await p.click('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(80);
+  ok(MW.opt.lay.ruled === 'D-055' && MW.opt.cell.ruled === 'D-055' && m0.lay === 'cols' && m0.cell === 'chips' && m0.squares.length === 4
+     && m0.squares.every(([g, v, on, dash, ruled]) => (on === 'true') === (v === pk(g)) && dash !== 'dashed' && (ruled === 'true') === (v === pk(g))) && m0.bodyRows === m0.heads.length,
+    'D-055 · BY MOMENT · his defaults on a cold start: moments as columns, cells as chips, pressed and marked ruled (no dash), a row per block', m0.squares);
+  await p.hover('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(120);
+  const tipR = await p.$eval('#tip', (e) => e.textContent);
+  ok(tipR.includes(D.words.ruledMark) && !tipR.includes(D.words.pickMark), 'D-055 · BY MOMENT · his default\'s hover says it is his, not my pick', tipR);
+  await p.click('#mobar .opt[data-mopt="lay"][data-v="rows"]'); await p.waitForTimeout(80);
   const m3 = await readM();
-  ok(m3.lay === 'cols' && JSON.stringify(m3.momHeads) === JSON.stringify(m0.rows.map((r) => r[0])) && m3.rows.length === m0.heads.length, 'BY MOMENT · moments as columns: the moments across the top in the same order, a row per block', { heads: m3.momHeads.length, rows: m3.rows.length });
+  ok(m3.lay === 'rows' && JSON.stringify(m3.rows) === JSON.stringify(m0.rows) && m3.bodyRows === m0.rows.length, 'BY MOMENT · moments as rows: the moments top to bottom in the same order, a row per moment', { moms: m3.rows.length, rows: m3.bodyRows });
   await p.click('#mobar .opt[data-mopt="cell"][data-v="counts"]'); await p.waitForTimeout(80);
   const m4 = await readM();
   ok(m4.cell === 'counts' && !m4.chips && m4.counts > 0, 'BY MOMENT · cells as counts: a number in each cell, no chips', { counts: m4.counts, chips: m4.chips });
   await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E14); await p.waitForTimeout(100);
   const m5 = await readM();
-  ok(m5.lay === 'cols' && m5.cell === 'counts' && m5.squares.filter(([, , on]) => on === 'true').map(([g, v]) => g + ':' + v).sort().join(' ') === 'cell:counts lay:cols', 'BY MOMENT · both looks are remembered for this viewer', [m5.lay, m5.cell]);
+  ok(m5.lay === 'rows' && m5.cell === 'counts' && m5.squares.filter(([, , on]) => on === 'true').map(([g, v]) => g + ':' + v).sort().join(' ') === 'cell:counts lay:rows', 'BY MOMENT · both looks are remembered for this viewer', [m5.lay, m5.cell]);
   await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' }));
-  await p.click('#mobar .opt[data-mopt="lay"][data-v="rows"]'); await p.waitForTimeout(60); await p.click('#mobar .opt[data-mopt="cell"][data-v="chips"]'); await p.waitForTimeout(80);
+  await p.click('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(60); await p.click('#mobar .opt[data-mopt="cell"][data-v="chips"]'); await p.waitForTimeout(80);
   const m6 = await readM();
-  ok(m6.lay === 'rows' && m6.cell === 'chips' && JSON.stringify(m6.rows) === JSON.stringify(m0.rows) && m6.chips === m0.chips, 'BY MOMENT · the first squares bring back my picks, the grid as it was', [m6.lay, m6.cell]);
+  ok(m6.lay === 'cols' && m6.cell === 'chips' && JSON.stringify(m6.rows) === JSON.stringify(m0.rows) && m6.chips === m0.chips, 'BY MOMENT · his default squares bring back the grid as it was', [m6.lay, m6.cell]);
   /* (f) a chip lit in the matrix lights everywhere; the station's glyph on every chip whose element it draws */
-  const K14 = 'table:users', sel14 = '#mogrid tr[data-mom="gate"] td[data-f="data"] .mc[data-key="' + K14 + '"]';
+  const K14 = 'table:users', sel14 = '#mogrid td[data-mom="gate"][data-f="data"] .mc[data-key="' + K14 + '"]';
   await p.$eval(sel14, (e) => e.scrollIntoView({ block: 'center' })); await p.waitForTimeout(60); await p.click(sel14); await p.waitForTimeout(120);
   const l14 = await p.evaluate((K) => ({ el: window.__allep.state.el, chip: !document.getElementById('elchip').hidden, here: document.getElementById('el-mo').getAttribute('data-here'),
     on: [...document.querySelectorAll('#board tr.row[data-el="on"]')].map((e) => e.getAttribute('data-ep')).sort(),
@@ -1299,14 +1309,11 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   const fit = async () => p.evaluate(() => { const G = document.getElementById('mogrid'); return { over: G.scrollWidth - G.clientWidth, note: !document.getElementById('moscroll').hidden,
     cut: [...G.querySelectorAll('.mc')].filter((c) => c.scrollWidth > c.clientWidth + 1).length }; });
   await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E14 + '"] td.id'); await p.waitForTimeout(120);
-  const g0 = await fit(); await p.click('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(80); const g1 = await fit();
-  await p.click('#mobar .opt[data-mopt="lay"][data-v="rows"]'); await p.waitForTimeout(80);
-  ok(g0.over <= 1 && g1.over <= 1 && !g0.cut && !g1.cut && !g0.note && !g1.note, 'BY MOMENT · at 1920 px the matrix fits its box in both looks and no chip is cut: chips wrap inside their cells', { rows: g0, cols: g1 });
-  const pk14 = await p.$$eval('#mobar .mopg', (gs) => gs.map((g) => [g.getAttribute('data-mom'), [...g.querySelectorAll('.mopath')].map((b) => [+b.getAttribute('data-path'), b.innerText.replace(/\s+/g, ' ').trim()])]));
-  const M14 = ROW[E14].mo, flat = pk14.flatMap((g) => g[1].map((x) => x[0])), live14 = M14.ex.map((x, i) => i).filter((i) => M14.ex[i][4]);
-  ok(JSON.stringify(flat) === JSON.stringify(live14) && pk14.every(([m, bs]) => bs.every(([i]) => M14.sp[M14.ex[i][3]][0] === m) && new Set(bs.map((b) => b[1])).size === bs.length)
-     && pk14.some(([m, bs]) => m === 'edge' && bs.length === 2),
-    'BY MOMENT · the path picker: the endings in time order under the moment each leaves at, two of one status there told apart by their own words (the edge\'s two 429s by their limiter)', pk14.map(([m, bs]) => m + ': ' + bs.map((b) => b[1]).join(' | ')));
+  const g0 = await fit(); await p.click('#mobar .opt[data-mopt="lay"][data-v="rows"]'); await p.waitForTimeout(80); const g1 = await fit();
+  await p.click('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(80);
+  ok(g0.over <= 1 && g1.over <= 1 && !g0.cut && !g1.cut && !g0.note && !g1.note, 'BY MOMENT · at 1920 px the matrix fits its box in both looks and no chip is cut: chips wrap inside their cells', { cols: g0, rows: g1 });
+  // CHANGED 2026-09-26 (D-055): the path picker is ONE row of codes; the moment and the words that told two of one status apart are in
+  // each code's hover — read below, on POST /cooking/sessions (section 15)
   const p87 = await p.$$eval('#mogrid td[data-f="proof"] .mc', (cs) => cs.filter((c) => /^C87/.test(c.textContent.trim())).map((c) => [...c.querySelectorAll('.vc-status')].map((x) => x.textContent)));
   const ubox = await p.$eval('#moband .mbb[data-f="over"]', (b) => { const inf = b.querySelector('.ainfo'); return { word: b.querySelector('b').textContent, infoHidden: inf ? getComputedStyle(inf).display === 'none' : null, info: inf ? inf.textContent : '' }; });
   ok(p87.length === 1 && p87[0].length >= 1 && p87[0].every((x) => x === '502') && ubox.word === MW.band.noTime && ubox.infoHidden === true && ubox.info.includes(MW.band.untimed.over.slice(0, 30)),
@@ -1319,7 +1326,7 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   const memAt = await p.$$eval('#mogrid td[data-f="data"] .mc[data-key="table:memberships"]', (cs) => [...new Set(cs.map((c) => c.closest('td').getAttribute('data-mom')))]);
   const i422 = ROW[E16].mo.ex.findIndex((x) => x[0] === P422.exit.id);
   await p.click('#mobar .mopath[data-path="' + i422 + '"]'); await p.waitForTimeout(100);
-  const rows422 = await p.$$eval('#mogrid tbody tr', (trs) => trs.map((tr) => tr.getAttribute('data-mom')));
+  const rows422 = await p.$$eval('#mogrid th.mom', (hs) => hs.map((h) => h.getAttribute('data-mom')));
   await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(80);
   ok(want16.has('gate') && want16.has('handler') && memAt.includes('gate') && memAt.includes('work') && !rows422.includes('work') && !rows422.includes('checks'),
     'BY MOMENT · ' + E16 + ': the memberships read the feed lists once as the login dependency\'s and once as the handler\'s stands at the dependencies AND at the work; the path to its 422 leaves before the handler and passes neither', { feed: [...want16], page: memAt, rows422 });
@@ -1332,6 +1339,126 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
     'BY MOMENT · ' + E17 + ': the 429 the feed lists but no path ends at is not offered as a path, and stands in the band, on no path', { dead17, pk17, band17 });
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
+
+/* 15 · D-055 (his ruling 2026-09-26). Real clicks and real hovers on POST /cooking/sessions, his example:
+   (a) the path row is ONE line: "all paths", then each ending a path ends at as its status alone, in time order, a gap between moments;
+       every code's hover names its moment (recomputed here from the words and D-053's failure groups), what the ending says and that it is
+       not in force; codes of one status have hovers of their own; a clicked code is filled, ringed, and says it is the path in force;
+       Tab from "all paths" lands on the first code with its focus drawn and its hover shown;
+   (b) the handler heads read his three failure groups, the checks, the work's first call (+ how many more) and "commit", recomputed from
+       the feed; no head runs past two lines (its line boxes counted); a failure head's hover names the catch's place;
+   (c) the code map's switch "what BY MOMENT carries": show all (my pick, dashed) on a cold start; its count is the fields the page marks
+       carried, of the fields it draws; every item marked carried carries a key BY MOMENT's grid draws, every keyed item left bright a key
+       it does not (the key join, read off the two sections); dim fades exactly the carried; hide takes them away, keeps the switch, and
+       says "+n in BY MOMENT" on a field carried in part; the copy button and the page's copy text carry the switch's line;
+       (review B2) a field with nothing on the endpoint is counted apart from "left" and fades in dim and hide, never hidden;
+       (review B1) on GET /recipe-creation/gustify/stream, whose steps touch tables the code map does not list, the tables fields stay
+       in hide and say how many, their hover names them (recomputed from BY MOMENT's drawn keys minus the code map's list), the header counts them */
+{ const fillW = (s0, x) => String(s0).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  const E = 'POST /cooking/sessions', R = ROW[E], FE = FJ.endpoints['endpoint:' + E], MW = D.words.mo, EW = D.words.endings, CW = D.words.carry, CL = D.words.copy.lines;
+  await open(PAGE); await p.click('#board tr.row[data-ep="' + E + '"] td.id'); await p.waitForTimeout(150);
+  await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' })); await p.waitForTimeout(80);
+  /* (a) the path row */
+  const live = R.mo.ex.map((x, i) => i).filter((i) => R.mo.ex[i][4]);
+  /* one line: every button's middle within a few pixels of the first's (a code is a little shorter than "all paths", centred on the line) */
+  const pr = await p.evaluate(() => { const bs = [...document.querySelectorAll('#mobar .mopath')], mid = (b) => { const q = b.getBoundingClientRect(); return q.top + q.height / 2; };
+    return { n: bs.length, tops: [...new Set(bs.map((b) => Math.abs(mid(b) - mid(bs[0])) <= 3 ? 0 : Math.round(mid(b))))],
+    codes: bs.slice(1).map((b) => [+b.getAttribute('data-path'), b.innerText.trim(), b.parentElement.getAttribute('data-si')]), first: bs[0].getAttribute('data-path'),
+    gaps: [...document.querySelectorAll('#mobar .mopg')].map((g) => parseFloat(getComputedStyle(g).marginRight)) }; });
+  ok(pr.first === 'all' && pr.n === live.length + 1 && pr.tops.length === 1 && JSON.stringify(pr.codes.map((c) => c[0])) === JSON.stringify(live)
+     && pr.codes.every(([i, t, si]) => t === String(R.mo.ex[i][1]) && +si === R.mo.ex[i][3]) && pr.gaps.length > 1 && pr.gaps.every((g) => g > 0),
+    'D-055 · the path row is one line: all paths, then each ending\'s status alone in time order (' + pr.codes.map((c) => c[1]).join(' ') + '), a gap between moments', pr);
+  const momName = (si) => { const x = R.mo.sp[si]; if (x[0] !== 'fail') return MW.moms[x[0]].name; const g = R.d.exits.moms[x[1]]; return MW.moms.fail.name + ' — ' + fillW(g[2].length ? EW.caught : EW.caughtBare, { calls: g[2].join(' · '), at: g[0], cls: g[1] }); };
+  const tips = [];
+  for (const i of live) { await p.hover('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(60); tips.push([i, await p.$eval('#tip', (e) => e.textContent)]); }
+  const badTip = tips.filter(([i, t]) => !t.includes(fillW(MW.path.mom, { mom: momName(R.mo.ex[i][3]) })) || !t.includes(MW.path.pickIt) || (R.mo.ex[i][6] && !t.includes(R.mo.ex[i][6])));
+  const byStatus = {}; tips.forEach(([i, t]) => { (byStatus[R.mo.ex[i][1]] = byStatus[R.mo.ex[i][1]] || []).push(t); });
+  const dupSame = Object.entries(byStatus).filter(([, ts]) => new Set(ts).size !== ts.length), dups = Object.keys(byStatus).filter((k) => byStatus[k].length > 1);
+  ok(!badTip.length && !dupSame.length && dups.length >= 2,
+    'D-055 · every code\'s hover names its moment, what the ending says and that it is not in force; codes of one status (' + dups.join(' · ') + ') have hovers of their own', { badTip: badTip.slice(0, 2), dupSame });
+  const i404 = R.mo.ex.findIndex((x) => x[1] === 404);
+  await p.click('#mobar .mopath[data-path="' + i404 + '"]'); await p.waitForTimeout(120);
+  await p.mouse.move(5, 5); await p.hover('#mobar .mopath[data-path="' + i404 + '"]'); await p.waitForTimeout(80);
+  const on = await p.evaluate((i) => { const b = document.querySelector('#mobar .mopath[data-path="' + i + '"]'), o = document.querySelector('#mobar .mopath[data-path="all"]');
+    return { checked: b.getAttribute('aria-checked'), bg: getComputedStyle(b).backgroundColor, bgOff: getComputedStyle(o).backgroundColor, sh: getComputedStyle(b).boxShadow, tip: document.getElementById('tip').textContent }; }, i404);
+  ok(on.checked === 'true' && on.bg !== on.bgOff && on.sh !== 'none' && on.tip.includes(MW.path.inForce), 'D-055 · the chosen code is filled and ringed, and its hover says it is the path in force', on);
+  await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(100); await p.mouse.move(5, 5);
+  await p.keyboard.press('Tab'); await p.waitForTimeout(100);
+  const kf = await p.evaluate(() => { const a = document.activeElement; return { path: a && a.getAttribute('data-path'), outline: a ? getComputedStyle(a).outlineStyle : null, tip: document.getElementById('tip').getAttribute('data-show') }; });
+  ok(kf.path === String(live[0]) && kf.outline !== 'none' && kf.tip === 'true', 'D-055 · Tab from "all paths" lands on the first code, its focus drawn and its hover shown', kf);
+  await p.keyboard.press('Escape');
+  /* (b) the heads */
+  const hd = await p.evaluate(() => [...document.querySelectorAll('#mogrid th.mom')].map((h) => { const rs = [...h.querySelectorAll('.mstg, .mn, .mh2')].flatMap((e) => [...e.getClientRects()]);
+    const ts = rs.map((q) => q.top).sort((a, b) => a - b); let lines = 0, at = -1e9; ts.forEach((t) => { if (t - at > 6) { lines++; at = t; } });   /* line boxes, by their tops */
+    return { m: h.getAttribute('data-mom'), si: +h.getAttribute('data-si'), face: h.getAttribute('data-face'), lines }; }));
+  const wantF = ['start_session · SessionNotFoundError', 'AllergenConflictError', 'start_session · ConcurrentCookCapError'];
+  const hLine = (q) => +String(q || '').replace(/^.*:(\d+)$/, '$1');
+  const wk = R.mo.sp.find((x) => x[0] === 'work'), wcalls = [...new Set(FE.paths.flatMap((q) => q.chain).filter((st) => (st.kind === 'call' || st.kind === 'collapsed') && String(st.at || '').startsWith(FE.file + ':')
+    && hLine(st.at) >= wk[2] && hLine(st.at) <= wk[3]).sort((a, b) => hLine(a.at) - hLine(b.at)).map((st) => st.fn.split('::').pop()))];
+  const commit = Object.values(STEPS).some((st) => st.fn === FE.handler && st.op === 'commit');
+  const face = (m) => (hd.find((h) => h.m === m) || {}).face;
+  ok(JSON.stringify(hd.filter((h) => h.m === 'fail').map((h) => h.face)) === JSON.stringify(wantF) && face('checks') === MW.moms.checks.name && commit && face('save') === 'commit'
+     && face('work') === wcalls[0] + ' +' + (wcalls.length - 1) && hd.every((h) => h.lines <= 2),
+    'D-055 · the handler heads: ' + hd.filter((h) => h.m === 'fail').map((h) => h.face).join(' | ') + ' · ' + face('checks') + ' · ' + face('work') + ' · ' + face('save') + ' — no head past two lines', hd.map((h) => [h.face, h.lines]));
+  const fh = hd.find((h) => h.m === 'fail'); await p.hover('#mogrid th.mom[data-si="' + fh.si + '"]'); await p.waitForTimeout(80);
+  const ftip = await p.$eval('#tip', (e) => e.textContent);
+  ok(ftip.includes(momName(fh.si)) && ftip.includes(R.d.exits.moms[0][0]), 'D-055 · a failure head\'s hover holds its full name, the catch\'s place among it', ftip);
+  /* (c) the switch */
+  await p.$eval('#ocol-cm', (e) => e.scrollIntoView({ block: 'start' })); await p.mouse.move(5, 5); await p.waitForTimeout(60);
+  const readC = () => p.evaluate(() => { const C = document.getElementById('ocol-cm'), mk = new Set([...document.querySelectorAll('#mogrid [data-keys]')].flatMap((e) => e.getAttribute('data-keys').split('\n')));
+    /* a path's fate is keyed by its ending's status, not by a member of its own: it is left out of the key join */
+    const fs = [...C.querySelectorAll('.pair[data-k], [data-sub][data-k]')], items = [...C.querySelectorAll('[data-cf][data-ci][data-key]:not([data-cf="d:fates"])')];
+    const shown = (e) => !!(e.offsetParent || e.getClientRects().length) && getComputedStyle(e).display !== 'none';
+    const op = (e) => { let o = 1; for (let n = e; n && n !== C; n = n.parentElement) o *= +getComputedStyle(n).opacity; return o; };
+    return { carry: C.getAttribute('data-carry'), count: document.getElementById('cvcount').textContent, fields: fs.length, whole: fs.filter((f) => f.getAttribute('data-cvs') === 'c').length,
+      squares: [...C.querySelectorAll('.opt[data-carry]')].map((o) => [o.getAttribute('data-carry'), o.getAttribute('aria-checked'), getComputedStyle(o).borderTopStyle]),
+      join: items.map((e) => [e.getAttribute('data-key'), e.getAttribute('data-cv') === '1', mk.has(e.getAttribute('data-key'))]),
+      cvOp: [...C.querySelectorAll('[data-cv="1"]')].map((e) => [op(e), shown(e)]), brightOp: items.filter((e) => e.getAttribute('data-cv') !== '1').map((e) => [op(e), shown(e)]),
+      notes: [...C.querySelectorAll('.cvn')].filter(shown).map((e) => e.textContent), switchShown: shown(C.querySelector('.cvopt')),
+      empty: fs.filter((f) => f.getAttribute('data-cvs') === 'e').length, cveOp: [...C.querySelectorAll('[data-cve="1"]')].map((e) => [op(e), shown(e)]),
+      xnotes: [...C.querySelectorAll('.cvx')].filter(shown).map((e) => [e.closest('[data-k]').getAttribute('data-k'), e.textContent]) }; });
+  const c0 = await readC();
+  ok(c0.carry === CW.pick && c0.squares.every(([v, on0, dash]) => (on0 === 'true') === (v === CW.pick) && (dash === 'dashed') === (v === CW.pick)),
+    'D-055 · the switch opens on "' + CW.opts[CW.pick].name + '", my pick, dashed', c0.squares);
+  ok(c0.count === fillW(CW.count, { covered: c0.whole, fields: c0.fields, left: c0.fields - c0.whole - c0.empty, empty: c0.empty }) && JSON.stringify([c0.whole, c0.fields, c0.empty, 0]) === JSON.stringify(R.cvn)
+     && c0.empty > 0 && c0.cveOp.length === c0.empty,
+    'D-055 · the header\'s count is the page\'s own, the fields with nothing here counted apart from what is left: ' + c0.count, { count: c0.count, whole: c0.whole, fields: c0.fields, empty: c0.empty, gen: R.cvn });
+  const jBad = c0.join.filter(([, cv, inMo]) => cv !== inMo);
+  ok(c0.join.length > 10 && !jBad.length && c0.join.some(([, cv]) => cv) && c0.join.some(([, cv]) => !cv),
+    'D-055 · every keyed item the switch marks carried is drawn in BY MOMENT\'s grid, every keyed item it leaves bright is not (' + c0.join.length + ' items)', jBad.slice(0, 4));
+  ok(c0.cvOp.every(([o, sh]) => o === 1 && sh) && c0.cveOp.every(([o, sh]) => o === 1 && sh), 'D-055 · show all: nothing faded, nothing hidden', c0.cvOp.filter(([o, sh]) => o !== 1 || !sh).length);
+  await p.click('#ocol-cm .opt[data-carry="dim"]'); await p.waitForTimeout(150); await p.mouse.move(5, 5); await p.waitForTimeout(150);
+  const c1 = await readC();
+  ok(c1.carry === 'dim' && c1.cvOp.length > 0 && c1.cvOp.every(([o, sh]) => o < 0.5 && sh) && c1.brightOp.every(([o]) => o === 1) && c1.cveOp.every(([o, sh]) => o < 1 && sh),
+    'D-055 · dim: the ' + c1.cvOp.length + ' carried marks fade and stay drawn, every bright item stays whole', { faded: c1.cvOp.filter(([o]) => o >= 0.5).length, dimBright: c1.brightOp.filter(([o]) => o !== 1).length });
+  await p.click('#ocol-cm .opt[data-carry="hide"]'); await p.waitForTimeout(150);
+  const c2 = await readC(), partly = Object.values(R.cv).filter((v) => v[0] === 'p');
+  ok(c2.carry === 'hide' && c2.cvOp.every(([, sh]) => !sh) && c2.brightOp.every(([, sh]) => sh) && c2.switchShown && c2.notes.length === partly.length
+     && c2.cveOp.length === c0.empty && c2.cveOp.every(([o, sh]) => o < 1 && sh) && !c2.xnotes.length
+     && c2.notes.every((t) => /^\+\d+ /.test(t) && t === fillW(CW.more, { n: +t.slice(1).split(' ')[0] })) && c2.count === c0.count,
+    'D-055 · hide: every carried mark leaves, every bright item stays, the switch stays, and each of the ' + partly.length + ' fields carried in part says how many are in BY MOMENT', { left: c2.cvOp.filter(([, sh]) => sh).length, notes: c2.notes });
+  await p.evaluate(() => { window.__copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (s0) => { window.__copied = s0; return Promise.resolve(); } } }); });
+  await p.click('#cmcopy'); await p.waitForTimeout(80);
+  const cLine = CL.cm + ' · ' + CW.label + ': ' + CW.opts.hide.name + ' (' + D.words.copy.his + ')';
+  const cp = await p.evaluate(() => [window.__copied, document.getElementById('out').value]);
+  ok(cp[0] && cp[0].includes(cLine) && cp[1].includes(cLine), 'D-055 · the code map\'s copy and the page\'s copy text both carry "' + cLine + '"', cp[0]);
+  /* (review B1) BY MOMENT holding MORE than the code map, said on the page: the stream endpoint, still in hide */
+  { const ES = 'GET /recipe-creation/gustify/stream', RS = ROW[ES], MK = D.mo.keys;
+    const moT = [...new Set(RS.mo.el.flatMap((e) => e[2].map((ki) => MK[ki])).filter((k) => k.startsWith('table:')).map((k) => k.slice(6)))];
+    const cmT = new Set((RS.u.tables || []).concat(RS.d.tables.items.map((t) => t[0]))), want = moT.filter((t) => !cmT.has(t)).sort();
+    await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ES + '"] td.id'); await p.waitForTimeout(150);
+    await p.$eval('#ocol-cm', (e) => e.scrollIntoView({ block: 'start' })); await p.mouse.move(5, 5); await p.waitForTimeout(60);
+    const cs = await readC(), tipOf = async (k) => { await p.hover('#ocol-cm .pair[data-k="' + k + '"] .cvx'); await p.waitForTimeout(80); return p.$eval('#tip', (e) => e.textContent); };
+    const tips = [await tipOf('c:tables'), await tipOf('d:tables')], note = fillW(CW.beyond, { n: want.length });
+    ok(want.length > 0 && JSON.stringify(cs.xnotes.map((x) => x[0]).sort()) === JSON.stringify(['c:tables', 'd:tables']) && cs.xnotes.every((x) => x[1] === note)
+       && tips.every((t) => t.includes(fillW(CW.tipBeyond, { n: want.length, names: want.join(', ') })))
+       && cs.count === fillW(CW.count, { covered: cs.whole, fields: cs.fields, left: cs.fields - cs.whole - cs.empty, empty: cs.empty }) + ' · ' + fillW(CW.beyondCount, { n: want.length }),
+      'B1 · ' + ES + ': BY MOMENT touches ' + want.join(', ') + ', which the code map does not list — both tables fields stay in hide, say "' + note + '", name them in their hover, and the header counts them',
+      { want, xnotes: cs.xnotes, count: cs.count, tip: tips[1].slice(0, 200) }); }
+  await p.click('#ocol-cm .opt[data-carry="all"]'); await p.waitForTimeout(120);
+  ok((await readC()).carry === 'all', 'D-055 · show all brings the code map back whole');
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the D-055 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));

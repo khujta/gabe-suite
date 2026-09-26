@@ -53,7 +53,11 @@
     "wide",
     "offocc",
     "occ",
-    "mom"
+    "mom",
+    "covered",
+    "fields",
+    "left",
+    "empty"
   ],
   "eyebrow": "every endpoint of one app, side by side",
   "h1": "All {nRows} endpoints of {app}, one row each",
@@ -739,14 +743,15 @@
     "cmPlain": "Copy the code map's settings for this endpoint as text, to paste back with your words under them."
   },
   "mo": {
-    "_about": "His ask 2026-09-26: are the moments universal, can every block be read on them. The spine, the moment words, the reasons and the two looks are my proposals (D-025.2); where each element stands is read off the feed by gen-all-endpoints.py (by_moment) and proven there.",
-    "lede": "One endpoint's time, top to bottom, with every block that happens in time as a column. A row is a moment of the request; a cell holds that block's elements acting at that moment. Pick an ending to follow only the path to it.",
+    "_about": "His ask 2026-09-26: are the moments universal, can every block be read on them. The spine, the moment words, the reasons and the path row are my proposals (D-025.2); the two looks' defaults, moments as columns and cells as chips, are his (D-055); where each element stands is read off the feed by gen-all-endpoints.py (by_moment) and proven there.",
+    "lede": "One endpoint's time, left to right, with every block that happens in time as a row (his default; the other look turns it). A column is a moment of the request; a cell holds that block's elements acting at that moment. Pick an ending to follow only the path to it.",
     "how": [
       "The moments are D-053's, extended. Before the handler they are fixed: the server starting (before any request), the screen sending the request, the app's edge, FastAPI reading the body, the dependencies (the login check among them), FastAPI checking the fields. Inside the handler they are read from its own lines: its checks, and what it does among them; the work, the calls it makes after a check and before its next check, catch or commit; one moment for each catch that turns a failure into an ending; saving, its own commit. Then the answer, what happens after it, and the uncaught error last, because it can escape at any moment.",
       "A handler moment that happens twice (checks, then a catch, then more checks) is drawn twice, in the order it happens, never merged. The arms of one if and else are drawn the same way, as runs in line order, though a request passes only one of them: pick its ending to see which. A fixed moment the endpoint does not have is drawn empty where it would stand.",
       "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs inside. A check stands where it is evaluated, on every path that makes the call it sits in; its ending stands where the request leaves. A check the map ties only to a catch stands where that catch raises its ending. A test has no time inside the request: it rides the ending it proves. What the map does not place is left in the band below, with its reason.",
       "A step is placed once for each path it is on: with the dependencies when a dependency runs it, else at the call that path makes. So one step can stand at more than one moment: the login dependency reads a table, and a handler call reads it again. When a path's own chain names no call reaching the step, it stands at the calls the endpoint's other paths make to its function, never after that path has left.",
-      "The path: every path at once, or the path to one ending, picked from the endings in the order they happen, under the moment each one leaves at. A picked path keeps only the moments it passes and the elements it passes there; an ending it passes by without leaving is kept."
+      "The path: every path at once, or the path to one ending. Each ending is a code, in the order they happen, a small gap between the moments they leave at; its hover says the moment, what the ending says, its limiter, and whether it is the path in force. A picked path keeps only the moments it passes and the elements it passes there; an ending it passes by without leaving is kept.",
+      "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it names one) and the class its except takes; the checks say so; the work names the first function it calls, and how many more; saving names what the handler's own step does there. Its full name, where the catch stands, its lines and its stage are in its hover."
     ],
     "covHead": "Across the {nRows} endpoints, what each block places:",
     "cov": "{block}: {placed} with a moment, {un} with none, of {total}.",
@@ -775,12 +780,18 @@
       "all": "all paths",
       "allPlain": "Every path at once: each element wherever it acts.",
       "one": "the path to {status}",
-      "onePlain": "Only the moments the path to this ending passes ({kind}, it leaves at {mom}), and only the elements it passes there."
+      "mom": "moment: {mom}",
+      "says": "says: {v}",
+      "lim": "limiter: {v}",
+      "inForce": "the path in force now",
+      "pickIt": "click to follow only this path"
     },
+    "head": { "stage": "stage {v}", "calls": "calls: {v}" },
     "opt": {
       "lay": {
         "label": "the moments",
-        "pick": "rows",
+        "pick": "cols",
+        "ruled": "D-055",
         "opts": {
           "rows": { "name": "moments as rows", "plain": "Time runs top to bottom; each block is a column." },
           "cols": { "name": "moments as columns", "plain": "Time runs left to right; each block is a row." }
@@ -789,6 +800,7 @@
       "cell": {
         "label": "the cells",
         "pick": "chips",
+        "ruled": "D-055",
         "opts": {
           "chips": { "name": "cells as chips", "plain": "Each cell names its elements, each one a chip that lights where it appears." },
           "counts": { "name": "cells as counts", "plain": "Each cell says how many elements act there." }
@@ -827,6 +839,25 @@
     "handler": "the handler starts here",
     "body": "the body",
     "tip": "{name} · {block}"
+  },
+  "carry": {
+    "_about": "D-055: his ask 2026-09-26, a switch in the code map that dims or hides every field BY MOMENT already carries, to see what else is there. Its three looks and the default (show all) are my proposal (D-025.2): the default is my pick, dashed. What counts as carried is read by gen-all-endpoints.py (carried) and proven there.",
+    "label": "what BY MOMENT carries",
+    "pick": "all",
+    "opts": {
+      "all": { "name": "show all", "plain": "Every field of the code map, as it is." },
+      "dim": { "name": "dim what BY MOMENT carries", "plain": "An element BY MOMENT places at a moment fades; a field whose elements it places, every one, fades with its name. Pointing at one brings it back. A field with nothing on this endpoint fades too, less; a field that lists fewer tables than BY MOMENT's steps touch stays and says how many more." },
+      "hide": { "name": "hide what BY MOMENT carries", "plain": "An element BY MOMENT places leaves the code map; a field it carries whole leaves with its name; a field it carries in part says how many of its elements are there. A field with nothing on this endpoint stays, faded; a field that lists fewer tables than BY MOMENT's steps touch stays and says how many more." }
+    },
+    "count": "{covered} of {fields} fields carried by BY MOMENT · {left} left · {empty} with nothing here",
+    "beyondCount": "{n} tables only in BY MOMENT",
+    "more": "+{n} in BY MOMENT",
+    "beyond": "+{n} tables only in BY MOMENT",
+    "tipAll": "BY MOMENT carries this field whole: each of its elements stands at a moment there.",
+    "tipPart": "BY MOMENT carries {n} of its {of} elements.",
+    "tipEmpty": "This field holds nothing on this endpoint: nothing for BY MOMENT to carry, and nothing it leaves out. Dim and hide fade it, and the header counts it apart.",
+    "tipBeyond": "BY MOMENT's steps also touch {n} tables this field does not list: {names}. The code map is short of them.",
+    "plain": "Carried: an element BY MOMENT places at a moment, on any path. A list carries each of its items apart; a count is carried when every member it counts is placed, in part when some are. A field no element of which BY MOMENT places (its fates, its alarms, the handler's file, the longest chain) stays as it is: it is what BY MOMENT leaves out. A field with nothing on this endpoint is counted apart, never as left. Where BY MOMENT's steps touch tables the code map does not list, the tables fields stay in every look and say how many, and the header counts them."
   },
   "authNoScheme": "own check",
   "authNoSchemePlain": "It asks for a login through its own check, with no declared scheme: the check reads the token itself, not from the usual header.",

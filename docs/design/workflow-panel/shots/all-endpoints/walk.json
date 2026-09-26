@@ -754,7 +754,7 @@
      "Household"
     ],
     "cm": [
-     "tables15",
+     "tables+14 in BY MOMENT15",
      "writes12",
      "households · RW"
     ],
@@ -831,7 +831,7 @@
     "rowsDim": 1,
     "uni": [],
     "cm": [
-     "tables15",
+     "tables+14 in BY MOMENT15",
      "users · RW",
      "users"
     ],
@@ -1528,7 +1528,7 @@
    {
     "click": "copy the settings",
     "at": [
-     1152,
+     1467,
      524
     ],
     "size": [
@@ -1540,39 +1540,26 @@
   ],
   [
    "the code map's copy button copied",
-   "page: all-endpoints · gustify @ 05007957\nendpoint: POST /recipe-creation/gustify\nthe code map · the moments: moments as header rows (my pick)\nthe code map · the checks: the check as its own column (my pick)\n\nyour words:\n"
+   "page: all-endpoints · gustify @ 05007957\nendpoint: POST /recipe-creation/gustify\nthe code map · the moments: moments as header rows (my pick)\nthe code map · the checks: the check as its own column (my pick)\nthe code map · what BY MOMENT carries: show all (my pick)\n\nyour words:\n"
   ],
   [
    "BY MOMENT · the path picker",
-   [
-    "all paths",
-    "at the edge: 429 sensitive | 429 global",
-    "reads the body: 422 | 400",
-    "the dependencies: 401 Not authenticated | 401 invalid token",
-    "checks the fields: 422",
-    "checks · lines 236 to 243: 403 | 409 | 400",
-    "after a call failed · lines 258 to 259: 400 | 429 AI rate limit exceeded. Try again shortly. | 429 AI budget reached. Try again later. | 402 | 503 | 429 AI capacity reached. Try again shortly. | 502 El proveedor de IA devolvió un resultado inválido. Intenta de nuevo. | 502 Error del proveedor de IA. Intenta de nuevo en unos momentos.",
-    "the answer: 201",
-    "escapes: 500"
-   ]
+   "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 403 409 400 │ fail: 400 429 429 402 503 429 502 502 │ answer: 201 │ uncaught: 500"
   ],
   [
    "BY MOMENT · all paths",
    [
-    "the moments Endings Proof Gates and decisions Data effects Functions Structures Client In-flight state Standard or specialist Stages and order",
-    "before any request setting-once rate_limit_active setting-once trusted_proxy_hops built-once _sensitive setting-once rate_limit_sensitive_per_minute setting-once rate_lim",
-    "the screen sends it ",
-    "EDGE at the edge refusal 429 refusal 429 sensitive global state idempotency_key flag environment, rate_limit_enabled CORSMiddleware IdempotencyMiddleware",
-    "INPUT reads the body framework 422 framework 400 IN GustifyCreateRequest ",
-    "GATE the dependencies refusal 401 refusal 401 get_auth_context caller context.py:98 · translate users R users W flush resolve_or_create_user accessor commit build_auth_co",
-    "INPUT checks the fields validation 422 C83 proves 422 mode model_tier body.mode missing body.mode string_too_long body.model_tier literal_error body missing",
-    "HANDLER checks lines 236 to 243 refusal 403 refusal 409 refusal 400 C971 proves 403 403 not ( RECIPE_CREATION_ENABLED or settings. recipe_creation_enabled) 409 self.house",
-    "HANDLER the work lines 248 to 252 ai_recipes.py:288 · pass-through ai_recipes.py:270 · pass-through ai_recipes.py:397 · pass-through ai_spend.py:102 · swallow reconciliat",
-    "HANDLER after a call failed — generate_gustify_recipe raised — caught at recipe_creation.py:258 (except Exception) lines 258 to 259 refusal 400 refusal 429 refusal 429 re",
-    "HANDLER saving line 261 commit post_create_gustify caller ",
-    "ANSWER the answer success 201 C75 proves 201 C76 proves 201 C77 proves 201 C77 proves 201 C78 proves 201 C82 proves 201 C84 proves 201 C85 proves 201 C86 proves 201 C88 p",
-    "after the answer ",
-    "UNCAUGHT escapes uncaught 500 "
+    "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
+    "Endings refusal 429 refusal 429 framework 422 framework 400 refusal 401 refusal 401 validation 422 refusal 403 refusal 409 refusal 400 refusal 400 refusal 429 refusal 429",
+    "Proof C83 proves 422 C971 proves 403 C80 proves 402 C81 proves 402 C87 proves 502 C88 proves 502 C88 proves 502 C75 proves 201 C76 proves 201 C77 proves 201 C77 proves 20",
+    "Gates and decisions sensitive global get_auth_context caller context.py:98 · translate 403 not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) 409 self.hous",
+    "Data effects users R users W flush resolve_or_create_user accessor commit build_auth_context caller memberships R households R locations R recipe_creation_requests R cano",
+    "Functions post_create_gustify caller AuthContext.require_household gate get_idempotency_key build_cooked_ledger accessor load_resolution_snapshot assert_credits_available",
+    "Structures IN GustifyCreateRequest mode model_tier OUT GustifyCreationResponse · 7 ",
+    "Client ",
+    "In-flight state setting-once rate_limit_active setting-once trusted_proxy_hops built-once _sensitive setting-once rate_limit_sensitive_per_minute setting-once rate_limit_",
+    "Standard or specialist flag environment, rate_limit_enabled binding TokenVerifier can answer 403 flag not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) re",
+    "Stages and order CORSMiddleware IdempotencyMiddleware body.mode missing body.mode string_too_long body.model_tier literal_error body missing "
    ]
   ],
   [
@@ -1605,12 +1592,13 @@
   [
    "BY MOMENT · its info",
    [
-    "One endpoint's time, top to bottom, with every block that happens in time as a column. A row is a moment of the request;",
+    "One endpoint's time, left to right, with every block that happens in time as a row (his default; the other look turns it",
     "The moments are D-053's, extended. Before the handler they are fixed: the server starting (before any request), the scre",
     "A handler moment that happens twice (checks, then a catch, then more checks) is drawn twice, in the order it happens, ne",
     "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs ",
     "A step is placed once for each path it is on: with the dependencies when a dependency runs it, else at the call that pat",
-    "The path: every path at once, or the path to one ending, picked from the endings in the order they happen, under the mom",
+    "The path: every path at once, or the path to one ending. Each ending is a code, in the order they happen, a small gap be",
+    "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it name",
     "Across the 80 endpoints, what each block places:",
     "Endings: 727 with a moment, 1 with none, of 728.",
     "Gates and decisions: 531 with a moment, 0 with none, of 531.",
@@ -1644,22 +1632,40 @@
    }
   ],
   [
-   "step 113 · moments-as-columns",
+   "BY MOMENT · the heads (moments as columns, his default)",
+   [
+    "before any request",
+    "the screen sends it",
+    "at the edge",
+    "reads the body",
+    "the dependencies",
+    "checks the fields",
+    "checks",
+    "generate_gustify_recipe +1",
+    "generate_gustify_recipe · Exception",
+    "commit",
+    "the answer",
+    "after the answer",
+    "escapes"
+   ]
+  ],
+  [
+   "step 113 · moments-as-rows",
    {
-    "click": "moments as columns",
+    "click": "moments as rows",
     "at": [
-     69,
+     1105,
      524
     ],
     "size": [
      32,
      32
     ],
-    "note": "the square \"moments as columns\""
+    "note": "the square \"moments as rows\""
    }
   ],
   [
-   "BY MOMENT · moments as columns",
+   "BY MOMENT · moments as rows",
    {
     "fits": {
      "box": 1854,
@@ -1674,9 +1680,9 @@
      "the dependencies",
      "checks the fields",
      "checks",
-     "the work",
-     "after a call failed — generate_gustify_recipe raised — caught at recipe_creation.py:258 (except Exception)",
-     "saving",
+     "generate_gustify_recipe +1",
+     "generate_gustify_recipe · Exception",
+     "commit",
      "the answer",
      "after the answer",
      "escapes"
@@ -1684,18 +1690,18 @@
    }
   ],
   [
-   "step 115 · moments-back-to-rows",
+   "step 115 · moments-back-to-columns",
    {
-    "click": "moments as rows",
+    "click": "moments as columns",
     "at": [
-     32,
+     1142,
      524
     ],
     "size": [
      32,
      32
     ],
-    "note": "the square \"moments as rows\" (my pick)"
+    "note": "the square \"moments as columns\" (his default)"
    }
   ],
   [
@@ -1703,7 +1709,7 @@
    {
     "click": "cells as counts",
     "at": [
-     186,
+     1259,
      524
     ],
     "size": [
@@ -1716,20 +1722,17 @@
   [
    "BY MOMENT · cells as counts",
    [
-    "the moments Endings Proof Gates and decisions Data effects Functions Structures Client In-flight state Standard or specialist Stages and order",
-    "before any request 7 ",
-    "the screen sends it ",
-    "EDGE at the edge 2 2 1 1 2",
-    "INPUT reads the body 2 1 ",
-    "GATE the dependencies 2 2 7 3 1 ",
-    "INPUT checks the fields 1 1 2 4",
-    "HANDLER checks lines 236 to 243 3 1 3 3 3 ",
-    "HANDLER the work lines 248 to 252 5 31 16 4 ",
-    "HANDLER after a call failed — generate_gustify_recipe raised — caught at recipe_creation.py:258 (except Exception) lines 258 to 259 8 5 9 1 3 ",
-    "HANDLER saving line 261 1 ",
-    "ANSWER the answer 1 11 1 1 ",
-    "after the answer ",
-    "UNCAUGHT escapes 1 "
+    "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
+    "Endings 2 2 2 1 3 8 1 1",
+    "Proof 1 1 5 11 ",
+    "Gates and decisions 2 2 3 5 9 ",
+    "Data effects 7 31 1 ",
+    "Functions 3 16 1 1 ",
+    "Structures 1 2 1 ",
+    "Client ",
+    "In-flight state 7 1 3 ",
+    "Standard or specialist 1 1 3 4 3 ",
+    "Stages and order 2 4 "
    ]
   ],
   [
@@ -1737,14 +1740,14 @@
    {
     "click": "cells as chips",
     "at": [
-     149,
+     1222,
      524
     ],
     "size": [
      32,
      32
     ],
-    "note": "the square \"cells as chips\" (my pick)"
+    "note": "the square \"cells as chips\" (his default)"
    }
   ],
   [
@@ -1752,30 +1755,30 @@
    {
     "click": "the path to 402 · refusal · after a call failed — generate_gustify_rec",
     "at": [
-     600,
-     527
+     745,
+     528
     ],
     "size": [
-     48,
-     26
+     42,
+     24
     ],
-    "note": "the path square \"the path to 402 · refusal · after a call failed — generate_gustify_recipe raised — caught at recipe_creation.py:258 (except Exception)\""
+    "note": "the path square \"the path to 402 · refusal · after a call failed — generate_gustify_recipe raised — caught at recipe_creation.py:258 (except Exception) · insufficient_credits\""
    }
   ],
   [
    "BY MOMENT · the path to the 402",
    [
-    "the moments Endings Proof Gates and decisions Data effects Functions Structures Client In-flight state Standard or specialist Stages and order",
-    "before any request setting-once rate_limit_active setting-once trusted_proxy_hops built-once _sensitive setting-once rate_limit_sensitive_per_minute setting-once rate_lim",
-    "the screen sends it ",
-    "EDGE at the edge refusal 429 refusal 429 sensitive global state idempotency_key flag environment, rate_limit_enabled CORSMiddleware IdempotencyMiddleware",
-    "INPUT reads the body framework 422 framework 400 IN GustifyCreateRequest ",
-    "GATE the dependencies refusal 401 refusal 401 get_auth_context caller users R users W flush resolve_or_create_user accessor commit build_auth_context caller memberships R",
-    "INPUT checks the fields validation 422 mode model_tier body.mode missing body.mode string_too_long body.model_tier literal_error body missing",
-    "HANDLER checks lines 236 to 243 refusal 403 refusal 409 refusal 400 403 not ( RECIPE_CREATION_ENABLED or settings. recipe_creation_enabled) 409 self.household is None 400",
-    "HANDLER the work lines 248 to 252 ai_recipes.py:288 · pass-through ai_recipes.py:270 · pass-through ai_recipes.py:397 · pass-through ai_spend.py:102 · swallow reconciliat",
-    "HANDLER after a call failed — generate_gustify_recipe raised — caught at recipe_creation.py:258 (except Exception) lines 258 to 259 refusal 400 refusal 429 refusal 429 re",
-    "after the answer "
+    "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
+    "Endings refusal 429 refusal 429 framework 422 framework 400 refusal 401 refusal 401 validation 422 refusal 403 refusal 409 refusal 400 refusal 400 refusal 429 refusal 429",
+    "Proof C80 proves 402 C81 proves 402 ",
+    "Gates and decisions sensitive global get_auth_context caller 403 not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) 409 self.household is None 400 key is N",
+    "Data effects users R users W flush resolve_or_create_user accessor commit build_auth_context caller memberships R households R locations R recipe_creation_requests R cano",
+    "Functions post_create_gustify caller AuthContext.require_household gate get_idempotency_key build_cooked_ledger accessor load_resolution_snapshot assert_credits_available",
+    "Structures IN GustifyCreateRequest mode model_tier ",
+    "Client ",
+    "In-flight state setting-once rate_limit_active setting-once trusted_proxy_hops built-once _sensitive setting-once rate_limit_sensitive_per_minute setting-once rate_limit_",
+    "Standard or specialist flag environment, rate_limit_enabled binding TokenVerifier can answer 403 flag not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) re",
+    "Stages and order CORSMiddleware IdempotencyMiddleware body.mode missing body.mode string_too_long body.model_tier literal_error body missing "
    ]
   ],
   [
@@ -1798,14 +1801,14 @@
    {
     "click": "householdsR",
     "at": [
-     691,
+     611,
      530
     ],
     "size": [
      124,
      20
     ],
-    "note": "the chip \"householdsR\" in the dependencies' row, Data effects"
+    "note": "the chip \"householdsR\" in the dependencies' column, Data effects"
    }
   ],
   [
@@ -1816,7 +1819,7 @@
     "says": "households (table) · 1 drawn here",
     "inGrid": [
      [
-      "the dependencies",
+      "gate",
       "data",
       "householdsR"
      ]
@@ -1846,27 +1849,27 @@
     "says": "households (table) · 5 drawn here",
     "inGrid": [
      [
-      "the dependencies",
+      "gate",
       "data",
       "householdsR"
      ],
      [
-      "the work",
+      "work",
       "data",
       "householdsR"
      ],
      [
-      "the work",
+      "work",
       "data",
       "householdsR"
      ],
      [
-      "the work",
+      "work",
       "data",
       "householdsW"
      ],
      [
-      "the work",
+      "work",
       "data",
       "householdsW"
      ]
@@ -1875,18 +1878,7 @@
   ],
   [
    "BY MOMENT · POST /setup/complete, the path picker",
-   [
-    "all paths",
-    "at the edge: 429 sensitive | 429 global",
-    "reads the body: 422 | 400",
-    "the dependencies: 401 Not authenticated | 401 invalid token",
-    "checks the fields: 422",
-    "checks · lines 191 to 193: 400",
-    "after a call failed · line 199: 409",
-    "after a call failed · line 201: 409",
-    "the answer: 200",
-    "escapes: 500"
-   ]
+   "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 400 │ fail: 409 │ fail: 409 │ answer: 200 │ uncaught: 500"
   ],
   [
    "step 126 · clear-the-by-moment-light",
@@ -1901,6 +1893,389 @@
      19
     ],
     "note": "the clear link on the lit chip above the table"
+   }
+  ],
+  [
+   "step 127 · open-cooking-sessions",
+   {
+    "click": "/cooking/sessionsPOST",
+    "at": [
+     33,
+     660
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /cooking/sessions"
+   }
+  ],
+  [
+   "D-055 · the path row",
+   "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 409 400 │ fail: 404 │ fail: 403 │ fail: 409 │ answer: 201 │ uncaught: 500"
+  ],
+  [
+   "D-055 · the heads",
+   [
+    "before any request",
+    "the screen sends it",
+    "at the edge",
+    "reads the body",
+    "the dependencies",
+    "checks the fields",
+    "checks",
+    "subscription_tier_for +2",
+    "start_session · SessionNotFoundError",
+    "AllergenConflictError",
+    "start_session · ConcurrentCookCapError",
+    "commit",
+    "the answer",
+    "after the answer",
+    "escapes"
+   ]
+  ],
+  [
+   "hover the moments-as-columns square",
+   "moments as columns · your default ┆ Time runs left to right; each block is a row."
+  ],
+  [
+   "hover the first 429 code",
+   "429 · sensitive · refusal ┆ moment: at the edge ┆ says: Rate limit exceeded. Try again shortly. ┆ limiter: sensitive ┆ click to follow only this path"
+  ],
+  [
+   "hover the second 429 code",
+   "429 · global · refusal ┆ moment: at the edge ┆ says: Rate limit exceeded. Try again shortly. ┆ limiter: global ┆ click to follow only this path"
+  ],
+  [
+   "step 132 · path-code-404",
+   {
+    "click": "the path to 404 · refusal · after a call failed — start_session raised",
+    "at": [
+     565,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 404 · refusal · after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) · Recipe not found\""
+   }
+  ],
+  [
+   "hover the chosen 404 code",
+   "404 · refusal ┆ moment: after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) ┆ says: Recipe not found ┆ the path in force now"
+  ],
+  [
+   "step 135 · path-all-again",
+   {
+    "click": "all paths",
+    "at": [
+     32,
+     536
+    ],
+    "size": [
+     81,
+     26
+    ],
+    "note": "the square \"all paths\""
+   }
+  ],
+  [
+   "hover a failure head",
+   "after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) ┆ line 155 ┆ stage HANDLER — the endpoint's own code decides ┆ A call raised; this catch turned the error into these endings."
+  ],
+  [
+   "hover the work head",
+   "the work ┆ lines 148 to 153 ┆ stage HANDLER — the endpoint's own code decides ┆ calls: subscription_tier_for · start_session · concurrent_cook_cap_for_tier ┆ The calls the handler makes after its checks, and what they read and write inside."
+  ],
+  [
+   "D-055 · the code map, show all",
+   {
+    "count": "34 of 55 fields carried by BY MOMENT · 18 left · 3 with nothing here",
+    "carry": "all",
+    "left": [
+     "tables (part)",
+     "declared success",
+     "tests (part)",
+     "writes (part)",
+     "fate",
+     "the tables (part)",
+     "each path's fate",
+     "handler (part)",
+     "steps",
+     "method and path",
+     "entity",
+     "first URL segment",
+     "proven (part)",
+     "alarms",
+     "behind (part)",
+     "functions behind, and how deep (part)",
+     "the lab's proof rank",
+     "alarms"
+    ],
+    "nothingHere": [
+     "beyond",
+     "lacks",
+     "norms it lacks"
+    ],
+    "notes": []
+   }
+  ],
+  [
+   "hover the dim square",
+   "dim what BY MOMENT carries ┆ An element BY MOMENT places at a moment fades; a field whose elements it places, every one, fades with its name. Pointing at one brings it back. A field with nothing on this endpoint fades too, less; a field that lists fewer tables than BY MOMENT's steps touch stays and says how many more."
+  ],
+  [
+   "step 139 · carry-dim",
+   {
+    "click": "dim what BY MOMENT carries",
+    "at": [
+     1386,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"dim what BY MOMENT carries\""
+   }
+  ],
+  [
+   "D-055 · the code map, dim",
+   {
+    "count": "34 of 55 fields carried by BY MOMENT · 18 left · 3 with nothing here",
+    "carry": "dim",
+    "left": [
+     "tables (part)",
+     "declared success",
+     "tests (part)",
+     "writes (part)",
+     "fate",
+     "the tables (part)",
+     "each path's fate",
+     "handler (part)",
+     "steps",
+     "method and path",
+     "entity",
+     "first URL segment",
+     "proven (part)",
+     "alarms",
+     "behind (part)",
+     "functions behind, and how deep (part)",
+     "the lab's proof rank",
+     "alarms"
+    ],
+    "nothingHere": [
+     "beyond",
+     "lacks",
+     "norms it lacks"
+    ],
+    "notes": []
+   }
+  ],
+  [
+   "step 141 · carry-hide",
+   {
+    "click": "hide what BY MOMENT carries",
+    "at": [
+     1423,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"hide what BY MOMENT carries\""
+   }
+  ],
+  [
+   "D-055 · the code map, hide",
+   {
+    "count": "34 of 55 fields carried by BY MOMENT · 18 left · 3 with nothing here",
+    "carry": "hide",
+    "left": [
+     "tables (part)",
+     "declared success",
+     "tests (part)",
+     "writes (part)",
+     "fate",
+     "the tables (part)",
+     "each path's fate",
+     "handler (part)",
+     "steps",
+     "method and path",
+     "entity",
+     "first URL segment",
+     "proven (part)",
+     "alarms",
+     "behind (part)",
+     "functions behind, and how deep (part)",
+     "the lab's proof rank",
+     "alarms"
+    ],
+    "nothingHere": [
+     "beyond",
+     "lacks",
+     "norms it lacks"
+    ],
+    "notes": [
+     "+8 in BY MOMENT",
+     "+1 in BY MOMENT",
+     "+1 in BY MOMENT",
+     "+8 in BY MOMENT",
+     "+1 in BY MOMENT",
+     "+9 in BY MOMENT",
+     "+5 in BY MOMENT",
+     "+5 in BY MOMENT"
+    ]
+   }
+  ],
+  [
+   "step 143 · copy-the-settings-with-hide",
+   {
+    "click": "copy the settings",
+    "at": [
+     1467,
+     524
+    ],
+    "size": [
+     147,
+     32
+    ],
+    "note": "the button \"copy the settings\""
+   }
+  ],
+  [
+   "D-055 · the code map's copy",
+   "page: all-endpoints · gustify @ 05007957\nendpoint: POST /cooking/sessions\nthe code map · the moments: moments as header rows (my pick)\nthe code map · the checks: the check as its own column (my pick)\nthe code map · what BY MOMENT carries: hide what BY MOMENT carries (your choice)\n\nyour words:\n"
+  ],
+  [
+   "step 144 · open-the-stream-endpoint-in-hide",
+   {
+    "click": "/recipe-creation/gustify/streamGETstream",
+    "at": [
+     33,
+     846
+    ],
+    "size": [
+     304,
+     32
+    ],
+    "note": "the row GET /recipe-creation/gustify/stream"
+   }
+  ],
+  [
+   "D-055 · GET /recipe-creation/gustify/stream, hide",
+   {
+    "count": "26 of 55 fields carried by BY MOMENT · 17 left · 12 with nothing here · 3 tables only in BY MOMENT",
+    "carry": "hide",
+    "left": [
+     "tables (BY MOMENT holds more)",
+     "declared success",
+     "fate",
+     "the tables (BY MOMENT holds more)",
+     "each path's fate",
+     "handler (part)",
+     "lacks",
+     "norms it lacks",
+     "steps",
+     "method and path",
+     "entity",
+     "first URL segment",
+     "alarms",
+     "behind (part)",
+     "functions behind, and how deep (part)",
+     "the lab's proof rank",
+     "alarms"
+    ],
+    "nothingHere": [
+     "reply",
+     "reply body",
+     "beyond",
+     "forks",
+     "data fns",
+     "fields",
+     "request body",
+     "screen",
+     "reads",
+     "the hook that calls it",
+     "screens above that hook",
+     "reason sites"
+    ],
+    "notes": [
+     "+3 tables only in BY MOMENT",
+     "+3 tables only in BY MOMENT",
+     "+1 in BY MOMENT",
+     "+2 in BY MOMENT",
+     "+2 in BY MOMENT"
+    ]
+   }
+  ],
+  [
+   "hover the stream tables note",
+   "the tables ┆ attribute: Operation per table ┆ The kind of touch each table gets — read, add, update or delete. ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there. ┆ BY MOMENT's steps also touch 3 tables this field does not list: canonical_ingredients, ingredient_aliases, ingredient_restrictions. The code map is short of them."
+  ],
+  [
+   "step 147 · back-to-cooking-sessions",
+   {
+    "click": "/cooking/sessionsPOST",
+    "at": [
+     33,
+     968
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /cooking/sessions"
+   }
+  ],
+  [
+   "step 148 · carry-show-all",
+   {
+    "click": "show all",
+    "at": [
+     1349,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"show all\" (my pick)"
+   }
+  ],
+  [
+   "D-055 · the code map, show all again",
+   {
+    "count": "34 of 55 fields carried by BY MOMENT · 18 left · 3 with nothing here",
+    "carry": "all",
+    "left": [
+     "tables (part)",
+     "declared success",
+     "tests (part)",
+     "writes (part)",
+     "fate",
+     "the tables (part)",
+     "each path's fate",
+     "handler (part)",
+     "steps",
+     "method and path",
+     "entity",
+     "first URL segment",
+     "proven (part)",
+     "alarms",
+     "behind (part)",
+     "functions behind, and how deep (part)",
+     "the lab's proof rank",
+     "alarms"
+    ],
+    "nothingHere": [
+     "beyond",
+     "lacks",
+     "norms it lacks"
+    ],
+    "notes": []
    }
   ],
   [
