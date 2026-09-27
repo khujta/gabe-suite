@@ -420,6 +420,9 @@
   #mogrid .mc .vc, #moband .mc .vc { max-width: none; flex: none; }   /* its own width, so moFloor measures the word, not the chip */
   .mc .mq { color: var(--muted); font-style: italic; }
   .mc .mpv { color: var(--muted); }
+  /* D-057: the Endings row's info line (behind the section's toggle) takes the head's width and never widens it: the columns were
+     measured without it */
+  #mogrid .moinf { display: block; width: 0; min-width: 100%; margin-top: 4px; white-space: normal; font-weight: 400; font-size: 12px; line-height: 1.35; color: var(--muted); text-transform: none; letter-spacing: 0; }
   .mcount { display: inline-block; min-width: 18px; font-weight: 650; font-variant-numeric: tabular-nums; }
   /* D-056 · the twelve adds, drawn: a status the endpoint does not declare is hollow (its frame, no fill); a test that fits endings at
      several moments rides each, its chip hollow and dashed; a function's depth, a race and a nested schema's mark ride inside the chip */
@@ -1040,8 +1043,7 @@
       ["fate", D.fates.map(function (f) { return cFate(f); })], ["piece", D.pieceWords.map(function (w) { return cPiece(w); })],
       ["ifk", Object.keys(EN.ifk).filter(function (k) { return ifk[k]; }).map(cIfk)], ["life", Object.keys(EF.life.vals).filter(function (k) { return life[k]; }).map(cLife)],
       ["dir", Object.keys(EN.dir).map(cDir)], ["ent", ROWS.map(function (r) { return r.ent; }).filter(function (e, i, a) { return e && a.indexOf(e) === i; }).sort().map(cEnt)],
-      ["switch", Object.keys(EF.switch.vals).map(function (v) { return cMine("switch", v); })], ["alarm", D.families.map(cAlarm)],
-      ["arm", Object.keys(EF.arm.vals).filter(function (v) { return v !== "_other"; }).map(function (v) { return cMine("arm", v); })],
+      ["switch", Object.keys(EF.switch.vals).map(function (v) { return cMine("switch", v); })], ["alarm", D.families.map(cAlarm)],   /* D-057: no arm row — which part of the map found an alarm is about the map (D-017) */
       ["branch", Object.keys(EF.branch.vals).filter(function (v) { return v !== "_other"; }).map(function (v) { return cMine("branch", v); })],
       ["does", Object.keys(EF.does.vals).filter(function (v) { return v !== "_other"; }).map(function (v) { return cMine("does", v); })],
       ["rule", Object.keys(EF.rule.groups).map(function (g) { var c = vIco(vc("rule", "_" + g, EF.rule.groups[g].name), EF.rule.groups[g].icon); c.appendChild(document.createTextNode(g)); return c; })],
@@ -1243,8 +1245,7 @@
           x[1] != null ? " · " : null, x[1] != null ? cMine("branch", x[1]) : null, x[2] != null ? " · " : null, x[2] != null ? cMine("does", x[2]) : null); }, dk.reasons.map(function (x) { return x[0]; })); more(b, d.reasons); }
     else if (k === "alarms") list(b, d.alarms, function (a) { var f = frag(cAlarm(a[0]));
       if (a[1] != null) f.appendChild(frag(" ", cStatus(a[1])));
-      if (a[4]) f.appendChild(frag(" · ", cMine("arm", a[4])));                                  /* the part of the map that found it */
-      else if ((a[3] || []).length) { f.appendChild(document.createTextNode(" · ")); a[3].forEach(function (q, j) { if (j) f.appendChild(document.createTextNode(" ")); f.appendChild(cStatus(q)); }); }
+      if ((a[3] || []).length) {                                                                  /* D-057: no arm word (D-017) */ f.appendChild(document.createTextNode(" · ")); a[3].forEach(function (q, j) { if (j) f.appendChild(document.createTextNode(" ")); f.appendChild(cStatus(q)); }); }
       else if (a[2]) f.appendChild(document.createTextNode(" · " + a[2]));
       return f; }, dk.alarms);
     else if (k === "pieces") { list(b, d.pieces.items, function (x, i) { return frag(pieceWords(x[0], r.xd.pieces[i]), " · " + x[1] + "/" + x[2] + " ", cPiece(x[3])); }, dk.pieces); more(b, d.pieces); }
@@ -1482,6 +1483,11 @@
   function moName(r, x) { if (x[0] !== "fail") return MW.moms[x[0]].name; var g = r.d.exits.moms[x[1]];
     return MW.moms.fail.name + " — " + fill(g[2].length ? W.endings.caught : W.endings.caughtBare, { calls: g[2].join(" · "), at: g[0], cls: g[1] }); }
   function moLines(x) { return x[2] == null ? "" : fill(x[2] === x[3] ? MW.line : MW.lines, { lo: x[2], hi: x[3] }); }
+  /* D-057 (c): what tells a path from the other paths to its ending — the forks it takes (their condition, or past every fork), else
+     what FastAPI checks on it; and a path code's own words: its ending's (when two endings share the status there), then that */
+  function forkText(fk) { return (fk || []).map(function (d) { return d[0] === "pred" ? d[1] : d[0] === "fall" ? MW.path.fall : (MW.path.split[d[1]] || d[1]); }).join(" · "); }
+  function forkLine(fk) { return fk.some(function (d) { return d[0] === "split"; }) ? forkText(fk) : fill(MW.path.fork, { v: forkText(fk) }); }
+  function pickFace(x) { return [x[5], x[9] ? forkText(x[9]) : null].filter(Boolean).join(" · "); }
   /* D-055 · a moment's head says at most two things; its full name, the catch's place, its lines and its stage ride the hover. After
      a call failed: the function the feed shows raising (when it names one) and the class its except takes; the checks; the work, the
      first function its run calls (+ how many more); saving, what the handler's own step does there. Any other moment: its short name */
@@ -1519,8 +1525,18 @@
   function moExtra(X, t) { var XW = W.mo.x, h = "", ln = function (s) { h += "<span class=ln>" + esc(s) + "</span>"; }, pl = function (s) { h += "<span class=pl>" + esc(s) + "</span>"; };
     if (X.dp) { ln(fill(XW.depth, { n: X.dp })); pl(XW.depthPlain); }
     if (X.cp) { ln(fill(XW.callPaths, { via: X.cp })); pl(fill(XW.callPathsPlain, { via: X.cp })); }   /* F3: on the call's paths, an upper bound */
+    if (X.cn) { ln(fill(XW.cutNear, { v: X.cn })); pl(fill(XW.cutNearPlain, { v: X.cn })); }   /* review F3: a caller whose list is cut */
+    if (X.cq && (MPATH.i == null || X.cq[1].indexOf(MPATH.i) >= 0)) { ln(fill(XW.callCheck, { via: X.cq[0] })); pl(fill(XW.callCheckPlain, { via: X.cq[0] })); }   /* review F1: a check inside a call, on the paths it rides only by that call */
     if (X.fa && MPATH.i != null && X.fa[MPATH.i]) { ln(fill(XW.fate, { v: X.fa[MPATH.i].map(function (f) { return W.fates[f].name; }).join(" · ") })); pl(XW.fatePlain); }
-    if (X.rc) { var rm = BYID[S.open].mo.ex[X.rc[3]]; ln(fill(XW.race, { cons: X.rc[0] })); pl(fill(XW.racePlain, { cols: X.rc[2].join(", "), tbl: X.rc[1], st: rm[1] })); }
+    if (X.rc) { ln(fill(XW.race, { cons: X.rc[0] })); pl(fill(XW.racePlain, { cols: X.rc[2].join(", "), tbl: X.rc[1], st: X.rc[3] })); }
+    /* D-057: (a) a check says the error it raises, with the words the code gives it · (e) the uncaught 500 says what escapes to it, and
+       the function it is raised in says nothing catches it · (b) a client branch says what it reads and what it does */
+    if (X.rz) ln(X.rz[1] != null ? fill(XW.raises, { cls: X.rz[0], msg: X.rz[1] }) : fill(XW.raisesBuilt, { cls: X.rz[0] }));
+    if (X.cz) X.cz.forEach(function (q) { ln(fill(XW.cause, { cls: q[0], at: q[1] })); });
+    if (X.ru) X.ru.forEach(function (q) { ln(fill(XW.uncaught, { cls: q[0], at: q[1] })); });
+    if (X.rd && X.rd[2] != null) ln(fill(XW.reads, { what: X.rd[0], op: X.rd[1], v: X.rd[2] }));
+    if (X.dw) ln(fill(XW.does, { v: X.dw }));
+    if (X.br && EF.branch.vals[X.br] && EF.branch.vals[X.br].plain) pl(EF.branch.vals[X.br].plain);
     if (X.hd) ln(fill(XW.headers, { v: X.hd.map(function (q) { return q[0] + ": " + q[1]; }).join(" · ") }));
     var dc = t.querySelector(".vc-status[data-decl]"); if (dc && t.getAttribute("data-f") === "end") { ln(dc.getAttribute("data-decl") === "1" ? XW.declared : XW.undeclared); pl(dc.getAttribute("data-decl") === "1" ? XW.declaredPlain : XW.undeclaredPlain); }
     if (X.st) ln(XW.stream);
@@ -1537,7 +1553,8 @@
     var txt = function (t, cls) { if (t) c.appendChild(moTxt(el("span", cls || "mt"), String(t))); };
     if (X.ho) { c.classList.add("hol"); c.setAttribute("data-ho", String(X.ho)); }
     if (X.in) c.appendChild(el("span", "mnest", "\u21b3"));
-    if (ch[0] === "end") { c.appendChild(cKind(ch[1])); c.appendChild(declMark(cStatus(ch[2]), ch[3], X.hd)); if (X.st && SK.badge.delivery) c.appendChild(skSub("delivery", "stream")); }
+    if (ch[0] === "end") { c.appendChild(cKind(ch[1])); var sc0 = c.appendChild(declMark(cStatus(ch[2]), ch[3], X.hd)); if (X.st && SK.badge.delivery) c.appendChild(skSub("delivery", "stream"));
+      if (X.cz) sc0.setAttribute("data-cz", X.cz.map(function (q) { return fill(MW.x.cause, { cls: q[0], at: q[1] }); }).join("\n")); }   /* D-057 (e): the status chip is what a pointer meets */
     else if (f === "proof") { txt(e[3]); c.appendChild(el("span", "mpv", MW.proves)); if (ch[0] === "status") c.appendChild(cStatus(ch[1]));
       else if (ch[0] === "statuses") ch[1].forEach(function (st) { c.appendChild(cStatus(st)); }); }
     else if (ch[0] === "status") { c.appendChild(cStatus(ch[1])); txt(e[3]); if (ch[2] === "raise") c.setAttribute("data-hint", (e[6] != null ? e[6] + " · " : "") + MW.atRaise); }
@@ -1548,10 +1565,14 @@
     else if (ch[0] === "switch") { c.appendChild(cMine("switch", ch[1])); txt(e[3]); }
     else if (ch[0] === "rule") { txt(e[3]); c.appendChild(cRule(ch[1], "")); }
     else if (ch[0] === "does" && ch[1] != null) { txt(e[3]); c.appendChild(cMine("does", ch[1])); }
+    else if (ch[0] === "rsn") { txt(e[3]);                                                   /* D-057 (b): what the client's branch compares */
+      if (ch[2] && ch[2] !== "===" && ch[2] !== "==") c.appendChild(el("span", "mq", ch[2]));
+      if (ch[1] === "status" && ch[3] != null) { var rs0 = cStatus(ch[3]); kd(rs0, ["status:" + ch[3]]); c.appendChild(rs0); }
+      else if (ch[3] != null) c.appendChild(el("span", "mq", String(ch[3]))); }
     else { txt(e[3]); if (ch[1] != null) c.appendChild(el("span", "mq", String(ch[1]))); }
     if (X.dp) c.appendChild(el("span", "mdp", "\u2193" + X.dp));                     /* D-056 (1): how many calls below the handler */
     if (X.fa && MPATH.i != null && X.fa[MPATH.i]) X.fa[MPATH.i].forEach(function (fa) { c.appendChild(cFate(fa)); });   /* D-056 (4): this path's verdict */
-    if (X.rc) { var rc = el("span", "mrc", MW.x.raceShort), rm = BYID[S.open].mo.ex[X.rc[3]], rs = cStatus(rm[1]); kd(rs, ["status:" + rm[1]]); rc.appendChild(rs); c.appendChild(rc); }   /* D-056 (5) */
+    if (X.rc) { var rc = el("span", "mrc", MW.x.raceShort), rs = cStatus(X.rc[3]); kd(rs, ["status:" + X.rc[3]]); rc.appendChild(rs); c.appendChild(rc); }   /* D-056 (5) */
     return c; }
   function moOpts(bar) { ["lay", "cell"].forEach(function (g) { var R = MW.opt[g], grp = el("div", "mgrp"), o = el("div", "opts"); grp.appendChild(el("span", "rl", R.label));
     o.setAttribute("role", "radiogroup"); o.setAttribute("aria-label", R.label);
@@ -1575,14 +1596,16 @@
     ps.setAttribute("role", "radiogroup"); ps.setAttribute("aria-label", MW.path.label);
     /* D-055 · ONE ROW: "all paths", then each ending a status code in time order, a small gap between the moments they leave at, no
        words — the moment, what the ending says, its limiter and whether it is the path in force are its hover. An ending no path ends at
-       (the feed lists it, no path reaches it) is not offered: it stands in the band, on no path */
+       (the feed lists it, no path reaches it) is not offered: it stands in the band, on no path. D-057 (c): a code is a PATH — an ending
+       several paths reach is several codes side by side, each hover saying the fork its path takes; a pick keeps that path alone */
     var at = ps, lastSi = null;
     [null].concat(M.ex.map(function (x, i) { return i; }).filter(function (i) { return M.ex[i][4]; })).forEach(function (i) { var b = el("button", "mopath" + (i == null ? "" : " mcode")); b.type = "button"; b.setAttribute("role", "radio");
       b.setAttribute("data-path", i == null ? "all" : String(i)); b.setAttribute("aria-checked", MPATH.i === i ? "true" : "false"); b.setAttribute("data-tip", "mopath");
       if (i == null) { b.textContent = MW.path.all; b.setAttribute("aria-label", MW.path.all); }
       else { var x = M.ex[i]; if (x[3] !== lastSi) { at = el("span", "mopg"); at.setAttribute("data-mom", M.sp[x[3]][0]); at.setAttribute("data-si", String(x[3])); ps.appendChild(at); lastSi = x[3]; }
         b.appendChild(cStatus(x[1])); [].forEach.call(b.querySelectorAll("[data-tip]"), function (n) { n.removeAttribute("data-tip"); });
-        b.setAttribute("aria-label", fill(MW.path.one, { status: x[1] }) + (x[5] ? " · " + x[5] : "") + " · " + (W.kinds[x[2]] || {}).name + " · " + moName(r, M.sp[x[3]]) + (x[6] ? " · " + x[6] : "")); b.setAttribute("data-x", x[0]); }
+        b.setAttribute("aria-label", fill(MW.path.one, { status: x[1] }) + (pickFace(x) ? " · " + pickFace(x) : "") + " · " + (W.kinds[x[2]] || {}).name + " · " + moName(r, M.sp[x[3]]) + (x[6] ? " · " + x[6] : ""));
+        b.setAttribute("data-x", x[0]); b.setAttribute("data-p", x[8]); }                      /* D-057 (c): a code is a path, of its ending */
       b.addEventListener("click", function () { MPATH.i = i; tipOff(); renderMo(); applyEl(); writeOut(LAST.L, LAST.GS);
         var nb = document.querySelector('#mobar .mopath[data-path="' + (i == null ? "all" : i) + '"]'); if (nb) nb.focus({ preventScroll: true }); });   /* the keyboard keeps its place */
       (i == null ? ps : at).appendChild(b); });
@@ -1595,6 +1618,7 @@
       if (MS.cell === "counts") { var n = el("span", "mcount", String(es.length)); kd(n, [].concat.apply([], es.map(function (e) { return moK(e[2]); })), false); t.appendChild(n); return t; }
       var w = el("div", "mcs"); es.forEach(function (e) { w.appendChild(moChip(e)); }); t.appendChild(w); return t; }
     function blockHead(f, tag) { var b = MO.fam[f], th = el(tag); th.setAttribute("data-block", b); th.setAttribute("data-f", f); th.setAttribute("data-tip", "block"); th.appendChild(markEl(b)); th.appendChild(document.createTextNode(BLK[b].name));
+      if (f === "end") { var ni = el("span", "ainfo moinf", fill(MW.noCode)); ni.id = "mo-nocode"; th.appendChild(ni); }   /* D-057: true of every refusal the app sends, so no moment of its own */
       if (D.marks[b] && D.marks[b].col) th.style.setProperty("--bc", D.marks[b].col); return th; }
     var G = $("mogrid"); G.textContent = ""; var t = el("table", "motab"), th = el("thead"), hr = el("tr"), tb = el("tbody"), cg = el("colgroup");
     t.setAttribute("data-lay", MS.lay); t.setAttribute("data-cell", MS.cell); t.setAttribute("data-path", MPATH.i == null ? "all" : String(MPATH.i));
@@ -1828,7 +1852,8 @@
        what it says; its limiter; whether it is the path in force */
     if (kind === "mopath") { var pa = t.getAttribute("data-path"), rm = BYID[S.open], pon = t.getAttribute("aria-checked") === "true", pf = "<span class=pl>" + esc(pon ? W.mo.path.inForce : W.mo.path.pickIt) + "</span>";
       if (pa === "all") return "<b>" + esc(W.mo.path.all) + "</b><span class=pl>" + esc(W.mo.path.allPlain) + "</span>" + pf;
-      var xx = rm.mo.ex[+pa]; return "<b>" + esc(xx[1] + (xx[5] ? " · " + xx[5] : "") + " · " + ((W.kinds[xx[2]] || {}).name || xx[2])) + "</b>"
+      var xx = rm.mo.ex[+pa]; return "<b>" + esc(xx[1] + (pickFace(xx) ? " · " + pickFace(xx) : "") + " · " + ((W.kinds[xx[2]] || {}).name || xx[2])) + "</b>"
+        + (xx[9] ? "<span class=ln>" + esc(forkLine(xx[9])) + "</span>" : "")
         + "<span class=ln>" + esc(fill(W.mo.path.mom, { mom: moName(rm, rm.mo.sp[xx[3]]) })) + "</span>"
         + (xx[6] ? "<span class=ln>" + esc(fill(W.mo.path.says, { v: xx[6] })) + "</span>" : "") + (xx[7] ? "<span class=ln>" + esc(fill(W.mo.path.lim, { v: xx[7] })) + "</span>" : "") + pf; }
     /* D-055: a moment head's hover — its full name (a catch's: what raised, where it was caught, the class), its lines, its stage, the calls its run makes */
@@ -1846,6 +1871,7 @@
     /* D-043: a value chip — its words, its family, what it means, and where its look is read (an element's hover: a little richer) */
     if (kind === "vc") { var vf = t.getAttribute("data-vc"), vv = t.getAttribute("data-vv"), ve = EF[vf], vp = vcPlain(vf, vv), vd = t.getAttribute("data-decl"), vh = t.getAttribute("data-hd");
       return "<b>" + esc(t.getAttribute("aria-label")) + "</b> · " + esc(ve.name) + (vh ? "<span class=ln>" + esc(fill(W.mo.x.headers, { v: vh })) + "</span>" : "")
+        + (t.getAttribute("data-cz") ? t.getAttribute("data-cz").split("\n").map(function (q) { return "<span class=ln>" + esc(q) + "</span>"; }).join("") : "")   /* D-057 (e) */
         + (vd != null ? "<span class=pl>" + esc(vd === "1" ? W.mo.x.declaredPlain : W.mo.x.undeclaredPlain) + "</span>" : "")
         + (vp ? "<span class=pl>" + esc(vp) + "</span>" : "") + "<span class=pl>" + esc(lookWords(ve)) + "</span>"
         + (t.getAttribute("data-nonode") === "true" ? "<span class=pl>" + esc(W.station.nonode) + "</span>" : ""); }
@@ -1909,7 +1935,8 @@
     if (S.open) lines.push(C.open + ": " + S.open);   /* the endpoint the section below the table shows (D-036) */
     if (S.el) lines.push(C.el + ": " + elName(S.el) + " (" + elKind(S.el) + ") · " + S.el);   /* the element lit (D-041), only while one is */
     lines = lines.concat(cmLines());                          /* the code map's settings and BY MOMENT's, with whose pick each is */
-    var rm = BYID[S.open]; if (rm) lines.push(C.mo + " · " + C.path + ": " + (MPATH.i == null || MPATH.ep !== rm.id ? W.mo.path.all : fill(W.mo.path.one, { status: rm.mo.ex[MPATH.i][1] }) + " (" + rm.mo.ex[MPATH.i][0] + ")"));
+    var rm = BYID[S.open]; if (rm) lines.push(C.mo + " · " + C.path + ": " + (MPATH.i == null || MPATH.ep !== rm.id ? W.mo.path.all : fill(W.mo.path.one, { status: rm.mo.ex[MPATH.i][1] })
+      + " (" + rm.mo.ex[MPATH.i][0] + (rm.mo.ex[MPATH.i][9] ? " · " + rm.mo.ex[MPATH.i][8] : "") + ")"));   /* D-057 (c): the path, where its ending has several */
     lines.push("", C.your, "");
     $("out").value = lines.join("\n");
   }

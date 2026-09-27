@@ -731,3 +731,18 @@ are.
 Deferred, with its trigger: (13) the reach fix — the map misses imports made inside a function, so UserDietaryProfile, two more
 tables and five functions on POST /cooking/sessions have no recorded step — waits until generation work reopens (D-023 lifted);
 it changes the forms generators, so it takes the full proof regime, not D-037's.
+
+## D-057 — What BY MOMENT already draws counts as carried; five more facts get a moment
+Date: 2026-09-26 · Input: the agent's verified analysis of what hide mode leaves bright on POST /cooking/sessions (34 rows, 29
+held, 5 corrected), asked by him: "can we do analysis about info that is not being showed in the moments? some of it might not fit
+in there but some might".
+Decision, his: "build 1 and 2".
+Consequence: (1) the code map's "what BY MOMENT carries" switch counts what BY MOMENT already draws — declared success (the filled
+success chip), the alarms undeclared · text-only · shared-status · race-500 (their endings and the raced flush), each path's fate
+(the write chips on a picked path), the handler's file (its chip's hover), method and path and the first URL segment (the heading).
+(2) five facts get a place: (a) reason-lost — the words the service raises, in the hover of the check that raises them · (b)
+reason-collapsed — the client's branch chip after the answer shows the status it reads and what it does · (c) the path row gets one
+code per PATH, not per ending, where several paths reach one ending (the replay 201 and the first-run 201) · (d) the functions
+behind with no call edge or known by name only, as chips at the call that reaches them, on its paths as an upper bound · (e)
+escape-500 — the cause in the 500 chip's hover. The timeless fields (fate tally, step count, behind count, proof rank, the
+arranging tests, the entity) stay where they are.

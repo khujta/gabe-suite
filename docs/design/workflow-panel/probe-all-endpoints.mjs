@@ -1247,7 +1247,8 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
     // CHANGED 2026-09-26 (D-055): moments as columns is his default — the moments, the blocks and the Endings cells are read in DOM
     // order, which is time order in both looks; a head's lines are its hover's now (data-lines)
     rows: [...t.querySelectorAll('th.mom')].map((h) => [h.getAttribute('data-mom'), h.getAttribute('data-lines')]),
-    heads: [...t.querySelectorAll('th[data-block]')].map((h) => h.textContent.trim()), bodyRows: t.querySelectorAll('tbody tr').length,
+    /* CHANGED 2026-09-26 (D-057): the Endings head holds an info line behind the toggle — a head's name is its text less that line */
+    heads: [...t.querySelectorAll('th[data-block]')].map((h) => [...h.childNodes].filter((q) => !(q.classList && q.classList.contains('ainfo'))).map((q) => q.textContent).join('').trim()), bodyRows: t.querySelectorAll('tbody tr').length,
     ends: [...t.querySelectorAll('td[data-f="end"]')].map((td) => [...td.querySelectorAll('.vc-status')].map((c) => c.textContent)),
     chips: t.querySelectorAll('.mc').length, counts: t.querySelectorAll('.mcount').length,
     band: [...document.querySelectorAll('#moband .mbb')].map((b) => [b.getAttribute('data-f'), b.textContent.slice(0, 80)]),
@@ -1342,7 +1343,8 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E17 + '"] td.id'); await p.waitForTimeout(120);
   const pk17 = await p.$$eval('#mobar .mopath[data-x]', (bs) => bs.map((b) => b.getAttribute('data-x')));
   const band17 = await p.$$eval('#moband .mbb[data-f="end"] .mbr', (rs) => rs.map((r) => [r.getAttribute('data-why'), r.querySelectorAll('.mc').length]));
-  ok(dead17.length === 1 && !pk17.includes(dead17[0]) && pk17.length === new Set(FE17.paths.map((q) => q.exit.id)).size && JSON.stringify(band17) === JSON.stringify([['nopath', 1]]),
+  // CHANGED 2026-09-26 (D-057 c): one code per PATH, not per ending
+  ok(dead17.length === 1 && !pk17.includes(dead17[0]) && pk17.length === FE17.paths.length && JSON.stringify(band17) === JSON.stringify([['nopath', 1]]),
     'BY MOMENT · ' + E17 + ': the 429 the feed lists but no path ends at is not offered as a path, and stands in the band, on no path', { dead17, pk17, band17 });
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
@@ -1414,7 +1416,9 @@ ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
   await p.$eval('#ocol-cm', (e) => e.scrollIntoView({ block: 'start' })); await p.mouse.move(5, 5); await p.waitForTimeout(60);
   const readC = () => p.evaluate(() => { const C = document.getElementById('ocol-cm'), mk = new Set([...document.querySelectorAll('#mogrid [data-keys]')].flatMap((e) => e.getAttribute('data-keys').split('\n')));
     /* a path's fate is keyed by its ending's status, not by a member of its own: it is left out of the key join */
-    const fs = [...C.querySelectorAll('.pair[data-k], [data-sub][data-k]')], items = [...C.querySelectorAll('[data-cf][data-ci][data-key]:not([data-cf="d:fates"])')];
+    /* CHANGED 2026-09-26 (D-057): an alarm is carried by the facts it reads and the handler's file by its chip's hover — neither is a
+       key BY MOMENT's grid draws, so both are left out of the key join too */
+    const fs = [...C.querySelectorAll('.pair[data-k], [data-sub][data-k]')], items = [...C.querySelectorAll('[data-cf][data-ci][data-key]:not([data-cf="d:fates"]):not([data-cf="d:alarms"]):not([data-cf="h:handler"][data-ci="1"])')];
     const shown = (e) => !!(e.offsetParent || e.getClientRects().length) && getComputedStyle(e).display !== 'none';
     const op = (e) => { let o = 1; for (let n = e; n && n !== C; n = n.parentElement) o *= +getComputedStyle(n).opacity; return o; };
     return { carry: C.getAttribute('data-carry'), count: document.getElementById('cvcount').textContent, fields: fs.length, whole: fs.filter((f) => f.getAttribute('data-cvs') === 'c').length,
@@ -1519,9 +1523,10 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   const dW = (n) => { const c = work.find((x) => x.keys.some((k) => k.endsWith('::' + n))); return c ? +((c.t.match(/↓(\d+)/) || [])[1]) : null; };
   const band1 = await p.$$eval('#moband .mbb[data-f="fn"] .mbr', (rs) => rs.map((r) => [r.getAttribute('data-why'), [...r.querySelectorAll('.mc')].map((c) => c.innerText.replace(/\s+/g, ' ').trim())]));
   ok(wantWork.every(([n, d]) => d > 1 && dW(n) === d) && gate.some((c) => c.keys.some((k) => k.endsWith('::build_auth_context')))
-     && band1.some(([w, cs]) => w === 'nolink' && ['_hold_hours', '_label', '_stages'].every((n) => cs.some((t) => t.startsWith(n))))
-     && band1.some(([w, cs]) => w === 'noname' && noname.every((n) => cs.includes(n))),
-    'D-056 (1) · BY MOMENT stands ' + wantWork.map(([n, d]) => n + ' ↓' + d).join(', ') + ' at the work (the call inside start_session reaches them), the login check\'s own at the dependencies; the card\'s other callees and the names no function carries in the band',
+     /* CHANGED 2026-09-26 (D-057 d): the card's other callees and the names no function carries now stand where their caller stands —
+        read in section 17 — so the band holds no function here */
+     && !band1.some(([w]) => w === 'nolink' || w === 'noname'),
+    'D-056 (1) · BY MOMENT stands ' + wantWork.map(([n, d]) => n + ' ↓' + d).join(', ') + ' at the work (the call inside start_session reaches them), the login check\'s own at the dependencies; no function behind is left in the band (D-057)',
     { work: work.map((c) => c.t), band: band1 });
   /* review F3: a function two calls down stands on the paths of the handler call that reaches it — an upper bound, since a path may
      leave start_session before it runs (the 404 raises at services/cooking.py:140, before seed_stage_schedule): its hover says so.
@@ -1560,7 +1565,7 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   const und = (FE.findings.find((f) => f.id === 'undeclared') || {}).statuses || [];
   const cmSt = await p.$$eval('#ocol-cm .pair[data-k="d:exits"] tr.erow .vc-status', (cs) => cs.map((v) => [v.textContent, v.getAttribute('data-decl')]));
   const hollowBg = ends.filter(([, d]) => d === '0').map(([, , bg]) => bg), fillBg = ends.filter(([, d]) => d === '1').map(([, , bg]) => bg);
-  ok(ends.length === R.mo.ex.length && ends.every(([s0, d]) => (s0 === '500' ? d === null : d === (dset.has(+s0) ? '1' : '0')))
+  ok(ends.length === new Set(R.mo.ex.map((x) => x[0])).size && ends.every(([s0, d]) => (s0 === '500' ? d === null : d === (dset.has(+s0) ? '1' : '0')))
      && JSON.stringify([...new Set(ends.filter(([, d]) => d === '0').map(([s0]) => +s0))].sort()) === JSON.stringify([...und].sort())
      && JSON.stringify(cmSt) === JSON.stringify(ends.map(([s0, d]) => [s0, d])) && hollowBg.every((bg) => /rgba\(0, 0, 0, 0\)|transparent/.test(bg)) && fillBg.every((bg) => !/rgba\(0, 0, 0, 0\)/.test(bg)),
     'D-056 (3) · ' + E + ' · each ending declared (' + [...new Set(ends.filter(([, d]) => d === '1').map(([s0]) => s0))].join(' ') + ') is filled, each not (' + und.join(' ') + ', the undeclared alarm) hollow, the uncaught unmarked — in BY MOMENT and the endings table',
@@ -1568,7 +1573,8 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   /* (4) the fate of the writes on a picked path */
   const bucketOf = (pid, sid) => { const ef = FE.paths.find((q) => q.id === pid).effects; return ({ committed: 'saved', maybe_committed: 'maybe', rolled_back: 'rolled', uncommitted: 'unsaved' })[['committed', 'maybe_committed', 'rolled_back', 'uncommitted'].find((b0) => (ef[b0] || []).includes(sid))]; };
   const addSt = (pid) => (FE.paths.find((q) => q.id === pid).effects.steps || []).map((e) => e.step).find((sid) => STEPS[sid].table === 'cooking_sessions' && STEPS[sid].op === 'add');
-  const fateAt = async (xid) => { const i = R.mo.ex.findIndex((x) => x[0] === xid); await p.click('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(120);
+  /* CHANGED 2026-09-26 (D-057 c): a code is a path — the path to the ending that runs the add is picked by its own id */
+  const fateAt = async (xid) => { const pid = (FE.paths.find((q) => q.exit.id === xid && addSt(q.id)) || {}).id, i = R.mo.ex.findIndex((x) => x[8] === pid); await p.click('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(120);
     const c = (await cell('work', 'data')).find((q) => q.keys.includes('table:cooking_sessions') && /\bW\b/.test(q.t)); return c ? c.fate : null; };
   const X201 = FE.returns.find((x) => x.status === 201).id, X403 = FE.produced.find((x) => x.status === 403).id;
   const w201 = [...new Set(FE.paths.filter((q) => q.exit.id === X201 && addSt(q.id)).map((q) => bucketOf(q.id, addSt(q.id))))], w403 = [...new Set(FE.paths.filter((q) => q.exit.id === X403 && addSt(q.id)).map((q) => bucketOf(q.id, addSt(q.id))))];
@@ -1641,6 +1647,161 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
     'D-056 (12) · ' + E12 + ' · the success wears the station\'s delivery:stream label in BY MOMENT and the endings table; no other endpoint streams', { ok12: ok12.map((c) => c.sub), cm12 });
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-056 checks', errs);
+
+/* 17 · D-057 (his ruling "build 1 and 2", 2026-09-26), each expected value recomputed HERE from forms.json or the station's levels.json,
+   read off the page after a real click or a real hover.
+   GROUP 1 — the switch counts what BY MOMENT already draws: on POST /cooking/sessions the method, the first segment, the declared status,
+   the handler (its function and its file), every path's fate and every alarm are carried; the count of the fates and the alarms' dots stay;
+   the facts are on the page (the heading's path, the filled success status, the handler chip's file:line, the alarms list with no arm
+   word and with the client's alarm); GET /healthz's alarms stay bright (its 429 is on no path). The Endings row's info line says no
+   refusal carries a code, counted on the feed.
+   GROUP 2 — (a) the check that raises the lost reason says the class and its words, the ending after the catch keeps the words it sends;
+   (b) a client branch shows the status it reads and says what it does, in place of the map's "read"; (c) the two paths to the 201 are two
+   codes, told apart by the fork each takes, each keeping its own moments and chips; (d) the functions behind no call edge places stand
+   where their nearest caller stands (the station's behind lists), on its paths, said in the hover, the ones known by name only without a
+   glyph; (e) on PATCH …/timer the 500 says what escapes to it and the function it is raised in says nothing catches it. */
+{ const fillW = (s0, x) => String(s0).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  const E = 'POST /cooking/sessions', EK = 'endpoint:' + E, R = ROW[E], FE = FJ.endpoints[EK], MX = D.words.mo.x, MP = D.words.mo.path;
+  const base = (at) => String(at || '').split('/').pop();
+  const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
+  const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
+    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+  const cell = (mom, f) => p.$$eval('#mogrid td[data-mom="' + mom + '"][data-f="' + f + '"] .mc', (cs) => cs.map((c) => ({ keys: c.getAttribute('data-keys'), t: c.innerText.replace(/\s+/g, ' ').trim(),
+    name: (c.querySelector('.mt') || {}).textContent || '', glyph: !!c.querySelector('.skg'), st: [...c.querySelectorAll('.vc-status')].map((v) => v.textContent), does: !!c.querySelector('[data-vc="does"]'),
+    w: [...c.querySelectorAll('.vc[data-vc="op"]')].map((v) => v.getAttribute('data-vv')), fate: [...c.querySelectorAll('.vc-fate')].map((v) => v.getAttribute('data-vv')), hint: c.getAttribute('data-hint') })));
+  await open(PAGE); await openEp(E);
+  /* GROUP 1 */
+  const g1 = await p.evaluate((fk) => { const C = document.getElementById('ocol-cm'), st = (k) => { const e = [...C.querySelectorAll('.pair[data-k]')].find((x) => x.getAttribute('data-k') === k); return e ? e.getAttribute('data-cvs') : null; };
+    const items = (k) => [...C.querySelectorAll('[data-cf="' + k + '"][data-ci]')].map((e) => e.getAttribute('data-cv') === '1');
+    const hc = [...document.querySelectorAll('#mogrid .mc[data-f="fn"]')].find((c) => c.getAttribute('data-keys') === fk);
+    return { st: Object.fromEntries(['h:method', 'h:segment', 'h:declared', 'h:handler', 'd:fates', 'd:alarms', 'c:alarms', 'c:fate'].map((k) => [k, st(k)])),
+      fates: items('d:fates'), alarms: items('d:alarms'), handler: items('h:handler'), head: [...document.querySelectorAll('#mohead h3 > span')].map((q) => q.textContent),
+      arm: C.querySelectorAll('.pair[data-k="d:alarms"] [data-vc="arm"]').length, list: [...C.querySelectorAll('.pair[data-k="d:alarms"] li [data-vc="alarm"]')].map((v) => v.getAttribute('data-vv')),
+      hint: hc ? hc.getAttribute('data-hint') : null, filled: [...document.querySelectorAll('#mogrid td[data-f="end"] .vc-status[data-decl="1"]')].map((v) => v.textContent) }; }, 'fn:' + FE.handler);
+  const al1 = [...(FE.findings || []), ...Object.values(FE.arm_findings || {}).flat(), ...((FJ.arm_findings || {}).frontend || []).filter((f) => f.endpoint === EK)].map((f) => f.id);
+  ok(['h:method', 'h:segment', 'h:declared', 'h:handler', 'd:fates', 'd:alarms'].every((k) => g1.st[k] === 'c') && g1.st['c:alarms'] === 'b' && g1.st['c:fate'] === 'b'
+     && g1.fates.length === FE.paths.length && g1.fates.every(Boolean) && g1.alarms.length === al1.length && g1.alarms.every(Boolean) && g1.handler.every(Boolean)
+     && g1.head.includes(FE.path) && FE.path.split('/')[1] === R.seg && g1.filled.includes(String(FE.declared.success.status)) && g1.hint === base(FE.file) + ':' + FE.line
+     && !g1.arm && JSON.stringify([...g1.list].sort()) === JSON.stringify([...al1].sort()) && g1.list.includes('reason-collapsed'),
+    'D-057 · group 1 · ' + E + ': the method, the segment, the declared ' + FE.declared.success.status + ', the handler and its file (' + g1.hint + '), the ' + FE.paths.length + ' fates and the ' + al1.length + ' alarms (' + al1.join(' ') + ') are carried, each fact drawn in BY MOMENT; the fates count and the alarm dots stay; no arm word',
+    { st: g1.st, head: g1.head, hint: g1.hint, list: g1.list, fates: g1.fates.filter((x) => !x).length, alarms: g1.alarms });
+  const own = FJ.endpoints ? Object.values(FJ.endpoints).flatMap((e0) => e0.produced || []).filter((x) => x.phase !== 'uncaught' && x.state === 'defined') : [];
+  await p.click('#itog-mo'); await p.waitForTimeout(80);
+  const nc = await p.$eval('#mo-nocode', (e) => [e.textContent, getComputedStyle(e).display, !!e.closest('#mogrid tr[data-f="end"]')]).catch(() => null);
+  await p.click('#itog-mo'); await p.waitForTimeout(60);
+  const nc0 = await p.$eval('#mo-nocode', (e) => getComputedStyle(e).display).catch(() => null);
+  ok(nc && nc[0] === fillW(D.words.mo.noCode, { nCoded: own.filter((x) => x.code).length, nRefusals: own.length }) && own.filter((x) => x.code).length === 0 && nc[1] !== 'none' && nc[2] && nc0 === 'none',
+    'D-057 · text-only · the Endings row says, behind the info toggle, that none of the app\'s ' + own.length + ' own refusals carries a code (' + own.filter((x) => x.code).length + ')', { nc, nc0 });
+  const E17b = 'GET /healthz', F17b = FJ.endpoints['endpoint:' + E17b], dead = (F17b.produced || []).filter((x) => !F17b.paths.some((q) => q.exit.id === x.id)).map((x) => x.status);
+  await openEp(E17b);
+  const hz = await p.evaluate(() => [...document.querySelectorAll('#ocol-cm [data-cf="d:alarms"][data-ci]')].map((e) => e.getAttribute('data-cv') === '1'));
+  ok(dead.length === 1 && dead[0] === 429 && hz.length === 2 && hz.every((x) => !x), 'D-057 · group 1 · ' + E17b + ': its alarms stay bright — the ' + dead[0] + ' they read is on no path', { dead, hz });
+  await openEp(E);
+  /* (a) the lost reason */
+  const rl = FE.findings.find((f) => f.id === 'reason-lost'), rz = Object.values(FJ.functions).flatMap((f0) => f0.raises || []).find((q) => q.msg === rl.was && FE.preconditions.some((g) => g.at === q.at));
+  const gA = FE.preconditions.find((g) => g.at === rz.at), tA = await tipAt('#mogrid td[data-f="gate"] .mc[data-keys^="guard:' + gA.id + '"] .mt');
+  const momA = await p.$eval('#mogrid td[data-f="gate"] .mc[data-keys^="guard:' + gA.id + '"]', (c) => c.closest('td').getAttribute('data-mom')).catch(() => null);
+  const xA = FE.produced.find((x) => x.at === rl.at && x.status === rl.status), endA = await p.$$eval('#mogrid td[data-f="end"] .mc', (cs) => cs.map((c) => [c.closest('td').getAttribute('data-mom'), c.getAttribute('data-hint')]));
+  ok(tA && tA.includes(fillW(MX.raises, { cls: rz.cls, msg: rz.msg })) && momA === 'work' && endA.some(([m, h]) => m === 'fail' && h === xA.detail),
+    'D-057 (a) · ' + E + ': the check ' + gA.pred + ' (at the work) says it raises ' + rz.cls + ' “' + rz.msg + '”; after the catch the 404 sends “' + xA.detail + '”', { tA: (tA || '').slice(0, 200), momA });
+  /* (b) what the client branch reads and does */
+  const S1 = FJ.frontend.reasons.sites.find((s0) => s0.id === 'r-56d72b7e4b'), cB = (await cell('after', 'client')).find((c) => c.keys === 'reason:' + S1.id);
+  const tB = await tipAt('#mogrid td[data-mom="after"][data-f="client"] .mc[data-keys="reason:' + S1.id + '"] .mt');
+  const E16b = 'POST /setup/complete', S2 = FJ.frontend.reasons.sites.find((s0) => s0.id === 'r-56477c4fb6');
+  await openEp(E16b); const cB2 = (await cell('after', 'client')).find((c) => c.keys === 'reason:' + S2.id), tB2 = await tipAt('#mogrid td[data-mom="after"][data-f="client"] .mc[data-keys="reason:' + S2.id + '"] .mt');
+  await openEp(E);
+  ok(cB && JSON.stringify(cB.st) === JSON.stringify([String(S1.value)]) && !cB.does && tB && tB.includes(S1.does[0].literal) && tB.includes(fillW(MX.reads, { what: S1.reads, op: S1.op, v: S1.value }))
+     && cB2 && JSON.stringify(cB2.st) === JSON.stringify([String(S2.value)]) && tB2 && tB2.includes(S2.does[0].args[0]),
+    'D-057 (b) · the client branch at ' + base(S1.at) + ' shows the ' + S1.value + ' it reads and says it hands back “' + S1.does[0].literal + '”; on ' + E16b + ' ' + base(S2.at) + ' says it calls ' + S2.does[0].callee + '(“' + S2.does[0].args[0] + '”)', { cB, tB: (tB || '').slice(0, 220), cB2 });
+  /* (c) two paths to the 201 */
+  const X201 = FE.returns.find((x) => x.status === 201).id, P201 = FE.paths.filter((q) => q.exit.id === X201);
+  const forkOf = (q) => q.chain.filter((s0) => s0.kind === 'branch' && s0.hit).map((s0) => { const b0 = FE.branches.find((b1) => b1.id === s0.ref); return b0.pred || MP.fall; }).join(' · ');
+  const codes = await p.$$eval('#mobar .mopath[data-x="' + X201 + '"]', (bs) => bs.map((b) => [b.getAttribute('data-path'), b.getAttribute('data-p'), b.parentElement.getAttribute('data-mom'), b.innerText.trim()]));
+  const res = [];
+  for (const [i, pid] of codes) { const t = await tipAt('#mobar .mopath[data-path="' + i + '"]'); await p.click('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(120);
+    const own0 = FE.paths.find((q) => q.id === pid).effects.steps.filter((e0) => !e0.dependency && WR.has((STEPS[e0.step] || {}).op)).map((e0) => STEPS[e0.step].table);
+    const ws = []; for (const m of ['checks', 'work', 'fail', 'save']) for (const c of await cell(m, 'data')) if (c.w.includes('w')) ws.push([c.name, c.fate]);
+    res.push({ pid, t, own0: [...new Set(own0)].sort(), ws, rows: await p.$$eval('#mogrid th.mom', (hs) => hs.map((h) => h.getAttribute('data-mom'))) }); }
+  await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(100);
+  const oneLine = await p.evaluate(() => { const bs = [...document.querySelectorAll('#mobar .mopath')], mid = (b) => { const q = b.getBoundingClientRect(); return q.top + q.height / 2; }; return bs.every((b) => Math.abs(mid(b) - mid(bs[0])) <= 3); });
+  ok(P201.length === 2 && codes.length === 2 && JSON.stringify(codes.map((c) => c[1]).sort()) === JSON.stringify(P201.map((q) => q.id).sort()) && codes.every((c) => c[2] === 'answer' && c[3] === '201')
+     && res.every((x) => x.t && x.t.includes(fillW(MP.fork, { v: forkOf(FE.paths.find((q) => q.id === x.pid)) }))) && res[0].t !== res[1].t
+     && res.every((x) => JSON.stringify([...new Set(x.ws.map((w) => w[0]))].sort()) === JSON.stringify(x.own0) && x.ws.every((w) => w[1].length === 1)) && res.some((x) => !x.ws.length) && res.some((x) => x.ws.length) && oneLine,
+    'D-057 (c) · ' + E + ': the 201 two paths reach is two codes at the answer, told apart by the fork each takes (' + P201.map((q) => forkOf(q)).join(' | ') + '); each keeps only its own writes (' + res.map((x) => x.ws.map((w) => w[0] + ':' + w[1]).join(',') || 'none').join(' | ') + '); the row stays one line',
+    { codes, res: res.map((x) => ({ pid: x.pid, ws: x.ws, own0: x.own0, t: (x.t || '').slice(0, 120) })) });
+  /* (d) the functions behind no call edge places */
+  const LV = JSON.parse(fs.readFileSync(path.join(REPO, 'templates/center/shell/example/codebase-graph-station/levels.json'), 'utf8'));
+  const LB = new Map(LV.fn_nodes.filter((n) => n.behind && n.behind.names).map((n) => [n.id.replace('#', '::'), n.behind.names]));
+  const work = await cell('work', 'fn'), placedFns = work.filter((c) => c.keys && c.keys.startsWith('fn:')).map((c) => c.keys.slice(3)).filter((k) => k !== FE.handler && LB.has(k));
+  const nearest = (n) => { const c0 = placedFns.filter((g) => LB.get(g).includes(n)); return c0.filter((g) => !c0.some((h) => h !== g && LB.get(g).includes(h.split('::').pop()))).map((g) => g.split('::').pop()); };
+  const wantD = [['_stages', 1], ['_label', 1], ['_hold_hours', 1], ['derive_restrictions', 0], ['ResolutionSnapshot.violations_for', 0]].map(([n, keyed]) => [n, keyed, nearest(n)]);
+  const gotD = [];
+  for (const [n, keyed, via] of wantD) { const c = work.find((x) => x.name === n); const i = work.indexOf(c);
+    const t = c ? await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc:nth-child(' + (i + 1) + ') .mt') : null;
+    gotD.push([n, !!c, c ? !!c.keys : null, c ? c.glyph : null, via, t && via.length === 1 && t.includes(fillW(MX.callPaths, { via: via[0] }))]); }
+  const bandD = await p.$$eval('#moband .mbb[data-f="fn"] .mbr', (rs) => rs.map((r) => r.getAttribute('data-why')));
+  ok(gotD.every(([n, here, hasKey, glyph, via, tipOk], j) => here && via.length === 1 && tipOk && (wantD[j][1] ? hasKey : !hasKey && !glyph)) && !bandD.length,
+    'D-057 (d) · ' + E + ': ' + gotD.map((x) => x[0] + ' under ' + x[4].join(',')).join(' · ') + ' stand at the work on their caller\'s paths (the hover says so); the two known by name only carry no key and no glyph; the band holds no function', { gotD, bandD });
+  /* (e) an error nothing catches */
+  const ET = 'PATCH /cooking/sessions/{session_id}/timer', FT = FJ.endpoints['endpoint:' + ET], fT = FT.findings.find((f) => f.id === 'escape-500');
+  const rfT = Object.entries(FJ.functions).filter(([, f0]) => (f0.raises || []).some((q) => q.at === fT.at && q.cls === fT.cls)).map(([k]) => k);
+  await openEp(ET);
+  const t500 = await tipAt('#mogrid td[data-mom="uncaught"][data-f="end"] .mc .vc-status'), tRu = rfT.length === 1 ? await tipAt('#mogrid td[data-f="fn"] .mc[data-keys="fn:' + rfT[0] + '"] .mt') : null;
+  ok(t500 && t500.includes(fillW(MX.cause, { cls: fT.cls, at: base(fT.at) })) && tRu && tRu.includes(fillW(MX.uncaught, { cls: fT.cls, at: base(fT.at) })),
+    'D-057 (e) · ' + ET + ': the 500 says it escapes from ' + fT.cls + ' raised at ' + base(fT.at) + ', and ' + (rfT[0] || '?').split('::').pop() + ' says it raises it and nothing catches it', { t500: (t500 || '').slice(0, 200), tRu: (tRu || '').slice(0, 200) });
+  /* review F1 · a check inside a call is on the paths making the call, less those the feed shows leaving before it (a returning fork
+     or a fired check its `after` negates): the replay code shows neither the recipe check nor the cap check; the first-run code shows
+     both, the cap check saying it may be skipped (its chain carries no step of it) */
+  await openEp(E);
+  const brF = new Map(FE.branches.map((b0) => [b0.id, b0])), preAt = new Map(FE.preconditions.filter((g) => g.at).map((g) => [g.at, g.pred]));
+  const takenF = (q) => new Set(q.chain.flatMap((s0) => s0.kind === 'branch' && s0.hit && brF.get(s0.ref) && (brF.get(s0.ref).return || brF.get(s0.ref).exit) ? [brF.get(s0.ref).pred]
+    : s0.kind === 'gate' && s0.hit && preAt.get(s0.at) ? [preAt.get(s0.at)] : []).filter(Boolean).map((T) => 'not (' + T + ')'));
+  const inCall = FE.preconditions.filter((g) => /^call .+ @ /.test(g.via || ''));
+  const f1 = [];
+  for (const [i, pid] of codes) { const q = FE.paths.find((x) => x.id === pid), tk = takenF(q), site = (g) => g.via.replace(/^call .+ @ /, '');
+    const makes = (g) => q.chain.some((s0) => (s0.kind === 'call' || s0.kind === 'collapsed') && s0.at === site(g)), carries = (g) => q.chain.some((s0) => (s0.kind === 'gate' || s0.kind === 'exit') && s0.ref === g.exit);
+    const want = inCall.filter((g) => carries(g) || (makes(g) && !(g.after || []).some((a) => tk.has(a)))).map((g) => g.id).sort();
+    const gone = inCall.filter((g) => makes(g) && !carries(g) && (g.after || []).some((a) => tk.has(a))).map((g) => g.id).sort();
+    await p.click('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(120);
+    const got = (await p.$$eval('#mogrid td[data-f="gate"] .mc[data-keys^="guard:"]', (cs) => cs.map((c) => c.getAttribute('data-keys').split('\n')[0].slice(6)))).filter((k) => inCall.some((g) => g.id === k)).sort();
+    /* on this path, a check it rides only by the call (its chain carries no step of its own) says so in its hover; one it carries does not */
+    const said = [];
+    for (const g of inCall.filter((g0) => got.includes(g0.id))) { const t = await tipAt('#mogrid td[data-f="gate"] .mc[data-keys^="guard:' + g.id + '"] .mt');
+      const ownStep = q.chain.some((s0) => (s0.kind === 'gate' && s0.at === g.at) || (g.exit && (s0.kind === 'gate' || s0.kind === 'exit') && s0.ref === g.exit));
+      said.push([g.id, ownStep, !!t && t.includes(fillW(MX.callCheck, { via: g.via.replace(/^call (.+) @ .+$/, '$1').split('::').pop() }))]); }
+    f1.push({ pid, want, gone, got, said }); }
+  await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(100);
+  const gCap = FE.preconditions.find((g) => /concurrent_cap/.test(g.pred || '')), tCap = await tipAt('#mogrid td[data-f="gate"] .mc[data-keys^="guard:' + gCap.id + '"] .mt');
+  ok(f1.length === 2 && f1.every((x) => JSON.stringify(x.got) === JSON.stringify(x.want)) && f1.some((x) => x.gone.length === 2) && f1.some((x) => !x.gone.length && x.got.includes(gCap.id))
+     && f1.every((x) => x.said.every(([, own, line]) => own !== line)) && f1.some((x) => x.said.some(([, own]) => own)) && tCap && tCap.includes(fillW(MX.callCheck, { via: 'start_session' })),
+    'review F1 · ' + E + ': a check inside start_session stands only on the paths that reach it — the replay code drops ' + (f1.find((x) => x.gone.length) || { gone: [] }).gone.length + ' (its fork returns first); the first-run code keeps the cap check, whose hover says a path may skip it, and the recipe check, whose own step its chain carries, says nothing of it',
+    { f1, tCap: (tCap || '').slice(0, 200) });
+  /* review F2 · a raise with no fixed words says its words are built as it raises (or none are given) — never that it has none */
+  const gF2 = FE.preconditions.find((g) => g.pred === 'recipe is None'), rzF2 = FJ.functions['apps/api/services/cooking.py::start_session'].raises.find((q) => q.at === gF2.at);
+  const tF2 = await tipAt('#mogrid td[data-f="gate"] .mc[data-keys^="guard:' + gF2.id + '"] .mt');
+  ok(rzF2 && rzF2.msg == null && tF2 && tF2.includes(fillW(MX.raisesBuilt, { cls: rzF2.cls })) && !/no fixed words/.test(tF2),
+    'review F2 · ' + E + ': the check ' + gF2.pred + ' says “' + fillW(MX.raisesBuilt, { cls: rzF2 && rzF2.cls }) + '”', (tF2 || '').slice(0, 200));
+  /* review F3 · a function joined to its caller by the station's behind lists names every placed function whose list is cut and does
+     not name it (it may also run under it) — recomputed from levels.json on the stream endpoint */
+  const E3 = 'GET /recipe-creation/gustify/stream', HF3 = FJ.endpoints['endpoint:' + E3].handler;
+  const CUT = new Map(LV.fn_nodes.filter((n) => n.behind && n.behind.names_more).map((n) => [n.id.replace('#', '::'), n.behind.names_more]));
+  await openEp(E3);
+  const allFn = await p.$$eval('#mogrid td[data-f="fn"] .mc', (cs) => cs.map((c) => c.getAttribute('data-keys'))), w3 = await cell('work', 'fn');
+  const placed3 = [...new Set(allFn.filter((k) => k && k.startsWith('fn:')).map((k) => k.split('\n')[0].slice(3)).filter((k) => k !== HF3 && LB.has(k)))];
+  const near3 = (n) => { const c0 = placed3.filter((g) => LB.get(g).includes(n)); return c0.filter((g) => !c0.some((h) => h !== g && LB.get(g).includes(h.split('::').pop()))); };
+  const cpPre = MX.callPaths.split('{via}')[0], cpNext = MX.callPathsPlain.split('{via}')[0], cnPre = MX.cutNear.split('{v}')[0];
+  const f3 = [];
+  for (let i = 0; i < w3.length; i++) { if (/\u2193/.test(w3[i].t)) continue;                       /* a depth mark: placed by its call edges, not by the lists */
+    const t = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc:nth-child(' + (i + 1) + ') .mt'); if (!t || !t.includes(cpPre)) continue;
+    const n0 = w3[i].name, own = w3[i].keys ? w3[i].keys.split('\n')[0].slice(3) : null, jc = near3(n0);
+    const via = t.slice(t.indexOf(cpPre) + cpPre.length).split(cpNext)[0].split(', ').sort();
+    if (JSON.stringify(via) !== JSON.stringify(jc.map((g) => g.split('::').pop()).sort())) continue;
+    const hid = [...new Set(placed3.filter((h) => CUT.has(h) && !LB.get(h).includes(n0) && !jc.includes(h) && h !== own).map((h) => h.split('::').pop()))].sort();
+    f3.push([n0, via, hid, hid.length ? t.includes(fillW(MX.cutNear, { v: hid.join(', ') })) && t.includes(fillW(MX.cutNearPlain, { v: hid.join(', ') })) : !t.includes(cnPre)]); }
+  ok(f3.length >= 6 && f3.every((x) => x[3]) && f3.filter((x) => x[2].length).length >= 6,
+    'review F3 · ' + E3 + ': ' + f3.filter((x) => x[2].length).length + ' of the ' + f3.length + ' functions joined to their caller say they may also run under ' + [...new Set(f3.flatMap((x) => x[2]))].join(', ') + ' (its list is cut); the rest say nothing of it', f3);
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the D-057 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));

@@ -515,7 +515,7 @@
       953,
       53,
       935,
-      6422
+      6441
      ]
     ],
     "universe": [
@@ -629,7 +629,7 @@
    {
     "stage": 18,
     "kind": 26,
-    "status": 35,
+    "status": 36,
     "role": 33,
     "dir": 2,
     "limit": 2,
@@ -645,8 +645,7 @@
     "rule": 5,
     "method": 1,
     "ent": 1,
-    "alarm": 9,
-    "arm": 1
+    "alarm": 10
    }
   ],
   [
@@ -1541,7 +1540,7 @@
   ],
   [
    "BY MOMENT · no moment",
-   "NO MOMENT Overview and risk no time Functions 7 with no moment no link to a call GeminiConfig.from_settings allowance_for build_candidate_resolutions by name only ResolutionSnapshot.resolve Settings.ai_timeout_for Settings.gemini_model_for _strip_port"
+   "NO MOMENT Overview and risk no time Functions 1 with no moment by name only _strip_port"
   ],
   [
    "step 109 · by-moment-info-open",
@@ -1573,7 +1572,7 @@
     "Endings: 727 with a moment, 1 with none, of 728.",
     "Gates and decisions: 531 with a moment, 0 with none, of 531.",
     "Data effects: 1337 with a moment, 29 with none, of 1366.",
-    "Functions: 1048 with a moment, 185 with none, of 1233.",
+    "Functions: 1176 with a moment, 57 with none, of 1233.",
     "Structures: 339 with a moment, 0 with none, of 339.",
     "Client: 174 with a moment, 0 with none, of 174.",
     "In-flight state: 696 with a moment, 10 with none, of 706.",
@@ -1697,7 +1696,7 @@
     "Proof 2 2 2 1 4 10 11 ",
     "Gates and decisions 2 2 3 5 9 ",
     "Data effects 7 31 1 ",
-    "Functions 7 3 17 1 1 ",
+    "Functions 7 3 23 1 1 ",
     "Structures 1 2 5 ",
     "Client ",
     "In-flight state 7 1 3 ",
@@ -1848,7 +1847,7 @@
   ],
   [
    "BY MOMENT · POST /setup/complete, the path picker",
-   "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 400 │ fail: 409 │ fail: 409 │ answer: 200 │ uncaught: 500"
+   "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 400 │ fail: 409 │ fail: 409 │ answer: 200 200 200 │ uncaught: 500"
   ],
   [
    "step 125 · clear-the-by-moment-light",
@@ -1882,7 +1881,7 @@
   ],
   [
    "D-055 · the path row",
-   "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 409 400 │ fail: 404 │ fail: 403 │ fail: 409 │ answer: 201 │ uncaught: 500"
+   "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 409 400 │ fail: 404 │ fail: 403 │ fail: 409 │ answer: 201 201 │ uncaught: 500"
   ],
   [
    "D-055 · the heads",
@@ -1961,26 +1960,18 @@
   [
    "D-055 · the code map, show all",
    {
-    "count": "36 of 56 fields carried by BY MOMENT · 17 left · 3 with nothing here",
+    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
     "carry": "all",
     "left": [
      "tables (part)",
-     "declared success",
      "arranges 7 other cases",
      "writes (part)",
      "fate",
      "the tables (part)",
-     "each path's fate",
-     "handler (part)",
      "steps",
-     "method and path",
      "entity",
-     "first URL segment",
      "alarms",
-     "behind (part)",
-     "functions behind, and how deep (part)",
-     "the lab's proof rank",
-     "alarms"
+     "the lab's proof rank"
     ],
     "nothingHere": [
      "beyond",
@@ -2012,26 +2003,18 @@
   [
    "D-055 · the code map, dim",
    {
-    "count": "36 of 56 fields carried by BY MOMENT · 17 left · 3 with nothing here",
+    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
     "carry": "dim",
     "left": [
      "tables (part)",
-     "declared success",
      "arranges 7 other cases",
      "writes (part)",
      "fate",
      "the tables (part)",
-     "each path's fate",
-     "handler (part)",
      "steps",
-     "method and path",
      "entity",
-     "first URL segment",
      "alarms",
-     "behind (part)",
-     "functions behind, and how deep (part)",
-     "the lab's proof rank",
-     "alarms"
+     "the lab's proof rank"
     ],
     "nothingHere": [
      "beyond",
@@ -2059,26 +2042,18 @@
   [
    "D-055 · the code map, hide",
    {
-    "count": "36 of 56 fields carried by BY MOMENT · 17 left · 3 with nothing here",
+    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
     "carry": "hide",
     "left": [
      "tables (part)",
-     "declared success",
      "arranges 7 other cases",
      "writes (part)",
      "fate",
      "the tables (part)",
-     "each path's fate",
-     "handler (part)",
      "steps",
-     "method and path",
      "entity",
-     "first URL segment",
      "alarms",
-     "behind (part)",
-     "functions behind, and how deep (part)",
-     "the lab's proof rank",
-     "alarms"
+     "the lab's proof rank"
     ],
     "nothingHere": [
      "beyond",
@@ -2088,10 +2063,7 @@
     "notes": [
      "+8 in BY MOMENT",
      "+1 in BY MOMENT",
-     "+8 in BY MOMENT",
-     "+1 in BY MOMENT",
-     "+18 in BY MOMENT",
-     "+18 in BY MOMENT"
+     "+8 in BY MOMENT"
     ]
    }
   ],
@@ -2132,26 +2104,20 @@
   [
    "D-055 · GET /recipe-creation/gustify/stream, hide",
    {
-    "count": "28 of 56 fields carried by BY MOMENT · 17 left · 11 with nothing here · 3 tables only in BY MOMENT",
+    "count": "34 of 56 fields carried by BY MOMENT · 11 left · 11 with nothing here · 3 tables only in BY MOMENT",
     "carry": "hide",
     "left": [
      "tables (BY MOMENT holds more)",
-     "declared success",
      "fate",
      "the tables (BY MOMENT holds more)",
-     "each path's fate",
-     "handler (part)",
      "lacks",
      "norms it lacks",
      "steps",
-     "method and path",
      "entity",
-     "first URL segment",
      "alarms",
      "behind (part)",
      "functions behind, and how deep (part)",
-     "the lab's proof rank",
-     "alarms"
+     "the lab's proof rank"
     ],
     "nothingHere": [
      "reply",
@@ -2169,9 +2135,8 @@
     "notes": [
      "+3 tables only in BY MOMENT",
      "+3 tables only in BY MOMENT",
-     "+1 in BY MOMENT",
-     "+19 in BY MOMENT",
-     "+19 in BY MOMENT"
+     "+22 in BY MOMENT",
+     "+22 in BY MOMENT"
     ]
    }
   ],
@@ -2212,26 +2177,18 @@
   [
    "D-055 · the code map, show all again",
    {
-    "count": "36 of 56 fields carried by BY MOMENT · 17 left · 3 with nothing here",
+    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
     "carry": "all",
     "left": [
      "tables (part)",
-     "declared success",
      "arranges 7 other cases",
      "writes (part)",
      "fate",
      "the tables (part)",
-     "each path's fate",
-     "handler (part)",
      "steps",
-     "method and path",
      "entity",
-     "first URL segment",
      "alarms",
-     "behind (part)",
-     "functions behind, and how deep (part)",
-     "the lab's proof rank",
-     "alarms"
+     "the lab's proof rank"
     ],
     "nothingHere": [
      "beyond",
@@ -2278,7 +2235,7 @@
   ],
   [
    "d056 hover the handler pair",
-   "handler ┆ async · 53 lines · returns CookingSessionResponse ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ no docstring ┆ attribute: The handler ┆ attribute: File:line ┆ attribute: Signature ┆ The function that faces the API and receives the request. ┆ BY MOMENT carries 1 of its 2 elements."
+   "handler ┆ async · 53 lines · returns CookingSessionResponse ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ no docstring ┆ attribute: The handler ┆ attribute: File:line ┆ attribute: Signature ┆ The function that faces the API and receives the request. ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there."
   ],
   [
    "d056 hover a not-declared 409",
@@ -2315,7 +2272,7 @@
   [
    "step 160 · d056-path-to-the-201",
    {
-    "click": "the path to 201 · success · the answer",
+    "click": "the path to 201 · existing is not None · success · the answer",
     "at": [
      721,
      537
@@ -2324,14 +2281,13 @@
      42,
      24
     ],
-    "note": "the code \"the path to 201 · success · the answer\""
+    "note": "the code \"the path to 201 · existing is not None · success · the answer\""
    }
   ],
   [
    "D-056 · the writes on the path to the 201",
    [
-    "users W saved",
-    "cooking_sessions W saved"
+    "users W saved"
    ]
   ],
   [
@@ -2453,12 +2409,12 @@
   ],
   [
    "review hover the handler signature and docstring",
-   "handler ┆ async · 53 lines · returns CookingSessionResponse ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ no docstring ┆ attribute: The handler ┆ attribute: File:line ┆ attribute: Signature ┆ The function that faces the API and receives the request. ┆ BY MOMENT carries 1 of its 2 elements."
+   "handler ┆ async · 53 lines · returns CookingSessionResponse ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ no docstring ┆ attribute: The handler ┆ attribute: File:line ┆ attribute: Signature ┆ The function that faces the API and receives the request. ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there."
   ],
   [
    "step 172 · review-path-to-the-201",
    {
-    "click": "the path to 201 · success · the answer",
+    "click": "the path to 201 · existing is not None · success · the answer",
     "at": [
      721,
      537
@@ -2467,14 +2423,13 @@
      42,
      24
     ],
-    "note": "the code \"the path to 201 · success · the answer\""
+    "note": "the code \"the path to 201 · existing is not None · success · the answer\""
    }
   ],
   [
    "review · the writes on the path to the 201, each with its fate",
    [
-    "users W saved",
-    "cooking_sessions W saved"
+    "users W saved"
    ]
   ],
   [
@@ -2485,7 +2440,7 @@
    "picture · review-by-moment-path-to-the-201",
    {
     "pieces": 1,
-    "height": 2246
+    "height": 2127
    }
   ],
   [
@@ -2566,8 +2521,426 @@
    "picture · review-the-stream-answer",
    {
     "pieces": 1,
-    "height": 4462
+    "height": 4555
    }
+  ],
+  [
+   "step 182 · d057-open-cooking-sessions",
+   {
+    "click": "/cooking/sessionsPOST",
+    "at": [
+     33,
+     968
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /cooking/sessions"
+   }
+  ],
+  [
+   "D-057 · the code map, show all",
+   {
+    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
+    "left": [
+     "tables (part)",
+     "arranges 7 other cases",
+     "writes (part)",
+     "fate",
+     "the tables (part)",
+     "steps",
+     "entity",
+     "alarms",
+     "the lab's proof rank"
+    ]
+   }
+  ],
+  [
+   "step 183 · d057-carry-hide",
+   {
+    "click": "hide what BY MOMENT carries",
+    "at": [
+     1423,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"hide what BY MOMENT carries\""
+   }
+  ],
+  [
+   "D-057 · the code map, hide",
+   {
+    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
+    "left": [
+     "tables (part)",
+     "arranges 7 other cases",
+     "writes (part)",
+     "fate",
+     "the tables (part)",
+     "steps",
+     "entity",
+     "alarms",
+     "the lab's proof rank"
+    ]
+   }
+  ],
+  [
+   "step 185 · d057-carry-show-all",
+   {
+    "click": "show all",
+    "at": [
+     1349,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"show all\""
+   }
+  ],
+  [
+   "d057 hover the alarms pair",
+   "alarms ┆ attribute: Findings ┆ The anomalies the form check found on the endpoint. ┆ shown by no universe row ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there."
+  ],
+  [
+   "D-057 · the path row",
+   "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 409 400 │ fail: 404 │ fail: 403 │ fail: 409 │ answer: 201 201 │ uncaught: 500"
+  ],
+  [
+   "d057 hover a 201 code (12)",
+   "201 · existing is not None · success ┆ the fork it takes: existing is not None ┆ moment: the answer ┆ click to follow only this path"
+  ],
+  [
+   "d057 hover a 201 code (13)",
+   "201 · past every fork, to the end · success ┆ the fork it takes: past every fork, to the end ┆ moment: the answer ┆ click to follow only this path"
+  ],
+  [
+   "step 189 · d057-the-201-code-12",
+   {
+    "click": "the path to 201 · existing is not None · success · the answer",
+    "at": [
+     721,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 201 · existing is not None · success · the answer\""
+   }
+  ],
+  [
+   "D-057 · on this 201, the writes",
+   [
+    "gate users W saved"
+   ]
+  ],
+  [
+   "D-057 · on this 201, the moments",
+   "before any request · the screen sends it · at the edge · reads the body · the dependencies · checks the fields · checks · subscription_tier_for +2 · commit · the answer · after the answer"
+  ],
+  [
+   "step 191 · d057-the-201-code-13",
+   {
+    "click": "the path to 201 · past every fork, to the end · success · the answer",
+    "at": [
+     766,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 201 · past every fork, to the end · success · the answer\""
+   }
+  ],
+  [
+   "D-057 · on this 201, the writes",
+   [
+    "gate users W saved",
+    "work cooking_sessions W saved"
+   ]
+  ],
+  [
+   "D-057 · on this 201, the moments",
+   "before any request · the screen sends it · at the edge · reads the body · the dependencies · checks the fields · checks · subscription_tier_for +2 · commit · the answer · after the answer"
+  ],
+  [
+   "step 193 · d057-all-paths-again",
+   {
+    "click": "all paths",
+    "at": [
+     32,
+     536
+    ],
+    "size": [
+     81,
+     26
+    ],
+    "note": "the square \"all paths\""
+   }
+  ],
+  [
+   "d057 hover the check that raises the lost reason",
+   "404 · existing is not None and existing.user_id != user_id · Gates and decisions ┆ start_session @ cooking.py:150 ┆ checked inside start_session; a path picked here may skip it ┆ It stands on the paths that call start_session, less those that leave start_session before it; a path may still skip it or leave before it, so a path picked here may not reach it. ┆ raises SessionNotFoundError: “Cooking session not found” ┆ The checks that stop a request and the forks that decide its ending."
+  ],
+  [
+   "d057 hover the 404 after the catch",
+   "refusal · kind of ending ┆ An ending where the app's own code says no. ┆ colour: as the table draws it · icon: as the endpoint lab draws it"
+  ],
+  [
+   "d057 hover the client branch that reads 409",
+   "apps/web/src/features/cooking/cookingSessionModel.ts:389 · none · Client ┆ reads the status: === 409 ┆ what it does: hands back the text “cooking.error.start_concurrent_cap” ┆ The branch uses neither the reason nor the error. ┆ The screen's side of each ending."
+  ],
+  [
+   "d057 hover _stages at the work",
+   "_stages · Functions ┆ on every path that calls seed_stage_schedule ┆ It runs inside seed_stage_schedule, and a path may leave seed_stage_schedule before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+  ],
+  [
+   "d057 hover _label at the work",
+   "_label · Functions ┆ on every path that calls _schedule_next ┆ It runs inside _schedule_next, and a path may leave _schedule_next before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+  ],
+  [
+   "d057 hover derive_restrictions at the work",
+   "derive_restrictions · Functions ┆ on every path that calls assert_recipe_allergen_safe ┆ It runs inside assert_recipe_allergen_safe, and a path may leave assert_recipe_allergen_safe before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+  ],
+  [
+   "step 200 · d057-open-the-by-moment-info",
+   {
+    "click": "show what this section is",
+    "at": [
+     193,
+     527
+    ],
+    "size": [
+     26,
+     26
+    ],
+    "note": "the info toggle of BY MOMENT"
+   }
+  ],
+  [
+   "D-057 · the Endings row, behind the info toggle",
+   "No refusal this app sends carries a code of its own (0 of its 362): a client tells one refusal from another by the status and the words alone."
+  ],
+  [
+   "step 202 · d057-close-the-by-moment-info",
+   {
+    "click": "hide what this section is",
+    "at": [
+     193,
+     527
+    ],
+    "size": [
+     26,
+     26
+    ],
+    "note": "the info toggle of BY MOMENT"
+   }
+  ],
+  [
+   "step 203 · d057-open-the-timer",
+   {
+    "click": "/cooking/sessions/{session_id}/timerPATCH",
+    "at": [
+     33,
+     524
+    ],
+    "size": [
+     304,
+     32
+    ],
+    "note": "the row PATCH /cooking/sessions/{session_id}/timer"
+   }
+  ],
+  [
+   "d057 hover the 500",
+   "500 · a server error status · status ┆ escapes from ValueError, raised at cooking.py:442 ┆ The server failed; nothing the caller changes fixes it. ┆ colour: as the endpoint lab draws it"
+  ],
+  [
+   "d057 hover set_session_timer",
+   "set_session_timer · Functions ┆ @ 368 ┆ depth 1 ┆ How many calls below the handler it is reached. ┆ raises ValueError at cooking.py:442, and nothing catches it ┆ The code that runs, sorted by how much it decides."
+  ],
+  [
+   "step 206 · d057-open-setup-complete",
+   {
+    "click": "/setup/completePOST",
+    "at": [
+     33,
+     529
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /setup/complete"
+   }
+  ],
+  [
+   "d057 hover the setup client branch",
+   "apps/web/src/features/auth/SetupScreen.tsx:43 · none · Client ┆ reads the status: === 409 ┆ what it does: hands back what t(“auth.setup.error.in_progress”) gives ┆ The branch uses neither the reason nor the error. ┆ The screen's side of each ending."
+  ],
+  [
+   "D-057 · POST /setup/complete, the path row",
+   "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 400 │ fail: 409 │ fail: 409 │ answer: 200 200 200 │ uncaught: 500"
+  ],
+  [
+   "step 208 · review-open-cooking-sessions",
+   {
+    "click": "/cooking/sessionsPOST",
+    "at": [
+     33,
+     660
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /cooking/sessions"
+   }
+  ],
+  [
+   "step 209 · review-carry-hide",
+   {
+    "click": "hide what BY MOMENT carries",
+    "at": [
+     1423,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"hide what BY MOMENT carries\""
+   }
+  ],
+  [
+   "review · the code map, hide",
+   {
+    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
+    "left": [
+     "tables (part)",
+     "arranges 7 other cases",
+     "writes (part)",
+     "fate",
+     "the tables (part)",
+     "steps",
+     "entity",
+     "alarms",
+     "the lab's proof rank"
+    ]
+   }
+  ],
+  [
+   "step 211 · review-carry-show-all",
+   {
+    "click": "show all",
+    "at": [
+     1349,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"show all\""
+   }
+  ],
+  [
+   "review · the path row",
+   "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 409 400 │ fail: 404 │ fail: 403 │ fail: 409 │ answer: 201 201 │ uncaught: 500"
+  ],
+  [
+   "review hover the 201 code 12",
+   "201 · existing is not None · success ┆ the fork it takes: existing is not None ┆ moment: the answer ┆ click to follow only this path"
+  ],
+  [
+   "review hover the 201 code 13",
+   "201 · past every fork, to the end · success ┆ the fork it takes: past every fork, to the end ┆ moment: the answer ┆ click to follow only this path"
+  ],
+  [
+   "review · the first-run 201 is the code whose hover says",
+   "past every fork, to the end"
+  ],
+  [
+   "step 214 · review-pick-the-first-run-201",
+   {
+    "click": "the path to 201 · past every fork, to the end · success · the answer",
+    "at": [
+     766,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 201 · past every fork, to the end · success · the answer\""
+   }
+  ],
+  [
+   "review · on the first-run 201, the checks at the work",
+   [
+    "404 existing is not None and existing.user_id != user_id",
+    "404 recipe is None",
+    "409 concurrent_cap is not None and active + 1 > concurrent_cap",
+    "existing is not None",
+    "start_session"
+   ]
+  ],
+  [
+   "review hover the check that raises SessionNotFoundError",
+   "404 · recipe is None · Gates and decisions ┆ start_session @ cooking.py:150 ┆ raises SessionNotFoundError; its words are no fixed text: built as it raises, or none given ┆ The checks that stop a request and the forks that decide its ending."
+  ],
+  [
+   "review hover the cap check",
+   "409 · concurrent_cap is not None and active + 1 > concurrent_cap · Gates and decisions ┆ start_session @ cooking.py:150 ┆ checked inside start_session; a path picked here may skip it ┆ It stands on the paths that call start_session, less those that leave start_session before it; a path may still skip it or leave before it, so a path picked here may not reach it. ┆ raises ConcurrentCookCapError; its words are no fixed text: built as it raises, or none given ┆ The checks that stop a request and the forks that decide its ending."
+  ],
+  [
+   "step 218 · review-all-paths-again",
+   {
+    "click": "all paths",
+    "at": [
+     32,
+     536
+    ],
+    "size": [
+     81,
+     26
+    ],
+    "note": "the square \"all paths\""
+   }
+  ],
+  [
+   "review hover the client branch after the answer",
+   "apps/web/src/features/cooking/cookingSessionModel.ts:389 · none · Client ┆ reads the status: === 409 ┆ what it does: hands back the text “cooking.error.start_concurrent_cap” ┆ The branch uses neither the reason nor the error. ┆ The screen's side of each ending."
+  ],
+  [
+   "review hover a function known by name only",
+   "ResolutionSnapshot.violations_for · Functions ┆ on every path that calls assert_recipe_allergen_safe ┆ It runs inside assert_recipe_allergen_safe, and a path may leave assert_recipe_allergen_safe before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+  ],
+  [
+   "step 221 · review-open-session-complete",
+   {
+    "click": "/cooking/sessions/{session_id}/completePOST",
+    "at": [
+     33,
+     744
+    ],
+    "size": [
+     304,
+     32
+    ],
+    "note": "the row POST /cooking/sessions/{session_id}/complete"
+   }
+  ],
+  [
+   "review hover the 500 of complete",
+   "500 · a server error status · status ┆ escapes from ValueError, raised at cooking.py:582 ┆ The server failed; nothing the caller changes fixes it. ┆ colour: as the endpoint lab draws it"
   ],
   [
    "rows at the end",

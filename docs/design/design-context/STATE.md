@@ -88,7 +88,7 @@ so when one is missing). Pictures: `../workflow-panel/shots/fold/` (the lab) and
 3. **The gallery**: 3–5 variants of the card at true size, one fader each, judged by seeing. Then the tests, and promote.
 
 Later: the reach fix — the map misses imports made inside a function (D-056 item 13; UserDietaryProfile and more on POST
-/cooking/sessions have no step), trigger: generation work reopens (D-023 lifted) · piece 9 (D-016) · 12b, the second round of in-flight detectors (D-019) · the robot for every kind (his 2026-09-17 ask,
+/cooking/sessions have no step; with it, the renamed `select` import no reader follows — the handler's user_dietary_profile read — and apps/api/reference outside the scanned roots, which the twin's config must claim), trigger: generation work reopens (D-023 lifted) · piece 9 (D-016) · 12b, the second round of in-flight detectors (D-019) · the robot for every kind (his 2026-09-17 ask,
 `workflow-panel/robot-brief.md`) · the "more information" toggle (D-017, due at the display step) · pages for the three blocks
 with none yet: Overview and risk, In-flight state, Standard or specialist (D-022) · a `suite-backlog.md` line for the parked
 WORLD region (D-031) · walk the stage-rule switch (open 1) · `pieces-digest.json` is stale against the cache (gastify's head

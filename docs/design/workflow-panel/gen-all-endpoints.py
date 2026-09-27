@@ -506,8 +506,9 @@ def decl_of(x: dict, dset: set):
 
 def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: dict, tally: collections.Counter) -> dict:
     """{sp: the spine [[moment, group, first line, last line]], el: placed [[family, spine index, keys, text, chip, endings | None, hint]],
-    un: no moment [[family, keys, text, why]], ex: the endings in time order [[id, status, kind, spine index, on a path (1|0), face]],
-    pass: per ending the spine indices its paths pass, n: {family: [records placed, records with none]}} — see the section head."""
+    un: no moment [[family, keys, text, why]], ex: the picker's codes, one per PATH (D-057), in the endings' time order [[ending id, status,
+    kind, spine index, 1, face, its words, its limiter, path id, the forks that tell it from the other paths to its ending | None]],
+    pass: per code the spine indices its path passes, n: {family: [records placed, records with none]}} — see the section head."""
     TO, F, ident = r["_to"], L["forms"], L["identity"]
     lab = ident["label"]; E = "endpoint:" + lab
     hf, H = ident.get("file") or "", fep.get("handler") or ""
@@ -531,6 +532,19 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     PIDS = [p["id"] for p in paths]
     EXIT = {p["id"]: p["exit"]["id"] for p in paths}
     chains = {p["id"]: p.get("chain") or [] for p in paths}
+    LABP = {p["id"]: p for p in TO["paths"]}                       # the lab's paths (their fates), the same ids as the feed's
+    PATH = {p["id"]: p for p in paths}
+    EFP = {p["id"]: p.get("effects") or {} for p in paths}
+    if sorted(LABP) != sorted(PIDS):
+        die(f"{lab}: the lab's paths and the feed's differ: {sorted(set(LABP) ^ set(PIDS))[:3]}")
+    # D-057 (a): the raises functions{} records, by the line they stand at — a check that IS one of them says what it raises
+    rz_at = collections.defaultdict(set)
+    for rec in fns.values():
+        for q in rec.get("raises") or []:
+            if q.get("at") and q.get("cls"):
+                rz_at[q["at"]].add((q["cls"], q.get("msg")))
+    # D-057 (e): an error nothing catches — its class and the line it is raised at (the endpoint pass's escape-500 findings)
+    esc = sorted({(f0.get("cls"), f0.get("at")) for f0 in fep.get("findings") or [] if f0.get("id") == "escape-500" and f0.get("cls") and f0.get("at")})
 
     # ── 1 · the handler's anchors: its own checks (D-053's rows), each failure group's catch, its own commit; its returns ──
     def own_line(g):                                             # a check or an ending: the handler line it stands at
@@ -648,20 +662,55 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             xx = {"hd": [[h, hdr[h]] for h in sorted(hdr)]} if hdr else {}
             if x["kind"] == "success" and r.get("stream"):
                 xx["st"] = 1
-            add("end", row_when(i), [stat(x.get("status"))], "", ["end", x["kind"], x.get("status"), decl_of(x, dset)],
-                on_ref[x["id"]] | inside | ends_at({x["id"]}), says(x), x["id"], x=xx)
+            if x["kind"] == "uncaught" and esc:                  # D-057 (e): what escapes to it — the class and the line it is raised at
+                xx["cz"] = [[c, _short(a)] for c, a in esc]
+            e = add("end", row_when(i), [stat(x.get("status"))], "", ["end", x["kind"], x.get("status"), decl_of(x, dset)],
+                    on_ref[x["id"]] | inside | ends_at({x["id"]}), says(x), x["id"], x=xx)
+            # D-057 · the facts this chip draws, as the members the switch reads (D-055): the success status the decorator declares, filled;
+            # the causes of the uncaught 500
+            e["m"] = ([("declared", str(x.get("status")))] if x["kind"] == "success" and decl_of(x, dset) == 1 else []) \
+                + ([("cause", a) for _c, a in esc] if x["kind"] == "uncaught" else [])
     # GATES AND DECISIONS — the own checks on their ending's row; the dependencies; the rate limiters; the deciding forks; the catches
     # a check acts where it is evaluated — the handler line it stands at (its own, or the call it sits inside, on every path making
     # that call); its ending may leave later (a check inside a call whose raise a catch translates is evaluated in the work, and its
     # ending leaves after the catch). A check the feed ties only to a catch (`via` except …) stands where that catch raises its ending.
     rk = r["dk"]["guards"]
+    # review F1 (D-057 c): a check evaluated inside a call rides the paths making that call, LESS the paths the feed shows leaving before
+    # it — a path that takes a fork whose arm returns, or fires a check, whose condition the check's own `after` list negates ("not (P)")
+    # never reaches it (the idempotent replay returns before the recipe and cap checks). A path left on it only because it makes the call
+    # (its chain carries no step of the check) is an upper bound: the chip's hover says so. PROOF: no path whose chain carries the
+    # check's own step is one the feed shows leaving before it
+    fpre = {g0["id"]: g0 for g0 in fep.get("preconditions") or []}
+    fbr = {b["id"]: b for b in fep.get("branches") or []}
+    pre_at = {g0.get("at"): g0.get("pred") for g0 in fep.get("preconditions") or [] if g0.get("at")}
+    taken = {pid: {"not (" + str(T) + ")" for T in ({(fbr.get(s.get("ref")) or {}).get("pred") for s in ch if s.get("kind") == "branch" and s.get("hit")
+                                                     and ((fbr.get(s.get("ref")) or {}).get("return") or (fbr.get(s.get("ref")) or {}).get("exit"))}
+                                                    | {pre_at.get(s.get("at")) for s in ch if s.get("kind") == "gate" and s.get("hit")}) if T}
+             for pid, ch in chains.items()}
     for i, t in enumerate(rows):
         for c in t["checks"]:
             g, q = pre[c], own_line(pre[c])
             w = (("h", q, "checks") if t["mom"] in ("checks", "unplaced") else ("h", q)) if q else row_when(i)
-            pp = (on_ref[t["x"]["id"]] if t["x"] is not None else set()) | site_paths.get(via_q(g), set())
-            add("gate", w, [rk[c][0]] + rk[c][1], g.get("pred") or "", ["status", g.get("status")] + (["raise"] if str(g.get("via") or "").startswith("except ") else []),
-                pp or (None if t["x"] is None else set()), (r["d"]["guards"]["items"][c][2] or ""), "g:" + g["id"])
+            onr = on_ref[t["x"]["id"]] if t["x"] is not None else set()
+            aft = set((fpre.get(g["id"]) or g).get("after") or [])
+            cps = {pid for pid in site_paths.get(via_q(g), set()) if not (taken[pid] & aft)}
+            gx = (fpre.get(g["id"]) or g).get("exit")               # the check's OWN step on a chain: a gate at its line, or its own ending's
+            own_c = {pid for pid, ch in chains.items() if any((s.get("kind") == "gate" and g.get("at") and s.get("at") == g.get("at"))
+                                                              or (gx and s.get("kind") in ("gate", "exit") and s.get("ref") == gx) for s in ch)}
+            if any(taken[pid] & aft for pid in own_c):
+                die(f"{lab}: the check {g['id']} is on a path's chain that the feed also shows leaving before it: {sorted(p0 for p0 in own_c if taken[p0] & aft)[:2]}")
+            tally["f1:drop"] += len(site_paths.get(via_q(g), set()) - cps - onr)
+            pp = onr | cps
+            # D-057 (a): a check that is a raise functions{} records says what it raises, and its words where the code writes them out
+            rz = sorted(rz_at.get(g.get("at")) or [], key=str)
+            xg = {"rz": list(rz[0])} if len(rz) == 1 else {}
+            if cps - own_c:                                      # the paths it rides only by the call: the hover says so on those alone
+                xg["cq"] = [nm(VIA_CALL.match(str(g.get("via"))).group(1)), cps - own_c]; tally["f1:up"] += 1
+            e = add("gate", w, [rk[c][0]] + rk[c][1], g.get("pred") or "", ["status", g.get("status")] + (["raise"] if str(g.get("via") or "").startswith("except ") else []),
+                    pp if (pp or onr or site_paths.get(via_q(g))) else (None if t["x"] is None else set()), (r["d"]["guards"]["items"][c][2] or ""), "g:" + g["id"], x=xg or None)
+            if len(rz) == 1:
+                e["m"] = [("rw", g["id"])]
+                tally["rz"] += 1; tally["rzMsg"] += bool(rz[0][1])
     au = F.get("auth") or {}
     gate_paths = {p for p in PIDS if any(s.get("phase") in ("security", "dependency") for s in chains[p])}
     # D-056 (10): the login check's hover names each scheme and what carries its credential; a limiter's, its cap, window and key
@@ -812,9 +861,16 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     for rd in ((fe.get("reasons") or {}).get("readers") or {}).get(E) or []:
         for ro in rd.get("routes") or []:
             routed[ro.get("site")].add(ro.get("exit"))
+    # D-057 (b): a reason chip says on its face what it compares (the status, or the code it reads) and in its hover what the branch
+    # does — the lab's own words for the site's does[] rows (window.doesWords, lifted by the build) — in place of the map's word "read"
     for s2 in F["frontend"].get("reason_sites") or []:
-        add("client", ("fix", "after"), ["reason:" + s2["id"]], f"{_short(s2.get('at'))}", ["does", s2.get("does_state")], ends_at(routed.get(s2["id"]) or set()) or None,
-            s2.get("branch"), "s:" + s2["id"])
+        dw = (X.get("dw") or {}).get(s2["id"])
+        if dw is None:
+            die(f"{lab}: reason site {s2['id']} has no words for what it does — the lab's doesWords was not run on it")
+        e = add("client", ("fix", "after"), ["reason:" + s2["id"]], f"{_short(s2.get('at'))}", ["rsn", s2.get("reads"), s2.get("op"), s2.get("value")],
+                ends_at(routed.get(s2["id"]) or set()) or None, None, "s:" + s2["id"],
+                x={"dw": dw, "br": s2.get("branch"), "rd": [s2.get("reads"), s2.get("op"), s2.get("value")]})
+        e["m"] = [("rsite", s2["id"])] if s2.get("reads") == "status" and s2.get("value") is not None else []
     # IN-FLIGHT STATE — each value where it is SET: at server start, by a middleware, by a dependency, on a handler line
     ikey = lambda x: x.get("ref") or "|".join(str(x.get(q)) for q in ("kind", "name", "set_at"))
     for x in (F.get("inflight") or {}).get("rows") or []:
@@ -1103,6 +1159,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     first = {s: i for i, s in enumerate(sids)}
     dgrp, placed_st = {}, set()
     n_occ, pbo = 0, collections.defaultdict(set)                   # pbo: per path, the buckets of its OWN writes placed here
+    pws, paft = collections.defaultdict(set), collections.defaultdict(set)   # D-057: per path, its own writes placed wearing a fate · its steps after the answer
     for (pid, j), (si, q, src, wd) in sorted(place.items(), key=lambda kv: (kv[1][0], first[occ[kv[0][0]][kv[0][1]][0]], kv[0])):
         s = occ[pid][j][0]; rec = steps.get(s) or {}
         mk = (rec.get("fn"), rec.get("at"), rec.get("op"), rec.get("table"))
@@ -1122,13 +1179,18 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             e["pb"].setdefault(pid, set()).add(bucket[(pid, s)])
             if occ[pid][j][2] != "gate":
                 pbo[pid].add(bucket[(pid, s)])
+                pws[pid].add(s)
+        if occ[pid][j][2] == "after":
+            paft[pid].add(s)
         tally["src:" + src] += 1; n_occ += 1
         placed_st.add(s)
-    # D-056 (4) PROOF: the fate each path's own writes wear here is the fate the code map's fates list gives that path
+    # D-056 (4) PROOF: the fate each path's own writes wear here is the fate the code map's fates list gives that path (read from the
+    # lab's path, whose steps carry their bucket — the feed's path steps do not, so a fate read off them is never more than none or after)
+    fate_p = {}
     for p in paths:
         own = pbo.get(p["id"]) or set()
         v = next((f for f in FATES if f in own), None)
-        fo = fate_of(p, after_writes(p, steps))
+        fo = fate_p[p["id"]] = fate_of(LABP[p["id"]], after_writes(p, steps))
         if fo not in ("after", "none") and v != fo:
             die(f"{lab} {p['id']}: its writes, placed, wear {sorted(own)}, and the code map's fates list says {fo}")
     # D-056 (5): a race on a unique key the handler's get-or-create claims — on the chip of the step the race breaks at, joined to the
@@ -1144,6 +1206,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             die(f"{lab}: the race at {cl.get('race_at')} stands on no placed flush, or the endpoint has no uncaught ending to join it to")
         for e in hit:
             e["x"]["rc"] = [cl.get("constraint"), cl.get("table"), list(cl.get("unique") or []), unc_x]
+            e.setdefault("m", []).append(("race", cl.get("race_at")))
         raced.add(cl.get("race_at"))
     r500 = {f.get("race_at") for f in ((fep.get("arm_findings") or {}).get("contract") or []) if f.get("id") == "race-500"}
     if raced != r500:
@@ -1170,7 +1233,12 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             add("data", ("un", "notable"), ["table:" + t["table"]], t["table"], ["op", t["rw"]], None, None, "t:" + t["table"])
     # FUNCTIONS — the handler (it starts at its first moment), each call a path's chain makes (at its line, on the paths making it),
     # what those calls reach (the reached_by records, on the paths they name; the path's own steps, at the call that placed them)
-    add("fn", ("hfirst",), [fk(H)], nm(H), None, "handler", f"{_short(fep.get('file') or hf)}:{fep.get('line')}", "f:" + H)
+    e = add("fn", ("hfirst",), [fk(H)], nm(H), None, "handler", f"{_short(fep.get('file') or hf)}:{fep.get('line')}", "f:" + H)
+    # D-057 · the handler's chip carries the code map's handler file: its hover is the file's name and line, the directory cut — PROVEN the
+    # same file and line the code map names, and a name no other handler file shares (the build counts the names across the feed)
+    if e["hint"] != f"{_short(r.get('file'))}:{r.get('line')}":
+        die(f"{lab}: the handler chip says {e['hint']}, the code map's handler pair {r.get('file')}:{r.get('line')}")
+    e["m"] = [("file", r.get("file"))] if r.get("_fileOne") else []
     fq = {}
     for pid, d in pcall.items():
         for q, fs in d.items():
@@ -1263,15 +1331,72 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     for e in els:
         if "si" not in e and e["w"][0] not in ("un", "next"):
             e["si"] = si_of(e)
+    # D-057 (d): a function behind the handler no call edge places (the walk's own with no link, the card's other callees, the names no
+    # function carries) stands where the function that calls it stands — the placed functions (the handler's own chip apart: it stands
+    # where the handler starts, not at a call) whose station behind list (levels.json fn_nodes behind.names) names it, less any of them
+    # another of them is behind (so the one nearest it). One moment: there, on that function's paths — an upper bound, as its hover
+    # says; several moments: the band says so; none: it stays where it was. A name no function carries is placed by name, no key, no glyph.
+    # Rounds, until nothing more is placed: a function placed this way can place the ones behind it
+    LB = X.get("lvbeh") or {}
+    unjoined = lambda e: e["f"] == "fn" and e["w"] in (("un", "nolink"), ("un", "noname"))
+
+    def callers_of(e, callers):
+        c = [(g, ge) for g, ge in callers if e["text"] in LB[g]]
+        return [(g, ge) for g, ge in c if not any(h != g and nm(h) in LB[g] for h, _he in c)]
+    while True:
+        callers = [(k[3:], e) for e in els if e["f"] == "fn" and isinstance(e.get("si"), int) and e["w"][0] != "un" and isinstance(e.get("paths"), set)
+                   and e["paths"] for k in e["keys"][:1] if k.startswith("fn:") and k[3:] != H and LB.get(k[3:])]
+        moved = 0
+        for e in [e for e in els if unjoined(e)]:
+            c = callers_of(e, callers)
+            if len({ge["si"] for _g, ge in c}) == 1:
+                e["si"] = c[0][1]["si"]; e["w"] = ("si", e["si"]); moved += 1
+                e["paths"] = set().union(*[ge["paths"] for _g, ge in c]); e["pw"] = set().union(*[ge["pw"] for _g, ge in c])
+                e["x"]["cp"] = ", ".join(sorted({nm(g) for g, _ge in c}))
+                e["o"] = min(ge["o"] for _g, ge in c)
+                e["_jc"] = {g for g, _ge in c}
+                tally["join:name" if e["id"].startswith("n:") else "join:fn"] += 1
+        if not moved:
+            break
+    for e in [e for e in els if unjoined(e)]:                   # the functions nearest it stand at several moments: said, never picked
+        if len({ge["si"] for _g, ge in callers_of(e, callers)}) > 1:
+            e["w"] = ("un", "twomom"); tally["join:several"] += 1
+        else:
+            tally["join:left"] += 1
+    # review F3: a behind list the station cut (levels.json behind.names_more) names only its first names, so a placed function whose
+    # list is cut and does not name it may call it too — nearer than the caller it joined, at another moment or on other paths. Each
+    # such function is named in the joined chip's hover (it may also run under it), counted, never silently trusted
+    CUT = X.get("lvcut") or {}
+    for e in els:
+        if "_jc" not in e:
+            continue
+        jc = e.pop("_jc") | {e["keys"][0][3:] if e["keys"] and e["keys"][0].startswith("fn:") else None}
+        hid = sorted({nm(h) for h, _he in callers if CUT.get(h) and e["text"] not in LB[h] and h not in jc})
+        if hid:
+            e["x"]["cn"] = ", ".join(hid); tally["join:cut"] += 1
+    # D-057 (e): the function an error nothing catches is raised in says so on its chip (each chip of it), at the call that reaches it
+    for c0, a0 in esc:
+        rf = sorted(fid for fid, rec in fns.items() if any(q.get("at") == a0 and q.get("cls") == c0 for q in rec.get("raises") or []))
+        for e in els:
+            if e["f"] == "fn" and any(k in ("fn:" + g.replace("#", "::") for g in rf) for k in e["keys"]):
+                e["x"].setdefault("ru", []).append([c0, _short(a0)])
+                e.setdefault("m", []).append(("raise", a0))
 
     # ── 6 · each element's paths → the endings it is on; PROOF: every path it is on passes its moment (a "wide" step: never after the
     # path left); an element on no path goes to the band; each block's records, placed or not, are the code map's own ──
-    ex = [[t["x"]["id"], t["x"].get("status"), t["x"]["kind"], x_si[t["x"]["id"]]] for t in rows if t["x"] is not None]
-    EI = {x[0]: i for i, x in enumerate(ex)}
-    if len(ex) > 30:
-        die(f"{lab}: {len(ex)} endings — the page keeps an element's endings as bits of one number, and holds thirty")
-    live = {EI[EXIT[p]] for p in PIDS if EXIT[p] in EI}          # the endings a path ends at: the picker offers only these
+    xrow = [[t["x"]["id"], t["x"].get("status"), t["x"]["kind"], x_si[t["x"]["id"]]] for t in rows if t["x"] is not None]
+    EI = {x[0]: i for i, x in enumerate(xrow)}                   # the endings in time order (D-053's rows)
+    # D-057 (c): the path picker holds one code per PATH — an ending several paths reach is several codes — in the endings' time order,
+    # the paths to one ending in the facts' order; an ending no path reaches is not offered. An element's paths ride as bits of one
+    # number, one bit per code (the page tests a bit)
+    TOP = [p["id"] for p in TO["paths"]]
+    picks = sorted((pid for pid in TOP if EXIT[pid] in EI), key=lambda pid: (EI[EXIT[pid]], TOP.index(pid)))
+    if len(picks) > 30:
+        die(f"{lab}: {len(picks)} paths — the page keeps an element's paths as bits of one number, and holds thirty")
+    PI = {pid: i for i, pid in enumerate(picks)}
+    live = set(range(len(picks)))
     seen = {p: set(passed[p]) for p in PIDS}
+    PX = {("endpoint", lab), ("segment", r.get("seg"))}          # D-057: the facts the placed chips draw (their members) — the heading draws the two
     # D-056 (6): a test whose status fits endings at several moments rides EACH of them, drawn hollow — "several moments" is no longer
     # its reason; one that fits endings at one moment stays one chip; one that proves no ending stays in the band
     for i0 in [i for i, e in enumerate(els) if e["f"] == "proof" and e.get("si") == ("un", "spans")]:
@@ -1312,20 +1437,32 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             die(f"{lab}: {e['f']} {e['id']} stands at {sp[si][0]}, after its path {bad[0]} has left")
         for p in e["pw"]:
             seen[p].add(si)
-        ends = sorted({EI[EXIT[p]] for p in pp if EXIT[p] in EI})
-        mask = None if set(ends) == live else sum(1 << i for i in ends)   # the endings it is on, one bit each (the page tests a bit)
+        ends = sorted({PI[p] for p in pp if p in PI})
+        mask = None if set(ends) == live else sum(1 << i for i in ends)   # the paths it is on, one bit each (the page tests a bit)
         if mask == 0:
-            die(f"{lab}: {e['f']} {e['id']} is placed on no ending")
+            die(f"{lab}: {e['f']} {e['id']} is placed on no path")
         xx = dict(e.get("x") or {})
-        if e.get("pb"):                                          # D-056 (4): per ending (the picker's index), the fates its paths give
-            fa = collections.defaultdict(set)
-            for pid, bs in e["pb"].items():
-                if EXIT[pid] in EI:
-                    fa[EI[EXIT[pid]]] |= bs
-            xx["fa"] = {str(k): [f for f in FATES if f in v] for k, v in sorted(fa.items())}
-        if "rc" in xx:                                           # D-056 (5): the ending the race escapes to, as the picker's index
-            xx["rc"] = xx["rc"][:3] + [EI[xx["rc"][3]]]
+        if e.get("pb"):                                          # D-056 (4): per path (the picker's index), the fate it gives the write
+            xx["fa"] = {str(PI[pid]): [f for f in FATES if f in bs] for pid, bs in sorted(e["pb"].items(), key=lambda kv: PI.get(kv[0], -1)) if pid in PI}
+        if "cq" in xx:                                           # review F1: the picker's indices of the paths a check rides only by its call
+            xx["cq"] = [xx["cq"][0], sorted(PI[q0] for q0 in xx["cq"][1] if q0 in PI and q0 in pp)]
+            if not xx["cq"][1]:
+                del xx["cq"]
+        if "rc" in xx:                                           # D-056 (5): the ending the race escapes to — its status
+            xx["rc"] = xx["rc"][:3] + [XS[xx["rc"][3]].get("status")]
         el.append([e["f"], si, e["keys"], e["text"], e["chip"], mask, e["hint"], xx or None, e["o"]]); rp[e["f"]].update(e["rec"])
+        PX.update(e.get("m") or [])
+        if e["f"] == "data":
+            PX.update(("step", q[2:]) for q in e["rec"] if q.startswith("s:"))
+    # D-057 · each path's fate, drawn: a path with no write of its own shows none (the fate "none"); a path whose own writes all stand at
+    # their moments wearing its fate on its pick (saved · maybe · rolled back · left unsaved); a path whose writes all run after the
+    # answer, each standing after the answer on it
+    for pid in picks:
+        fo = fate_p[pid]
+        own = {q["step"] for q in (EFP[pid].get("steps") or []) if not q.get("dependency") and (steps.get(q["step"]) or {}).get("op") in WRITE_OPS}
+        if fo == "none" and not own or fo == "after" and {a["step"] for a in after_writes(PATH[pid], steps)} <= paft[pid] \
+                or fo not in ("none", "after") and own and own <= pws[pid]:
+            PX.add(("fate", pid))
     # the records each block holds, read from the code map's own members and the lab's facts — never from the elements above
     U = r["u"]
     ms = lambda cid, fb: set(U[cid]) if cid in U else set(fb)
@@ -1381,27 +1518,43 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     el.sort(key=lambda x: (x[1], MO_ORDER.index(x[0]), x[8]))           # stable: within one family, the order the records were read
     for x in el:
         x.pop()                                                      # [family, moment, keys, words, chip, endings, hint, extras (D-056)]
-    # the path picker: each ending in time order, under the moment it leaves at; two of one status at one moment are told apart by
-    # the first of these that differs between them — their own words, the limiter, their checks, the ending's condition, its line
+    # the path picker: each path under the moment its ending leaves at, in time order; two endings of one status at one moment are told
+    # apart by the first of these that differs between them — their own words, the limiter, their checks, the ending's condition, its
+    # line. D-057 (c): two paths to one ending are told apart by the forks each takes (the chain's branches it takes: their condition,
+    # or its running past every fork), else by what FastAPI checks on it (its own parameters or a dependency's) — PROVEN distinct
     frec = {x["id"]: x for x in (fep.get("produced") or []) + (fep.get("framework_exits") or [])}
     lim = {l0.get("exit"): str(l0.get("limiter") or l0.get("class") or "").lstrip("_") for l0 in (F.get("rate") or {}).get("limits") or []}
     chk = {t["x"]["id"]: " · ".join(pre[c].get("pred") or "" for c in t["checks"]) for t in rows if t["x"] is not None}
     tell = (lambda x: says(XS[x]), lim.get, chk.get, lambda x: (frec.get(x) or {}).get("pred"),
             lambda x: _short((frec.get(x) or {}).get("site") or (frec.get(x) or {}).get("at")))
+    brs = {b["id"]: b for b in fep.get("branches") or []}
+    fork = {}
+    for xid in EI:
+        ps = [pid for pid in picks if EXIT[pid] == xid]
+        if len(ps) < 2:
+            continue
+        took = {pid: [["pred", brs[s["ref"]]["pred"]] if (brs.get(s["ref"]) or {}).get("pred") else ["fall"] if (brs.get(s["ref"]) or {}).get("token") == "fall-through"
+                      else die(f"{lab} {pid}: it takes fork {s['ref']}, which the feed names by no condition") for s in chains[pid] if s.get("kind") == "branch" and s.get("hit")]
+                for pid in ps}
+        if any(not v for v in took.values()) or len({json.dumps(v) for v in took.values()}) != len(ps):
+            took = {pid: [["split", PATH[pid].get("split")]] if PATH[pid].get("split") else [] for pid in ps}
+        if any(not v for v in took.values()) or len({json.dumps(v) for v in took.values()}) != len(ps):
+            die(f"{lab} {xid}: {len(ps)} paths reach it, and neither the forks they take nor what FastAPI checks tells them apart")
+        fork.update(took); tally["forkEnds"] += 1; tally["forkPaths"] += len(ps)
+    ex = [[EXIT[pid], XS[EXIT[pid]].get("status"), XS[EXIT[pid]]["kind"], x_si[EXIT[pid]], 1, None] for pid in picks]
     grp = collections.defaultdict(list)
     for i, x in enumerate(ex):
-        x.append(1 if i in live else 0); x.append(None)
-        if i in live:
-            grp[(x[3], x[1])].append(i)
+        grp[(x[3], x[1])].append(i)
     for ids in grp.values():
-        if len(ids) > 1:
-            fc = next(([t(ex[i][0]) for i in ids] for t in tell if all(t(ex[i][0]) for i in ids) and len({t(ex[i][0]) for i in ids}) == len(ids)), None)
+        xs_ = list(dict.fromkeys(ex[i][0] for i in ids))         # the distinct endings among them: two paths to one ending share its words
+        if len(xs_) > 1:
+            fc = next(([t(x) for x in xs_] for t in tell if all(t(x) for x in xs_) and len({t(x) for x in xs_}) == len(xs_)), None)
             tally["faces"] += fc is None
-            for i, f2 in zip(ids, fc or [None] * len(ids)):
-                ex[i][5] = f2
-    for x in ex:                                                  # D-055: what a path code's hover says — the ending's own words, its limiter
-        x.append(says(XS[x[0]]) or None); x.append(lim.get(x[0]) or None)
-    pas = [sorted(set().union(*[seen[p] for p in PIDS if EXIT[p] == x[0]])) if x[4] else [] for x in ex]
+            for i in ids:
+                ex[i][5] = dict(zip(xs_, fc or [None] * len(xs_)))[ex[i][0]]
+    for i, x in enumerate(ex):                                    # D-055: what a path code's hover says — the ending's own words, its limiter
+        x += [says(XS[x[0]]) or None, lim.get(x[0]) or None, picks[i], fork.get(picks[i])]   # D-057: the path, the forks that tell it apart
+    pas = [sorted(seen[pid]) for pid in picks]
     # D-055: the code-map members BY MOMENT places, read through the RECORDS the build check above joins (each placed element's
     # records, turned into the member the code map names: an ending, a guard, a table a step touches, a function …); the members of
     # the records that check counts as the code map's own (want · sub); and the keys every placed element is drawn with
@@ -1442,7 +1595,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             PM.update(byrec[(f, rec)])
     PW = {m for f in rp for rec in rp[f] if rec in (want.get(f, set()) | sub.get(f, set())) for m in byrec[(f, rec)]}
     return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "n": {f: [len(rp[f]), len(ru[f])] for f, _a in MO_FAM if rp[f] or ru[f]},
-            "_P": PM, "_Pw": PW, "_K": KM}
+            "_P": PM | PX, "_Pw": PW, "_K": KM}
 
 
 MO_ORDER = [f for f, _a in MO_FAM]
@@ -1454,7 +1607,12 @@ MO_ORDER = [f for f, _a in MO_FAM]
 # its MEMBERS — the code map's own identities (the row record's `u`, its detail items, D-053's rows), never the page's words — and a
 # member is carried when BY MOMENT places it at a moment on any path (by_moment's _P, read through the records its build check joins).
 # An item field (a list, a table's rows) carries each drawn item apart; a count carries all its members or part of them. A field no
-# member of which BY MOMENT places (its fates, its alarms, the file, a count of chain steps) stays bright.
+# member of which BY MOMENT places (a count of the fates, the alarms' dots, a count of chain steps, the proof rank) stays bright.
+#     D-057 (his ruling "build 1 and 2"): a member is also a FACT a placed chip draws, said by by_moment beside the records — the success
+# status the decorator declares (the filled success chip), the handler's file (its chip's hover), the endpoint and its first segment
+# (BY MOMENT's heading), a path's fate (its writes wearing it on its pick, or no write of its own), a raise's words on its check, a
+# client branch's status and what it does, a race on its flush, the cause on the 500 and on the function it escapes from, a step. An
+# alarm's members are the facts it reads (amem), so the switch reads it carried when each stands at its moment.
 #     PROVEN per endpoint: (A) every member BY MOMENT places is drawn there under the key the code map draws it with; (B) a member not
 # placed is never drawn there under a key of its own; (C) every record BY MOMENT places that its build check counts as the code map's
 # own (want · sub) is a member a code-map field names — so the switch can hide nothing BY MOMENT does not hold, and miss nothing it does.
@@ -1463,8 +1621,8 @@ MO_ORDER = [f for f, _a in MO_FAM]
 # every look and say how many tables only BY MOMENT holds (state x), and the header counts them.
 # Per field: [state, the drawn items' flags, carried, of, the tables only BY MOMENT holds (state x, or p with some)]; states c · p · b,
 # e = the field holds nothing on this endpoint (nothing to carry, nothing left out — counted apart, never "left"), x = every element it
-# lists is carried AND BY MOMENT holds more of its kind. Three fields hold nothing BY MOMENT could place by construction (a path's
-# fate, the chain's length, the proof rank): they are never e, they are what BY MOMENT leaves out.
+# lists is carried AND BY MOMENT holds more of its kind. Three fields hold nothing BY MOMENT could place by construction (the tally
+# of the paths' fates, the chain's length, the proof rank): they are never e, they are what BY MOMENT leaves out.
 CV_KINDLESS = ("c:fate", "c:chain", "d:proof")
 CV_TABLES = ("c:tables", "d:tables")
 
@@ -1504,6 +1662,52 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
             "alarms": [("finding", a) for a in (v["alarms"] if isinstance(v["alarms"], list) else [])],
             "behind": [("fn", un(k0, "fn:")) for k0 in dk.get("behind") or []], "switches": uu("switches", "switch"),
             "pieces": pieces if live("pieces") else [], "lacks": [("lack", x[0]) for x in d["lacks"]]}
+    # D-057 · an alarm's members are the facts it reads, each where BY MOMENT draws it (never the verdict word, which has no moment):
+    # undeclared — the endings it names, hollow · text-only — its endings, their words in their hovers · shared-status — its endings ·
+    # race-500 — the flush the race breaks at, and the uncaught 500 · reason-lost — the check whose raise words its hover says, and the
+    # ending that sends other words · reason-collapsed — the client's branch with the status it reads and what it does, and the endings it
+    # takes · escape-500 — the cause on the 500, and the raise on the function it escapes from · refusal-writes — the fate of its path ·
+    # safe-method-commits — its commit. PROVEN each reading names what the alarm names, else the build stops
+    prod = {x["id"]: x for x in fep.get("produced") or []}
+    own_txt = [x for x in prod.values() if x.get("phase") != "uncaught" and x.get("state") == "defined" and not x.get("code")]
+    dset = declared_set(fep)
+    unc_x = next((x["id"] for x in F["exits"] if x["kind"] == "uncaught"), None)
+    fnr = fj.get("functions") or {}
+
+    def amem(f):
+        fid = f.get("id")
+        if fid == "undeclared":
+            xs = [xid for xid, x in prod.items() if xid in XS and XS[xid]["kind"] != "uncaught" and x.get("state") in ("defined", "default") and decl_of(XS[xid], dset) == 0]
+            if sorted({XS[q].get("status") for q in xs}) != sorted(f.get("statuses") or []):
+                die(f"{r['id']}: D-057 — the undeclared endings are {sorted({XS[q].get('status') for q in xs})}, the alarm names {f.get('statuses')}")
+            return [("end", q) for q in xs]
+        if fid == "text-only":
+            if len({(x.get("status"), str(x.get("detail"))) for x in own_txt}) != f.get("n") or any(x["id"] not in XS for x in own_txt):
+                die(f"{r['id']}: D-057 — text-only counts {f.get('n')} refusals, the endpoint's own words-only refusals are {len(own_txt)} endings")
+            return [("end", x["id"]) for x in own_txt]
+        if fid in ("shared-status", "reason-collapsed"):
+            xs = [x["id"] for x in own_txt if x["id"] in XS and x.get("status") == f.get("status") and str(x.get("detail")) in (f.get("details") or [])]
+            if sorted({str(prod[q].get("detail")) for q in xs}) != sorted(f.get("details") or []):
+                die(f"{r['id']}: D-057 — {fid} {f.get('status')} names {f.get('details')}, the endings say {sorted({str(prod[q].get('detail')) for q in xs})}")
+            return [("end", q) for q in xs] + ([("rsite", f.get("site"))] if fid == "reason-collapsed" else [])
+        if fid == "race-500":
+            return [("race", f.get("race_at")), ("end", unc_x)]
+        if fid == "reason-lost":
+            hr = [x for x in prod.values() if x.get("at") == f.get("at") and x.get("status") == f.get("status") and x.get("detail") == f.get("detail")]
+            cls = {c.strip() for x in hr for c in re.split(r"[|,]", str(x.get("via") or "").replace("except ", "")) if c.strip()}
+            ats = {q.get("at") for rec in fnr.values() if any(b.get("root") == "endpoint:" + r["id"] for b in rec.get("reached_by") or [])
+                   for q in rec.get("raises") or [] if q.get("msg") == f.get("was") and q.get("cls") in cls}
+            gs = [g["id"] for g in pre if g.get("at") in ats]
+            if len(hr) != 1 or not gs or hr[0]["id"] not in XS:          # one finding stands for every raise of those words it translates
+                die(f"{r['id']}: D-057 — reason-lost at {f.get('at')}: {len(hr)} endings send its words, {len(gs)} checks raise “{f.get('was')}”")
+            return [("rw", g0) for g0 in gs] + [("end", hr[0]["id"])]
+        if fid == "escape-500":
+            return [("cause", f.get("at")), ("raise", f.get("at"))]
+        if fid == "refusal-writes":
+            return [("fate", q) for q in f.get("paths") or []]
+        if fid == "safe-method-commits":
+            return [("step", q) for q in f.get("commits") or []]
+        return [("finding", fid)]
     slots = [c[0] for c in COLS if c[2] == "slot"]
     for cid, _a, kind, _arm, _g in COLS:
         if kind == "slot" and cid != slots[0]:
@@ -1515,7 +1719,8 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
     DET = {"exits": [[("end", t["x"]["id"])] if t["x"] is not None else [("guard", t["pre"]["id"])] for t in TO["rows"]],
            "guards": [[("guard", g["id"])] for g in pre],
            "tables": [[("table", t[0])] for t in d["tables"]["items"]], "gateWrites": [[("table", t)] for t in d["gateWrites"]],
-           "fates": [[] for _x in d["fates"]["items"]], "gates": [one(m) for m in gates], "limits": [[m] for m in lims],
+           # D-057: each path's fate, where BY MOMENT draws it (the write chips on its pick, or no write of its own)
+           "fates": [[("fate", p["id"])] for p in TO["paths"]], "gates": [one(m) for m in gates], "limits": [[m] for m in lims],
            # D-056 (8) a schema inside the body or the reply · (7) each ending that sends a header, drawn in the reply pair
            "request": ([("body",)] + fields + [("nested", k0) for k0 in dk["reqNest"]]) if d.get("request") else [],
            "response": ([("reply",)] + [("nested", k0) for k0 in dk["repNest"]] if d.get("response") else []) + [("end", h[3]) for h in r["xd"]["hdr"]],
@@ -1527,7 +1732,7 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
            # an arranging call has no moment: its member is its own ("arranged", case), never the acting case's ("case", …), so a case
            # that also acts at a moment does not carry the arranging one with it — only a placed arranging record could, and none is
            "arranged": [[("arranged", un(k0, "case:"))] for k0 in dk["arranged"]],
-           "reasons": [[("reason", un(x[0], "reason:"))] for x in dk["reasons"]], "alarms": [[("finding", a[0])] for a in d["alarms"]],
+           "reasons": [[("reason", un(x[0], "reason:"))] for x in dk["reasons"]], "alarms": [amem(f) for f in r["_al"]],
            "pieces": [[("piece", un(k0, "piece:"))] for k0 in dk["pieces"]], "lacks": [[("lack", x[0])] for x in d["lacks"]]}
     ITEMS = {"exits", "guards", "tables", "gateWrites", "fates", "gates", "limits", "deciders", "switches", "inflight", "reasons", "alarms", "pieces", "lacks",
              "behind", "hook", "screens", "arranged"}
@@ -1627,6 +1832,9 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
             die(f"mo.opt.{g}: its default {O.get('pick')!r} is not one of its options")
         if "ruled" in O and not re.fullmatch(r"D-\d{3}", str(O["ruled"])):           # his default names the ruling (D-055), like a rail's
             die(f"mo.opt.{g}: `ruled` must name the ruling (D-nnn), not {O['ruled']!r}")
+    bad = sorted({d0[1] for r in rows for x in r["mo"]["ex"] for d0 in x[9] or [] if d0[0] == "split" and d0[1] not in MW["path"]["split"]})
+    if bad:
+        die(f"BY MOMENT: paths told apart by what FastAPI checks ({bad}) that mo.path.split has no words for")
     KT = {}
     for r in rows:
         for x in r["mo"]["el"]:
@@ -1902,10 +2110,8 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
         rows_ = [ikey(r) for r in (inf.get("rows") or []) if r.get("dies") == d_]
         put(cid, len(rows_), len(rows_), Z[cid]["zero"], rows_)
 
-    al = [f["id"] for f in (F.get("findings") or [])]
-    al += [f["id"] for fs in (F.get("arm_findings") or {}).values() for f in fs]
-    al += [f.get("id") for f in (F["frontend"].get("findings") or []) if f.get("id")]
-    al = sorted(set(al))
+    ALS = list(F.get("findings") or []) + [f for fs in (F.get("arm_findings") or {}).values() for f in fs] + [f for f in (F["frontend"].get("findings") or []) if f.get("id")]
+    al = sorted({f["id"] for f in ALS})
     put("alarms", al, len(al), Z["alarms"]["zero"])
     beh = L["functions"]["behind"].get("fns") or 0
     put("behind", beh, beh, Z["behind"]["zero"])
@@ -1998,11 +2204,11 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
         # helper · "ah" both] (a case the feed lists in both lists is one case, counted once)
         "arranged": arranged_of(fep.get("tests") or {}),
         "reasons": cap([[s.get("at"), s.get("branch"), s.get("does_state")] for s in rs]),
-        # [id, status, its words, the statuses it names, the arm that found it] — the statuses and the arm ride apart so the code
-        # map draws each as a chip (D-043); the words keep the same text, so what the column is read to hold does not move
+        # [id, status, its words, the statuses it names, None] — the statuses ride apart so the code map draws each as a chip (D-043).
+        # D-057: the client's own alarms join the list (the count row already counted them); an arm's alarm says no arm — which part
+        # of the map found it is about the map, not the code (D-017)
         "alarms": [[f["id"], f.get("status"), ", ".join(str(d) for d in (f.get("details") or f.get("statuses") or []))[:80],
-                    [s for s in (f.get("statuses") or []) if isinstance(s, int)], None] for f in (F.get("findings") or [])]
-                  + [[f["id"], None, a, [], a] for a, fs in (F.get("arm_findings") or {}).items() for f in fs],
+                    [s for s in (f.get("statuses") or []) if isinstance(s, int)], None] for f in ALS],
         "pieces": cap([[r["words"], r["n"], r["of"], r["word"]] for r in pc["rows"] if r["word"] in ("rare", "only here")]),
         "lacks": [[r["words"], r["n"], r["of"]] for r in pc["missing_norms"]],
     }
@@ -2015,7 +2221,7 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
             # D-056 (11): the handler's outline and docstring [async, lines, returns, the def text, the docstring] · (12) a streamed answer
             "sig": [(ident.get("sig") or {}).get("async"), (ident.get("sig") or {}).get("lines"), (ident.get("sig") or {}).get("returns"), ident.get("gsig"), ident.get("doc") or None],
             "stream": 1 if (L.get("security") or {}).get("stream") else 0,
-            "_hook": hooks, "_files": files,
+            "_hook": hooks, "_files": files, "_al": ALS,                  # D-057: the alarms' own records, parallel to d.alarms
             # D-043: what the code map's chips need beside the detail lists, parallel to their items — kept OUT of `d`, so the words
             # the gaps are read against (every string `d` holds) do not move: each path's kind of ending, and each piece's family and
             # value from its key (a status, a method or a switch kind in a piece's own sentence is drawn as its chip)
@@ -2345,6 +2551,26 @@ const out={op:pick(K.RWC,(col,k)=>({chip:(/>([^<]+)</.exec(K.rwChip(k))||[])[1],
 process.stdout.write(JSON.stringify(out));"""
 
 
+DOES_JS = r"""
+const vm=require('vm'),fs=require('fs'),path=require('path');const H=process.argv[1];
+const win={};win.window=win;const ctx=vm.createContext(win);
+for(const f of ['_station.js','_lab-ep.js','_lab-ep-panels.js']) vm.runInContext(fs.readFileSync(path.join(H,f),'utf8'),ctx,{filename:f});
+const S=JSON.parse(fs.readFileSync(0,'utf8')),out={};for(const s of S) out[s.id]=win.doesWords(s);process.stdout.write(JSON.stringify(out));"""
+
+
+def does_lift(sites: list) -> dict:
+    """D-057 (b): {site id: what its branch does} — the lab's own words (_lab-ep-panels.js doesWords), run under node over each
+    reason site's does[] rows, never retyped here."""
+    uniq = list({s["id"]: s for s in sites if s.get("id")}.values())
+    r = subprocess.run(["node", "-e", DOES_JS, str(HERE)], input=json.dumps(uniq), capture_output=True, text=True)
+    if r.returncode != 0:
+        die("the lab's doesWords could not be run under node: " + r.stderr.strip()[-400:])
+    out = json.loads(r.stdout)
+    if sorted(out) != sorted(s["id"] for s in uniq) or any(not isinstance(v, str) or not v for v in out.values()):
+        die("the lab's doesWords gave no words for some reason site")
+    return out
+
+
 def _registry(p: Path):
     """A forms registry module (data only), loaded from its own file."""
     import importlib.util
@@ -2386,7 +2612,7 @@ def enc_lift(W: dict) -> tuple:
     E["rule"] = dict(sorted(rule.items()))
     F = W["enc"]["fam"]
     icons = {v["icon"] for v in E["kind"].values()} | {v["icon"] for v in E["ifk"].values()} | {v["icon"] for v in E["dir"].values()}
-    icons |= {x["icon"] for f in ("switch", "alarm", "arm", "branch", "does") for x in F[f]["vals"].values()} | {g["icon"] for g in G.values()} | {F["limit"]["icon"]}
+    icons |= {x["icon"] for f in ("switch", "alarm", "branch", "does") for x in F[f]["vals"].values()} | {g["icon"] for g in G.values()} | {F["limit"]["icon"]}   # D-057: no arm family (D-017)
     return E, css, icons
 
 
@@ -2529,7 +2755,17 @@ def build(argv: list) -> tuple:
         keyspace(r, L, fj["endpoints"]["endpoint:" + r["id"]], X, CL, spec["_look"]["lift"]["jReal"][0])
         r["ro"] = roles_by_key(L, r)                                   # the roles the code map's chips wear (D-043)
     # ── BY MOMENT (his ask 2026-09-26): every timed block's elements on one spine per endpoint, placed only by recorded facts ──
-    ADJ, MEMO, MOT = fn_adj(json.loads((UNI.EX / "levels.json").read_text(encoding="utf-8"))), {}, collections.Counter()
+    LV = json.loads((UNI.EX / "levels.json").read_text(encoding="utf-8"))
+    ADJ, MEMO, MOT = fn_adj(LV), {}, collections.Counter()
+    # D-057 (d): each function the station draws, the names its behind list holds (levels.json fn_nodes behind.names)
+    X["lvbeh"] = {n["id"].replace("#", "::"): set((n.get("behind") or {}).get("names") or []) for n in LV.get("fn_nodes") or [] if (n.get("behind") or {}).get("names")}
+    X["lvcut"] = {n["id"].replace("#", "::"): (n.get("behind") or {}).get("names_more") for n in LV.get("fn_nodes") or [] if (n.get("behind") or {}).get("names_more")}
+    # D-057 (b): what each client branch does, in the lab's own words (its doesWords, run over the site's does[] rows)
+    X["dw"] = does_lift([s for L in facts for s in L["forms"]["frontend"].get("reason_sites") or []])
+    # D-057: the handler chip's hover names the file without its directory — only where no other handler file has that name
+    hb = collections.Counter(_short(f) for f in {r["file"] for r in rows if r.get("file")})
+    for r in rows:
+        r["_fileOne"] = bool(r.get("file")) and hb[_short(r["file"])] == 1
     for L, r in zip(facts, rows):
         r["mo"] = by_moment(L, fj, fj["endpoints"]["endpoint:" + r["id"]], r, X, ADJ, MEMO, MOT)
         carried(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], W)      # D-055: what BY MOMENT carries of the code map, proven
@@ -2613,7 +2849,7 @@ def build(argv: list) -> tuple:
     # groups (one per catch per endpoint) · endpoints whose moments come in several runs · the longest endings table
     d53 = collections.Counter()
     for r in rows:
-        r.pop("_cd"); r.pop("_cv"); TO = r.pop("_to"); r.pop("_hook"); r.pop("_files"); r.pop("_beh")
+        r.pop("_cd"); r.pop("_cv"); TO = r.pop("_to"); r.pop("_hook"); r.pop("_files"); r.pop("_beh"); r.pop("_al"); r.pop("_fileOne")
         d53["endings"] += sum(1 for t in TO["rows"] if t["x"]); d53["checks"] += sum(len(t["checks"]) for t in TO["rows"] if t["x"])
         d53["alone"] += sum(1 for t in TO["rows"] if not t["x"]); d53["groups"] += len(TO["moms"])
         d53["runs"] += any(n > 1 for n in TO["runs"].values()); d53["rows"] = max(d53["rows"], len(TO["rows"]))
@@ -2656,7 +2892,13 @@ def build(argv: list) -> tuple:
     arms_on = sorted(a for a, x in (fj.get("arms") or {}).items() if isinstance(x, dict) and x.get("present"))
     arms_off = sorted(a for a, x in (fj.get("arms") or {}).items() if isinstance(x, dict) and not x.get("present"))
 
-    tok = {"app": app, "head": head, "uniHref": uni_href, "nFeed": len(keys), "nRows": len(rows), "nCols": len(cols), "nBlocks": len(blocks),
+    # D-057 (text-only): the Endings row's info line says no refusal the app sends carries a code — counted on the whole feed, and the
+    # build stops the day one does (the line would be false)
+    own_ref = [x for e0 in (fj.get("endpoints") or {}).values() for x in e0.get("produced") or [] if x.get("phase") != "uncaught" and x.get("state") == "defined"]
+    n_coded = sum(1 for x in own_ref if x.get("code"))
+    if n_coded:
+        die(f"mo.noCode says no refusal carries a code, and {n_coded} of the app's {len(own_ref)} do — reword it")
+    tok = {"app": app, "head": head, "uniHref": uni_href, "nRefusals": len(own_ref), "nCoded": n_coded, "nFeed": len(keys), "nRows": len(rows), "nCols": len(cols), "nBlocks": len(blocks),
            "formsSha": sha(forms)[:8], "archmapSha": sha(archmap)[:8], "formsPath": tilde(forms), "archmapPath": tilde(archmap),
            "arms": " · ".join(arms_on) or "none", "armsOff": " · ".join(arms_off) or "none",
            "nShare": n_share, "rTop": max(a["r"] for a in A.values()), "rLow": min(a["r"] for a in A.values()), "nR3": sum(1 for c in cols if c["r"] == max(a["r"] for a in A.values())),
@@ -2735,6 +2977,17 @@ def build(argv: list) -> tuple:
                 f" · asserting tests {sm56(lambda r: sum(1 for x in r['mo']['el'] if x[7] and 'as' in x[7]))}"
                 f" · (11) signatures {n56(lambda r: r['sig'][3])} · docstrings {n56(lambda r: r['sig'][4])}"
                 f" · (12) streams {n56(lambda r: r['stream'])}")
+    # D-057: what the switch now reads as carried, and the five places — endpoints · elements
+    lft = {k0: x[0] + x[1] for k0, x in cv_left.items() if x[0] + x[1]}
+    cs = next((r for r in rows if r["id"] == "POST /cooking/sessions"), None)
+    summary += (f"\nD-057 · carried whole {min(r['cvn'][0] for r in rows)}–{max(r['cvn'][0] for r in rows)} of {rows[0]['cvn'][1]}"
+                + (f" · POST /cooking/sessions {cs['cvn'][0]} carried · {cs['cvn'][1] - cs['cvn'][0] - cs['cvn'][2]} left · {cs['cvn'][2]} empty" if cs else "")
+                + " · left feed-wide " + " ".join(f"{k0}:{n}" for k0, n in sorted(lft.items(), key=lambda kv: (-kv[1], kv[0])))
+                + f"\n        (a) checks saying their raise {MOT['rz']} ({MOT['rzMsg']} with its words)"
+                f" · (b) reason chips {sum(1 for r in rows for x in r['mo']['el'] if x[4] and x[4][0] == 'rsn')}"
+                f" · (c) endings two paths reach {MOT['forkEnds']} ({MOT['forkPaths']} codes); a check inside a call left off {MOT['f1:drop']} paths that leave before it, {MOT['f1:up']} said on the call's paths"
+                f" · (d) out of the band: {MOT['join:fn']} functions behind + {MOT['join:name']} by name only ({MOT['join:cut']} of them may also run under a function whose list is cut), {MOT['join:several']} at several moments, {MOT['join:left']} left"
+                f" · (e) 500s with a cause {sum(1 for r in rows for x in r['mo']['el'] if x[7] and 'cz' in x[7])}, raising chips {sum(1 for r in rows for x in r['mo']['el'] if x[7] and 'ru' in x[7])}")
     return html, summary, out, check
 
 

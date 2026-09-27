@@ -69,7 +69,9 @@
     "cons",
     "cols",
     "tbl",
-    "st"
+    "st",
+    "msg",
+    "op"
   ],
   "eyebrow": "every endpoint of one app, side by side",
   "h1": "All {nRows} endpoints of {app}, one row each",
@@ -811,7 +813,14 @@
       "says": "says: {v}",
       "lim": "limiter: {v}",
       "inForce": "the path in force now",
-      "pickIt": "click to follow only this path"
+      "pickIt": "click to follow only this path",
+      "_fork": "D-057 (c): where several paths reach one ending, each is a code of its own, told apart by the forks it takes, else by what FastAPI checks on it",
+      "fork": "the fork it takes: {v}",
+      "fall": "past every fork, to the end",
+      "split": {
+        "dependency-params": "FastAPI checks a dependency's own parameters",
+        "own-params": "FastAPI checks its own parameters"
+      }
     },
     "head": { "stage": "stage {v}", "calls": "calls: {v}" },
     "opt": {
@@ -874,6 +883,10 @@
       "depthPlain": "How many calls below the handler it is reached.",
       "callPaths": "on every path that calls {via}",
       "callPathsPlain": "It runs inside {via}, and a path may leave {via} before it runs, so a path picked here may not reach it.",
+      "cutNear": "may also run under {v}",
+      "cutNearPlain": "{v} calls more functions than are listed; if this is one of them, it also runs where {v} runs, on its paths.",
+      "callCheck": "checked inside {via}; a path picked here may skip it",
+      "callCheckPlain": "It stands on the paths that call {via}, less those that leave {via} before it; a path may still skip it or leave before it, so a path picked here may not reach it.",
       "fate": "on this path: {v}",
       "fatePlain": "With one path picked, a write wears what the path does with it.",
       "race": "a race on {cons}",
@@ -895,8 +908,16 @@
       "hollow": "fits {n} endings; this is one of them",
       "hollowPlain": "Its status fits endings at several moments, so it rides each of them, drawn hollow: it proves one of them, not which.",
       "inside": "inside {v}",
-      "file": "a file, not a hook or component inside it"
-    }
+      "file": "a file, not a hook or component inside it",
+      "_d057": "D-057 (his ruling \"build 1 and 2\"): a check says the error it raises and its words (a); a client branch what it reads and what it does (b); an error nothing catches its cause, on the 500 and on the function it is raised in (e)",
+      "raises": "raises {cls}: “{msg}”",
+      "raisesBuilt": "raises {cls}; its words are no fixed text: built as it raises, or none given",
+      "reads": "reads the {what}: {op} {v}",
+      "does": "what it does: {v}",
+      "cause": "escapes from {cls}, raised at {at}",
+      "uncaught": "raises {cls} at {at}, and nothing catches it"
+    },
+    "noCode": "No refusal this app sends carries a code of its own ({nCoded} of its {nRefusals}): a client tells one refusal from another by the status and the words alone."
   },
   "carry": {
     "_about": "D-055: his ask 2026-09-26, a switch in the code map that dims or hides every field BY MOMENT already carries, to see what else is there. Its three looks and the default (show all) are my proposal (D-025.2): the default is my pick, dashed. What counts as carried is read by gen-all-endpoints.py (carried) and proven there.",
@@ -915,7 +936,7 @@
     "tipPart": "BY MOMENT carries {n} of its {of} elements.",
     "tipEmpty": "This field holds nothing on this endpoint: nothing for BY MOMENT to carry, and nothing it leaves out. Dim and hide fade it, and the header counts it apart.",
     "tipBeyond": "BY MOMENT's steps also touch {n} tables this field does not list: {names}. The code map is short of them.",
-    "plain": "Carried: an element BY MOMENT places at a moment, on any path. A list carries each of its items apart; a count is carried when every member it counts is placed, in part when some are. A field no element of which BY MOMENT places (its fates, its alarms, the handler's file, the longest chain) stays as it is: it is what BY MOMENT leaves out. A field with nothing on this endpoint is counted apart, never as left. Where BY MOMENT's steps touch tables the code map does not list, the tables fields stay in every look and say how many, and the header counts them."
+    "plain": "Carried: an element BY MOMENT places at a moment, on any path, or a fact one of its elements draws. A list carries each of its items apart: an alarm when every fact it reads stands at its moment, a path's fate when its writes wear it on its pick (or it writes nothing of its own). A count is carried when every member it counts is placed, in part when some are. A field that sums the whole endpoint up (the count of the fates, the alarms' dots, the longest chain, the proof's rank) stays as it is: it is what BY MOMENT leaves out. A field with nothing on this endpoint is counted apart, never as left. Where BY MOMENT's steps touch tables the code map does not list, the tables fields stay in every look and say how many, and the header counts them."
   },
   "authNoScheme": "own check",
   "authNoSchemePlain": "It asks for a login through its own check, with no declared scheme: the check reads the token itself, not from the usual header.",
@@ -1271,16 +1292,6 @@
         "text-only": { "icon": "doc" }, "undeclared": { "icon": "file" }, "shared-status": { "icon": "both" }, "reason-lost": { "icon": "prompt" },
         "reason-collapsed": { "icon": "prefix" }, "escape-500": { "icon": "nav" }, "race-500": { "icon": "swords" }, "refusal-writes": { "icon": "store" },
         "safe-method-commits": { "icon": "wrap" }, "_other": { "icon": "alert" } } },
-      "arm": { "name": "the part of the map that found it", "ico": "mine", "vals": {
-        "effects": { "icon": "action", "plain": "The writes a path leaves, and what saves them." },
-        "contract": { "icon": "key", "plain": "What a caller must send and what it gets back." },
-        "kinds": { "icon": "layers", "plain": "The pieces around the handler: the middleware, the dependencies, what lives during a request." },
-        "short": { "icon": "bracket", "plain": "The rules a shape, a table or a setting holds." },
-        "tests": { "icon": "test", "plain": "What the tests prove." },
-        "frontend": { "icon": "screen", "plain": "What the screens do with the answer." },
-        "paths": { "icon": "journey", "plain": "The ways a request goes." },
-        "switches": { "icon": "config", "plain": "What outside the code decides the way." },
-        "_other": { "icon": "info", "plain": "A part of the map." } } },
       "branch": { "name": "what the branch does with the reason", "ico": "mine", "vals": {
         "reads": { "icon": "show", "plain": "The branch reads the reason the endpoint gives." },
         "passed": { "icon": "suffix", "plain": "The branch hands the error to code that reads it." },
