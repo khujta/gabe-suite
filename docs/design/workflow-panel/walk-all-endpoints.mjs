@@ -501,7 +501,9 @@ await pic('more-information-open');
       return R.mo.ex.findIndex((x, i) => x[1] === 201 && R.mo.el.some((e) => e[7] && e[7].fa && e[7].fa[i])); }), sel = '#mobar .mopath[data-path="' + i201 + '"]';
     await center('#mobar'); await step('review-path-to-the-201', sel, 'the code "' + (await txt(sel)) + '"');
     say('review · the writes on the path to the 201, each with its fate', await fates());
-    await hoverSay('review hover seed_stage_schedule on the 201 path', '#mogrid .mc[data-keys="fn:apps/api/services/long_prep.py::seed_stage_schedule"] .mt');
+    /* CHANGED 2026-09-27 (the scoped-import fix): seed_stage_schedule's own steps now name the path it runs on — the first-run 201 —
+       so on this replay 201 it is not drawn; its hover is read on the first-run 201 below */
+    say('review · seed_stage_schedule on the replay 201 path', (await p.$('#mogrid .mc[data-keys="fn:apps/api/services/long_prep.py::seed_stage_schedule"]')) ? 'drawn' : 'not drawn: the replay returns before start_session seeds a stage');
     await shotPieces('review-by-moment-path-to-the-201', '#sec-mo');
     await center('#mobar'); await step('review-all-paths-again', '#mobar .mopath[data-path="all"]', 'the square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"'); }
   await hoverSay('review hover the 401 declared or not with its header', '#mogrid td[data-mom="gate"][data-f="end"] .mc .vc-status');
@@ -587,6 +589,7 @@ await pic('more-information-open');
   say('review · the first-run 201 is the code whose hover says', first != null ? fall : 'MISSING');
   if (first != null) { await center('#mobar'); await step('review-pick-the-first-run-201', '#mobar .mopath[data-path="' + first + '"]', 'the code "' + (await txt('#mobar .mopath[data-path="' + first + '"]')) + '"');
     say('review · on the first-run 201, the checks at the work', await p.$$eval('#mogrid td[data-mom="work"][data-f="gate"] .mc', (cs) => cs.map((c) => c.innerText.replace(/\s+/g, ' ').trim())));
+    await hoverSay('review hover seed_stage_schedule on the first-run 201', '#mogrid .mc[data-keys="fn:apps/api/services/long_prep.py::seed_stage_schedule"] .mt');
     await shotOf('review-by-moment-first-run-201', '#sec-mo');
     const sr = await chipBy('work', 'gate', 'recipe is None'); if (sr) await center(sr); if (sr) await hoverSay('review hover the check that raises SessionNotFoundError', sr); else say('MISSING recipe is None', 'work');
     const sq = await chipBy('work', 'gate', 'concurrent_cap is not None and active + 1 > concurrent_cap'); if (sq) await center(sq); if (sq) await hoverSay('review hover the cap check', sq); else say('MISSING the cap check', 'work');

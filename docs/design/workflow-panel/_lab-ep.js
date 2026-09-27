@@ -30465,9 +30465,9 @@ window.LABEP = {
    "of": 80,
    "median_tested": 1,
    "most_tested": 19,
-   "none": 28,
+   "none": 27,
    "app": {
-    "tested": 122,
+    "tested": 123,
     "produced": 577
    },
    "rule": "ranked by how many of its produced endings a test names; endpoints that tie share the places from `rank` to `rank_to`"

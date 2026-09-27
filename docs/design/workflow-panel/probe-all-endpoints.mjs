@@ -1402,7 +1402,9 @@ ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
   const hd = await p.evaluate(() => [...document.querySelectorAll('#mogrid th.mom')].map((h) => { const rs = [...h.querySelectorAll('.mstg, .mn, .mh2')].flatMap((e) => [...e.getClientRects()]);
     const ts = rs.map((q) => q.top).sort((a, b) => a - b); let lines = 0, at = -1e9; ts.forEach((t) => { if (t - at > 6) { lines++; at = t; } });   /* line boxes, by their tops */
     return { m: h.getAttribute('data-mom'), si: +h.getAttribute('data-si'), face: h.getAttribute('data-face'), lines }; }));
-  const wantF = ['start_session · SessionNotFoundError', 'AllergenConflictError', 'start_session · ConcurrentCookCapError'];
+  /* CHANGED 2026-09-27 (the scoped-import fix): start_session imports assert_recipe_allergen_safe in its own body — the page now sees the
+     class raised through that call, so the 403's head names start_session like its neighbours */
+  const wantF = ['start_session · SessionNotFoundError', 'start_session · AllergenConflictError', 'start_session · ConcurrentCookCapError'];
   const hLine = (q) => +String(q || '').replace(/^.*:(\d+)$/, '$1');
   const wk = R.mo.sp.find((x) => x[0] === 'work'), wcalls = [...new Set(FE.paths.flatMap((q) => q.chain).filter((st) => (st.kind === 'call' || st.kind === 'collapsed') && String(st.at || '').startsWith(FE.file + ':')
     && hLine(st.at) >= wk[2] && hLine(st.at) <= wk[3]).sort((a, b) => hLine(a.at) - hLine(b.at)).map((st) => st.fn.split('::').pop()))];
@@ -1530,17 +1532,28 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
      && !band1.some(([w]) => w === 'nolink' || w === 'noname'),
     'D-056 (1) · BY MOMENT stands ' + wantWork.map(([n, d]) => n + ' ↓' + d).join(', ') + ' at the work (the call inside start_session reaches them), the login check\'s own at the dependencies; no function behind is left in the band (D-057)',
     { work: work.map((c) => c.t), band: band1 });
-  /* review F3: a function two calls down stands on the paths of the handler call that reaches it — an upper bound, since a path may
-     leave start_session before it runs (the 404 raises at services/cooking.py:140, before seed_stage_schedule): its hover says so.
-     count_active_sessions, whose own steps name the paths it runs on, stands on those paths only (not the replay 201) and says nothing */
+  /* review F3: a function whose own steps name the paths it runs on stands on those paths only and says nothing more —
+     count_active_sessions (not the replay 201), and seed_stage_schedule too.
+     CHANGED 2026-09-27 (the scoped-import fix): start_session imports seed_stage_schedule in its own body, so the effects arm now walks
+     it — its update of cooking_sessions is a step on the 201 path, and it stands on exactly that ending (it was the upper-bound example).
+     A function with no steps of its own still stands on the paths of the handler call that reaches it — an upper bound, its hover says
+     so: read on the first endpoint the page draws one, from the page's record of it (e[7].cp) */
+  const onOwn = (fid) => { const e0 = R.mo.el.find((e) => e[0] === 'fn' && e[2].some((ki) => MK[ki] === 'fn:' + fid)); if (!e0) return null;
+    return { on: R.mo.ex.map((x, i) => [x[0], e0[5] == null || !!((e0[5] >> i) & 1)]).filter(([, on]) => on).map(([x]) => x),
+      paths: FE.paths.filter((q) => (q.effects.steps || []).some((e) => (STEPS[e.step] || {}).fn === fid)).map((q) => q.exit.id), cp: (e0[7] || {}).cp || null }; };
+  const same = (a, b) => JSON.stringify([...new Set(a)].sort()) === JSON.stringify([...new Set(b)].sort());
+  const oSeed = onOwn('apps/api/services/long_prep.py::seed_stage_schedule'), oCount = onOwn('apps/api/services/cooking.py::count_active_sessions');
   const tSeed = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc[data-keys="fn:apps/api/services/long_prep.py::seed_stage_schedule"] .mt');
   const tCount = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc[data-keys="fn:apps/api/services/cooking.py::count_active_sessions"] .mt');
-  const eCount = R.mo.el.find((e) => e[0] === 'fn' && e[2].some((ki) => MK[ki] === 'fn:apps/api/services/cooking.py::count_active_sessions'));
-  const pathsCount = FE.paths.filter((q) => (q.effects.steps || []).some((e) => (STEPS[e.step] || {}).fn === 'apps/api/services/cooking.py::count_active_sessions')).map((q) => q.exit.id);
-  const onCount = R.mo.ex.map((x, i) => [x[0], eCount[5] == null || !!((eCount[5] >> i) & 1)]).filter(([, on]) => on).map(([x]) => x);
-  ok(tSeed && tSeed.includes(fillW(MX.callPaths, { via: 'start_session' })) && tCount && !tCount.includes(fillW(MX.callPaths, { via: 'start_session' }))
-     && JSON.stringify([...new Set(pathsCount)].sort()) === JSON.stringify([...new Set(onCount)].sort()),
-    'review F3 · ' + E + ' · seed_stage_schedule\'s hover says it stands "' + fillW(MX.callPaths, { via: 'start_session' }) + '" (a path may leave before it runs); count_active_sessions stands on exactly the endings its own steps are on', { tSeed: (tSeed || '').slice(0, 160), onCount, pathsCount });
+  const EU = FEED.find((ep) => ROW[ep].mo.el.some((e) => e[0] === 'fn' && (e[7] || {}).cp));
+  let tUp = null, eUp = null;
+  if (EU) { eUp = ROW[EU].mo.el.find((e) => e[0] === 'fn' && (e[7] || {}).cp); await openEp(EU);
+    const kUp = MK[eUp[2][0]]; tUp = await tipAt('#mogrid td[data-f="fn"] .mc[data-keys^="' + kUp + '"] .mt'); await openEp(E); }
+  ok(oSeed && oCount && tSeed && tCount && !oSeed.cp && !oCount.cp && same(oSeed.paths, oSeed.on) && same(oCount.paths, oCount.on) && oSeed.paths.length > 0
+     && !tSeed.includes(fillW(MX.callPaths, { via: 'start_session' })) && !tCount.includes(fillW(MX.callPaths, { via: 'start_session' }))
+     && !!EU && !!tUp && tUp.includes(fillW(MX.callPaths, { via: eUp[7].cp })),
+    'review F3 · ' + E + ' · seed_stage_schedule and count_active_sessions stand on exactly the endings their own steps are on and say nothing more; on ' + EU + ' a function with no steps of its own stands on the paths of ' + (eUp && eUp[7].cp) + ', and its hover says so',
+    { oSeed, oCount, EU, tUp: (tUp || '').slice(0, 160) });
   /* (2) the cases it arranges */
   const arrWant = [...new Set([...(FE.tests.arranged_by || []), ...(FE.tests.helper_arranged || [])])], arrPage = await p.$$eval('#ocol-cm .pair[data-k="d:arranged"] [data-key]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
   const arrTxt = await p.$eval('#ocol-cm .pair[data-k="d:arranged"] .pk', (e) => e.textContent), inGrid = await p.$$eval('#mogrid [data-keys]', (cs) => cs.flatMap((c) => c.getAttribute('data-keys').split('\n')));
@@ -1576,14 +1589,19 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   const bucketOf = (pid, sid) => { const ef = FE.paths.find((q) => q.id === pid).effects; return ({ committed: 'saved', maybe_committed: 'maybe', rolled_back: 'rolled', uncommitted: 'unsaved' })[['committed', 'maybe_committed', 'rolled_back', 'uncommitted'].find((b0) => (ef[b0] || []).includes(sid))]; };
   const addSt = (pid) => (FE.paths.find((q) => q.id === pid).effects.steps || []).map((e) => e.step).find((sid) => STEPS[sid].table === 'cooking_sessions' && STEPS[sid].op === 'add');
   /* CHANGED 2026-09-26 (D-057 c): a code is a path — the path to the ending that runs the add is picked by its own id */
-  const fateAt = async (xid) => { const pid = (FE.paths.find((q) => q.exit.id === xid && addSt(q.id)) || {}).id, i = R.mo.ex.findIndex((x) => x[8] === pid); await p.click('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(120);
+  const fateOn = async (pid) => { const i = R.mo.ex.findIndex((x) => x[8] === pid); await p.click('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(120);
     const c = (await cell('work', 'data')).find((q) => q.keys.includes('table:cooking_sessions') && /\bW\b/.test(q.t)); return c ? c.fate : null; };
   const X201 = FE.returns.find((x) => x.status === 201).id, X403 = FE.produced.find((x) => x.status === 403).id;
-  const w201 = [...new Set(FE.paths.filter((q) => q.exit.id === X201 && addSt(q.id)).map((q) => bucketOf(q.id, addSt(q.id))))], w403 = [...new Set(FE.paths.filter((q) => q.exit.id === X403 && addSt(q.id)).map((q) => bucketOf(q.id, addSt(q.id))))];
-  const f201 = await fateAt(X201), f403 = await fateAt(X403);
+  const w201 = [...new Set(FE.paths.filter((q) => q.exit.id === X201 && addSt(q.id)).map((q) => bucketOf(q.id, addSt(q.id))))];
+  /* CHANGED 2026-09-27 (the scoped-import fix): the 403 is raised inside assert_recipe_allergen_safe, two calls down, BEFORE start_session
+     adds the session — its path stops at that raise (effects.read_to), so no path to the 403 runs the add and the chip wears no fate there
+     (it wore "left unsaved", a claim the fix found false) */
+  const p403 = FE.paths.filter((q) => q.exit.id === X403), f201 = await fateOn((FE.paths.find((q) => q.exit.id === X201 && addSt(q.id)) || {}).id);
+  const f403 = p403.length === 1 ? await fateOn(p403[0].id) : ['more than one path'];
   await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(120); const fAll = await p.$$eval('#mogrid .vc-fate', (cs) => cs.length);
-  ok(JSON.stringify(f201) === JSON.stringify(w201) && JSON.stringify(f403) === JSON.stringify(w403) && w201[0] === 'saved' && w403[0] === 'unsaved' && fAll === 0,
-    'D-056 (4) · ' + E + ' · the add to cooking_sessions wears "' + D.words.fates.saved.name + '" on the path to the 201 and "' + D.words.fates.unsaved.name + '" on the path to the 403 (the feed\'s buckets); all paths, no fate', { f201, f403, fAll });
+  ok(JSON.stringify(f201) === JSON.stringify(w201) && w201[0] === 'saved' && p403.length === 1 && !addSt(p403[0].id) && p403[0].effects.read_to
+     && (!f403 || !f403.length) && fAll === 0,
+    'D-056 (4) · ' + E + ' · the add to cooking_sessions wears "' + D.words.fates.saved.name + '" on the path to the 201 (the feed\'s bucket); the 403\'s path stops at the raise at ' + (p403[0] || { effects: {} }).effects.read_to + ', before the add — no fate there; all paths, no fate', { f201, f403, fAll });
   /* (5) the race */
   const r500 = ((FE.arm_findings || {}).contract || []).filter((f) => f.id === 'race-500'), rc = (await cell('work', 'data')).filter((c) => c.race);
   const rcTip = await tipAt('#mogrid td[data-mom="work"][data-f="data"] .mc:has(.mrc) .mt'), claim = FE.repeat.claims.find((c) => c.race === 'uncaught');
@@ -1879,7 +1897,10 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
   const u1 = await readU(), acc = u1.rows.ACCESSES, accBad = Object.entries(acc.items).filter(([i, it]) => (it.op < 0.5) !== GO.has(OPS.ACCESSES[i] + '|' + it.keys[0]));
   const dimBad = []; Object.entries(u1.rows).forEach(([rn, row]) => Object.entries(row.items).forEach(([i, it]) => { const m = row.st === 'c' || it.cv, o = row.st === 'c' ? row.rowOp : it.op;
     if (m ? !(o < 0.5 && it.shown) : o !== 1) dimBad.push([rn, i, o]); }));
-  ok(u1.carry === 'dim' && !dimBad.length && !accBad.length && Object.values(acc.items).some((it) => it.op < 0.5) && Object.values(acc.items).some((it) => it.op === 1),
+  /* CHANGED 2026-09-27 (the scoped-import fix): the handler's own read of user_dietary_profile (`_sel(UserDietaryProfile)` after a
+     `select as _sel` it imports in its body) is a step now, so BY MOMENT draws all seven tables and every Accesses row fades — accBad
+     still proves each row against BY MOMENT's grid */
+  ok(u1.carry === 'dim' && !dimBad.length && !accBad.length && Object.values(acc.items).some((it) => it.op < 0.5),
     'D-058 · dim: the universe\'s carried items fade and stay drawn — the Accesses rows of the tables BY MOMENT draws (' + Object.values(acc.items).filter((it) => it.op < 0.5).length + ' of ' + Object.keys(acc.items).length + ') among them — every other item stays whole', { dimBad: dimBad.slice(0, 4), accBad });
   await p.click('#ocol-uni .opt[data-carry="hide"]'); await p.waitForTimeout(150);
   const u2 = await readU(), hideBad = [], notes = [];
@@ -1908,7 +1929,8 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
       m: e.getAttribute('data-cv') === '1' || e.closest('.gblk').getAttribute('data-cv') === '1', gcs: e.getAttribute('data-gcs'), op: op(e), shown: shown(e) }));
     return { items, count: document.getElementById('gcvcount').textContent, carry: G.getAttribute('data-carry'), dir: G.getAttribute('data-dir') }; });
   const g1 = await readG(), fct = (t) => g1.items.find((x) => x.fact && x.t === t) || {};
-  const byName = ['derive_restrictions', 'ResolutionSnapshot.violations_for'], cases = ['C237', 'C267'], stay = ['UserDietaryProfile', R.uni.rows.find((u) => u.row === 'SOURCE').kvs[0][2], 'conflict · large surface'];
+  /* CHANGED 2026-09-27 (the scoped-import fix): UserDietaryProfile moved from "stays whole" to "fades" — BY MOMENT draws its table now */
+  const byName = ['derive_restrictions', 'ResolutionSnapshot.violations_for'], cases = ['C237', 'C267'], stay = [R.uni.rows.find((u) => u.row === 'SOURCE').kvs[0][2], 'conflict · large surface'], nowDrawn = ['UserDietaryProfile'];
   /* what a name IS comes from the row's own record (its key, parallel to its name — the DOM draws the glyph, not the key) */
   const FK = new Map(R.rgaps.flatMap((g) => g[3].map((n, i) => [g[0] + '|' + n, (g[4] || [])[i] || null])));
   /* F2 (review 2026-09-26): a name stands for the card's items of its row named the same (a journey with its entities, a table's
@@ -1919,8 +1941,8 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
   const fBad = g1.items.filter((x) => x.fact).filter((x) => { const w = gWant(x); return x.m !== w || (x.m ? !(x.op < 0.5) : x.op !== 1); });
   const gC = g1.items.filter((x) => x.m).length;
   ok(g1.dir === 'uni' && g1.carry === 'dim' && byName.every((n) => fct(n).m && fct(n).op < 0.5 && MN.has(n)) && cases.every((c) => fct(c).m === MK.has('case:' + c) && (fct(c).op < 0.5) === MK.has('case:' + c))
-     && stay.every((n) => fct(n).t && !fct(n).m && fct(n).op === 1) && !fBad.length,
-    'D-058 · THE GAPS from the universe, dim: ' + byName.join(' and ') + ' fade (BY MOMENT names them), ' + cases.map((c) => c + (MK.has('case:' + c) ? ' fades' : ' stays')).join(', ') + '; ' + stay.join(', ') + ' stay whole — every name marked exactly as BY MOMENT\'s grid draws it',
+     && stay.every((n) => fct(n).t && !fct(n).m && fct(n).op === 1) && nowDrawn.every((n) => fct(n).t && fct(n).m && fct(n).op < 0.5) && !fBad.length,
+    'D-058 · THE GAPS from the universe, dim: ' + byName.join(' and ') + ' fade (BY MOMENT names them), ' + nowDrawn.join(', ') + ' fades (BY MOMENT draws its table), ' + cases.map((c) => c + (MK.has('case:' + c) ? ' fades' : ' stays')).join(', ') + '; ' + stay.join(', ') + ' stay whole — every name marked exactly as BY MOMENT\'s grid draws it',
     { fBad: fBad.slice(0, 4), stay: stay.map((n) => [n, fct(n).m, fct(n).op]) });
   ok(g1.count === fillW(CW.pcount, { carried: gC, items: g1.items.length, left: g1.items.length - gC }) && JSON.stringify([gC, g1.items.length]) === JSON.stringify(R.gcn.uni),
     'D-058 · THE GAPS\' header count (from the universe) is the page\'s own marks: ' + g1.count, { count: g1.count, page: [gC, g1.items.length], gen: R.gcn.uni });

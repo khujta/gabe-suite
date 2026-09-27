@@ -1570,19 +1570,19 @@
     "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An end",
     "Across the 80 endpoints, what each block places:",
     "Endings: 727 with a moment, 1 with none, of 728.",
-    "Gates and decisions: 531 with a moment, 0 with none, of 531.",
-    "Data effects: 1337 with a moment, 29 with none, of 1366.",
-    "Functions: 1176 with a moment, 57 with none, of 1233.",
+    "Gates and decisions: 532 with a moment, 0 with none, of 532.",
+    "Data effects: 1342 with a moment, 31 with none, of 1373.",
+    "Functions: 1191 with a moment, 51 with none, of 1242.",
     "Structures: 339 with a moment, 0 with none, of 339.",
     "Client: 174 with a moment, 0 with none, of 174.",
     "In-flight state: 696 with a moment, 10 with none, of 706.",
-    "Proof: 367 with a moment, 33 with none, of 400.",
+    "Proof: 368 with a moment, 33 with none, of 401.",
     "Stages and order: 442 with a moment, 0 with none, of 442.",
     "Standard or specialist: 223 with a moment, 15 with none, of 238.",
     "Overview and risk: 0 with a moment, 0 with none, of 0.",
-    "Data effects, how each step was placed on each path it is on (4534 in all): 90 on the handler's own line, 470 inside a c",
+    "Data effects, how each step was placed on each path it is on (4559 in all): 95 on the handler's own line, 455 inside a c",
     "3 times a chain lists a call inside a catch its path never passes; that call is left off that path.",
-    "5 times a path lists a step that no call of its own reaches while another path places it; it is left off that path."
+    "8 times a path lists a step that no call of its own reaches while another path places it; it is left off that path."
    ]
   ],
   [
@@ -1895,7 +1895,7 @@
     "checks",
     "subscription_tier_for +2",
     "start_session · SessionNotFoundError",
-    "AllergenConflictError",
+    "start_session · AllergenConflictError",
     "start_session · ConcurrentCookCapError",
     "commit",
     "the answer",
@@ -1955,19 +1955,16 @@
   ],
   [
    "hover the work head",
-   "the work ┆ lines 148 to 153 ┆ stage HANDLER — the endpoint's own code decides ┆ calls: subscription_tier_for · start_session · concurrent_cook_cap_for_tier ┆ The calls the handler makes after its checks, and what they read and write inside."
+   "the work ┆ lines 138 to 153 ┆ stage HANDLER — the endpoint's own code decides ┆ calls: subscription_tier_for · start_session · concurrent_cook_cap_for_tier ┆ The calls the handler makes after its checks, and what they read and write inside."
   ],
   [
    "D-055 · the code map, show all",
    {
-    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
+    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
     "carry": "all",
     "left": [
-     "tables (part)",
      "arranges 7 other cases",
-     "writes (part)",
      "fate",
-     "the tables (part)",
      "steps",
      "entity",
      "alarms",
@@ -2003,14 +2000,11 @@
   [
    "D-055 · the code map, dim",
    {
-    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
+    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
     "carry": "dim",
     "left": [
-     "tables (part)",
      "arranges 7 other cases",
-     "writes (part)",
      "fate",
-     "the tables (part)",
      "steps",
      "entity",
      "alarms",
@@ -2042,14 +2036,11 @@
   [
    "D-055 · the code map, hide",
    {
-    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
+    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
     "carry": "hide",
     "left": [
-     "tables (part)",
      "arranges 7 other cases",
-     "writes (part)",
      "fate",
-     "the tables (part)",
      "steps",
      "entity",
      "alarms",
@@ -2060,11 +2051,7 @@
      "lacks",
      "norms it lacks"
     ],
-    "notes": [
-     "+8 in BY MOMENT",
-     "+1 in BY MOMENT",
-     "+8 in BY MOMENT"
-    ]
+    "notes": []
    }
   ],
   [
@@ -2177,14 +2164,11 @@
   [
    "D-055 · the code map, show all again",
    {
-    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
+    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
     "carry": "all",
     "left": [
-     "tables (part)",
      "arranges 7 other cases",
-     "writes (part)",
      "fate",
-     "the tables (part)",
      "steps",
      "entity",
      "alarms",
@@ -2243,7 +2227,7 @@
   ],
   [
    "d056 hover a function behind",
-   "seed_stage_schedule · Functions ┆ depth 2 ┆ How many calls below the handler it is reached. ┆ on every path that calls start_session ┆ It runs inside start_session, and a path may leave start_session before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+   "seed_stage_schedule · Functions ┆ depth 2 ┆ How many calls below the handler it is reached. ┆ The code that runs, sorted by how much it decides."
   ],
   [
    "d056 hover the race",
@@ -2293,7 +2277,7 @@
   [
    "step 162 · d056-path-to-the-403",
    {
-    "click": "the path to 403 · refusal · after a call failed — caught at cooking.py",
+    "click": "the path to 403 · refusal · after a call failed — start_session raised",
     "at": [
      617,
      537
@@ -2302,14 +2286,13 @@
      42,
      24
     ],
-    "note": "the code \"the path to 403 · refusal · after a call failed — caught at cooking.py:159 (except AllergenConflictError) · Recipe contains your allergen restrictions\""
+    "note": "the code \"the path to 403 · refusal · after a call failed — start_session raised — caught at cooking.py:159 (except AllergenConflictError) · Recipe contains your allergen restrictions\""
    }
   ],
   [
    "D-056 · the writes on the path to the 403",
    [
-    "users W saved",
-    "cooking_sessions W left unsaved"
+    "users W saved"
    ]
   ],
   [
@@ -2433,18 +2416,18 @@
    ]
   ],
   [
-   "review hover seed_stage_schedule on the 201 path",
-   "seed_stage_schedule · Functions ┆ depth 2 ┆ How many calls below the handler it is reached. ┆ on every path that calls start_session ┆ It runs inside start_session, and a path may leave start_session before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+   "review · seed_stage_schedule on the replay 201 path",
+   "not drawn: the replay returns before start_session seeds a stage"
   ],
   [
    "picture · review-by-moment-path-to-the-201",
    {
     "pieces": 1,
-    "height": 2127
+    "height": 2100
    }
   ],
   [
-   "step 175 · review-all-paths-again",
+   "step 174 · review-all-paths-again",
    {
     "click": "all paths",
     "at": [
@@ -2474,7 +2457,7 @@
    }
   ],
   [
-   "step 178 · review-open-cooking-active",
+   "step 177 · review-open-cooking-active",
    {
     "click": "/cooking/activeGET",
     "at": [
@@ -2497,7 +2480,7 @@
    "CookingPhotoRef · Structures ┆ inside CookingSessionResponse ┆ The shapes of the body that comes in and the body that goes out."
   ],
   [
-   "step 180 · review-open-the-stream",
+   "step 179 · review-open-the-stream",
    {
     "click": "/recipe-creation/gustify/streamGETstream",
     "at": [
@@ -2525,7 +2508,7 @@
    }
   ],
   [
-   "step 182 · d057-open-cooking-sessions",
+   "step 181 · d057-open-cooking-sessions",
    {
     "click": "/cooking/sessionsPOST",
     "at": [
@@ -2542,13 +2525,10 @@
   [
    "D-057 · the code map, show all",
    {
-    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
+    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
     "left": [
-     "tables (part)",
      "arranges 7 other cases",
-     "writes (part)",
      "fate",
-     "the tables (part)",
      "steps",
      "entity",
      "alarms",
@@ -2557,7 +2537,7 @@
    }
   ],
   [
-   "step 183 · d057-carry-hide",
+   "step 182 · d057-carry-hide",
    {
     "click": "hide what BY MOMENT carries",
     "at": [
@@ -2574,13 +2554,10 @@
   [
    "D-057 · the code map, hide",
    {
-    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
+    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
     "left": [
-     "tables (part)",
      "arranges 7 other cases",
-     "writes (part)",
      "fate",
-     "the tables (part)",
      "steps",
      "entity",
      "alarms",
@@ -2589,7 +2566,7 @@
    }
   ],
   [
-   "step 185 · d057-carry-show-all",
+   "step 184 · d057-carry-show-all",
    {
     "click": "show all",
     "at": [
@@ -2620,7 +2597,7 @@
    "201 · past every fork, to the end · success ┆ the fork it takes: past every fork, to the end ┆ moment: the answer ┆ click to follow only this path"
   ],
   [
-   "step 189 · d057-the-201-code-12",
+   "step 188 · d057-the-201-code-12",
    {
     "click": "the path to 201 · existing is not None · success · the answer",
     "at": [
@@ -2645,7 +2622,7 @@
    "before any request · the screen sends it · at the edge · reads the body · the dependencies · checks the fields · checks · subscription_tier_for +2 · commit · the answer · after the answer"
   ],
   [
-   "step 191 · d057-the-201-code-13",
+   "step 190 · d057-the-201-code-13",
    {
     "click": "the path to 201 · past every fork, to the end · success · the answer",
     "at": [
@@ -2663,7 +2640,9 @@
    "D-057 · on this 201, the writes",
    [
     "gate users W saved",
-    "work cooking_sessions W saved"
+    "work cooking_sessions W saved",
+    "work cooking_sessions W saved",
+    "work cooking_stage_reminders W saved"
    ]
   ],
   [
@@ -2671,7 +2650,7 @@
    "before any request · the screen sends it · at the edge · reads the body · the dependencies · checks the fields · checks · subscription_tier_for +2 · commit · the answer · after the answer"
   ],
   [
-   "step 193 · d057-all-paths-again",
+   "step 192 · d057-all-paths-again",
    {
     "click": "all paths",
     "at": [
@@ -2710,7 +2689,7 @@
    "derive_restrictions · Functions ┆ on every path that calls assert_recipe_allergen_safe ┆ It runs inside assert_recipe_allergen_safe, and a path may leave assert_recipe_allergen_safe before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
   ],
   [
-   "step 200 · d057-open-the-by-moment-info",
+   "step 199 · d057-open-the-by-moment-info",
    {
     "click": "show what this section is",
     "at": [
@@ -2729,7 +2708,7 @@
    "No refusal this app sends carries a code of its own (0 of its 362): a client tells one refusal from another by the status and the words alone."
   ],
   [
-   "step 202 · d057-close-the-by-moment-info",
+   "step 201 · d057-close-the-by-moment-info",
    {
     "click": "hide what this section is",
     "at": [
@@ -2744,7 +2723,7 @@
    }
   ],
   [
-   "step 203 · d057-open-the-timer",
+   "step 202 · d057-open-the-timer",
    {
     "click": "/cooking/sessions/{session_id}/timerPATCH",
     "at": [
@@ -2767,7 +2746,7 @@
    "set_session_timer · Functions ┆ @ 368 ┆ depth 1 ┆ How many calls below the handler it is reached. ┆ raises ValueError at cooking.py:442, and nothing catches it ┆ The code that runs, sorted by how much it decides."
   ],
   [
-   "step 206 · d057-open-setup-complete",
+   "step 205 · d057-open-setup-complete",
    {
     "click": "/setup/completePOST",
     "at": [
@@ -2790,7 +2769,7 @@
    "all paths │ edge: 429 429 │ body: 422 400 │ gate: 401 401 │ fields: 422 │ checks: 400 │ fail: 409 │ fail: 409 │ answer: 200 200 200 │ uncaught: 500"
   ],
   [
-   "step 208 · review-open-cooking-sessions",
+   "step 207 · review-open-cooking-sessions",
    {
     "click": "/cooking/sessionsPOST",
     "at": [
@@ -2805,7 +2784,7 @@
    }
   ],
   [
-   "step 209 · review-carry-hide",
+   "step 208 · review-carry-hide",
    {
     "click": "hide what BY MOMENT carries",
     "at": [
@@ -2822,13 +2801,10 @@
   [
    "review · the code map, hide",
    {
-    "count": "44 of 56 fields carried by BY MOMENT · 9 left · 3 with nothing here",
+    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
     "left": [
-     "tables (part)",
      "arranges 7 other cases",
-     "writes (part)",
      "fate",
-     "the tables (part)",
      "steps",
      "entity",
      "alarms",
@@ -2837,7 +2813,7 @@
    }
   ],
   [
-   "step 211 · review-carry-show-all",
+   "step 210 · review-carry-show-all",
    {
     "click": "show all",
     "at": [
@@ -2868,7 +2844,7 @@
    "past every fork, to the end"
   ],
   [
-   "step 214 · review-pick-the-first-run-201",
+   "step 213 · review-pick-the-first-run-201",
    {
     "click": "the path to 201 · past every fork, to the end · success · the answer",
     "at": [
@@ -2891,6 +2867,10 @@
     "existing is not None",
     "start_session"
    ]
+  ],
+  [
+   "review hover seed_stage_schedule on the first-run 201",
+   "seed_stage_schedule · Functions ┆ depth 2 ┆ How many calls below the handler it is reached. ┆ The code that runs, sorted by how much it decides."
   ],
   [
    "review hover the check that raises SessionNotFoundError",
@@ -2962,7 +2942,7 @@
    {
     "universe": [
      "all",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "all",
@@ -2996,7 +2976,7 @@
    {
     "universe": [
      "dim",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "all",
@@ -3008,7 +2988,7 @@
   ],
   [
    "d058 hover the Accesses row title",
-   "Accesses · the Gabe Universe ┆ 5 reads · 2 writes ┆ attribute: Tables touched · Operation per table · my reading ┆ BY MOMENT draws 5 of its 7 items."
+   "Accesses · the Gabe Universe ┆ 5 reads · 2 writes ┆ attribute: Tables touched · Operation per table · my reading ┆ BY MOMENT draws every item of this row."
   ],
   [
    "step 229 · d058-universe-hide",
@@ -3030,7 +3010,7 @@
    {
     "universe": [
      "hide",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "all",
@@ -3040,9 +3020,7 @@
     "notes": [
      "HEAD +1 in BY MOMENT",
      "GUARDS +1 in BY MOMENT",
-     "ACCESSES +5 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
-     "CONNECTIONS +8 in BY MOMENT",
      "CODE BEHIND +12 in BY MOMENT",
      "TESTS +2 in BY MOMENT",
      "SOURCE +1 in BY MOMENT"
@@ -3084,19 +3062,17 @@
    {
     "universe": [
      "hide",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "dim",
      "uni",
-     "4 of 16 carried by BY MOMENT · 12 left"
+     "5 of 16 carried by BY MOMENT · 11 left"
     ],
     "notes": [
      "HEAD +1 in BY MOMENT",
      "GUARDS +1 in BY MOMENT",
-     "ACCESSES +5 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
-     "CONNECTIONS +8 in BY MOMENT",
      "CODE BEHIND +12 in BY MOMENT",
      "TESTS +2 in BY MOMENT",
      "SOURCE +1 in BY MOMENT"
@@ -3109,7 +3085,7 @@
   ],
   [
    "d058 hover UserDietaryProfile in the gaps",
-   "Connections ┆ UserDietaryProfile ┆ the universe card draws it; the code-map column never names it ┆ WHY not carried ┆ STATUS open — The code map's tables are the endpoint's access.ops in the station's graph feed, and this model's table is not among them; the station's Connections draw an inferred reads_from edge to it. Which reading holds is not measured yet: the measurement owed is where that edge comes from. my proposal"
+   "Connections ┆ UserDietaryProfile ┆ the universe card draws it; the code-map column never names it ┆ WHY shown another way — the tables ┆ STATUS solved elsewhere — The code map holds the same table among the endpoint's reads and writes, in the field linked here; the station's Connections draw it from the same kind of read. my proposal ┆ the tables ┆ BY MOMENT already carries all of it."
   ],
   [
    "step 236 · d058-gaps-hide",
@@ -3131,19 +3107,17 @@
    {
     "universe": [
      "hide",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "hide",
      "uni",
-     "4 of 16 carried by BY MOMENT · 12 left"
+     "5 of 16 carried by BY MOMENT · 11 left"
     ],
     "notes": [
      "HEAD +1 in BY MOMENT",
      "GUARDS +1 in BY MOMENT",
-     "ACCESSES +5 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
-     "CONNECTIONS +8 in BY MOMENT",
      "CODE BEHIND +12 in BY MOMENT",
      "TESTS +2 in BY MOMENT",
      "SOURCE +1 in BY MOMENT",
@@ -3172,7 +3146,7 @@
    {
     "universe": [
      "hide",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "hide",
@@ -3182,9 +3156,7 @@
     "notes": [
      "HEAD +1 in BY MOMENT",
      "GUARDS +1 in BY MOMENT",
-     "ACCESSES +5 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
-     "CONNECTIONS +8 in BY MOMENT",
      "CODE BEHIND +12 in BY MOMENT",
      "TESTS +2 in BY MOMENT",
      "SOURCE +1 in BY MOMENT",
@@ -3240,7 +3212,7 @@
    {
     "universe": [
      "all",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "all",
@@ -3270,7 +3242,7 @@
    {
     "universe": [
      "dim",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "all",
@@ -3288,18 +3260,18 @@
     "accesses": [
      [
       "reads → CookingPhoto · cooking_photos",
-      true,
-      "0.3"
+      false,
+      "1"
      ],
      [
       "reads → CookingSession · cooking_sessions",
-      true,
-      "0.3"
+      false,
+      "1"
      ],
      [
       "reads → Recipe · recipes",
-      true,
-      "0.3"
+      false,
+      "1"
      ],
      [
       "reads → RecipeIngredient · recipe_ingredients",
@@ -3308,13 +3280,13 @@
      ],
      [
       "reads → SubscriptionEntitlement · subscription_entitlement",
-      true,
-      "0.3"
+      false,
+      "1"
      ],
      [
       "writes → CookingSession · cooking_sessions",
-      true,
-      "0.3"
+      false,
+      "1"
      ],
      [
       "writes → CookingStageReminder · cooking_stage_reminders",
@@ -3344,7 +3316,7 @@
    {
     "universe": [
      "hide",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "all",
@@ -3354,9 +3326,7 @@
     "notes": [
      "HEAD +1 in BY MOMENT",
      "GUARDS +1 in BY MOMENT",
-     "ACCESSES +5 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
-     "CONNECTIONS +8 in BY MOMENT",
      "CODE BEHIND +12 in BY MOMENT",
      "TESTS +2 in BY MOMENT",
      "SOURCE +1 in BY MOMENT"
@@ -3371,18 +3341,18 @@
     "accesses": [
      [
       "reads → CookingPhoto · cooking_photos",
-      true,
-      "gone"
+      false,
+      "1"
      ],
      [
       "reads → CookingSession · cooking_sessions",
-      true,
-      "gone"
+      false,
+      "1"
      ],
      [
       "reads → Recipe · recipes",
-      true,
-      "gone"
+      false,
+      "1"
      ],
      [
       "reads → RecipeIngredient · recipe_ingredients",
@@ -3391,13 +3361,13 @@
      ],
      [
       "reads → SubscriptionEntitlement · subscription_entitlement",
-      true,
-      "gone"
+      false,
+      "1"
      ],
      [
       "writes → CookingSession · cooking_sessions",
-      true,
-      "gone"
+      false,
+      "1"
      ],
      [
       "writes → CookingStageReminder · cooking_stage_reminders",
@@ -3457,12 +3427,12 @@
    {
     "universe": [
      "all",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "dim",
      "uni",
-     "4 of 16 carried by BY MOMENT · 12 left"
+     "5 of 16 carried by BY MOMENT · 11 left"
     ],
     "notes": []
    }
@@ -3470,7 +3440,7 @@
   [
    "D-058 review · the gaps' names, dim",
    [
-    "UserDietaryProfile",
+    "UserDietaryProfile · carried",
     "ResolutionSnapshot.violations_for · carried",
     "derive_restrictions · carried",
     "C237 · carried",
@@ -3504,12 +3474,12 @@
    {
     "universe": [
      "all",
-     "31 of 64 carried by BY MOMENT · 33 left"
+     "36 of 64 carried by BY MOMENT · 28 left"
     ],
     "gaps": [
      "hide",
      "uni",
-     "4 of 16 carried by BY MOMENT · 12 left"
+     "5 of 16 carried by BY MOMENT · 11 left"
     ],
     "notes": [
      "TESTS +2 in BY MOMENT",
@@ -3520,7 +3490,7 @@
   [
    "D-058 review · the gaps' names, hide",
    [
-    "UserDietaryProfile",
+    "UserDietaryProfile · carried · gone",
     "ResolutionSnapshot.violations_for · carried · gone",
     "derive_restrictions · carried · gone",
     "C237 · carried · gone",
