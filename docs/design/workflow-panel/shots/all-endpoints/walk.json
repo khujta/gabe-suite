@@ -2678,11 +2678,11 @@
   ],
   [
    "d057 hover _stages at the work",
-   "_stages · Functions ┆ depth 3 ┆ How many calls below the handler it is reached. ┆ on every path that calls start_session ┆ It runs inside start_session, and a path may leave start_session before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+   "_stages · Functions ┆ depth 3 ┆ How many calls below the handler it is reached. ┆ The code that runs, sorted by how much it decides."
   ],
   [
    "d057 hover _label at the work",
-   "_label · Functions ┆ depth 4 ┆ How many calls below the handler it is reached. ┆ on every path that calls start_session ┆ It runs inside start_session, and a path may leave start_session before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+   "_label · Functions ┆ depth 4 ┆ How many calls below the handler it is reached. ┆ The code that runs, sorted by how much it decides."
   ],
   [
    "d057 hover derive_restrictions at the work",

@@ -1310,9 +1310,26 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                             inf.add(pid)
                 own = {pid for e2 in dstep.get(f, []) for pid in e2["paths"]}
                 xq = dict(xx or {})
+                # D-061 (2): a function deeper than the handler's own callees stands on the paths of the CALLER it hangs under in
+                # the walk (its walk parent's chip), not on every path of the handler call that reaches it — and its paths are an
+                # upper bound only where the parent's are (the parent's hover says so, and so does this one, naming the same call)
+                pe = [e0 for e0 in els if e0["f"] == "fn" and e0["keys"][:1] == [fk(BH["par"][f])] and e0["w"][0] != "un"
+                      and isinstance(e0.get("paths"), set) and e0["paths"]] if BH["par"].get(f) else []
+                pp = set().union(*(e0["paths"] for e0 in pe)) if pe else set()
+                pcp = next(((e0.get("x") or {}).get("cp") for e0 in pe if (e0.get("x") or {}).get("cp")), None)
+                par_exact = bool(ps & pp) and not pcp
+                if ps & pp:
+                    ps &= pp
+                    inf &= ps
+                    tally["beh:parent"] += 1
                 if inf and own:
                     ps -= inf - own
                     tally["beh:own"] += 1
+                elif inf and par_exact:
+                    tally["beh:pexact"] += 1                 # its parent's paths are the parent's own: said as no upper bound
+                elif inf and pcp:
+                    xq["cp"] = pcp
+                    tally["beh:cp"] += 1
                 elif inf:
                     q0 = min(qq)
                     via = sorted({g for g, qs0 in direct.items() if q0 in qs0 and f in reach_of(adj, g, memo)}) or \
@@ -2607,11 +2624,13 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
     # by level, then the card's Code behind callees the walk does not hold that the feeds hold one function for; a callee name the
     # feeds hold no single function for (and the walk does not name) stays a count. The column and the pair hold every named one.
     walk = L["functions"].get("walk") or []
-    wids, root, wlist = [], {}, []
+    wids, root, wlist, wpar = [], {}, [], {}
     for i, lv in enumerate(walk):
         for q in lv:
             f = q["id"].replace("#", "::")
             par = next((p0 for p0 in walk[i - 1] if p0["name"] == q.get("via")), None) if i else None
+            if par:
+                wpar.setdefault(f, par["id"].replace("#", "::"))        # D-061 (2): the caller it hangs under in the walk
             root[f] = root.get(par["id"].replace("#", "::"), f) if par else f
             dep = (q.get("rel") == "depends") if not i else bool(next((w0 for w0 in wlist if w0[0] == root[f] and w0[2]), None))
             wlist.append([f, i + 1, dep]); wids.append(f)
@@ -2628,7 +2647,7 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
         die(f"{r['id']}: a function behind the handler is named twice in the behind pair")
     to("behind", *bk)
     dk["behind"] = bk if v.get("behind") != "absent" else []
-    r["_beh"] = {"walk": wlist, "extra": [f for _n, f in extra], "noname": noname}
+    r["_beh"] = {"walk": wlist, "extra": [f for _n, f in extra], "noname": noname, "par": wpar}
     r["ck"] = {c: sorted(ks) for c, ks in sorted(ck.items()) if ks}
     r["_cd"] = {c: sorted(ks) for c, ks in cd.items() if ks}          # the generator's own reading (D-042), popped before the page
     r["_cv"] = {c: sorted(ks - cd[c]) for c, ks in cv.items() if ks - cd[c]}
@@ -3095,7 +3114,7 @@ def build(argv: list) -> tuple:
     ex56 = [x for r in rows for x in r["xd"]["exits"] if x[5] is not None]
     summary += (f"\nD-056 · (1) behind named {n56(lambda r: r['dk']['behind'])} · {sm56(lambda r: len(r['dk']['behind']))} functions"
                 f" ({sm56(lambda r: sum(len(lv) for lv in r['d']['behind'][2]))} by level, {sm56(lambda r: len(r['d']['behind'][3]))} depth not known),"
-                f" BY MOMENT at a call {MOT['beh:call']} (its own steps name its paths {MOT['beh:own']}, on the call's paths {MOT['beh:cp']}) · the dependencies {MOT['beh:gate']} · a step {MOT['beh:step']} · none {MOT['beh:none']};"
+                f" BY MOMENT at a call {MOT['beh:call']} (on its walk parent's paths {MOT['beh:parent']}; its own steps name its paths {MOT['beh:own']}, on the parent's own paths {MOT['beh:pexact']}, on the call's paths {MOT['beh:cp']}) · the dependencies {MOT['beh:gate']} · a step {MOT['beh:step']} · none {MOT['beh:none']};"
                 f" by name only {n56(lambda r: r['d']['behind'][4])} · {sm56(lambda r: r['d']['behind'][4])}"
                 f" · (2) arranges {n56(lambda r: r['d']['arranged'])} · {sm56(lambda r: len(r['d']['arranged']))} cases ({MOT['arrBand']} in the band, {MOT['arrHeld']} already there)"
                 f" · (3) endings declared {sum(1 for x in ex56 if x[5])} · not {sum(1 for x in ex56 if not x[5])} on {n56(lambda r: any(x[5] == 0 for x in r['xd']['exits']))}"

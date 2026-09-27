@@ -1541,7 +1541,10 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
      CHANGED 2026-09-27 (the scoped-import fix): start_session imports seed_stage_schedule in its own body, so the effects arm now walks
      it — its update of cooking_sessions is a step on the 201 path, and it stands on exactly that ending (it was the upper-bound example).
      A function with no steps of its own still stands on the paths of the handler call that reaches it — an upper bound, its hover says
-     so: read on the first endpoint the page draws one, from the page's record of it (e[7].cp) */
+     so: read on the first endpoint the page draws one, from the page's record of it (e[7].cp).
+     CHANGED 2026-09-27 (D-061 (2)): a function in the walk now stands on its walk PARENT's paths and says "on every path that calls"
+     only where the parent's paths are themselves an upper bound — on this feed no parent's are, so the first chip that says it is one
+     joined to its caller by name (D-057 (d), which keeps its line); the read below is unchanged */
   const onOwn = (fid) => { const e0 = R.mo.el.find((e) => e[0] === 'fn' && e[2].some((ki) => MK[ki] === 'fn:' + fid)); if (!e0) return null;
     return { on: R.mo.ex.map((x, i) => [x[0], e0[5] == null || !!((e0[5] >> i) & 1)]).filter(([, on]) => on).map(([x]) => x),
       paths: FE.paths.filter((q) => (q.effects.steps || []).some((e) => (STEPS[e.step] || {}).fn === fid)).map((q) => q.exit.id), cp: (e0[7] || {}).cp || null }; };
@@ -1549,15 +1552,46 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   const oSeed = onOwn('apps/api/services/long_prep.py::seed_stage_schedule'), oCount = onOwn('apps/api/services/cooking.py::count_active_sessions');
   const tSeed = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc[data-keys="fn:apps/api/services/long_prep.py::seed_stage_schedule"] .mt');
   const tCount = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc[data-keys="fn:apps/api/services/cooking.py::count_active_sessions"] .mt');
-  const EU = FEED.find((ep) => ROW[ep].mo.el.some((e) => e[0] === 'fn' && (e[7] || {}).cp));
+  const upK = (e) => e[0] === 'fn' && (e[7] || {}).cp && e[2] && e[2].length;   /* CHANGED (D-061 (2)): a keyed one — a chip joined by name only has no key to hover by */
+  const EU = FEED.find((ep) => ROW[ep].mo.el.some(upK));
   let tUp = null, eUp = null;
-  if (EU) { eUp = ROW[EU].mo.el.find((e) => e[0] === 'fn' && (e[7] || {}).cp); await openEp(EU);
+  if (EU) { eUp = ROW[EU].mo.el.find(upK); await openEp(EU);
     const kUp = MK[eUp[2][0]]; tUp = await tipAt('#mogrid td[data-f="fn"] .mc[data-keys^="' + kUp + '"] .mt'); await openEp(E); }
   ok(oSeed && oCount && tSeed && tCount && !oSeed.cp && !oCount.cp && same(oSeed.paths, oSeed.on) && same(oCount.paths, oCount.on) && oSeed.paths.length > 0
      && !tSeed.includes(fillW(MX.callPaths, { via: 'start_session' })) && !tCount.includes(fillW(MX.callPaths, { via: 'start_session' }))
      && !!EU && !!tUp && tUp.includes(fillW(MX.callPaths, { via: eUp[7].cp })),
     'review F3 · ' + E + ' · seed_stage_schedule and count_active_sessions stand on exactly the endings their own steps are on and say nothing more; on ' + EU + ' a function with no steps of its own stands on the paths of ' + (eUp && eUp[7].cp) + ', and its hover says so',
     { oSeed, oCount, EU, tUp: (tUp || '').slice(0, 160) });
+  /* D-061 (2) (his ruling 2026-09-27): a function behind the handler stands on the paths of the CALLER it hangs under in the walk
+     (its walk parent's chip), not on every path of the handler call — _stages under seed_stage_schedule, _label and _hold_hours
+     under _schedule_next stand on exactly their parent's endings, fewer than the start_session call's; and the hover's "on every
+     path that calls" line is said only where the parent's own paths are an upper bound (here none is, so neither they nor their
+     parents say it). Feed-wide: every walk function whose parent's chip carries no such line carries none. From the page's record,
+     and the three hovers by real hovers */
+  { const onOf = (n) => { const e0 = R.mo.el.find((e) => e[0] === 'fn' && e[3] === n); return e0 ? { on: R.mo.ex.map((x, i) => [x[8], e0[5] == null || !!((e0[5] >> i) & 1)]).filter(([, on]) => on).map(([x]) => x), cp: (e0[7] || {}).cp || null } : null; };
+    const W61 = L56.functions.walk || [], parOf = (n) => { const i = W61.findIndex((lv) => lv.some((q) => q.name === n)); const q = i > 0 ? W61[i].find((x) => x.name === n) : null; return q ? q.via : null; };
+    const deep = ['_stages', '_label', '_hold_hours'].map((n) => { const o = onOf(n), pa = parOf(n), po = pa ? onOf(pa) : null; return [n, pa, o, po]; });
+    const call = onOf('start_session');
+    const tips61 = [];
+    for (const [n] of deep) { const c = work.find((x) => x.keys.some((k) => k.endsWith('::' + n))); tips61.push(c ? await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc[data-keys^="' + c.keys[0] + '"] .mt') : null); }
+    /* a walk function the walk places — none of its own records name it on this endpoint (a chain call, a reached_by record, a step
+       of its own: those name its paths themselves, and stand) */
+    const bad61 = [], byKey = (Rr, fid) => Rr.mo.el.find((e) => e[0] === 'fn' && (e[2] || []).some((ki) => MK[ki] === 'fn:' + fid));
+    for (const ep of FEED) { const Rr = ROW[ep], Fe = FJ.endpoints['endpoint:' + ep] || {}, Lr = facts(ep), Wr = (Lr && Lr.functions && Lr.functions.walk) || [];
+      const ownF = new Set([...(Fe.paths || []).flatMap((q) => q.chain || []).filter((st) => (st.kind === 'call' || st.kind === 'collapsed') && st.fn).map((st) => st.fn),
+        ...(Fe.paths || []).flatMap((q) => ((q.effects || {}).steps || []).map((x) => (STEPS[x.step] || {}).fn)).filter(Boolean),
+        ...Object.entries(FJ.functions || {}).filter(([, f0]) => (f0.reached_by || []).some((rb) => rb.root === 'endpoint:' + ep)).map(([k]) => k)]);
+      for (let i = 1; i < Wr.length; i++) for (const q of Wr[i]) {
+        const fid = q.id.replace('#', '::'), par = Wr[i - 1].find((x) => x.name === q.via);
+        if (!par || ownF.has(fid)) continue;
+        const e0 = byKey(Rr, fid), pe = byKey(Rr, par.id.replace('#', '::'));
+        if (e0 && pe && e0[5] != null && pe[5] != null && !(pe[7] || {}).cp && ((e0[7] || {}).cp || (e0[5] & ~pe[5]))) bad61.push(ep + ' · ' + q.name); } }
+    ok(deep.every(([n, pa, o, po]) => o && po && same(o.on, po.on) && !o.cp && !po.cp) && call && deep.every(([, , o]) => o.on.length < call.on.length)
+       && JSON.stringify(deep.map(([n, pa]) => [n, pa])) === JSON.stringify([['_stages', 'seed_stage_schedule'], ['_label', '_schedule_next'], ['_hold_hours', '_schedule_next']])
+       && tips61.every((t) => t && !t.includes(MX.callPaths.split('{via}')[0])) && !bad61.length,
+      'D-061 (2) · ' + E + ' · ' + deep.map(([n, pa, o]) => n + ' on ' + pa + '\'s ' + (o ? o.on.length : '?') + ' path(s)').join(', ') + ' (start_session\'s call: ' + (call ? call.on.length : '?')
+        + '), no "on every path that calls" in their hovers; feed-wide no walk function stands wider than an exact parent or says more',
+      { deep: deep.map(([n, pa, o, po]) => [n, pa, o && o.on, po && po.on]), call: call && call.on, tips61: tips61.map((t) => (t || '').slice(0, 100)), bad61: bad61.slice(0, 5) }); }
   /* (2) the cases it arranges */
   const arrWant = [...new Set([...(FE.tests.arranged_by || []), ...(FE.tests.helper_arranged || [])])], arrPage = await p.$$eval('#ocol-cm .pair[data-k="d:arranged"] [data-key]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
   const arrTxt = await p.$eval('#ocol-cm .pair[data-k="d:arranged"] .pk', (e) => e.textContent), inGrid = await p.$$eval('#mogrid [data-keys]', (cs) => cs.flatMap((c) => c.getAttribute('data-keys').split('\n')));
