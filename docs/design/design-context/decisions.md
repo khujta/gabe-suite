@@ -771,3 +771,16 @@ dry run of the old and new generators on copies of the four targets, id stabilit
 D-023 holds: nothing is written into a twin; the design pages keep gustify @ 05007957 — their feed is rebuilt from a read-only copy
 of that commit, and swapped only if the old generators reproduce today's feed from the same copy. (2) the coverage audit is parked
 in STATE.md with its trigger: the elements bar's new layout settled — or a parallel session he starts, read-only on the twins.
+
+## D-060 — The reach fix's four follow-ups are built
+Date: 2026-09-27 · Input: the four follow-ups the reach fix (D-059) found and did not build, each needing a ruling.
+Decision, his: "lets tackle these" — and on the coverage audit file another session wrote: "the coverage audit is in fact the
+parallel work, your [decision] was ok".
+Consequence, each under the FULL proof regime of D-059 (fixtures that fire and stay silent, mutants, serial batteries, an A/B dry run
+on copies of the four targets, re-blessed baselines, the lab feed rebuilt from a copy of gustify @ 05007957, the doctor):
+(1) module-level library aliases of ORM verbs (`pg_insert`, `sa_delete`, …) are read as those verbs, like the function-local ones —
+the byte rule is lifted for this change on purpose (gustify 2 sites, tier3 23); (2) `reached_by` keeps every route a root takes to a
+function, so its path list is the union and no true path reference is dropped (tier3 loses 14 today); (3) the call graph's missing
+same-module calls — `_stages` (a plain call, long_prep.py:100), `_label` and `_hold_hours` (inside keyword arguments, :84–85), the
+last two not even nodes — are diagnosed first, then fixed in suite code; graft is third-party and stays untouched; (4) the baseline
+checker stops reading the board's "on the board N days" text as a real change.

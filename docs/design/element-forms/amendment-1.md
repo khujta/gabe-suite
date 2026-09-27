@@ -853,7 +853,7 @@ Other endpoints:
    - task roots from `amap.task_roots` (`build_center_a3.py:2106`), keyed `endpoint:TASK <name>`;
    - event handlers from `amap.dispatch.dispatches[].t`, converted from `file#qual`;
    - task dispatch edges from `C.task_map(repo)` (cached `_TASKS`, `_a3_code.py:2722-2724`). Never from levels.
-2. **Reach:** `_a3_forms_reach.bfs` seeded with handlers, dependency defs at their `applies_to` depth, dispatch and task edges (`rel: dispatches`), and task/handler roots. Each entry is `{root, depth, rel, caller, site, root_site}`; `reached_by[].paths` = the paths whose chain has `{kind: call, at: root_site}`.
+2. **Reach:** `_a3_forms_reach.bfs` seeded with handlers, dependency defs at their `applies_to` depth, dispatch and task edges (`rel: dispatches`), and task/handler roots. Each entry is `{root, depth, rel, caller, site, root_site}`; `reached_by[].paths` = the paths whose chain has `{kind: call, at: root_site}` — since D-060 for EVERY root site that reaches the function (`_a3_forms_reach.routes`, one route per line of the root, each re-proved hop by hop by `_a3_forms_fn._proved`): `paths` is the union, and an entry with two or more routes lists them as `routes: [{root_site, depth, via, site, paths}]` in request order; the entry's own fields stay the walk's route.
 3. **Function forms** for reached functions that carry a fact:
    - `commits` are refs to Slice 6 `st:` ids (a hard need);
    - `raises` come from `P._analyse` escapes, with `through` from the catch trail;

@@ -21,8 +21,9 @@ rich lenses are NOT new data: they come from insight blocks the suite's own
   * endpoint URL first segment                                                 → ``usecases``
   * intra FK ∪ shared-touch components                                          → ``communities``
 
-Only the cross-file function CALL edges (``fn_edges``, the Layers cross-lane wires)
-need the graft index; they are honest-empty when the arm is absent. Everything else
+Only the function CALL edges (``fn_edges``, the Layers wires — cross-file, plus a drawn
+function's calls into its own file, rule 3b3) need the graft index; they are
+honest-empty when the arm is absent. Everything else
 is pure archmap + C4 derivation — the same data, one host without a graft binary.
 
 Determinism: a pure function of (amap, graph, graft index fp) with every list sorted;
@@ -245,6 +246,8 @@ def build_levels(amap: dict[str, Any], graph: dict[str, Any],
     #      2. cross-entity MODEL USERS — a fn reads/writes a model another entity owns
     #      3. graft handler-CALL TARGETS — the fns a handler invokes (so the call
     #         wires have both endpoints drawn; the lab drops an edge to an undrawn fn)
+    #    and the rules below widen it along evidence: data touchers (2b), the write
+    #    path (3b), resolved port hops (3b2), a drawn fn's calls into its own file (3b3).
     drawn_fn: dict[str, str] = {}       # graft-style id (file#fn) → owning entity
     _handlers: set[str] = set()         # the handler ids — the ONLY roots of fn_edges
     # 1 · handlers (function_insight key is file::fn; the drawn id is graft's file#fn)
@@ -268,6 +271,7 @@ def build_levels(amap: dict[str, Any], graph: dict[str, Any],
         _handlers.add(_tid)
     # 2 · use_edges + usefns — a fn references a model owned elsewhere
     usefns_by: dict[str, dict[str, int]] = {}
+    _bare: set[str] = set()             # the ids rule 2 minted from a bare def name (a method's reads `file#m`)
     for cls in sorted(MI):
         owner = cls_ent.get(cls)
         if not owner:
@@ -280,8 +284,9 @@ def build_levels(amap: dict[str, Any], graph: dict[str, Any],
                 usefns_by[using][fn] = usefns_by[using].get(fn, 0) + 1
                 if using != owner:
                     lv["use_edges"].append({"fs": using, "cls": cls, "ts": owner, "fn": fn})
-                    if rfile:
-                        drawn_fn.setdefault(rfile + "#" + fn, using)  # a CROSS-entity model-user is drawn
+                    if rfile and rfile + "#" + fn not in drawn_fn:
+                        _bare.add(rfile + "#" + fn)
+                        drawn_fn[rfile + "#" + fn] = using  # a CROSS-entity model-user is drawn
     lv["use_edges"].sort(key=lambda e: (e["fs"], e["ts"], e["cls"], e["fn"]))
     # 2b · DATA TOUCHERS (operator ruling 2026-09-11) — any function that reads or writes a table is
     #      drawn, whether or not a call edge reaches it. The rules above descend from ROOTS, which
@@ -393,6 +398,37 @@ def build_levels(amap: dict[str, Any], graph: dict[str, Any],
             if c["s"] in drawn_fn and c["t"] in drawn_fn and (c["s"], c["t"]) not in _have_b:
                 _have_b.add((c["s"], c["t"]))
                 _fedges.append(_fedge(c, c["s"], c["t"], c["ss"], c["ts"]))
+    # 3b3 · SAME-MODULE CALLS (D-060 (3), 2026-09-27) — a drawn function's plain calls into its OWN file are
+    #       drawn, callee and edge, transitively within that file. graft resolves them (gustify's long_prep
+    #       `_schedule_next → _label · _hold_hours`, `seed_stage_schedule → _stages`) but no rule above admits
+    #       a pure helper — 3 wants a handler source, 3b a write to descend toward, 2b/3c a table — so the
+    #       helper that decides a drawn function's result stayed a hidden star, and an edge between two drawn
+    #       functions of one file (`_stages` is drawn as a model user) never drew either. Bounded by the file:
+    #       only plain calls (`dispatches` and `binds` keep their own rules), only from an already-drawn
+    #       function, never across a file. Runs BEFORE 3c so a newly drawn helper's read wires draw too.
+    #       Only a call the caller's own source makes (graft.functions.same_file, _a3_samefile): graft resolves
+    #       `x.m()` by the bare name and prefers a same-file class, so tier3's `logger.error(...)` reached a
+    #       same-file `Result.error` (review F3) — no confirmation, no edge.
+    _conf = {(p[0], p[1]) for p in (_gf.get("same_file") or [])}
+    _same: dict[str, list[dict[str, Any]]] = {}
+    for c in _gf.get("calls") or []:
+        if c.get("rel", "calls") == "calls" and (c["s"], c["t"]) in _conf:
+            _same.setdefault(c["s"], []).append(c)
+    if _same:
+        _have_m = {(e["s"], e["t"]) for e in _fedges}
+        _q_m = sorted(drawn_fn)
+        _seen_m, _i_m = set(_q_m), 0
+        while _i_m < len(_q_m):
+            _s = _q_m[_i_m]
+            _i_m += 1
+            for c in _same.get(_s, []):
+                drawn_fn.setdefault(c["t"], c["ts"])
+                if (_s, c["t"]) not in _have_m:
+                    _have_m.add((_s, c["t"]))
+                    _fedges.append(_fedge(c, _s, c["t"], c["ss"], c["ts"]))
+                if c["t"] not in _seen_m:
+                    _seen_m.add(c["t"])
+                    _q_m.append(c["t"])
 
     # 3c · DATA READ WIRES (tier0 review 2026-09-07; collapsed 2026-09-12) — the READ path the write
     #      rule cannot see. Rule 3b descends only toward a WRITE (d2w), so a helper that only READS
@@ -420,6 +456,14 @@ def build_levels(amap: dict[str, Any], graph: dict[str, Any],
                     continue
                 _have3.add((_s, _t))
                 _fedges.append(_fedge(c, _s, _t, c["ss"], c["ts"]))
+    # ONE FUNCTION, ONE NODE (D-060 review F3) — rule 2 names a model user by the BARE def name, so a method is
+    # drawn as `file#m` beside graft's `file#Class.m` once another rule draws that (3b3 drew 24 such twins on
+    # tier3). The bare id goes when a qualified `<Class>.m` of its file is drawn and the file has no module-level `m`.
+    _known = set(_gf.get("fn_slug") or {}) | {k.replace("::", "#", 1) for k in FI}
+    _tail = {(i.partition("#")[0], i.rpartition(".")[2]) for i in drawn_fn if "." in i.partition("#")[2]}
+    for _fid in sorted(_bare):
+        if _fid not in _known and tuple(_fid.split("#", 1)) in _tail:
+            drawn_fn.pop(_fid, None)
     # both endpoints are now in drawn_fn by construction; keep the edge only if so
     _fedges = [e for e in _fedges if e["s"] in drawn_fn and e["t"] in drawn_fn]
     # class 9 · reaches — a drawn fn → provider:<name> (external SDK/LLM edge). The provider is NOT a

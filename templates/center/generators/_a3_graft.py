@@ -51,6 +51,7 @@ import os as _os
 # and each CALL below keeps its own try/except, so a parser bug still degrades to honest-empty
 import _a3_stacks_di as _dimod
 import _a3_stacks_pydi as _pdimod
+import _a3_samefile as _sfmod   # D-060 review F3: the same-file calls the caller's own source makes (rule 3b3 draws only these)
 
 _INDEX_REL = Path(_os.environ.get("GABE_GRAFT_INDEX") or (Path("graft") / ".graph" / "wiring.json"))   # an ABSOLUTE GABE_GRAFT_INDEX reads an index built out of tree (`graft --dir <out> build <repo>`; review 2026-09-06) — unset keeps byte-identical behaviour
 _NOISE_SUFFIXES = (".js", ".mjs", ".jsx")
@@ -1040,6 +1041,13 @@ def graft_arm(root: Path, entities: dict[str, Any],
         out = derive_cross(wiring, entities)       # ORIGINAL wiring + entities — L1 kinds untouched (P5)
         fout = derive_functions(wiring, bentities, dispatches=_disp, module_calls=_mcalls,
                                 bindings=_dibind)   # ORIGINAL calls + dispatches + module calls + BOTH port arms' bindings; boot-homed
+        # the same-file calls the caller's own source confirms (D-060 review F3): graft resolves `x.m()` by the bare
+        # method name and prefers a same-file class, so a same-file edge is kept for levels rule 3b3 only when the
+        # caller names the callee itself. In-process only (never emitted); a reader bug confirms nothing.
+        try:
+            fout["same_file"] = _sfmod.confirm(root, fout["calls"], _sfmod.spans_of(wiring))
+        except Exception:  # noqa: BLE001
+            fout["same_file"] = []
         behind = derive_behind(_w2, bentities)     # {<file>#<fn> → {fns, depth}} per endpoint handler (+ the BOOT root)
         endpoint_access = derive_endpoint_access(_w2, bentities, faccess)  # A2: ORM access via the call-tree
         fn_roles = derive_fn_roles(_w2, faccess)   # C1: accessor/caller/gate/pure per function
@@ -1067,7 +1075,7 @@ def graft_arm(root: Path, entities: dict[str, Any],
             "pydi": {k: _pdi.get(k) for k in ("present", "reason", "stats")},
             "index_nodes": meta.get("nodeCount"), "index_edges": meta.get("edgeCount"),
             "pairs": out["pairs"], "stats": out["stats"],
-            "functions": fout,   # {fn_slug, calls} — the fn-level slice the LEVELS graph draws
+            "functions": fout,   # {fn_slug, calls, same_file} — the fn-level slice the LEVELS graph draws
             "behind": behind,    # the endpoint call-tree floor (a view-only complexity signal)
             "endpoint_access": endpoint_access,  # A2: per-endpoint ORM read/write ops via the call-tree
             "fn_roles": fn_roles,   # C1: {<file>#<fn> → accessor/caller/gate/pure} for the function badges

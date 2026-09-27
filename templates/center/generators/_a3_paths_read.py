@@ -97,6 +97,7 @@ class _Mod:
         self.assigns: dict[str, ast.AST] = {}
         self.consts: dict[str, object] = {}
         self.scopes: list | None = None                      # the functions that import in their own body — `_fn_scopes`
+        self.verbs: dict | None = None                       # the module's own ORM-library import table for `_verb`
         for node in tree.body:
             if isinstance(node, (ast.Import, ast.ImportFrom)):
                 self.imports.update((name, b) for name, b, _ in _import_rows(repo, rel, node))
@@ -150,8 +151,11 @@ def _local_row(m: _Mod | None, name: str | None, at):
 
 
 def _verb(m: _Mod, call) -> str | None:
-    """A bare call's name as the ORM-verb readers match it (``_a3_scope.verb``) — through this module's scopes."""
-    return S.verb(_fn_scopes(m), call)
+    """A call's name as the ORM-verb readers match it (``_a3_scope.verb``) — through this module's scopes, then its own
+    ORM-library import table (``_a3_scope.module_imports``, memoised on the module)."""
+    if m.verbs is None:
+        m.verbs = S.module_imports(m.tree)
+    return S.verb(_fn_scopes(m), call, m.verbs)
 
 
 def _import_at(m: _Mod | None, name: str | None, at=None):

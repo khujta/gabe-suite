@@ -276,8 +276,8 @@ def effect_events(repo: Path, m, qual: str, fn, m2t: dict, widen: bool = True) -
         for n in ast.walk(node):
             if not isinstance(n, ast.Call):
                 continue
-            attr = n.func.attr if isinstance(n.func, ast.Attribute) else None
-            bare = P._verb(m, n)                          # `_sel(Model)` after `from sqlalchemy import select as _sel` in the function
+            bare = P._verb(m, n)                          # `_sel(Model)` after `from sqlalchemy import select as _sel` · `sa.update(Model)`
+            attr = n.func.attr if isinstance(n.func, ast.Attribute) and bare is None else None   # a library verb is never a session method
             base = {**ctx, "line": n.lineno}
             if attr in EF["tx"] and _session_call(fn, n):
                 acc.append({**base, "kind": "fx", "op": EF["tx"][attr]})

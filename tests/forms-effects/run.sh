@@ -770,17 +770,131 @@ finally:
     CA.deep_raise = keep
 PY
 
-py "E21 · FIRE+SILENT: an ORM verb a function imports under an alias is that verb — its read is a step, in the effects arm and in the code map; a MODULE-level alias stays the written name" <<'PY'
+py "E21 · FIRE+SILENT: an ORM verb imported from the ORM library under an alias — by the function or by its module, or reached through the library module (sa.update) — is that verb (ONE rule, _a3_scope.verb): its read or write is a step, in the effects arm and in the code map; a project import or a name the function binds itself never is" <<'PY'
 f = build(A)
 ok = next(p for p in paths(f, "endpoint:GET /shop/tags") if p["exit"]["kind"] == "success")
 assert [(s["op"], s["table"], s["at"]) for s in seq(f, ok)] == [("read", "tags", at("api/shop.py", "_sel(Tag)"))], seq(f, ok)
 two = next(p for p in paths(f, "endpoint:GET /shop/tags2") if p["exit"]["kind"] == "success")
-assert seq(f, two) == [], seq(f, two)
+assert [(s["op"], s["table"], s["at"]) for s in seq(f, two)] == [("read", "tags", at("api/shop.py", "msel(Tag)"))], seq(f, two)   # D-060 (1): the module's alias
 m = P._mod(A, "api/shop.py")
 m2t = {r["cls"]: r["table"] for r in MODELS}
-sc = C._S.fn_scopes(m.tree)
-assert C._orm_access(m.defs["list_tags"], m2t, sc).get("ops") == [{"model": "Tag", "table": "tags", "rw": "r"}], C._orm_access(m.defs["list_tags"], m2t, sc)
-assert not C._orm_access(m.defs["list_tags"], m2t).get("ops") and not C._orm_access(m.defs["list_tags_module"], m2t, sc).get("ops")
+sc, mv = C._S.fn_scopes(m.tree), C._S.module_imports(m.tree)
+R = [{"model": "Tag", "table": "tags", "rw": "r"}]
+assert C._orm_access(m.defs["list_tags"], m2t, sc).get("ops") == R, C._orm_access(m.defs["list_tags"], m2t, sc)
+assert C._orm_access(m.defs["list_tags_module"], m2t, sc, mv).get("ops") == R, C._orm_access(m.defs["list_tags_module"], m2t, sc, mv)
+assert not C._orm_access(m.defs["list_tags"], m2t).get("ops") and not C._orm_access(m.defs["list_tags_module"], m2t, sc).get("ops"), \
+    "E21 cannot fail: the tables are not what read the aliases"
+# a Core WRITE through a module-level dialect alias (gustify's reconciliation idiom), end to end
+def _upsert(d):
+    patch(d, "api/shop.py", "from sqlalchemy import select as msel\n",
+          "from sqlalchemy import select as msel\nfrom sqlalchemy.dialects.postgresql import insert as pg_insert\n")
+    (d / "api/shop.py").write_text((d / "api/shop.py").read_text() + '\n\n@router.post("/upsert")\ndef upsert(ref: str, session=Depends(get_session)):\n'
+                                   '    session.execute(pg_insert(Tag).values(name=ref))\n    session.commit()\n    return {"ok": True}\n')
+g = build(variant("pgins", _upsert))
+w = next(p for p in paths(g, "endpoint:POST /shop/upsert") if p["exit"]["kind"] == "success")
+assert [(s["op"], s["table"]) for s in seq(g, w)] == [("insert", "tags"), ("commit", None)], [(s["op"], s["table"]) for s in seq(g, w)]
+assert tables(g, w["effects"]["committed"]) == ["tags"], w["effects"]
+# D-060 review F1: an attribute of an ORM-library MODULE is its verb (`sa.update` · `postgresql.insert`), end to end
+def _libattr(d):
+    patch(d, "api/shop.py", "from sqlalchemy import select as msel\n",
+          "from sqlalchemy import select as msel\nimport sqlalchemy as sa\nfrom sqlalchemy.dialects import postgresql\n")
+    (d / "api/shop.py").write_text((d / "api/shop.py").read_text() + '\n\n@router.post("/bump")\ndef bump_tag(ref: str, session=Depends(get_session)):\n'
+                                   '    session.execute(sa.update(Tag).where(Tag.name == ref).values(name="x"))\n'
+                                   '    session.execute(postgresql.insert(Tag).values(name=ref))\n'
+                                   '    session.execute(sa.delete(Tag).where(Tag.name == "old"))\n    session.commit()\n    return {"ok": True}\n')
+h = build(variant("libattr", _libattr))
+w = next(p for p in paths(h, "endpoint:POST /shop/bump") if p["exit"]["kind"] == "success")
+assert [(s["op"], s["table"]) for s in seq(h, w)] == [("update", "tags"), ("insert", "tags"), ("delete", "tags"), ("commit", None)], \
+    [(s["op"], s["table"]) for s in seq(h, w)]           # `sa.delete(Tag)` is the Core verb, never the session's `.delete(obj)`
+# SILENT (review F1): a PROJECT function imported under a verb's name is followed as the project's, never read as the verb
+def _projalias(d):
+    (d / "services/crud.py").write_text("from models import Tag\n\n\ndef delete(session, name):\n    row = session.get(Tag, name)\n"
+                                        "    session.delete(row)\n    session.commit()\n")
+    patch(d, "api/shop.py", "from sqlalchemy import select as msel\n", "from sqlalchemy import select as msel\nfrom services.crud import delete as remove_tag\n")
+    (d / "api/shop.py").write_text((d / "api/shop.py").read_text() + '\n\n@router.post("/remove")\ndef remove(ref: str, session=Depends(get_session)):\n'
+                                   '    remove_tag(session, ref)\n    return {"ok": True}\n')
+k = build(variant("projalias", _projalias))
+r = next(p for p in paths(k, "endpoint:POST /shop/remove") if p["exit"]["kind"] == "success")
+assert [(s["op"], s["table"], s["fn"]) for s in seq(k, r)] == [("read", "tags", "services/crud.py::delete"), ("delete", "tags", "services/crud.py::delete"),
+                                                               ("commit", None, "services/crud.py::delete")], seq(k, r)
+assert tables(k, r["effects"]["committed"]) == ["tags"], r["effects"]
+# the rule's own edges: which statement binds the written name at the call
+import ast, _a3_scope as S
+t = ast.parse("""from typing import TYPE_CHECKING
+from sqlalchemy import select as q, delete as purge, update as bump, insert as ins
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.dialects import postgresql
+import sqlalchemy as ins
+import sqlalchemy as sa
+import services.crud as crud
+from services.crud import delete as remove_tag
+from . import update as rel_update
+if TYPE_CHECKING:
+    from sqlalchemy import select as tq
+try:
+    from sqlalchemy import delete as rq
+except ImportError:
+    rq = None
+def purge(x):
+    return x
+bump = make_bump()
+def uses():
+    pg_insert(Tag); q(Tag); purge(Tag); bump(Tag); ins(Tag); tq(Tag); rq(Tag); remove_tag(Tag); rel_update(Tag)
+def attrs():
+    sa.update(Tag); postgresql.insert(Tag); sa.func(Tag); crud.delete(Tag); ins.select(Tag); sa.orm.delete(Tag)
+def local_first():
+    from sqlalchemy import delete as q
+    q(Tag)
+def local_project():
+    from helpers import build as q
+    q(Tag)
+def before_local():
+    q(Tag)
+    from sqlalchemy import select as q
+def shadowed(pg_insert, *sa):
+    pg_insert(Tag); sa.update(Tag)
+def rebound():
+    q = make(); q(Tag)
+def loops():
+    for pg_insert in fs:
+        pg_insert(Tag)
+    with ctx() as q:
+        q(Tag)
+    try:
+        pass
+    except E as sa:
+        sa.update(Tag)
+def comps():
+    return [q(T) for q in fs], [pg_insert(T) for x in pg_insert(T)], (lambda q: q(Tag)), [q(T) for q in q(fs)]
+def outer():
+    pg_insert = f
+    def inner():
+        pg_insert(Tag)
+    return inner
+def kw(x=pg_insert(Tag)):
+    return x
+class Repo:
+    from sqlalchemy import delete as cq
+    def m(self):
+        cq(Tag)
+""")
+scs, mod = S.fn_scopes(t), S.module_imports(t)
+def verbs(fn):
+    node = next(n for n in ast.walk(t) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == fn)
+    return [S.verb(scs, c, mod) for c in sorted((c for c in ast.walk(node) if isinstance(c, ast.Call)), key=lambda c: (c.lineno, c.col_offset))]
+assert verbs("uses") == ["insert", "select", "purge", "bump", "ins", "tq", "rq", "remove_tag", "rel_update"], verbs("uses")   # FIRE ×2 · a def, an assignment, a plain import rebind · TYPE_CHECKING and a try are never read · a project or relative import is never the library's
+assert verbs("attrs") == ["update", "insert", None, None, "select", None], verbs("attrs")            # FIRE: a library MODULE's verb attribute · SILENT: not a verb, a project module, a dotted receiver
+assert verbs("local_first") == ["delete"], verbs("local_first")                                   # the function's own import decides, never the module's
+assert verbs("local_project") == ["q"], verbs("local_project")                                    # … and a project import there is never the library's
+assert verbs("before_local") == ["q"], verbs("before_local")                                      # its local, still unbound: the written name, never the module's
+assert verbs("shadowed") == ["pg_insert", None], verbs("shadowed")                                # a parameter (and *args) named like a module alias is the function's own
+assert verbs("rebound") == ["make", "q"], verbs("rebound")                                        # … and so is an assignment in the function
+assert verbs("loops") == ["pg_insert", "ctx", "q", None], verbs("loops")                          # … a for / with / except target
+assert verbs("comps") == ["q", "insert", "insert", "q", "q", "select"], verbs("comps")             # a comprehension target shadows in its element; its FIRST iterable (even over the target's own name) is the module's; a lambda parameter
+assert verbs("outer") == ["pg_insert"], verbs("outer")                                            # a nested def reads its enclosing function's binding
+assert verbs("kw") == ["insert"], verbs("kw")                                                     # a default runs outside the function
+assert verbs("m") == ["cq"], verbs("m")                                                           # a class body's import is its own
+assert S.verb(scs, ast.parse("x.q(Tag)").body[0].value, mod) is None                              # not a bare name, not a library module
 PY
 
 py "E22 · FIRE: a class the callee imports in its own body is read with its bases on the path — the except of its base it passes through is a catch on the chain, its rollback a step" <<'PY'
@@ -823,7 +937,7 @@ for rel in ("db.py", "services/orders.py", "services/deep.py", "api/shop.py"):
         evs = E.effect_events(A, m, qual, node, m2t, widen=False)
         mine = {(e["model"], "r" if e["op"] == "read" else "w") for e in evs
                 if e["kind"] == "fx" and e.get("model") and e["op"] not in ("flush", "commit", "rollback", "savepoint")}
-        acc = C._orm_access(node, m2t, C._S.fn_scopes(m.tree))
+        acc = C._orm_access(node, m2t, C._S.fn_scopes(m.tree), C._S.module_imports(m.tree))
         assert mine == {(o["model"], o["rw"]) for o in acc.get("ops") or []}, (rel, qual, mine, acc)
         assert any(e["kind"] == "fx" and e["op"] in ("flush", "commit") for e in evs) == bool(acc.get("commits")), (rel, qual)
         checked += 1

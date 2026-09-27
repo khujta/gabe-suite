@@ -18,9 +18,10 @@
 # Baseline bulk lives outside the repo ($GABE_BASELINE_DIR, default ~/.cache/gabe-map-baselines);
 # a per-file hash manifest is COMMITTED at tests/baselines/<name>.sha256 so re-blessing shows up in git.
 #
-# NORMALISATION is deliberately narrow — ISO run timestamps only. That was measured sufficient on
-# gustify (2026-09-11: 82/82 files identical across two runs of the same generators). Anything else
-# that differs is REAL and must be explained, never normalised away.
+# NORMALISATION is deliberately narrow — the ISO run timestamp, the relative-age cells, and the board
+# card's "on the board N days" tooltip (a count of days since the row was recorded, so it ticks with
+# the wallclock while the tree stands still). Anything else that differs is REAL and must be
+# explained, never normalised away.
 #
 # COST: a full capture/check of all three targets is MINUTES (tier3 alone is 3.4k py + 2.6k ts).
 # Serial by design — this machine runs heavy work one job at a time.
@@ -59,12 +60,16 @@ WANT=("$@")
 
 _want() { [ ${#WANT[@]} -eq 0 ] && return 0; for w in "${WANT[@]}"; do [ "$w" = "$1" ] && return 0; done; return 1; }
 
-# Strip the two renderings that move WITHOUT the tree moving, so two runs of the SAME generators
-# compare equal: the ISO run timestamp, and the relative-age cells (T-34d / "3 d ago") the emitter
-# renders server-side. Both are deliberately narrow — anything else that differs is REAL.
-# (The suite treats relative time as volatile too: _a3_render._VOLATILE_RX hashes it out of the
-# row fingerprint so a tick cannot re-badge a row NEW.)
-_NORM_RX='s/[0-9]{4}-[0-9]{2}-[0-9]{2}[ T][0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?//g; s/T\xe2\x88\x92[0-9]+[dhm]/T-AGE/g; s/\b[0-9]+ ?[dhm] ago\b/AGE ago/g'
+# Strip the three renderings that move WITHOUT the tree moving, so two runs of the SAME generators
+# compare equal: the ISO run timestamp, the relative-age cells (T-34d / "3 d ago") the emitter
+# renders server-side, and the board card's age tooltip — _a3_board.card_html writes
+# title="recorded <date> — on the board <N> days", and only the COUNT is volatile (the recorded
+# date stays: it moves only when the tree does). The rule reads the count only after a BARE date:
+# a recorded value with a clock time loses its timestamp to the first rule, and its count is then
+# the one witness left that the date moved. All three are deliberately narrow — anything else
+# that differs is REAL. (The suite treats relative time as volatile too: _a3_render._VOLATILE_RX
+# hashes it out of the row fingerprint so a tick cannot re-badge a row NEW.) Proven by tests/board.
+_NORM_RX='s/[0-9]{4}-[0-9]{2}-[0-9]{2}[ T][0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?//g; s/T\xe2\x88\x92[0-9]+[dhm]/T-AGE/g; s/\b[0-9]+ ?[dhm] ago\b/AGE ago/g; s/( title="recorded [0-9]{4}-[0-9]{2}-[0-9]{2} \xe2\x80\x94 on the board )[0-9]+ days"/\1N days"/g'
 _norm() { sed -E "$_NORM_RX" "$1"; }
 
 # the SEMANTIC census — what a reader of the map would actually lose or gain

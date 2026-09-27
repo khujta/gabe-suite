@@ -6,8 +6,12 @@ one call level the endpoint pass reads (``translation: "beyond one level"``) —
 endpoints they surface on, the commits it makes (Slice 6 ``st:`` ids), its savepoints and the broad catches that
 swallow. Functions are reached from every root the map knows — endpoint handlers, their dependencies (the kinds
 ``dependencies`` forms), task roots and event handlers — by ``_a3_forms_reach.bfs``; ``reached_by`` names each root with
-its depth and the call site inside the root, and for an endpoint root the paths whose chain calls through that site. A
-function no fact attaches to gets no form (``OPTIONS.function_scope: facts``). Imports no arm.
+its depth and the call site inside the root the walk left it through. A root may reach the function through SEVERAL of
+its own calls (D-060): ``_a3_forms_reach.routes`` finds one route per root site, each is re-proved hop by hop from the
+source (``_proved``) before it counts, an entry with two or more lists them as ``routes`` in request order, and for an
+endpoint root ``paths`` is the union of the paths whose chain calls through a proved route's root site — a path is
+listed only through a route it passes. A function no fact attaches to gets no form (``OPTIONS.function_scope: facts``).
+Imports no arm.
 """
 from __future__ import annotations
 
@@ -89,6 +93,31 @@ def _root_site(reached: dict, fid: str, root: str) -> str | None:
     return None
 
 
+def _proved(repo: Path, root: str, fid: str, hops) -> bool:
+    """A route stands only when every hop re-reads from the source: the function the previous hop entered holds, on the
+    hop's line, a call the resolver takes to the hop's callee; the last callee is ``fid``; the root is never re-entered;
+    at most ``reach_depth`` hops."""
+    if not hops or len(hops) > F.OPTIONS["reach_depth"]:
+        return False
+    cur = root
+    for s, nxt in hops:
+        rel, _, q = cur.partition("::")
+        m, node = _def(repo, rel, q)
+        srel, _, ln = s.rpartition(":")
+        if node is None or srel != rel or nxt == root or not ln.isdigit():
+            return False
+        if not any(e["kind"] == "call" and e["line"] == int(ln) and (r := R.callee(repo, m, q, node, e["node"])) is not None
+                   and f"{r[0].rel}::{r[1]}" == nxt for e in P._events(node)):
+            return False
+        cur = nxt
+    return cur == fid
+
+
+def _passing(plist: list, site: str) -> list[str]:
+    """The paths whose chain calls through the root's line ``site`` (a ``call`` or ``collapsed`` step at it)."""
+    return sorted(p["id"] for p in plist if any(c.get("kind") in ("call", "collapsed") and c.get("at") == site for c in p.get("chain") or []))
+
+
 def _swallows(repo: Path, m, node) -> list[dict]:
     """Every broad handler (bare, ``Exception``, ``BaseException``) that returns normally — one that calls a retry method
     (``RETRY_CALLS``, which raises) does not."""
@@ -142,6 +171,7 @@ def functions_part(repo: Path, forms: dict, amap: dict) -> tuple[dict, list, dic
     seeds, names, handlers = roots(repo, forms, amap)
     walk = R.bfs(repo, seeds)
     reached = walk["reached"]
+    every = R.routes(repo, seeds)
     fids = sorted(set(reached) | set(names))
     produced = [(key, v, r) for key, e in sorted((forms.get("endpoints") or {}).items()) for v in (e.get("variants") or [e]) for r in v.get("produced") or []]
     rows_by_raise: dict = {}
@@ -167,7 +197,7 @@ def functions_part(repo: Path, forms: dict, amap: dict) -> tuple[dict, list, dic
             commits.setdefault(s["fn"], []).append(sid)
     out, found = {}, []
     stats = {"roots": len(names), "reached": len(fids), "pairs": 0, "truncated": walk["truncated"], "forms": 0,
-             "raises": 0, "translation": {}, "refusals": 0, "swallows": 0}
+             "raises": 0, "translation": {}, "refusals": 0, "swallows": 0, "routes": 0, "multi_route_pairs": 0, "routes_unproven": 0}
     for fid in fids:
         rel, _, q = fid.partition("::")
         m, node = _def(repo, rel, q)
@@ -178,11 +208,22 @@ def functions_part(repo: Path, forms: dict, amap: dict) -> tuple[dict, list, dic
             by.append({"root": name, "depth": 0})
         for root, e in sorted((reached.get(fid) or {}).items()):
             site = _root_site(reached, fid, root)
+            got = (every.get(fid) or {}).get(root) or {}
+            rs = sorted(((s, r) for s, r in got.items() if _proved(repo, root, fid, r["hops"])), key=lambda x: int(x[0].rpartition(":")[2]))
+            own = dict(rs).get(site)                  # the walk's own route must be one of the proved ones, at its depth
+            stats["routes_unproven"] += len(got) - len(rs) + (own is None or own["depth"] != e["depth"])
             for name in names.get(root, [root]):
                 entry = {"root": name, "depth": e["depth"], "via": e["via"], "site": e["site"], "root_site": site}
+                per = {}
                 if root in handlers and site:
-                    entry["paths"] = sorted(p["id"] for key, v in handlers[root] if key == name for p in v.get("paths") or []
-                                            if any(c.get("kind") in ("call", "collapsed") and c.get("at") == site for c in p.get("chain") or []))
+                    plist = [p for key, v in handlers[root] if key == name for p in v.get("paths") or []]
+                    per = {s: _passing(plist, s) for s, _ in rs}
+                    entry["paths"] = sorted({p for ids in per.values() for p in ids})
+                if len(rs) > 1:                          # D-060: every root site that reaches fid, in request order
+                    entry["routes"] = [{"root_site": s, "depth": r["depth"], "via": r["via"], "site": r["site"],
+                                        **({"paths": per[s]} if per else {})} for s, r in rs]
+                stats["routes"] += len(rs)
+                stats["multi_route_pairs"] += len(rs) > 1
                 by.append(entry)
         stats["pairs"] += sum(1 for b in by if b["depth"] > 0)
         endpoint_depths = [b["depth"] for b in by if str(b["root"]).startswith("endpoint:") and not str(b["root"]).startswith("endpoint:TASK ")]

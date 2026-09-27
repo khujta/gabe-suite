@@ -250,11 +250,21 @@ check("app/deps.py::get_current_user" in _fi,
 check(str(_unp.get("app/broken.py", "")).startswith("syntax error") and "app/deps.py" not in _unp,
       f"function_insight FIRE: a file the shim cannot rescue is NAMED in unparseable_files, never a silent hole ({_unp})")
 
-# ── function_insight reads an ORM verb a function imports under an alias as that verb (_a3_scope.verb); a module-level alias stays the written name ──
+# ── function_insight reads an ORM verb imported under an alias — by the function or by its module — as that verb (_a3_scope.verb, D-060) ──
 _vr = _pl.Path(_tf.mkdtemp()); (_vr / "app").mkdir(); (_vr / "app/__init__.py").write_text("")
 (_vr / "app/models.py").write_text("class Recipe(Base):\n    __tablename__ = 'recipes'\n")
-(_vr / "app/svc.py").write_text("from sqlalchemy import select as msel\n\nfrom app.models import Recipe\n\n\ndef read_local(session):\n    from sqlalchemy import select as _sel\n"
-                                "    return session.execute(_sel(Recipe))\n\n\ndef read_module(session):\n    return session.execute(msel(Recipe))\n")
+(_vr / "app/svc.py").write_text("from typing import TYPE_CHECKING\nfrom sqlalchemy import select as msel\nfrom sqlalchemy.dialects.postgresql import insert as pg_insert\n"
+                                "if TYPE_CHECKING:\n    from sqlalchemy import delete as tdel\n\nfrom app.models import Recipe\n\n\ndef read_local(session):\n    from sqlalchemy import select as _sel\n"
+                                "    return session.execute(_sel(Recipe))\n\n\ndef read_module(session):\n    return session.execute(msel(Recipe))\n\n\n"
+                                "def upsert(session):\n    session.execute(pg_insert(Recipe).values(name='x'))\n\n\n"
+                                "def purge_guarded(session):\n    session.execute(tdel(Recipe))\n\n\n"
+                                "def read_shadowed(session):\n    from app.helpers import build as msel\n    return session.execute(msel(Recipe))\n\n\n"
+                                "def bump(session):\n    session.execute(sa.update(Recipe).values(name='y'))\n    session.execute(postgresql.insert(Recipe).values(name='z'))\n\n\n"
+                                "def remove(session):\n    return crud_delete(Recipe)\n\n\n"
+                                "def by_param(session, pg_insert, sa):\n    session.execute(pg_insert(Recipe))\n    session.execute(sa.update(Recipe))\n\n\n"
+                                "def by_comp(session, fs):\n    return [msel(Recipe) for msel in fs]\n")
+(_vr / "app/svc.py").write_text((_vr / "app/svc.py").read_text().replace(
+    "from app.models import Recipe\n", "from app.models import Recipe\nimport sqlalchemy as sa\nfrom sqlalchemy.dialects import postgresql\nfrom app.crud import delete as crud_delete\n", 1))
 C.ENTITY_CODE = {"e": {"services": ["app/svc.py"], "models": ["app/models.py"]}}; C._EMAP_CACHE.clear(); C._FN_INSIGHT = None; C._FN_SIM_MODE = {}; C._UNPARSEABLE.clear()
 try:
     _fv = C.function_insight(_vr)
@@ -262,8 +272,18 @@ finally:
     C.ENTITY_CODE = _sv_ec; C._EMAP_CACHE.clear(); C._EMAP_CACHE.update(_sv_cache); C._FN_INSIGHT = _sv_fi; C._FN_SIM_MODE = _sv_sim; C._UNPARSEABLE.clear(); C._UNPARSEABLE.update(_sv_unp)
 check((_fv.get("app/svc.py::read_local") or {}).get("access", {}).get("ops") == [{"model": "Recipe", "table": "recipes", "rw": "r"}],
       f"function_insight FIRE: `_sel(Recipe)` after a function-local `from sqlalchemy import select as _sel` is a read of recipes ({(_fv.get('app/svc.py::read_local') or {}).get('access')})")
-check(not (_fv.get("app/svc.py::read_module") or {}).get("access", {}).get("ops"),
-      f"function_insight SILENT: a MODULE-level alias (`select as msel`) stays the written name — its own ruling ({(_fv.get('app/svc.py::read_module') or {}).get('access')})")
+def _ops(q):
+    return (_fv.get(f"app/svc.py::{q}") or {}).get("access", {}).get("ops")
+check(_ops("read_module") == [{"model": "Recipe", "table": "recipes", "rw": "r"}],
+      f"function_insight FIRE: a MODULE-level alias (`select as msel`) is the verb it imports — D-060 (1) ({_ops('read_module')})")
+check(_ops("upsert") == [{"model": "Recipe", "table": "recipes", "rw": "w"}],
+      f"function_insight FIRE: a module-level dialect alias (`insert as pg_insert`) is a Core write ({_ops('upsert')})")
+check(not _ops("purge_guarded") and not _ops("read_shadowed"),
+      f"function_insight SILENT: an alias under `if TYPE_CHECKING:` is never read, and a function's own import of the name shadows the module's ({_ops('purge_guarded')} · {_ops('read_shadowed')})")
+check(_ops("bump") == [{"model": "Recipe", "table": "recipes", "rw": "w"}],
+      f"function_insight FIRE: an attribute of an ORM-library MODULE (`sa.update` after `import sqlalchemy as sa` · `postgresql.insert`) is a Core write ({_ops('bump')})")
+check(not _ops("remove") and not _ops("by_param") and not _ops("by_comp"),
+      f"function_insight SILENT: a PROJECT function imported under a verb's name (`delete as crud_delete`) is never the verb; a parameter or a comprehension target named like a module alias is the function's own ({_ops('remove')} · {_ops('by_param')} · {_ops('by_comp')})")
 
 # ── the Depends ALIAS carries its declaring file + a factory callee; an ambiguous gate name resolves beside the alias ──
 _ar = _pl.Path(_tf.mkdtemp()); (_ar / "app/api/routes").mkdir(parents=True)

@@ -1701,7 +1701,7 @@ def _call_bare(func) -> str | None:      # foo(...) / Model(...) → "foo" / "Mo
     return func.id if isinstance(func, ast.Name) else None
 
 
-def _orm_access(fnnode, m2t: dict[str, str], scopes: list | None = None) -> dict:
+def _orm_access(fnnode, m2t: dict[str, str], scopes: list | None = None, module: dict | None = None) -> dict:
     """{'ops': [{'model','table','rw'}], 'commits': bool} for one function, or {}.
 
     B1 (the ORM substrate, 2026-08-27) widened the near-census: the symtab now binds a var
@@ -1711,8 +1711,10 @@ def _orm_access(fnnode, m2t: dict[str, str], scopes: list | None = None) -> dict
     ``select(Model.col)`` / ``.join(Model)`` / ``.select_from(Model)`` chain (a column select the
     old bare-Name rule ignored). Residual floors stay honest: a cross-file helper return, a
     dict-comprehension binding and a multi-model select still under-count, never mis-table. ``scopes``
-    (``_a3_scope.fn_scopes`` of the file) reads a verb the function imports under an alias
-    (``from sqlalchemy import select as _sel``) as the verb it imports (``_a3_scope.verb``)."""
+    (``_a3_scope.fn_scopes`` of the file) and ``module`` (``_a3_scope.module_imports`` of the file) read a verb the
+    function or its module imports from the ORM library under an alias (``from sqlalchemy import select as _sel`` ·
+    ``from sqlalchemy.dialects.postgresql import insert as pg_insert`` · ``sa.update(M)`` after ``import sqlalchemy as
+    sa``) as the verb it imports (``_a3_scope.verb``)."""
     if not m2t:
         return {}
 
@@ -1775,7 +1777,7 @@ def _orm_access(fnnode, m2t: dict[str, str], scopes: list | None = None) -> dict
                     _put(symtab.get(_t.value.id), "w")
         if not isinstance(n, ast.Call):
             continue
-        attr, bare = _call_attr(n.func), (_S.verb(scopes, n) if scopes else _call_bare(n.func))
+        attr, bare = _call_attr(n.func), _S.verb(scopes or [], n, module)
         # (class 5b) SITE arm: `Schema.model_validate(v)` / `.model_validate_json(v)` — the schema
         # SERIALIZES the model bound to v (resolved through the B1 symtab). The schema name is raw
         # here (not in m2t); build_c4_graph resolves it to a schema node. model:None = a residual
@@ -2220,6 +2222,7 @@ def function_insight(repo: Path) -> dict:
         _hl = bool(set(_file_imports(f)) & _HTTP_IMPORT_NAMES)   # B1: does THIS module import an http client?
         _pv = _file_providers(f)                                 # class 9: this module's SDK imports → provider binds
         _scopes = _S.fn_scopes(tree)                              # a verb imported under an alias in the function (_a3_scope.verb)
+        _verbs = _S.module_imports(tree)                          # … or by the module itself
 
         def _add(node, cls: str | None):
             if node.name.startswith("__") or len(node.name) < 3:
@@ -2239,7 +2242,7 @@ def function_insight(repo: Path) -> dict:
                            for a in node.args.args if a.arg != "self"],
                 "returns": ast.unparse(node.returns) if node.returns else "",
                 "doc": _first_sentence(ast.get_docstring(node)),
-                "access": _orm_access(node, model2table, _scopes),   # C2: ORM read/write ops → model/table
+                "access": _orm_access(node, model2table, _scopes, _verbs),   # C2: ORM read/write ops → model/table
                 "ids": {i for i in _re_mod.findall(
                     r"[A-Za-z_][A-Za-z0-9_]{3,}", body)} - _PY_KEYWORDS,
             }

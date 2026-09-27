@@ -163,40 +163,43 @@ ck(all("hidden_fns" not in (e.get("counts") or {}) for e in lv["entities"]),
 # 3b · WRITE-PATH enrichment — the d2w gradient draws the mid-chain calls the handler
 # rule hides: descent (d2w−1), the 0→0 writer→writer hop, the 0→1 anchor→delegating-
 # writer hop; a LATERAL step (1→1, non-shortest) stays undrawn. SILENT without d2w.
+# Each function lives in its OWN file (D-060 (3), deliberate): rule 3b3 draws a drawn function's
+# same-file calls, so a chain kept in one file would test 3b3, not the d2w gradient; only `writer`
+# stays in svc/o.py, where the 2b / P3 cases read its function_insight row.
 _GW = {"present": True, "functions": {
-    "fn_slug": {"api/orders.py#list_orders": "orders", "svc/o.py#svc_write": "orders",
-                "svc/o.py#writer": "orders", "svc/o.py#boundary_peer": "orders",
-                "svc/o.py#delegate": "orders", "svc/o.py#deep_writer": "orders",
-                "svc/o.py#lateral": "orders", "svc/o.py#reader": "orders"},
+    "fn_slug": {"api/orders.py#list_orders": "orders", "svc/s.py#svc_write": "orders",
+                "svc/o.py#writer": "orders", "svc/p.py#boundary_peer": "orders",
+                "svc/g.py#delegate": "orders", "svc/dw.py#deep_writer": "orders",
+                "svc/l.py#lateral": "orders", "svc/r.py#reader": "orders"},
     "calls": [
-        {"s": "api/orders.py#list_orders", "t": "svc/o.py#svc_write", "ss": "orders", "ts": "orders", "conf": "extracted"},
-        {"s": "svc/o.py#svc_write", "t": "svc/o.py#writer", "ss": "orders", "ts": "orders", "conf": "inferred"},
-        {"s": "svc/o.py#writer", "t": "svc/o.py#boundary_peer", "ss": "orders", "ts": "orders", "conf": "inferred"},
-        {"s": "svc/o.py#boundary_peer", "t": "svc/o.py#delegate", "ss": "orders", "ts": "orders", "conf": "inferred"},
-        {"s": "svc/o.py#delegate", "t": "svc/o.py#deep_writer", "ss": "orders", "ts": "orders", "conf": "inferred"},
-        {"s": "svc/o.py#svc_write", "t": "svc/o.py#lateral", "ss": "orders", "ts": "orders", "conf": "inferred"},
+        {"s": "api/orders.py#list_orders", "t": "svc/s.py#svc_write", "ss": "orders", "ts": "orders", "conf": "extracted"},
+        {"s": "svc/s.py#svc_write", "t": "svc/o.py#writer", "ss": "orders", "ts": "orders", "conf": "inferred"},
+        {"s": "svc/o.py#writer", "t": "svc/p.py#boundary_peer", "ss": "orders", "ts": "orders", "conf": "inferred"},
+        {"s": "svc/p.py#boundary_peer", "t": "svc/g.py#delegate", "ss": "orders", "ts": "orders", "conf": "inferred"},
+        {"s": "svc/g.py#delegate", "t": "svc/dw.py#deep_writer", "ss": "orders", "ts": "orders", "conf": "inferred"},
+        {"s": "svc/s.py#svc_write", "t": "svc/l.py#lateral", "ss": "orders", "ts": "orders", "conf": "inferred"},
         # lateral's own path to an anchor (1→0) keeps its d2w=1 DERIVABLE, yet lateral is
         # never seeded/reached → stays undrawn; reader has NO d2w entry (a pure read path)
-        {"s": "svc/o.py#lateral", "t": "svc/o.py#boundary_peer", "ss": "orders", "ts": "orders", "conf": "inferred"},
-        {"s": "svc/o.py#writer", "t": "svc/o.py#reader", "ss": "orders", "ts": "orders", "conf": "inferred"}]},
-    "distance_to_write": {"api/orders.py#list_orders": 2, "svc/o.py#svc_write": 1,
-                          "svc/o.py#writer": 0, "svc/o.py#boundary_peer": 0,
-                          "svc/o.py#delegate": 1, "svc/o.py#deep_writer": 0,
-                          "svc/o.py#lateral": 1}}
+        {"s": "svc/l.py#lateral", "t": "svc/p.py#boundary_peer", "ss": "orders", "ts": "orders", "conf": "inferred"},
+        {"s": "svc/o.py#writer", "t": "svc/r.py#reader", "ss": "orders", "ts": "orders", "conf": "inferred"}]},
+    "distance_to_write": {"api/orders.py#list_orders": 2, "svc/s.py#svc_write": 1,
+                          "svc/o.py#writer": 0, "svc/p.py#boundary_peer": 0,
+                          "svc/g.py#delegate": 1, "svc/dw.py#deep_writer": 0,
+                          "svc/l.py#lateral": 1}}
 _lvw = _a3_levels.build_levels(AMAP, graph, graft=_GW)
 _we = {(e["s"], e["t"]) for e in _lvw["fn_edges"]}
-ck(("svc/o.py#svc_write", "svc/o.py#writer") in _we,
+ck(("svc/s.py#svc_write", "svc/o.py#writer") in _we,
    "3b FIRE: the d2w gradient draws the mid-chain call the handler rule hides")
-ck(("svc/o.py#writer", "svc/o.py#boundary_peer") in _we,
+ck(("svc/o.py#writer", "svc/p.py#boundary_peer") in _we,
    "3b: the writer→writer (0→0) commit-boundary hop is drawn")
-ck(("svc/o.py#boundary_peer", "svc/o.py#delegate") in _we and ("svc/o.py#delegate", "svc/o.py#deep_writer") in _we,
+ck(("svc/p.py#boundary_peer", "svc/g.py#delegate") in _we and ("svc/g.py#delegate", "svc/dw.py#deep_writer") in _we,
    "3b: anchor→delegating-writer (0→1) + its own descent (1→0) are drawn")
-ck(("svc/o.py#svc_write", "svc/o.py#lateral") not in _we,
+ck(("svc/s.py#svc_write", "svc/l.py#lateral") not in _we,
    "3b: a LATERAL step (1→1, non-shortest write path) stays undrawn")
-ck(("svc/o.py#writer", "svc/o.py#reader") not in _we,
+ck(("svc/o.py#writer", "svc/r.py#reader") not in _we,
    "3b: a call to a NO-d2w target (pure read path) is skipped, not crashed on")
 _wids = {n["id"] for n in _lvw["fn_nodes"]}
-ck("svc/o.py#deep_writer" in _wids and "svc/o.py#lateral" not in _wids and "svc/o.py#reader" not in _wids,
+ck("svc/dw.py#deep_writer" in _wids and "svc/l.py#lateral" not in _wids and "svc/r.py#reader" not in _wids,
    "3b: write-path fns join the drawn set; lateral + reader stay hidden stars")
 ck(next((n for n in _lvw["fn_nodes"] if n["id"] == "svc/o.py#writer"), {}).get("d2w") == 0,
    "3b: d2w rides onto the newly drawn write-path fn_nodes (0 is real)")
@@ -220,8 +223,224 @@ ck([e for e in _a3_levels.build_levels(AMAP, graph, graft={"present": True, "fun
    "class 8 honest-empty: no graft.depends → no depends fn_edge")
 _GW0 = {"present": True, "functions": _GW["functions"]}
 _lvw0 = _a3_levels.build_levels(AMAP, graph, graft=_GW0)
-ck(len(_lvw0["fn_edges"]) == 2 and {e["t"] for e in _lvw0["fn_edges"]} == {"svc/o.py#svc_write", "svc/o.py#writer"},
+ck(len(_lvw0["fn_edges"]) == 2 and {e["t"] for e in _lvw0["fn_edges"]} == {"svc/s.py#svc_write", "svc/o.py#writer"},
    "3b SILENT: no distance_to_write → the handler-rooted edge + the ONE data-reach hop (writer carries access.ops; 3c 2026-09-07) — no write-path descent")
+# 3b3 · SAME-MODULE CALLS (D-060 (3)) — a drawn function's plain calls into its OWN file draw, callee and edge,
+# transitively within the file; never across a file, never from an undrawn caller, never a dispatches edge.
+# gustify's long_prep: `_schedule_next → _label · _hold_hours` (pure helpers, no rule drew them) and
+# `seed_stage_schedule → _stages` (both drawn — _stages as a model user — yet the edge never drew).
+_AMM = copy.deepcopy(AMAP)
+_AMM["entities"]["orders"]["files"] = _AMM["entities"]["orders"]["files"] + [["services", "svc/m.py", 40]]
+_AMM["model_insight"]["User"]["internal_refs"] = [{"file": "svc/m.py", "defs": ["stages", "run", "lonely", "dup"]}]      # cross-entity MODEL USERS (rule 2), by the BARE def name
+for _nm, _rw in (("seed", "w"), ("read_x", "r")):                                                 # seed and read_x: DATA TOUCHERS (rule 2b)
+    _f = "svc/m.py" if _nm == "seed" else "svc/r.py"
+    _AMM["function_insight"][f"{_f}::{_nm}"] = {"fn": _nm, "entity": "orders", "file": _f, "layer": "services", "handler": False, "god": False,
+                                               "internal": 1, "api": 0, "web": 0, "access": {"ops": [{"model": "Order", "table": "orders", "rw": _rw}], "commits": _rw == "w"}}
+_mm = lambda n: {"svc/m.py#" + n: "orders"}
+_GM = {"present": True, "functions": {
+    "fn_slug": {**_mm("seed"), **_mm("stages"), **_mm("label"), **_mm("hold"), **_mm("orphan"), **_mm("orphan2"), **_mm("on_evt"),
+                **_mm("Client.get"), **_mm("Worker.run"), **_mm("Worker.dup"), **_mm("dup"),
+                "svc/r.py#read_x": "orders", "svc/far.py#pure": "orders", "svc/x.py#ghost": "orders", "api/orders.py#list_orders": "orders"},
+    # the same-file calls the caller's own source makes (_a3_samefile.confirm, carried by graft_arm) — rule 3b3 draws only these
+    "same_file": [["svc/m.py#label", "svc/m.py#hold"], ["svc/m.py#orphan", "svc/m.py#orphan2"], ["svc/m.py#seed", "svc/m.py#Worker.dup"],
+                  ["svc/m.py#seed", "svc/m.py#Worker.run"], ["svc/m.py#seed", "svc/m.py#label"], ["svc/m.py#seed", "svc/m.py#stages"]],
+    "calls": [
+        {"s": "svc/m.py#seed", "t": "svc/m.py#stages", "ss": "orders", "ts": "orders", "conf": "extracted"},     # two drawn ends, one file
+        {"s": "svc/m.py#seed", "t": "svc/m.py#label", "ss": "orders", "ts": "orders", "conf": "extracted"},      # a pure helper
+        {"s": "svc/m.py#label", "t": "svc/m.py#hold", "ss": "orders", "ts": "orders", "conf": "extracted"},      # … and ITS helper
+        {"s": "svc/m.py#label", "t": "svc/r.py#read_x", "ss": "orders", "ts": "orders", "conf": "extracted"},    # a helper's read wire (3c)
+        {"s": "svc/m.py#label", "t": "svc/far.py#pure", "ss": "orders", "ts": "orders", "conf": "extracted"},    # a pure callee in ANOTHER file
+        {"s": "svc/x.py#ghost", "t": "svc/m.py#orphan", "ss": "orders", "ts": "orders", "conf": "extracted"},    # an undrawn caller
+        {"s": "svc/m.py#orphan", "t": "svc/m.py#orphan2", "ss": "orders", "ts": "orders", "conf": "extracted"},
+        {"s": "svc/m.py#seed", "t": "svc/m.py#on_evt", "ss": "orders", "ts": "orders", "conf": "extracted", "rel": "dispatches"},
+        {"s": "svc/m.py#seed", "t": "svc/m.py#Client.get", "ss": "orders", "ts": "orders", "conf": "extracted"},   # graft's bare-name guess (`d.get()`) — unconfirmed
+        {"s": "svc/m.py#seed", "t": "svc/m.py#Worker.run", "ss": "orders", "ts": "orders", "conf": "extracted"},   # the method rule 2 drew as `svc/m.py#run`
+        {"s": "svc/m.py#seed", "t": "svc/m.py#Worker.dup", "ss": "orders", "ts": "orders", "conf": "extracted"}]}}
+_lvm = _a3_levels.build_levels(_AMM, graph, graft=_GM)
+_mids = {n["id"] for n in _lvm["fn_nodes"]}; _med = {(e["s"], e["t"]): e for e in _lvm["fn_edges"]}
+ck("svc/m.py#label" in _mids and ("svc/m.py#seed", "svc/m.py#label") in _med and _med[("svc/m.py#seed", "svc/m.py#label")]["rel"] == "calls"
+   and next(n for n in _lvm["fn_nodes"] if n["id"] == "svc/m.py#label")["slug"] == "orders",
+   "3b3 FIRE: a drawn function's pure helper in its OWN file draws — node (homed by graft) and a plain calls edge")
+ck("svc/m.py#hold" in _mids and ("svc/m.py#label", "svc/m.py#hold") in _med,
+   "3b3 FIRE: the draw is transitive within the file (helper → helper)")
+ck(("svc/m.py#seed", "svc/m.py#stages") in _med,
+   "3b3 FIRE: two drawn functions of one file get the edge no other rule drew (the `_stages` case)")
+_GMx = copy.deepcopy(_GM); _GMx["functions"]["calls"] = [c for c in _GMx["functions"]["calls"] if c["t"] != "svc/m.py#stages"]
+ck("svc/m.py#stages" in {n["id"] for n in _a3_levels.build_levels(_AMM, graph, graft=_GMx)["fn_nodes"]},
+   "3b3: `stages` is drawn by rule 2 without the call — the case above is an EDGE between two drawn ends")
+ck(("svc/m.py#label", "svc/r.py#read_x") in _med,
+   "3b3 FIRE: a newly drawn helper's read wire draws — 3b3 runs before 3c")
+ck("svc/far.py#pure" not in _mids and ("svc/m.py#label", "svc/far.py#pure") not in _med,
+   "3b3 SILENT: a pure callee in another file stays undrawn (the cross-file contract is unchanged)")
+ck("svc/m.py#orphan" not in _mids and "svc/m.py#orphan2" not in _mids,
+   "3b3 SILENT: a same-file call whose caller is undrawn draws nothing")
+ck("svc/m.py#on_evt" not in _mids and not any(e.get("rel") == "dispatches" for e in _lvm["fn_edges"]),
+   "3b3 SILENT: a same-file dispatches edge keeps its own rule (not handler-rooted → undrawn)")
+ck(next(e for e in _lvm["entities"] if e["slug"] == "orders")["counts"].get("hidden_fns") == 6,
+   "3b3: the star-field floor counts only what stays undrawn (orphan · orphan2 · on_evt · pure · ghost · Client.get)")
+ck(json.dumps(_lvm, sort_keys=True) == json.dumps(_a3_levels.build_levels(_AMM, graph, graft=_GM), sort_keys=True),
+   "3b3: byte-deterministic (double-build equality)")
+_lvm0 = _a3_levels.build_levels(_AMM, graph)
+ck(_lvm0["fn_edges"] == [] and "svc/m.py#label" not in {n["id"] for n in _lvm0["fn_nodes"]},
+   "3b3 SILENT: no graft → no same-file edge, no helper node (honest-empty)")
+# review F3 · graft resolves `x.m()` by the bare name and prefers a same-file class — only the calls the caller's own
+# source makes draw (graft.functions.same_file); no list, no same-file edge
+ck(("svc/m.py#seed", "svc/m.py#Client.get") not in _med and "svc/m.py#Client.get" not in _mids,
+   "3b3 SILENT (review F3): a same-file graft edge the caller's source does not make (`d.get()` → `Client.get`) stays undrawn")
+_GMn = copy.deepcopy(_GM); _GMn["functions"].pop("same_file")
+_lvn = _a3_levels.build_levels(_AMM, graph, graft=_GMn); _nids = {n["id"] for n in _lvn["fn_nodes"]}
+ck(not any(e["s"].startswith("svc/m.py#") and e["t"].startswith("svc/m.py#") for e in _lvn["fn_edges"]) and "svc/m.py#label" not in _nids,
+   "3b3 SILENT: no confirmation list → no same-file edge and no helper node (graft alone is not enough)")
+# review F3 · ONE FUNCTION, ONE NODE — rule 2 names a model user by its BARE def name; the bare id goes once its
+# qualified twin is drawn, unless the file has a module-level function of that name
+ck("svc/m.py#Worker.run" in _mids and "svc/m.py#run" not in _mids,
+   "one node FIRE: a method rule 2 drew as `file#run` is ONE node once `file#Worker.run` is drawn")
+ck("svc/m.py#run" in _nids and "svc/m.py#Worker.run" not in _nids,
+   "one node SILENT: while the qualified twin is undrawn, the bare id stays (nothing to merge into)")
+ck("svc/m.py#lonely" in _mids and "svc/m.py#dup" in _mids and "svc/m.py#Worker.dup" in _mids,
+   "one node SILENT: a bare model user with no twin stays; a module-level `dup` the index knows keeps its node beside `Worker.dup`")
+# the confirmation leaf itself (_a3_samefile) over real source — Python by AST, TypeScript by the caller's lines
+import tempfile, pathlib, _a3_samefile as SF, _a3_graft as GG
+_sr = pathlib.Path(tempfile.mkdtemp())
+(_sr / "svc").mkdir()
+(_sr / "svc/m.py").write_text("""import logging
+logger = logging.getLogger(__name__)
+
+
+class Result:
+    @classmethod
+    def error(cls, msg):
+        return cls()
+
+
+class Client:
+    def get(self, k):
+        return k
+
+
+class Base:
+    def hook(self):
+        return 1
+
+    def run(self):
+        return self.hook() + self.tick()
+
+    def tick(self):
+        return 0
+
+
+class Worker(Base):
+    def __init__(self):
+        self.db = connect()
+        self.cache = Client()
+
+    def hook(self):
+        return super().hook()
+
+    def go(self, x):
+        self.db.get(x)
+        x.decode()
+        return Worker.make(), type(self).tick(self), self.cache.get(x)
+
+    @classmethod
+    def make(cls):
+        return cls.build()
+
+    @classmethod
+    def build(cls):
+        return Worker()
+
+
+class Other:
+    def get_by(self):
+        return self.user_db.go(1)
+
+
+def make_client() -> "Client | None":
+    return Client()
+
+
+def use(w: Worker, c):
+    make_client().get(1)
+    k = make_client()
+    k.get(2)
+    w.go(3)
+    c.get(4)
+
+
+def seed(d):
+    logger.error("x")
+    d.get("k")
+    Result.error("m")
+
+    def inner():
+        return _label(d)
+    return inner(), Worker()
+
+
+def _label(d):
+    return str(d)
+""")
+_sp = [("seed", "_label"), ("seed", "seed.inner"), ("seed.inner", "_label"), ("seed", "Result.error"), ("seed", "Worker.__init__"),
+       ("Base.run", "Base.hook"), ("Base.run", "Worker.hook"), ("Base.run", "Base.tick"), ("Worker.hook", "Base.hook"),
+       ("Worker.go", "Worker.make"), ("Worker.go", "Base.tick"), ("Worker.make", "Worker.build"), ("Worker.build", "Worker.__init__"),
+       ("use", "Client.get"), ("use", "Worker.go"), ("use", "Base.tick"), ("Other.get_by", "Result.error"),
+       ("seed", "Client.get"), ("seed", "Result.error2"), ("Worker.__init__", "Worker.go"), ("Worker.go", "Result.error"), ("Worker.go", "Client.get"),
+       ("Other.get_by", "Worker.go"), ("Worker.__init__", "Client.get")]
+_cf = {(a.split("#")[1], b.split("#")[1]) for a, b in SF.confirm(_sr, [{"s": "svc/m.py#" + a, "t": "svc/m.py#" + b} for a, b in _sp])}
+ck(_cf >= {("seed", "seed.inner"), ("seed.inner", "_label"), ("seed", "Result.error"), ("seed", "Worker.__init__"),
+           ("Base.run", "Base.hook"), ("Base.run", "Worker.hook"), ("Base.run", "Base.tick"), ("Worker.hook", "Base.hook"),
+           ("Worker.go", "Worker.make"), ("Worker.go", "Base.tick"), ("Worker.make", "Worker.build"), ("Worker.build", "Worker.__init__"),
+           ("Worker.go", "Client.get"), ("use", "Client.get"), ("use", "Worker.go")},
+   f"samefile FIRE: a bare call · a nested def · a closure's call · `Class.m()` · a constructor · self./cls./super()./type(self). up and down the same-file lineage · `self.cache.get()` (self.cache = Client()) · `k.get()` (k = make_client() -> Client) · `w.go()` (w: Worker) ({sorted(_cf)})")
+ck(not _cf & {("seed", "_label"), ("seed", "Client.get"), ("seed", "Result.error2"), ("Worker.go", "Result.error"),
+              ("Other.get_by", "Worker.go"), ("Worker.__init__", "Client.get"), ("use", "Base.tick"), ("Other.get_by", "Result.error"),
+              ("Worker.__init__", "Worker.go")},
+   f"samefile SILENT: a call inside a nested def is the nested def's · `d.get()` · `logger.error()` · `x.decode()` · `self.user_db.go()` · `c.get()` (c unannotated) · a constructor is not its methods · a name never called ({sorted(_cf)})")
+(_sr / "web").mkdir()
+(_sr / "web/store.ts").write_text("""export function hashToken(t: string): string {
+  return t;
+}
+export class Store {
+  query<T>(sql: string): T[] {
+    return [];
+  }
+  save(t: string) {
+    this.query<string>(hashToken(t));
+    const c = new Client();
+    return Store.count();
+  }
+  static count() { return 0; }
+  peek(obj: any) {
+    obj.hashToken(2);
+    return obj.get(1);
+  }
+}
+export class Client {
+  get(k: number) { return k; }
+  constructor() {}
+}
+""")
+_tsp = {"web/store.ts#Store.save": (8, 12), "web/store.ts#Store.peek": (14, 17)}
+_tc = {(a.split("#")[1], b.split("#")[1]) for a, b in SF.confirm(_sr, [
+    {"s": "web/store.ts#Store.save", "t": "web/store.ts#" + t} for t in ("Store.query", "hashToken", "Client.constructor", "Store.count", "Client.get")]
+    + [{"s": "web/store.ts#Store.peek", "t": "web/store.ts#" + t} for t in ("Client.get", "hashToken")], _tsp)}
+ck(_tc == {("Store.save", "Store.query"), ("Store.save", "hashToken"), ("Store.save", "Client.constructor"), ("Store.save", "Store.count")},
+   f"samefile TS FIRE+SILENT: `this.m<T>()` · `f()` · `new K()` · `K.m()` confirm; `obj.get()` → Client.get and `obj.hashToken()` → hashToken do not ({sorted(_tc)})")
+ck(SF.confirm(_sr, [{"s": "web/store.ts#Store.save", "t": "web/store.ts#hashToken"}]) == [],
+   "samefile TS SILENT: without the caller's span nothing is read, nothing confirmed")
+# graft_arm carries the list end to end: an index whose same-file edges are one true call and two bare-name guesses
+_gd = _sr / "graft" / ".graph"; _gd.mkdir(parents=True)
+_nodes = [{"id": "svc/m.py#" + q, "kind": k, "path": "svc/m.py"} for q, k in (("seed", "function"), ("_label", "function"),
+          ("Result.error", "method"), ("Client.get", "method"), ("seed.inner", "function"))]
+(_gd / "wiring.json").write_text(json.dumps({"meta": {"version": 1}, "nodes": _nodes, "edges": [
+    {"source": "svc/m.py#seed", "target": "svc/m.py#seed.inner", "relation": "calls", "confidence": "extracted"},
+    {"source": "svc/m.py#seed", "target": "svc/m.py#Client.get", "relation": "calls", "confidence": "extracted"},
+    {"source": "svc/m.py#seed.inner", "target": "svc/m.py#_label", "relation": "calls", "confidence": "extracted"},
+    {"source": "svc/m.py#_label", "target": "svc/m.py#Result.error", "relation": "calls", "confidence": "extracted"}]}))
+_ga = GG.graft_arm(_sr, {"orders": {"files": [["services", "svc/m.py", 60]]}}, allow_build=False)
+ck(_ga.get("present") and _ga["functions"].get("same_file") == [["svc/m.py#seed", "svc/m.py#seed.inner"], ["svc/m.py#seed.inner", "svc/m.py#_label"]],
+   f"graft_arm FIRE+SILENT: the arm carries the confirmed same-file calls and drops graft's guesses ({(_ga.get('functions') or {}).get('same_file')} · {_ga.get('reason')})")
 # fn CODE-BEHIND: graft.fn_behind attaches to the matching drawn fn_node; a fn with no
 # fn_behind entry (a leaf) carries no `behind` — honest-empty, the panel omits the section.
 _lo = [n for n in _lvg["fn_nodes"] if n["id"] == "api/orders.py#list_orders"][0]

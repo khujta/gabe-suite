@@ -1794,5 +1794,105 @@ h = build(d, "kinds")["handlers"]["services/listen.py::on_placed"]
 assert (h["bus"] or {}).get("fn") == "events/bus.py::EventBus.publish" and h["bus"]["isolation"]["kind"] == "savepoint", h.get("bus")
 PY
 
+
+# D-060 (2): a function a root reaches through SEVERAL of its own calls keeps every route; paths is their union, proved
+cat >> "$T/prelude.py" <<'PYP'
+def forked(name="forked"):
+    def edit(d):
+        patch(d, "services/work.py", "def record(session, x):",
+              "def far1(x):\n    return far2(x)\n\n\ndef far2(x):\n    return far3(x)\n\n\ndef far3(x):\n    return far4(x)\n\n\ndef far4(x):\n    return deep_b(x)\n\n\n"
+              "def other(x):\n    return x\n\n\ndef loop(x):\n    from api.fork import split\n    return split(x)\n\n\ndef record(session, x):")
+        (d / "services/aaa.py").write_text("from services.work import deep_b\n\n\ndef relay(x):\n    return deep_b(x)\n")
+        (d / "api/fork.py").write_text('from fastapi import APIRouter, HTTPException\n\nfrom services.aaa import relay\nfrom services.work import deep_a, far1, loop, other\n\n'
+            'router = APIRouter(prefix="/fork")\n\n\n@router.post("/split")\ndef split(x: int):\n    if x > 5:\n        deep_a(x)\n'
+            '        raise HTTPException(status_code=418, detail="big")\n    if x > 3:\n        far1(x)\n        raise HTTPException(status_code=419, detail="far")\n'
+            '    if x > 1:\n        other(x)\n        raise HTTPException(status_code=420, detail="other")\n    if x > 0:\n        loop(x)\n'
+            '        raise HTTPException(status_code=421, detail="loop")\n    relay(x)\n    raise HTTPException(status_code=409, detail="small")\n\n\n'
+            '@router.post("/one")\ndef one(x: int):\n    deep_a(x)\n    return {"ok": True}\n')
+    return variant8(name, edit)
+def by_status(f, key):
+    e = f["endpoints"][key]
+    st = {r["id"]: r["status"] for r in e["produced"]}
+    return {st.get(p["exit"]["id"]): p["id"] for p in e["paths"]}
+def route_proof(f):                                   # every listed path passes the root site of a listed route (its chain's own step)
+    chains = {p["id"]: {c.get("at") for c in p["chain"] if c.get("kind") in ("call", "collapsed")}
+              for ep in f["endpoints"].values() for v in ep.get("variants") or [ep] for p in v.get("paths") or []}
+    return [(fid, b["root"], p) for fid, fn_ in f["functions"].items() for b in fn_["reached_by"] for p in b.get("paths") or []
+            if not any(r["root_site"] in chains[p] for r in (b.get("routes") or [b]))]
+PYP
+
+py "C74 · FIRE: a function the root reaches through two of its own calls keeps BOTH routes, in request order, each with the paths that pass it — paths is their union; the walk's own route keeps its bytes" <<'PY'
+d = forked()
+f = build(d, "kinds,paths")
+ps = by_status(f, "endpoint:POST /fork/split")
+e = next(b for b in f["functions"]["services/work.py::deep_b"]["reached_by"] if b["root"] == "endpoint:POST /fork/split")
+# the walk's tie at depth 2 falls to services/aaa.py (sorted first) — the LATER handler line, the tier3 flip
+assert (e["root_site"], e["depth"], e["via"], e["site"]) == (at("api/fork.py", "relay(x)", repo=d), 2, "services/aaa.py::relay", at("services/aaa.py", "return deep_b(x)", repo=d)), e
+assert [r["root_site"] for r in e["routes"]] == [at("api/fork.py", "deep_a(x)", repo=d), at("api/fork.py", "relay(x)", repo=d)], e["routes"]
+assert [(r["depth"], r["via"]) for r in e["routes"]] == [(2, "services/work.py::deep_a"), (2, "services/aaa.py::relay")], e["routes"]
+assert [r["paths"] for r in e["routes"]] == [[ps[418]], [ps[409]]] and e["paths"] == sorted([ps[418], ps[409]]), (e, ps)
+assert route_proof(f) == [], route_proof(f)
+sf = f["arms"]["kinds"]["stats"]["functions"]
+assert sf["routes_unproven"] == 0 and sf["multi_route_pairs"] >= 1 and sf["routes"] >= sf["pairs"], sf
+PY
+
+py "C75 · SILENT: a site past reach_depth, a site that reaches nothing of it, a site that reaches it only THROUGH THE ROOT add no route and no path; a one-route entry keeps today's keys and bytes; the proof refuses a forged route" <<'PY'
+import _a3_forms_fn as FN
+d = forked()
+f = build(d, "kinds,paths")
+ps = by_status(f, "endpoint:POST /fork/split")
+e = next(b for b in f["functions"]["services/work.py::deep_b"]["reached_by"] if b["root"] == "endpoint:POST /fork/split")
+sites = [r["root_site"] for r in e["routes"]]
+assert ps[419] not in e["paths"] and at("api/fork.py", "far1(x)", repo=d) not in sites, e      # far1 → far2 → far3 → far4 → deep_b: five hops
+assert ps[420] not in e["paths"] and at("api/fork.py", "other(x)", repo=d) not in sites, e     # other reaches nothing of it
+assert ps[421] not in e["paths"] and at("api/fork.py", "loop(x)", repo=d) not in sites, e      # loop → split (its own import) → …: through the root
+one = next(b for b in f["functions"]["services/work.py::deep_b"]["reached_by"] if b["root"] == "endpoint:POST /fork/one")
+assert "routes" not in one and set(one) == {"root", "depth", "via", "site", "root_site", "paths"} and one["root_site"] == at("api/fork.py", "deep_a(x)", 2, repo=d), one
+g = build(S8, "kinds,paths")                                                           # the Slice 8 tree has no second route anywhere
+assert not any("routes" in b for fn_ in g["functions"].values() for b in fn_["reached_by"]), "a one-route tree grew routes"
+assert g["arms"]["kinds"]["stats"]["functions"]["multi_route_pairs"] == 0 and route_proof(g) == [], g["arms"]["kinds"]["stats"]["functions"]
+root, fid = "api/fork.py::split", "services/work.py::deep_b"
+good = ((at("api/fork.py", "deep_a(x)", repo=d), "services/work.py::deep_a"), (at("services/work.py", "return deep_b(x)", repo=d), fid))
+assert FN._proved(d, root, fid, good) is True
+assert FN._proved(d, root, fid, ((at("api/fork.py", "other(x)", repo=d), "services/work.py::deep_a"), good[1])) is False          # the wrong line
+assert FN._proved(d, root, "services/work.py::deep_a", good) is False                                                              # the wrong end
+assert FN._proved(d, root, fid, ((at("api/fork.py", "loop(x)", repo=d), "services/work.py::loop"),
+                                 (at("services/work.py", "return split(x)", repo=d), root)) + good) is False                       # through the root
+far = tuple((at(r, t, repo=d), n) for r, t, n in (("api/fork.py", "far1(x)", "services/work.py::far1"), ("services/work.py", "return far2(x)", "services/work.py::far2"),
+      ("services/work.py", "return far3(x)", "services/work.py::far3"), ("services/work.py", "return far4(x)", "services/work.py::far4"),
+      ("services/work.py", "return deep_b(x)", fid)))
+far = far[:4] + ((at("services/work.py", "return deep_b(x)", 2, repo=d), fid),)
+assert FN._proved(d, root, fid, far) is False                                                                                      # five hops past reach_depth 4
+PY
+
+py "C76 · the union cannot pass unnoticed: with the walk's single route standing in for routes, the second route and its path are gone and C74's check goes red" <<'PY'
+import _a3_forms_reach as R
+d = forked()
+keep = R.routes
+def only_walk(repo, seeds, depth=None):
+    w = R.bfs(repo, seeds, depth)["reached"]
+    out = {}
+    for fid, per in w.items():
+        for root, e in per.items():
+            hops, cur = [], fid
+            while True:
+                x = w[cur][root]
+                hops.insert(0, (x["site"], cur))
+                if x["via"] == root:
+                    break
+                cur = x["via"]
+            out.setdefault(fid, {}).setdefault(root, {})[hops[0][0]] = {**e, "hops": tuple(hops)}
+    return out
+R.routes = only_walk
+try:
+    f = build(d, "kinds,paths")
+finally:
+    R.routes = keep
+ps = by_status(f, "endpoint:POST /fork/split")
+e = next(b for b in f["functions"]["services/work.py::deep_b"]["reached_by"] if b["root"] == "endpoint:POST /fork/split")
+assert "routes" not in e and e["paths"] == [ps[409]], ("C76 cannot fail: the per-site walk is not what added the route", e)
+assert f["arms"]["kinds"]["stats"]["functions"]["routes_unproven"] == 0, f["arms"]["kinds"]["stats"]["functions"]
+PY
+
 echo "forms-kinds: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1

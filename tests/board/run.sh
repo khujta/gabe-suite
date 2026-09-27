@@ -146,6 +146,58 @@ chipcss_ok "$T/seats-l.css" && bad "fire: a seats.css without the .bc-sha rules 
 sed 's/^\(\.bc-sha\[data-live="1"\]:hover, \.bc-sha:focus-visible{ .*\) }$/\1 outline:none; }/' "$SEATS_CSS" > "$T/seats-m.css"
 grep -q 'outline:none; }$' "$T/seats-m.css" && ! chipcss_ok "$T/seats-m.css" && ok || bad "fire: a .bc-sha rule that drops the focus ring (outline:none) must be caught"
 
+# --- the baseline NORMALISER (scripts/map-baseline.sh) meets the card's age tooltip ------------------
+# card_html writes title="recorded <date> — on the board <N> days": the COUNT ticks with the wallclock
+# while the tree stands still, so two runs a day apart must compare equal on it — and on nothing else
+# (the normaliser's rule: anything else that differs is REAL). The cards come from the REAL emitter, so
+# a reworded tooltip turns the FIRE case red instead of letting the baseline drift into noise again.
+BASELINE="$REPO/scripts/map-baseline.sh"
+python3 - "$T" "$(dirname "$GEN")" <<'PY'
+import sys, pathlib
+out = pathlib.Path(sys.argv[1]); sys.path.insert(0, sys.argv[2])
+import _a3_board as B
+def card(name, age=68, created="2026-07-21", detail="a planned phase with cells unticked"):
+    c = dict(track="build", state="open", title="Phase 3 · pantry sync", detail=detail, source="PLAN.md",
+             done=False, ripe=False, ripe_why="", age_days=age, created=created, closed_days=None)
+    (out / name).write_text(B.card_html(c, {}), encoding="utf-8")
+card("n-a68.html"); card("n-a69.html", age=69)                                  # a day later: only the count moved
+card("n-date.html", created="2026-07-22")                                     # the RECORDED date moved: the tree did
+card("n-d12.html", detail="held 12 days"); card("n-d13.html", detail="held 13 days")                   # a count in the prose
+card("n-p3.html", detail="on the board 3 days"); card("n-p4.html", detail="on the board 4 days")       # the phrase, outside the tooltip
+card("n-t21.html", created="2026-07-21 10:00"); card("n-t22.html", created="2026-07-22 10:00", age=67)  # a recorded DATETIME moved: rule 1 strips it, the count is the witness
+PY
+_nh() { sed -E "$1" "$T/$2" | sha256sum; }
+_rx() { grep -m1 "^_NORM_RX='" "$1" | sed "s/^_NORM_RX='//; s/'\$//"; }
+norm_fire() {    # a card a day older normalises to the same bytes (and the raw bytes really differ)
+  local rx; rx=$(_rx "$1"); [ -n "$rx" ] && ! cmp -s "$T/n-a68.html" "$T/n-a69.html" \
+    && [ "$(_nh "$rx" n-a68.html)" = "$(_nh "$rx" n-a69.html)" ]
+}
+norm_silent() {  # the recorded date (a bare date or a datetime), a count in the prose, and the phrase outside the tooltip all stay REAL
+  local rx; rx=$(_rx "$1"); [ -n "$rx" ] \
+    && [ "$(_nh "$rx" n-a68.html)" != "$(_nh "$rx" n-date.html)" ] \
+    && [ "$(_nh "$rx" n-d12.html)" != "$(_nh "$rx" n-d13.html)" ] \
+    && [ "$(_nh "$rx" n-p3.html)" != "$(_nh "$rx" n-p4.html)" ] \
+    && [ "$(_nh "$rx" n-t21.html)" != "$(_nh "$rx" n-t22.html)" ]
+}
+grep -q 'on the board ' "$T/n-a68.html" && ok || bad "silent: card_html must still write the age tooltip the normaliser reads"
+norm_fire   "$BASELINE" && ok || bad "fire: map-baseline.sh must normalise the card's 'on the board N days' count (a day later reads as a change)"
+norm_silent "$BASELINE" && ok || bad "silent: map-baseline.sh must keep the recorded date, prose counts and the phrase outside the tooltip REAL"
+# n) the phrase rule dropped — a board a day older reads as a map change again
+sed "/^_NORM_RX=/s/; s\/( title=\"recorded[^']*//" "$BASELINE" > "$T/mb-n.sh"
+! grep '^_NORM_RX=' "$T/mb-n.sh" | grep -q 'on the board' && ! norm_fire "$T/mb-n.sh" && ok || bad "fire: a normaliser without the board-age rule must be caught"
+# o) over-broad — every '<N> days' in the page normalised
+sed "/^_NORM_RX=/s/s\/( title=\"recorded [^/]*\/[^/]*\/g'/s\/[0-9]+ days\/N days\/g'/" "$BASELINE" > "$T/mb-o.sh"
+grep -q 's/\[0-9\]+ days/N days/g' "$T/mb-o.sh" && ! norm_silent "$T/mb-o.sh" && ok || bad "fire: a normaliser eating every '<N> days' must be caught"
+# p) the whole tooltip stripped — the recorded date would hide a real change
+sed "/^_NORM_RX=/s/s\/( title=\"recorded [^/]*\/[^/]*\/g'/s\/ title=\"recorded [^\"]*\"\/\/g'/" "$BASELINE" > "$T/mb-p.sh"
+grep -q 's/ title="recorded \[^"\]\*"//g' "$T/mb-p.sh" && ! norm_silent "$T/mb-p.sh" && ok || bad "fire: a normaliser stripping the whole tooltip (its recorded date) must be caught"
+# q) unanchored — the phrase normalised wherever it is written, prose included
+sed "/^_NORM_RX=/s/s\/( title=\"recorded [^/]*\/[^/]*\/g'/s\/on the board [0-9]+ days\/on the board N days\/g'/" "$BASELINE" > "$T/mb-q.sh"
+grep -q "s/on the board \[0-9\]+ days/on the board N days/g'" "$T/mb-q.sh" && ! norm_silent "$T/mb-q.sh" && ok || bad "fire: an unanchored board-age rule (prose included) must be caught"
+# r) the date unanchored (D-060 review F4) — a recorded datetime loses its time to rule 1 and its count here, so its move hides
+sed '/^_NORM_RX=/s/recorded \[0-9\]{4}-\[0-9\]{2}-\[0-9\]{2} /recorded [^"]* /' "$BASELINE" > "$T/mb-r.sh"
+grep -q 'recorded \[^"\]\* ' "$T/mb-r.sh" && norm_fire "$T/mb-r.sh" && ! norm_silent "$T/mb-r.sh" && ok || bad "fire: a board-age rule that reads the count after ANY recorded value (a datetime's date move hidden) must be caught"
+
 echo "=================================="
 echo "board battery: $pass passed, $fail failed"
 [ "$fail" = 0 ]
