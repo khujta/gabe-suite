@@ -144,7 +144,7 @@ def _branch(repo: Path, e: dict) -> tuple[dict, list, list]:
             _BRANCH[e["t"]] = (None, None, None)
         else:
             A = P._analyse(repo, tm, node)
-            escs = {x["cls"]: sorted(P._bases(repo, tm, x["cls"])) for x in A["escapes"]}
+            escs = {x["cls"]: sorted(P._bases(repo, tm, x["cls"], at=x["at"])) for x in A["escapes"]}
             _BRANCH[e["t"]] = (f"{file}::{tq}", sorted(escs.items()), sorted({r["status"] for r in A["rows"] if r.get("status")}))
     t, escs, refuses = _BRANCH[e["t"]]
     row = {"impl": e["impl"], "t": t or e["t"].replace("#", "::"), "pred": e.get("predicate") or None, "binding": e.get("binding")}
@@ -220,7 +220,7 @@ def _settings_of(repo: Path, m, fn, v):
         elif isinstance(m.assigns.get(base.id), ast.Call):
             base = m.assigns[base.id]
     if cls is None and isinstance(base, ast.Call) and isinstance(base.func, ast.Name):
-        r = P._resolve(repo, m, base.func.id)
+        r = P._resolve(repo, m, base.func.id, at=base)
         if r and r[1] in r[0].classes:
             cls = r
         elif r and r[1] in r[0].defs and r[0].defs[r[1]].returns is not None:

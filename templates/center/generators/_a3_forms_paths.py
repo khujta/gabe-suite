@@ -152,7 +152,7 @@ def _response_class(repo: Path, m, call) -> str | None:
     name = P._leaf(call.func)
     if name in F.RESPONSE_DEFAULTS:
         return name
-    r = P._resolve(repo, m, name) if isinstance(call.func, ast.Name) else None
+    r = P._resolve(repo, m, name, at=call) if isinstance(call.func, ast.Name) else None
     cls = r[0].classes.get(r[1]) if r else None
     return next((b for b in (P._leaf(x) for x in (cls.bases if cls is not None else ())) if b in F.RESPONSE_DEFAULTS), None)
 
@@ -233,8 +233,8 @@ def _deciding(repo: Path, m, fn, v: dict, fid: str):
         r = R.callee(repo, m, fn.name, fn, call)
         if r is None:
             f = call.func
-            if isinstance(f, ast.Name) and (m.imports.get(f.id) or (None,))[0]:
-                got = P._resolve(repo, m, f.id)
+            if isinstance(f, ast.Name) and (P._import_at(m, f.id, call) or (None,))[0]:
+                got = P._resolve(repo, m, f.id, at=call)
                 if got and got[1] in got[0].classes:
                     collapsed.append({"site": site, "call": name, "fn": f"{got[0].rel}::{got[1]}", "reason": "constructor: builds a value"})
                 else:
@@ -360,12 +360,13 @@ def row_condition(repo: Path, r: dict, fp: str, cache: dict) -> tuple:
     """A middleware row's ``when`` on the route ``fp`` → ``(True | False | None, residual, terms)``: path membership is
     decided against the route template, every other term stays open. ``cache`` keeps the resolved terms and the method's
     once-assigned locals per (file, via, when) — the switches arm reads the same answer."""
-    file = str(r.get("site") or r.get("at") or "").rpartition(":")[0]
-    ck = (file, r.get("via"), r["when"])
+    site = str(r.get("site") or r.get("at") or "")
+    file = site.rpartition(":")[0]
+    ck = (file, r.get("via"), r["when"], site)
     if ck not in cache:
         m = P._mod(repo, file)
         meth = next((m.defs[f"{r.get('via')}.{x}"] for x in F.MIDDLEWARE_METHODS if f"{r.get('via')}.{x}" in m.defs), None) if m else None
-        cache[ck] = (S.terms(repo, m, r.get("via"), r["when"]) if m else [], S.locals_once(meth) if meth is not None else {})
+        cache[ck] = (S.terms(repo, m, r.get("via"), r["when"], at=site) if m else [], S.locals_once(meth) if meth is not None else {})
     terms, subst = cache[ck]
     known = {}
     for t in terms:

@@ -427,6 +427,15 @@ seven = build(variant("seven", lambda d: patch(d, "config.py", "hot_per_minute: 
 assert next(x for x in ep(seven, "endpoint:POST /shop/place")["rate"]["limits"] if x.get("limiter") == "_hot")["args"][0]["value"] == 7
 PY
 
+py "E11 · FIRE: a limiter class the middleware's __init__ imports in its own body is read there — its arguments are named by that class's parameters" <<'PY'
+def local(d):
+    (d / "middleware/window.py").write_text("class Window2:\n    def __init__(self, limit: int, window_seconds: float) -> None:\n        self._limit = limit\n\n    def allow(self, key, now):\n        return True\n")
+    patch(d, "middleware/limit.py", "        self._hot = Window(s.hot_per_minute, s.window_seconds)\n",
+          "        from middleware.window import Window2 as W2\n        self._hot = W2(s.hot_per_minute, s.window_seconds)\n")
+hot = next(x for x in ep(build(variant("localwin", local)), "endpoint:POST /shop/place")["rate"]["limits"] if x.get("limiter") == "_hot")
+assert hot["class"] == "W2" and [(a["param"], a["value"], a["state"]) for a in hot["args"]] == [("limit", 5, "default"), ("window_seconds", 60.0, "default")], hot
+PY
+
 py "E9 · FIRE: K4 — each exit's media, body and headers: a response model, a literal response, a security 401, a refusal, a 422, a 500" <<'PY'
 f = build(A)
 e = ep(f, "endpoint:POST /shop/place")

@@ -7,12 +7,16 @@ JSON body), the name the response is bound to, the helper functions it calls (on
 service calls made inside ``pytest.raises(X)``, and every assertion made on a response: ``status`` (``==`` or ``in``),
 ``detail`` and ``code`` literals, ``is_success``, and any other attribute read (``attrs``). Roles, first match wins:
 R1 a helper's call → ``arrange`` · R2 never asserted → ``arrange`` · R3 a status-only 2xx assertion followed by an
-asserted call → ``arrange-checked`` · R4 otherwise → ``act``.
+asserted call → ``arrange-checked`` · R4 otherwise → ``act``. A ``pytest.raises`` root the test imports in its own body
+carries that import as ``imp`` (``_a3_scope``'s rule — ``null`` for a use before it); the module's ``imports`` decide
+the rest.
 """
 from __future__ import annotations
 
 import ast
 import re
+
+import _a3_scope as S
 
 VERBS = frozenset({"get", "post", "put", "patch", "delete", "head", "options"})
 DETAIL_KEYS = frozenset({"detail", "message", "error"})
@@ -197,6 +201,21 @@ def _roles(calls: list) -> None:
             c["role"] = "act"
 
 
+def _local_imp(scopes: list, root: str | None, line: int):
+    """``(True, [module, name] | None)`` when a function-local import binds ``root`` at ``line`` — the same ``[module,
+    name]`` shape as the module's ``imports`` (None: used before its import, or a relative import no module string
+    names) — else ``(False, None)``."""
+    r = S.local(scopes, root, (line, S.FAR)) if root else None
+    if r is None:
+        return False, None
+    stmt, a = r[2], r[3]
+    if stmt is S.SHADOWED:
+        return True, None
+    if isinstance(stmt, ast.Import):
+        return True, [a.name if a.asname else a.name.split(".")[0], None]
+    return True, ([stmt.module, a.name] if stmt.module else None)
+
+
 def extract(src: str) -> dict:
     """``{"tests": {function name: {line, calls[], raises[]}}, "overrides": bool, "imports": {alias: [module, name]}}`` for one
     test module."""
@@ -220,10 +239,15 @@ def extract(src: str) -> dict:
             for a in n.names:
                 imports[a.asname or a.name] = [n.module, a.name]
     out = {"tests": {}, "overrides": "dependency_overrides" in src, "imports": imports}
+    scopes = S.fn_scopes(tree)
     for fn in defs:
         ctx = {"aliases": dict(module_aliases), "by_var": {}, "json_of": {}, "calls": [], "helpers": helpers, "seen_helpers": set(),
                "module_aliases": module_aliases, "raises": [], "in_raises": None}
         _walk(fn.body, ctx)
+        for r in ctx["raises"]:
+            hit, imp = _local_imp(scopes, r["root"], r["line"])
+            if hit:
+                r["imp"] = imp
         _roles(ctx["calls"])
         out["tests"][fn.name] = {"line": fn.lineno, "calls": ctx["calls"], "raises": ctx["raises"]}
     return out

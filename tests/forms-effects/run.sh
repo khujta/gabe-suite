@@ -171,6 +171,87 @@ def feed(session, ref):
 def frames(events):
     for e in events:
         yield b"data: " + e
+
+
+def stamp(session, ref):
+    session.add(Tag(name=ref))
+
+
+def guard_stamp(session, ref):
+    session.add(Audit(note=ref))
+    if ref == "no":
+        raise Refused()
+    session.add(Tag(name=ref))
+
+
+def deep_stamp(session, ref):
+    session.add(Audit(note=ref))
+    check_ref(session, ref)
+    session.add(Tag(name=ref))
+
+
+def check_ref(session, ref):
+    session.add(Claim(key=ref))
+    if ref == "no":
+        raise Refused("deep")
+
+
+def either_stamp(session, ref):
+    check_ref(session, ref)
+    session.add(Tag(name=ref))
+    check_other(session, ref)
+
+
+def check_other(session, ref):
+    if ref == "other":
+        raise Refused("other")
+
+
+def deep_value(session, ref):
+    session.add(Audit(note=ref))
+    check_value(ref)
+    session.add(Tag(name=ref))
+
+
+def check_value(ref):
+    if ref == "bad":
+        raise ValueError("bad value")
+
+
+def relay_stamp(session, ref):
+    from services.soft import Soft
+    try:
+        if ref == "soft":
+            raise Soft()
+    except Refused:
+        session.rollback()  # the relay undoes, then passes it on
+        raise
+    session.add(Tag(name=ref))
+PYF
+cat > "$A/services/soft.py" <<'PYF'
+from services.orders import Refused
+
+
+class Soft(Refused):
+    pass
+PYF
+cat > "$A/services/errs3.py" <<'PYF'
+class AppError(Exception):
+    pass
+
+
+class Denied3(AppError):
+    pass
+PYF
+cat > "$A/services/relay.py" <<'PYF'
+def relay3(session, ref):
+    from services.errs3 import AppError, Denied3
+    try:
+        if ref == "x":
+            raise Denied3()
+    except AppError:
+        session.rollback()
+        raise
 PYF
 cat > "$A/services/deep.py" <<'PYF'
 from models import Audit
@@ -199,12 +280,15 @@ cat > "$A/api/shop.py" <<'PYF'
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
+from sqlalchemy import select as msel
 from sqlalchemy.exc import IntegrityError
 
 from db import get_session, get_user
 from models import Audit, Order, Tag
 from services.deep import d1
-from services.orders import Refused, alert, feed, frames, make_pair, place, tally, write_note
+from services.errs3 import Denied3
+from services.orders import Refused, alert, deep_stamp, deep_value, either_stamp, feed, frames, make_pair, place, relay_stamp, tally, write_note
+from services.relay import relay3
 
 router = APIRouter(prefix="/shop")
 
@@ -315,6 +399,101 @@ def delete_me(ref: str, session=Depends(get_session)):
     except Exception:
         pass
     return None
+
+
+@router.post("/stamp")
+def stamp_it(ref: str, session=Depends(get_session)):
+    from services.orders import stamp
+    stamp(session, ref)
+    session.commit()
+    return {"ok": True}
+
+
+@router.post("/stamp2")
+def stamp_again(ref: str, session=Depends(get_session)):
+    stamp(session, ref)
+    session.commit()
+    return {"ok": True}
+
+
+@router.post("/guarded")
+def guarded_stamp(ref: str, session=Depends(get_session)):
+    from services.orders import guard_stamp
+    try:
+        guard_stamp(session, ref)
+    except Refused:
+        raise HTTPException(status_code=403, detail="refused")
+    session.commit()
+    return {"ok": True}
+
+
+@router.post("/deep2")
+def deep_two(ref: str, session=Depends(get_session)):
+    try:
+        deep_stamp(session, ref)
+    except Refused:
+        raise HTTPException(status_code=403, detail="refused deep")
+    session.commit()
+    return {"ok": True}
+
+
+@router.post("/deepv")
+def deep_v(ref: str, session=Depends(get_session)):
+    try:
+        deep_value(session, ref)
+    except ValueError:
+        raise HTTPException(status_code=422, detail="bad value")
+    session.commit()
+    return {"ok": True}
+
+
+@router.post("/either")
+def either(ref: str, session=Depends(get_session)):
+    try:
+        either_stamp(session, ref)
+    except Refused:
+        raise HTTPException(status_code=403, detail="refused either")
+    session.commit()
+    return {"ok": True}
+
+
+@router.get("/tags")
+def list_tags(session=Depends(get_session)):
+    from sqlalchemy import select as _sel
+    return {"n": len(session.execute(_sel(Tag)).scalars().all())}
+
+
+@router.get("/tags2")
+def list_tags_module(session=Depends(get_session)):
+    return {"n": len(session.execute(msel(Tag)).scalars().all())}
+
+
+@router.post("/relay")
+def relay(ref: str, session=Depends(get_session)):
+    try:
+        relay_stamp(session, ref)
+    except Refused:
+        raise HTTPException(status_code=403, detail="relayed")
+    session.commit()
+    return {"ok": True}
+
+
+@router.post("/relay3")
+def relay_three(ref: str, session=Depends(get_session)):
+    try:
+        relay3(session, ref)
+    except Denied3:
+        raise HTTPException(status_code=403, detail="denied3")
+    return {"ok": True}
+
+
+@router.post("/rename")
+def rename(ref: str, session=Depends(get_session)):
+    from sqlalchemy import select as _sel
+    found = session.execute(_sel(Tag).where(Tag.name == ref)).scalar_one()
+    found.name = "x"
+    session.commit()
+    return {"ok": True}
 PYF
 
 py() {  # py "<name>" <<'PY' … PY  — the prelude gives A · T · GEN · build() · variant() · patch() · at() · paths() · seq()
@@ -509,14 +688,127 @@ place = by_split(f, "endpoint:POST /shop/place")[(409, "handler")]              
 assert "after_response" not in place["effects"] and place["effects"]["rolled_back"], place["effects"]   # stay in the rollup
 PY
 
+py "E17 · FIRE+SILENT: a service the handler imports in its OWN body is walked — its write is a step on the path, committed by the handler; a handler that calls the same name without importing it books nothing from it" <<'PY'
+f = build(A)
+ok = next(p for p in paths(f, "endpoint:POST /shop/stamp") if p["exit"]["kind"] == "success")
+got = [(r["op"], r["table"], r["at"], r["fn"]) for r in seq(f, ok)]
+lines = (A / "api/shop.py").read_text().splitlines()
+commit = next(i + 1 for i in range(lines.index("def stamp_it(ref: str, session=Depends(get_session)):"), len(lines)) if "session.commit()" in lines[i])
+assert got == [("add", "tags", at("services/orders.py", "session.add(Tag(name=ref))"), "services/orders.py::stamp"),
+               ("commit", None, f"api/shop.py:{commit}", "api/shop.py::stamp_it")], got
+assert tables(f, ok["effects"]["committed"]) == ["tags"] and not ok["effects"]["uncommitted"], ok["effects"]
+two = next(p for p in paths(f, "endpoint:POST /shop/stamp2") if p["exit"]["kind"] == "success")
+assert [r["op"] for r in seq(f, two)] == ["commit"] and not two["effects"]["committed"], "a local import leaked into another handler: " + str(seq(f, two))
+PY
+
+py "E19 · FIRE: a refusal the handler translates from a service it imports in its own body is verified at the service's raise, and its path reads that service TO the raise — the write before it is a step, the write after it never ran" <<'PY'
+f = build(A)
+r = next(x for x in f["endpoints"]["endpoint:POST /shop/guarded"]["produced"] if x["status"] == 403)
+assert r["source"] == "verified" and r["raised_at"] == at("services/orders.py", "        raise Refused()"), r
+p = next(p for p in paths(f, "endpoint:POST /shop/guarded") if p["status"] == 403)
+got = [(s["op"], s["table"], s["at"]) for s in seq(f, p) if s["fn"] == "services/orders.py::guard_stamp"]
+lines = (A / "services/orders.py").read_text().splitlines()
+first = next(i + 1 for i in range(lines.index("def guard_stamp(session, ref):"), len(lines)) if "session.add(" in lines[i])
+assert got == [("add", "audits", f"services/orders.py:{first}")], got
+assert tables(f, p["effects"]["uncommitted"]) == ["audits"] and not p["effects"]["committed"], p["effects"]
+ok = next(p for p in paths(f, "endpoint:POST /shop/guarded") if p["exit"]["kind"] == "success")
+assert tables(f, ok["effects"]["committed"]) == ["audits", "tags"], ok["effects"]                 # SILENT: the success path runs it all
+PY
+
+py "E18 · SILENT: the local scan only ADDS — with it off, every endpoint but the two whose handler imports in its own body is byte-identical and every step id the same; the one row it CHANGES is the refusal whose raise site became known" <<'PY'
+import _a3_paths_read as PR, _a3_forms_reach as R
+on = build(A)
+keep = PR._fn_scopes
+PR._fn_scopes = lambda mm: []
+P.reset_caches(); R.reset_caches()
+try:
+    off = build(A)
+finally:
+    PR._fn_scopes = keep
+    P.reset_caches(); R.reset_caches()
+diff = sorted(k for k in set(on["endpoints"]) | set(off["endpoints"]) if json.dumps(on["endpoints"].get(k), sort_keys=True) != json.dumps(off["endpoints"].get(k), sort_keys=True))
+assert diff == ["endpoint:GET /shop/tags", "endpoint:POST /shop/guarded", "endpoint:POST /shop/relay", "endpoint:POST /shop/relay3", "endpoint:POST /shop/rename", "endpoint:POST /shop/stamp"], diff
+assert all(on["steps"][k] == off["steps"][k] for k in set(off["steps"]) & set(on["steps"])), "a step id changed its row"
+gone = {k: off["steps"][k] for k in set(off["steps"]) - set(on["steps"])}      # only a step the whole-call read of an UNVERIFIED 403 minted:
+assert [(r["fn"], r["op"], r["table"], r["cond"]) for r in gone.values()] == [("services/orders.py::relay_stamp", "add", "tags", True)], gone   # verified now, the path stops at the raise
+assert {on["steps"][k]["fn"] for k in set(on["steps"]) - set(off["steps"])} == {"services/orders.py::stamp", "services/orders.py::guard_stamp",
+                                                                                "api/shop.py::list_tags", "api/shop.py::rename", "services/orders.py::relay_stamp",
+                                                                                "services/relay.py::relay3"}, \
+    sorted((on["steps"][k]["fn"], on["steps"][k]["op"], on["steps"][k]["cond"]) for k in set(on["steps"]) - set(off["steps"]))
+rows = {n: {(r["phase"], r["status"]): r for r in x["endpoints"]["endpoint:POST /shop/guarded"]["produced"]} for n, x in (("on", on), ("off", off))}
+assert rows["off"][("handler", 403)]["source"] == "unverified" and "raised_at" not in rows["off"][("handler", 403)], rows["off"]
+changed = sorted(k for k in rows["on"] if rows["on"][k]["id"] != rows["off"].get(k, {}).get("id"))
+assert changed == [("handler", 403)], changed        # the ONE changed row: its raise site is known now, and the site joins its x: id
+PY
+
+py "E20 · FIRE+SILENT: an UNVERIFIED translation whose one possible raise is two calls down reads the call to THAT raise — the writes before it are on the path, the write after it never ran; two possible raises read the call whole" <<'PY'
+import _a3_forms_catch as CA
+f = build(A)
+row = next(r for r in f["endpoints"]["endpoint:POST /shop/deep2"]["produced"] if r.get("status") == 403)
+assert row["source"] == "unverified" and "raised_at" not in row, row                 # the endpoint pass still reads one level
+p = next(p for p in paths(f, "endpoint:POST /shop/deep2") if p["status"] == 403)
+deep = at("services/orders.py", 'raise Refused("deep")')
+assert p["effects"]["read_to"] == deep and p["state"] == "partial", (p["effects"], p["state"])
+got = [(s["op"], s["table"], s["fn"]) for s in seq(f, p)]
+assert got == [("add", "audits", "services/orders.py::deep_stamp"), ("add", "claims", "services/orders.py::check_ref")], got
+assert tables(f, p["effects"]["uncommitted"]) == ["audits", "claims"] and all(f["steps"][x]["cond"] for x in p["effects"]["uncommitted"]), p["effects"]
+ok = next(p for p in paths(f, "endpoint:POST /shop/deep2") if p["exit"]["kind"] == "success")
+assert tables(f, ok["effects"]["committed"]) == ["audits", "claims", "tags"] and "read_to" not in ok["effects"], ok["effects"]      # SILENT: success runs it all
+two = next(p for p in paths(f, "endpoint:POST /shop/either") if p["status"] == 403)
+assert "read_to" not in two["effects"] and tables(f, two["effects"]["uncommitted"]) == ["claims", "tags"], two["effects"]         # SILENT: two raises, no bound
+g = next(p for p in paths(f, "endpoint:POST /shop/guarded") if p["status"] == 403)
+assert "read_to" not in g["effects"], g["effects"]                                    # SILENT: a verified translation reads its own raise
+v = next(p for p in paths(f, "endpoint:POST /shop/deepv") if p["status"] == 422 and p["phase"] == "handler")
+assert "read_to" not in v["effects"] and tables(f, v["effects"]["uncommitted"]) == ["audits", "tags"], v["effects"]   # SILENT: `except ValueError` also catches what a library raises
+keep = CA.deep_raise
+CA.deep_raise = lambda *a, **k: None
+try:
+    g2 = build(A)
+    q = next(p for p in paths(g2, "endpoint:POST /shop/deep2") if p["status"] == 403)
+    assert "tags" in tables(g2, [x["step"] for x in q["effects"]["steps"]]), "E20 cannot fail: the deep raise is not what bounded the read"
+finally:
+    CA.deep_raise = keep
+PY
+
+py "E21 · FIRE+SILENT: an ORM verb a function imports under an alias is that verb — its read is a step, in the effects arm and in the code map; a MODULE-level alias stays the written name" <<'PY'
+f = build(A)
+ok = next(p for p in paths(f, "endpoint:GET /shop/tags") if p["exit"]["kind"] == "success")
+assert [(s["op"], s["table"], s["at"]) for s in seq(f, ok)] == [("read", "tags", at("api/shop.py", "_sel(Tag)"))], seq(f, ok)
+two = next(p for p in paths(f, "endpoint:GET /shop/tags2") if p["exit"]["kind"] == "success")
+assert seq(f, two) == [], seq(f, two)
+m = P._mod(A, "api/shop.py")
+m2t = {r["cls"]: r["table"] for r in MODELS}
+sc = C._S.fn_scopes(m.tree)
+assert C._orm_access(m.defs["list_tags"], m2t, sc).get("ops") == [{"model": "Tag", "table": "tags", "rw": "r"}], C._orm_access(m.defs["list_tags"], m2t, sc)
+assert not C._orm_access(m.defs["list_tags"], m2t).get("ops") and not C._orm_access(m.defs["list_tags_module"], m2t, sc).get("ops")
+PY
+
+py "E22 · FIRE: a class the callee imports in its own body is read with its bases on the path — the except of its base it passes through is a catch on the chain, its rollback a step" <<'PY'
+f = build(A)
+p = next(p for p in paths(f, "endpoint:POST /shop/relay") if p["status"] == 403)
+row = next(r for r in f["endpoints"]["endpoint:POST /shop/relay"]["produced"] if r.get("status") == 403)
+assert row["source"] == "verified" and row["raised_at"] == at("services/orders.py", "            raise Soft()"), row
+src = (A / "services/orders.py").read_text().splitlines()
+start = src.index("def relay_stamp(session, ref):")
+relay_except = f"services/orders.py:{next(i + 1 for i in range(start, len(src)) if src[i] == '    except Refused:')}"
+cat = [c for c in p["chain"] if c["kind"] == "catch"]
+assert [(c["op"], c["at"], c["cls"]) for c in cat][:1] == [("pass-through", relay_except, "Refused")], cat
+assert "rollback" in [s["op"] for s in seq(f, p)], seq(f, p)
+q = next(p for p in paths(f, "endpoint:POST /shop/relay3") if p["status"] == 403)      # the chain names the callee's except of a BASE of the class the handler catches
+src3 = (A / "services/relay.py").read_text().splitlines()
+assert [(c["op"], c["at"], c["cls"]) for c in q["chain"] if c["kind"] == "catch"][:1] == [("pass-through", f"services/relay.py:{src3.index('    except AppError:') + 1}", "AppError")], q["chain"]
+assert [s["op"] for s in seq(f, q)] == ["rollback"], seq(f, q)
+PY
+
 py "E4 · FIRE + SILENT: each widening tagged where it binds; with widenings off no step carries one" <<'PY'
 f = build(A)
 wid = {(r["op"], r["table"], r.get("widening"), r["at"]) for r in f["steps"].values() if r.get("widening")}
 want = {("update", "orders", "W1", at("api/shop.py", "order.ref = ref")), ("update", "orders", "W2", at("api/shop.py", 'found.ref = "x"')),
         ("delete", "claims", "W2", at("services/orders.py", "session.delete(row)")), ("read", "audits", "W3", at("services/orders.py", "func.count")),
-        ("add", "tags", "W4", at("api/shop.py", "add_all")), ("add", "orders", "W4", at("api/shop.py", "add_all"))}
+        ("add", "tags", "W4", at("api/shop.py", "add_all")), ("add", "orders", "W4", at("api/shop.py", "add_all")),
+        ("update", "tags", "W2", at("api/shop.py", 'found.name = "x"'))}                 # bound from `_sel(Tag)`, a select the handler imports under an alias
 assert want <= wid, sorted(want - wid)
-assert f["arms"]["effects"]["stats"]["widenings"] == {"W1": 1, "W2": 2, "W3": 1, "W4": 2}, f["arms"]["effects"]["stats"]["widenings"]
+assert f["arms"]["effects"]["stats"]["widenings"] == {"W1": 1, "W2": 3, "W3": 1, "W4": 2}, f["arms"]["effects"]["stats"]["widenings"]
 g = build(A, widen=False)
 assert not any(r.get("widening") for r in g["steps"].values()) and g["arms"]["effects"]["options"]["widenings"] is False
 assert not any(r["op"] == "update" for r in g["steps"].values()), "an update bound through a widening with widenings off"
@@ -531,7 +823,7 @@ for rel in ("db.py", "services/orders.py", "services/deep.py", "api/shop.py"):
         evs = E.effect_events(A, m, qual, node, m2t, widen=False)
         mine = {(e["model"], "r" if e["op"] == "read" else "w") for e in evs
                 if e["kind"] == "fx" and e.get("model") and e["op"] not in ("flush", "commit", "rollback", "savepoint")}
-        acc = C._orm_access(node, m2t)
+        acc = C._orm_access(node, m2t, C._S.fn_scopes(m.tree))
         assert mine == {(o["model"], o["rw"]) for o in acc.get("ops") or []}, (rel, qual, mine, acc)
         assert any(e["kind"] == "fx" and e["op"] in ("flush", "commit") for e in evs) == bool(acc.get("commits")), (rel, qual)
         checked += 1

@@ -58,7 +58,7 @@ def _sites(repo: Path, st: dict) -> list[dict]:
     out = [dict(f, m=m, rel=m.rel, fn=st["fid"], via=None, pos=(f["line"], 0, f["line"], f["col"]), param=f.get("recv"))
            for f in own["facts"] if f["k"] != "bg" or f["recv"] is None or f["recv"] in own["bg_params"]]
     for c in own["calls"]:
-        r = R.callee(repo, m, st["qual"], node, c["node"]) or RD._local_callee(repo, m, own["imports"], c["node"])
+        r = R.callee(repo, m, st["qual"], node, c["node"])
         if r is None or r[1] not in r[0].defs or G._is_center(r[0].rel) or r[0].defs[r[1]] is node:
             continue
         cm, cnode = r[0], r[0].defs[r[1]]
@@ -143,8 +143,8 @@ def _dep_stations(repo: Path, MW, m, fn, dec, asker: dict, seen: set, out: list,
 def _scope(repo: Path, pairs: list) -> object:
     """The path prefixes the innermost guard above a site names, else ``"all"``."""
     for m, guards in pairs:
-        for g, _ in reversed(guards or ()):
-            px = P._path_prefixes(g, m, repo)
+        for g, gl in reversed(guards or ()):
+            px = P._path_prefixes(g, m, repo, at=gl)
             if px:
                 return sorted(px)
     return "all"
@@ -283,7 +283,7 @@ def _init_rows(repo: Path, st: dict) -> dict:
                 continue
             hand = {"attr": attr}
             if isinstance(val, ast.Call) and n is not val:
-                lc = S._class(repo, cm, P._leaf(val.func))
+                lc = S._class(repo, cm, P._leaf(val.func), at=val)
                 li = lc[0].defs.get(f"{lc[1].name}.__init__") if lc else None
                 ps = [a.arg for a in li.args.args[1:]] if li is not None else []
                 pos = next((i for i, a in enumerate(val.args) if any(x is n for x in ast.walk(a))), None)
@@ -293,8 +293,8 @@ def _init_rows(repo: Path, st: dict) -> dict:
         ctor = val.value if isinstance(val, ast.Await) else val
         if not isinstance(ctor, ast.Call) or is_read(ctor.func):
             continue
-        made = S._class(repo, cm, P._leaf(ctor.func))
-        fn_r = P._resolve(repo, cm, P._leaf(ctor.func))
+        made = S._class(repo, cm, P._leaf(ctor.func), at=ctor)
+        fn_r = P._resolve(repo, cm, P._leaf(ctor.func), at=ctor)
         returns = S._class(repo, fn_r[0], S._ann_name(fn_r[0].defs[fn_r[1]].returns)) if fn_r and fn_r[1] in fn_r[0].defs else None
         if any(h and S._is_settings(repo, *h) for h in (made, returns)):                # `self._s = get_settings()` is a settings read, not an object built
             continue
@@ -408,7 +408,7 @@ def _bg_rows(repo: Path, walked: list, sites: list, open_: bool) -> list:
         if s["k"] != "bg":
             continue
         queued.add((i, s.get("param")))
-        r = P._resolve(repo, s["m"], s["task"].id) if isinstance(s["task"], ast.Name) else None
+        r = P._resolve(repo, s["m"], s["task"].id, at=s["task"]) if isinstance(s["task"], ast.Name) else None
         row = {"kind": "background", "name": P._unp(s["task"], 120), "param": s.get("param")}
         if r and r[1] in r[0].defs:
             row["task"] = f"{r[0].rel}::{r[1]}"
@@ -591,8 +591,9 @@ def _endpoint(repo: Path, forms: dict, MW, v: dict, m, fn, dec, mws: list, proce
 
 
 def _by_site(named: str) -> tuple:
+    """Sort key: file, line, then the whole entry — two entries on one line never fall to a set's hash order."""
     f, _, ln = named.partition(" ")[0].rpartition(":")
-    return (f, int(ln)) if ln.isdigit() else (named, 0)
+    return (f, int(ln), named) if ln.isdigit() else (named, 0, named)
 
 
 def inflight_part(repo: Path, forms: dict, amap: dict) -> tuple[dict, list, dict]:

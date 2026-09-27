@@ -184,7 +184,7 @@ def _call_class(repo: Path, m, v):
     for call in calls:
         if not (isinstance(call, ast.Call) and isinstance(call.func, ast.Name)):
             continue
-        r = P._resolve(repo, m, call.func.id)
+        r = P._resolve(repo, m, call.func.id, at=call)
         if r and r[1] in r[0].classes:
             return r[0].rel, r[1]
         if r and r[1] in r[0].defs and r[0].defs[r[1]].returns is not None:

@@ -133,20 +133,22 @@ def tasks_part(repo: Path, forms: dict, amap: dict) -> tuple[dict, list, dict]:
 
 
 # ── handlers ─────────────────────────────────────────────────────────────────────────────────────────
-def _registrations(trees: dict, event: str, t_rel: str, t_q: str) -> list[dict]:
+def _registrations(repo: Path, trees: dict, event: str, t_rel: str, t_q: str) -> list[dict]:
     """``register*(Event, handler)`` calls whose handler name resolves — through a function-local or module import —
-    to ``t_rel::t_q``, with the call's order among the event's registrations in the same function."""
+    to ``t_rel::t_q``, with the call's order among the event's registrations in the same function. Which import binds
+    the name at the call is the scoped-import rule's (``_a3_paths_read._local_row``)."""
     out = []
     mod = t_rel[:-3].replace("/", ".")
     for f, t in sorted(trees.items()):
         module_imp = {a.asname or a.name: (n.module, a.name) for n in t.body if isinstance(n, ast.ImportFrom) for a in n.names}
+        pm = P._mod(repo, f)
         for fn in (n for n in ast.walk(t) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))):
-            local = {a.asname or a.name: (n.module, a.name) for n in _own(fn) if isinstance(n, ast.ImportFrom) for a in n.names}
             calls = sorted((n for n in _own(fn) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr in F.BUS_REGISTER
                             and len(n.args) >= 2 and P._leaf(n.args[0]) == event), key=lambda n: (n.lineno, n.col_offset))
             for i, n in enumerate(calls):
                 hn = n.args[1].id if isinstance(n.args[1], ast.Name) else None
-                src = local.get(hn) or module_imp.get(hn)
+                row = P._local_row(pm, hn, n)
+                src = ((row[3].module, row[4].name) if isinstance(row[3], ast.ImportFrom) else None) if row else module_imp.get(hn)
                 hit = (src and src[1] == t_q and src[0] and (mod == src[0] or mod.endswith("." + src[0]))) or (hn == t_q and f == t_rel)
                 if hit:
                     out.append({"at": f"{f}:{n.lineno}", "call": n.func.attr, "order": i, "of": len(calls)})
@@ -187,7 +189,7 @@ def _instance_method(repo: Path, m, call: ast.Call):
     f = call.func
     if not (isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name)):
         return None
-    r = P._resolve(repo, m, f.value.id)
+    r = P._resolve(repo, m, f.value.id, at=call)
     val = r[0].assigns.get(r[1]) if r else None
     if not (isinstance(val, ast.Call) and isinstance(val.func, ast.Name)):
         return None
@@ -224,7 +226,7 @@ def handlers_part(repo: Path, forms: dict, amap: dict) -> tuple[dict, list, dict
         if bus is None:
             stats["publish_unresolved"] += 1
         form["bus"] = bus
-        regs = _registrations(trees, event, t_rel, t_q)
+        regs = _registrations(repo, trees, event, t_rel, t_q)
         form["registration"] = regs
         if not regs:
             stats["unregistered"] += 1

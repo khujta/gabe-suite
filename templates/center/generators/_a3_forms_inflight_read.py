@@ -119,14 +119,6 @@ def _method_never(repo: Path, m, guards, method: str | None) -> bool:
     return False
 
 
-def _local_callee(repo: Path, m, imports: dict, call):
-    """F2 — a bare-name call the module's imports do not name, through the function's OWN ``from x import y`` statements
-    (``_a3_paths._Mod`` reads imports off the module body only) → ``(module, qual)`` of a project def, or None."""
-    imp = imports.get(call.func.id) if isinstance(call.func, ast.Name) else None
-    r = P._resolve(repo, P._mod(repo, imp[0]), imp[1]) if imp and imp[0] else None
-    return r if r and r[1] in r[0].defs else None
-
-
 def _receiver(fn, first: str | None, expr) -> tuple | None:
     """RECEIVER PROOF for ``<x>.state`` → ``(carrier, "unproven" | None)``, or None when it is no row (``self.state``): ``app``
     is the application; a parameter typed as the connection, or a dispatch's first parameter, is the request; anything else
@@ -143,15 +135,14 @@ def _receiver(fn, first: str | None, expr) -> tuple | None:
     return f"{P._unp(expr, 60)}.state", "unproven"
 
 
-def _cv_var(repo: Path, m, fn, recv, imports: dict | None = None) -> tuple | None:
+def _cv_var(repo: Path, m, fn, recv) -> tuple | None:
     """``(file, NAME, label)`` when ``recv`` RESOLVES to a module-level ``ContextVar(...)`` — never by the method name alone.
-    The module's imports first, then the function's OWN import statements (``imports`` — the fallback F2 gave callees)."""
-    r, local = None, imports or {}
+    Read where it is written: an import in the function's own body counts (``_a3_paths_read``'s scoped-import rule)."""
+    r = None
     if isinstance(recv, ast.Name) and recv.id not in _params(fn):
-        imp = local.get(recv.id)
-        r = P._resolve(repo, m, recv.id) or (P._resolve(repo, P._mod(repo, imp[0]), imp[1]) if imp and imp[0] and imp[1] else None)
+        r = P._resolve(repo, m, recv.id, at=recv)
     elif isinstance(recv, ast.Attribute) and isinstance(recv.value, ast.Name):
-        imp = m.imports.get(recv.value.id) or local.get(recv.value.id)
+        imp = P._import_at(m, recv.value.id, recv)
         if imp and imp[0] and imp[1] is None:
             r = P._resolve(repo, P._mod(repo, imp[0]), recv.attr)
     val = r[0].assigns.get(r[1]) if r else None
@@ -186,7 +177,7 @@ def _task_args(call) -> list[str]:
 
 
 def _census(repo: Path, m, node, qual: str, dispatch: bool = False) -> dict:
-    """What ONE function does to in-flight state in its own body → ``{facts, calls, bg_params, passes, loads, imports}``; memoised by
+    """What ONE function does to in-flight state in its own body → ``{facts, calls, bg_params, passes, loads}``; memoised by
     fid, so a dependency 79 endpoints share is read once."""
     key = ("census", m.rel, qual, dispatch)
     if key in _MEMO:
@@ -197,18 +188,12 @@ def _census(repo: Path, m, node, qual: str, dispatch: bool = False) -> dict:
     visited = _visit(node)
     recv_call = {id(n.func.value): n for n, *_ in visited if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)}
     held: dict = {}
-    imports: dict = {}
     for n, guards, cond, *_ in sorted(visited, key=lambda x: (getattr(x[0], "lineno", 0), getattr(x[0], "col_offset", 0))):
         if isinstance(n, (ast.Assign, ast.AnnAssign)) and n.value is not None:
             got = _carried(repo, m, n.value)
             for t in (n.targets if isinstance(n, ast.Assign) else [n.target]):
                 if got and isinstance(t, ast.Name):
                     held.setdefault(t.id, {**got, "cond": True, "guards": guards} if cond else got)     # F1: a binding under a condition says so
-        elif isinstance(n, ast.ImportFrom):
-            mf = C._resolve_module(repo, m.rel, n.module, n.level)
-            imports.update({a.asname or a.name: (mf, a.name) for a in n.names if a.name != "*"})
-        elif isinstance(n, ast.Import):                          # `import state` inside the function — a module, never a callee
-            imports.update({a.asname or a.name.split(".")[0]: (C._resolve_module(repo, m.rel, a.name, 0), None) for a in n.names})
     facts, calls, passes, loads, releases = [], [], [], [], []
     made, handed, taken, entered = {}, set(), set(), set()     # a lock OBJECT bound to a name · returned · the names acquired · the names a `with` enters
 
@@ -259,7 +244,7 @@ def _census(repo: Path, m, node, qual: str, dispatch: bool = False) -> dict:
         if got and got.get("state"):                              # getattr(<x>.state, "attr", …) — the name is the carrier leaf's
             state("sr", n, guards, cond, got["state"], n.args[0].value if isinstance(n.args[0], ast.Attribute) else None)
         if isinstance(f, ast.Attribute) and f.attr in IN["contextvar_ops"]:
-            var = _cv_var(repo, m, node, f.value, imports)
+            var = _cv_var(repo, m, node, f.value)
             if var:
                 add("cv", n, guards, cond, op=f.attr, var=var, final=final, src=_carried(repo, m, n.args[0], held) if f.attr == "set" and n.args else None)
         if leaf in IN["contextvar_binders"]:
@@ -296,7 +281,7 @@ def _census(repo: Path, m, node, qual: str, dispatch: bool = False) -> dict:
             f["object"] = f.get("id") in handed or name in taken  # … `lock.acquire()` — the acquire is the taking, this call only built the object
     out = {"facts": sorted((f for f in facts if not f.get("object")), key=lambda f: (f["line"], f["col"], f["k"])), "calls": sorted(calls, key=lambda c: (c["line"], c["col"])),
            "bg_params": [p for p in params if _ann_leaves(P._param_ann(node, p)) & set(IN["background_types"])],
-           "passes": sorted({(x["line"], x["param"]): x for x in passes}.values(), key=lambda x: (x["line"], x["param"])), "loads": sorted(set(loads), key=lambda x: (x[1], x[0])), "imports": imports}
+           "passes": sorted({(x["line"], x["param"]): x for x in passes}.values(), key=lambda x: (x["line"], x["param"])), "loads": sorted(set(loads), key=lambda x: (x[1], x[0]))}
     _MEMO[key] = out
     return out
 
@@ -349,8 +334,9 @@ def _factory_arms(repo: Path, m, factory, fqual: str, am, call, name: str) -> tu
     conditional)], whole)``: through the factory's own body — ``name = <Name>``, or an ``a if t else b`` / ``a or b`` of names,
     each arm the ``Depends(factory(...))`` call's bindings do not prove dead (the one arm left by proof is unconditional; else
     every arm, conditional); a factory PARAMETER is the name the call passed, read in the asker's module ``am``; and each name
-    through the factory's OWN import statements (F2). ``whole`` is False when an arm stays unresolved."""
-    bound, imports = _bound(factory, call), _census(repo, m, factory, fqual)["imports"]
+    through the factory's OWN import statements (F2 — the scoped-import rule: a name the factory's closure names is read at
+    the factory's last line, past every import in its body). ``whole`` is False when an arm stays unresolved."""
+    bound, fend = _bound(factory, call), getattr(factory, "end_lineno", None) or factory.lineno
     vals = [(n.value, g) for n, g, *_ in sorted(_visit(factory), key=lambda x: getattr(x[0], "lineno", 0)) if isinstance(n, (ast.Assign, ast.AnnAssign))
             and n.value is not None and any(isinstance(t, ast.Name) and t.id == name for t in (n.targets if isinstance(n, ast.Assign) else [n.target]))]
     live = [v for v, g in vals if not _dead(g, bound)]
@@ -375,8 +361,8 @@ def _factory_arms(repo: Path, m, factory, fqual: str, am, call, name: str) -> tu
         spread(expr if expr is not None else ast.Constant(None), False, am if origin == "caller" else m)
     out, whole = [], bool(arms)
     for v, cond, mod in arms:
-        imp = imports.get(v.id) if isinstance(v, ast.Name) and mod is m else None
-        r = (P._resolve(repo, mod, v.id) or (P._resolve(repo, P._mod(repo, imp[0]), imp[1]) if imp and imp[0] and imp[1] else None)) if isinstance(v, ast.Name) else None
+        at = v if mod is not m or getattr(v, "lineno", None) else fend       # a name no statement wrote is read past the factory's imports
+        r = P._resolve(repo, mod, v.id, at=at) if isinstance(v, ast.Name) else None
         whole = whole and bool(r)
         out += [(r, cond)] if r and r not in [x for x, _ in out] else []
     return out, whole

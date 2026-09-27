@@ -756,3 +756,18 @@ Consequence: THE GABE UNIVERSE and THE GAPS panels of ONE ENDPOINT each get the 
 whose elements are all carried is carried whole; a count or text item stays bright unless every member it counts is carried. Each
 panel's header counts what BY MOMENT carries and what is left. One switch per panel (the agent's call, his to overturn: dim one
 panel while reading another whole). Both copy texts carry the switches.
+
+## D-059 — The reach fix is built now; the twins' code-vs-map coverage audit waits for the elements bar
+Date: 2026-09-27 · Input: the agent's explanation of the reach fix (the paths reader sees only a file's top-level imports; gustify
+imports its own modules inside 17 functions at 32 places) and its recommendation to do it next.
+Decision, his: "do the [reach] fix" — and: "save this other item for when we have figured out the command bar we are designing now
+for all elements: map twin all's code against the coverage of the resulting codebase map and Gabe Universe, with that check for the
+things we are not putting in the map/universe, classify them by importance/relevance from an architect's pov and evaluate if scan
+must be wider or [deeper] to reach some of those gaps … parallel to this session or after we finish our current work and settle in
+a new layout for the elements bar in the Gabe Universe diagram".
+Consequence: (1) the reach fix — `_a3_paths_read` also reads the imports written inside a function, scoped to that function — is
+built as generation code under the FULL proof regime (fixture cases that fire and stay silent, mutants, the forms batteries, an A/B
+dry run of the old and new generators on copies of the four targets, id stability, re-blessed baselines, the doctor), not D-037's.
+D-023 holds: nothing is written into a twin; the design pages keep gustify @ 05007957 — their feed is rebuilt from a read-only copy
+of that commit, and swapped only if the old generators reproduce today's feed from the same copy. (2) the coverage audit is parked
+in STATE.md with its trigger: the elements bar's new layout settled — or a parallel session he starts, read-only on the twins.

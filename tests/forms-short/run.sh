@@ -169,6 +169,31 @@ assert all(c["id"].startswith(("case:schema:", "case:framework:")) for c in r["c
 assert f["schemas"]["schema:CreateItem"]["extra"] == "forbid" and f["schemas"]["schema:CreateItem"]["consumers"] == 1
 PY
 
+py "SF13 · FIRE+SILENT: a validator that imports its error classes in its OWN body reads them with their bases — a ValueError subclass it raises is a value_error case, one it catches as ValueError itself is none" <<'PY'
+def local(d):
+    (d / "errs.py").write_text("class BadName(ValueError):\n    pass\n\n\nclass Quiet(ValueError):\n    pass\n")
+    patch(d, "schemas.py", "class Loose(BaseModel):\n    name: str\n", '''class Loose(BaseModel):
+    name: str
+
+    @field_validator("name")
+    @classmethod
+    def _name(cls, value):
+        from errs import BadName, Quiet
+        try:
+            if value == "q":
+                raise Quiet("hush")
+        except ValueError:
+            return value
+        if value == "x":
+            raise BadName("no x")
+        return value
+''')
+f = build(variant("localerr", local), "short")
+r = row(f, "endpoint:POST /items/loose")
+got = sorted((c["loc"], c["type"], c.get("rule") or c.get("msg")) for c in r["cases"] if c.get("state") != "default" and c["loc"] == "body.name")
+assert got == [("body.name", "missing", None), ("body.name", "value_error", "no x")], got
+PY
+
 py "SF1 · SILENT: no extra_forbidden without forbid, no allow-list case when the call site passes none, no case for a normalisation" <<'PY'
 f = build(A, "short")
 lo = row(f, "endpoint:POST /items/loose")
@@ -1403,6 +1428,18 @@ f = build(d, "short", ())
 oe = f["settings"]["setting:orders_enabled"]["environment"]
 assert oe["state"] == "defined" and [(x["file"], x["value"]) for x in oe["files"]] == [(".env.example", "false")], oe
 assert not [x for x in f["arm_findings"]["short"] if x["id"] == "env-unset" and x["setting"] == "setting:orders_enabled"], f["arm_findings"]["short"]
+PY
+
+py "SF14 · FIRE: a settings factory a function imports in its OWN body proves the call it makes a reader — the read is a reader with a call receiver, never an unverified one" <<'PY'
+import sys; sys.path.insert(0, str(T))
+from setting_fixture import T as TT, at, make
+d = make(TT / "slocal")
+p = d / "services/limits.py"
+p.write_text(p.read_text() + "\n\ndef region_now() -> str:\n    from config import get_settings as gs3\n    return gs3().region\n")
+f = build(d, "short", ())
+rg = f["settings"]["setting:region"]
+assert (at(d, "services/limits.py", "gs3().region"), "call") in [(r["at"], r["receiver"]) for r in rg["readers"]], rg["readers"]
+assert at(d, "services/limits.py", "gs3().region") not in [r["at"] for r in rg.get("readers_unverified") or []], rg
 PY
 
 py "SF10 · mutations: a typed receiver turns an unverified read into a reader; a tree with no settings class reads the part absent while its stage stands; a setting part that raises reads present:false and writes no settings" <<'PY'

@@ -355,6 +355,100 @@ def root(svc: Svc):
 PYF
 printf 'def parse_endpoints():\n    return 1\n' > "$A/scripts/_a3_code.py"   # a vendored center generator — never walked
 printf 'def helper():\n    return 1\n' > "$A/scripts/tooling.py"                # the project's own script — walked
+# K13 · the scoped-import rule: names a function imports in its OWN body (outside api/, so no endpoint changes)
+cat > "$A/services/far.py" <<'PYF'
+def leaf():
+    return 1
+
+
+def helper():
+    return 2
+
+
+def relay():
+    return helper()
+PYF
+cat > "$A/services/scoped.py" <<'PYF'
+from typing import TYPE_CHECKING
+
+from services.chain import leaf
+
+
+def before():
+    leaf()
+    from services.far import leaf
+    leaf()
+
+
+def nested():
+    from services.far import helper as hh
+
+    def inner():
+        return hh()
+
+    return inner
+
+
+def sibling():
+    leaf()
+    hh()
+
+
+def aliased():
+    import services.far as ff
+    from services.far import helper as hp
+    ff.helper()
+    hp()
+
+
+def typed():
+    if TYPE_CHECKING:
+        from services.far import leaf
+    leaf()
+
+
+def guarded():
+    try:
+        from services.far import leaf
+    except ImportError:
+        pass
+    leaf()
+
+
+def shadowed():
+    from json import loads as leaf
+    leaf()
+
+
+def chained():
+    from services.far import relay
+    relay()
+
+
+def reimport():
+    from services.chain import leaf
+    leaf()
+    from services.far import leaf
+    leaf()
+
+
+def outer_only():
+    def inner():
+        from services.far import leaf
+        return leaf()
+
+    leaf()
+    return inner
+
+
+def dotted():
+    import services.sub.deep
+    services.pkg_fn()
+PYF
+mkdir -p "$A/services/sub"
+printf 'def pkg_fn():\n    return 1\n' > "$A/services/__init__.py"
+printf 'def pkg_fn():\n    return 2\n' > "$A/services/sub/deep.py"
+printf '' > "$A/services/sub/__init__.py"
 
 py() {  # py "<name>" <<'PY' … PY   — runs outside $GEN (so GEN_OVERRIDE wins); the prelude gives A · T · REPO · GEN ·
         # forms_of(repo) · hev_of(events) · eps(forms) · writer(key)
@@ -759,6 +853,48 @@ R.callee = keep
 R.reset_caches()
 G._is_center = lambda p: False
 assert "scripts/_a3_code.py::parse_endpoints" in R.bfs(A, [(m, "root")], depth=4)["reached"], "K6 cannot fail: the skip is not what hid the vendored file"
+PY
+
+py "K13 · the scoped-import rule: a function-local import binds from its line on, in its function and the defs nested in it, shadows the module's name there, never leaks to a sibling; TYPE_CHECKING and ImportError blocks stay unread; aliases bind like module-level ones; the reach follows it" <<'PY'
+import _a3_paths as P, _a3_paths_read as PR, _a3_forms_reach as R
+m = P._mod(A, "services/scoped.py")
+def fn(name):
+    return next(n for n in ast.walk(m.tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == name)
+def own_calls(f):
+    return sorted((c for c in ast.walk(f) if isinstance(c, ast.Call) and not any(
+        c in ast.walk(d) for d in ast.walk(f) if d is not f and isinstance(d, (ast.FunctionDef, ast.AsyncFunctionDef)))),
+        key=lambda c: (c.lineno, c.col_offset))
+def got(name):
+    f = fn(name)
+    return [(lambda r: f"{r[0].rel}::{r[1]}" if r else None)(P._callee(A, m, f, c)) for c in own_calls(f)]
+CH, FL, FH = "services/chain.py::leaf", "services/far.py::leaf", "services/far.py::helper"
+assert got("before") == [None, FL], "before its line the name is the function's local, still unbound — nothing, never the module's; after it the local import's: " + str(got("before"))
+assert got("reimport") == [CH, FL], "a later import of the same name in one function wins from its line on: " + str(got("reimport"))
+assert got("outer_only") == [CH] and got("inner") == [FH] and [P._callee(A, m, fn("inner"), c) for c in own_calls(fn("inner"))][0][0].rel == "services/far.py", \
+    "SILENT: a nested def's own import never reaches its enclosing function: " + str((got("outer_only"), got("inner")))
+assert got("dotted") == ["services/__init__.py::pkg_fn"], "`import a.b` binds `a`, the PACKAGE — never the file of a.b: " + str(got("dotted"))
+assert got("inner") == [FH], "a nested def sees its enclosing function's import, alias and all: " + str(got("inner"))
+assert got("sibling") == [CH, None], "SILENT: another function's local import never leaks: " + str(got("sibling"))
+assert got("aliased") == [FH, FH], "`import a.b as c` and `from x import y as z` bind like module-level ones: " + str(got("aliased"))
+assert got("typed") == [CH] and got("guarded") == [CH], "SILENT: TYPE_CHECKING and ImportError blocks are unread, as at module level: " + str((got("typed"), got("guarded")))
+assert got("shadowed") == [None], "a library import shadows the module's project name — nothing, never the module's leaf: " + str(got("shadowed"))
+assert P._resolve(A, m, "leaf") == P._resolve(A, m, "leaf", at=fn("sibling").body[0]) and P._resolve(A, m, "leaf")[0].rel == "services/chain.py"
+assert sorted(m.imports) == ["TYPE_CHECKING", "leaf"], "SILENT: the module table is the module's own statements: " + str(sorted(m.imports))
+assert P._import_at(m, "leaf", fn("before").body[0]) == (None, None), "a use before the function's own import binds nothing"
+assert P._import_at(m, "leaf", fn("before").body[2]) == ("services/far.py", "leaf") and P._import_at(m, "leaf") == ("services/chain.py", "leaf")
+assert P._resolve(A, m, "leaf", at="services/other.py:8") == P._resolve(A, m, "leaf"), "a site in another file reads the module table"
+out = R.bfs(A, [(m, "chained")], depth=4)["reached"]
+assert out.get("services/far.py::relay", {}).get("services/scoped.py::chained", {}).get("depth") == 1 and \
+    out.get(FH, {}).get("services/scoped.py::chained") == {"depth": 2, "via": "services/far.py::relay", "site": "services/far.py:10"}, out
+keep = PR._fn_scopes
+PR._fn_scopes = lambda mm: []
+R.reset_caches()
+try:
+    assert got("before") != [None, FL] and "services/far.py::relay" not in R.bfs(A, [(m, "chained")], depth=4)["reached"], \
+        "K13 cannot fail: the local scan is not what resolved these"
+finally:
+    PR._fn_scopes = keep
+    R.reset_caches()
 PY
 
 py "K7 · sync: form_drift NAG/COUNT and the baseline census equal the registry; arm findings never reach the endpoint summary (F37)" <<'PY'

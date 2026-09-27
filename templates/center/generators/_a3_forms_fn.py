@@ -119,7 +119,7 @@ def _raises(repo: Path, m, node, rows_by_raise: dict, escapes_by_at: dict, climb
     for x in P._analyse(repo, m, node)["escapes"]:
         row = {"cls": x["cls"], "at": x["at"], **({"msg": x["msg"]} if x.get("msg") else {}), **({"pred": x["pred"]} if x.get("pred") else {})}
         ev = events.get(int(x["at"].rpartition(":")[2]))
-        through = [t for t in CA.trail(x["cls"], P._bases(repo, m, x["cls"]), ev["tries"], hev) if t["op"] != "escape"] if ev else []
+        through = [t for t in CA.trail(x["cls"], P._bases(repo, m, x["cls"], at=x["at"]), ev["tries"], hev) if t["op"] != "escape"] if ev else []
         if through:
             row["through"] = [{"at": f"{m.rel}:{t['handler']}", "types": t["types"], "op": t["op"]} for t in through]
         row["translated_by"] = rows_by_raise.get(x["at"], [])

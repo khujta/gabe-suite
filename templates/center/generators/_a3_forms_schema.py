@@ -449,7 +449,7 @@ def _raise_type(repo: Path, m, exc) -> str | None:
     if not cls:
         return None
     if cls not in SH.RAISE_ERRORS:
-        base = next((b for b in sorted(P._bases(repo, m, cls)) if b in SH.RAISE_ERRORS and SH.RAISE_ERRORS[b]), None)
+        base = next((b for b in sorted(P._bases(repo, m, cls, at=exc)) if b in SH.RAISE_ERRORS and SH.RAISE_ERRORS[b]), None)
         return SH.RAISE_ERRORS[base] if base else None
     if SH.RAISE_ERRORS[cls] is None:
         first = exc.args[0] if isinstance(exc, ast.Call) and exc.args else None
@@ -526,7 +526,7 @@ def _rules(repo: Path, m, fn, bound: dict | None = None, hop: bool = True, bm=No
             if etype is None:
                 continue
             cls = P._leaf(exc.func) if isinstance(exc, ast.Call) else exc.id
-            if P._climb(cls, P._bases(repo, m, cls) | {"Exception"}, e["tries"], hev)[0] != "escape":
+            if P._climb(cls, P._bases(repo, m, cls, at=e["node"]) | {"Exception"}, e["tries"], hev)[0] != "escape":
                 continue                                  # the validator catches its own raise: pydantic never sees it
             guards = [g for g, _ in e["guards"]]
             rule = rule_of(etype, f"{m.rel}:{e['line']}", " and ".join(guards) or None, guards, e["after"], _message(repo, m, bm, exc, bound))

@@ -43,6 +43,18 @@ class LockedError(Exception):
     status = 423
 
 
+class HeldError(LockedError):
+    pass
+
+
+class RetiredError(Exception):
+    pass
+
+
+class GoneError(Exception):
+    pass
+
+
 class SpentError(Exception):
     pass
 
@@ -199,6 +211,28 @@ def fetch(item_id, include_deleted=False):
     if item_id < 0:
         raise Lost("bad id")
     return item_id
+
+
+def pick_one(item_id):
+    if item_id < 0:
+        raise Busy("negative")
+    if item_id == 0:
+        raise HTTPException(410, "gone")
+    return item_id
+PYF
+cat > "$A/services/gate.py" <<'PYF'
+def forbid(flag):
+    from services.items import Denied
+    if flag:
+        raise Denied("scoped no")
+    return flag
+
+
+def hold_on(flag):
+    from errors import HeldError
+    if flag:
+        raise HeldError()
+    return flag
 PYF
 cat > "$A/api/items.py" <<'PYF'
 from typing import Annotated
@@ -342,6 +376,58 @@ async def get_metered(request: Request):
 @limiter.limit(TIERS[1], key_func=lambda r: "k")
 async def get_tiered(request: Request):
     return {"ok": True}
+
+
+@router.get("/scoped")
+async def get_scoped(item_id: int):
+    from services.gate import forbid
+    from services.items import pick_one
+    forbid(item_id)
+    try:
+        return pick_one(item_id)
+    except Busy as exc:
+        raise HTTPException(409, "scoped busy") from exc
+
+
+@router.get("/unscoped")
+async def get_unscoped(item_id: int):
+    return pick_one(item_id)
+
+
+@router.get("/held")
+async def get_held(flag: int):
+    from errors import LockedError
+    from services.gate import hold_on
+    try:
+        return hold_on(flag)
+    except LockedError:
+        raise HTTPException(423, "held")
+
+
+@router.get("/held2")
+async def get_held2(flag: int):
+    from services.gate import hold_on
+    return hold_on(flag)
+
+
+@router.get("/retired")
+async def get_retired(flag: int):
+    from errors import ErrCode, GoneError, RetiredError
+    code = ErrCode("x")
+    if flag:
+        raise RetiredError()
+    raise GoneError(code)
+
+
+@router.get("/caught")
+async def get_caught(flag: int):
+    from errors import HeldError, LockedError
+    try:
+        if flag:
+            raise HeldError()
+    except LockedError:
+        return {"kept": True}
+    return {"ok": True}
 PYF
 mkdir -p "$A/api/errors"
 cat > "$A/api/errors/handlers.py" <<'PYF'
@@ -358,6 +444,31 @@ def register(app):
     @app.exception_handler(LockedError)
     async def locked(request, exc):
         return as_response(exc)
+PYF
+cat > "$A/api/errors/late.py" <<'PYF'
+from errors import GoneError, RetiredError
+
+
+def register_late(app):
+    from api.errors.render import retired_response
+    app.add_exception_handler(RetiredError, retired_response)
+    app.add_exception_handler(GoneError, gone_handler)
+
+
+def gone_handler(request, exc):
+    from api.errors.render import to_gone
+    return to_gone(exc)
+PYF
+cat > "$A/api/errors/render.py" <<'PYF'
+from fastapi.responses import JSONResponse
+
+
+def retired_response(request, exc):
+    return JSONResponse(status_code=410, content={"code": "retired"})
+
+
+def to_gone(exc):
+    return JSONResponse(status_code=404, content={"code": "gone"})
 PYF
 cat > "$A/api/plain.py" <<'PYF'
 from fastapi import APIRouter, Request
@@ -453,13 +564,15 @@ PY
 check "C0 · the pass runs and forms every endpoint" <<'PY'
 assert O["present"] is True, O
 assert O["framework"]["locks"] == {"uv.lock": "0.136.3"}, O["framework"]
-assert O["stats"]["endpoints"] == 26 and O["stats"]["unformed"] == 0 and O["stats"]["collisions"] == 0, O["stats"]
+assert O["stats"]["endpoints"] == 32 and O["stats"]["unformed"] == 0 and O["stats"]["collisions"] == 0, O["stats"]
 assert set(O["endpoints"]) == {"endpoint:POST /items/apply", "endpoint:GET /items/team", "endpoint:GET /items/dynamic",
     "endpoint:GET /items/deep", "endpoint:GET /items/swallow", "endpoint:GET /items/coded", "endpoint:GET /items/denied",
     "endpoint:GET /items/locked", "endpoint:GET /plain", "endpoint:GET /files/raw", "endpoint:GET /files/sheet",
     "endpoint:GET /files/meta", "endpoint:GET /files/spent", "endpoint:GET /files", "endpoint:POST /files", "endpoint:GET /items/loose", "endpoint:GET /items/strict",
     "endpoint:GET /items/kept", "endpoint:GET /items/leak", "endpoint:GET /items/maybe",
-    "endpoint:GET /items/stream", "endpoint:GET /items/stream2", "endpoint:GET /items/limited", "endpoint:GET /items/pooled", "endpoint:GET /items/metered", "endpoint:GET /items/tiered"}, sorted(O["endpoints"])
+    "endpoint:GET /items/stream", "endpoint:GET /items/stream2", "endpoint:GET /items/limited", "endpoint:GET /items/pooled", "endpoint:GET /items/metered", "endpoint:GET /items/tiered",
+    "endpoint:GET /items/scoped", "endpoint:GET /items/unscoped", "endpoint:GET /items/held", "endpoint:GET /items/held2",
+    "endpoint:GET /items/caught", "endpoint:GET /items/retired"}, sorted(O["endpoints"])
 PY
 
 check "C1 · FIRE: a handler raise is a text-only refusal, its guard a precondition, the body a 422" <<'PY'
@@ -616,6 +729,97 @@ t = rows("endpoint:GET /items/tiered", status=429)
 assert sorted(r["detail"] for r in t) == ["{'error': 'Rate limit exceeded: 20/day'}", "{'error': 'Rate limit exceeded: 6/hour'}"] and all(r["state"] == "defined" for r in t), t   # one entry each of a list constant, two decorators → two rows
 assert "shared-status" in fid("endpoint:GET /items/tiered"), E("endpoint:GET /items/tiered")["findings"]   # two 429s told apart only by text — a real nag
 assert not rows("endpoint:GET /items/loose", status=429), "a route without a limiter mints no 429"
+PY
+
+check "C20 · FIRE: a callee the HANDLER imports in its own body is read one call level down — its refusal, its raise the except translates (verified, with the guard behind it), and a class it imports itself to raise is that class" <<'PY'
+import re
+k = "endpoint:GET /items/scoped"
+src = open(__import__("os").environ["APP"] + "/services/items.py").read().splitlines()
+busy = next(i + 1 for i, l in enumerate(src) if 'raise Busy("negative")' in l)
+t = rows(k, status=409)
+assert len(t) == 1 and t[0]["source"] == "verified" and t[0]["raised_at"] == f"services/items.py:{busy}", t
+assert any(g["pred"] == "item_id < 0" and g["status"] == 409 and g["depth"] == 1 for g in E(k)["preconditions"]), E(k)["preconditions"]
+g = rows(k, status=410)
+assert len(g) == 1 and g[0]["depth"] == 1 and g[0]["via"].startswith("call pick_one @ api/items.py:") and g[0]["detail"] == "gone", g
+d = rows(k, status=403)
+assert len(d) == 1 and d[0]["detail"] == "Denied(…)" and d[0]["via"].startswith("call forbid @ api/items.py:") and d[0]["state"] == "defined" \
+    and d[0]["pred"] == "flag" and d[0]["at"] == "services/gate.py:4", E(k)["produced"]
+assert not [f for f in E(k)["findings"] if f["id"] == "escape-500"], "a class imported to be raised is still an HTTPException subclass: " + str(E(k)["findings"])
+PY
+
+check "C21 · SILENT: another handler that calls the same name WITHOUT importing it reads nothing from it — a local import never leaks out of its function" <<'PY'
+k = "endpoint:GET /items/unscoped"
+assert sorted((r["phase"], r["status"]) for r in E(k)["produced"]) == [("uncaught", 500), ("validation", 422)], E(k)["produced"]
+assert "pick_one" not in json.dumps(E(k)) and E(k)["findings"] == [], E(k)
+PY
+
+check "C22 · SILENT: the local scan only ADDS — with it off, every endpoint but the one whose handler imports in its own body is byte-identical (a class imported to be raised that is no HTTPException, /items/locked, included)" <<'PY'
+import pathlib, os
+sys.path.insert(0, os.environ["GEN"]); os.environ["GABE_REPO_ROOT"] = os.environ["APP"]
+import _a3_paths as P, _a3_paths_read as PR
+keep = PR._fn_scopes
+PR._fn_scopes = lambda mm: []
+P.reset_caches()
+try:
+    off = P.build(D["amap"], pathlib.Path(os.environ["APP"]))
+finally:
+    PR._fn_scopes = keep
+    P.reset_caches()
+diff = sorted(k for k in O["endpoints"] if json.dumps(O["endpoints"][k], sort_keys=True) != json.dumps(off["endpoints"].get(k), sort_keys=True))
+assert diff == ["endpoint:GET /items/caught", "endpoint:GET /items/held", "endpoint:GET /items/held2", "endpoint:GET /items/retired", "endpoint:GET /items/scoped"], diff
+skip = ("rows", "findings", "unknown_rows", "unknown_reasons", "unresolved_calls")
+assert {k: v for k, v in O["stats"].items() if k not in skip} == {k: v for k, v in off["stats"].items() if k not in skip}, (O["stats"], off["stats"])
+assert O["stats"]["rows"] == off["stats"]["rows"] + 5, (O["stats"]["rows"], off["stats"]["rows"])    # scoped's 403 and 410, held2's and retired's two app-handler rows
+assert O["stats"]["unknown_rows"] == off["stats"]["unknown_rows"] + 1, (O["stats"], off["stats"])      # held2's app handler sets its status at runtime
+assert O["stats"]["unresolved_calls"] == off["stats"]["unresolved_calls"] + 1, (O["stats"], off["stats"])   # retired's ErrCode("x"): a class its import names
+more = {k: O["stats"]["findings"].get(k, 0) - off["stats"]["findings"].get(k, 0) for k in set(O["stats"]["findings"]) | set(off["stats"]["findings"])}
+assert {k: v for k, v in more.items() if v} == {"reason-lost": 1, "escape-500": -3, "undeclared": 1}, more   # the 409 knows its raise; caught's catch is seen; retired's two app handlers answer
+PY
+
+check "C23 · FIRE: a class a function imports in its own body is read with its BASES where it is raised — the handler's except of the base translates it (verified), an app handler registered for the base answers it, a handler's own except of the base catches it" <<'PY'
+import os
+src = open(os.environ["APP"] + "/services/gate.py").read().splitlines()
+held = "services/gate.py:" + str(next(i + 1 for i, l in enumerate(src) if "raise HeldError()" in l))
+t = rows("endpoint:GET /items/held", status=423)
+assert len(t) == 1 and t[0]["source"] == "verified" and t[0]["raised_at"] == held and t[0]["via"] == "except LockedError", E("endpoint:GET /items/held")["produced"]
+assert "escape-500" not in fid("endpoint:GET /items/held"), E("endpoint:GET /items/held")["findings"]
+a = [r for r in E("endpoint:GET /items/held2")["produced"] if r.get("via") == "app handler LockedError"]
+assert len(a) == 1 and a[0]["raised_at"] == held and a[0]["source"] == "verified", E("endpoint:GET /items/held2")["produced"]
+assert "escape-500" not in fid("endpoint:GET /items/held2"), E("endpoint:GET /items/held2")["findings"]
+unc = next(r for r in E("endpoint:GET /items/caught")["produced"] if r["phase"] == "uncaught")
+assert "causes" not in unc and "escape-500" not in fid("endpoint:GET /items/caught"), E("endpoint:GET /items/caught")
+PY
+
+check "C25 · FIRE: app exception handlers read where they are written — a handler function a register function imports in its own body, a helper a handler imports to build its answer; a class the handler imports and only constructs counts as an unresolved project call" <<'PY'
+k = "endpoint:GET /items/retired"
+got = sorted((r["status"], r["via"], r["at"], r["source"]) for r in E(k)["produced"] if str(r.get("via", "")).startswith("app handler "))
+assert got == [(404, "app handler GoneError", "api/errors/render.py:9", "verified"), (410, "app handler RetiredError", "api/errors/render.py:5", "verified")], got
+assert "escape-500" not in fid(k), E(k)["findings"]
+assert O["stats"]["unresolved_calls"] == 1, O["stats"]
+PY
+
+check "C24 · FIRE+SILENT: a middleware class an app FACTORY imports in its own body is read where add_middleware names it — its exits, its form, the request.state it sets; one imported by another function never is" <<'PY'
+import os, pathlib, tempfile
+sys.path.insert(0, os.environ["GEN"])
+import _a3_code as C, _a3_paths as P, _a3_forms_mw as MW, _a3_forms_contract as CT
+r = pathlib.Path(tempfile.mkdtemp())
+(r / "app/mw").mkdir(parents=True)
+(r / "app/mw/auth.py").write_text(
+    "from fastapi.responses import JSONResponse\n\n\nclass AuthMiddleware:\n    async def dispatch(self, request, call_next):\n"
+    "        request.state.tenant = request.headers.get('x-tenant')\n        if not request.headers.get('x-key'):\n"
+    "            return JSONResponse(status_code=401, content={'detail': 'no key'})\n        return await call_next(request)\n")
+(r / "app/main.py").write_text(
+    "from fastapi import FastAPI\n\n\ndef create_app():\n    app = FastAPI()\n    from app.mw.auth import AuthMiddleware\n"
+    "    app.add_middleware(AuthMiddleware)\n    return app\n\n\ndef other_app():\n    app = FastAPI()\n    app.add_middleware(AuthMiddleware)\n    return app\n")
+amap = {"app_middleware": C.parse_app_middleware(r, entity_code={"e": {"api": ["app/main.py"]}})}
+assert [(x["cls"], x["line"]) for x in amap["app_middleware"]] == [("AuthMiddleware", 7), ("AuthMiddleware", 13)], amap
+st = {"unknown_middleware": []}
+ex = P._middleware_exits(r, amap, st)
+assert [(x["status"], x["via"]) for x in ex] == [(401, "AuthMiddleware")] and st["unknown_middleware"] == ["AuthMiddleware"], (ex, st)
+forms, _, _ = MW.middleware_forms(r, {"endpoints": {}}, amap)
+kinds = sorted((f.get("registered_at"), f.get("kind")) for e in forms.values() for f in (e.get("variants") or [e]))
+assert kinds == [("app/main.py:13", "unknown"), ("app/main.py:7", "project")], kinds
+assert CT._state_setter(r, amap, "tenant") == {"header": "x-tenant", "set_at": "app/mw/auth.py:6", "via": "AuthMiddleware"}, CT._state_setter(r, amap, "tenant")
 PY
 
 check "C10a · determinism and no mutation of the archmap it reads" <<'PY'

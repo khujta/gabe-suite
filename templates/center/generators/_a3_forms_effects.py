@@ -137,7 +137,7 @@ class _Symtab:
                         and inner.args[0].id in m2t:
                     self._bind(tgt.id, inner.args[0].id, "W2")
                     continue
-                sel = next((x for x in ast.walk(inner) if isinstance(x, ast.Call) and P._leaf(x.func) == "select"), None)
+                sel = next((x for x in ast.walk(inner) if isinstance(x, ast.Call) and (P._verb(m, x) or P._leaf(x.func)) == "select"), None)
                 hits = {h for h in (_root(a, m2t) for a in sel.args) if h} if sel is not None else set()
                 if len(hits) == 1:
                     self._bind(tgt.id, hits.pop(), "W2")
@@ -277,7 +277,7 @@ def effect_events(repo: Path, m, qual: str, fn, m2t: dict, widen: bool = True) -
             if not isinstance(n, ast.Call):
                 continue
             attr = n.func.attr if isinstance(n.func, ast.Attribute) else None
-            bare = n.func.id if isinstance(n.func, ast.Name) else None
+            bare = P._verb(m, n)                          # `_sel(Model)` after `from sqlalchemy import select as _sel` in the function
             base = {**ctx, "line": n.lineno}
             if attr in EF["tx"] and _session_call(fn, n):
                 acc.append({**base, "kind": "fx", "op": EF["tx"][attr]})
@@ -411,11 +411,12 @@ class _Steps:
         if f"{cm.rel}::{cq}" in trail:
             return []
         force = callee_point == "cond"
-        point = None if force else callee_point
+        nest = callee_point if isinstance(callee_point, dict) else None   # {point, sites}: read to a call, and that callee on
+        point = None if force else nest["point"] if nest else callee_point
         late = e.get("after_response", False)                 # §A4 V17: a generator the response streams runs later
         return [(sid, {**sub, "tries": e["tries"] + sub["tries"], "try_fids": (fid,) * len(e["tries"]) + sub["try_fids"],
                        **({"after_response": True} if late or sub.get("after_response") else {})})
-                for sid, sub in self.of(cm, cq, depth + 1, trail | {fid}, point, cond or force, suppressed)]
+                for sid, sub in self.of(cm, cq, depth + 1, trail | {fid}, point, cond or force, suppressed, sites=nest and nest["sites"])]
 
     def of(self, m, qual: str, depth: int = 0, trail: frozenset = frozenset(), point=None, cond: bool = False,
            suppressed: bool = False, sites: dict | None = None, tries_seen: list | None = None) -> list:
@@ -489,7 +490,8 @@ def _dependency_state(p: dict, row: dict | None, fw_ok: bool) -> str:
 def _handler_pairs(repo: Path, v: dict, m, fn, p: dict, S: _Steps) -> tuple[list, list]:
     """The handler's steps on a handler path: read to the exit's raise or return, or to the call that reached it — that
     callee read to its raise (the chain's hit gate sits at the CALLEE's raise for a translated row), a deciding callee
-    to the arm the path took."""
+    to the arm the path took. An UNVERIFIED translation (the raise is deeper than the endpoint pass reads) reads the
+    call it came through down to the one raise ``_a3_forms_catch.deep_raise`` finds, never past it → ``read_to``."""
     qual = _qual(m, fn)
     evs = effect_events(repo, m, qual, fn, S.m2t, S.widen)
     chain = p["chain"]
@@ -505,11 +507,13 @@ def _handler_pairs(repo: Path, v: dict, m, fn, p: dict, S: _Steps) -> tuple[list
                 cev = effect_events(repo, cm, cq, cm.defs[cq], S.m2t, S.widen)
                 sites[ce["line"]] = _point(cev, "return", I._line(rr["at"])) if _inside(cm, cq, rr["at"]) else "cond"
     hit = next((c for c in reversed(chain) if c["kind"] == "gate" and c.get("hit")), None)
+    read_to = None
     if p["exit"]["kind"] == "success":
         rr = returns.get(p["exit"]["id"])
         point = _point(evs, "return", I._line(rr["at"])) if rr and _file(rr["at"]) == m.rel else None
     elif hit is not None and _file(hit.get("at")) == m.rel and _point(evs, "raise", I._line(hit["at"])):
         point = _point(evs, "raise", I._line(hit["at"]))
+        read_to = _deep_sites(repo, v, m, fn, qual, p, evs, I._line(hit["at"]), S, sites)
     else:
         site = next((c for c in reversed(chain) if c["kind"] in ("call", "collapsed") and _file(c.get("at")) == m.rel), None)
         point = _point(evs, "call", I._line(site["at"])) if site else None
@@ -520,8 +524,33 @@ def _handler_pairs(repo: Path, v: dict, m, fn, p: dict, S: _Steps) -> tuple[list
             sites[ce["line"]] = (_point(cev, "raise", I._line(hit["at"])) or "cond") if hit and _inside(cm, cq, hit.get("at")) else "cond"
     seen: list = []
     if point is None:                                      # nowhere to stop: every step the handler could take, cond
-        return S.of(m, qual, 0, cond=True, sites=sites or {0: None}, tries_seen=seen), seen
-    return S.of(m, qual, 0, point=point, sites=sites or {0: None}, tries_seen=seen), seen
+        return S.of(m, qual, 0, cond=True, sites=sites or {0: None}, tries_seen=seen), seen, None
+    return S.of(m, qual, 0, point=point, sites=sites or {0: None}, tries_seen=seen), seen, read_to
+
+
+def _deep_sites(repo: Path, v: dict, m, fn, qual: str, p: dict, evs: list, line: int, S: _Steps, sites: dict) -> str | None:
+    """An unverified translation raised in the handler at ``line``: when one raise two or more calls below the try is the
+    only place the caught class can start (``CA.deep_raise``), the call it came through is read down to it — each call
+    to the call below it, the last to that raise — and the raise site is returned. None leaves the call read whole."""
+    row = next((r for r in v.get("produced") or [] if r.get("id") == p["exit"]["id"]), None)
+    raise_ev = next((e for e in evs if e["kind"] == "raise" and e["line"] == line), None)
+    if not row or row.get("source") != "unverified" or raise_ev is None or raise_ev.get("handler") is None:
+        return None
+    T, h = raise_ev["handler"]
+    calls = [e for e in evs if e["kind"] == "call" and any(t is T for t in e["tries"])]
+    deep = CA.deep_raise(repo, m, qual, fn, h, calls, EF["depth"])
+    if deep is None:
+        return None
+    site, chain = deep
+    cm, cq, ln = chain[-1]
+    spec = _point(effect_events(repo, cm, cq, cm.defs[cq], S.m2t, S.widen), "raise", ln) or "cond"
+    for cm, cq, ln in reversed(chain[:-1]):
+        pt = _point(effect_events(repo, cm, cq, cm.defs[cq], S.m2t, S.widen), "call", ln)
+        if pt is None:
+            return None
+        spec = {"point": pt, "sites": {ln: spec}}
+    sites[site] = spec
+    return f"{chain[-1][0].rel}:{chain[-1][2]}"
 
 
 def _catch_pairs(repo: Path, p: dict, S: _Steps, through: list) -> list:
@@ -646,9 +675,9 @@ def endpoint_effects(repo: Path, key: str, v: dict, m, fn, dec, S: _Steps, stats
                 for pr in dep_pairs[d["fid"]]:
                     (after if pr[1].get("teardown") else before).append(pr)
         dep_n = len(before)
-        body, passed = [], []
+        body, passed, read_to = [], [], None
         if p["phase"] == "handler" and p["exit"]["kind"] in ("refusal", "success"):
-            body, passed = _handler_pairs(repo, v, m, fn, p, S)
+            body, passed, read_to = _handler_pairs(repo, v, m, fn, p, S)
         body += _catch_pairs(repo, p, S, through)
         pairs = before + body + after
         origin = ["dependency"] * dep_n + ["endpoint"] * len(body) + ["dependency"] * len(after)
@@ -664,6 +693,8 @@ def endpoint_effects(repo: Path, key: str, v: dict, m, fn, dec, S: _Steps, stats
                **_rollup(S.steps, seq, failed), "dependency": state}
         if late:
             eff["after_response"] = [{"step": sid, "via": S.steps[sid]["fn"]} for sid, _ in late]
+        if read_to:                                          # the raise an unverified translation was read to, calls below
+            eff["read_to"] = read_to
         p["effects"] = eff
         for (sid, _), o in zip(pairs, origin):
             if S.steps[sid]["op"] == "commit":

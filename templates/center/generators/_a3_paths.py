@@ -38,9 +38,9 @@ from _a3_paths_read import (  # noqa: F401 — re-exported: the arms reach these
     _DEP_MAX, _EVENTS, _LOCKS, _MODS, _Mod, _PRED_CAP,
     _ROUTE_METHODS, _STATUS_RX, _TRY,
     _VER_RX, _bases, _calls, _climb, _detail, _events,
-    _exits, _handler_types, _http_parts, _http_subclass, _is_reraise, _leaf,
-    _literal, _mod, _resolve, _response_exit, _status, _streamed_calls, _unp,
-    _walk, _where, reset_caches,
+    _exits, _fn_scopes, _handler_types, _http_parts, _http_subclass, _import_at, _import_rows, _is_reraise, _leaf,
+    _literal, _local_row, _mod, _resolve, _response_exit, _status, _streamed_calls, _unp,
+    _verb, _walk, _where, reset_caches,
 )
 
 
@@ -87,7 +87,7 @@ def _analyse(repo: Path, m: _Mod, fn) -> dict:
         cls = _leaf(exc)
         if not cls or not cls[:1].isupper():                 # `raise size_error` — a variable, not a class: nothing to classify
             continue
-        sub = _http_subclass(repo, m, cls)
+        sub = _http_subclass(repo, m, cls, at=e["node"])
         if sub is not None:                                  # `class AuthError(HTTPException)` — a refusal, never an escape
             row = {**sub, "at": at, "via": f"raise {cls}", **_where(e)}
             if _climb("HTTPException", {"Exception"}, e["tries"], hev)[0] == "swallow":
@@ -97,7 +97,7 @@ def _analyse(repo: Path, m: _Mod, fn) -> dict:
             continue
         msg = (exc.args[0].value if isinstance(exc, ast.Call) and exc.args and isinstance(exc.args[0], ast.Constant)
                and isinstance(exc.args[0].value, str) else None)
-        where, hid = _climb(cls, _bases(repo, m, cls), e["tries"], hev)
+        where, hid = _climb(cls, _bases(repo, m, cls, at=e["node"]), e["tries"], hev)
         ex = {"cls": cls, "at": at, **({"msg": msg} if msg else {}), **_where(e)}
         if where == "escape":
             escapes.append(ex)
@@ -134,7 +134,7 @@ def _class_of(repo: Path, m: _Mod, ann):
 def _callee(repo: Path, m: _Mod, fn, call):
     f = call.func
     if isinstance(f, ast.Name):
-        r = _resolve(repo, m, f.id)
+        r = _resolve(repo, m, f.id, at=call)                 # an import in the caller's own body counts from its line on
         return r if r and r[1] in r[0].defs else None
     if isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name):
         ann = _param_ann(fn, f.value.id)
@@ -142,7 +142,7 @@ def _callee(repo: Path, m: _Mod, fn, call):
             r = _class_of(repo, m, ann)
             if r and f"{r[1]}.{f.attr}" in r[0].defs:
                 return r[0], f"{r[1]}.{f.attr}"
-        imp = m.imports.get(f.value.id)
+        imp = _import_at(m, f.value.id, call)
         if imp and imp[0] and imp[1] is None:
             tm = _mod(repo, imp[0])
             if tm and f.attr in tm.defs:
@@ -301,13 +301,14 @@ def _deps(repo: Path, m: _Mod, fn, dec, depth: int, seen: set, acc: dict) -> Non
 
 
 # ── middleware ───────────────────────────────────────────────────────────────────────────────────────
-def _path_prefixes(pred: str, m: _Mod, repo: Path):
+def _path_prefixes(pred: str, m: _Mod, repo: Path, at=None):
+    """``at``: the guard's line in ``m`` — where a helper it calls is read (the text itself carries no position)."""
     try:
         node = ast.parse(pred, mode="eval").body
     except SyntaxError:
         return None
     if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
-        r = _resolve(repo, m, node.func.id)
+        r = _resolve(repo, m, node.func.id, at=at)
         if r and r[1] in r[0].defs:
             body = [s for s in r[0].defs[r[1]].body
                     if not (isinstance(s, ast.Expr) and isinstance(s.value, ast.Constant))]
@@ -328,7 +329,7 @@ def _middleware_exits(repo: Path, amap: dict, stats: dict) -> list[dict]:
     out: list[dict] = []
     for mw in amap.get("app_middleware") or []:
         m = _mod(repo, mw.get("file"))
-        r = _resolve(repo, m, mw.get("cls"))
+        r = _resolve(repo, m, mw.get("cls"), at=f"{mw.get('file')}:{mw.get('line')}")   # an app factory's own import counts
         if not r or r[1] not in r[0].classes:
             spec = F.THIRD_PARTY_MIDDLEWARE.get(mw.get("cls"))
             if spec is None:
@@ -364,8 +365,8 @@ def _middleware_exits(repo: Path, amap: dict, stats: dict) -> list[dict]:
             if not ex:
                 continue
             scope, preds = None, []
-            for g, _ in e["guards"]:
-                px = _path_prefixes(g, cm, repo)
+            for g, gl in e["guards"]:
+                px = _path_prefixes(g, cm, repo, at=gl)
                 if px:
                     scope = sorted(px)
                 else:
@@ -412,7 +413,7 @@ def _app_handlers(repo: Path, files: list[str]) -> dict[str, dict]:
                         if isinstance(dec, ast.Call) and _leaf(dec.func) == "exception_handler" and dec.args:
                             pairs.append((_leaf(dec.args[0]), m, node))
                 elif isinstance(node, ast.Call) and _leaf(node.func) == "add_exception_handler" and len(node.args) > 1:
-                    r = _resolve(repo, m, _leaf(node.args[1]))
+                    r = _resolve(repo, m, _leaf(node.args[1]), at=node)
                     if r and r[1] in r[0].defs:
                         pairs.append((_leaf(node.args[0]), r[0], r[0].defs[r[1]]))
             for cls, hm, fnode in pairs:
@@ -424,7 +425,7 @@ def _app_handlers(repo: Path, files: list[str]) -> dict[str, dict]:
                         continue
                     val, vm, vline = e["node"].value, hm, e["line"]
                     if isinstance(val, ast.Call) and _leaf(val.func) not in F.RESPONSE_CLASSES:
-                        r = _resolve(repo, hm, _leaf(val.func))      # `return to_json_response(exc)` — ONE helper hop (onyx)
+                        r = _resolve(repo, hm, _leaf(val.func), at=val)   # `return to_json_response(exc)` — ONE helper hop (onyx)
                         if r and r[1] in r[0].defs:
                             for e2 in _events(r[0].defs[r[1]]):
                                 if e2["kind"] == "return" and isinstance(e2["node"].value, ast.Call) \
@@ -606,7 +607,7 @@ def _form(repo: Path, amap: dict, slug: str, ep: dict, mwx: list, files: list, f
         r = _callee(repo, m, fn, ce["node"])
         if not r:
             f = ce["node"].func
-            if isinstance(f, ast.Name) and (m.imports.get(f.id) or (None,))[0]:
+            if isinstance(f, ast.Name) and (_import_at(m, f.id, ce["node"]) or (None,))[0]:
                 stats["unresolved_calls"] += 1
             continue
         cm, qual = r
@@ -631,7 +632,7 @@ def _form(repo: Path, amap: dict, slug: str, ep: dict, mwx: list, files: list, f
             if gen:                                          # not this endpoint's 500: the client sees a cut stream
                 late.append({"cls": ex["cls"], "at": ex["at"], "via": via})
                 continue
-            where, h = _climb(ex["cls"], _bases(repo, cm, ex["cls"]), ce["tries"], H["hev"])
+            where, h = _climb(ex["cls"], _bases(repo, cm, ex["cls"], at=ex["at"]), ce["tries"], H["hev"])
             if where == "translate":
                 for hr in by_handler.get(id(h), []):
                     hr["source"], hr["raised_at"] = "verified", ex["at"]
@@ -647,7 +648,7 @@ def _form(repo: Path, amap: dict, slug: str, ep: dict, mwx: list, files: list, f
     kept = []
     for x in escapes:                                        # an app exception handler catches what escaped
         xm = _mod(repo, x["at"].rpartition(":")[0])
-        hit = x["cls"] if x["cls"] in apph else next((b for b in sorted(_bases(repo, xm, x["cls"])) if b in apph), None)
+        hit = x["cls"] if x["cls"] in apph else next((b for b in sorted(_bases(repo, xm, x["cls"], at=x["at"])) if b in apph), None)
         if hit:
             hrows.append(_copy(apph[hit], phase="handler", depth=1, via=f"app handler {hit}", raised_at=x["at"],
                                source="verified"))

@@ -300,7 +300,7 @@ class _Spine:
             node = next((n for q, n in sm.defs.items() if n.lineno <= _line(src) <= getattr(n, "end_lineno", n.lineno)), None) if sm else None
             e = next((e for e in P._events(node) if e["kind"] == "raise" and e["line"] == _line(src)), None) if node is not None else None
             if e is not None:
-                for t in CA.trail(cls, P._bases(self.repo, sm, cls), e["tries"], _hev(node)):
+                for t in CA.trail(cls, P._bases(self.repo, sm, cls, at=src), e["tries"], _hev(node)):
                     if t["op"] != "escape":
                         out.append({"kind": "catch", "op": t["op"], "at": f"{sm.rel}:{t['handler']}", "cls": " | ".join(t["types"])})
         e = next((e for e in P._events(self._node_of(row)) if e["kind"] == "raise" and e["line"] == _line(row.get("at"))), None) if self._node_of(row) is not None else None

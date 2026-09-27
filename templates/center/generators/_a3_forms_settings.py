@@ -27,8 +27,8 @@ _CHAIN_DEPTH = 4          # base classes read, nearest first
 _EXPAND_CAP = 16          # properties expanded for one attribute
 
 
-def _class(repo: Path, m, name: str | None):
-    r = P._resolve(repo, m, name)
+def _class(repo: Path, m, name: str | None, at=None):
+    r = P._resolve(repo, m, name, at=at)
     return (r[0], r[0].classes[r[1]]) if r and r[1] in r[0].classes else None
 
 
@@ -190,9 +190,9 @@ def _typed_local(repo: Path, m, init, name: str):
         if isinstance(c, ast.Name):
             got = _class(repo, m, _ann_name(P._param_ann(init, c.id)))
         elif isinstance(c, ast.Call):
-            got = _class(repo, m, P._leaf(c.func))                 # a constructor: Settings()
+            got = _class(repo, m, P._leaf(c.func), at=c)           # a constructor: Settings()
             if got is None:
-                r = P._resolve(repo, m, P._leaf(c.func))
+                r = P._resolve(repo, m, P._leaf(c.func), at=c)
                 got = _class(repo, r[0], _ann_name(r[0].defs[r[1]].returns)) if r and r[1] in r[0].defs else None
         if got:
             return got
@@ -322,12 +322,13 @@ def resolve_const(repo, m, name: str):
     return v
 
 
-def _helper_subject(repo: Path, m, call: ast.Call) -> str | None:
+def _helper_subject(repo: Path, m, call: ast.Call, at=None) -> str | None:
     """``is_hot(request.url.path)`` whose one-return body is ``path.startswith(…)`` → ``request.url.path``: the startswith
-    receiver with the helper's parameter replaced by the argument bound to it. None when it cannot be proven."""
+    receiver with the helper's parameter replaced by the argument bound to it. None when it cannot be proven. ``at``: where
+    the guard is written (the text carries no position) — a helper the method imports in its own body."""
     if not isinstance(call.func, ast.Name):
         return None
-    r = P._resolve(repo, m, call.func.id)
+    r = P._resolve(repo, m, call.func.id, at=at)
     fn = r[0].defs.get(r[1]) if r else None
     if fn is None:
         return None
@@ -350,11 +351,12 @@ def _helper_subject(repo: Path, m, call: ast.Call) -> str | None:
     return ast.unparse(_Bind().visit(copy.deepcopy(ret.func.value)))
 
 
-def terms(repo, m, cls_name: str | None, src: str) -> list[dict]:
+def terms(repo, m, cls_name: str | None, src: str, at=None) -> list[dict]:
     """Each leaf term of a condition, resolved where the source proves it — ``not`` · ``and`` · ``or`` are walked, never a
     term: ``self.<attr>`` → :func:`resolve_self_attr` · ``x in CONST`` / ``x not in CONST`` → the constant's values ·
     ``x.startswith(CONST)``, directly or through a one-return helper (``_a3_paths._path_prefixes``) → the prefixes, with
-    the tested expression as ``subject`` · anything else ``opaque``, verbatim."""
+    the tested expression as ``subject`` · anything else ``opaque``, verbatim. ``at``: where the condition is written in
+    ``m`` (a node, line or site) — a helper it calls is read there (``_a3_paths_read``'s scoped-import rule)."""
     repo = Path(repo)
     try:
         node = ast.parse(src, mode="eval").body
@@ -372,13 +374,13 @@ def terms(repo, m, cls_name: str | None, src: str) -> list[dict]:
                 return {"src": s, "kind": "not-in" if isinstance(n.ops[0], ast.NotIn) else "in", "subject": ast.unparse(n.left),
                         "values": list(vals) if isinstance(vals, tuple) else [vals]}
         if isinstance(n, ast.Call):
-            prefixes = P._path_prefixes(s, m, repo)
+            prefixes = P._path_prefixes(s, m, repo, at=at)
             direct = isinstance(n.func, ast.Attribute) and n.func.attr == "startswith" and bool(n.args)
             if prefixes is None and direct and isinstance(n.args[0], ast.Name):
                 v = resolve_const(repo, m, n.args[0].id)          # an imported constant — _path_prefixes reads local ones
                 prefixes = (v,) if isinstance(v, str) else v if isinstance(v, tuple) else None
             if prefixes is not None:
-                subject = ast.unparse(n.func.value) if direct else _helper_subject(repo, m, n)
+                subject = ast.unparse(n.func.value) if direct else _helper_subject(repo, m, n, at=at)
                 return {"src": s, "kind": "startswith", "subject": subject, "values": list(prefixes)}
         return {"src": s, "kind": "opaque"}
 

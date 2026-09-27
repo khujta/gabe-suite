@@ -202,7 +202,7 @@ def run(forms: dict, ctx: dict) -> dict:
             rec["refs"] = refs
             calls_out.append(rec)
         for r in t["raises"]:                              # the rows that translate X, raised in the called service's file
-            imp = mod.get("imports", {}).get(r.get("root") or "")
+            imp = r["imp"] if "imp" in r else mod.get("imports", {}).get(r.get("root") or "")   # a root the test imports itself
             files = {f"{imp[0].replace('.', '/')}.py", f"{imp[0].replace('.', '/')}/{imp[1]}.py" if imp[1] else ""} - {""} if imp else set()
             hits = [(e, row) for e in eps for row in e["v"].get("produced") or []
                     if row.get("raised_at") and row.get("via") and r["raises"] in str(row["via"]) and row.get("id")

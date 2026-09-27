@@ -154,7 +154,7 @@ def _arm(repo: Path, cm, cname: str, node, subst: dict) -> dict:
         vals = [right.value] if isinstance(right, ast.Constant) else list(P._literal(right) or ())
         if vals:
             return {"kind": "method", "src": src, "values": vals}
-    terms = S.terms(repo, cm, cname, ast.unparse(inner))
+    terms = S.terms(repo, cm, cname, ast.unparse(inner), at=node)
     if len(terms) == 1:
         t = terms[0]
         kind = {"in": "exact-paths", "not-in": "exact-paths", "startswith": "prefix"}.get(t["kind"])
@@ -215,15 +215,15 @@ def _helper_exits(repo: Path, cm, cname: str, meth, known_sites: set) -> list[di
         val = val.value if isinstance(val, ast.Await) else val
         if not (isinstance(val, ast.Call) and isinstance(val.func, ast.Name)):
             continue
-        r = P._resolve(repo, cm, val.func.id)
+        r = P._resolve(repo, cm, val.func.id, at=val)
         fn = r[0].defs.get(r[1]) if r else None
         for e2 in (P._events(fn) if fn is not None else []):
             ex = P._response_exit(e2["node"].value, r[0], repo) if e2["kind"] == "return" else None
             if not ex:
                 continue
             scope, preds = None, []
-            for g, _ in e["guards"]:
-                px = P._path_prefixes(g, cm, repo)
+            for g, gl in e["guards"]:
+                px = P._path_prefixes(g, cm, repo, at=gl)
                 if px:
                     scope = sorted(px)
                 else:
@@ -286,7 +286,7 @@ def middleware_forms(repo: Path, forms: dict, amap: dict) -> tuple[dict, list, l
                 "outer": f"middleware:{mws[i + 1]['cls']}" if i + 1 < n else None,
                 "inner": f"middleware:{mws[i - 1]['cls']}" if i > 0 else None}
         m = P._mod(repo, mw.get("file"))
-        r = P._resolve(repo, m, cls) if m else None
+        r = P._resolve(repo, m, cls, at=f"{mw.get('file')}:{mw.get('line')}") if m else None
         arms: list = []
         extra: list = []
         if r and r[1] in r[0].classes:

@@ -21,6 +21,7 @@ from pathlib import Path
 
 import _center_data as _cd
 import _a3_guard
+import _a3_scope as _S
 import _a3_tests
 from _a3_render import (E, ENT_COL, entity_badge, kind_ic, kind_tag, entity_icon, legend,
                         lines_grade, md, sechead, subnav, table, th_label, trunc, xtable)
@@ -1700,7 +1701,7 @@ def _call_bare(func) -> str | None:      # foo(...) / Model(...) → "foo" / "Mo
     return func.id if isinstance(func, ast.Name) else None
 
 
-def _orm_access(fnnode, m2t: dict[str, str]) -> dict:
+def _orm_access(fnnode, m2t: dict[str, str], scopes: list | None = None) -> dict:
     """{'ops': [{'model','table','rw'}], 'commits': bool} for one function, or {}.
 
     B1 (the ORM substrate, 2026-08-27) widened the near-census: the symtab now binds a var
@@ -1709,7 +1710,9 @@ def _orm_access(fnnode, m2t: dict[str, str]) -> dict:
     bound Model — the write that has no flush yet, decision 3: NOT flush-gated), and the ROOT of a
     ``select(Model.col)`` / ``.join(Model)`` / ``.select_from(Model)`` chain (a column select the
     old bare-Name rule ignored). Residual floors stay honest: a cross-file helper return, a
-    dict-comprehension binding and a multi-model select still under-count, never mis-table."""
+    dict-comprehension binding and a multi-model select still under-count, never mis-table. ``scopes``
+    (``_a3_scope.fn_scopes`` of the file) reads a verb the function imports under an alias
+    (``from sqlalchemy import select as _sel``) as the verb it imports (``_a3_scope.verb``)."""
     if not m2t:
         return {}
 
@@ -1772,7 +1775,7 @@ def _orm_access(fnnode, m2t: dict[str, str]) -> dict:
                     _put(symtab.get(_t.value.id), "w")
         if not isinstance(n, ast.Call):
             continue
-        attr, bare = _call_attr(n.func), _call_bare(n.func)
+        attr, bare = _call_attr(n.func), (_S.verb(scopes, n) if scopes else _call_bare(n.func))
         # (class 5b) SITE arm: `Schema.model_validate(v)` / `.model_validate_json(v)` — the schema
         # SERIALIZES the model bound to v (resolved through the B1 symtab). The schema name is raw
         # here (not in m2t); build_c4_graph resolves it to a schema node. model:None = a residual
@@ -2216,6 +2219,7 @@ def function_insight(repo: Path) -> dict:
         lines = text.splitlines()
         _hl = bool(set(_file_imports(f)) & _HTTP_IMPORT_NAMES)   # B1: does THIS module import an http client?
         _pv = _file_providers(f)                                 # class 9: this module's SDK imports → provider binds
+        _scopes = _S.fn_scopes(tree)                              # a verb imported under an alias in the function (_a3_scope.verb)
 
         def _add(node, cls: str | None):
             if node.name.startswith("__") or len(node.name) < 3:
@@ -2235,7 +2239,7 @@ def function_insight(repo: Path) -> dict:
                            for a in node.args.args if a.arg != "self"],
                 "returns": ast.unparse(node.returns) if node.returns else "",
                 "doc": _first_sentence(ast.get_docstring(node)),
-                "access": _orm_access(node, model2table),   # C2: ORM read/write ops → model/table
+                "access": _orm_access(node, model2table, _scopes),   # C2: ORM read/write ops → model/table
                 "ids": {i for i in _re_mod.findall(
                     r"[A-Za-z_][A-Za-z0-9_]{3,}", body)} - _PY_KEYWORDS,
             }
@@ -2461,8 +2465,12 @@ def dispatch_map(repo: Path) -> dict:
                 return f
         return None
 
-    def _resolve(name, f, local):
-        src = local.get(name) or module_imp.get(f, {}).get(name)
+    def _resolve(name, f, row):
+        """``row``: the function-local import ``_a3_scope`` says binds ``name`` at the call (None: the module's)."""
+        if row is None:
+            src = module_imp.get(f, {}).get(name)
+        else:                                            # a local `import x`, or a use before the local import: no from-import names it
+            src = (row[2].module, row[3].name) if isinstance(row[2], ast.ImportFrom) else None
         if src:
             hf = _mod2file(src[0])
             if hf:
@@ -2482,21 +2490,17 @@ def dispatch_map(repo: Path) -> dict:
 
     registry: dict[str, list[str]] = {}                 # EventClsName → [handler_id]
     for f, t in trees.items():
+        scopes = _S.fn_scopes(t)                          # the handler name is read where the call writes it (_a3_scope)
         for fnnode in ast.walk(t):
             if not isinstance(fnnode, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
-            local = {}
-            for n in _own_nodes(fnnode):
-                if isinstance(n, ast.ImportFrom):
-                    for a in n.names:
-                        local[a.asname or a.name] = (n.module, a.name)
             for n in _own_nodes(fnnode):
                 if (isinstance(n, ast.Call) and _call_attr(n.func) in _DISPATCH_REG and len(n.args) >= 2):
                     ev = _call_bare(n.args[0]) or (n.args[0].attr if isinstance(n.args[0], ast.Attribute) else None)
                     hn = _call_bare(n.args[1])
                     if not ev or not hn:
                         continue
-                    hid = _resolve(hn, f, local)
+                    hid = _resolve(hn, f, _S.local(scopes, hn, _S.point(n)))
                     if hid:
                         registry.setdefault(ev, []).append(hid)
     dispatches: list[tuple] = []
@@ -2558,23 +2562,45 @@ def module_calls(repo: Path) -> dict:
     for f, t in trees.items():
         defs[f] = {n.name for n in t.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
 
-    def _mod_alias_file(f: str, node) -> dict[str, str]:
-        """{alias: file} for one import statement — only aliases that name a MODULE FILE (a `from x import fn` names a fn, not a module → skipped)."""
-        out: dict[str, str] = {}
+    def _alias_file(f: str, node, a) -> str | None:
+        """One alias of an import statement → the MODULE FILE it names, or None (a `from x import fn` names a fn, not a module)."""
         if isinstance(node, ast.ImportFrom):
+            if a.name == "*":
+                return None
+            mf = _resolve_module(repo, f, (node.module + "." + a.name) if node.module else a.name, node.level)
+        else:
+            mf = _resolve_module(repo, f, a.name, 0)
+        return mf if mf and mf.endswith(".py") and not mf.endswith("__init__.py") else None
+
+    def _mod_alias_file(f: str, node) -> dict[str, str]:
+        """{alias: file} for one import statement — only aliases that name a MODULE FILE. `import pkg.mod` binds the DOTTED
+        name here, matched by the unparsed receiver below."""
+        out: dict[str, str] = {}
+        if isinstance(node, (ast.ImportFrom, ast.Import)):
             for a in node.names:
-                if a.name == "*":
-                    continue
-                dotted = (node.module + "." + a.name) if node.module else a.name
-                mf = _resolve_module(repo, f, dotted, node.level)
-                if mf and mf.endswith(".py") and not mf.endswith("__init__.py"):
+                mf = _alias_file(f, node, a)
+                if mf:
                     out[a.asname or a.name] = mf
-        elif isinstance(node, ast.Import):
-            for a in node.names:
-                mf = _resolve_module(repo, f, a.name, 0)
-                if mf and mf.endswith(".py") and not mf.endswith("__init__.py"):
-                    out[a.asname or a.name] = mf     # `import pkg.mod` binds the DOTTED name; matched by the unparsed receiver below
         return out
+
+    def _alias_at(f: str, top: dict, scopes: list, key: str, call) -> str | None:
+        """The module file the receiver ``key`` names at ``call`` — the scoped-import rule (``_a3_scope``) on its head name:
+        a function-local binding of the head name shadows the module's (a use before it binds nothing); a dotted
+        ``pkg.mod`` is the latest local ``import pkg.mod`` in scope, else — while the head is still the package — the
+        module's (a module object is shared)."""
+        head = key.split(".")[0]
+        rows = _S.visible(scopes, head, _S.point(call))
+        if rows is None:
+            return top.get(key)
+        if rows is _S.SHADOWED:
+            return None
+        if head == key:
+            return _alias_file(f, rows[-1][2], rows[-1][3])
+        hit = [r for r in rows if isinstance(r[2], ast.Import) and not r[3].asname and r[3].name == key]
+        if hit:
+            return _alias_file(f, hit[-1][2], hit[-1][3])
+        last = rows[-1]
+        return top.get(key) if isinstance(last[2], ast.Import) and not last[3].asname else None
 
     def _own_nodes(fn):
         stack = list(ast.iter_child_nodes(fn))
@@ -2590,23 +2616,20 @@ def module_calls(repo: Path) -> dict:
         top: dict[str, str] = {}
         for node in t.body:
             top.update(_mod_alias_file(f, node))
+        scopes = _S.fn_scopes(t)
         for fnnode in ast.walk(t):
             if not isinstance(fnnode, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
-            local = dict(top)
-            for n in _own_nodes(fnnode):
-                if isinstance(n, (ast.ImportFrom, ast.Import)):
-                    local.update(_mod_alias_file(f, n))
             pid = f"{f}#{fnnode.name}"
             for n in _own_nodes(fnnode):
                 if not (isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)):
                     continue
                 recv = n.func.value
                 key = recv.id if isinstance(recv, ast.Name) else (ast.unparse(recv) if isinstance(recv, ast.Attribute) else None)
-                if not key or key not in local:
+                tf = _alias_at(f, top, scopes, key, n) if key else None
+                if not tf:
                     continue
                 sites += 1
-                tf = local[key]
                 if n.func.attr in defs.get(tf, set()) and f"{tf}#{n.func.attr}" != pid:
                     edges.add((pid, f"{tf}#{n.func.attr}"))
     calls = [{"s": s_, "t": t_, "conf": "extracted"} for (s_, t_) in sorted(edges)]

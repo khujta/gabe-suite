@@ -129,7 +129,7 @@ def _read(repo: Path, m, node) -> dict:
 def _state_setter(repo: Path, amap: dict, attr: str) -> dict | None:
     """The app middleware that writes ``request.state.<attr>``, and the header the written value came from."""
     for mw in amap.get("app_middleware") or []:
-        r = P._resolve(repo, P._mod(repo, mw.get("file")), mw.get("cls"))
+        r = P._resolve(repo, P._mod(repo, mw.get("file")), mw.get("cls"), at=f"{mw.get('file')}:{mw.get('line')}")
         if not r or r[1] not in r[0].classes:
             continue
         cm, cls = r
@@ -376,7 +376,7 @@ def _rate(repo: Path, forms: dict, v: dict, m, fn) -> dict:
             found = S._self_assigns(init, hit.group(1)) if init is not None else []
             val = found[-1][0] if found else None
             if isinstance(val, ast.Call):
-                lc = S._class(repo, cm, P._leaf(val.func))
+                lc = S._class(repo, cm, P._leaf(val.func), at=val)
                 li = lc[0].defs.get(f"{lc[1].name}.__init__") if lc else None
                 params = [a.arg for a in li.args.args[1:]] if li is not None else []
                 lim.update({"class": P._leaf(val.func), "init_at": f"{cm.rel}:{val.lineno}",

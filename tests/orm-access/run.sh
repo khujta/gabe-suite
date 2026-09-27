@@ -250,6 +250,21 @@ check("app/deps.py::get_current_user" in _fi,
 check(str(_unp.get("app/broken.py", "")).startswith("syntax error") and "app/deps.py" not in _unp,
       f"function_insight FIRE: a file the shim cannot rescue is NAMED in unparseable_files, never a silent hole ({_unp})")
 
+# ── function_insight reads an ORM verb a function imports under an alias as that verb (_a3_scope.verb); a module-level alias stays the written name ──
+_vr = _pl.Path(_tf.mkdtemp()); (_vr / "app").mkdir(); (_vr / "app/__init__.py").write_text("")
+(_vr / "app/models.py").write_text("class Recipe(Base):\n    __tablename__ = 'recipes'\n")
+(_vr / "app/svc.py").write_text("from sqlalchemy import select as msel\n\nfrom app.models import Recipe\n\n\ndef read_local(session):\n    from sqlalchemy import select as _sel\n"
+                                "    return session.execute(_sel(Recipe))\n\n\ndef read_module(session):\n    return session.execute(msel(Recipe))\n")
+C.ENTITY_CODE = {"e": {"services": ["app/svc.py"], "models": ["app/models.py"]}}; C._EMAP_CACHE.clear(); C._FN_INSIGHT = None; C._FN_SIM_MODE = {}; C._UNPARSEABLE.clear()
+try:
+    _fv = C.function_insight(_vr)
+finally:
+    C.ENTITY_CODE = _sv_ec; C._EMAP_CACHE.clear(); C._EMAP_CACHE.update(_sv_cache); C._FN_INSIGHT = _sv_fi; C._FN_SIM_MODE = _sv_sim; C._UNPARSEABLE.clear(); C._UNPARSEABLE.update(_sv_unp)
+check((_fv.get("app/svc.py::read_local") or {}).get("access", {}).get("ops") == [{"model": "Recipe", "table": "recipes", "rw": "r"}],
+      f"function_insight FIRE: `_sel(Recipe)` after a function-local `from sqlalchemy import select as _sel` is a read of recipes ({(_fv.get('app/svc.py::read_local') or {}).get('access')})")
+check(not (_fv.get("app/svc.py::read_module") or {}).get("access", {}).get("ops"),
+      f"function_insight SILENT: a MODULE-level alias (`select as msel`) stays the written name — its own ruling ({(_fv.get('app/svc.py::read_module') or {}).get('access')})")
+
 # ── the Depends ALIAS carries its declaring file + a factory callee; an ambiguous gate name resolves beside the alias ──
 _ar = _pl.Path(_tf.mkdtemp()); (_ar / "app/api/routes").mkdir(parents=True)
 (_ar / "app/__init__.py").write_text(""); (_ar / "app/api/__init__.py").write_text("")
@@ -348,6 +363,29 @@ finally:
     C.ENTITY_CODE = _sv3; C._EMAP_CACHE.clear(); C._EMAP_CACHE.update(_sv_cache); C._DISPATCH = _sv_disp
 check({e["s"].split("#")[-1] for e in _dmn.get("dispatches", [])} == {"inner"},
       "dispatch_map [6]: a nested-fn publish is credited to inner only, never the encloser")
+
+# ── the scoped-import rule (_a3_scope) in the code map's two tables: a handler / module alias is read WHERE the call writes it ──
+C._DISPATCH = None; _sv_mc2 = C._MODCALLS
+_sr2 = _pl.Path(_tf.mkdtemp()); (_sr2 / "app").mkdir(); (_sr2 / "app/__init__.py").write_text("")
+(_sr2 / "app/h.py").write_text("def handle(s, e):\n    return 1\n")
+(_sr2 / "app/crud.py").write_text("def authenticate(session, email, password):\n    return None\ndef get_user_by_email(session, email):\n    return None\n")
+(_sr2 / "app/reg2.py").write_text(
+    "from typing import TYPE_CHECKING\n\n\ndef setup():\n    from app.h import handle as han\n    def wire():\n        bus.register_once(Ev2, han)\n    wire()\n\n\n"
+    "def other():\n    bus.register_once(Ev3, han)\n\n\ndef typed():\n    if TYPE_CHECKING:\n        from app.h import handle as han3\n    bus.register_once(Ev4, han3)\n")
+(_sr2 / "app/pub2.py").write_text("def fire():\n    bus.publish(session, Ev2(x=1))\n    bus.publish(session, Ev3(x=1))\n    bus.publish(session, Ev4(x=1))\n")
+(_sr2 / "app/scoped.py").write_text(
+    "def outer():\n    from app import crud as c3\n    def inner():\n        return c3.get_user_by_email(None, 'x')\n    return inner\n\n\n"
+    "def early():\n    c4.authenticate(None, 'a', 'b')\n    from app import crud as c4\n")
+_sv4 = C.ENTITY_CODE; C.ENTITY_CODE = {"e": {"services": ["app/h.py", "app/crud.py", "app/reg2.py", "app/pub2.py", "app/scoped.py"]}}
+C._EMAP_CACHE.clear(); C._DISPATCH = None; C._MODCALLS = None
+try:
+    _dms, _mcs = C.dispatch_map(_sr2), C.module_calls(_sr2)
+finally:
+    C.ENTITY_CODE = _sv4; C._EMAP_CACHE.clear(); C._EMAP_CACHE.update(_sv_cache); C._DISPATCH = _sv_disp; C._MODCALLS = _sv_mc2
+check(sorted((e["s"].split("#")[-1], e["t"].split("#")[-1], e["event"]) for e in _dms.get("dispatches", [])) == [("fire", "handle", "Ev2")],
+      f"dispatch_map scoped FIRE+SILENT: a nested def registers the handler its ENCLOSING function imports; another function's import never leaks; a TYPE_CHECKING import is unread ({_dms})")
+check(sorted((e["s"].split("#")[-1], e["t"].split("#")[-1]) for e in _mcs.get("calls", [])) == [("inner", "get_user_by_email")],
+      f"module_calls scoped FIRE+SILENT: a nested def reads its enclosing function's module alias; a use BEFORE the function's own import names nothing ({_mcs})")
 
 # ── C4 follow-up · ENDPOINT MIDDLEWARE (_endpoint_middleware) — the level-2 gate/dep floor ──
 def epmw(src):

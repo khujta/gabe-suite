@@ -1711,5 +1711,88 @@ r = bg(e)
 assert [(x["queues"], x["name"], x.get("passed_at")) for x in r] == [("beyond one level", "tasks", at("api/flight.py", '    later("k"', repo=e))], "handed on inside `tasks if FLAG else None` — the row says so, and where: " + str(r)
 PY
 
+py "C68 · a task a handler imports in its OWN body and queues is that function: background row with its task; SILENT: the same name no import explains names no task" <<'PY'
+def localsend(d):
+    (d / "services/mail.py").write_text("def post(key, who=None):\n    return None\n")
+    patch(d, "api/flight.py", "    tasks.add_task(send, key, who=ctx)\n", "    from services.mail import post\n    tasks.add_task(post, key, who=ctx)\n")
+r = row(flight(build(variant_if("localsend", localsend), "kinds"), "POST /flight/park"), kind="background")
+assert (r["name"], r.get("task"), r["queues"]) == ("post", "services/mail.py::post", "found"), r
+def nosend(d):
+    (d / "services/mail.py").write_text("def post(key, who=None):\n    return None\n")
+    patch(d, "api/flight.py", "    tasks.add_task(send, key, who=ctx)\n", "    tasks.add_task(post, key, who=ctx)\n")
+r = row(flight(build(variant_if("nosend", nosend), "kinds"), "POST /flight/park"), kind="background")
+assert r["name"] == "post" and r.get("task") is None, r
+PY
+
+py "C69 · a class a service imports in its own body and raises is read with its BASES there: the except of its base it passes through is on its raise's trail" <<'PY'
+def relay(d):
+    (d / "services/errs.py").write_text("from services.work import Gone\n\n\nclass Missing(Gone):\n    pass\n")
+    patch(d, "services/work.py", "def careful(x):", "def relay_gone(x):\n    from services.errs import Missing\n    try:\n        if x < 0:\n            raise Missing()\n    except Gone:\n        raise\n    return x\n\n\ndef careful(x):")
+    patch(d, "api/work.py", "from services.work import Busy, careful, deep_a, record, reserve\n", "from services.work import Busy, careful, deep_a, record, relay_gone, reserve\n")
+    patch(d, "api/work.py", '@router.post("/raw")', '@router.post("/relay")\ndef relay(x: int):\n    relay_gone(x)\n    return {"ok": True}\n\n\n@router.post("/raw")')
+d = variant8("relay", relay)
+f = build(d, "kinds")
+m = next(x for x in f["functions"]["services/work.py::relay_gone"]["raises"] if x["cls"] == "Missing")
+assert m.get("through") == [{"at": at("services/work.py", "    except Gone:", repo=d), "types": ["Gone"], "op": "pass-through"}], m
+assert [(u["endpoint"], u["status"]) for u in m["untranslated_at"]] == [("endpoint:POST /work/relay", 500)], m
+PY
+
+py "C70 · a path helper a middleware imports INSIDE dispatch is read where the guard is written: its prefix scopes the exit under it, and as a pass-through arm it is a prefix the exempt route is decided by — in the kinds form and the paths rows alike" <<'PY'
+def localhelp(d):
+    (d / "middleware/paths.py").write_text("from starlette.responses import JSONResponse\n\nHOT2 = (\"/orders\",)\nOPEN = (\"/healthz\",)\n\n\ndef is_hot(path):\n    return path.startswith(HOT2)\n\n\n"
+                                           "def is_open(path):\n    return path.startswith(OPEN)\n\n\ndef too_many():\n    return JSONResponse(status_code=429, content={\"detail\": \"too many\"})\n")
+    patch(d, "middleware/gate.py", "    async def dispatch(self, request, call_next):\n        if not self._enabled or request.url.path in EXEMPT:",
+          "    async def dispatch(self, request, call_next):\n        from middleware.paths import is_hot, is_open, too_many\n        if not self._enabled or is_open(request.url.path):")
+    patch(d, "middleware/gate.py", "        if request.url.path.startswith(HOT):", "        if is_hot(request.url.path):\n            if request.headers.get(\"x-flood\"):\n                return too_many()")
+d = variant("localhelp", localhelp)
+f = build(d, "kinds,paths")
+g = f["middleware"]["middleware:Gate"]
+assert [(a["kind"], a.get("values")) for a in g["pass_through"]] == [("flag", None), ("prefix", ["/healthz"])], g["pass_through"]
+by_scope = {("all" if x["scope"] == "all" else "hot"): x for x in g["exits"]}
+assert by_scope["hot"]["scope"] == ["/orders"] and by_scope["hot"]["applies_to"] == 1, by_scope["hot"]
+assert by_scope["all"]["exempt"] == ["endpoint:GET /healthz"] and by_scope["all"]["applies_to"] == 3, by_scope["all"]
+hz = [r for r in f["endpoints"]["endpoint:GET /healthz"]["produced"] if r.get("id") == by_scope["all"]["id"]]
+assert hz and all(r.get("applies") is False for r in hz), hz
+hop = [x for x in g["exits"] if x.get("hop") == "helper too_many"]
+assert len(hop) == 1 and hop[0]["scope"] == ["/orders"] and hop[0]["at"].startswith("middleware/paths.py:"), "a response helper imported in dispatch is read one hop down, scoped by the local path helper above it: " + str(hop)
+PY
+
+py "C71 · deps_unresolved_at and unplaced_middleware_at never fall to a set's hash order: two entries on one line sort by the whole entry, whatever order they arrive in" <<'PY'
+import itertools, _a3_forms_inflight as IFL
+want = ["a.py:1 Depends(x)", "a.py:3 Depends(alpha)", "a.py:3 Depends(zeta)", "b.py:2 y"]
+for perm in itertools.permutations(want):
+    assert sorted(perm, key=IFL._by_site) == want, (perm, sorted(perm, key=IFL._by_site))
+PY
+
+py "C72 · a middleware's __init__ and dispatch read names they import in their OWN body: the settings object a locally imported factory or class returns, the counter class it builds and hands a setting to, a settings factory call that is no object built, the path helper that scopes the read" <<'PY'
+def initlocal(d):
+    (d / "middleware/window.py").write_text("from collections import defaultdict, deque\n\n\nclass Window:\n    def __init__(self, limit, seconds):\n        self._limit = limit\n        self._hits = defaultdict(deque)\n\n    def allow(self, key):\n        return len(self._hits[key]) < self._limit\n")
+    (d / "middleware/paths.py").write_text("def on_park(path):\n    return path.startswith(\"/flight/park\")\n")
+    patch(d, "middleware/count.py", "    def __init__(self, app, settings: Settings | None = None):\n        super().__init__(app)\n        s = settings or get_settings()\n        self._on = s.limit_enabled\n        self._win = Window(s.limit_n, 60)\n",
+          "    def __init__(self, app, settings=None):\n        super().__init__(app)\n        from config import Settings as Cfg, get_settings as gs\n        from middleware.window import Window as Win\n"
+          "        s = settings or Cfg()\n        t = settings or gs()\n        self._on = t.limit_enabled\n        self._win = Win(s.limit_n, 60)\n        self._cfg = gs()\n")
+    patch(d, "middleware/count.py", "    async def dispatch(self, request, call_next):\n        if not self._on:",
+          "    async def dispatch(self, request, call_next):\n        from middleware.paths import on_park\n        if not self._on:")
+    patch(d, "middleware/count.py", '        if request.url.path.startswith("/flight/park"):', "        if on_park(request.url.path):")
+d = variant_if("initlocal", initlocal)
+proc = build(d, "kinds")["inflight"]["process"]
+win = proc.get("built-once:middleware/count.py::Count._win") or {}
+assert (win.get("class"), win.get("class_at")) == ("Win", at("middleware/window.py", "class Window", repo=d)) and [h["attr"] for h in win.get("holds") or []] == ["_hits"], win
+assert win["read_at"][0]["scope"] == ["/flight/park"] and win["applies_to"] == 1, win.get("read_at")
+n = proc.get("setting-once:middleware/count.py::Count.limit_n") or {}
+assert [{k: h[k] for k in ("attr", "param")} for h in n.get("hands_to") or []] == [{"attr": "_win", "param": "limit"}], n
+assert "setting-once:middleware/count.py::Count.limit_enabled" in proc, sorted(proc)
+assert "built-once:middleware/count.py::Count._cfg" not in proc, "a settings factory the __init__ imports is a settings read, never an object built: " + str(sorted(proc))
+PY
+
+py "C73 · a bus instance the publisher imports in its OWN body is that bus: the handler form names its publish method, isolation and catch" <<'PY'
+def localbus(d):
+    patch(d, "api/work.py", "from events.bus import bus\n", "")
+    patch(d, "api/work.py", "def place(x: int, session=Depends(get_session)):\n", "def place(x: int, session=Depends(get_session)):\n    from events.bus import bus\n")
+d = variant8("localbus", localbus)
+h = build(d, "kinds")["handlers"]["services/listen.py::on_placed"]
+assert (h["bus"] or {}).get("fn") == "events/bus.py::EventBus.publish" and h["bus"]["isolation"]["kind"] == "savepoint", h.get("bus")
+PY
+
 echo "forms-kinds: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1

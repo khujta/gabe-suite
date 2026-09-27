@@ -87,7 +87,10 @@ so when one is missing). Pictures: `../workflow-panel/shots/fold/` (the lab) and
 2. **M3**: the channel budget for the first prism.
 3. **The gallery**: 3–5 variants of the card at true size, one fader each, judged by seeing. Then the tests, and promote.
 
-Later: the reach fix — the map misses imports made inside a function (D-056 item 13; UserDietaryProfile and more on POST
+Later: the twins' code-vs-map COVERAGE AUDIT (D-059, his words): map every twin's code against the coverage of the resulting codebase map
+and Gabe Universe; list what the map/universe does not carry; classify each by importance/relevance from an architect's point of view;
+judge whether the scan must go wider (more roots/files) or deeper (inside elements) to reach them — trigger: the elements bar's new
+layout in the Gabe Universe is settled, or he starts it in a parallel session (read-only on the twins, no builds) · the reach fix — BEING BUILT (D-059; was D-056 item 13; UserDietaryProfile and more on POST
 /cooking/sessions have no step; with it, the renamed `select` import no reader follows — the handler's user_dietary_profile read — and apps/api/reference outside the scanned roots, which the twin's config must claim), trigger: generation work reopens (D-023 lifted) · piece 9 (D-016) · 12b, the second round of in-flight detectors (D-019) · the robot for every kind (his 2026-09-17 ask,
 `workflow-panel/robot-brief.md`) · the "more information" toggle (D-017, due at the display step) · pages for the three blocks
 with none yet: Overview and risk, In-flight state, Standard or specialist (D-022) · a `suite-backlog.md` line for the parked

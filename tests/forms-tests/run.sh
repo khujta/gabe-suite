@@ -373,6 +373,18 @@ o = row(f, OTHER, 409, "other busy")
 assert o.get("raised_at", "").startswith("services/other.py:") and ("C9", "service raises") not in refs(o), (o.get("raised_at"), refs(o))   # a verified Busy raised in another file
 PY
 
+py "T12 · FIRE+SILENT: a service the test imports in its OWN body is the pytest.raises root — the translating row raised in its file takes the ref; the same name no import explains takes none" <<'PY'
+def local(d):
+    patch(d, "tests/test_items.py", 'def test_service_busy_C9():\n    with pytest.raises(Busy):\n        create("busy")',
+          'def test_service_busy_C9():\n    from services.items import create as make\n    with pytest.raises(Busy):\n        make("busy")')
+f = build(variant("localraise", local))
+assert ("C9", "service raises") in refs(row(f, CREATE, 409, "busy")), refs(row(f, CREATE, 409, "busy"))
+r = f["test_cases"]["C9"]["raises"]
+assert [(x["root"], x.get("imp")) for x in r] == [("make", ["services.items", "create"])], r
+g = build(variant("localgone", lambda d: patch(d, "tests/test_items.py", '    with pytest.raises(Busy):\n        create("busy")', '    with pytest.raises(Busy):\n        make("busy")')))
+assert ("C9", "service raises") not in refs(row(g, CREATE, 409, "busy")) and "imp" not in g["test_cases"]["C9"]["raises"][0], g["test_cases"]["C9"]
+PY
+
 py "T9 · honest-empty: no junit reads present false; the tests arm off writes nothing" <<'PY'
 g = build(variant("nojunit", lambda d: (d / "tests/results/api-junit.xml").unlink()))
 assert g["arms"]["tests"]["present"] is False and "junit" in g["arms"]["tests"]["reason"] and "test_cases" not in g, g["arms"]["tests"]

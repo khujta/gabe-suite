@@ -5,6 +5,12 @@ and ``tests/forms-core`` K8 pins the list). Nothing here knows what FastAPI is �
 resolves a status and a detail, walks statements with their guard · try · after stacks, and climbs a raise to the handler
 that catches it. The endpoint shape (parameters, dependencies, middleware, routes, the row assembly) stays in
 ``_a3_paths.py``.
+
+A name read INSIDE a function resolves through the ONE scoped-import rule (``_a3_scope``, asked by ``_resolve(…, at=)``
+· ``_import_at`` · ``_local_row``): an import in a function's own body binds from its line onward, in that function and
+the defs nested in it, and shadows the module's binding there — before it, the name binds nothing; an import under ``if
+TYPE_CHECKING`` or in a ``try`` catching ImportError is read at neither level; ``_binding`` turns a statement into a
+``(file, symbol)`` pair the same way at both levels. Without a local import the module table decides.
 """
 from __future__ import annotations
 
@@ -15,11 +21,12 @@ from pathlib import Path
 
 import _a3_code as _C
 import _a3_forms as F
+import _a3_scope as S
 from _a3_stacks_pydi import _ann_name
 
 _STATUS_RX = re.compile(F.STATUS_NAME_RX)
 _ROUTE_METHODS = ("get", "post", "put", "patch", "delete")
-_TRY = (ast.Try,) + ((ast.TryStar,) if hasattr(ast, "TryStar") else ())
+_TRY = S.TRY
 _DEP_MAX = 4
 _PRED_CAP = 160
 _MODS: dict[tuple[str, str], "_Mod | None"] = {}
@@ -65,25 +72,34 @@ def _literal(v):
     return None
 
 
+def _binding(repo: Path, rel: str, node, a) -> tuple:
+    """One alias of an import statement → ``(module file, symbol | None)``, the same at both levels: ``from x import y``
+    → ``(x, y)``; ``import a.b as c`` → ``(a.b, None)``; ``import a.b`` binds ``a``, the PACKAGE → ``(a, None)``."""
+    if isinstance(node, ast.ImportFrom):
+        return _C._resolve_module(repo, rel, node.module, node.level), a.name
+    return _C._resolve_module(repo, rel, a.name if a.asname else a.name.split(".")[0], 0), None
+
+
+def _import_rows(repo: Path, rel: str, node) -> list[tuple]:
+    """One import statement → ``[(bound name, (module file, symbol | None), alias)]`` — the names ``_a3_scope.names``
+    says it binds, each through ``_binding``."""
+    return [(name, _binding(repo, rel, node, a), a) for name, a in S.names(node)]
+
+
 class _Mod:
     """One parsed file: imports, defs (`fn`, `Class.method`), classes, module assignments, constants."""
 
     def __init__(self, rel: str, tree: ast.Module, repo: Path) -> None:
-        self.rel, self.tree = rel, tree
+        self.rel, self.tree, self.repo = rel, tree, repo
         self.imports: dict[str, tuple] = {}
         self.defs: dict[str, ast.AST] = {}
         self.classes: dict[str, ast.ClassDef] = {}
         self.assigns: dict[str, ast.AST] = {}
         self.consts: dict[str, object] = {}
+        self.scopes: list | None = None                      # the functions that import in their own body — `_fn_scopes`
         for node in tree.body:
-            if isinstance(node, ast.ImportFrom):
-                mf = _C._resolve_module(repo, rel, node.module, node.level)
-                for a in node.names:
-                    if a.name != "*":
-                        self.imports[a.asname or a.name] = (mf, a.name)
-            elif isinstance(node, ast.Import):
-                for a in node.names:
-                    self.imports[a.asname or a.name.split(".")[0]] = (_C._resolve_module(repo, rel, a.name, 0), None)
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                self.imports.update((name, b) for name, b, _ in _import_rows(repo, rel, node))
             elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 self.defs[node.name] = node
             elif isinstance(node, ast.ClassDef):
@@ -110,10 +126,53 @@ def _mod(repo: Path, rel: str | None) -> _Mod | None:
     return _MODS[key]
 
 
-def _resolve(repo: Path, m: _Mod | None, name: str | None, hops: int = 2):
-    """A name in module ``m`` → (module, qual) of the repo def/class/assignment it names, or None."""
+# ── a name inside a function: the scoped-import rule ─────────────────────────────────────────────────
+def _fn_scopes(m: _Mod) -> list:
+    """``_a3_scope.fn_scopes`` of ``m``, memoised on the module: ``[(first line, last line, [((line, col), name,
+    statement, alias)])]`` — the functions that import in their own body."""
+    if m.scopes is None:
+        m.scopes = S.fn_scopes(m.tree)
+    return m.scopes
+
+
+def _local_row(m: _Mod | None, name: str | None, at):
+    """The function-local import that binds ``name`` at ``at`` (a node, line or ``m.rel:line`` site) → ``((line, col),
+    name, (module file, symbol | None), statement, alias)``; ``(…, (None, None), None, None)`` when the function imports
+    it only later (its local, still unbound); None when no function around ``at`` imports ``name`` (the module table
+    decides)."""
     if m is None or not name:
         return None
+    r = S.local(_fn_scopes(m), name, S.point(at, m.rel))
+    if r is None:
+        return None
+    return (r[0], name, _binding(m.repo, m.rel, r[2], r[3]) if r[2] is not S.SHADOWED else (None, None),
+            r[2] if r[2] is not S.SHADOWED else None, r[3])
+
+
+def _verb(m: _Mod, call) -> str | None:
+    """A bare call's name as the ORM-verb readers match it (``_a3_scope.verb``) — through this module's scopes."""
+    return S.verb(_fn_scopes(m), call)
+
+
+def _import_at(m: _Mod | None, name: str | None, at=None):
+    """``name``'s import binding ``(module file, symbol | None)`` at ``at``: a function-local import in scope there
+    shadows the module's; else the module table's; None when neither imports it."""
+    row = _local_row(m, name, at)
+    if row is not None:
+        return row[2]
+    return m.imports.get(name) if m is not None else None
+
+
+def _resolve(repo: Path, m: _Mod | None, name: str | None, hops: int = 2, at=None):
+    """A name in module ``m`` → (module, qual) of the repo def/class/assignment it names, or None. ``at`` (a node, line
+    or site of ``m``) is where the name is read: a function-local import in scope there shadows everything the module
+    binds; without one — or without ``at`` — the module table decides, byte for byte as before."""
+    if m is None or not name:
+        return None
+    row = _local_row(m, name, at) if at is not None else None
+    if row is not None:
+        b = row[2]
+        return _resolve(repo, _mod(repo, b[0]), b[1], hops - 1) if b[0] and b[1] and hops else None
     if name in m.defs or name in m.classes or name in m.assigns:
         return m, name
     imp = m.imports.get(name)
@@ -122,10 +181,11 @@ def _resolve(repo: Path, m: _Mod | None, name: str | None, hops: int = 2):
     return None
 
 
-def _bases(repo: Path, m: _Mod | None, cls: str) -> set[str]:
-    """A class's base names, two hops (``class Busy(DomainError)`` · ``class DomainError(Exception)``)."""
+def _bases(repo: Path, m: _Mod | None, cls: str, at=None) -> set[str]:
+    """A class's base names, two hops (``class Busy(DomainError)`` · ``class DomainError(Exception)``). ``at``: where the
+    name is read (``_resolve``) — a class a function imports in its own body."""
     out: set[str] = set()
-    r = _resolve(repo, m, cls)
+    r = _resolve(repo, m, cls, at=at)
     if not r or r[1] not in r[0].classes:
         return out
     for b in r[0].classes[r[1]].bases:
@@ -226,10 +286,10 @@ def _response_exit(val, m: _Mod, repo: Path) -> dict | None:
     return {"status": st, "state": "defined", **_detail(content, m, repo, st)}
 
 
-def _http_subclass(repo: Path, m: _Mod, cls: str) -> dict | None:
+def _http_subclass(repo: Path, m: _Mod, cls: str, at=None) -> dict | None:
     """A project class whose bases reach an HTTP exception → its refusal row (status from ``super().__init__(status_code=…)``
-    or a ``status_code = …`` class attribute; unknown when neither is literal), else None."""
-    r = _resolve(repo, m, cls)
+    or a ``status_code = …`` class attribute; unknown when neither is literal), else None. ``at``: where it is raised."""
+    r = _resolve(repo, m, cls, at=at)
     if not r or r[1] not in r[0].classes or not (_bases(repo, r[0], r[1]) & F.HTTP_EXCEPTIONS):
         return None
     node, cm = r[0].classes[r[1]], r[0]

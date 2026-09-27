@@ -519,6 +519,43 @@ assert [(b["call"], b["why"]) for b in x.get("branches", [])] == [("guarded", ["
 assert {c["call"]: c["reason"] for c in x["collapsed"]} == {"ensure": "no value return"}, x["collapsed"]   # a void helper
 PY
 
+py "S3.P19 · FIRE+SILENT: a class a handler imports in its OWN body is read there — its constructor collapses as one, a response class it subclasses sets the return's status; the same names no import explains are unresolved" <<'PY'
+def edit(d):
+    (d / "services/shapes.py").write_text("class Shape:\n    pass\n")
+    (d / "services/resp.py").write_text("from fastapi.responses import RedirectResponse\n\n\nclass Away(RedirectResponse):\n    pass\n")
+    (d / "api/local.py").write_text('''from fastapi import APIRouter
+
+router = APIRouter(prefix="/local")
+
+
+@router.post("/shape")
+def shape():
+    from services.shapes import Shape
+    s = Shape()
+    return {"s": str(s)}
+
+
+@router.get("/away")
+def away():
+    from services.resp import Away
+    return Away("/elsewhere")
+
+
+@router.post("/bare")
+def bare():
+    s = Shape()
+    return Away(str(s))
+''')
+f = build(variant("localimp", edit), "paths")
+sh = f["endpoints"]["endpoint:POST /local/shape"]
+assert [(c["call"], c["fn"], c["reason"]) for c in sh["collapsed"]] == [("Shape", "services/shapes.py::Shape", "constructor: builds a value")], sh.get("collapsed")
+aw = [(r["kind"], r["status"], r["state"]) for r in f["endpoints"]["endpoint:GET /local/away"]["returns"] if r["depth"] == 0]
+assert aw == [("return", 307, "default")], aw
+b = f["endpoints"]["endpoint:POST /local/bare"]
+assert not b.get("collapsed"), b.get("collapsed")          # SILENT: no import names them — neither a constructor nor an unresolved project call
+assert [(r["kind"], r["status"]) for r in b["returns"] if r["depth"] == 0] != [("return", 307)], b["returns"]
+PY
+
 py "S3.P9 · conditions read a local path and route templates; a condition proven true reads applies:true" <<'PY'
 def edit(d):
     patch(d, "middleware/gate.py", "        if not self._enabled or request.url.path in EXEMPT:", "        path = request.url.path\n        if path in EXEMPT:")
@@ -685,6 +722,25 @@ def differs(d):
 g = build(variant("sw-differs", differs), "switches")
 b2 = next(s for s in g["endpoints"]["endpoint:GET /me/credits"]["switches"] if s["kind"] == "binding")
 assert b2["changes_exit"] is True and "proves" not in b2, b2
+PY
+
+py "S5.P20 · FIRE: switches read names their functions import in their OWN body — a branch's error class imported inside it keeps its base (the except of the base translates it); a settings factory called inside a function is a settings choice" <<'PY'
+import sys; sys.path.insert(0, str(T))
+from switches_fixture import edit_sw
+def local(d):
+    edit_sw(d)
+    (d / "revoked.py").write_text("from ports import BadToken\n\n\nclass Revoked(BadToken):\n    pass\n")
+    patch(d, "ports.py", '        if token == "bad":\n            raise BadToken("bad")', '        from revoked import Revoked\n        if token == "bad":\n            raise Revoked("bad")')
+    patch(d, "services/credits.py", "    if tier == \"chef\":\n        return settings.credits_chef\n",
+          "    from config import get_settings as gs2\n    if tier == \"chef\":\n        return gs2().credits_chef\n")
+f = build(variant("sw-local", local), "switches")
+e = f["endpoints"]["endpoint:GET /me/credits"]
+b = next(s for s in e["switches"] if s["kind"] == "binding")
+ends = {x["impl"]: x.get("ends") for x in b["branches"]}
+assert [x.split(" → ")[1].split(" ")[0] for x in ends["MockVerifier"]] == ["translate"] and ends["MockVerifier"][0].startswith("Revoked → translate deps.py:") \
+    and ends["MockVerifier"][0].split(" ")[-1] == ends["RealVerifier"][0].split(" ")[-1], ends     # both caught by the same except BadToken
+v = [s for s in e["switches"] if s["kind"] == "value"]
+assert [(x.get("setting"), x["pred"]) for x in v[0]["branches"]] == [("credits_chef", "tier == 'chef'"), ("credits_free", "not (tier == 'chef')")], v
 PY
 
 py "S5.P9 · value switch: a settings choice three calls down is placed with its chain; one past reach_depth is only counted" <<'PY'
