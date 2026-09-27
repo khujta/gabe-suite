@@ -57,6 +57,7 @@ import _a3_ledger  # noqa: E402  (the case ledger, rulings 2026-07-24)
 import _a3_tests  # noqa: E402  (model_insight serialization into archmap)
 from _a3_code import ENTITY_CODE, ENTITY_MODELS, collect_entity_map  # noqa: E402
 from _a3_evidence import is_reference  # noqa: E402
+import _a3_evidence as _EVD  # noqa: E402  (captured_at — when a proof set was captured: its newest commit)
 from _a3_feature import (  # noqa: E402
     ENTITY_PROOFS,
     ENTITY_RX,
@@ -1081,7 +1082,7 @@ def _guess_owner(name: str) -> str:
 _shelf_rows = []
 for _d in pdirs:
     _owners = _set_owners.get(_d.name, [])
-    _mt = max((p.stat().st_mtime for p in _d.glob("*.png")), default=0)
+    _mt = _EVD.captured_at(sorted(_d.glob("*.png")))[0]       # the newest COMMIT of its shots (a file's time only untracked)
     _when = (_dt.datetime.fromtimestamp(_mt, _dt.timezone.utc)
              .strftime("%Y-%m-%d") if _mt else "—")
     _ecell = " ".join(
@@ -1236,7 +1237,7 @@ for name in [c["key"] for c in CORPORA]:
 
 _proof_rows = []
 if pdirs:
-    _dated = [(d, max((p.stat().st_mtime for p in d.glob("*.png")), default=0),
+    _dated = [(d, _EVD.captured_at(sorted(d.glob("*.png")))[0],   # when captured: the newest commit of its shots
                len(list(d.glob("*.png")))) for d in pdirs]
     for d, mt, n in sorted(_dated, key=lambda x: -x[1])[:8]:
         when = _dt.datetime.fromtimestamp(mt, _dt.timezone.utc).strftime("%Y-%m-%d") \
@@ -2588,6 +2589,19 @@ def main() -> int:
     if not (CENTER_OUT / "assets" / "rowclick.js").exists():
         print("  ⚠ assets/rowclick.js is missing — row-click-to-expand and the "
               "targeted-row (#dm-…) opener degrade; wire it into the skeletons.")
+    # D-061: the board and the Evidence tab ship their dates as dates and the PAGE counts the days — a shell without
+    # the counter leaves the board's age/done framings' cards in their hidden pool, its two date KPIs at "—", and a
+    # feature page's Captured cell at its static date. Every page that carries a counted date is checked.
+    _days_js = (CENTER_OUT / "assets" / "a3-days.js").exists()
+    _blind = [pg.name for pg in sorted(CENTER_OUT.glob("*.html"))
+              if pg.name == "board.html" or pg.name.startswith("feature")
+              if (_t := pg.read_text(encoding="utf-8", errors="replace"))
+              and ("data-day=" in _t or "data-days=" in _t or pg.name == "board.html")
+              and ('src="assets/a3-days.js"' not in _t or not _days_js)]
+    if _blind:
+        print(f"  ⚠ {', '.join(_blind[:6])}{' …' if len(_blind) > 6 else ''} does not load assets/a3-days.js — the "
+              "board's age and done framings and its two date KPIs stay empty, a feature page's Captured day stays "
+              "uncounted (the page counts the days, D-061); update the shell (propagate.sh ships it).")
     return 0
 
 

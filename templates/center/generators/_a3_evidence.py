@@ -15,6 +15,7 @@ import datetime as _dt
 import json
 import os
 import re
+import subprocess
 from pathlib import Path
 
 import _center_data as _cd
@@ -265,13 +266,66 @@ def _role_cell(cls: dict) -> str:
             + (f'<br><small>{E(" — ".join(small))}</small>' if small else ""))
 
 
-def _rel_days(ts: float) -> str:
-    days = (_dt.datetime.now().timestamp() - ts) / 86400
-    if days < 1:
-        return "today"
-    if days < 2:
-        return "yesterday"
-    return f"{int(days)}d ago"
+_GIT_TIMEOUT = 30
+_TOPS: dict[str, str | None] = {}
+
+
+def _git(cwd: Path, *args: str) -> str | None:
+    """One git READ (stdout), without optional locks (never an index.lock in a tree a build only reads); None when git
+    is missing, the directory is no work tree, the call fails or times out."""
+    try:
+        r = subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, timeout=_GIT_TIMEOUT,
+                           env={**os.environ, "GIT_OPTIONAL_LOCKS": "0"})
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return r.stdout if r.returncode == 0 else None
+
+
+def captured_at(files: list[Path]) -> tuple[float, bool]:
+    """When a proof set was captured → ``(instant, committed)``: the newest COMMIT time of its tracked files (``git log -1
+    --format=%ct``) — a commit's date, so a clone made any day reads the same instant — and ``committed`` True; a file
+    git does not track (or a tree with no git) counts by its modification time, and when such a file is the newest the
+    instant is that file's time and ``committed`` False (the page says so). ``(0.0, False)`` for no files. The file time
+    is the checkout's or the copy's, never the capture's, which is why it is only the fallback (D-061 review B-2)."""
+    if not files:
+        return 0.0, False
+    d = files[0].parent
+    key = str(d)
+    if key not in _TOPS:
+        top = _git(d, "rev-parse", "--show-toplevel")
+        _TOPS[key] = top.strip() if top and top.strip() else None
+    top = _TOPS[key]
+    rel: dict[str, Path] = {}
+    if top:
+        root = Path(top).resolve()
+        for f in files:
+            try:
+                rel[f.resolve().relative_to(root).as_posix()] = f
+            except ValueError:
+                pass
+    tracked: set[str] = set()
+    if rel:
+        out = _git(Path(top), "ls-files", "-z", "--", *sorted(rel))
+        tracked = {x for x in (out or "").split("\0") if x in rel}
+    ct = 0.0
+    if tracked:
+        out = _git(Path(top), "log", "-1", "--format=%ct", "--", *sorted(tracked))
+        ct = float(out.strip()) if out and out.strip().isdigit() else 0.0
+    counted = {id(rel[t]) for t in tracked} if ct else set()      # a tracked file is counted by its commit
+    mt = max((f.stat().st_mtime for f in files if id(f) not in counted), default=0.0)
+    return (ct, True) if ct and ct >= mt else (mt, False)
+
+
+def _captured(ts: float, committed: bool = True) -> str:
+    """When a set was captured (``captured_at``): an INSTANT (``data-day="@<epoch seconds>"``), and the page's own script
+    (assets/a3-days.js) takes the VIEWER's calendar day of it and counts the days to the viewer's today when the page
+    is opened (D-061) — a capture at 22:30 in UTC−3 is that evening's, never the next UTC day's. The static text is the
+    UTC date (what a page without the script shows, said as UTC). The build writes no wallclock-relative word, so an
+    unchanged shelf renders the same bytes on any day; a capture counted by a file's time says so."""
+    day = _dt.datetime.fromtimestamp(ts, _dt.timezone.utc).date().isoformat()
+    loose = "" if committed else " (the file's time — not committed)"
+    return (f'<span class="a3-day" data-day="@{int(ts)}" data-day-text="{{d}}" data-day-title="captured {{date}}{loose} · {{d}}" '
+            f'title="captured {day} UTC{loose}">{day}</span>')
 
 
 def collect_set(name: str, pdir: Path) -> dict:
@@ -369,12 +423,12 @@ def collect_set(name: str, pdir: Path) -> dict:
         legs.append({"name": "unfiled", "files": unassigned,
                      "note": "on disk in this set but not claimed by any leg "
                              "in the manifest — shown, not hidden"})
-    newest = max((f.stat().st_mtime for f in media), default=0.0)
+    newest, committed = captured_at(media)
     return {"name": name, "dir": pdir,
             "exists": pdir.is_dir() or single is not None,
             "single": single is not None, "man": man,
             "shots": shots, "videos": videos, "traces": traces, "refs": refs,
-            "legs": legs, "newest": newest}
+            "legs": legs, "newest": newest, "committed": committed}
 
 
 def _labels(files: list[Path], pdir: Path) -> list[str]:
@@ -693,7 +747,7 @@ def build_evidence_tab(cov: dict, label: str = "this entity",
             f'{len(s["shots"])} shot(s)' if s["shots"] else "",
             f'{len(s["videos"])} video(s)' if s["videos"] else "",
             f'{len(s["traces"])} trace(s)' if s["traces"] else ""])) or "—"
-        captured = (f'{_rel_days(s["newest"])}<br>'
+        captured = (f'{_captured(s["newest"], s.get("committed", True))}<br>'
                     f'<small>{E(trunc(str(man.get("source_run", "run not recorded")), 42))}</small>'
                     if s["newest"] else '<span class="sub">—</span>')
         # The story is NOT a column — it reads in full inside the opened row

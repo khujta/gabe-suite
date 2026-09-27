@@ -31,6 +31,16 @@ Two honesty rules the spike settled (docs/investigations/2026-07-25-board-spike/
     than an honest blank.
   * EFFORT IS PRICED FROM RECORDED LINE COUNTS where archmap has them, and
     stamped `~inferred` where it does not.
+
+DATES ARE ABSOLUTE; THE PAGE COUNTS THE DAYS (D-061). The generator writes no
+wallclock-relative text: a card carries its recorded and closed dates as
+dates (`data-created` · `data-closed`, a chip's `data-day`), and the page's
+own script (assets/a3-days.js) measures them against the VIEWER's today when
+the page opens — "N days", never "today" or "ago". So the age and done
+framings, which bucket by that distance, ship their cards in a pool the
+script sorts into columns, and the two date KPIs ship the dates they count.
+A board built once reads right on any later day, and its bytes do not move
+while the tree stands still.
 """
 
 from __future__ import annotations
@@ -82,6 +92,12 @@ STATES = [
 EFFORTS = [("XS", "XS · minutes", "#16794c"), ("S", "S · under an hour", "#0d6e78"),
            ("M", "M · a sitting", "#b45309"), ("L", "L · a phase", "#b3403a")]
 
+# The date framings' columns, in order. Which column a card sits in is a distance
+# in days from the viewer's today, so the PAGE picks it (a3-days.js, D-061): each
+# bounded column takes a card whose distance is at most its bound (the first that
+# fits), the unbounded one the rest, `undated` a card with no date at all.
+AGE_BOUND = {"fresh": 7, "recent": 30, "aging": 90}
+RECENCY_BOUND = {"d7": 7, "d30": 30, "d90": 90}
 AGES = [
     ("fresh", "This week", "#16794c", "Recorded in the last 7 days."),
     ("recent", "8 – 30 days", "#0d6e78", "Still current."),
@@ -130,27 +146,16 @@ def phase_id(p: dict) -> str:
     return p["num"] if p.get("id") == p.get("name") else p.get("id") or p["num"]
 
 
-def age_bucket(n):
-    if n is None:
-        return "undated"
-    return ("fresh" if n <= 7 else "recent" if n <= 30
-            else "aging" if n <= 90 else "stale")
+def bucket_spec(cols: list, bounds: dict) -> str:
+    """A date framing's columns as the page reads them — ``fresh:7 recent:30 aging:90 stale`` — each bounded column
+    with its bound, the unbounded one bare; ``undated`` is left out (a card with no date goes there, not by distance)."""
+    return " ".join(f"{k}:{bounds[k]}" if k in bounds else k for k, *_ in cols if k != "undated")
 
 
-def recency_bucket(n):
-    if n is None:
-        return "undated"
-    return "d7" if n <= 7 else "d30" if n <= 30 else "d90" if n <= 90 else "older"
-
-
-def human_age(n):
-    if n is None:
-        return "undated"
-    if n < 31:
-        return f"{n}d"
-    if n < 365:
-        return f"{round(n / 30.4)}mo"
-    return f"{n // 365}y"
+def day_of(stamp) -> str | None:
+    """The absolute date inside a recorded stamp, ``YYYY-MM-DD`` — or None when the stamp names none."""
+    d = D.as_date(stamp)
+    return d.isoformat() if d else None
 
 
 # --------------------------------------------------------------------------- #
@@ -282,8 +287,9 @@ def _card(**kw) -> dict:
     kw.setdefault("inferred", [])
     kw.setdefault("cells", None)
     kw.setdefault("owes", [])
-    kw["age_days"] = D.days_since(kw.get("created"))
-    kw["closed_days"] = D.days_since(kw.get("closed"))
+    # the two dates as DATES (D-061): how far each sits from today is the page's to count, never the build's
+    kw["created_day"] = day_of(kw.get("created"))
+    kw["closed_day"] = day_of(kw.get("closed"))
     c, x = D.as_date(kw.get("created")), D.as_date(kw.get("closed"))
     kw["cycle_days"] = (x - c).days if (c and x) else None
     return kw
@@ -546,6 +552,15 @@ def _chip(cls: str, text: str, title: str = "", style: str = "") -> str:
             + f">{text}</span>")
 
 
+def _day_chip(cls: str, day: str, text: str, title: str, static_title: str, classes: str = "") -> str:
+    """A chip whose distance in days the PAGE counts (a3-days.js, D-061): it ships the absolute date — its text, and
+    ``static_title`` as its tooltip: what a reader without the script sees — and the templates the script fills,
+    ``{d}`` → ``N days``. ``classes``: ``age-fresh:7 …`` — the class the distance picks."""
+    return (f'<span class="{cls}" data-day="{day}" data-day-text="{E(text)}" data-day-title="{E(title)}"'
+            + (f' data-day-class="{E(classes)}"' if classes else "")
+            + f' title="{E(static_title)}">{E(text.replace("{d}", day))}</span>')
+
+
 def card_html(c: dict, labels: dict) -> str:
     tlabel, tcol, _ = TRACKS[c["track"]]
     chips = [_chip("bc-tk", E(tlabel), style=f"--tc:{tcol}")]
@@ -580,20 +595,22 @@ def card_html(c: dict, labels: dict) -> str:
         chips.append(_chip("bc-def", f'↻{c["deferred"]}', "times deferred"))
 
     if c["done"]:
-        if c.get("closed_days") is not None:
-            chips.append(_chip("bc-closed", f'✓ {human_age(c["closed_days"])} ago',
-                               f'closed {c.get("closed")}'))
+        if c.get("closed_day"):
+            chips.append(_day_chip("bc-closed", c["closed_day"], "✓ {d}",
+                                   f'closed {c.get("closed")} · {{d}}', f'closed {c.get("closed")}'))
         if c.get("cycle_days") is not None:
             chips.append(_chip("bc-age", f'{c["cycle_days"]}d open',
                                "days from first recorded to closed"))
-    elif c.get("age_days") is not None:
-        chips.append(_chip(f'bc-age age-{age_bucket(c["age_days"])}',
-                           human_age(c["age_days"]),
-                           f'recorded {c.get("created")} — on the board '
-                           f'{c["age_days"]} days'))
+    elif c.get("created_day"):
+        chips.append(_day_chip("bc-age", c["created_day"], "{d}",
+                               f'recorded {c.get("created")} — on the board {{d}}', f'recorded {c.get("created")}',
+                               " ".join(f"age-{k}:{v}" for k, v in AGE_BOUND.items()) + " age-stale"))
     if c.get("last_activity") and not c["done"]:
-        chips.append(_chip("bc-age", f'touched {E(c["last_activity"])}',
-                           "last ledger entry naming this phase"))
+        touched = day_of(c["last_activity"])          # a ledger date is no commit: the page counts it (review B-5)
+        chips.append(_day_chip("bc-age", touched, "touched {d}",
+                               f'last ledger entry naming this phase — {c["last_activity"]} · {{d}}',
+                               f'last ledger entry naming this phase — {c["last_activity"]}') if touched else
+                     _chip("bc-age", f'touched {E(c["last_activity"])}', "last ledger entry naming this phase"))
 
     ripe = (_chip("bc-ripe", "◆ ripe", c["ripe_why"]) if c["ripe"] else "")
     # the commit a DONE row names, Status first (never .bchip: board.js reads
@@ -628,11 +645,13 @@ def card_html(c: dict, labels: dict) -> str:
 
     # Two date facts the KPI tiles filter on, carried as attributes so a tile
     # click can narrow to its OWN population (mode-switch alone shows the whole
-    # board). Definitions mirror kpis() EXACTLY — "closed 30d" = done and closed
-    # within 30 days; "over 3 months" = open and older than 90 days.
-    cd, ad = c.get("closed_days"), c.get("age_days")
-    closed30 = "1" if (c["done"] and cd is not None and cd <= 30) else "0"
-    aged = "1" if (not c["done"] and ad is not None and ad > 90) else "0"
+    # board). They are distances from today, so the PAGE sets them (a3-days.js,
+    # D-061) from the card's own date and the tile's rule (kpis(): "closed 30d" =
+    # done and closed within 30 days; "over 3 months" = open and older than 90);
+    # the generator ships "0" and the date: an open card its recorded date, a done
+    # card its closed one.
+    days = (f'data-closed="{c["closed_day"]}" ' if c["done"] and c.get("closed_day") else
+            f'data-created="{c["created_day"]}" ' if not c["done"] and c.get("created_day") else "")
 
     return (
         f'<article class="bcard" data-track="{E(c["track"])}" '
@@ -641,7 +660,7 @@ def card_html(c: dict, labels: dict) -> str:
         f'data-area="{E(c.get("area") or "")}" '
         f'data-effort="{E(c.get("effort") or "")}" '
         f'data-ripe="{"1" if c["ripe"] else "0"}" '
-        f'data-closed30="{closed30}" data-aged="{aged}" '
+        f'data-closed30="0" data-aged="0" {days}'
         f'style="--tc:{tcol}">'
         f'<div class="bc-top">{"".join(chips)}{ripe}{sha}</div>'
         f'<h4>{E(c["title"])}</h4><p>{E(c["detail"])}</p>'
@@ -669,11 +688,11 @@ def _columns_for(mode, cards, labels):
     if mode == "effort":
         return ([(k, lab, col, "") for k, lab, col in EFFORTS],
                 lambda c: c.get("effort") or "L", open_)
+    # the date framings: which column is a distance from today — the page's to pick (no key function, D-061)
     if mode == "age":
-        return (list(AGES), lambda c: age_bucket(c.get("age_days")), open_)
+        return list(AGES), None, open_
     if mode == "done":
-        return (list(RECENCY),
-                lambda c: recency_bucket(c.get("closed_days")), done)
+        return list(RECENCY), None, done
     ents = [e for e in labels if any(e in (c["entities"] or []) for c in open_)]
     keys = [(e, labels[e], entity_color(e), "") for e in ents]
     keys.append(("_cross", "Cross-cutting", "#7a8595",
@@ -681,8 +700,32 @@ def _columns_for(mode, cards, labels):
     return keys, lambda c: ((c["entities"] or [None])[0]) or "_cross", open_
 
 
+EMPTY = {"done": "nothing closed in this window", "": "nothing here — and that is the good outcome"}
+
+
+def _date_board(mode, keys, pop, labels) -> str:
+    """A framing whose columns are distances from today (age · done, D-061): the columns ship empty and every card rides
+    ONE pool, already in its column's reading order; the page's script (assets/a3-days.js) moves each card into the
+    column its distance picks (``data-days`` names the card's date, ``data-buckets`` the bounds), then counts, marks the
+    ripe, mixes the tracks and folds past ``data-cap`` exactly as ``board_html`` does for the other framings."""
+    done = mode == "done"
+    items = sorted(pop, key=(lambda c: (c.get("closed") or "", c["title"])) if done else _sortkey, reverse=done)
+    cols = "".join(
+        f'<section class="bcol" data-col="{E(k)}" style="--cc:{colr}">'
+        f'<header><h3>{E(label)}<span class="n">0</span></h3>'
+        + (f'<p>{E(blurb)}</p>' if blurb else "")
+        + '</header><div class="bstack"></div></section>'
+        for k, label, colr, blurb in keys)
+    return (f'<div class="bboard" data-mode="{E(mode)}" data-days="{"closed" if done else "created"}" '
+            f'data-buckets="{bucket_spec(keys, RECENCY_BOUND if done else AGE_BOUND)}" data-undated="undated" '
+            f'data-cap="{CAP}" data-empty="{E(EMPTY["done" if done else ""])}" style="display:none">'
+            f'{cols}<div class="bpool" hidden>{"".join(card_html(c, labels) for c in items)}</div></div>')
+
+
 def board_html(mode, cards, labels) -> str:
     keys, keyf, pop = _columns_for(mode, cards, labels)
+    if keyf is None:
+        return _date_board(mode, keys, pop, labels)
     buckets: dict[str, list] = {k: [] for k, *_ in keys}
     for c in pop:
         buckets.setdefault(keyf(c), []).append(c)
@@ -713,9 +756,7 @@ def board_html(mode, cards, labels) -> str:
                f'{"".join(card_html(c, labels) for c in tail)}</div>'
                f'<button class="bmore" data-n="{len(tail)}">+ {len(tail)} more'
                f'</button>' if tail else "")
-            + ('<div class="bempty">'
-               + ("nothing closed in this window" if mode == "done"
-                  else "nothing here — and that is the good outcome")
+            + ('<div class="bempty">' + EMPTY["done" if mode == "done" else ""]
                + "</div>" if not items else "")
             + "</div></section>")
     return (f'<div class="bboard" data-mode="{E(mode)}" style="display:none">'
@@ -805,18 +846,25 @@ def phase_strip(plan) -> tuple[str, str]:
     return html, _json.dumps(seq)
 
 
+def _day_kpi(label: str, days: list, rule: str, flag: str, field: str, sub: str = "", sub_rule: str = "",
+             alert: bool = False) -> str:
+    """A KPI tile that counts DAYS FROM TODAY (D-061) — so the page counts it (assets/a3-days.js): the tile ships the
+    absolute dates it counts over (``data-kpi-days``), its rule (``le:30`` — within 30 days · ``gt:90`` — older than
+    90), and the card flag and date field its click filters on (``data-kpi-flag`` · ``data-kpi-field``, the card's
+    ``data-closed``/``data-created``); ``sub`` is a template, ``{n}`` → the count under ``sub_rule``. Same markup as
+    ``_a3_render.kpi``; the value reads ``—`` until the script has counted."""
+    attrs = (f' data-kpi-days="{" ".join(sorted(days))}" data-kpi-rule="{rule}" data-kpi-flag="{flag}"'
+             f' data-kpi-field="{field}"' + (f' data-kpi-sub="{sub_rule}" data-kpi-sub-text="{E(sub)}"' if sub_rule else "")
+             + (' data-kpi-alert="1"' if alert else ""))
+    shown = sub.replace("{n}", "—") if sub_rule else sub
+    return (f'<div class="kpi"{attrs}><div class="lab">{E(label)}</div><div class="val">—</div>'
+            + (f'<div class="sub">{E(shown)}</div>' if shown else "") + "</div>")
+
+
 def kpis(cards) -> str:
     open_ = [c for c in cards if not c["done"]]
     done = [c for c in cards if c["done"]]
     owed = sum(1 for c in open_ if c["state"] == "owed_to_you")
-    # `x or 999` would be wrong: a card closed TODAY has closed_days == 0,
-    # which is falsy, and every same-day close would count as ancient.
-    d7 = sum(1 for c in done
-             if c.get("closed_days") is not None and c["closed_days"] <= 7)
-    d30 = sum(1 for c in done
-              if c.get("closed_days") is not None and c["closed_days"] <= 30)
-    stale = sum(1 for c in open_
-                if c.get("age_days") is not None and c["age_days"] > 90)
     cyc = sorted(c["cycle_days"] for c in done if c.get("cycle_days") is not None)
     out = [
         kpi("open cards", str(len(open_)), "across 6 tracks"),
@@ -826,8 +874,10 @@ def kpis(cards) -> str:
             "prerequisites already met"),
         kpi("blocked", str(sum(1 for c in open_ if c["state"] == "blocked")),
             "gated by a decision"),
-        kpi("closed 30d", str(d30), f"{d7} in the last 7"),
-        kpi("over 3 months", str(stale), "open and aging", alert=bool(stale)),
+        _day_kpi("closed 30d", [c["closed_day"] for c in done if c.get("closed_day")], "le:30", "closed30", "closed",
+                 "{n} in the last 7", "le:7"),
+        _day_kpi("over 3 months", [c["created_day"] for c in open_ if c.get("created_day")], "gt:90", "aged", "created",
+                 "open and aging", alert=True),
     ]
     if cyc:
         out.append(kpi("median cycle", f"{cyc[len(cyc) // 2]}d",

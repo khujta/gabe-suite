@@ -269,9 +269,11 @@ def build_levels(amap: dict[str, Any], graph: dict[str, Any],
         _tid = str(_r.get("file")) + "#" + str(_r.get("fn"))
         drawn_fn.setdefault(_tid, _f2s_t.get(str(_r.get("file")), "__unclaimed__"))
         _handlers.add(_tid)
-    # 2 · use_edges + usefns — a fn references a model owned elsewhere
+    # 2 · use_edges + usefns — a fn references a model owned elsewhere. The model user is DRAWN under its
+    #     QUALIFIED id (D-061) — `file#Worker.run`, the id graft and every other rule give it — from the archmap's
+    #     `quals`, never `file#run` from the bare def name (which named a method as a module function no index knows,
+    #     so no graft edge ever reached it). An archmap written before `quals` keeps the def names.
     usefns_by: dict[str, dict[str, int]] = {}
-    _bare: set[str] = set()             # the ids rule 2 minted from a bare def name (a method's reads `file#m`)
     for cls in sorted(MI):
         owner = cls_ent.get(cls)
         if not owner:
@@ -284,9 +286,9 @@ def build_levels(amap: dict[str, Any], graph: dict[str, Any],
                 usefns_by[using][fn] = usefns_by[using].get(fn, 0) + 1
                 if using != owner:
                     lv["use_edges"].append({"fs": using, "cls": cls, "ts": owner, "fn": fn})
-                    if rfile and rfile + "#" + fn not in drawn_fn:
-                        _bare.add(rfile + "#" + fn)
-                        drawn_fn[rfile + "#" + fn] = using  # a CROSS-entity model-user is drawn
+            if using != owner and rfile:
+                for qual in (ref["quals"] if "quals" in ref else ref.get("defs") or []):
+                    drawn_fn.setdefault(rfile + "#" + qual, using)   # a CROSS-entity model-user is drawn
     lv["use_edges"].sort(key=lambda e: (e["fs"], e["ts"], e["cls"], e["fn"]))
     # 2b · DATA TOUCHERS (operator ruling 2026-09-11) — any function that reads or writes a table is
     #      drawn, whether or not a call edge reaches it. The rules above descend from ROOTS, which
@@ -456,14 +458,6 @@ def build_levels(amap: dict[str, Any], graph: dict[str, Any],
                     continue
                 _have3.add((_s, _t))
                 _fedges.append(_fedge(c, _s, _t, c["ss"], c["ts"]))
-    # ONE FUNCTION, ONE NODE (D-060 review F3) — rule 2 names a model user by the BARE def name, so a method is
-    # drawn as `file#m` beside graft's `file#Class.m` once another rule draws that (3b3 drew 24 such twins on
-    # tier3). The bare id goes when a qualified `<Class>.m` of its file is drawn and the file has no module-level `m`.
-    _known = set(_gf.get("fn_slug") or {}) | {k.replace("::", "#", 1) for k in FI}
-    _tail = {(i.partition("#")[0], i.rpartition(".")[2]) for i in drawn_fn if "." in i.partition("#")[2]}
-    for _fid in sorted(_bare):
-        if _fid not in _known and tuple(_fid.split("#", 1)) in _tail:
-            drawn_fn.pop(_fid, None)
     # both endpoints are now in drawn_fn by construction; keep the edge only if so
     _fedges = [e for e in _fedges if e["s"] in drawn_fn and e["t"] in drawn_fn]
     # class 9 · reaches — a drawn fn → provider:<name> (external SDK/LLM edge). The provider is NOT a

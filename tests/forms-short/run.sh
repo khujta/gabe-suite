@@ -1082,6 +1082,23 @@ fd = next(x for x in g["arm_findings"]["short"] if x["id"] == "migration-drift")
 assert (fd["columns"], fd["checks"]) == (["created_at", "qty"], ["ck_orders_qty"]) and not [x for x in g["arm_findings"]["short"] if x["id"] == "default-overridden"], g["arm_findings"]["short"]
 PY
 
+py "SF3b · FIRE+SILENT (D-061 S2): M2 guard_use reads the guard's select by the ONE verb rule — the library's select under an alias or through its module is one; a project function named select never is" <<'PY'
+import sys; sys.path.insert(0, str(T))
+from model_fixture import mbuild, mvariant
+def guard(name, head, call):
+    def edit(d):
+        patch(d, "services/orders.py", "from sqlalchemy import select\n", head)
+        patch(d, "services/orders.py", "session.execute(select(Order)", "session.execute(" + call)
+        (d / "helpers.py").write_text("def select(*a):\n    return a\n")
+        (d / "dbf.py").write_text("from sqlalchemy import select\n")
+    g = mbuild(mvariant(name, edit), "short")
+    return [u["unique"] for u in g["models"]["model:Order"]["guard_use"]]
+assert guard("g-alias", "from sqlalchemy import select as q\n", "q(Order)") == [["key", "team_id"]]        # FIRE: the written name was `q`
+assert guard("g-mod", "import sqlalchemy as sa\n", "sa.select(Order)") == [["key", "team_id"]]             # FIRE: through the library module
+assert guard("g-proj", "from helpers import select\n", "select(Order)") == []                              # SILENT: a project `select`
+assert guard("g-facade", "from dbf import select\n", "select(Order)") == [["key", "team_id"]]              # FIRE: a project facade of the library's select, one hop
+PY
+
 py "SF11 · FIRE+SILENT: a raw ALTER TABLE … RENAME COLUMN is a rename the replay reads — no phantom drift for either half, and it is not a raw op" <<'PY'
 import sys; sys.path.insert(0, str(T))
 from model_fixture import make, mbuild, mvariant

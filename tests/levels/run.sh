@@ -231,7 +231,8 @@ ck(len(_lvw0["fn_edges"]) == 2 and {e["t"] for e in _lvw0["fn_edges"]} == {"svc/
 # `seed_stage_schedule → _stages` (both drawn — _stages as a model user — yet the edge never drew).
 _AMM = copy.deepcopy(AMAP)
 _AMM["entities"]["orders"]["files"] = _AMM["entities"]["orders"]["files"] + [["services", "svc/m.py", 40]]
-_AMM["model_insight"]["User"]["internal_refs"] = [{"file": "svc/m.py", "defs": ["stages", "run", "lonely", "dup"]}]      # cross-entity MODEL USERS (rule 2), by the BARE def name
+_AMM["model_insight"]["User"]["internal_refs"] = [{"file": "svc/m.py", "defs": ["stages", "run", "lonely", "dup"],   # cross-entity MODEL USERS (rule 2)
+                                                  "quals": ["stages", "Worker.run", "Svc.lonely", "dup", "Worker.dup"]}]  # … drawn by QUALIFIED name (D-061 S3)
 for _nm, _rw in (("seed", "w"), ("read_x", "r")):                                                 # seed and read_x: DATA TOUCHERS (rule 2b)
     _f = "svc/m.py" if _nm == "seed" else "svc/r.py"
     _AMM["function_insight"][f"{_f}::{_nm}"] = {"fn": _nm, "entity": "orders", "file": _f, "layer": "services", "handler": False, "god": False,
@@ -291,14 +292,44 @@ _GMn = copy.deepcopy(_GM); _GMn["functions"].pop("same_file")
 _lvn = _a3_levels.build_levels(_AMM, graph, graft=_GMn); _nids = {n["id"] for n in _lvn["fn_nodes"]}
 ck(not any(e["s"].startswith("svc/m.py#") and e["t"].startswith("svc/m.py#") for e in _lvn["fn_edges"]) and "svc/m.py#label" not in _nids,
    "3b3 SILENT: no confirmation list → no same-file edge and no helper node (graft alone is not enough)")
-# review F3 · ONE FUNCTION, ONE NODE — rule 2 names a model user by its BARE def name; the bare id goes once its
-# qualified twin is drawn, unless the file has a module-level function of that name
+# D-061 S3 · ONE FUNCTION, ONE ID — rule 2 draws a model user under its QUALIFIED name (`quals`, the id graft gives it),
+# never `file#run` for the method `Worker.run`: nothing bare is minted, so nothing needs folding into a twin later
 ck("svc/m.py#Worker.run" in _mids and "svc/m.py#run" not in _mids,
-   "one node FIRE: a method rule 2 drew as `file#run` is ONE node once `file#Worker.run` is drawn")
-ck("svc/m.py#run" in _nids and "svc/m.py#Worker.run" not in _nids,
-   "one node SILENT: while the qualified twin is undrawn, the bare id stays (nothing to merge into)")
-ck("svc/m.py#lonely" in _mids and "svc/m.py#dup" in _mids and "svc/m.py#Worker.dup" in _mids,
-   "one node SILENT: a bare model user with no twin stays; a module-level `dup` the index knows keeps its node beside `Worker.dup`")
+   "qualified id FIRE: rule 2 draws the method model user as `file#Worker.run` — one node, graft's id")
+ck("svc/m.py#Worker.run" in _nids and "svc/m.py#run" not in _nids,
+   "qualified id FIRE: … even when no other rule draws the method (no same-file list here) — never a bare stand-in")
+ck("svc/m.py#Svc.lonely" in _mids and "svc/m.py#lonely" not in _mids,
+   "qualified id FIRE: a method no index knows keeps its class in its id")
+ck("svc/m.py#dup" in _mids and "svc/m.py#Worker.dup" in _mids and "svc/m.py#stages" in _mids,
+   "qualified id SILENT: a module-level model user keeps its id (bare IS its qualified name), beside the same-named method")
+_AMq = copy.deepcopy(_AMM); _AMq["model_insight"]["User"]["internal_refs"][0].pop("quals")
+_qids = {n["id"] for n in _a3_levels.build_levels(_AMq, graph)["fn_nodes"]}
+ck("svc/m.py#run" in _qids and "svc/m.py#lonely" in _qids and "svc/m.py#Worker.run" not in _qids,
+   "qualified id: an archmap written before `quals` keeps the def names (the ids it always had)")
+_wr = next((n for n in _lvm["fn_nodes"] if n["id"] == "svc/m.py#Worker.run"), {})
+ck(_wr.get("slug") == "orders" and _wr.get("name") == "Worker.run",
+   "qualified id: the node is homed by the using entity and named by its qualified name")
+# the archmap side: model_insight names each model user by its qualified name too — every def of a listed name whose
+# own span mentions the class (`Other.run` shares the name and does not), a nested def by its enclosing chain
+import tempfile as _tf, pathlib as _pl, _a3_code as C
+_qr = _pl.Path(_tf.mkdtemp()); (_qr / "app").mkdir(); (_qr / "app/__init__.py").write_text("")
+(_qr / "app/models.py").write_text("class Order(Base):\n    __tablename__ = 'orders'\n    id = Column(Integer, primary_key=True)\n")
+(_qr / "app/svc.py").write_text("from app.models import Order\n\n\ndef top(s):\n    return s.get(Order, 1)\n\n\n"
+                                "class Worker:\n    def run(self, s):\n        return s.get(Order, 1)\n\n    def idle(self):\n        return 1\n\n\n"
+                                "class Other:\n    def run(self):\n        return 2\n\n\n"
+                                "def outer(s):\n    def inner():\n        return Order\n    return inner\n")
+_sv = (C.ENTITY_CODE, C._INSIGHT)
+C.ENTITY_CODE = {"orders": {"models": ["app/models.py"]}, "svc": {"services": ["app/svc.py"]}}
+C._EMAP_CACHE.clear(); C._INSIGHT = None; C._DEF_SPANS.clear()
+try:
+    _ref = (C.model_insight(_qr).get("Order") or {}).get("internal_refs") or [{}]
+finally:
+    C.ENTITY_CODE, C._INSIGHT = _sv; C._EMAP_CACHE.clear(); C._DEF_SPANS.clear()
+ck(_ref[0].get("defs") == ["top", "outer", "run", "inner"],
+   f"model_insight SILENT: `defs` keeps its bare names, order and bytes ({_ref})")
+ck(_ref[0].get("quals") == ["top", "outer", "Worker.run", "outer.inner"],
+   f"model_insight FIRE: `quals` names the method by its class and the nested def by its enclosing function, and leaves out "
+   f"the same-named method that does not use the model ({_ref})")
 # the confirmation leaf itself (_a3_samefile) over real source — Python by AST, TypeScript by the caller's lines
 import tempfile, pathlib, _a3_samefile as SF, _a3_graft as GG
 _sr = pathlib.Path(tempfile.mkdtemp())

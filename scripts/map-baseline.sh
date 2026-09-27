@@ -15,17 +15,25 @@
 #   scripts/map-baseline.sh list
 #
 # --gens DIR runs a DIFFERENT generators tree (an A/B of a refactor branch) against the same baseline.
+# The SHELL renders with its generators: every build takes GABE_SHELL_SRC=<gens>/../shell (the pair under test — a
+# target's own vendored shell is the target's, and after D-061 a shell older than its generators renders a board that
+# cannot count its days), unless the target's pinned env names one; a build whose log says a page does not load
+# assets/a3-days.js FAILS instead of being blessed or compared.
 # Baseline bulk lives outside the repo ($GABE_BASELINE_DIR, default ~/.cache/gabe-map-baselines);
 # a per-file hash manifest is COMMITTED at tests/baselines/<name>.sha256 so re-blessing shows up in git.
 #
-# NORMALISATION is deliberately narrow — the ISO run timestamp, the relative-age cells, and the board
-# card's "on the board N days" tooltip (a count of days since the row was recorded, so it ticks with
-# the wallclock while the tree stands still). Anything else that differs is REAL and must be
-# explained, never normalised away.
+# NORMALISATION is deliberately narrow — the ISO run timestamp and the T−N freshness cells (index · test
+# corpora). Anything else that differs is REAL and must be explained, never normalised away: since D-061 the
+# board and the Evidence tab write no wallclock-relative word (their dates are absolute; the page counts the
+# days when it is opened), so a day's tick no longer moves them and nothing here hides it.
 #
 # COST: a full capture/check of all three targets is MINUTES (tier3 alone is 3.4k py + 2.6k ts).
 # Serial by design — this machine runs heavy work one job at a time.
 set -uo pipefail
+# Every git READ of a target runs without optional locks — `git status` would otherwise refresh the target's index
+# and take its index.lock, a write into a tree this script promises never to touch (and a lock another session on
+# that repo can trip over). Exported, so the build's own git reads (the commits feed) inherit it too.
+export GIT_OPTIONAL_LOCKS=0
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 BASE_DIR="${GABE_BASELINE_DIR:-$HOME/.cache/gabe-map-baselines}"
 MANIFEST_DIR="$REPO/tests/baselines"
@@ -60,16 +68,16 @@ WANT=("$@")
 
 _want() { [ ${#WANT[@]} -eq 0 ] && return 0; for w in "${WANT[@]}"; do [ "$w" = "$1" ] && return 0; done; return 1; }
 
-# Strip the three renderings that move WITHOUT the tree moving, so two runs of the SAME generators
-# compare equal: the ISO run timestamp, the relative-age cells (T-34d / "3 d ago") the emitter
-# renders server-side, and the board card's age tooltip — _a3_board.card_html writes
-# title="recorded <date> — on the board <N> days", and only the COUNT is volatile (the recorded
-# date stays: it moves only when the tree does). The rule reads the count only after a BARE date:
-# a recorded value with a clock time loses its timestamp to the first rule, and its count is then
-# the one witness left that the date moved. All three are deliberately narrow — anything else
-# that differs is REAL. (The suite treats relative time as volatile too: _a3_render._VOLATILE_RX
-# hashes it out of the row fingerprint so a tick cannot re-badge a row NEW.) Proven by tests/board.
-_NORM_RX='s/[0-9]{4}-[0-9]{2}-[0-9]{2}[ T][0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?//g; s/T\xe2\x88\x92[0-9]+[dhm]/T-AGE/g; s/\b[0-9]+ ?[dhm] ago\b/AGE ago/g; s/( title="recorded [0-9]{4}-[0-9]{2}-[0-9]{2} \xe2\x80\x94 on the board )[0-9]+ days"/\1N days"/g'
+# Strip the two renderings that move WITHOUT the tree moving, so two runs of the SAME generators
+# compare equal: the ISO run timestamp (the regen stamp — when the build ran) and the T−N freshness
+# cells (_center_data.rel_age: how long ago a suite ran, rendered server-side on index and the test
+# corpora). Both are deliberately narrow — anything else that differs is REAL. D-061 retired the other
+# two: the board's "on the board N days" tooltip and the "N d ago" age cells (the board's closed chip,
+# the Evidence tab's Captured cell) — those pages now carry absolute dates and count the days in the
+# viewer's browser, so a normaliser for them would only hide a regression that wrote one back. (The
+# suite treats relative time as volatile too: _a3_render._VOLATILE_RX hashes it out of the row
+# fingerprint so a tick cannot re-badge a row NEW.) Proven by tests/board.
+_NORM_RX='s/[0-9]{4}-[0-9]{2}-[0-9]{2}[ T][0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?//g; s/T\xe2\x88\x92[0-9]+[dhm]/T-AGE/g'
 _norm() { sed -E "$_NORM_RX" "$1"; }
 
 # the SEMANTIC census — what a reader of the map would actually lose or gain
@@ -124,10 +132,16 @@ _run() {  # $1 name, $2 repo path, $3 out dir
   local dirty; dirty=$(git -C "$path" status --porcelain 2>/dev/null | wc -l)
   [ "$dirty" = 0 ] || echo "  ⚠ $name has $dirty dirty path(s) — the baseline will carry that noise"
   rm -rf "$out"; mkdir -p "$out"
-  ( cd "$GENS" && env $4 GABE_REPO_ROOT="$path" GABE_CENTER_OUT="$out" GABE_GRAFT_BUILD=0 \
+  local shell; shell="$(cd "$GENS/.." && pwd)/shell"
+  [ -d "$shell" ] || { echo "  ⚠ no shell beside $GENS — $name renders with its own (resolve_shell)"; shell=""; }
+  ( cd "$GENS" && env ${shell:+GABE_SHELL_SRC="$shell"} $4 GABE_REPO_ROOT="$path" GABE_CENTER_OUT="$out" GABE_GRAFT_BUILD=0 \
       timeout 1800 python3 build_center_a3.py ) >"$out/.build.log" 2>&1
   local rc=$?
   [ $rc = 0 ] || { echo "  FAIL $name — build exited $rc (see $out/.build.log)"; return 1; }
+  if grep -q 'does not load assets/a3-days.js' "$out/.build.log"; then
+    echo "  FAIL $name — $(grep -m1 'does not load assets/a3-days.js' "$out/.build.log" | sed -E 's/^ *⚠ //' | cut -c1-90)… (the shell cannot count its days)"
+    return 1
+  fi
   echo "$(git -C "$path" rev-parse HEAD)" > "$out/.head"
   return 0
 }

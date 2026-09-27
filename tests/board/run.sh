@@ -19,6 +19,14 @@
 # a done card that names a commit, and seats.css styles the class it emits (its
 # keyboard focus ring kept). What the seats DO is proven in a browser by
 # tests/embed-pane/seats.mjs; what a regen WRITES, by tests/center.
+#
+# D-061 (the board's dates): the generator writes no wallclock-relative text — two
+# builds of one tree with the clock a day apart are the same bytes (the regen stamp
+# aside), and the PAGE counts the days (assets/a3-days.js) — proven in a real
+# browser at two simulated todays (days.mjs + days_check.py, file://). Then the
+# baseline normaliser without its retired board/ago rules, and S4: every git read
+# map-baseline.sh makes of a target runs with GIT_OPTIONAL_LOCKS=0. No chrome or
+# no Playwright is RED, not a skip (a checker that cannot run is not evidence).
 set -u
 REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 GEN="$REPO/templates/center/generators/_a3_board.py"
@@ -39,8 +47,9 @@ bad() { fail=$((fail+1)); echo "FAIL: $1"; }
 # --- the two predicates, so the SAME check that passes on the shipped file is
 #     the one asserted to FAIL on a mutated copy (a checker that cannot fail is
 #     non-evidence — meta-review P2). ------------------------------------------
-gen_ok() {  # the generator emits BOTH KPI-filter attributes on every card
-  grep -q 'data-closed30="' "$1" && grep -q 'data-aged="' "$1"
+gen_ok() {  # the generator emits BOTH KPI-filter attributes on every card (the page sets them from the card's date and
+            # the tile's rule — D-061), and each date KPI tile names the flag its click filters on
+  grep -q 'data-closed30="0" data-aged="0"' "$1" && grep -q '"le:30", "closed30", "closed"' "$1" && grep -q '"gt:90", "aged", "created"' "$1"
 }
 js_ok() {   # board.js carries, applies, and WIRES both filter dimensions,
             # and builds the spine rail mapped to gabe commands
@@ -100,10 +109,10 @@ chip_ok    "$GEN"        && ok || bad "silent: card_html must emit the .bc-sha c
 chipcss_ok "$SEATS_CSS"  && ok || bad "silent: seats.css must style .bc-sha, ● apart from ○"
 
 # --- FIRE: drift on EITHER half is caught ----------------------------------
-T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
+T=${BOARD_T:-$(mktemp -d)}; [ -n "${BOARD_T:-}" ] || trap 'rm -rf "$T"' EXIT
 
 # a) generator drops the closed-30d attribute → the silent-KPI bug returns
-sed 's/data-closed30="{closed30}" data-aged="{aged}" //' "$GEN" > "$T/gen.py"
+sed 's/data-closed30="0" data-aged="0" //' "$GEN" > "$T/gen.py"
 gen_ok "$T/gen.py" && bad "fire: a generator missing data-closed30 must be caught" || ok
 
 # b) board.js loses the closed30 filter dimension from F
@@ -146,57 +155,222 @@ chipcss_ok "$T/seats-l.css" && bad "fire: a seats.css without the .bc-sha rules 
 sed 's/^\(\.bc-sha\[data-live="1"\]:hover, \.bc-sha:focus-visible{ .*\) }$/\1 outline:none; }/' "$SEATS_CSS" > "$T/seats-m.css"
 grep -q 'outline:none; }$' "$T/seats-m.css" && ! chipcss_ok "$T/seats-m.css" && ok || bad "fire: a .bc-sha rule that drops the focus ring (outline:none) must be caught"
 
-# --- the baseline NORMALISER (scripts/map-baseline.sh) meets the card's age tooltip ------------------
-# card_html writes title="recorded <date> — on the board <N> days": the COUNT ticks with the wallclock
-# while the tree stands still, so two runs a day apart must compare equal on it — and on nothing else
-# (the normaliser's rule: anything else that differs is REAL). The cards come from the REAL emitter, so
-# a reworded tooltip turns the FIRE case red instead of letting the baseline drift into noise again.
+# --- D-061 · the board writes no wallclock-relative text; the PAGE counts the days -------------------------------------
+# datefix.py dates the cards on every side of the bounds the page counts (0 · 7 · 30 · 90 days); clockbuild.py builds that
+# ONE tree with the clock at 2026-09-27 and again at 2026-09-28. SILENT: the two board.html are the same bytes once the
+# run timestamp (the regen stamp, the normaliser's first rule) is stripped — and the raw diff is that stamp and nothing
+# else. FIRE: a generator that writes one clock read into a card, on a mutated COPY of the generators.
+HERE="$REPO/tests/board"
+GENS="$REPO/templates/center/generators"
+SHELL_SRC="$REPO/templates/center/shell"
 BASELINE="$REPO/scripts/map-baseline.sh"
-python3 - "$T" "$(dirname "$GEN")" <<'PY'
-import sys, pathlib
-out = pathlib.Path(sys.argv[1]); sys.path.insert(0, sys.argv[2])
-import _a3_board as B
-def card(name, age=68, created="2026-07-21", detail="a planned phase with cells unticked"):
-    c = dict(track="build", state="open", title="Phase 3 · pantry sync", detail=detail, source="PLAN.md",
-             done=False, ripe=False, ripe_why="", age_days=age, created=created, closed_days=None)
-    (out / name).write_text(B.card_html(c, {}), encoding="utf-8")
-card("n-a68.html"); card("n-a69.html", age=69)                                  # a day later: only the count moved
-card("n-date.html", created="2026-07-22")                                     # the RECORDED date moved: the tree did
-card("n-d12.html", detail="held 12 days"); card("n-d13.html", detail="held 13 days")                   # a count in the prose
-card("n-p3.html", detail="on the board 3 days"); card("n-p4.html", detail="on the board 4 days")       # the phrase, outside the tooltip
-card("n-t21.html", created="2026-07-21 10:00"); card("n-t22.html", created="2026-07-22 10:00", age=67)  # a recorded DATETIME moved: rule 1 strips it, the count is the witness
-PY
-_nh() { sed -E "$1" "$T/$2" | sha256sum; }
 _rx() { grep -m1 "^_NORM_RX='" "$1" | sed "s/^_NORM_RX='//; s/'\$//"; }
-norm_fire() {    # a card a day older normalises to the same bytes (and the raw bytes really differ)
-  local rx; rx=$(_rx "$1"); [ -n "$rx" ] && ! cmp -s "$T/n-a68.html" "$T/n-a69.html" \
-    && [ "$(_nh "$rx" n-a68.html)" = "$(_nh "$rx" n-a69.html)" ]
+cbuild() {   # cbuild <generators dir> <day> <out dir> — the datefix tree built with the clock at <day>, its centre copied out
+  rm -rf "$T/fx/docs/site/center/"*.html "$T/fx/docs/site/center/assets"
+  (cd "$T" && GABE_REPO_ROOT="$T/fx" GABE_SHELL_SRC="$SHELL_SRC" GABE_GRAFT_BUILD=0 \
+     python3 "$HERE/clockbuild.py" "$1" "$2" >"$T/cb.log" 2>&1) && rm -rf "$3" && cp -r "$T/fx/docs/site/center" "$3"
 }
-norm_silent() {  # the recorded date (a bare date or a datetime), a count in the prose, and the phrase outside the tooltip all stay REAL
-  local rx; rx=$(_rx "$1"); [ -n "$rx" ] \
-    && [ "$(_nh "$rx" n-a68.html)" != "$(_nh "$rx" n-date.html)" ] \
-    && [ "$(_nh "$rx" n-d12.html)" != "$(_nh "$rx" n-d13.html)" ] \
-    && [ "$(_nh "$rx" n-p3.html)" != "$(_nh "$rx" n-p4.html)" ] \
-    && [ "$(_nh "$rx" n-t21.html)" != "$(_nh "$rx" n-t22.html)" ]
+same_days() {   # same_days <centre A> <centre B> <map-baseline.sh> — board.html equal under the script's normaliser
+  local rx; rx=$(_rx "$3"); [ -n "$rx" ] && [ -f "$1/board.html" ] && [ -f "$2/board.html" ] \
+    && [ "$(sed -E "$rx" "$1/board.html" | sha256sum)" = "$(sed -E "$rx" "$2/board.html" | sha256sum)" ]
 }
-grep -q 'on the board ' "$T/n-a68.html" && ok || bad "silent: card_html must still write the age tooltip the normaliser reads"
-norm_fire   "$BASELINE" && ok || bad "fire: map-baseline.sh must normalise the card's 'on the board N days' count (a day later reads as a change)"
-norm_silent "$BASELINE" && ok || bad "silent: map-baseline.sh must keep the recorded date, prose counts and the phrase outside the tooltip REAL"
-# n) the phrase rule dropped — a board a day older reads as a map change again
-sed "/^_NORM_RX=/s/; s\/( title=\"recorded[^']*//" "$BASELINE" > "$T/mb-n.sh"
-! grep '^_NORM_RX=' "$T/mb-n.sh" | grep -q 'on the board' && ! norm_fire "$T/mb-n.sh" && ok || bad "fire: a normaliser without the board-age rule must be caught"
-# o) over-broad — every '<N> days' in the page normalised
-sed "/^_NORM_RX=/s/s\/( title=\"recorded [^/]*\/[^/]*\/g'/s\/[0-9]+ days\/N days\/g'/" "$BASELINE" > "$T/mb-o.sh"
-grep -q 's/\[0-9\]+ days/N days/g' "$T/mb-o.sh" && ! norm_silent "$T/mb-o.sh" && ok || bad "fire: a normaliser eating every '<N> days' must be caught"
-# p) the whole tooltip stripped — the recorded date would hide a real change
-sed "/^_NORM_RX=/s/s\/( title=\"recorded [^/]*\/[^/]*\/g'/s\/ title=\"recorded [^\"]*\"\/\/g'/" "$BASELINE" > "$T/mb-p.sh"
-grep -q 's/ title="recorded \[^"\]\*"//g' "$T/mb-p.sh" && ! norm_silent "$T/mb-p.sh" && ok || bad "fire: a normaliser stripping the whole tooltip (its recorded date) must be caught"
-# q) unanchored — the phrase normalised wherever it is written, prose included
-sed "/^_NORM_RX=/s/s\/( title=\"recorded [^/]*\/[^/]*\/g'/s\/on the board [0-9]+ days\/on the board N days\/g'/" "$BASELINE" > "$T/mb-q.sh"
-grep -q "s/on the board \[0-9\]+ days/on the board N days/g'" "$T/mb-q.sh" && ! norm_silent "$T/mb-q.sh" && ok || bad "fire: an unanchored board-age rule (prose included) must be caught"
-# r) the date unanchored (D-060 review F4) — a recorded datetime loses its time to rule 1 and its count here, so its move hides
-sed '/^_NORM_RX=/s/recorded \[0-9\]{4}-\[0-9\]{2}-\[0-9\]{2} /recorded [^"]* /' "$BASELINE" > "$T/mb-r.sh"
-grep -q 'recorded \[^"\]\* ' "$T/mb-r.sh" && norm_fire "$T/mb-r.sh" && ! norm_silent "$T/mb-r.sh" && ok || bad "fire: a board-age rule that reads the count after ANY recorded value (a datetime's date move hidden) must be caught"
+python3 "$HERE/datefix.py" "$T/fx" >/dev/null 2>&1
+if cbuild "$GENS" 2026-09-27 "$T/c27" && cbuild "$GENS" 2026-09-28 "$T/c28"; then ok; else bad "fixture: the datefix board did not build"; tail -5 "$T/cb.log"; fi
+same_days "$T/c27" "$T/c28" "$BASELINE" && ok || bad "silent: a board built a day later must be the same bytes (run timestamp aside)"
+! cmp -s "$T/c27/board.html" "$T/c28/board.html" \
+  && [ "$(diff "$T/c27/board.html" "$T/c28/board.html" | grep '^[<>]' | grep -vcE 'regen (· )?2026-09-2[78] 10:00Z')" = 0 ] \
+  && ok || bad "silent: the only raw difference a day makes is the regen stamp (the clock really moved; nothing else did)"
+grep -q 'data-created="2026-09-27"' "$T/c27/board.html" && grep -q 'data-kpi-days="' "$T/c27/board.html" \
+  && grep -q '<script src="assets/a3-days.js" defer></script>' "$T/c27/board.html" && [ -f "$T/c27/assets/a3-days.js" ] \
+  && ok || bad "silent: the board ships the dates as dates, the KPI tiles their dates, and loads a3-days.js"
+# the build warns when the shell it renders with cannot count the days (a twin whose vendored shell predates D-061)
+grep -q 'does not load assets/a3-days.js' "$T/cb.log" && bad "silent: the current shell must not trip the missing-counter warning" || ok
+rm -rf "$T/shell-old"; cp -r "$SHELL_SRC" "$T/shell-old"; sed -i '/assets\/a3-days.js/d' "$T/shell-old/board.html"; rm -f "$T/shell-old/assets/a3-days.js"
+rm -rf "$T/fx/docs/site/center/"*.html "$T/fx/docs/site/center/assets"
+(cd "$T" && GABE_REPO_ROOT="$T/fx" GABE_SHELL_SRC="$T/shell-old" GABE_GRAFT_BUILD=0 python3 "$GENS/build_center_a3.py" >"$T/old-shell.log" 2>&1)
+grep -q 'does not load assets/a3-days.js' "$T/old-shell.log" && ok || bad "fire: a shell without a3-days.js must be named by the build (its date framings would stay empty)"
+# FIRE B1 — one clock read leaks into a card's tooltip: the two days' boards differ
+rm -rf "$T/gm1"; cp -r "$GENS" "$T/gm1"
+sed -i "s/f'recorded {c.get(\"created\")}',$/f'recorded {c.get(\"created\")} (seen {D.NOW.date()})',/" "$T/gm1/_a3_board.py"
+if grep -q '(seen {D.NOW.date()})' "$T/gm1/_a3_board.py" && cbuild "$T/gm1" 2026-09-27 "$T/m27" && cbuild "$T/gm1" 2026-09-28 "$T/m28"; then
+  same_days "$T/m27" "$T/m28" "$BASELINE" && bad "fire B1: a board carrying one clock read must differ a day later" || ok
+else bad "fixture: the B1 mutation did not apply or build"; fi
+
+# --- review B-1 · B-2 · B-4: the Evidence tab's Captured day ----------------------------------------------------------
+# datefix.py --evidence: the gadget entity claims two proof sets in a git tree — `gadget-walk` COMMITTED at
+# 2026-09-28T01:30Z (22:30 on the 27th at UTC−3) with its shot's file time moved to a later day (a checkout's time),
+# `gadget-draft` untracked (file time 2026-09-20T12:00Z). SILENT: the feature page is the same bytes a day later, ships
+# the commit's INSTANT (never the checkout's time) and the draft's file time, loads a3-days.js, and no warning fires.
+# FIRE (B-4): a shell whose feature.html does not load the counter is NAMED by the build.
+ebuild() {   # ebuild <generators dir> <day> <out dir> [<shell>] — the --evidence tree built with the clock at <day>
+  rm -rf "$T/fxe/docs/site/center/"*.html "$T/fxe/docs/site/center/assets"
+  (cd "$T" && GABE_REPO_ROOT="$T/fxe" GABE_SHELL_SRC="${4:-$SHELL_SRC}" GABE_GRAFT_BUILD=0 \
+     python3 "$HERE/clockbuild.py" "$1" "$2" >"$T/eb.log" 2>&1) && rm -rf "$3" && cp -r "$T/fxe/docs/site/center" "$3"
+}
+python3 "$HERE/datefix.py" "$T/fxe" --evidence >/dev/null 2>&1
+if ebuild "$GENS" 2026-09-27 "$T/e27" && ebuild "$GENS" 2026-09-28 "$T/e28"; then ok; else bad "fixture: the --evidence tree did not build"; tail -5 "$T/eb.log"; fi
+_erx=$(_rx "$BASELINE")
+[ -f "$T/e27/feature-gadget.html" ] && [ "$(sed -E "$_erx" "$T/e27/feature-gadget.html" | sha256sum)" = "$(sed -E "$_erx" "$T/e28/feature-gadget.html" | sha256sum)" ] \
+  && ok || bad "silent: a feature page built a day later must be the same bytes (run timestamp aside)"
+grep -q 'data-day="@1790559000"' "$T/e27/feature-gadget.html" && grep -q 'data-day="@1789905600"' "$T/e27/feature-gadget.html" \
+  && grep -q '<script src="assets/a3-days.js" defer></script>' "$T/e27/feature-gadget.html" \
+  && ok || bad "silent: the Captured cell ships the commit's instant (never the checkout's file time), an untracked set its file time, and the page loads a3-days.js"
+grep -q 'does not load assets/a3-days.js' "$T/eb.log" && bad "silent: the current shell's feature page must not trip the missing-counter warning" || ok
+rm -rf "$T/shell-nf"; cp -r "$SHELL_SRC" "$T/shell-nf"; sed -i '/assets\/a3-days.js/d' "$T/shell-nf/feature.html"
+ebuild "$GENS" 2026-09-27 "$T/enf" "$T/shell-nf"
+grep -q 'feature-gadget.html does not load assets/a3-days.js' "$T/eb.log" && ok \
+  || bad "fire (B-4): a feature page that carries a counted day but does not load a3-days.js must be named by the build"
+
+# --- the page counts the days: the SAME board opened on two days (a real browser, file://) -----------------------------
+# days.mjs sets the viewer's clock to each day and prints what a3-days.js made of the page; days_check.py judges it.
+# FIRE: four mutants of the counting (a3-days.js, on copies of the built centre) and one of the generator's pool order.
+CHROME="${GABE_CHROME_BIN:-/usr/bin/google-chrome-stable}"; [ -x "$CHROME" ] || CHROME=/usr/bin/google-chrome
+[ -n "${GABE_PW_DIR:-}" ] && [ -z "${PLAYWRIGHT_DIR:-}" ] && export PLAYWRIGHT_DIR="$GABE_PW_DIR"
+PW=0; node --input-type=module -e "await import('$REPO/skills/gabe-docsite/tools/_playwright.mjs')" >/dev/null 2>&1 && PW=1
+days_run() {   # days_run <centre> <tag> — both days, judged; the judge's output in $T/days-<tag>.out
+  (cd "$HERE" && GABE_CHROME_BIN="$CHROME" timeout 120 node days.mjs "$1/board.html" 2026-09-27 2026-09-28 >"$T/snap-$2.jsonl" 2>"$T/snap-$2.err")
+  python3 "$HERE/days_check.py" "$T/snap-$2.jsonl" >"$T/days-$2.out" 2>&1
+}
+dmut() {   # dmut <tag> <old> <new> — a copy of the 27th's centre whose a3-days.js has ONE exact replacement
+  rm -rf "$T/d-$1"; cp -r "$T/c27" "$T/d-$1"
+  python3 - "$T/d-$1/assets/a3-days.js" "$2" "$3" <<'PY' || bad "fixture: the $1 mutation did not apply"
+import sys
+f, old, new = sys.argv[1:4]
+s = open(f, encoding="utf-8").read()
+if s.count(old) != 1: sys.exit(1)
+open(f, "w", encoding="utf-8").write(s.replace(old, new))
+PY
+}
+redfor() {   # redfor <tag> <assert id> <what the mutant did> — that run's judge turned the assert red
+  grep -q "  FAIL  $2 " "$T/days-$1.out" && ok || { bad "fire ($1): $3 must turn $2 red"; tail -3 "$T/days-$1.out"; }
+}
+if [ -x "$CHROME" ] && [ "$PW" = 1 ] && [ -f "$T/c27/board.html" ]; then
+  if days_run "$T/c27" silent; then ok; else bad "silent: the page must count the days right on both days (see below)"; grep FAIL "$T/days-silent.out"; cat "$T/snap-silent.err"; fi
+  echo "  days (headless): $(grep -c '  PASS  ' "$T/days-silent.out") pass · $(grep -c '  FAIL  ' "$T/days-silent.out") fail"
+  dmut pool    "  each('.bboard[data-days]', null, function (b) {" "  each('.bboard[data-none]', null, function (b) {"
+  dmut clock   "var TODAY = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());" "var TODAY = now.getTime();"
+  dmut bound   "return kv[0] === 'le' ? n <= b" "return kv[0] === 'le' ? n < b"
+  dmut noflag  "      c.setAttribute('data-' + flag, n !== null && holds(k.getAttribute('data-kpi-rule'), n) ? '1' : '0');" ""
+  for m in pool clock bound noflag; do days_run "$T/d-$m" "$m"; done
+  redfor pool   D3.27 "a script that never empties the date framings' pools"
+  redfor pool   A1 "a script that never empties the date framings' pools"
+  redfor clock  C1 "a distance counted from the clock time, not the calendar day (off by one at noon)"
+  redfor bound  K1 "a within-30 rule that drops the card closed exactly 30 days back"
+  redfor noflag K3 "a KPI that never sets the card flag its click filters on"
+  # B5 — the generator's pool in the wrong order: the done framing no longer reads newest first
+  rm -rf "$T/gm5"; cp -r "$GENS" "$T/gm5"
+  sed -i 's/if done else _sortkey, reverse=done)$/if done else _sortkey, reverse=False)/' "$T/gm5/_a3_board.py"
+  if grep -q 'reverse=False)$' "$T/gm5/_a3_board.py" && cbuild "$T/gm5" 2026-09-27 "$T/g5"; then
+    days_run "$T/g5" order; redfor order N3 "a done pool shipped oldest first"
+  else bad "fixture: the B5 mutation did not apply or build"; fi
+  # B-5 — an open phase's ledger touch written back as a bare date: nothing counts it
+  rm -rf "$T/gm6"; cp -r "$GENS" "$T/gm6"
+  sed -i 's/^        touched = day_of(c\["last_activity"\])/        touched = None/' "$T/gm6/_a3_board.py"
+  if grep -q '^        touched = None' "$T/gm6/_a3_board.py" && cbuild "$T/gm6" 2026-09-27 "$T/g6"; then
+    days_run "$T/g6" touched; redfor touched C5 "an open phase's touched date shipped uncounted"
+  else bad "fixture: the B-5 mutation did not apply or build"; fi
+  echo "  days FIRE: $(cat "$T"/days-{pool,clock,bound,noflag,order,touched}.out 2>/dev/null | grep -c '  FAIL  ') assert(s) red across 6 mutants"
+  # the Evidence tab's Captured day, opened by a viewer at UTC−3 (23:45 on the capture's evening, then three days on)
+  # and one in UTC — SILENT on the built page; FIRE: the generator ships the UTC date (review B-1), counts the capture
+  # by the checkout's file time (B-2), the counter reads the instant on the UTC calendar (B-1, the script's half), and
+  # the feature page never loads the counter (B-4)
+  ev_run() {   # ev_run <centre> <tag> — the three viewers, judged; the judge's output in $T/days-<tag>.out
+    (cd "$HERE" && GABE_CHROME_BIN="$CHROME" timeout 120 node days.mjs "$1/feature-gadget.html" "2026-09-28T02:45:00Z@America/Sao_Paulo" \
+       "2026-09-30T13:00:00Z@America/Sao_Paulo" "2026-09-28T12:00:00Z@UTC" >"$T/esnap-$2.jsonl" 2>"$T/esnap-$2.err")
+    python3 "$HERE/days_check.py" --evidence "$T/esnap-$2.jsonl" >"$T/days-$2.out" 2>&1
+  }
+  if ev_run "$T/e27" esilent; then ok; else bad "silent: the page must count the Captured day on the viewer's own calendar (see below)"; grep FAIL "$T/days-esilent.out"; cat "$T/esnap-esilent.err"; fi
+  echo "  captured (headless): $(grep -c '  PASS  ' "$T/days-esilent.out") pass · $(grep -c '  FAIL  ' "$T/days-esilent.out") fail"
+  rm -rf "$T/gme1"; cp -r "$GENS" "$T/gme1"; sed -i 's/data-day="@{int(ts)}"/data-day="{day}"/' "$T/gme1/_a3_evidence.py"
+  if grep -q 'data-day="{day}"' "$T/gme1/_a3_evidence.py" && ebuild "$T/gme1" 2026-09-27 "$T/eg1"; then
+    ev_run "$T/eg1" eutc; redfor eutc E3 "a Captured cell shipped as its UTC date"
+  else bad "fixture: the eutc mutation did not apply or build"; fi
+  rm -rf "$T/gme2"; cp -r "$GENS" "$T/gme2"
+  sed -i 's/^    return (ct, True) if ct and ct >= mt else (mt, False)$/    return (max(f.stat().st_mtime for f in files), True)/' "$T/gme2/_a3_evidence.py"
+  if grep -q 'return (max(f.stat().st_mtime for f in files), True)$' "$T/gme2/_a3_evidence.py" && ebuild "$T/gme2" 2026-09-27 "$T/eg2"; then
+    ev_run "$T/eg2" emtime; redfor emtime E3 "a capture counted by the checkout's file time"
+  else bad "fixture: the emtime mutation did not apply or build"; fi
+  rm -rf "$T/d-ejs"; cp -r "$T/e27" "$T/d-ejs"
+  python3 - "$T/d-ejs/assets/a3-days.js" <<'PY' || bad "fixture: the ejs mutation did not apply"
+import sys
+f = sys.argv[1]; s = open(f, encoding="utf-8").read()
+old = "return [t.getFullYear(), t.getMonth(), t.getDate()];"
+if s.count(old) != 1: sys.exit(1)
+open(f, "w", encoding="utf-8").write(s.replace(old, "return [t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()];"))
+PY
+  ev_run "$T/d-ejs" ejs; redfor ejs E3 "an instant counted on the UTC calendar, not the viewer's"
+  ev_run "$T/enf" enf; redfor enf E2 "a feature page that never loads the counter"
+  echo "  captured FIRE: $(cat "$T"/days-{eutc,emtime,ejs,enf}.out 2>/dev/null | grep -c '  FAIL  ') assert(s) red across 4 mutants"
+else
+  bad "headless: RED — the page's day count DID NOT RUN (chrome at $CHROME: $([ -x "$CHROME" ] && echo yes || echo no) · playwright: $([ "$PW" = 1 ] && echo yes || echo no))"
+  echo "         provision: see tests/embed-pane/run.sh (a system chrome + GABE_PW_DIR)"
+fi
+
+# --- the baseline NORMALISER (scripts/map-baseline.sh) after D-061 ----------------------------------------------------
+# The board and the Evidence tab no longer tick with the clock, so the two rules that hid their ticks are gone: nothing
+# may normalise "on the board N days" or "N d ago" (a normaliser for them would only hide a regression that wrote one
+# back). The run-timestamp rule stays — it is what makes the day-apart pair above compare equal — and so does the T−N
+# rule (index and the test corpora still render a suite run's freshness server-side).
+norm_ok() {
+  local rx; rx=$(_rx "$1"); [ -n "$rx" ] && ! grep -q 'on the board' <<<"$rx" && ! grep -q ' ago' <<<"$rx" \
+    && grep -qF '[ T][0-9]{2}:[0-9]{2}' <<<"$rx" && grep -qF 'T\xe2\x88\x92[0-9]+[dhm]' <<<"$rx"
+}
+norm_ok "$BASELINE" && ok || bad "silent: map-baseline.sh keeps the run-timestamp and T−N rules and carries no board-age or ago rule"
+python3 - "$BASELINE" "$T" <<'PY'
+import sys, pathlib
+src, out = pathlib.Path(sys.argv[1]).read_text(), pathlib.Path(sys.argv[2])
+line = next(l for l in src.splitlines() if l.startswith("_NORM_RX='"))
+iso = "s/[0-9]{4}-[0-9]{2}-[0-9]{2}[ T][0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?//g; "
+for tag, new in (("board", line[:-1] + '; s/( title="recorded [0-9]{4}-[0-9]{2}-[0-9]{2} \\xe2\\x80\\x94 on the board )[0-9]+ days"/\\1N days"/g\''),
+                 ("ago", line[:-1] + "; s/\\b[0-9]+ ?[dhm] ago\\b/AGE ago/g'"),
+                 ("iso", line.replace(iso, ""))):
+    (out / f"mb-{tag}.sh").write_text(src.replace(line, new))
+PY
+grep -q 'on the board' "$T/mb-board.sh" && ! norm_ok "$T/mb-board.sh" && ok || bad "fire: a normaliser that brings the board-age rule back must be caught"
+grep -q ' ago' "$T/mb-ago.sh" && ! norm_ok "$T/mb-ago.sh" && ok || bad "fire: a normaliser that brings the 'N d ago' rule back must be caught"
+! grep -qF '[ T][0-9]{2}:[0-9]{2}' "$T/mb-iso.sh" && ! same_days "$T/c27" "$T/c28" "$T/mb-iso.sh" && ok \
+  || bad "fire: without the run-timestamp rule the day-apart boards must compare unequal (the stamp is real clock)"
+
+# --- S4 · every git read of a target runs without optional locks (GIT_OPTIONAL_LOCKS=0) ----------------------------------
+# A copy of map-baseline.sh in a scratch repo layout (its manifests land there, never here), a git on PATH that records the
+# environment it was called with, a stand-in generators dir, one target. SILENT: every git call saw GIT_OPTIONAL_LOCKS=0.
+# FIRE: the same copy without the export — the target's `git status` would take its index.lock.
+mbrun() {   # mbrun <script> <log> — one capture over the scratch roster; the fake git's calls land in <log>
+  rm -rf "$T/mb/base" "$T/mb/tests" && mkdir -p "$T/mb/tests/baselines" "$T/mb/scripts" && cp "$1" "$T/mb/scripts/map-baseline.sh" && : >"$2"
+  (cd "$T/mb" && PATH="$T/fakebin:$PATH" GITLOG="$2" GABE_BASELINE_TARGETS="$T/mb/targets.conf" GABE_BASELINE_DIR="$T/mb/base" \
+     bash scripts/map-baseline.sh capture --gens "$T/mb/gens" fx >"$2.out" 2>&1)
+}
+mkdir -p "$T/fakebin" "$T/mb/gens"
+printf '#!/usr/bin/env bash\necho "${GIT_OPTIONAL_LOCKS:-unset} $*" >>"$GITLOG"\ncase "$*" in *"rev-parse HEAD"*) echo 0123456789abcdef0123456789abcdef01234567;; esac\nexit 0\n' >"$T/fakebin/git"
+chmod +x "$T/fakebin/git"
+printf 'import json, os\nopen(os.path.join(os.environ["GABE_CENTER_OUT"], "archmap.json"), "w").write(json.dumps({"entities": {}}))\n' >"$T/mb/gens/build_center_a3.py"
+printf 'fx|%s|\n' "$T/fx" >"$T/mb/targets.conf"
+locks_ok() { [ -s "$1" ] && grep -q 'status --porcelain' "$1" && grep -q 'rev-parse HEAD' "$1" && ! grep -qv '^0 ' "$1"; }
+mbrun "$BASELINE" "$T/git-silent.log"
+locks_ok "$T/git-silent.log" && grep -q 'blessed:' "$T/git-silent.log.out" && ok \
+  || { bad "silent: every git read map-baseline.sh makes of a target runs with GIT_OPTIONAL_LOCKS=0"; cat "$T/git-silent.log" "$T/git-silent.log.out"; }
+grep -v '^export GIT_OPTIONAL_LOCKS=0$' "$BASELINE" >"$T/mb-nolock.sh"
+mbrun "$T/mb-nolock.sh" "$T/git-fire.log"
+! grep -q '^export GIT_OPTIONAL_LOCKS' "$T/mb-nolock.sh" && ! locks_ok "$T/git-fire.log" && grep -q '^unset .*status --porcelain' "$T/git-fire.log" && ok \
+  || bad "fire: a map-baseline.sh that drops the export must be caught (its git status ran with optional locks)"
+
+# --- review B-3 · a baseline renders with ITS generators' shell, and a page that cannot count its days fails the bless ----
+# The same scratch roster. SILENT: the build ran with GABE_SHELL_SRC=<gens>/../shell (the pair under test, never the
+# target's own vendored shell). FIRE: the script without that line (the build saw no GABE_SHELL_SRC); a build whose log
+# names a page that does not load a3-days.js is a FAIL, never blessed.
+mkdir -p "$T/mb/shell"; export SHELLOG="$T/shell-env.txt"
+printf 'import json, os\nopen(os.path.join(os.environ["GABE_CENTER_OUT"], "archmap.json"), "w").write(json.dumps({"entities": {}}))\nopen(os.environ["SHELLOG"], "w").write(os.environ.get("GABE_SHELL_SRC", "unset"))\n' >"$T/mb/gens/build_center_a3.py"
+mbrun "$BASELINE" "$T/git-shell.log"
+[ "$(cat "$T/shell-env.txt" 2>/dev/null)" = "$(cd "$T/mb/shell" && pwd)" ] && grep -q 'blessed:' "$T/git-shell.log.out" && ok \
+  || { bad "silent: map-baseline.sh builds with the shell beside its generators"; cat "$T/shell-env.txt" "$T/git-shell.log.out"; }
+sed 's/env ${shell:+GABE_SHELL_SRC="$shell"} $4 /env $4 /' "$BASELINE" >"$T/mb-noshell.sh"
+mbrun "$T/mb-noshell.sh" "$T/git-noshell.log"
+! grep -q 'GABE_SHELL_SRC="$shell"' "$T/mb-noshell.sh" && [ "$(cat "$T/shell-env.txt" 2>/dev/null)" = unset ] && ok \
+  || bad "fire: a map-baseline.sh that drops the shell must be caught (the target's own shell rendered the baseline)"
+printf 'import json, os\nopen(os.path.join(os.environ["GABE_CENTER_OUT"], "archmap.json"), "w").write(json.dumps({"entities": {}}))\nprint("  \u26a0 board.html does not load assets/a3-days.js \u2014 its age and done framings stay empty")\n' >"$T/mb/gens/build_center_a3.py"
+mbrun "$BASELINE" "$T/git-blind.log"
+grep -q 'FAIL fx' "$T/git-blind.log.out" && ! grep -q 'blessed:' "$T/git-blind.log.out" && ok \
+  || { bad "fire: a build that names a page unable to count its days must FAIL, not be blessed"; cat "$T/git-blind.log.out"; }
 
 echo "=================================="
 echo "board battery: $pass passed, $fail failed"

@@ -22,6 +22,7 @@ from pathlib import Path
 import _a3_code as C
 import _a3_forms as F
 import _a3_forms_migrate as M
+import _a3_scope as SC
 import _a3_graft as G
 
 _LOCK_RX = {"uv.lock": r'name = "{pkg}"\s*\nversion = "([^"]+)"', "poetry.lock": r'name = "{pkg}"\s*\nversion = "([^"]+)"',
@@ -239,17 +240,21 @@ def _own(fn):
         todo += [c for c in ast.iter_child_nodes(n) if not isinstance(c, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda))]
 
 
-def guard_uses(trees: dict, cls: str, unique_sets: list) -> list[dict]:
-    """A ``select(Model)…where(Model.a == …)`` naming exactly a unique column set, bound to a name an exiting ``if`` tests."""
+def guard_uses(trees: dict, cls: str, unique_sets: list, repo: Path | None = None, memo: dict | None = None) -> list[dict]:
+    """A ``select(Model)…where(Model.a == …)`` naming exactly a unique column set, bound to a name an exiting ``if`` tests.
+    The ``select`` is the ORM verb rule's (``_a3_scope.verb``) — a project function named ``select`` is not one, a
+    project facade that imports it from the library is (``repo``: followed one hop, ``_a3_code.verb_table``)."""
     sets = [frozenset(s) for s in unique_sets if s]
     out = []
     for f, t in sorted(trees.items()):
+        scopes = SC.fn_scopes(t)
+        table = C.verb_table(repo, f, t, memo if memo is not None else {}) if repo is not None else SC.module_imports(t)
         for fn in (n for n in ast.walk(t) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))):
             for body in [fn.body] + [getattr(n, a) for n in _own(fn) for a in ("body", "orelse") if isinstance(getattr(n, a, None), list)]:
                 for i, st in enumerate(body):
                     if not (isinstance(st, ast.Assign) and len(st.targets) == 1 and isinstance(st.targets[0], ast.Name)):
                         continue
-                    if not any(isinstance(x, ast.Call) and M._leaf(x.func) == "select" and any(isinstance(a, ast.Name) and a.id == cls for a in x.args)
+                    if not any(isinstance(x, ast.Call) and SC.verb(scopes, x, table) == "select" and any(isinstance(a, ast.Name) and a.id == cls for a in x.args)
                                for x in ast.walk(st.value)):
                         continue
                     compared = frozenset(c.left.attr for c in ast.walk(st.value) if isinstance(c, ast.Compare) and isinstance(c.left, ast.Attribute)
@@ -314,6 +319,7 @@ def model_part(repo: Path, forms: dict, amap: dict) -> tuple[dict, dict, list]:
     rows += list(((amap.get("model_census") or {}).get("unclaimed")) or [])
     mapped = C._mapped_trees(repo)
     outside: dict | None = None
+    vmemo: dict = {}                                               # verb_table's one-hop facade tables (guard_uses)
     fi = amap.get("function_insight") or {}
     writers: dict = {}
     for fid, sig in fi.items():
@@ -389,7 +395,7 @@ def model_part(repo: Path, forms: dict, amap: dict) -> tuple[dict, dict, list]:
         if mig is None and table in gone:
             d = [{"field": "table", "model": "present", "migration": "dropped"}]
         form = {"cls": cls, "table": table, "file": rel, "at": f"{rel}:{node.lineno}", "sqlalchemy": ver[0] if ver else None,
-                "columns": cols, "constraints": args, "hooks": hooks, "guard_use": guard_uses({f: t for f, t in mapped.items() if cls in names[f]}, cls, unique_sets) if unique_sets else [],
+                "columns": cols, "constraints": args, "hooks": hooks, "guard_use": guard_uses({f: t for f, t in mapped.items() if cls in names[f]}, cls, unique_sets, repo, vmemo) if unique_sets else [],
                 "default_overridden": overridden, "writers": sorted(writers.get(cls, ())), "writers_outside_map": outside_sites[:20], "tests_outside_map": len(test_sites),
                 "m10": {"races": [{"step": sid, "state": s["race"]["state"], "at": s["at"]} for sid, s in sorted(steps.items())
                                   if s.get("model") == cls and "race" in s],

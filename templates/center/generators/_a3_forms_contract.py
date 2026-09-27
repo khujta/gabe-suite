@@ -205,9 +205,12 @@ def _arms(m, fn, call) -> list:
     return []
 
 
-def _idioms(fn, model: str, line: int) -> list:
+def _idioms(m, fn, model: str, line: int) -> list:
+    """The claim idioms ``fn`` (of module ``m``) uses around a unique insert: the library's claim calls by name, and a
+    get-or-create — a ``select`` (the ORM verb rule, ``_a3_scope.verb``: a project function named ``select`` is not one) or
+    a ``.get`` naming ``model`` before ``line``."""
     found = {n.func.attr for n in _own(fn) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr in CT["claim_idioms"]}
-    if any(isinstance(n, ast.Call) and n.lineno < line and (P._leaf(n.func) == "select" or (isinstance(n.func, ast.Attribute) and n.func.attr == "get"))
+    if any(isinstance(n, ast.Call) and n.lineno < line and (P._verb(m, n) == "select" or (isinstance(n.func, ast.Attribute) and n.func.attr == "get"))
            and any(isinstance(x, ast.Name) and x.id == model for x in ast.walk(n)) for n in _own(fn)):
         found.add("get-or-create")
     return sorted(found)
@@ -238,7 +241,7 @@ def _claims(repo: Path, forms: dict, m2t: dict, uq: dict, m, fn, local: str, dep
                 race = next((s["race"] for s in steps.values() if s["fn"] == fid and s["op"] == "add" and s.get("model") == leaf and "race" in s), None)
                 row = {"model": leaf, "table": m2t[leaf], "column": k.arg, "unique": list(keys[0]["cols"]), "at": f"{m.rel}:{n.lineno}", "fn": fid,
                        "race": race["state"] if race else "unknown", "arms": _arms(*caller) if caller else [],
-                       "idioms": sorted(set(_idioms(fn, leaf, n.lineno)) | (set(_idioms(caller[1], leaf, 10 ** 9)) - {"get-or-create"} if caller else set()))}
+                       "idioms": sorted(set(_idioms(m, fn, leaf, n.lineno)) | (set(_idioms(caller[0], caller[1], leaf, 10 ** 9)) - {"get-or-create"} if caller else set()))}
                 if keys[0].get("name"):
                     row["constraint"] = keys[0]["name"]
                 if race:

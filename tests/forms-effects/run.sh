@@ -770,7 +770,7 @@ finally:
     CA.deep_raise = keep
 PY
 
-py "E21 · FIRE+SILENT: an ORM verb imported from the ORM library under an alias — by the function or by its module, or reached through the library module (sa.update) — is that verb (ONE rule, _a3_scope.verb): its read or write is a step, in the effects arm and in the code map; a project import or a name the function binds itself never is" <<'PY'
+py "E21 · FIRE+SILENT: an ORM verb imported from the ORM library under an alias — by the function or by its module, or reached through the library module (sa.update) — is that verb (ONE rule, _a3_scope.verb): its read or write is a step, in the effects arm and in the code map; a project definition named like a verb (a def, a class, a project import — D-061 S1) never is, and is followed as the project's" <<'PY'
 f = build(A)
 ok = next(p for p in paths(f, "endpoint:GET /shop/tags") if p["exit"]["kind"] == "success")
 assert [(s["op"], s["table"], s["at"]) for s in seq(f, ok)] == [("read", "tags", at("api/shop.py", "_sel(Tag)"))], seq(f, ok)
@@ -818,6 +818,52 @@ r = next(p for p in paths(k, "endpoint:POST /shop/remove") if p["exit"]["kind"] 
 assert [(s["op"], s["table"], s["fn"]) for s in seq(k, r)] == [("read", "tags", "services/crud.py::delete"), ("delete", "tags", "services/crud.py::delete"),
                                                                ("commit", None, "services/crud.py::delete")], seq(k, r)
 assert tables(k, r["effects"]["committed"]) == ["tags"], r["effects"]
+# D-061 S1 · FIRE: a project function LITERALLY named `delete` (imported unaliased) is that function — followed, its read,
+# delete and commit on the path — never the Core verb (which read `delete(session, ref)` as a write with no model and
+# followed nothing: the path came out empty)
+def _projverb(d):
+    (d / "services/crud.py").write_text("from models import Tag\n\n\ndef delete(session, name):\n    row = session.get(Tag, name)\n"
+                                        "    session.delete(row)\n    session.commit()\n")
+    patch(d, "api/shop.py", "from sqlalchemy import select as msel\n", "from sqlalchemy import select as msel\nfrom services.crud import delete\n")
+    (d / "api/shop.py").write_text((d / "api/shop.py").read_text() + '\n\n@router.post("/drop")\ndef drop(ref: str, session=Depends(get_session)):\n'
+                                   '    delete(session, ref)\n    return {"ok": True}\n')
+pv = build(variant("projverb", _projverb))
+r = next(p for p in paths(pv, "endpoint:POST /shop/drop") if p["exit"]["kind"] == "success")
+assert [(s["op"], s["table"], s["fn"]) for s in seq(pv, r)] == [("read", "tags", "services/crud.py::delete"), ("delete", "tags", "services/crud.py::delete"),
+                                                                ("commit", None, "services/crud.py::delete")], seq(pv, r)
+# D-061 S1 · SILENT: a verb bound to a local the rule cannot read (gustify's reconciliation idiom: `insert = pg_insert if pg
+# else sqlite_insert`) is still the verb — unresolved, and the file imports `insert` from the library
+def _localverb(d):
+    patch(d, "api/shop.py", "from sqlalchemy import select as msel\n",
+          "from sqlalchemy import select as msel\nfrom sqlalchemy.dialects.postgresql import insert as pg_insert\n"
+          "from sqlalchemy.dialects.sqlite import insert as sqlite_insert\n")
+    (d / "api/shop.py").write_text((d / "api/shop.py").read_text() + '\n\n@router.post("/queue")\ndef queue(ref: str, pg: bool = True, session=Depends(get_session)):\n'
+                                   '    insert = pg_insert if pg else sqlite_insert\n    session.execute(insert(Tag).values(name=ref))\n'
+                                   '    session.commit()\n    return {"ok": True}\n')
+lv = build(variant("localverb", _localverb))
+w = next(p for p in paths(lv, "endpoint:POST /shop/queue") if p["exit"]["kind"] == "success")
+assert [(s["op"], s["table"]) for s in seq(lv, w)] == [("insert", "tags"), ("commit", None)], [(s["op"], s["table"]) for s in seq(lv, w)]
+# D-061 S1/S2 · SILENT: a project `select` binds nothing — no read of the model, and no W2 widening of the name its result
+# is assigned to (the W2 select is asked through the same rule: its written name no longer stands in for the verb)
+def _projsel(d):
+    (d / "services/pick.py").write_text("def select(model):\n    return model\n")
+    patch(d, "api/shop.py", "from sqlalchemy import select as msel\n", "from sqlalchemy import select as msel\nfrom services.pick import select\n")
+    (d / "api/shop.py").write_text((d / "api/shop.py").read_text() + '\n\n@router.post("/lookup")\ndef lookup(ref: str, session=Depends(get_session)):\n'
+                                   '    found = session.execute(select(Tag)).scalar_one()\n    found.name = ref\n    session.commit()\n    return {"ok": True}\n')
+ps = build(variant("projsel", _projsel))
+k2 = next(p for p in paths(ps, "endpoint:POST /shop/lookup") if p["exit"]["kind"] == "success")
+assert [(s["op"], s["table"]) for s in seq(ps, k2)] == [("commit", None)], [(s["op"], s["table"], s.get("widening")) for s in seq(ps, k2)]
+# D-061 S1 review · FIRE: a project FACADE that imports `select` from the library (services/dbf.py) is the library's select one
+# hop on — the same endpoint as projsel reads the model and widens the name its result is bound to
+def _facade(d):
+    (d / "services/dbf.py").write_text("from sqlalchemy import select\n")
+    patch(d, "api/shop.py", "from sqlalchemy import select as msel\n", "from sqlalchemy import select as msel\nfrom services.dbf import select\n")
+    (d / "api/shop.py").write_text((d / "api/shop.py").read_text() + '\n\n@router.post("/lookup")\ndef lookup(ref: str, session=Depends(get_session)):\n'
+                                   '    found = session.execute(select(Tag)).scalar_one()\n    found.name = ref\n    session.commit()\n    return {"ok": True}\n')
+fc = build(variant("facade", _facade))
+k3 = next(p for p in paths(fc, "endpoint:POST /shop/lookup") if p["exit"]["kind"] == "success")
+assert [(s["op"], s["table"], s.get("widening")) for s in seq(fc, k3)] == [("read", "tags", None), ("update", "tags", "W2"), ("commit", None, None)], \
+    [(s["op"], s["table"], s.get("widening")) for s in seq(fc, k3)]
 # the rule's own edges: which statement binds the written name at the call
 import ast, _a3_scope as S
 t = ast.parse("""from typing import TYPE_CHECKING
@@ -882,18 +928,58 @@ scs, mod = S.fn_scopes(t), S.module_imports(t)
 def verbs(fn):
     node = next(n for n in ast.walk(t) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == fn)
     return [S.verb(scs, c, mod) for c in sorted((c for c in ast.walk(node) if isinstance(c, ast.Call)), key=lambda c: (c.lineno, c.col_offset))]
-assert verbs("uses") == ["insert", "select", "purge", "bump", "ins", "tq", "rq", "remove_tag", "rel_update"], verbs("uses")   # FIRE ×2 · a def, an assignment, a plain import rebind · TYPE_CHECKING and a try are never read · a project or relative import is never the library's
+assert verbs("uses") == ["insert", "select", None, None, None, None, None, None, None], verbs("uses")   # FIRE ×2 · a def, an assignment, a plain import rebind (a MODULE is no verb) · TYPE_CHECKING and a try are never read · a project or relative import is never the library's
 assert verbs("attrs") == ["update", "insert", None, None, "select", None], verbs("attrs")            # FIRE: a library MODULE's verb attribute · SILENT: not a verb, a project module, a dotted receiver
 assert verbs("local_first") == ["delete"], verbs("local_first")                                   # the function's own import decides, never the module's
-assert verbs("local_project") == ["q"], verbs("local_project")                                    # … and a project import there is never the library's
-assert verbs("before_local") == ["q"], verbs("before_local")                                      # its local, still unbound: the written name, never the module's
-assert verbs("shadowed") == ["pg_insert", None], verbs("shadowed")                                # a parameter (and *args) named like a module alias is the function's own
-assert verbs("rebound") == ["make", "q"], verbs("rebound")                                        # … and so is an assignment in the function
-assert verbs("loops") == ["pg_insert", "ctx", "q", None], verbs("loops")                          # … a for / with / except target
-assert verbs("comps") == ["q", "insert", "insert", "q", "q", "select"], verbs("comps")             # a comprehension target shadows in its element; its FIRST iterable (even over the target's own name) is the module's; a lambda parameter
-assert verbs("outer") == ["pg_insert"], verbs("outer")                                            # a nested def reads its enclosing function's binding
+assert verbs("local_project") == [None], verbs("local_project")                                   # … and a project import there is never the library's
+assert verbs("before_local") == [None], verbs("before_local")                                     # its local, still unbound: never the module's
+assert verbs("shadowed") == [None, None], verbs("shadowed")                                       # a parameter (and *args) named like a module alias is the function's own
+assert verbs("rebound") == [None, None], verbs("rebound")                                         # … and so is an assignment in the function
+assert verbs("loops") == [None, None, None, None], verbs("loops")                                 # … a for / with / except target
+assert verbs("comps") == [None, "insert", "insert", None, None, "select"], verbs("comps")          # a comprehension target shadows in its element; its FIRST iterable (even over the target's own name) is the module's; a lambda parameter
+assert verbs("outer") == [None], verbs("outer")                                                   # a nested def reads its enclosing function's binding
 assert verbs("kw") == ["insert"], verbs("kw")                                                     # a default runs outside the function
-assert verbs("m") == ["cq"], verbs("m")                                                           # a class body's import is its own
+assert verbs("m") == [None], verbs("m")                                                           # a class body's import is its own
+# D-061 S1 · a verb's WRITTEN name: the library's only when the file imports it from the library; a definition that is not
+# the library's — a def or class here or in an enclosing function, an import from any other package — is that function
+def run(src, fn):
+    tt = ast.parse(src); sc2, md2 = S.fn_scopes(tt), S.module_imports(tt)
+    node = next(n for n in ast.walk(tt) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == fn)
+    return [S.verb(sc2, c, md2) for c in sorted((c for c in ast.walk(node) if isinstance(c, ast.Call)), key=lambda c: (c.lineno, c.col_offset))]
+assert run("from sqlalchemy import delete\ndef delete(s, x):\n    pass\ndef f():\n    delete(s, M)\n", "f") == [None]          # FIRE: a module def after the library's import
+assert run("def delete(s, x):\n    pass\nfrom sqlalchemy import delete\ndef f():\n    delete(M)\n", "f") == ["delete"]        # SILENT: … the library's import after it
+assert run("from sqlalchemy import select\ndef f():\n    def select(x):\n        return x\n    select(M)\n", "f") == [None]   # FIRE: a nested def
+assert run("from app.crud import delete\nfrom sqlalchemy import select\ndef f():\n    delete(M)\n    from app.q import select\n    select(M)\n", "f") == [None, None]   # FIRE: a project import at either level
+assert run("from sqlalchemy.dialects.postgresql import insert as pg_insert\ndef f(pg):\n    insert = pg_insert if pg else x\n    insert(M)\n", "f") == ["insert"]   # SILENT: a local of library values
+assert run("from sqlmodel import *\ndef f():\n    select(M); delete(M)\n", "f") == ["select", "delete"]                         # SILENT: a star import of the library imports them
+assert run("def g():\n    from sqlalchemy import select\ndef f():\n    select(M); delete(M)\n", "f") == ["select", None]            # unresolved: the verb only where the file imports it
+assert run("def f(delete):\n    delete(M)\nfrom sqlalchemy import delete as d\n", "f") == ["delete"]                                 # a parameter: unresolved, imported under an alias
+assert [S.verb([], c, None) for c in ast.walk(ast.parse("select(M); delete(M)")) if isinstance(c, ast.Call)] == ["select", "delete"]   # no module table: the written verb stands
+# the review of D-061 S1: three library bindings the rule had dropped, and the innermost binding deciding
+assert run("try:\n    from sqlmodel import select\nexcept ImportError:\n    from sqlalchemy import select\ndef f():\n    select(M)\n", "f") == ["select"]   # FIRE: a compat try still imports from the library
+assert run("try:\n    from sqlmodel import select as q\nexcept ImportError:\n    from sqlalchemy import select as q\ndef f():\n    q(M)\n", "f") == ["select"]   # FIRE: … under an alias, every alternative the library's
+assert run("try:\n    from sqlalchemy import select\nexcept ImportError:\n    from app.q import select\ndef f():\n    select(M)\n", "f") == ["select"]   # an alternative that is the project's: unread, the file imports it
+assert run("try:\n    from sqlalchemy import select as q\nexcept ImportError:\n    from app.q import select as q\ndef f():\n    q(M)\n", "f") == [None]   # SILENT: … and under an alias no evidence stands
+assert run("try:\n    from sqlalchemy import select as q\nexcept ImportError:\n    q = None\ndef f():\n    q(M)\n", "f") == [None]   # SILENT: … nor where the fallback assigns
+assert run("import sqlalchemy as sa\nselect = sa.select\ndef f():\n    select(M)\n", "f") == ["select"]                                  # FIRE: an alias assignment of a library module's verb
+assert run("from sqlalchemy import select as _s\nq = _s\ndef f():\n    q(M)\n", "f") == ["select"]                                        # FIRE: … of a library binding
+assert run("import app.db as sa\nselect = sa.select\ndef f():\n    select(M)\n", "f") == [None]                                        # SILENT: a project module's attribute
+assert run("def outer(M):\n    from sqlalchemy import delete\n    def inner():\n        def delete(x):\n            return x\n        return delete(M)\n    return inner\n", "inner") == [None]   # FIRE: a def nested inside the importing function is deeper
+assert run("def outer(M):\n    from sqlalchemy import delete\n    def inner(delete):\n        return delete(M)\n    return inner\n", "inner") == ["delete"]   # … a parameter there: unresolved, the file imports it
+assert run("def outer(M):\n    from sqlalchemy import delete as d\n    def inner(d):\n        return d(M)\n    return inner\n", "inner") == [None]   # … and under an alias it is the parameter's
+assert run("def outer(M):\n    delete = 1\n    def inner():\n        from sqlalchemy import delete\n        return delete(M)\n    return inner\n", "inner") == ["delete"]   # SILENT: an ENCLOSING binding never outranks the inner import
+assert run("def f(M):\n    from sqlalchemy import delete as d\n    d(M)\n    def d(x):\n        return x\n", "f") == ["delete"]            # SILENT: the importing function's own later def: its import binds at the call
+# a project FACADE one hop on (the reader's follow): `from app.db import select` where app/db.py imports it from the library
+FAC = {"app.db": "from sqlalchemy import select, delete as remove\nimport sqlalchemy as sa\nupdate = sa.update\n", "app.q": "def select(x):\n    return x\n"}
+def runf(src, fn):
+    tt = ast.parse(src); sc2 = S.fn_scopes(tt)
+    md2 = S.module_imports(tt, follow=lambda st, a: S.module_imports(ast.parse(FAC[st.module])) if st.module in FAC else None)
+    node = next(n for n in ast.walk(tt) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == fn)
+    return [S.verb(sc2, c, md2) for c in sorted((c for c in ast.walk(node) if isinstance(c, ast.Call)), key=lambda c: (c.lineno, c.col_offset))]
+assert runf("from app.db import select, remove, update\ndef f():\n    select(M); remove(M); update(M)\n", "f") == ["select", "delete", "update"]   # FIRE: the facade's library bindings, at module level
+assert runf("def f():\n    from app.db import select as pick\n    pick(M)\n", "f") == ["select"]                                                # FIRE: … imported in the function
+assert runf("from app.q import select\nfrom app.db import sa\ndef f():\n    select(M); sa.select(M)\n", "f") == [None, "select"]              # SILENT: a project def behind the import · a library module re-exported
+assert runf("from app.none import select\ndef f():\n    select(M)\n", "f") == [None]                                                      # SILENT: a module the reader cannot resolve
 assert S.verb(scs, ast.parse("x.q(Tag)").body[0].value, mod) is None                              # not a bare name, not a library module
 PY
 

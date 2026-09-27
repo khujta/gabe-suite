@@ -32,6 +32,7 @@ _PRED_CAP = 160
 _MODS: dict[tuple[str, str], "_Mod | None"] = {}
 _EVENTS: dict[int, list] = {}
 _LOCKS: dict[str, tuple | None] = {}
+_VERBS: dict = {}                                            # verb_table's one-hop facade tables
 _VER_RX = {
     "uv.lock": re.compile(r'^name = "fastapi"\s*\nversion = "([^"]+)"', re.M),
     "poetry.lock": re.compile(r'^name = "fastapi"\s*\nversion = "([^"]+)"', re.M),
@@ -43,6 +44,7 @@ def reset_caches() -> None:
     _MODS.clear()
     _EVENTS.clear()
     _LOCKS.clear()
+    _VERBS.clear()
 
 
 # ── per-file tables ──────────────────────────────────────────────────────────────────────────────────
@@ -152,9 +154,9 @@ def _local_row(m: _Mod | None, name: str | None, at):
 
 def _verb(m: _Mod, call) -> str | None:
     """A call's name as the ORM-verb readers match it (``_a3_scope.verb``) — through this module's scopes, then its own
-    ORM-library import table (``_a3_scope.module_imports``, memoised on the module)."""
+    ORM-library import table (``_a3_code.verb_table``: a facade module one hop on, memoised on the module)."""
     if m.verbs is None:
-        m.verbs = S.module_imports(m.tree)
+        m.verbs = _C.verb_table(m.repo, m.rel, m.tree, _VERBS)
     return S.verb(_fn_scopes(m), call, m.verbs)
 
 

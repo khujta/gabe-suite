@@ -16,6 +16,7 @@ import ast
 import glob as _glob
 import json as _json
 import re as _re_mod
+from collections import deque
 from urllib.parse import quote as _uq
 from pathlib import Path
 
@@ -286,6 +287,28 @@ def _resolve_module(repo: Path, from_rel: str, module: str | None, level: int) -
                 except ValueError:
                     return str(cand)
     return None
+
+
+def verb_table(repo: Path, rel: str, tree, memo: dict):
+    """``_a3_scope.module_imports`` of the file ``rel`` with the one-hop ``follow`` the ORM verb rule asks of a project
+    import (D-061): a ``from x import y`` → the ORM-library table of the module file ``x`` names (``_resolve_module``),
+    so ``from app.db import select`` reads as the library's ``select`` when ``app/db.py`` imports it from the library. A
+    target is parsed once per ``memo`` and QUIETLY — a file that does not parse is no facade, and is not recorded here
+    (the scan that owns it says so). ONE helper for the code map, the element forms' resolver and the model arm."""
+    def follow(stmt, _alias):
+        tgt = _resolve_module(repo, rel, stmt.module, stmt.level)
+        if not tgt:
+            return None
+        key = (str(repo), tgt)
+        if key not in memo:
+            src = _safe_read(repo / tgt)
+            try:
+                t = ast.parse(src) if src is not None else None
+            except (SyntaxError, ValueError):
+                t = None
+            memo[key] = _S.module_imports(t) if t is not None else None
+        return memo[key]
+    return _S.module_imports(tree, follow=follow)
 
 
 def _mounts_for(repo: Path, files) -> dict:
@@ -824,14 +847,26 @@ _DEF_SPANS: dict[str, list] = {}
 
 def _def_spans(f: str, text: str) -> list:
     """Per-file (def name, start, end) spans, parsed once per build."""
+    return [(name, s, e) for name, _q, s, e in _qual_spans(f, text)]
+
+
+def _qual_spans(f: str, text: str) -> list:
+    """Per-file (def name, qualified name, start, end) spans in ``ast.walk`` order, parsed once per build. The qualified
+    name is the id form graft and function_insight use after ``file#``: the enclosing classes and functions joined by
+    dots — ``Worker.run`` · ``outer.inner`` · ``Cls.m.cb`` — the bare name for a module-level def."""
     if f not in _DEF_SPANS:
+        out: list = []
         try:
-            _DEF_SPANS[f] = [
-                (n.name, n.lineno, n.end_lineno or n.lineno)
-                for n in ast.walk(ast.parse(text))
-                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+            todo = deque([(ast.parse(text), "")])
         except SyntaxError:
-            _DEF_SPANS[f] = []
+            todo = deque()
+        while todo:
+            node, pre = todo.popleft()
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                out.append((node.name, pre + node.name, node.lineno, node.end_lineno or node.lineno))
+            inner = pre + node.name + "." if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) else pre
+            todo.extend((c, inner) for c in ast.iter_child_nodes(node))
+        _DEF_SPANS[f] = out
     return _DEF_SPANS[f]
 
 
@@ -1562,14 +1597,19 @@ def model_insight(repo: Path) -> dict:
                                      if f != c["file"] and rx.search(t))
         c["internal"] = len(c["internal_files"])
         # WHICH defs in each referencing file mention the class — for the
-        # detail's "Usage by internal" table (file · functions).
+        # detail's "Usage by internal" table (file · functions). `quals` names
+        # the same defs by their qualified name (`Worker.run`, never `run`) —
+        # every def of each listed name whose own span mentions the class — so
+        # the levels feed draws a model user under the id graft gives it (D-061).
         c["internal_refs"] = []
         for f in c["internal_files"]:
             lines = texts[f].splitlines()
-            defs = [name for name, s, e in _def_spans(f, texts[f])
+            hits = [(name, qual) for name, qual, s, e in _qual_spans(f, texts[f])
                     if rx.search("\n".join(lines[s - 1:e]))]
+            defs = list(dict.fromkeys(name for name, _q in hits))[:6]
             c["internal_refs"].append(
-                {"file": f, "defs": list(dict.fromkeys(defs))[:6]})
+                {"file": f, "defs": defs,
+                 "quals": list(dict.fromkeys(q for name, q in hits if name in defs))})
     for c in classes.values():
         mine = {n for n, *_ in c["fields"]}
         best, best_j, shared = "", 0.0, 0
@@ -2216,13 +2256,14 @@ def function_insight(repo: Path) -> dict:
                 _m2t_trees[_u["file"]] = _t
     model2table = _model_table_map(_m2t_trees)
     fns: dict[str, dict] = {}
+    _vmemo: dict = {}                                        # verb_table's one-hop facade tables, this build
     for f, tree in trees.items():
         text = texts[f]
         lines = text.splitlines()
         _hl = bool(set(_file_imports(f)) & _HTTP_IMPORT_NAMES)   # B1: does THIS module import an http client?
         _pv = _file_providers(f)                                 # class 9: this module's SDK imports → provider binds
         _scopes = _S.fn_scopes(tree)                              # a verb imported under an alias in the function (_a3_scope.verb)
-        _verbs = _S.module_imports(tree)                          # … or by the module itself
+        _verbs = verb_table(repo, f, tree, _vmemo)                # … or by the module itself (a facade one hop on)
 
         def _add(node, cls: str | None):
             if node.name.startswith("__") or len(node.name) < 3:

@@ -225,11 +225,16 @@ _TAG_RX = re.compile(r"<[^>]+>")
 # Relative-time vocabulary that moves between builds without the row itself
 # changing — hashed as a placeholder so a T−27h → T−28h tick never re-badges.
 _VOLATILE_RX = re.compile(
+    # A day the PAGE counts (D-061: `<span … data-day="YYYY-MM-DD" …>date</span>`, filled
+    # by assets/a3-days.js) takes the placeholder a relative age took before it — so a row
+    # that used to read "31d ago" keeps its fingerprint, and is not badged NEW for the change.
+    r'<span\b[^>]*\bdata-day="[^"]*"[^>]*>[^<]*</span>|'
     # `d` was missing from the T− class while the sibling "N ago" alternative had it, so a
     # T−34d → T−35d tick DID re-badge — the exact failure this scrubber exists to prevent
     # (caught on gastify by the golden master, 2026-09-11: one flipped day re-fingerprinted
     # the api corpus row and stamped it NEW on an unchanged tree).
-    r"T−\d+\s*[dhm]|\b\d+\s*[dhm]\s+ago\b|\btoday\b|\byesterday\b|\bhoy\b|\bayer\b",
+    # `future?` is rel_age's word for a record stamped past the build's clock: a tick too (review B-6).
+    r"T−\d+\s*[dhm]|\b\d+\s*[dhm]\s+ago\b|\btoday\b|\byesterday\b|\bhoy\b|\bayer\b|\bfuture\?",
     re.IGNORECASE)
 _ROWMARKS: dict = {"baseline": None, "seen": {}, "counts": {}}
 

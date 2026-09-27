@@ -784,3 +784,20 @@ function, so its path list is the union and no true path reference is dropped (t
 same-module calls — `_stages` (a plain call, long_prep.py:100), `_label` and `_hold_hours` (inside keyword arguments, :84–85), the
 last two not even nodes — are diagnosed first, then fixed in suite code; graft is third-party and stays untouched; (4) the baseline
 checker stops reading the board's "on the board N days" text as a real change.
+
+## D-061 — The board's relative dates are counted when the page opens; the helpers stand on their caller's paths; the small items close
+Date: 2026-09-27 · Input: the D-060 report's two open calls (BY MOMENT's deep helpers on an upper bound; the board still changing daily)
+and its "left open" list.
+Decision, his: "let's tackle the two goals … About the board, it still changes daily. If there is a day there, let's make it so that
+the dates are kind of absolute in the sense that commits will not change date (because those are commits). Any other date that we
+show should be calculated on the fly against today, not recorded hard in the code somewhere when we generate this. It should be
+dynamic. No matter if we open the thing today or tomorrow, the calculation will happen at the moment that we open it … It's okay
+that we don't show things like yesterday or 2 days ago and only show the distance in days. Also, I would like to tackle the left
+open and small items."
+Consequence: (1) the board generator writes no wallclock-relative text: a commit's date stays absolute; every other date goes into
+the page as an absolute date and the page's own script shows the distance in days when it is opened — "N days", no "yesterday" or
+"today" words; the board is byte-stable across days, so the baseline checker's board rule goes if nothing needs it. (2) BY MOMENT
+places a function behind the handler on the paths of the caller it hangs under, not on every path of the handler call. (3) the small
+items: a project function literally named `delete`/`select` is no ORM verb; functions drawn by rule 2 get their qualified id (the id
+changes are listed); the contract arm's idioms and the model arm's guard-use check ask the shared verb rule; map-baseline's git
+status runs with GIT_OPTIONAL_LOCKS=0. Generation code takes the full proof (D-059); the page change takes D-037's.

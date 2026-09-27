@@ -137,7 +137,7 @@ class _Symtab:
                         and inner.args[0].id in m2t:
                     self._bind(tgt.id, inner.args[0].id, "W2")
                     continue
-                sel = next((x for x in ast.walk(inner) if isinstance(x, ast.Call) and (P._verb(m, x) or P._leaf(x.func)) == "select"), None)
+                sel = next((x for x in ast.walk(inner) if isinstance(x, ast.Call) and P._verb(m, x) == "select"), None)   # the ONE verb rule
                 hits = {h for h in (_root(a, m2t) for a in sel.args) if h} if sel is not None else set()
                 if len(hits) == 1:
                     self._bind(tgt.id, hits.pop(), "W2")

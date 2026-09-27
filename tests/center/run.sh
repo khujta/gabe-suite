@@ -1853,6 +1853,53 @@ R.init_rowmarks(base)
 assert "t-new" in R.table(["Set", "Captured"],
                           [["f6-spike", "31d ago<br><small>python</small>"]]), \
     "scrubbing the age must not blind the digest to a real change"
+# D-061: the Evidence tab's Captured cell ships an ABSOLUTE instant the page counts (a3-days.js takes the VIEWER's
+# calendar day of it — review B-1: a UTC date miscounts an evening capture west of Greenwich). The day span takes
+# the placeholder the relative age took, so a row that read "31d ago" keeps its fingerprint across the change — and
+# the static text (no script) is the UTC date, said as UTC, with no relative word in the bytes.
+import re, _a3_evidence as EVD
+cap = EVD._captured(1788000000.0)        # 2026-08-29T10:40Z
+assert cap.startswith('<span class="a3-day" data-day="@1788000000" data-day-text="{d}" data-day-title="captured {date} · {d}" ') \
+    and 'title="captured 2026-08-29 UTC"' in cap and ">2026-08-29</span>" in cap, cap
+assert "not committed" in EVD._captured(1788000000.0, False) and "not committed" not in cap, "a file-time capture says so"
+assert not re.search(r"\b(ago|today|yesterday)\b", cap), cap
+# review B-2: WHEN a set was captured is its newest COMMIT (a clone made any day reads the same), a file's time only
+# for a file git does not track — FIRE: the committed shot's date, not the checkout's; an untracked NEWER shot wins
+# and says so; SILENT: an untracked OLDER shot does not move it; no git at all → the file's time
+import os, subprocess, tempfile, pathlib
+def _g(root, *a, env=None):
+    subprocess.run(["git", *a], cwd=root, check=True, capture_output=True, env={**os.environ, **(env or {})})
+cr = pathlib.Path(tempfile.mkdtemp()); (cr / "p").mkdir()
+shot = cr / "p" / "01.png"; shot.write_bytes(b"\x89PNG")
+_g(cr, "init", "-q"); _g(cr, "config", "user.email", "c@x"); _g(cr, "config", "user.name", "c"); _g(cr, "add", "-A")
+_g(cr, "commit", "-q", "-m", "shot", env={"GIT_AUTHOR_DATE": "2026-08-01T10:00:00Z", "GIT_COMMITTER_DATE": "2026-08-01T10:00:00Z"})
+os.utime(shot, (1790000000, 1790000000))                          # the checkout's time: 2026-09-21 — never the capture's
+T0 = 1785578400.0                                                 # 2026-08-01T10:00Z
+assert EVD.captured_at([shot]) == (T0, True), EVD.captured_at([shot])
+old = cr / "p" / "00.png"; old.write_bytes(b"\x89PNG"); os.utime(old, (1780000000, 1780000000))
+assert EVD.captured_at([old, shot]) == (T0, True), EVD.captured_at([old, shot])
+new = cr / "p" / "02.png"; new.write_bytes(b"\x89PNG"); os.utime(new, (1790000000, 1790000000))
+assert EVD.captured_at([old, shot, new]) == (1790000000.0, False), EVD.captured_at([old, shot, new])
+bare = pathlib.Path(tempfile.mkdtemp()) / "b.png"; bare.write_bytes(b"\x89PNG"); os.utime(bare, (1780000000, 1780000000))
+assert EVD.captured_at([bare]) == (1780000000.0, False) and EVD.captured_at([]) == (0.0, False), EVD.captured_at([bare])
+base = snapshot_of(lambda: R.table(["Set", "Captured"],
+                                   [["f6-spike", "31d ago<br><small>node</small>"]]))
+R.init_rowmarks(base)
+assert "t-new" not in R.table(["Set", "Captured"], [["f6-spike", cap + "<br><small>node</small>"]]), \
+    "the Captured cell's move from a relative age to a page-counted date must not re-badge the row"
+assert "t-new" in R.table(["Set", "Captured"], [["f6-spike", cap + "<br><small>python</small>"]]), \
+    "the day span must not blind the digest to a real change beside it"
+# review B-6: a record stamped seconds AFTER the build read its clock (a lab run's run-history row) is "T−1m", never
+# "future?" — FIRE: past the skew it still says future?; and the word is a tick, so a row that read "future?" in one
+# build and "T−1m" in the next keeps its fingerprint (it was the tests/center flake: a stray NEW badge)
+import datetime as _ddt, _center_data as CD
+_iso = lambda s: (CD.NOW + _ddt.timedelta(seconds=s)).isoformat()
+assert (CD.rel_age(_iso(20)), CD.rel_age(_iso(1500)), CD.rel_age(_iso(4000)), CD.rel_age(_iso(-7200))) == ("T−1m", "T−1m", "future?", "T−2h"), \
+    (CD.rel_age(_iso(20)), CD.rel_age(_iso(4000)))
+base = snapshot_of(lambda: R.table(["Source", "Date", "Last change"], [["api", "2026-09-27", "future?"]]))
+R.init_rowmarks(base)
+assert "t-new" not in R.table(["Source", "Date", "Last change"], [["api", "2026-09-27", "T−1m"]]), \
+    "a future? → T−1m tick must not re-badge the row"
 # xtable rows badge too — exactly the new one
 base = snapshot_of(lambda: R.xtable(["Set", "Role"], [(["old-set", "principal"], "")]))
 R.init_rowmarks(base)
@@ -2123,17 +2170,21 @@ assert done_n == 1 and open_n >= 2, (open_n, done_n)
 assert B.board_html("done", mixed, labels).count('class="bcard"') == done_n
 assert B.board_html("state", mixed, labels).count('class="bcard"') == open_n
 
-# ---- KPI reconciliation: 0 is a real number, not "missing" --------------
-# `closed_days or 999` once made every same-day close count as ancient, so the
-# KPI contradicted the column beside it. The close date is TODAY, not a
-# literal: a hardcoded 2026-07-25 passed for exactly seven days and then
-# failed on 2026-08-01 — date-rot reporting a bug that did not exist.
+# ---- KPI reconciliation: the date KPIs ship DATES, the page counts them ---
+# (D-061) A tile that counts days from today is counted in the viewer's
+# browser (assets/a3-days.js — proven at two simulated todays by tests/board):
+# the generator ships the close dates it counts over, the rule and the flag its
+# click filters on, and no count of its own — so the page is the same bytes on
+# any day. A same-day close ships its date like any other (0 is a real distance:
+# `closed_days or 999` once counted every same-day close as ancient).
 import datetime as _dt
 _today = _dt.date.today().isoformat()
 k = B.kpis([B._card(id="x", track="debt", title="t", detail="", state="done",
                     done=True, created=_today, closed=_today,
                     source="s")])
-assert "1 in the last 7" in k, k
+assert (f'data-kpi-days="{_today}" data-kpi-rule="le:30" data-kpi-flag="closed30" data-kpi-field="closed" '
+        'data-kpi-sub="le:7" data-kpi-sub-text="{n} in the last 7"') in k, k
+assert '<div class="val">—</div><div class="sub">— in the last 7</div>' in k and "1 in the last 7" not in k, k
 sys.exit(0)
 BOARDPY
 ) >"$T/py.out" 2>&1; then ok; else bad "board card model + closure verdict (see below)"; cat "$T/py.out"; fi

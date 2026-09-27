@@ -265,7 +265,26 @@ _vr = _pl.Path(_tf.mkdtemp()); (_vr / "app").mkdir(); (_vr / "app/__init__.py").
                                 "def by_comp(session, fs):\n    return [msel(Recipe) for msel in fs]\n")
 (_vr / "app/svc.py").write_text((_vr / "app/svc.py").read_text().replace(
     "from app.models import Recipe\n", "from app.models import Recipe\nimport sqlalchemy as sa\nfrom sqlalchemy.dialects import postgresql\nfrom app.crud import delete as crud_delete\n", 1))
-C.ENTITY_CODE = {"e": {"services": ["app/svc.py"], "models": ["app/models.py"]}}; C._EMAP_CACHE.clear(); C._FN_INSIGHT = None; C._FN_SIM_MODE = {}; C._UNPARSEABLE.clear()
+# D-061 S1: a project definition named like a verb — a project import of `delete`, a module `def select` — is that
+# function, never the Core verb; a local bound to library verbs (gustify's `insert = pg_insert if pg else sqlite_insert`)
+# still is (unresolved, and the file imports `insert` from the library)
+(_vr / "app/svc2.py").write_text("from sqlalchemy.dialects.postgresql import insert as pg_insert\nfrom sqlalchemy.dialects.sqlite import insert as sqlite_insert\n"
+                                 "from app.crud import delete\nfrom app.models import Recipe\n\n\ndef select(model):\n    return model\n\n\n"
+                                 "def drop(session):\n    session.execute(delete(Recipe))\n\n\n"
+                                 "def pick(session):\n    return session.execute(select(Recipe))\n\n\n"
+                                 "def queue(session, pg):\n    insert = pg_insert if pg else sqlite_insert\n    session.execute(insert(Recipe).values(name='x'))\n")
+# the D-061 review: a project facade that imports the verbs from the library (followed one hop), a compat try, an alias
+# assignment of a library module's verb — each still the library's verb; a facade that DEFINES `select` is not
+(_vr / "app/dbf.py").write_text("from sqlalchemy import select, delete\n")
+(_vr / "app/qdef.py").write_text("def select(model):\n    return model\n")
+(_vr / "app/svc3.py").write_text("try:\n    from sqlmodel import select as csel\nexcept ImportError:\n    from sqlalchemy import select as csel\n"
+                                 "import sqlalchemy as sa\nfrom app.dbf import select, delete as fdel\nfrom app.models import Recipe\nasel = sa.select\n\n\n"
+                                 "def f_read(session):\n    return session.execute(select(Recipe))\n\n\n"
+                                 "def f_del(session):\n    session.execute(fdel(Recipe))\n\n\n"
+                                 "def compat_read(session):\n    return session.execute(csel(Recipe))\n\n\n"
+                                 "def alias_read(session):\n    return session.execute(asel(Recipe))\n\n\n"
+                                 "def q_def(session):\n    from app.qdef import select\n    return session.execute(select(Recipe))\n")
+C.ENTITY_CODE = {"e": {"services": ["app/svc.py", "app/svc2.py", "app/svc3.py"], "models": ["app/models.py"]}}; C._EMAP_CACHE.clear(); C._FN_INSIGHT = None; C._FN_SIM_MODE = {}; C._UNPARSEABLE.clear()
 try:
     _fv = C.function_insight(_vr)
 finally:
@@ -282,6 +301,21 @@ check(not _ops("purge_guarded") and not _ops("read_shadowed"),
       f"function_insight SILENT: an alias under `if TYPE_CHECKING:` is never read, and a function's own import of the name shadows the module's ({_ops('purge_guarded')} · {_ops('read_shadowed')})")
 check(_ops("bump") == [{"model": "Recipe", "table": "recipes", "rw": "w"}],
       f"function_insight FIRE: an attribute of an ORM-library MODULE (`sa.update` after `import sqlalchemy as sa` · `postgresql.insert`) is a Core write ({_ops('bump')})")
+def _ops2(q):
+    return (_fv.get(f"app/svc2.py::{q}") or {}).get("access", {}).get("ops")
+check(not _ops2("drop") and not _ops2("pick"),
+      f"function_insight SILENT (D-061 S1): a project import literally named `delete` and a module `def select` are those functions, never the Core verbs ({_ops2('drop')} · {_ops2('pick')})")
+def _ops3(q):
+    return (_fv.get(f"app/svc3.py::{q}") or {}).get("access", {}).get("ops")
+_R3, _W3 = [{"model": "Recipe", "table": "recipes", "rw": "r"}], [{"model": "Recipe", "table": "recipes", "rw": "w"}]
+check(_ops3("f_read") == _R3 and _ops3("f_del") == _W3,
+      f"function_insight FIRE (D-061 review): a project facade that imports select/delete from the library is the library's verb one hop on ({_ops3('f_read')} · {_ops3('f_del')})")
+check(_ops3("compat_read") == _R3 and _ops3("alias_read") == _R3,
+      f"function_insight FIRE (D-061 review): a compat try (sqlmodel, else sqlalchemy) and an alias assignment `asel = sa.select` are the library's select ({_ops3('compat_read')} · {_ops3('alias_read')})")
+check(not _ops3("q_def"),
+      f"function_insight SILENT (D-061 review): a project module that DEFINES select, imported in the function, is that function ({_ops3('q_def')})")
+check(_ops2("queue") == [{"model": "Recipe", "table": "recipes", "rw": "w"}],
+      f"function_insight FIRE (D-061 S1): a local bound to library verbs (`insert = pg_insert if pg else sqlite_insert`) is still the Core write ({_ops2('queue')})")
 check(not _ops("remove") and not _ops("by_param") and not _ops("by_comp"),
       f"function_insight SILENT: a PROJECT function imported under a verb's name (`delete as crud_delete`) is never the verb; a parameter or a comprehension target named like a module alias is the function's own ({_ops('remove')} · {_ops('by_param')} · {_ops('by_comp')})")
 

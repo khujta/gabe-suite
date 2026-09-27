@@ -395,6 +395,24 @@ s = f["arms"]["contract"]["stats"]
 assert s["findings"] == {"race-500": 1} and s["claims"] == 3 and s["races"] == {"handled": 2, "uncaught": 1}, s
 PY
 
+py "E6b · FIRE+SILENT (D-061 S2): a claim's get-or-create is a select by the ONE verb rule — the library's select under an alias or through its module is one; a project function named select never is" <<'PY'
+def goc(name, head, call, extra=None):
+    def edit(d):
+        for rel, text in (extra or {}).items():
+            (d / rel).write_text(text)
+        patch(d, "services/orders.py", "from models import Claim, Order\n", head + "from models import Claim, Order\n")
+        patch(d, "services/orders.py", "def place(session, key):\n    order = Order(key=key)\n",
+              "def place(session, key):\n    found = session.execute(" + call + ").scalar_one_or_none()\n    order = Order(key=key)\n")
+    f = build(variant(name, edit))
+    return ep(f, "endpoint:POST /shop/place")["repeat"]["claims"][0]["idioms"]
+assert ep(build(A), "endpoint:POST /shop/place")["repeat"]["claims"][0]["idioms"] == [], "no select before the insert, no get-or-create"
+assert goc("goc-alias", "from sqlalchemy import select as q\n", "q(Order).where(Order.key == key)") == ["get-or-create"]      # FIRE: the written name was `q`
+assert goc("goc-mod", "import sqlalchemy as sa\n", "sa.select(Order).where(Order.key == key)") == ["get-or-create"]           # FIRE: through the library module
+assert goc("goc-proj", "from helpers import select\n", "select(Order, key)") == []                                            # SILENT: a project `select`
+assert goc("goc-facade", "from dbf import select\n", "select(Order).where(Order.key == key)", {"dbf.py": "from sqlalchemy import select\n"}) == ["get-or-create"]   # FIRE: a project facade of the library's select, one hop
+assert goc("goc-pdef", "from dbf import select\n", "select(Order, key)", {"dbf.py": "def select(*a):\n    return a\n"}) == []                                # SILENT: … a module that defines it
+PY
+
 py "E7 · FIRE + SILENT: U12 — a key through request.state or a header read, the refusal that requires it; missing on a keyless POST, n/a on a GET" <<'PY'
 f = build(A)
 pl = ep(f, "endpoint:POST /shop/place")["repeat"]
