@@ -201,6 +201,13 @@ NOLINE = 10 ** 9                                                                
 BROAD = {"Exception", "BaseException"}                                               # a catch that takes every error
 
 
+def _routes(rb: dict) -> list:
+    """A reached_by record's routes (D-060): its `routes`, one per handler call that reaches the function, each with the paths
+    passing THAT call — else the record itself, its one route. Never the record's own `paths` against a route's line: they are
+    the union over the routes."""
+    return rb.get("routes") or [rb]
+
+
 def _line(at) -> int | None:
     m = re.search(r":(\d+)(?:-\d+)?$", str(at or ""))
     return int(m.group(1)) if m else None
@@ -225,12 +232,14 @@ def time_order(F: dict, fep: dict, fj: dict, ident: dict, EW: dict) -> dict:
     pre = F.get("preconditions") or []
     frec = {x["id"]: x for x in (fep.get("produced") or []) + (fep.get("framework_exits") or [])}
     fns = fj.get("functions") or {}
-    # the raises the feed reaches from each handler call site of this endpoint (the kinds arm's functions, joined by root_site)
+    # the raises the feed reaches from each handler call site of this endpoint (the kinds arm's functions, joined by root_site —
+    # every route's, D-060: a function the handler reaches through several of its calls is reached from each)
     reach = collections.defaultdict(list)
     for f in fns.values():
         for rb in f.get("reached_by") or []:
-            if rb.get("root") == E and rb.get("root_site"):
-                reach[rb["root_site"]] += f.get("raises") or []
+            for rt in _routes(rb) if rb.get("root") == E else ():
+                if rt.get("root_site"):
+                    reach[rt["root_site"]] += f.get("raises") or []
     # the phases in the order the chains show them: every step's phase as the chains meet it, then the path's own; a phase no
     # chain shows falls in after them, in the facts' own phase list
     seen = []
@@ -252,7 +261,8 @@ def time_order(F: dict, fep: dict, fj: dict, ident: dict, EW: dict) -> dict:
         site = m.group(2) + ":" + m.group(3)
         for f in fns.values():
             r = next((q for q in f.get("raises") or [] if q.get("at") == g.get("at")), None)
-            if r is None or r.get("through") or not any(rb.get("root") == E and rb.get("root_site") == site for rb in f.get("reached_by") or []):
+            if r is None or r.get("through") or not any(rb.get("root") == E and any(rt.get("root_site") == site for rt in _routes(rb))
+                                                        for rb in f.get("reached_by") or []):
                 continue
             xs = {t["exit"] for q in f["raises"] if q is not r and q.get("cls") == r.get("cls") for t in q.get("translated_by") or [] if t.get("endpoint") == E}
             if len(xs) == 1 and next(iter(xs)) in X and X[next(iter(xs))].get("status") == g.get("status"):
@@ -613,14 +623,16 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             if s.get("kind") in ("call", "collapsed") and s.get("fn") and inh(s.get("at")) and not off_for(_line(s["at"]), pid):
                 d[_line(s["at"])].add(s["fn"]); site_paths[_line(s["at"])].add(pid)
         pcall[pid] = d
-    # functions{}.reached_by, per function: handler line → the paths the record names (None: it names none)
+    # functions{}.reached_by, per function: handler line → the paths the record names (None: it names none) — per ROUTE (D-060): a
+    # record reached through several handler calls lists each call with the paths passing THAT call; its own `paths` is their union
     rb_idx = collections.defaultdict(dict)
     for f, rec in fns.items():
-        for b in rec.get("reached_by") or []:
-            if b.get("root") == E and inh(b.get("root_site")):
-                q, bp = _line(b["root_site"]), b.get("paths")
-                cur = rb_idx[f].get(q, set())
-                rb_idx[f][q] = None if (bp is None or cur is None) else cur | {x for x in bp if x in EXIT}
+        for rb in rec.get("reached_by") or []:
+            for b in _routes(rb) if rb.get("root") == E else ():
+                if inh(b.get("root_site")):
+                    q, bp = _line(b["root_site"]), b.get("paths")
+                    cur = rb_idx[f].get(q, set())
+                    rb_idx[f][q] = None if (bp is None or cur is None) else cur | {x for x in bp if x in EXIT}
 
     # ── 2 · every element, with WHEN it acts: ("fix", moment) · ("h", line[, class]) · ("fail", group) · ("hc",) · ("un", why) ──
     els = []                                                     # dicts: f, w, keys, text, chip, paths (None = every path passing it), hint, id
@@ -775,8 +787,8 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             # a catch inside a callee: the handler calls that reach its function — its own records, else the records of the
             # functions it calls (their `via` names it, their root_site the handler call)
             qs, _src = sites(cf)
-            qs = qs or sorted({_line(b["root_site"]) for f2 in fns.values() for b in f2.get("reached_by") or []
-                               if b.get("root") == E and b.get("via") == cf and inh(b.get("root_site"))})
+            qs = qs or sorted({_line(b["root_site"]) for f2 in fns.values() for rb in f2.get("reached_by") or [] if rb.get("root") == E
+                               for b in _routes(rb) if b.get("via") == cf and inh(b.get("root_site"))})
             w = ("hs", qs) if qs else ("un", "pathsonly")
         # the paths whose chain passes the catch (it acts there); a catch no chain shows: the paths the feed lists it on
         pp = {p for p in PIDS if any(s.get("kind") == "catch" and s.get("at") == at for s in chains[p])} or set(c.get("paths") or [])

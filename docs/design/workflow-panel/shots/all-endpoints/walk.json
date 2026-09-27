@@ -515,7 +515,7 @@
       953,
       53,
       935,
-      6441
+      6537
      ]
     ],
     "universe": [
@@ -630,7 +630,7 @@
     "stage": 18,
     "kind": 26,
     "status": 36,
-    "role": 33,
+    "role": 37,
     "dir": 2,
     "limit": 2,
     "fate": 18,
@@ -1000,11 +1000,11 @@
    "code map · the station glyphs and labels",
    {
     "function": {
-     "n": 33,
+     "n": 37,
      "labels": {
       "caller": 8,
       "accessor": 20,
-      "pure": 4,
+      "pure": 8,
       "gate": 1
      }
     },
@@ -1571,8 +1571,8 @@
     "Across the 80 endpoints, what each block places:",
     "Endings: 727 with a moment, 1 with none, of 728.",
     "Gates and decisions: 532 with a moment, 0 with none, of 532.",
-    "Data effects: 1342 with a moment, 31 with none, of 1373.",
-    "Functions: 1191 with a moment, 51 with none, of 1242.",
+    "Data effects: 1345 with a moment, 28 with none, of 1373.",
+    "Functions: 1494 with a moment, 53 with none, of 1547.",
     "Structures: 339 with a moment, 0 with none, of 339.",
     "Client: 174 with a moment, 0 with none, of 174.",
     "In-flight state: 696 with a moment, 10 with none, of 706.",
@@ -1582,7 +1582,7 @@
     "Overview and risk: 0 with a moment, 0 with none, of 0.",
     "Data effects, how each step was placed on each path it is on (4559 in all): 95 on the handler's own line, 455 inside a c",
     "3 times a chain lists a call inside a catch its path never passes; that call is left off that path.",
-    "8 times a path lists a step that no call of its own reaches while another path places it; it is left off that path."
+    "4 times a path lists a step that no call of its own reaches while another path places it; it is left off that path."
    ]
   ],
   [
@@ -1696,7 +1696,7 @@
     "Proof 2 2 2 1 4 10 11 ",
     "Gates and decisions 2 2 3 5 9 ",
     "Data effects 7 31 1 ",
-    "Functions 7 3 23 1 1 ",
+    "Functions 10 3 30 1 1 ",
     "Structures 1 2 5 ",
     "Client ",
     "In-flight state 7 1 3 ",
@@ -2122,8 +2122,8 @@
     "notes": [
      "+3 tables only in BY MOMENT",
      "+3 tables only in BY MOMENT",
-     "+22 in BY MOMENT",
-     "+22 in BY MOMENT"
+     "+26 in BY MOMENT",
+     "+26 in BY MOMENT"
     ]
    }
   ],
@@ -2199,7 +2199,7 @@
   ],
   [
    "D-056 · the code map, d:behind",
-   "functions behind, and how deep 18 · 4 depth 1 AuthContext.require_household gate get_auth_context caller _attach_photos caller concurrent_cook_cap_for_tier pure start_session accessor subscription_tier_for accessor depth 2 build_auth_context caller _recipe_titles accessor list_photo_refs accessor count_active_sessions accessor seed_stage_schedule accessor assert_recipe_allergen_safe gate depth 3 FirebaseTokenVerifier.verify pure MockTokenVerifier.verify pure load_household_context accessor resolve_or_create_user accessor _schedule_next accessor depth 4 get_principal_location accessor depth not known _hold_hours _label _stages pure +2 by name only"
+   "functions behind, and how deep 18 · 4 depth 1 AuthContext.require_household gate get_auth_context caller _attach_photos caller concurrent_cook_cap_for_tier pure start_session accessor subscription_tier_for accessor depth 2 build_auth_context caller _recipe_titles accessor list_photo_refs accessor count_active_sessions accessor seed_stage_schedule accessor assert_recipe_allergen_safe gate depth 3 FirebaseTokenVerifier.verify pure MockTokenVerifier.verify pure load_household_context accessor resolve_or_create_user accessor _schedule_next accessor _stages pure depth 4 _get_firebase_app pure identity_from_firebase_claims pure get_principal_location accessor _hold_hours pure _label pure depth 5 _firebase_credential pure +2 by name only"
   ],
   [
    "D-056 · the code map, d:arranged",
@@ -2381,13 +2381,13 @@
   ],
   [
    "review · the behind pair, by name",
-   "functions behind, and how deep 18 · 4 depth 1 AuthContext.require_household gate get_auth_context caller _attach_photos caller concurrent_cook_cap_for_tier pure start_session accessor subscription_tier_for accessor depth 2 build_auth_context caller _recipe_titles accessor list_photo_refs accessor count_active_sessions accessor seed_stage_schedule accessor assert_recipe_allergen_safe gate depth 3 FirebaseTokenVerifier.verify pure MockTokenVerifier.verify pure load_household_context accessor resolve_or_create_user accessor _schedule_next accessor depth 4 get_principal_location accessor depth not known _hold_hours _label _stages pure +2 by name only"
+   "functions behind, and how deep 18 · 4 depth 1 AuthContext.require_household gate get_auth_context caller _attach_photos caller concurrent_cook_cap_for_tier pure start_session accessor subscription_tier_for accessor depth 2 build_auth_context caller _recipe_titles accessor list_photo_refs accessor count_active_sessions accessor seed_stage_schedule accessor assert_recipe_allergen_safe gate depth 3 FirebaseTokenVerifier.verify pure MockTokenVerifier.verify pure load_household_context accessor resolve_or_create_user accessor _schedule_next accessor _stages pure depth 4 _get_firebase_app pure identity_from_firebase_claims pure get_principal_location accessor _hold_hours pure _label pure depth 5 _firebase_credential pure +2 by name only"
   ],
   [
    "picture · review-behind-pair-by-name",
    {
     "pieces": 1,
-    "height": 627
+    "height": 722
    }
   ],
   [
@@ -2423,7 +2423,7 @@
    "picture · review-by-moment-path-to-the-201",
    {
     "pieces": 1,
-    "height": 2100
+    "height": 2269
    }
   ],
   [
@@ -2504,7 +2504,7 @@
    "picture · review-the-stream-answer",
    {
     "pieces": 1,
-    "height": 4555
+    "height": 4631
    }
   ],
   [
@@ -2678,11 +2678,11 @@
   ],
   [
    "d057 hover _stages at the work",
-   "_stages · Functions ┆ on every path that calls seed_stage_schedule ┆ It runs inside seed_stage_schedule, and a path may leave seed_stage_schedule before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+   "_stages · Functions ┆ depth 3 ┆ How many calls below the handler it is reached. ┆ on every path that calls start_session ┆ It runs inside start_session, and a path may leave start_session before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
   ],
   [
    "d057 hover _label at the work",
-   "_label · Functions ┆ on every path that calls _schedule_next ┆ It runs inside _schedule_next, and a path may leave _schedule_next before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+   "_label · Functions ┆ depth 4 ┆ How many calls below the handler it is reached. ┆ on every path that calls start_session ┆ It runs inside start_session, and a path may leave start_session before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
   ],
   [
    "d057 hover derive_restrictions at the work",

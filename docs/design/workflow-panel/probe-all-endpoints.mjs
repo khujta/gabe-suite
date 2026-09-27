@@ -1107,7 +1107,7 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
   const F13 = (a) => String(a || '').replace(/:\d+(-\d+)?$/, ''), PREPH = ['middleware', 'body-parse', 'security', 'dependency', 'validation'];
   const raisers = (ep, xid) => { const E = 'endpoint:' + ep, F0 = FJ.endpoints[E], XS = {}, out = {}; let cat = null;
     [...(F0.produced || []), ...(F0.framework_exits || []), ...(F0.returns || [])].forEach((x) => { XS[x.id] = x; });
-    const reach = (site) => Object.values(FJ.functions || {}).filter((f) => (f.reached_by || []).some((b) => b.root === E && b.root_site === site)).flatMap((f) => f.raises || []);
+    const reach = (site) => Object.values(FJ.functions || {}).filter((f) => (f.reached_by || []).some((b) => b.root === E && (b.routes || [b]).some((r) => r.root_site === site))).flatMap((f) => f.raises || []);   /* D-060: every route's handler call */
     (F0.paths || []).filter((q) => q.exit.id === xid).forEach((q) => { const ch = q.chain;
       let lb = -1; ch.forEach((s, i) => { if (PREPH.includes(s.phase)) lb = i; });
       const cs = ch.map((s, i) => (s.kind === 'catch' && i > lb ? i : -1)).filter((i) => i >= 0); if (!cs.length) return;
@@ -1519,8 +1519,12 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   const card = R.uni.rows.find((u) => u.row === 'CODE BEHIND'), cn = card.items.concat(card.rest || []), wn = new Set(walk.flat());
   const extra = cn.filter((n, i) => card.keys[i] && !wids.includes(card.keys[i])), noname = cn.filter((n, i) => !card.keys[i] && !wn.has(n));
   const bhWant = walk.map((lv, i) => [fillW(PW.behindDepth, { n: i + 1 }), lv]).concat(extra.length ? [[PW.behindExtra, extra]] : []);
-  ok(JSON.stringify(bh.map((l) => [l.head, l.names.map((x) => x[1])])) === JSON.stringify(bhWant) && bhN === fillW(PW.behindNoname, { n: noname.length }) && noname.length === 2 && extra.length === 3,
-    'D-056 (1) · ' + E + ' · the behind pair names the ' + wn.size + ' functions the lab\'s walk reaches, level by level, then the card\'s ' + extra.join(', ') + ' (depth not known), and counts ' + noname.join(', ') + ' by name only',
+  /* CHANGED 2026-09-27 (D-060 (3)): the station draws a drawn function's calls into its own file, so _stages (↓3, seed_stage_schedule)
+     and _label · _hold_hours (↓4, _schedule_next) are in the walk by their call edges — the card has no callee left apart */
+  const lvOf = (n) => walk.findIndex((l) => l.includes(n)) + 1;
+  ok(JSON.stringify(bh.map((l) => [l.head, l.names.map((x) => x[1])])) === JSON.stringify(bhWant) && bhN === fillW(PW.behindNoname, { n: noname.length }) && noname.length === 2 && extra.length === 0
+     && lvOf('_stages') === 3 && lvOf('_label') === 4 && lvOf('_hold_hours') === 4,
+    'D-056 (1) · ' + E + ' · the behind pair names the ' + wn.size + ' functions the lab\'s walk reaches, level by level — _stages ↓' + lvOf('_stages') + ', _label ↓' + lvOf('_label') + ', _hold_hours ↓' + lvOf('_hold_hours') + ' among them, none of the card\'s apart — and counts ' + noname.join(', ') + ' by name only',
     { page: bh.map((l) => [l.head, l.names.length]), want: bhWant.map((x) => [x[0], x[1].length]), bhN });
   const work = await cell('work', 'fn'), gate = await cell('gate', 'fn');
   const wantWork = ['seed_stage_schedule', 'assert_recipe_allergen_safe', '_schedule_next'].map((n) => { const lv = walk.findIndex((l) => l.includes(n)); return [n, lv + 1]; });
@@ -1754,14 +1758,18 @@ ok(!errs.length, 'no page error after the D-056 checks', errs);
   const LB = new Map(LV.fn_nodes.filter((n) => n.behind && n.behind.names).map((n) => [n.id.replace('#', '::'), n.behind.names]));
   const work = await cell('work', 'fn'), placedFns = work.filter((c) => c.keys && c.keys.startsWith('fn:')).map((c) => c.keys.slice(3)).filter((k) => k !== FE.handler && LB.has(k));
   const nearest = (n) => { const c0 = placedFns.filter((g) => LB.get(g).includes(n)); return c0.filter((g) => !c0.some((h) => h !== g && LB.get(g).includes(h.split('::').pop()))).map((g) => g.split('::').pop()); };
-  const wantD = [['_stages', 1], ['_label', 1], ['_hold_hours', 1], ['derive_restrictions', 0], ['ResolutionSnapshot.violations_for', 0]].map(([n, keyed]) => [n, keyed, nearest(n)]);
+  /* CHANGED 2026-09-27 (D-060 (3)): _stages · _label · _hold_hours left this list — the walk reaches them by call edges now, so they
+     stand at the work with their depth (↓3 · ↓4 · ↓4), read below; the lists join only the two known by name */
+  const wantD = [['derive_restrictions', 0], ['ResolutionSnapshot.violations_for', 0]].map(([n, keyed]) => [n, keyed, nearest(n)]);
+  const deepD = ['_stages', '_label', '_hold_hours'].map((n) => { const c = work.find((x) => x.name === n); return [n, c ? +((c.t.match(/\u2193(\d+)/) || [])[1]) : null, c ? !!c.keys : null]; });
   const gotD = [];
   for (const [n, keyed, via] of wantD) { const c = work.find((x) => x.name === n); const i = work.indexOf(c);
     const t = c ? await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc:nth-child(' + (i + 1) + ') .mt') : null;
     gotD.push([n, !!c, c ? !!c.keys : null, c ? c.glyph : null, via, t && via.length === 1 && t.includes(fillW(MX.callPaths, { via: via[0] }))]); }
   const bandD = await p.$$eval('#moband .mbb[data-f="fn"] .mbr', (rs) => rs.map((r) => r.getAttribute('data-why')));
-  ok(gotD.every(([n, here, hasKey, glyph, via, tipOk], j) => here && via.length === 1 && tipOk && (wantD[j][1] ? hasKey : !hasKey && !glyph)) && !bandD.length,
-    'D-057 (d) · ' + E + ': ' + gotD.map((x) => x[0] + ' under ' + x[4].join(',')).join(' · ') + ' stand at the work on their caller\'s paths (the hover says so); the two known by name only carry no key and no glyph; the band holds no function', { gotD, bandD });
+  ok(gotD.every(([n, here, hasKey, glyph, via, tipOk], j) => here && via.length === 1 && tipOk && (wantD[j][1] ? hasKey : !hasKey && !glyph)) && !bandD.length
+     && JSON.stringify(deepD) === JSON.stringify([['_stages', 3, true], ['_label', 4, true], ['_hold_hours', 4, true]]),
+    'D-057 (d) · ' + E + ': ' + gotD.map((x) => x[0] + ' under ' + x[4].join(',')).join(' · ') + ' stand at the work on their caller\'s paths (the hover says so) and carry no key and no glyph; ' + deepD.map((x) => x[0] + ' ↓' + x[1]).join(' · ') + ' stand there by their call edges (D-060 (3)); the band holds no function', { gotD, deepD, bandD });
   /* (e) an error nothing catches */
   const ET = 'PATCH /cooking/sessions/{session_id}/timer', FT = FJ.endpoints['endpoint:' + ET], fT = FT.findings.find((f) => f.id === 'escape-500');
   const rfT = Object.entries(FJ.functions).filter(([, f0]) => (f0.raises || []).some((q) => q.at === fT.at && q.cls === fT.cls)).map(([k]) => k);
@@ -1818,8 +1826,11 @@ ok(!errs.length, 'no page error after the D-056 checks', errs);
     if (JSON.stringify(via) !== JSON.stringify(jc.map((g) => g.split('::').pop()).sort())) continue;
     const hid = [...new Set(placed3.filter((h) => CUT.has(h) && !LB.get(h).includes(n0) && !jc.includes(h) && h !== own).map((h) => h.split('::').pop()))].sort();
     f3.push([n0, via, hid, hid.length ? t.includes(fillW(MX.cutNear, { v: hid.join(', ') })) && t.includes(fillW(MX.cutNearPlain, { v: hid.join(', ') })) : !t.includes(cnPre)]); }
-  ok(f3.length >= 6 && f3.every((x) => x[3]) && f3.filter((x) => x[2].length).length >= 6,
-    'review F3 · ' + E3 + ': ' + f3.filter((x) => x[2].length).length + ' of the ' + f3.length + ' functions joined to their caller say they may also run under ' + [...new Set(f3.flatMap((x) => x[2]))].join(', ') + ' (its list is cut); the rest say nothing of it', f3);
+  /* CHANGED 2026-09-27 (D-060 (3)): _error_event and _result_event, same-file calls of _finalize_stream, stand by their call edges now
+     (↓2) — no longer joined through the lists, so 5 functions are read here (4 cut-near) where 7 (6) were */
+  const byEdge3 = ['_error_event', '_result_event'].map((n) => { const c = w3.find((x) => x.name === n); return [n, c ? +((c.t.match(/\u2193(\d+)/) || [])[1]) : null]; });
+  ok(f3.length >= 5 && f3.every((x) => x[3]) && f3.filter((x) => x[2].length).length >= 4 && byEdge3.every(([, d]) => d === 2),
+    'review F3 · ' + E3 + ': ' + f3.filter((x) => x[2].length).length + ' of the ' + f3.length + ' functions joined to their caller say they may also run under ' + [...new Set(f3.flatMap((x) => x[2]))].join(', ') + ' (its list is cut); the rest say nothing of it; ' + byEdge3.map((x) => x[0] + ' ↓' + x[1]).join(' · ') + ' stand by their call edges', { f3, byEdge3 });
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-057 checks', errs);
 

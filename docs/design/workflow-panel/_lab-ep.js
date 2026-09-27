@@ -19931,8 +19931,8 @@ window.LABEP = {
     "columns_filled_by_db": 51,
     "columns_cascade": 12,
     "columns_renamed_in_db": 1,
-    "functions": 28,
-    "functions_with_line": 7,
+    "functions": 33,
+    "functions_with_line": 9,
     "steps": 26,
     "steps_with_line": 26
    },
@@ -26665,6 +26665,49 @@ window.LABEP = {
    ],
    [
     {
+     "id": "apps/api/api/setup.py#_subscription_block",
+     "name": "_subscription_block",
+     "file": "apps/api/api/setup.py",
+     "loaded": true,
+     "conf": "extracted",
+     "role": "pure",
+     "layer": "api",
+     "entity": "auth",
+     "handler": false,
+     "lines": 10,
+     "async": true,
+     "returns": "SubscriptionSummary",
+     "god": false,
+     "usage": 1,
+     "d2w": null,
+     "commits": false,
+     "ops": [],
+     "behind": {
+      "depth": 3,
+      "fns": 4,
+      "names": [
+       "allowance_for",
+       "credits_summary",
+       "credits_used_this_month",
+       "month_start"
+      ]
+     },
+     "insight": {
+      "lines": 10,
+      "returns": "SubscriptionSummary",
+      "async": true,
+      "calls_nothing_else": false,
+      "doc": "Subscription block with the D95 credits surface (allowance + derived remaining).",
+      "tables": 0,
+      "used_by_api_files": 0,
+      "used_by_other_files": 1
+     },
+     "rel": "calls",
+     "via": "_me_response_from_result",
+     "at": null,
+     "at_why": "no feed carries this function's line — it opens at its file"
+    },
+    {
      "id": "apps/api/auth/context.py#build_auth_context",
      "name": "build_auth_context",
      "file": "apps/api/auth/context.py",
@@ -27718,6 +27761,79 @@ window.LABEP = {
    ],
    [
     {
+     "id": "apps/api/auth/verifier.py#_get_firebase_app",
+     "name": "_get_firebase_app",
+     "file": "apps/api/auth/verifier.py",
+     "loaded": true,
+     "conf": "extracted",
+     "role": "pure",
+     "layer": "services",
+     "entity": "auth",
+     "handler": false,
+     "lines": 10,
+     "async": null,
+     "returns": "Any",
+     "god": false,
+     "usage": 1,
+     "d2w": null,
+     "commits": false,
+     "ops": [],
+     "behind": {
+      "depth": 1,
+      "fns": 1,
+      "names": [
+       "_firebase_credential"
+      ]
+     },
+     "insight": {
+      "lines": 10,
+      "returns": "Any",
+      "async": false,
+      "calls_nothing_else": false,
+      "doc": null,
+      "tables": 0,
+      "used_by_api_files": 0,
+      "used_by_other_files": 1
+     },
+     "rel": "calls",
+     "via": "FirebaseTokenVerifier.verify",
+     "at": "apps/api/auth/verifier.py:85"
+    },
+    {
+     "id": "apps/api/auth/verifier.py#identity_from_firebase_claims",
+     "name": "identity_from_firebase_claims",
+     "file": "apps/api/auth/verifier.py",
+     "loaded": true,
+     "conf": "extracted",
+     "role": "pure",
+     "layer": "services",
+     "entity": "auth",
+     "handler": false,
+     "lines": 8,
+     "async": null,
+     "returns": "VerifiedIdentity",
+     "god": false,
+     "usage": 1,
+     "d2w": null,
+     "commits": false,
+     "ops": [],
+     "behind": null,
+     "insight": {
+      "lines": 8,
+      "returns": "VerifiedIdentity",
+      "async": false,
+      "calls_nothing_else": true,
+      "doc": "Map a decoded Firebase ID token to a provider-agnostic identity.",
+      "tables": 0,
+      "used_by_api_files": 0,
+      "used_by_other_files": 1
+     },
+     "rel": "calls",
+     "via": "FirebaseTokenVerifier.verify",
+     "at": null,
+     "at_why": "no feed carries this function's line — it opens at its file"
+    },
+    {
      "id": "apps/api/services/idempotency.py#_reclaim",
      "name": "_reclaim",
      "file": "apps/api/services/idempotency.py",
@@ -27756,16 +27872,86 @@ window.LABEP = {
      "via": "_outcome_for",
      "at": null,
      "at_why": "no feed carries this function's line — it opens at its file"
+    },
+    {
+     "id": "apps/api/services/idempotency.py#is_claim_abandoned",
+     "name": "is_claim_abandoned",
+     "file": "apps/api/services/idempotency.py",
+     "loaded": true,
+     "conf": "extracted",
+     "role": "pure",
+     "layer": "services",
+     "entity": "auth",
+     "handler": false,
+     "lines": 18,
+     "async": null,
+     "returns": "bool",
+     "god": false,
+     "usage": 2,
+     "d2w": null,
+     "commits": false,
+     "ops": [],
+     "behind": null,
+     "insight": {
+      "lines": 18,
+      "returns": "bool",
+      "async": false,
+      "calls_nothing_else": false,
+      "doc": "Pure abandonment check: FAILED is always abandoned (an explicit terminal-failure marker); PENDING is abandoned once it outlives ``ttl``; COMPLETED (or any other terminal status) is never \"abandoned\" — it replays instead. Reusable by ad hoc idempotency mechanisms that mirror this module's claim shape without sharing its model.",
+      "tables": 0,
+      "used_by_api_files": 0,
+      "used_by_other_files": 2
+     },
+     "rel": "calls",
+     "via": "_outcome_for",
+     "at": null,
+     "at_why": "no feed carries this function's line — it opens at its file"
+    }
+   ],
+   [
+    {
+     "id": "apps/api/auth/verifier.py#_firebase_credential",
+     "name": "_firebase_credential",
+     "file": "apps/api/auth/verifier.py",
+     "loaded": true,
+     "conf": "extracted",
+     "role": "pure",
+     "layer": "services",
+     "entity": "auth",
+     "handler": false,
+     "lines": 11,
+     "async": null,
+     "returns": "Any",
+     "god": false,
+     "usage": 1,
+     "d2w": null,
+     "commits": false,
+     "ops": [],
+     "behind": null,
+     "insight": {
+      "lines": 11,
+      "returns": "Any",
+      "async": false,
+      "calls_nothing_else": true,
+      "doc": null,
+      "tables": 0,
+      "used_by_api_files": 0,
+      "used_by_other_files": 1
+     },
+     "rel": "calls",
+     "via": "_get_firebase_app",
+     "at": "apps/api/auth/verifier.py:72"
     }
    ]
   ],
   "walk_levels": [
    3,
-   16,
+   17,
    7,
+   4,
    1
   ],
-  "walk_total": 27,
+  "walk_total": 32,
   "walk_note": "the levels calls-walk (fn_edges, conf per hop) vs c4 behind.fns (graft-only hops the walk cannot see)",
   "does": {
    "rows": [
@@ -27832,6 +28018,13 @@ window.LABEP = {
        "writes"
       ]
      },
+     "on_the_walk": true
+    },
+    {
+     "fn": "apps/api/api/setup.py::_subscription_block",
+     "name": "_subscription_block",
+     "does": [],
+     "why": {},
      "on_the_walk": true
     },
     {
@@ -28148,6 +28341,20 @@ window.LABEP = {
      "on_the_walk": true
     },
     {
+     "fn": "apps/api/auth/verifier.py::_get_firebase_app",
+     "name": "_get_firebase_app",
+     "does": [],
+     "why": {},
+     "on_the_walk": true
+    },
+    {
+     "fn": "apps/api/auth/verifier.py::identity_from_firebase_claims",
+     "name": "identity_from_firebase_claims",
+     "does": [],
+     "why": {},
+     "on_the_walk": true
+    },
+    {
      "fn": "apps/api/services/idempotency.py::_reclaim",
      "name": "_reclaim",
      "does": [
@@ -28158,6 +28365,20 @@ window.LABEP = {
        "writes"
       ]
      },
+     "on_the_walk": true
+    },
+    {
+     "fn": "apps/api/services/idempotency.py::is_claim_abandoned",
+     "name": "is_claim_abandoned",
+     "does": [],
+     "why": {},
+     "on_the_walk": true
+    },
+    {
+     "fn": "apps/api/auth/verifier.py::_firebase_credential",
+     "name": "_firebase_credential",
+     "does": [],
+     "why": {},
      "on_the_walk": true
     },
     {
@@ -28231,8 +28452,8 @@ window.LABEP = {
     }
    ],
    "two_or_more": 6,
-   "none": 4,
-   "of": 33,
+   "none": 9,
+   "of": 38,
    "by_role": {
     "faces the web": 1,
     "decides an ending": 6,
@@ -29725,7 +29946,7 @@ window.LABEP = {
   "entity_counts": {
    "endpoints": 4,
    "files": 38,
-   "hidden_fns": 116,
+   "hidden_fns": 111,
    "lines": 4665,
    "models": 6,
    "schemas": 6
