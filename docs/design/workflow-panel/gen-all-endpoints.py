@@ -1564,9 +1564,10 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             return [("end", rec)]
         if f == "gate":
             return [({"g": "guard", "b": "fork", "c": "catch", "a": "gate", "l": "limiter"}[p], v)]
-        if f == "data":
+        if f == "data":                                           # F1: a step's table, and the op its chip wears (r | w)
             t = (steps.get(v) or {}).get("table") if p == "s" else v
-            return [("table", t)] if t else []
+            op = [("wtable" if steps[v].get("op") in WRITE_OPS else "rtable", t)] if t and p == "s" else []
+            return [("table", t)] + op if t else []
         if f == "fn":
             return [("fn", v)]
         if f == "shape":                                          # D-056 (8): a schema inside the body or the reply, by its key
@@ -1651,7 +1652,9 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
             ("h:entity", "n", [("entity", r["ent"])] if r.get("ent") else []),
             ("h:segment", "n", [("segment", r["seg"])]),
             ("h:declared", "n", [("declared", r["declared"])] if r.get("declared") not in (None, "") else [])]
-    COLM = {"all": ends, "stage": ends if live("stage") else [], "tables": uu("tables", "table"), "written": uu("written", "table"), "guards": uu("guards", "guard"),
+    # F1 (review 2026-09-26): a table the code map lists as WRITTEN is carried by a write chip on it, a table's r/w item by a chip of
+    # each op it names — never by a chip of the other op (a read of cooking_photos never carries its delete); "tables" (touched) by any
+    COLM = {"all": ends, "stage": ends if live("stage") else [], "tables": uu("tables", "table"), "written": uu("written", "wtable"), "guards": uu("guards", "guard"),
             "auth": gates if live("auth") else [], "response": [("reply",)] if d.get("response") else [], "acts": acts if live("acts") else [],
             "asserted": cases(True) if live("asserted") else [], "proof": cases(False) if live("proof") else [],
             "branches": uu("branches", "fork"), "catches": uu("catches", "catch"), "rate": lims if live("rate") else [], "fate": [],
@@ -1718,7 +1721,8 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
     one = lambda m: [m] if m[-1] else []
     DET = {"exits": [[("end", t["x"]["id"])] if t["x"] is not None else [("guard", t["pre"]["id"])] for t in TO["rows"]],
            "guards": [[("guard", g["id"])] for g in pre],
-           "tables": [[("table", t[0])] for t in d["tables"]["items"]], "gateWrites": [[("table", t)] for t in d["gateWrites"]],
+           "tables": [[(q + "table", t[0]) for q in ("r", "w") if q in str(t[1] if len(t) > 1 else "")] or [("table", t[0])] for t in d["tables"]["items"]],
+           "gateWrites": [[("wtable", t)] for t in d["gateWrites"]],
            # D-057: each path's fate, where BY MOMENT draws it (the write chips on its pick, or no write of its own)
            "fates": [[("fate", p["id"])] for p in TO["paths"]], "gates": [one(m) for m in gates], "limits": [[m] for m in lims],
            # D-056 (8) a schema inside the body or the reply · (7) each ending that sends a header, drawn in the reply pair
@@ -1759,19 +1763,22 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
             return "case:" + i[2:].rsplit(":", 1)[0]
         if k0 == "arranged":
             return "case:" + i
-        pfx = {"table": "table", "guard": "guard", "fork": "fork", "catch": "catch", "limiter": "limiter", "reason": "reason",
+        pfx = {"table": "table", "rtable": "table", "wtable": "table", "guard": "guard", "fork": "fork", "catch": "catch", "limiter": "limiter", "reason": "reason",
                "inflight": "inflight", "case": "case", "rule": "rule", "switch": "switch", "piece": "piece"}.get(k0)
         return pfx + ":" + str(i) if pfx and i is not None else None
     allm = {m for _k, t, ms in spec for m in ([x for it in ms for x in it] if t == "i" else ms)}
     # PROOF (A) · (B) · (C) — see the section head
+    OPK = {(x[4][1], k0) for x in mo["el"] if x[0] == "data" and x[4] and x[4][0] == "op" for k0 in x[2]}   # (r | w, key) as drawn
     for m in sorted(P & allm, key=str):
         if key(m) and key(m) not in K:
             die(f"{r['id']}: D-055 — BY MOMENT places {m} by its records, but draws no element under its key {key(m)}")
+        if m[0] in ("rtable", "wtable") and (m[0][0], key(m)) not in OPK:
+            die(f"{r['id']}: F1 — BY MOMENT places {m} by its records, but draws no {m[0][0]} chip on {key(m)}")
     pk = {key(m) for m in P if key(m)}
     for m in sorted(allm - P, key=str):
         if key(m) in K and key(m) not in pk:
             die(f"{r['id']}: D-055 — BY MOMENT draws {key(m)} at a moment, but its records place no member of the code map under it ({m})")
-    lost = sorted((m for m in PW - allm if m[0] != "table"), key=str)
+    lost = sorted((m for m in PW - allm if m[0] not in ("table", "rtable", "wtable")), key=str)   # an op the code map does not list on a table: BY MOMENT holding more
     extra = sorted({m[1] for m in PW - allm if m[0] == "table"})           # tables BY MOMENT's steps touch that the code map does not list
     if lost:
         die(f"{r['id']}: D-055 — BY MOMENT places members its build check counts as the code map's, which no code-map field names: {lost[:4]}")
@@ -1801,6 +1808,115 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
         nc += cv[k0][0] == "c"
         ne += cv[k0][0] == "e"
     r["cv"], r["cvn"] = cv, [nc, len(spec), ne, len(extra)]
+    # D-058: what BY MOMENT draws at a moment, as the two other panels read it — the keys its placed chips carry (K, the set the
+    # proofs above join on), the endpoint its heading draws (the member h:method is read carried by, PX), and the functions it places
+    # by name only (D-057 d: no key, no glyph — their name is what it draws). F4 (review 2026-09-26): a name is also carried when a
+    # KEYED function chip draws it, as long as that name stands for ONE function there (two functions of one name: neither is read);
+    # F1: the tables read and the tables written, apart — carried()'s own members rtable · wtable, never the other op
+    if ("endpoint", r["id"]) not in P:
+        die(f"{r['id']}: D-058 — BY MOMENT's heading is read as drawing the endpoint, yet its members do not hold it")
+    r["_by"] = (set(K) | {"endpoint:" + r["id"]}, fn_names(mo["el"]), {"table:" + str(m[1]) for m in P if m[0] == "rtable"},
+                {"table:" + str(m[1]) for m in P if m[0] == "wtable"})
+
+
+def fn_names(el: list) -> set:
+    """The function names BY MOMENT draws at a moment: a chip with no key (its name is all it draws), or a keyed function chip whose
+    name no other function chip there shares under another key (F4)."""
+    by = collections.defaultdict(set)
+    for x in el:
+        if x[0] == "fn":
+            by[x[3]].add(next((k0 for k0 in x[2] if str(k0).startswith("fn:")), ""))
+    return {n for n, ks in by.items() if "" in ks or len(ks) == 1}
+
+
+# ── 2e · D-058: WHAT BY MOMENT CARRIES, IN THE GABE UNIVERSE AND THE GAPS ────────────────────────────────────────────────
+# His ruling 2026-09-26: "the same buttons to hide or dim the information that we already put below, but in the Gabe universe ...
+# see in both panels what is already on the by moment table". ONE join, the code map's: an item is carried when BY MOMENT draws it
+# at a moment — by its D-041 key (carried()'s K, the set its proofs join on) or, for a function the card names without a key, by the
+# name BY MOMENT places it under; the endpoint by BY MOMENT's heading. Never a second reading: the universe's items are
+# _ae_universe.uni_elements (each with its members, or None when the card does not name what it counts — a count, a line, a flag,
+# a file's cases), THE GAPS read the same items. A row is carried whole when every item is; in part when some are.
+#     THE GAPS, from the universe (b): a name by the universe items it names (their members); an attribute a row shows
+# by the row's items that hold it (the why tables say which; an item they do not place may hold any, so it counts for every one);
+# a row that maps to no attribute by all its items. From the code map (a): an attribute by the code-map fields that hold it, each
+# as carried() read it — carried whole when every field is (c, or x with items), in part when one carries some.
+#     PROVEN per endpoint: every item marked carried has each member drawn in BY MOMENT's placed chips (re-read from its record, never
+# from its band; a table's access by a chip of ITS op; a function's name on a chip that draws it); every item left bright has a
+# member it does not draw; a gap's name is marked exactly as the universe's items it names are; the counts are the marks'.
+def panels_carried(r: dict, T: list, NT: dict, slots: list) -> None:
+    MK, MN, MR, MW = r.pop("_by")
+    el = r["mo"]["el"]
+    rk = {k for x in el for k in x[2]} | {"endpoint:" + r["id"]}          # the placed record, re-read (the heading: see carried())
+    fk = lambda x: {k for k in x[2] if str(k).startswith("fn:")}
+    rn = {x[3] for x in el if x[0] == "fn" and (not x[2] or len({k for y in el if y[0] == "fn" and y[3] == x[3] for k in fk(y)}) == 1)}
+    ro = {(x[4][1], k) for x in el if x[0] == "data" and x[4] and x[4][0] == "op" for k in x[2]}   # (r | w, table key) as each chip draws it
+    band = {k for u in r["mo"]["un"] for k in u[1]} - rk                   # what BY MOMENT holds with no moment only
+    SET = {"k": MK, "n": MN, "r": MR, "w": MW}
+    drawn = lambda m: (m[1] in rk and m[1] not in band) if m[0] == "k" else (m[1] in rn) if m[0] == "n" else ((m[0], m[1]) in ro)
+
+    def mark(ms, where):
+        f = 1 if ms and all(m[1] in SET[m[0]] for m in ms) else 0
+        for m in ms or []:
+            if f and not drawn(m):
+                die(f"{r['id']}: D-058 — {where} is marked carried, yet BY MOMENT places no chip with {m} at a moment")
+        if ms and not f and all(drawn(m) for m in ms):
+            die(f"{r['id']}: D-058 — BY MOMENT draws every member of {where}, which the panel leaves bright")
+        return f
+
+    def state(c, n):
+        return "c" if n and c == n else "p" if c else "b"
+    # THE GABE UNIVERSE: per row [state, a flag per item in draw order, carried, items]
+    ucv, UE = [], {}
+    for u in r["uni"]["rows"]:
+        es = UNI.uni_elements(u, T, NT)
+        fl = [mark(ms, f"the universe's {u['row']} item {i}") for i, (ms, _a, _id) in enumerate(es)]
+        ucv.append([state(sum(fl), len(es)), fl, sum(fl), len(es)])
+        UE[u["row"]] = (es, fl)
+    r["ucv"], r["ucn"] = ucv, [sum(x[2] for x in ucv), sum(x[3] for x in ucv)]
+    # THE GAPS, from the universe (b): parallel to rgaps — [the unmapped row's [state, c, n] | None, [per attribute], [a flag per name]].
+    # F2 (review 2026-09-26): a name stands for the universe items of its row that it names (its key, or a Code behind function's
+    # name) — their members, all of them: a journey's case AND its entities, both of a table's accesses (r and w); PROVEN marked as
+    # those items are, item by item (a name no item of its row carries is read by its own member)
+    gb, cb, nb = [], 0, 0
+    for g in r["rgaps"]:
+        es, fl = UE[g[0]]
+        u_it = [state(sum(fl), len(fl)), sum(fl), len(fl)] if g[2] else None
+        a_it = []
+        for a in g[1]:
+            mem = [i for i, (_ms, at_, _id) in enumerate(es) if at_ is None or a in at_]
+            a_it.append([state(sum(fl[i] for i in mem), len(mem)), sum(fl[i] for i in mem), len(mem)])
+        f_it = []
+        for nm_, K in zip(g[3], g[4]):
+            gid = ("k", K) if K else ("n", nm_) if g[0] == "CODE BEHIND" else None
+            its = [i for i, e in enumerate(es) if gid and e[2] == gid]
+            if not its:
+                ms = [gid] if gid else None
+            else:
+                ms = None if any(es[i][0] is None for i in its) else list(dict.fromkeys(m for i in its for m in es[i][0]))
+            f = mark(ms, f"the gap {nm_!r} @ {g[0]}")
+            if its and f != int(all(fl[i] for i in its)):
+                die(f"{r['id']}: D-058 — the gap {nm_!r} @ {g[0]} is marked {f}, the universe's items {its} it names {[fl[i] for i in its]}")
+            f_it.append(f)
+        gb.append([u_it, a_it, f_it])
+        cb += (u_it is not None and u_it[0] == "c") + sum(x[0] == "c" for x in a_it) + sum(f_it)
+        nb += (u_it is not None) + len(a_it) + len(f_it)
+    # THE GAPS, from the code map (a): per attribute [state, members carried, members] over the fields that hold it, as carried() read
+    # them. F3 (review 2026-09-26): a field with nothing on this endpoint (e) neither carries nor leaves anything (the code map's own
+    # reading) — it is passed over; a field that holds nothing BY MOMENT could place (the fates' tally, the chain, the proof rank) is
+    # what BY MOMENT leaves out — ONE member left, so an attribute it keeps from whole reads 15 of 16, never 15 of 15
+    cvk = lambda f: "c:" + ",".join(slots) if f.startswith("c:") and f[2:] in slots else f
+    ga = {}
+    for a in r["gaps"] + [x[0] for x in r["partly"]]:
+        fs = list(dict.fromkeys(cvk(f) for f in r["has"].get(a) or []))
+        if not fs or any(f not in r["cv"] for f in fs):
+            die(f"{r['id']}: D-058 — the gap {a} is held by {fs}, which are not all fields carried() read")
+        X = [r["cv"][f] for f in fs if r["cv"][f][0] != "e"]
+        whole = bool(X) and all(x[0] == "c" or (x[0] == "x" and x[3]) for x in X)
+        ga[a] = ["c" if whole else "p" if any(x[0] in ("c", "p", "x") and x[2] for x in X) else "b", sum(x[2] for x in X), sum(x[3] or 1 for x in X)]
+        if (ga[a][0] == "c") != (ga[a][1] == ga[a][2] > 0):
+            die(f"{r['id']}: D-058 — the gap {a} reads {ga[a][0]} with {ga[a][1]} of {ga[a][2]} carried")
+    r["gcv"] = {"a": ga, "b": gb}
+    r["gcn"] = {"cm": [sum(x[0] == "c" for x in ga.values()), len(ga)], "uni": [cb, nb]}
 
 
 def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Counter) -> dict:
@@ -2863,9 +2979,14 @@ def build(argv: list) -> tuple:
         r["rgaps"] = UNI.reverse_gaps(r, r["uni"], UW, set(r["has"]))        # the gaps the other way (D-040)
         r["uni"].pop("_drawn")                                          # the generator's own reading, never drawn
     # D-044: every gap's reasons (D-042's rule) and its status line (one.gaps.status.table, my proposal), checked here
-    n_st = UNI.gap_whys(rows, fj, W, W["el"]["why"]["table"], UNI.names_table(W, A, inv, FLD), A, FLD, bool(only))
+    NT = UNI.names_table(W, A, inv, FLD)
+    n_st = UNI.gap_whys(rows, fj, W, W["el"]["why"]["table"], NT, A, FLD, bool(only))
     for r in rows:                                                      # each name's selector served the hover's reading only; its KEY
         r["rgaps"] = [g[:4] + [[K for K, _sl in g[4]]] for g in r["rgaps"]]   # stays, so THE GAPS draws the name the station's way (D-052)
+    # D-058: what BY MOMENT carries, in the Gabe Universe and THE GAPS — carried()'s own join, proven per endpoint
+    slots = [c["id"] for c in cols if c["kind"] == "slot"]
+    for r in rows:
+        panels_carried(r, W["el"]["why"]["table"], NT, slots)
     icon_names, colour_refs = UNI.mark_refs(W)
     icon_names |= {x["icon"] for x in spec.values() if isinstance(x, dict) and x.get("icon")}
     icon_names |= {f["icon"] for f in spec["RISK"]["flags"].values()} | {c["icon"] for c in W["cols"].values()}
@@ -2988,6 +3109,14 @@ def build(argv: list) -> tuple:
                 f" · (c) endings two paths reach {MOT['forkEnds']} ({MOT['forkPaths']} codes); a check inside a call left off {MOT['f1:drop']} paths that leave before it, {MOT['f1:up']} said on the call's paths"
                 f" · (d) out of the band: {MOT['join:fn']} functions behind + {MOT['join:name']} by name only ({MOT['join:cut']} of them may also run under a function whose list is cut), {MOT['join:several']} at several moments, {MOT['join:left']} left"
                 f" · (e) 500s with a cause {sum(1 for r in rows for x in r['mo']['el'] if x[7] and 'cz' in x[7])}, raising chips {sum(1 for r in rows for x in r['mo']['el'] if x[7] and 'ru' in x[7])}")
+    # D-058: what BY MOMENT carries in the other two panels — items carried of items, summed over the feed, and on his example
+    s58 = lambda f: [sum(f(r)[0] for r in rows), sum(f(r)[1] for r in rows)]
+    u58, a58, b58 = s58(lambda r: r["ucn"]), s58(lambda r: r["gcn"]["cm"]), s58(lambda r: r["gcn"]["uni"])
+    summary += (f"\nD-058 · the Gabe Universe {u58[0]} of {u58[1]} items carried · {u58[1] - u58[0]} left"
+                f" (rows whole {sum(1 for r in rows for x in r['ucv'] if x[0] == 'c')}, in part {sum(1 for r in rows for x in r['ucv'] if x[0] == 'p')})"
+                f" · THE GAPS from the code map {a58[0]} of {a58[1]} · {a58[1] - a58[0]} left, from the universe {b58[0]} of {b58[1]} · {b58[1] - b58[0]} left"
+                + (f"\n        POST /cooking/sessions · universe {cs['ucn'][0]} of {cs['ucn'][1]} · {cs['ucn'][1] - cs['ucn'][0]} left"
+                   f" · gaps from the code map {cs['gcn']['cm'][0]} of {cs['gcn']['cm'][1]} · from the universe {cs['gcn']['uni'][0]} of {cs['gcn']['uni'][1]}" if cs else ""))
     return html, summary, out, check
 
 

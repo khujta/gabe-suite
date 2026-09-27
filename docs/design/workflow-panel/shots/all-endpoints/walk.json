@@ -501,14 +501,14 @@
       32,
       53,
       561,
-      2907
+      2943
      ],
      [
       "ocol-gaps",
       607,
       53,
       331,
-      928
+      987
      ],
      [
       "ocol-cm",
@@ -605,7 +605,7 @@
      "the endings",
      "its own checks"
     ],
-    "tip": "The endings · shown by no universe rowwhy not drawnstatus open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's produced[], returns[] and framework_exits[] (the endpoint pass and the paths arm). my proposalEvery distinct way a request to the endpoint can end."
+    "tip": "The endings · shown by no universe rowwhy not drawnstatus open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's produced[], returns[] and framework_exits[] (the endpoint pass and the paths arm). my proposalEvery distinct way a request to the endpoint can end.BY MOMENT already carries all of it."
    }
   ],
   [
@@ -707,7 +707,7 @@
      "proven",
      "the endings"
     ],
-    "tip": "Tests C1048 the universe card draws it; the code-map column never names it WHY counted, not named — tests · beyond · proven · the endings STATUS solved elsewhere — The code map counts this case in the fields linked here — the calls that act on this endpoint and, where a call proves an ending, that ending — without naming it. my proposal tests beyond proven the endings"
+    "tip": "Tests C1048 the universe card draws it; the code-map column never names it WHY counted, not named — tests · beyond · proven · the endings STATUS solved elsewhere — The code map counts this case in the fields linked here — the calls that act on this endpoint and, where a call proves an ending, that ending — without naming it. my proposal tests beyond proven the endings BY MOMENT already carries all of it."
    }
   ],
   [
@@ -716,7 +716,7 @@
     "click": "in the code map, not in the universe",
     "at": [
      620,
-     368
+     331
     ],
     "size": [
      32,
@@ -1195,7 +1195,7 @@
    "pointing at a gap shown in part",
    {
     "gap": "Own guardsshown in part",
-    "tip": "Own guards · shown in partThe card draws RECIPE_CREATION_ENABLED: 1 of 2. The rest is shown by no universe row.why not drawnstatus open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's preconditions[], each with the ending it guards. my proposalA check in the handler's own code that refuses the request."
+    "tip": "Own guards · shown in partThe card draws RECIPE_CREATION_ENABLED: 1 of 2. The rest is shown by no universe row.why not drawnstatus open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's preconditions[], each with the ending it guards. my proposalA check in the handler's own code that refuses the request.BY MOMENT already carries all of it."
    }
   ],
   [
@@ -1508,7 +1508,7 @@
   ],
   [
    "the code map's copy button copied",
-   "page: all-endpoints · gustify @ 05007957\nendpoint: POST /recipe-creation/gustify\nthe code map · the moments: moments as header rows (my pick)\nthe code map · the checks: the check as its own column (my pick)\nthe code map · what BY MOMENT carries: show all (my pick)\n\nyour words:\n"
+   "page: all-endpoints · gustify @ 05007957\nendpoint: POST /recipe-creation/gustify\nthe code map · the moments: moments as header rows (my pick)\nthe code map · the checks: the check as its own column (my pick)\nthe code map · what BY MOMENT carries: show all (my pick)\nthe Gabe Universe · what BY MOMENT carries: show all (my pick)\nthe gaps · what BY MOMENT carries: show all (my pick)\n\nyour words:\n"
   ],
   [
    "BY MOMENT · the path picker",
@@ -2084,7 +2084,7 @@
   ],
   [
    "D-055 · the code map's copy",
-   "page: all-endpoints · gustify @ 05007957\nendpoint: POST /cooking/sessions\nthe code map · the moments: moments as header rows (my pick)\nthe code map · the checks: the check as its own column (my pick)\nthe code map · what BY MOMENT carries: hide what BY MOMENT carries (your choice)\n\nyour words:\n"
+   "page: all-endpoints · gustify @ 05007957\nendpoint: POST /cooking/sessions\nthe code map · the moments: moments as header rows (my pick)\nthe code map · the checks: the check as its own column (my pick)\nthe code map · what BY MOMENT carries: hide what BY MOMENT carries (your choice)\nthe Gabe Universe · what BY MOMENT carries: show all (my pick)\nthe gaps · what BY MOMENT carries: show all (my pick)\n\nyour words:\n"
   ],
   [
    "step 143 · open-the-stream-endpoint-in-hide",
@@ -2941,6 +2941,636 @@
   [
    "review hover the 500 of complete",
    "500 · a server error status · status ┆ escapes from ValueError, raised at cooking.py:582 ┆ The server failed; nothing the caller changes fixes it. ┆ colour: as the endpoint lab draws it"
+  ],
+  [
+   "step 223 · d058-open-cooking-sessions",
+   {
+    "click": "/cooking/sessionsPOST",
+    "at": [
+     33,
+     670
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /cooking/sessions"
+   }
+  ],
+  [
+   "D-058 · both panels, show all",
+   {
+    "universe": [
+     "all",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "all",
+     "cm",
+     "17 of 22 carried by BY MOMENT · 5 left"
+    ],
+    "notes": []
+   }
+  ],
+  [
+   "d058 hover the universe dim square",
+   "dim what BY MOMENT carries ┆ An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name. A row whose items it draws, every one, fades with its title. Pointing at one brings it back."
+  ],
+  [
+   "step 226 · d058-universe-dim",
+   {
+    "click": "dim what BY MOMENT carries",
+    "at": [
+     279,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"dim what BY MOMENT carries\" in the Gabe Universe"
+   }
+  ],
+  [
+   "D-058 · the universe, dim",
+   {
+    "universe": [
+     "dim",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "all",
+     "cm",
+     "17 of 22 carried by BY MOMENT · 5 left"
+    ],
+    "notes": []
+   }
+  ],
+  [
+   "d058 hover the Accesses row title",
+   "Accesses · the Gabe Universe ┆ 5 reads · 2 writes ┆ attribute: Tables touched · Operation per table · my reading ┆ BY MOMENT draws 5 of its 7 items."
+  ],
+  [
+   "step 229 · d058-universe-hide",
+   {
+    "click": "hide what BY MOMENT carries",
+    "at": [
+     316,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"hide what BY MOMENT carries\" in the Gabe Universe"
+   }
+  ],
+  [
+   "D-058 · the universe, hide",
+   {
+    "universe": [
+     "hide",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "all",
+     "cm",
+     "17 of 22 carried by BY MOMENT · 5 left"
+    ],
+    "notes": [
+     "HEAD +1 in BY MOMENT",
+     "GUARDS +1 in BY MOMENT",
+     "ACCESSES +5 in BY MOMENT",
+     "PAYLOAD +1 in BY MOMENT",
+     "CONNECTIONS +8 in BY MOMENT",
+     "CODE BEHIND +12 in BY MOMENT",
+     "TESTS +2 in BY MOMENT",
+     "SOURCE +1 in BY MOMENT"
+    ]
+   }
+  ],
+  [
+   "step 231 · d058-gaps-the-universe-way",
+   {
+    "click": "in the universe, not in the code map",
+    "at": [
+     657,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"in the universe, not in the code map\""
+   }
+  ],
+  [
+   "step 232 · d058-gaps-dim",
+   {
+    "click": "dim what BY MOMENT carries",
+    "at": [
+     854,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"dim what BY MOMENT carries\" in THE GAPS"
+   }
+  ],
+  [
+   "D-058 · the gaps (the universe way), dim",
+   {
+    "universe": [
+     "hide",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "dim",
+     "uni",
+     "4 of 16 carried by BY MOMENT · 12 left"
+    ],
+    "notes": [
+     "HEAD +1 in BY MOMENT",
+     "GUARDS +1 in BY MOMENT",
+     "ACCESSES +5 in BY MOMENT",
+     "PAYLOAD +1 in BY MOMENT",
+     "CONNECTIONS +8 in BY MOMENT",
+     "CODE BEHIND +12 in BY MOMENT",
+     "TESTS +2 in BY MOMENT",
+     "SOURCE +1 in BY MOMENT"
+    ]
+   }
+  ],
+  [
+   "d058 hover derive_restrictions in the gaps",
+   "Code behind ┆ derive_restrictions ┆ the universe card draws it; the code-map column never names it ┆ WHY counted, not named — behind · functions behind, and how deep · low priority — Functions behind · walk levels ┆ STATUS solved elsewhere — The code map counts this callee among the functions behind the handler, linked here. The feeds hold no single function for the name, so it cannot be named on its own. my proposal ┆ behind functions behind, and how deep ┆ BY MOMENT already carries all of it."
+  ],
+  [
+   "d058 hover UserDietaryProfile in the gaps",
+   "Connections ┆ UserDietaryProfile ┆ the universe card draws it; the code-map column never names it ┆ WHY not carried ┆ STATUS open — The code map's tables are the endpoint's access.ops in the station's graph feed, and this model's table is not among them; the station's Connections draw an inferred reads_from edge to it. Which reading holds is not measured yet: the measurement owed is where that edge comes from. my proposal"
+  ],
+  [
+   "step 236 · d058-gaps-hide",
+   {
+    "click": "hide what BY MOMENT carries",
+    "at": [
+     891,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"hide what BY MOMENT carries\" in THE GAPS"
+   }
+  ],
+  [
+   "D-058 · the gaps (the universe way), hide",
+   {
+    "universe": [
+     "hide",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "hide",
+     "uni",
+     "4 of 16 carried by BY MOMENT · 12 left"
+    ],
+    "notes": [
+     "HEAD +1 in BY MOMENT",
+     "GUARDS +1 in BY MOMENT",
+     "ACCESSES +5 in BY MOMENT",
+     "PAYLOAD +1 in BY MOMENT",
+     "CONNECTIONS +8 in BY MOMENT",
+     "CODE BEHIND +12 in BY MOMENT",
+     "TESTS +2 in BY MOMENT",
+     "SOURCE +1 in BY MOMENT",
+     "TESTS +2 in BY MOMENT",
+     "TESTS +2 in BY MOMENT"
+    ]
+   }
+  ],
+  [
+   "step 238 · d058-gaps-the-code-map-way",
+   {
+    "click": "in the code map, not in the universe",
+    "at": [
+     620,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"in the code map, not in the universe\""
+   }
+  ],
+  [
+   "D-058 · the gaps (the code map way), hide",
+   {
+    "universe": [
+     "hide",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "hide",
+     "cm",
+     "17 of 22 carried by BY MOMENT · 5 left"
+    ],
+    "notes": [
+     "HEAD +1 in BY MOMENT",
+     "GUARDS +1 in BY MOMENT",
+     "ACCESSES +5 in BY MOMENT",
+     "PAYLOAD +1 in BY MOMENT",
+     "CONNECTIONS +8 in BY MOMENT",
+     "CODE BEHIND +12 in BY MOMENT",
+     "TESTS +2 in BY MOMENT",
+     "SOURCE +1 in BY MOMENT",
+     "c7 +2 in BY MOMENT",
+     "c1 +1 in BY MOMENT",
+     "c1 +15 in BY MOMENT",
+     "c6 +1 in BY MOMENT",
+     "c10 +10 in BY MOMENT",
+     "c10 +6 in BY MOMENT"
+    ]
+   }
+  ],
+  [
+   "D-058 · the page's copy text, the three switches",
+   [
+    "the code map · what BY MOMENT carries: show all (my pick)",
+    "the Gabe Universe · what BY MOMENT carries: hide what BY MOMENT carries (your choice)",
+    "the gaps · what BY MOMENT carries: hide what BY MOMENT carries (your choice)"
+   ]
+  ],
+  [
+   "step 240 · d058-universe-show-all-again",
+   {
+    "click": "show all",
+    "at": [
+     242,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"show all\" (my pick)"
+   }
+  ],
+  [
+   "step 241 · d058-gaps-show-all-again",
+   {
+    "click": "show all",
+    "at": [
+     817,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"show all\" (my pick)"
+   }
+  ],
+  [
+   "D-058 · both panels, show all again",
+   {
+    "universe": [
+     "all",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "all",
+     "cm",
+     "17 of 22 carried by BY MOMENT · 5 left"
+    ],
+    "notes": []
+   }
+  ],
+  [
+   "step 242 · d058-review-universe-dim",
+   {
+    "click": "dim what BY MOMENT carries",
+    "at": [
+     279,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"dim what BY MOMENT carries\" in the Gabe Universe"
+   }
+  ],
+  [
+   "D-058 review · the universe, dim",
+   {
+    "universe": [
+     "dim",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "all",
+     "cm",
+     "17 of 22 carried by BY MOMENT · 5 left"
+    ],
+    "notes": []
+   }
+  ],
+  [
+   "D-058 review · the universe, dim — head · payload · accesses",
+   {
+    "head": "API ENDPOINT · COOKING",
+    "payload": "18 fields ferried · → CookingSessionResponse (response)",
+    "accesses": [
+     [
+      "reads → CookingPhoto · cooking_photos",
+      true,
+      "0.3"
+     ],
+     [
+      "reads → CookingSession · cooking_sessions",
+      true,
+      "0.3"
+     ],
+     [
+      "reads → Recipe · recipes",
+      true,
+      "0.3"
+     ],
+     [
+      "reads → RecipeIngredient · recipe_ingredients",
+      false,
+      "1"
+     ],
+     [
+      "reads → SubscriptionEntitlement · subscription_entitlement",
+      true,
+      "0.3"
+     ],
+     [
+      "writes → CookingSession · cooking_sessions",
+      true,
+      "0.3"
+     ],
+     [
+      "writes → CookingStageReminder · cooking_stage_reminders",
+      false,
+      "1"
+     ]
+    ]
+   }
+  ],
+  [
+   "step 244 · d058-review-universe-hide",
+   {
+    "click": "hide what BY MOMENT carries",
+    "at": [
+     316,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"hide what BY MOMENT carries\" in the Gabe Universe"
+   }
+  ],
+  [
+   "D-058 review · the universe, hide",
+   {
+    "universe": [
+     "hide",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "all",
+     "cm",
+     "17 of 22 carried by BY MOMENT · 5 left"
+    ],
+    "notes": [
+     "HEAD +1 in BY MOMENT",
+     "GUARDS +1 in BY MOMENT",
+     "ACCESSES +5 in BY MOMENT",
+     "PAYLOAD +1 in BY MOMENT",
+     "CONNECTIONS +8 in BY MOMENT",
+     "CODE BEHIND +12 in BY MOMENT",
+     "TESTS +2 in BY MOMENT",
+     "SOURCE +1 in BY MOMENT"
+    ]
+   }
+  ],
+  [
+   "D-058 review · the universe, hide — head · payload · accesses",
+   {
+    "head": "COOKING +1 IN BY MOMENT",
+    "payload": "18 fields ferried",
+    "accesses": [
+     [
+      "reads → CookingPhoto · cooking_photos",
+      true,
+      "gone"
+     ],
+     [
+      "reads → CookingSession · cooking_sessions",
+      true,
+      "gone"
+     ],
+     [
+      "reads → Recipe · recipes",
+      true,
+      "gone"
+     ],
+     [
+      "reads → RecipeIngredient · recipe_ingredients",
+      false,
+      "1"
+     ],
+     [
+      "reads → SubscriptionEntitlement · subscription_entitlement",
+      true,
+      "gone"
+     ],
+     [
+      "writes → CookingSession · cooking_sessions",
+      true,
+      "gone"
+     ],
+     [
+      "writes → CookingStageReminder · cooking_stage_reminders",
+      false,
+      "1"
+     ]
+    ]
+   }
+  ],
+  [
+   "step 246 · d058-review-universe-show-all",
+   {
+    "click": "show all",
+    "at": [
+     242,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"show all\" (my pick)"
+   }
+  ],
+  [
+   "step 247 · d058-review-gaps-the-universe-way",
+   {
+    "click": "in the universe, not in the code map",
+    "at": [
+     657,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"in the universe, not in the code map\""
+   }
+  ],
+  [
+   "step 248 · d058-review-gaps-dim",
+   {
+    "click": "dim what BY MOMENT carries",
+    "at": [
+     854,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"dim what BY MOMENT carries\" in THE GAPS"
+   }
+  ],
+  [
+   "D-058 review · the gaps (the universe way), dim",
+   {
+    "universe": [
+     "all",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "dim",
+     "uni",
+     "4 of 16 carried by BY MOMENT · 12 left"
+    ],
+    "notes": []
+   }
+  ],
+  [
+   "D-058 review · the gaps' names, dim",
+   [
+    "UserDietaryProfile",
+    "ResolutionSnapshot.violations_for · carried",
+    "derive_restrictions · carried",
+    "C237 · carried",
+    "C267 · carried",
+    "11 case(s)",
+    "6 case(s)",
+    "11 case(s)",
+    "6 case(s)",
+    "endpoints",
+    "apps/api/api/cooking.py:585",
+    "conflict · large surface"
+   ]
+  ],
+  [
+   "step 250 · d058-review-gaps-hide",
+   {
+    "click": "hide what BY MOMENT carries",
+    "at": [
+     891,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"hide what BY MOMENT carries\" in THE GAPS"
+   }
+  ],
+  [
+   "D-058 review · the gaps (the universe way), hide",
+   {
+    "universe": [
+     "all",
+     "31 of 64 carried by BY MOMENT · 33 left"
+    ],
+    "gaps": [
+     "hide",
+     "uni",
+     "4 of 16 carried by BY MOMENT · 12 left"
+    ],
+    "notes": [
+     "TESTS +2 in BY MOMENT",
+     "TESTS +2 in BY MOMENT"
+    ]
+   }
+  ],
+  [
+   "D-058 review · the gaps' names, hide",
+   [
+    "UserDietaryProfile",
+    "ResolutionSnapshot.violations_for · carried · gone",
+    "derive_restrictions · carried · gone",
+    "C237 · carried · gone",
+    "C267 · carried · gone",
+    "11 case(s)",
+    "6 case(s)",
+    "11 case(s)",
+    "6 case(s)",
+    "endpoints",
+    "apps/api/api/cooking.py:585",
+    "conflict · large surface"
+   ]
+  ],
+  [
+   "step 252 · d058-review-gaps-show-all",
+   {
+    "click": "show all",
+    "at": [
+     817,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"show all\" (my pick)"
+   }
+  ],
+  [
+   "step 253 · d058-review-copy-the-settings",
+   {
+    "click": "copy the settings",
+    "at": [
+     1467,
+     524
+    ],
+    "size": [
+     147,
+     32
+    ],
+    "note": "the button \"copy the settings\" of the code map"
+   }
+  ],
+  [
+   "D-058 review · the code map's copy, as copied",
+   "page: all-endpoints · gustify @ 05007957\nendpoint: POST /cooking/sessions\nthe code map · the moments: moments as header rows (my pick)\nthe code map · the checks: the check as its own column (my pick)\nthe code map · what BY MOMENT carries: show all (my pick)\nthe Gabe Universe · what BY MOMENT carries: show all (my pick)\nthe gaps · what BY MOMENT carries: show all (my pick)\n\nyour words:\n"
+  ],
+  [
+   "D-058 review · beside the button",
+   "copied"
   ],
   [
    "rows at the end",

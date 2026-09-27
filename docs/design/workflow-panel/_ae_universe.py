@@ -774,6 +774,74 @@ def names_drawn(u: dict) -> list:
     return []
 
 
+def uni_elements(u: dict, T: list, NT: dict) -> list:
+    """D-058 · the ITEMS a universe row draws, in the order the page draws them (the template's uRow gives each the same index),
+    each [its members, its attributes, what it is named by]. A member is ("k", key) — the D-041 key it is drawn with — or ("n",
+    name) for a function Code behind names without a key (BY MOMENT places those by name, D-057); a table an access or a
+    connection reads or writes is ("r" | "w", key) — carried only by a BY MOMENT chip of that op (F1). An item whose members the
+    card does not name (a count, a line, a flag, a file's cases, an aggregate journey) has None: it can never be read as carried.
+    Its attributes come from the two why tables (a keyed item by its kind, a key-less one by its selector); None when neither lists
+    it (it may hold any attribute of its row). What it is named by — ("k", its key) or ("n", a callee's name), None for an item
+    with neither — is what THE GAPS' names join on (F2): a gap's name stands for the items of its row named the same."""
+    r, it, ks = u["row"], u.get("items") or [], u.get("keys") or []
+    at = lambda i: ks[i] if i < len(ks) and isinstance(ks[i], str) else None
+    def attrs(k=None, sel=None):
+        kind = k.split(":", 1)[0] if k else None
+        a = sorted({x for e in T if kind and e["kind"] == kind and r in e["rows"] for x in e["attrs"]})
+        e = NT.get((r, sel)) if sel and not kind else None
+        return a or (list(e["attrs"]) if e else None)
+    one = lambda k, sel=None, op=None: [[(op or "k", k)] if k else None, attrs(k, sel), ("k", k) if k else None]
+    tab = lambda k, rw: rw if k and str(k).startswith("table:") and rw in ("r", "w") else None
+    if r == "HEAD":
+        return [one(at(0)), one(at(2))]
+    if r in ("USAGE", "DELIVERY", "DOCSTRING"):
+        return [[None, attrs(None, "value"), None]]
+    if r in ("EVIDENCE", "MODEL ROW"):
+        return [[None, attrs(None, "value"), None]]
+    if r == "GUARDS":
+        return [one(at(i)) for i in range(len(it))]
+    if r == "ACCESSES":                                          # each access by its op: a read is not its write
+        return [one(at(i), None, tab(at(i), str(it[i][0]))) for i in range(len(it))]
+    if r == "PAYLOAD":
+        m = re.search(r"→ (\S+)", u["value"])
+        return [[None, None, None], one(at(0))] if m and at(0) else [[None, None, None]]
+    if r == "CONNECTIONS":
+        if not it:
+            return [[None, None, None]]
+        rel = {"reads_from": "r", "writes_to": "w"}
+        return [one(k, None, tab(k, rel.get(g[0]))) for gi, g in enumerate(it) for mi, _m in enumerate(g[3] + g[7])
+                for k in [ks[gi][mi] if gi < len(ks) and mi < len(ks[gi]) else None]]
+    if r == "CODE BEHIND":
+        names = it + (u.get("rest") or [])
+        ch = [[[("k", at(i))] if at(i) else [("n", n)], attrs(at(i), "callee"), ("k", at(i)) if at(i) else ("n", n)] for i, n in enumerate(names)]
+        # the count counts u["count"] functions; its members are named only when the card lists every one of them
+        cnt = [m for c in ch for m in c[0]] if len(names) == u.get("count") else None
+        return [[cnt, attrs("fn:x"), None]] + ch
+    if r == "TESTS":
+        if not u.get("tabs"):
+            return [[None, None, None]]
+        return ([one(at(i)) for i in range(len(it))] + [[None, attrs(None, "file"), None] for _f in u.get("files") or []]
+                + ([[None, None, None]] if u.get("casesMore") else []))
+    if r == "JOURNEYS":
+        out = []
+        for i, j in enumerate(it):
+            jk = ks[i] if i < len(ks) and ks[i] else [None, []]
+            faces = [e for n, e in enumerate(j[3]) if e and j[3].index(e) == n]
+            fk = list(jk[1] or [])
+            ms = [("k", jk[0])] + [("k", k) for k in fk] if jk[0] and len(fk) == len(faces) and all(fk) else None
+            out.append([ms, attrs(jk[0], "journey"), ("k", jk[0]) if jk[0] else None])
+        return out
+    if r in ("IDENTITY", "SOURCE"):
+        return [one(at(i), kv[1]) for i, kv in enumerate(u.get("kvs") or [])]
+    if r == "SIGNATURE":
+        return ([[None, None, None]] if it and it[0] else []) + ([[None, None, None]] if u.get("value") else [])
+    if r == "RISK":
+        return [[None, attrs(None, f[0]), None] for f in it]
+    if r == "ABOVE":
+        return [one(at(0), "cluster"), one(at(1)), [None, None, None]]
+    return []
+
+
 def reverse_gaps(row: dict, uni: dict, U: dict, carried_attrs: set) -> list:
     """THE GAPS, the other way (D-040): what the universe card shows for this endpoint that the code-map column does not hold.
     Per drawn row, in the card's order: [row, the row's attributes the code map holds nothing for here, whether the row maps to

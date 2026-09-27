@@ -1,6 +1,8 @@
 {
   "_about": "Authored words for all-endpoints.html — the only strings on the page that are not facts. gen-all-endpoints.py refuses to build when a line here types a number (a {token} the generator or the page fills instead) or says a word D-018 took out. Tokens the generator fills are listed in its `tok`; the ones the page fills while it runs are listed in _runtime.",
   "_runtime": [
+    "carried",
+    "items",
     "via",
     "cards",
     "n",
@@ -763,7 +765,9 @@
       "el": "element lit",
       "cm": "the code map",
       "mo": "by moment",
-      "path": "the path"
+      "path": "the path",
+      "uni": "the Gabe Universe",
+      "gaps": "the gaps"
     },
     "pick": "my pick",
     "his": "your choice",
@@ -936,7 +940,31 @@
     "tipPart": "BY MOMENT carries {n} of its {of} elements.",
     "tipEmpty": "This field holds nothing on this endpoint: nothing for BY MOMENT to carry, and nothing it leaves out. Dim and hide fade it, and the header counts it apart.",
     "tipBeyond": "BY MOMENT's steps also touch {n} tables this field does not list: {names}. The code map is short of them.",
-    "plain": "Carried: an element BY MOMENT places at a moment, on any path, or a fact one of its elements draws. A list carries each of its items apart: an alarm when every fact it reads stands at its moment, a path's fate when its writes wear it on its pick (or it writes nothing of its own). A count is carried when every member it counts is placed, in part when some are. A field that sums the whole endpoint up (the count of the fates, the alarms' dots, the longest chain, the proof's rank) stays as it is: it is what BY MOMENT leaves out. A field with nothing on this endpoint is counted apart, never as left. Where BY MOMENT's steps touch tables the code map does not list, the tables fields stay in every look and say how many, and the header counts them."
+    "_aboutPanels": "D-058: his ruling 2026-09-26, the same switch in the Gabe Universe and in THE GAPS, one per panel, each remembered apart. The names and the default are the code map's (D-055: show all is my pick, dashed); what each panel reads as carried is gen-all-endpoints.py's panels_carried, on carried()'s own join, proven there.",
+    "pcount": "{carried} of {items} carried by BY MOMENT · {left} left",
+    "panels": {
+      "uni": {
+        "opts": {
+          "all": "Every row of the universe card, as it is.",
+          "dim": "An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name. A row whose items it draws, every one, fades with its title. Pointing at one brings it back.",
+          "hide": "An item BY MOMENT draws leaves the card; a row whose items it draws, every one, leaves with its title; a row it draws in part says how many of its items are there."
+        },
+        "plain": "Carried, on the universe card: an item BY MOMENT draws at a moment, on any path, found by the key the code map's switch reads, or, for a function Code behind names without a key, by its name (when that name is one function there); a table an access or a connection reads or writes, by a chip of that same op (a read never carries a write); the endpoint is BY MOMENT's heading. A count or a line (the usage, the fields a payload ferries, a file's cases, a flag, the signature) stays unless the card names every member it counts and BY MOMENT draws each one. What BY MOMENT holds only in its band, with no moment, is not carried.",
+        "tipAll": "BY MOMENT draws every item of this row.",
+        "tipPart": "BY MOMENT draws {n} of its {of} items."
+      },
+      "gaps": {
+        "opts": {
+          "all": "Every gap, as it is.",
+          "dim": "A gap BY MOMENT already carries fades: a name it draws at a moment; an attribute of the universe card whose items it draws, every one; an attribute of the code map whose fields it carries whole. A block of such gaps fades with its head. Pointing at one brings it back.",
+          "hide": "A gap BY MOMENT already carries leaves; a block it carries whole leaves with its head; a block or an attribute it carries in part says how many are there."
+        },
+        "plain": "The switch reads whichever way the gaps are shown. From the code map: an attribute is carried when every code-map field that holds it is carried whole, as the code map's own switch reads it; a field with nothing here is passed over, and a field that sums the endpoint up counts as one element BY MOMENT leaves out. From the universe: a name is carried when BY MOMENT draws every item of the card it names (a journey with the entities it crosses, a table's read and its write); an attribute when BY MOMENT draws every item of the row that holds it; a row that maps to no attribute when it draws every item of that row.",
+        "tipAll": "BY MOMENT already carries all of it.",
+        "tipPart": "BY MOMENT carries {n} of its {of} elements."
+      }
+    },
+    "plain": "Carried: an element BY MOMENT places at a moment, on any path, or a fact one of its elements draws. A table read is carried by a chip that reads it, a table written by one that writes it. A list carries each of its items apart: an alarm when every fact it reads stands at its moment, a path's fate when its writes wear it on its pick (or it writes nothing of its own). A count is carried when every member it counts is placed, in part when some are. A field that sums the whole endpoint up (the count of the fates, the alarms' dots, the longest chain, the proof's rank) stays as it is: it is what BY MOMENT leaves out. A field with nothing on this endpoint is counted apart, never as left. Where BY MOMENT's steps touch tables the code map does not list, the tables fields stay in every look and say how many, and the header counts them."
   },
   "authNoScheme": "own check",
   "authNoSchemePlain": "It asks for a login through its own check, with no declared scheme: the check reads the token itself, not from the usual header.",

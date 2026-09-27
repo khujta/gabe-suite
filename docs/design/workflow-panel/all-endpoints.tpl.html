@@ -473,6 +473,15 @@
   .cvx { display: none; font-size: var(--fs-min); color: var(--ink); border: 1px solid var(--accent); border-radius: 5px; padding: 0 5px; margin-left: 6px; white-space: nowrap; }
   #ocol-cm[data-carry="dim"] .cvx, #ocol-cm[data-carry="hide"] .cvx { display: inline-block; }
   .pair > div > .cvn { margin: 1px 0 2px; }
+  /* D-058 · the same switch in the Gabe Universe and in THE GAPS, one per panel: an item BY MOMENT draws (data-cv) fades or leaves;
+     a row or a block it draws whole carries the mark itself (never its items too, so a faded row fades once) */
+  #ocol-uni[data-carry="dim"] [data-cv="1"], #ocol-gaps[data-carry="dim"] [data-cv="1"] { opacity: .3; transition: opacity .12s; }
+  #ocol-uni[data-carry="dim"] [data-cv="1"]:hover, #ocol-uni[data-carry="dim"] [data-cv="1"]:focus-within, #ocol-uni[data-carry="dim"] [data-cv="1"].elon, #ocol-uni[data-carry="dim"] [data-cv="1"]:has(.elon),
+  #ocol-gaps[data-carry="dim"] [data-cv="1"]:hover, #ocol-gaps[data-carry="dim"] [data-cv="1"]:focus-within { opacity: 1; }
+  #ocol-uni[data-carry="hide"] [data-cv="1"], #ocol-gaps[data-carry="hide"] [data-cv="1"] { display: none !important; }
+  #ocol-uni[data-carry="hide"] .cvn, #ocol-gaps[data-carry="hide"] .cvn { display: inline-block; }
+  .pcvbar { margin: 4px 0 6px; }
+  .gblk > .gbh > .cvn, .gap > .cvn, .ust .sechd > .cvn { margin-left: 6px; }
   .moband { margin-top: 10px; border: 1px dashed var(--rule); border-radius: var(--radius, 10px); padding: 8px 12px; }
   .moband > h3 { margin: 0 0 4px; font-size: var(--fs-sm); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
   .mbb { border-top: 1px solid var(--rule-soft); padding: 5px 0; display: grid; grid-template-columns: minmax(0, 16em) minmax(0, 1fr); gap: 2px 12px; align-items: start; font-size: var(--fs-xs); }
@@ -1293,78 +1302,118 @@
   function uKv(icon, k, v) { return E("div", "kv", uIco(icon, "kico"), el("span", "k", k), el("span", "v", v == null ? "" : String(v))); }
   function uChip(cls, glyph, label, title) { var c = E("span", "pchip " + cls, glyph ? uIco(glyph) : null, label); if (title) c.title = title; return c; }
   /* the station's expander: the first `cap` rows, then its own "+N more" button, which shows the rest */
-  function uList(labels, cap, cls, glyph, twisty, keys) { var box = el("div", "xpl"), shown = Math.min(cap, labels.length); keys = keys || [];
+  /* D-058 · an item of a universe row carries its index in the order the generator read the row (_ae_universe.uni_elements), and,
+     when BY MOMENT draws it and its row is carried in part, the mark the switch reads (a row carried whole carries the mark itself).
+     In hide a capped list leaves out what BY MOMENT carries BEFORE its cap, so its own "+N more" counts what is left */
+  var UC = { fl: [], mk: false, hide: false };
+  function ueOf(uc) { return function (n, i) { if (!n) return n; n.setAttribute("data-ue", String(i)); if (uc.mk && uc.fl[i]) n.setAttribute("data-cv", "1"); return n; }; }
+  function uKeep(uc, i) { return !(uc.hide && uc.fl[i]); }
+  /* F5 · a separator between two items of one line is its own span: it goes (fades, leaves) with either item BY MOMENT draws, so hide
+     never leaves a stray " · " at a line's edge */
+  function uSep(uc, a, b, style, text) { var s = el("span", null, text == null ? " · " : text); if (style) s.setAttribute("style", style);
+    if (uc.mk && (uc.fl[a] || uc.fl[b])) s.setAttribute("data-cv", "1"); return s; }
+  function uList(labels, cap, cls, glyph, twisty, keys, idx) { var uc = UC, ue = ueOf(uc); keys = keys || [];
+    if (idx) { var keep = idx.map(function (x, i) { return i; }).filter(function (i) { return uKeep(uc, idx[i]); });
+      labels = keep.map(function (i) { return labels[i]; }); keys = keep.map(function (i) { return keys[i]; }); idx = keep.map(function (i) { return idx[i]; }); }
+    var box = el("div", "xpl"), shown = Math.min(cap, labels.length);
     function paint() { box.textContent = "";
       labels.slice(0, shown).forEach(function (l, i) { var tw = el("span", twisty ? "xtw" : "xtwsp"); if (twisty) tw.title = W.one.uni.twisty;
-        box.appendChild(E("div", "xrow", E("div", "xhead", tw, kd(uChip(cls, glyph, l), keys[i])))); });
+        var xr = E("div", "xrow", E("div", "xhead", tw, kd(uChip(cls, glyph, l), keys[i]))); if (idx) ue(xr, idx[i]); box.appendChild(xr); });
       if (shown < labels.length) { var b = el("button", "more xmore", "+" + (labels.length - shown) + " " + D.ucard.more); b.type = "button";
         b.addEventListener("click", function () { shown = labels.length; paint(); }); box.appendChild(b); } }
     /* a lit element behind "+N more" is shown, as the station's own "+N more" shows it (D-041) */
     box._reveal = function (K) { if (shown < labels.length && keys.slice(shown).indexOf(K) >= 0) { shown = labels.length; paint(); } };
     paint(); return box; }
   function uTests(u) { var cases = u.items, files = u.files || [], lab = new RegExp(UL.testLabel), first = u.tabs.length ? u.tabs[0][0] : null, ck = u.keys || [], cur = 0, reveal = null;
-    function body(k) { var w = el("div"), cs = cases.map(function (c, i) { return i; }).filter(function (i) { return cases[i][2] === k; }), fs = files.filter(function (f) { return f[1] === k; });
-      var chip = function (i) { var c = cases[i], st = c[1] || "unknown"; return kd(uChip("st-" + st, UL.stateIco[st] || UL.testGroup, lab.test(c[0] || "") ? c[0] : (c[3] || c[0] || "?"), (UL.stateLbl[st] || st) + (c[3] ? " · " + c[3] : "")), ck[i]); };
+    var uc = UC, ue = ueOf(uc), nC = cases.length;                                    /* D-058: cases, then files, then the cases more */
+    function body(k) { var w = el("div"), cs = cases.map(function (c, i) { return i; }).filter(function (i) { return cases[i][2] === k && uKeep(uc, i); }), fs = files.map(function (f, j) { return j; }).filter(function (j) { return files[j][1] === k; });
+      var chip = function (i) { var c = cases[i], st = c[1] || "unknown"; return ue(kd(uChip("st-" + st, UL.stateIco[st] || UL.testGroup, lab.test(c[0] || "") ? c[0] : (c[3] || c[0] || "?"), (UL.stateLbl[st] || st) + (c[3] ? " · " + c[3] : "")), ck[i]), i); };
       cs.slice(0, UL.dcap).forEach(function (i) { w.appendChild(chip(i)); }); reveal = null;
       if (cs.length > UL.dcap) { var extra = el("div"); extra.style.display = "none"; cs.slice(UL.dcap).forEach(function (i) { extra.appendChild(chip(i)); }); w.appendChild(extra);
         var mb = el("span", "more", "+" + (cs.length - UL.dcap) + " " + D.ucard.more), lb = el("span", "more", UL.seeLess); mb.style.cursor = lb.style.cursor = "pointer"; lb.style.display = "none";
         mb.addEventListener("click", function () { extra.style.display = ""; mb.style.display = "none"; lb.style.display = ""; });
         lb.addEventListener("click", function () { extra.style.display = "none"; mb.style.display = ""; lb.style.display = "none"; }); w.appendChild(mb); w.appendChild(lb);
         reveal = function (K) { if (extra.style.display === "none" && cs.slice(UL.dcap).some(function (i) { return ck[i] === K; })) mb.click(); }; }
-      if (u.casesMore && k === first) { var n = el("div", "sublbl", "+" + u.casesMore + " " + UL.casesMore); n.style.marginTop = "6px"; w.appendChild(n); }
+      if (u.casesMore && k === first) { var n = el("div", "sublbl", "+" + u.casesMore + " " + UL.casesMore); n.style.marginTop = "6px"; w.appendChild(ue(n, nC + files.length)); }
       if (fs.length) { var fl = E("div", "sublbl", uIco(UL.fileCov[0]), UL.fileCov[1] + " · " + fs.length + " (" + UL.fileCov[2] + ")"); fl.style.marginTop = "7px"; w.appendChild(fl);
-        fs.forEach(function (f) { w.appendChild(uChip(UL.fileChip[0], UL.fileChip[2], f[0], UL.fileChip[1])); }); }
+        fs.filter(function (j) { return uKeep(uc, nC + j); }).forEach(function (j) { var f = files[j]; w.appendChild(ue(uChip(UL.fileChip[0], UL.fileChip[2], f[0], UL.fileChip[1]), nC + j)); }); }
       return w; }
     var box = el("div", "urow usec"); box.setAttribute("data-row", u.row); box.appendChild(uHd(u, u.count, u.ok));
     /* a lit case in another tab: that tab is shown; one behind the tab's own "+N more": the rest is shown (D-041) */
     box._reveal = function (K) { var i = ck.indexOf(K); if (i < 0) return; var t = u.tabs.map(function (x) { return x[0]; }).indexOf(cases[i][2]);
       if (u.tabs.length > 1 && t >= 0 && t !== cur) show(t); if (reveal) reveal(K); };
-    if (!u.tabs.length) { box.appendChild(styled("div", "font-size:12px;color:var(--muted)", u.value)); return box; }
+    if (!u.tabs.length) { box.appendChild(ue(styled("div", "font-size:12px;color:var(--muted)", u.value), 0)); return box; }
     if (u.tabs.length === 1) { box.appendChild(E("div", "sublbl", uIco(UL.testGroup), u.tabs[0][0] + " " + u.tabs[0][1])); box.appendChild(body(u.tabs[0][0])); return box; }
     var bar = el("div", "tabbar"), hold = el("div");
     function show(i) { cur = i; hold.textContent = ""; hold.appendChild(body(u.tabs[i][0])); [].forEach.call(bar.children, function (c, j) { c.classList.toggle("on", j === i); }); }
     u.tabs.forEach(function (t, i) { var b = E("button", "tab", uIco(UL.testGroup), t[0], el("span", "tabn", String(t[1]))); b.type = "button"; b.addEventListener("click", function () { show(i); }); bar.appendChild(b); });
     box.appendChild(bar); box.appendChild(hold); show(0); return box; }
-  function uRow(u, r) { var say = W.universe.say, it = u.items || [], ks = u.keys || [], box = el("div", "urow usec"); box.setAttribute("data-row", u.row);
+  function uRow(u, r) { var say = W.universe.say, it = u.items || [], ks = u.keys || [], box = el("div", "urow usec"), ue = ueOf(UC); box.setAttribute("data-row", u.row);
     if (u.row === "HEAD") { box.className = "urow phead"; box.setAttribute("data-tip", "uni");
       var t = document.createElement("span"); t.innerHTML = UL.inline[0] + UL.headW + '" height="' + UL.headW + UL.inline[1] + UL.kindCol + UL.inline[2] + (UL.ico[u.icon] || "") + "</svg>";
-      var he = styled("span", UL.headEnt, " · "); he.appendChild(ksp(it[2], ks[2]));
-      var pt = E("div", "ptype", t.firstChild, el("span", null, it[1]), he); pt.style.color = "var(--uk-endpoint)";
-      box.appendChild(E("div", "ptitle", kd(el("div", "pname", it[0]), ks[0]), pt)); return box; }
+      var he = ue(styled("span", UL.headEnt, ""), 1); he.appendChild(ksp(it[2], ks[2]));      /* D-058: the endpoint (its name, glyph, type) · its entity */
+      var pt = E("div", "ptype", ue(t.firstChild, 0), ue(el("span", null, it[1]), 0), uSep(UC, 0, 1, UL.headEnt), he); pt.style.color = "var(--uk-endpoint)";
+      box.appendChild(E("div", "ptitle", ue(kd(el("div", "pname", it[0]), ks[0]), 0), pt)); return box; }
     if (u.row === "TESTS") return uTests(u);
-    if (u.row === "EVIDENCE" || u.row === "MODEL ROW") { var kv = uKv(u.icon, u.title, u.value); kv.classList.add("urow"); kv.setAttribute("data-row", u.row); kv.setAttribute("data-tip", "uni"); return kv; }
+    if (u.row === "EVIDENCE" || u.row === "MODEL ROW") { var kv = ue(uKv(u.icon, u.title, u.value), 0); kv.classList.add("urow"); kv.setAttribute("data-row", u.row); kv.setAttribute("data-tip", "uni"); return kv; }
     if (u.row === "RISK") { box.className = "urow flagssec"; box.setAttribute("data-tip", "uni");
-      it.forEach(function (f) { box.appendChild(E("div", "flagrow " + f[3], uIco(f[1]), el("span", "flbl", f[2]))); }); return box; }
+      it.forEach(function (f, i) { box.appendChild(ue(E("div", "flagrow " + f[3], uIco(f[1]), el("span", "flbl", f[2])), i)); }); return box; }
     box.appendChild(uHd(u, u.count, u.ok));
-    if (u.row === "USAGE") { var ub = E("div", "ubar", el("div", "ufill")); ub.firstChild.style.width = Math.min(UL.usage[0], u.count * UL.usage[1]) + "%"; box.appendChild(ub); box.appendChild(E("div", "sublbl", uIco(UL.usage[2]), u.value)); }
-    else if (u.row === "GUARDS") box.appendChild(E("div", null, it.map(function (g, i) { return E("div", "sublbl", uIco(g[2] ? UL.guards[0] : UL.guards[1]), ksp(g[0], ks[i]), " ", styled("span", UL.guards[2], "· " + g[1] + (g[2] ? UL.guards[3] : ""))); })));
-    else if (u.row === "DELIVERY") box.appendChild(E("div", "sublbl", uIco(UL.delivery[0]), UL.delivery[1], styled("span", UL.delivery[2], u.note)));
-    else if (u.row === "ACCESSES") box.appendChild(E("div", null, it.map(function (o, i) { var w = o[0] === "w"; return kd(E("div", "sublbl", uIco(w ? UL.access[0] : UL.access[1]), (w ? UL.access[2] : UL.access[3]) + o[1] + " ", styled("span", UL.access[4], "· " + o[2])), ks[i]); })));
-    else if (u.row === "PAYLOAD") { var pm = /→ (\S+)/.exec(u.value);
-      box.appendChild(pm && ks[0] ? E("div", "sublbl", uIco(UL.payload), u.value.slice(0, pm.index + 2), ksp(pm[1], ks[0]), u.value.slice(pm.index + 2 + pm[1].length)) : E("div", "sublbl", uIco(UL.payload), u.value)); }
-    else if (u.row === "CONNECTIONS") { var cb = el("div", "connbox");
-      if (!it.length) cb.appendChild(styled("div", "font-size:12px;color:var(--muted)", u.value));
+    if (u.row === "USAGE") { var ub = ue(E("div", "ubar", el("div", "ufill")), 0); ub.firstChild.style.width = Math.min(UL.usage[0], u.count * UL.usage[1]) + "%"; box.appendChild(ub); box.appendChild(ue(E("div", "sublbl", uIco(UL.usage[2]), u.value), 0)); }
+    else if (u.row === "GUARDS") box.appendChild(E("div", null, it.map(function (g, i) { return ue(E("div", "sublbl", uIco(g[2] ? UL.guards[0] : UL.guards[1]), ksp(g[0], ks[i]), " ", styled("span", UL.guards[2], "· " + g[1] + (g[2] ? UL.guards[3] : ""))), i); })));
+    else if (u.row === "DELIVERY") box.appendChild(ue(E("div", "sublbl", uIco(UL.delivery[0]), UL.delivery[1], styled("span", UL.delivery[2], u.note)), 0));
+    else if (u.row === "ACCESSES") box.appendChild(E("div", null, it.map(function (o, i) { var w = o[0] === "w"; return ue(kd(E("div", "sublbl", uIco(w ? UL.access[0] : UL.access[1]), (w ? UL.access[2] : UL.access[3]) + o[1] + " ", styled("span", UL.access[4], "· " + o[2])), ks[i]), i); })));
+    else if (u.row === "PAYLOAD") { var pm = /→ (\S+)/.exec(u.value), pre = pm ? u.value.slice(0, pm.index) : "", ph = pre.replace(/ · $/, "");   /* D-058: the count it ferries · the schema */
+      box.appendChild(pm && ks[0] ? E("div", "sublbl", uIco(UL.payload), ue(el("span", null, ph), 0), ph !== pre ? uSep(UC, 0, 1, null, pre.slice(ph.length)) : null,
+        ue(E("span", null, u.value.slice(pm.index, pm.index + 2), ksp(pm[1], ks[0]), u.value.slice(pm.index + 2 + pm[1].length)), 1)) : ue(E("div", "sublbl", uIco(UL.payload), u.value), 0)); }
+    else if (u.row === "CONNECTIONS") { var cb = el("div", "connbox"), base = 0;
+      if (!it.length) cb.appendChild(ue(styled("div", "font-size:12px;color:var(--muted)", u.value), 0));
       /* a group: its relation and count, its trust badge; then its members as the station's chips — the other end's kind picks
-         the chip's class and glyph — the first `cap`, then "+N more" */
+         the chip's class and glyph — the first `cap`, then "+N more". D-058: a group whose every member BY MOMENT draws goes with them */
       it.forEach(function (g, gi) { var st = g[2] === say.structural, tt = st ? UL.ttag.slice(3) : UL.ttag.slice(0, 3), tg = el("span", "ttag " + tt[0], tt[2]); tg.title = tt[1];
+        var ms = g[3].concat(g[7]), idx = ms.map(function (m, j) { return base + j; }); base += ms.length;
         var hd = E("div", "sublbl", uIco(g[6]), g[0] + " " + g[1], tg); hd.setAttribute("data-group", g[0]);
-        var list = el("div", g[2] === UL.inferred[0] ? UL.inferred[1] : ""); list.appendChild(uList(g[3].concat(g[7]), UL.connCap, UL.chipCls[g[5]] || UL.chipDef, g[5], true, ks[gi]));
+        if (UC.mk && idx.length && idx.every(function (i) { return UC.fl[i]; })) hd.setAttribute("data-cv", "1");
+        var list = el("div", g[2] === UL.inferred[0] ? UL.inferred[1] : ""); list.appendChild(uList(ms, UL.connCap, UL.chipCls[g[5]] || UL.chipDef, g[5], true, ks[gi], idx));
         cb.appendChild(hd); cb.appendChild(list); }); box.appendChild(cb); }
-    else if (u.row === "CODE BEHIND") box.appendChild(E("div", null, E("div", "sublbl", uIco(UL.behind[0]), u.value + (UL.fnOff ? UL.behind[2] : UL.behind[1])),
-      uList(it.concat(u.rest || []), UL.behindCap, UL.behindChip[0], UL.behindChip[1], !UL.fnOff, ks)));
+    else if (u.row === "CODE BEHIND") { var bn = it.concat(u.rest || []);                             /* D-058: the count, then each callee */
+      box.appendChild(E("div", null, ue(E("div", "sublbl", uIco(UL.behind[0]), u.value + (UL.fnOff ? UL.behind[2] : UL.behind[1])), 0),
+        uList(bn, UL.behindCap, UL.behindChip[0], UL.behindChip[1], !UL.fnOff, ks, bn.map(function (n, i) { return i + 1; })))); }
     else if (u.row === "JOURNEYS") { var js = el("div", "jsec"), real = new RegExp(UL.jReal);
-      it.forEach(function (j, ji) { var ok = real.test(j[0] || ""), jk = ks[ji] || [null, []]; js.appendChild(E("div", "jmeta" + (ok ? "" : " jagg"), kd(el("span", "jcid" + (ok ? "" : " noc"), j[0]), jk[0]), el("span", "corp", j[1]), el("span", "ncomp", j[2] + " " + D.ucard.comp)));
-        var fc = el("div", "jfaces"); j[3].filter(function (e, i, a) { return e && a.indexOf(e) === i; }).forEach(function (e, fi) { var f = E("span", "face" + (e === u.home ? " fhome" : ""), uIco(UL.faceIco)); f.title = e; f.style.color = UL.hue[e]; fc.appendChild(kd(f, jk[1][fi])); });
+      it.forEach(function (j, ji) { var ok = real.test(j[0] || ""), jk = ks[ji] || [null, []]; js.appendChild(ue(E("div", "jmeta" + (ok ? "" : " jagg"), kd(el("span", "jcid" + (ok ? "" : " noc"), j[0]), jk[0]), el("span", "corp", j[1]), el("span", "ncomp", j[2] + " " + D.ucard.comp)), ji));
+        var fc = ue(el("div", "jfaces"), ji); j[3].filter(function (e, i, a) { return e && a.indexOf(e) === i; }).forEach(function (e, fi) { var f = E("span", "face" + (e === u.home ? " fhome" : ""), uIco(UL.faceIco)); f.title = e; f.style.color = UL.hue[e]; fc.appendChild(kd(f, jk[1][fi])); });
         js.appendChild(fc); }); box.appendChild(js); }
-    else if (u.row === "IDENTITY" || u.row === "SOURCE") u.kvs.forEach(function (k, i) { var kv = uKv(k[0], k[1], k[2]); kd(kv.querySelector(".v"), ks[i]); box.appendChild(kv); });
-    else if (u.row === "SIGNATURE") { if (it[0]) { var sd = styled("div", UL.sig[0], u.parts ? null : it[0]); sd.className = "doc";
+    else if (u.row === "IDENTITY" || u.row === "SOURCE") u.kvs.forEach(function (k, i) { var kv = ue(uKv(k[0], k[1], k[2]), i); kd(kv.querySelector(".v"), ks[i]); box.appendChild(kv); });
+    else if (u.row === "SIGNATURE") { if (it[0]) { var sd = ue(styled("div", UL.sig[0], u.parts ? null : it[0]), 0); sd.className = "doc";
         (u.parts || []).forEach(function (q) { sd.appendChild(q[1] ? ksp(q[0], q[1]) : document.createTextNode(q[0])); }); box.appendChild(sd); }
-      if (u.value) box.appendChild(uKv(UL.sig[1], UL.sig[2], u.value)); }
-    else if (u.row === "DOCSTRING") box.appendChild(el("div", "doc", u.value));
+      if (u.value) box.appendChild(ue(uKv(UL.sig[1], UL.sig[2], u.value), it[0] ? 1 : 0)); }
+    else if (u.row === "DOCSTRING") box.appendChild(ue(el("div", "doc", u.value), 0));
     else if (u.row === "ABOVE") { var nav = function (lead, label, key) { return E("div", "pnav", lead, E("span", "pnl", label, key ? ksp(key[0], key[1]) : null), E("span", "pdir " + UL.above[4], uIco(UL.above[4]))); };
       var core = E("span", "pki pcore", uSvg(UL.core)), dot = el("span", "pdot"); dot.style.background = u.dot;
-      box.appendChild(nav(core, UL.above[0] + it[0])); box.appendChild(ks[1] ? nav(dot, UL.above[1], [it[1], ks[1]]) : nav(dot, UL.above[1] + it[1])); box.appendChild(nav(uIco(UL.above[2]), UL.above[3])); }
+      box.appendChild(ue(nav(core, UL.above[0] + it[0]), 0)); box.appendChild(ue(ks[1] ? nav(dot, UL.above[1], [it[1], ks[1]]) : nav(dot, UL.above[1] + it[1]), 1)); box.appendChild(ue(nav(uIco(UL.above[2]), UL.above[3]), 2)); }
     return box; }
+  /* D-058 · a row BY MOMENT draws whole carries the mark itself, its title with it; a row it draws in part says, in hide, how many of
+     its items are there — beside its title (or at the end of a row with none) */
+  function uMark(row, cv) { row.setAttribute("data-ucs", cv[0]); if (cv[0] === "c") row.setAttribute("data-cv", "1");
+    if (cv[0] === "p" && PV.uni === "hide") { var nt = el("span", "cvn", fill(W.carry.more, { n: cv[2] })), hd = row.querySelector(":scope > .sechd") || row.querySelector(".ptype");
+      (hd || row).appendChild(nt); } }
+  /* ══ D-058 · WHAT BY MOMENT CARRIES, IN THE GABE UNIVERSE AND IN THE GAPS (his ruling 2026-09-26). The code map's switch, once
+     per panel and each remembered apart: every item as it is (my pick, dashed), what BY MOMENT draws dimmed, or hidden. The generator
+     read which items (r.ucv per universe row: [state c|p|b, a flag per item, carried, items]; r.gcv.a per attribute the code map
+     holds, r.gcv.b per universe row the other way) on the code map's own join, and proved it; nothing is decided here. ══ */
+  var PKEY = { uni: "gabe:allep:carry:uni:v1", gaps: "gabe:allep:carry:gaps:v1" }, PV = { uni: W.carry.pick, gaps: W.carry.pick };
+  try { Object.keys(PKEY).forEach(function (q) { var v = window.localStorage.getItem(PKEY[q]); if (v && W.carry.opts[v]) PV[q] = v; }); } catch (e) {}
+  function carryBar(pnl) { var CW = W.carry, cg = el("div", "cvopt"), co = el("div", "opts"); cg.setAttribute("data-pnl", pnl); cg.appendChild(el("span", "rl", CW.label));
+    co.setAttribute("role", "radiogroup"); co.setAttribute("aria-label", CW.label);
+    Object.keys(CW.opts).forEach(function (v) { var bt = el("button", "opt"); bt.type = "button"; bt.setAttribute("role", "radio"); bt.setAttribute("data-carry", v); bt.setAttribute("data-pnl", pnl);
+      bt.setAttribute("aria-checked", PV[pnl] === v ? "true" : "false"); bt.setAttribute("aria-label", CW.opts[v].name); bt.setAttribute("data-tip", "copt");
+      if (CW.pick === v) bt.setAttribute("data-pick", "true");                         /* my pick: dashed (D-025.2) */
+      var ic = document.createElementNS("http://www.w3.org/2000/svg", "svg"); ic.setAttribute("viewBox", "0 0 24 24"); ic.setAttribute("aria-hidden", "true"); ic.innerHTML = CICON[v]; bt.appendChild(ic);
+      bt.addEventListener("click", function () { PV[pnl] = v; try { window.localStorage.setItem(PKEY[pnl], v); } catch (x) {} tipOff(); renderOne(); applyEl(); writeOut(LAST.L, LAST.GS);
+        var back = document.querySelector("#ocol-" + pnl + ' .opt[data-carry="' + v + '"]'); if (back) back.focus({ preventScroll: true }); }); co.appendChild(bt); });
+    cg.appendChild(co); var bar = el("div", "pcvbar"); bar.appendChild(cg); return bar; }
+  function pCount(n) { var c = el("span", "cvc", fill(W.carry.pcount, { carried: n[0], items: n[1], left: n[1] - n[0] })); return c; }
+  function pNote(n) { return el("span", "cvn", fill(W.carry.more, { n: n })); }
   /* the gaps' two directions (D-040): today's reading is the default and my pick; the choice is remembered per viewer */
   var GKEY = "gabe:allep:gapdir:v1", GD = W.one.gaps.dir.pick;
   try { var gv = window.localStorage.getItem(GKEY); if (gv && W.one.gaps.dir.opts[gv]) GD = gv; } catch (e) {}
@@ -1393,9 +1442,14 @@
     var gapSet = {}; if (GD === "cm") { r.gaps.forEach(function (a) { gapSet[a] = "true"; }); r.partly.forEach(function (x) { gapSet[x[0]] = "part"; }); }
     /* LEFT · the Gabe Universe, in the station's own look (D-040): each row drawn with the card's classes, icons and words,
        lifted from the station by the generator; the values are the ones the generator computed the station's way */
-    var U = $("ocol-uni"); U.textContent = ""; U.setAttribute("data-ep", r.id); U.appendChild(colH(O.uni.title, "endpoint")); U.appendChild(elSay("el-uni")); U.appendChild(el("p", "plain ainfo", fill(O.uni.plain)));
+    var U = $("ocol-uni"); U.textContent = ""; U.setAttribute("data-ep", r.id); U.setAttribute("data-carry", PV.uni); U.appendChild(colH(O.uni.title, "endpoint")); U.appendChild(elSay("el-uni")); U.appendChild(el("p", "plain ainfo", fill(O.uni.plain)));
+    /* D-058: how many of the card's items BY MOMENT carries, in its header; what "carried" means behind the toggle; the switch */
+    var ucc = pCount(r.ucn); ucc.id = "ucvcount"; U.querySelector("h3").appendChild(ucc);
+    U.appendChild(el("p", "plain ainfo", W.carry.panels.uni.plain)); U.lastChild.id = "ucv-plain"; U.appendChild(carryBar("uni"));
     var card = el("div", "ust"), pbody = el("div", "pbody");
-    r.uni.rows.forEach(function (u) { var row = uRow(u, r); if (u.row === "HEAD") card.appendChild(row); else pbody.appendChild(row); });
+    r.uni.rows.forEach(function (u, ui) { var cv = r.ucv[ui]; UC = { fl: cv[1], mk: cv[0] === "p", hide: cv[0] === "p" && PV.uni === "hide" };
+      var row = uRow(u, r); uMark(row, cv); if (u.row === "HEAD") card.appendChild(row); else pbody.appendChild(row); });
+    UC = { fl: [], mk: false, hide: false };
     card.appendChild(pbody); U.appendChild(card);
     if (r.uni.silent.length) U.appendChild(el("div", "usilent", fill(O.uni.silent, { rows: r.uni.silent.map(function (x) { return US[x].name; }).join(" · ") })));
     /* RIGHT · the code map: every pair the side panel held, under the block its attribute is homed in */
@@ -1423,24 +1477,33 @@
     skAll(C);                                                 /* D-052: every element the code map names, drawn the station's way */
     applyCarry(C, r);                                         /* D-055: what BY MOMENT carries, dimmed or hidden as the switch says */
     /* MIDDLE · the gaps, my reading, in the direction chosen at its top (D-040) */
-    var G = $("ocol-gaps"); G.textContent = ""; G.setAttribute("data-ep", r.id); G.setAttribute("data-dir", GD); var gh = colH(O.gaps.title, "skip"); var mine = el("span", "mine", O.gaps.mine); mine.setAttribute("data-tip", "mine"); gh.appendChild(mine); G.appendChild(gh);
+    var G = $("ocol-gaps"); G.textContent = ""; G.setAttribute("data-ep", r.id); G.setAttribute("data-dir", GD); G.setAttribute("data-carry", PV.gaps); var gh = colH(O.gaps.title, "skip"); var mine = el("span", "mine", O.gaps.mine); mine.setAttribute("data-tip", "mine"); gh.appendChild(mine); G.appendChild(gh);
+    var gcc = pCount(r.gcn[GD]); gcc.id = "gcvcount"; gh.appendChild(gcc);                 /* D-058: the count of the way shown */
     var dr = el("div", "opts gdir"); dr.setAttribute("role", "radiogroup"); dr.setAttribute("aria-label", O.gaps.dir.label);
     Object.keys(O.gaps.dir.opts).forEach(function (k) { var b = el("button", "opt"); b.type = "button"; b.setAttribute("role", "radio"); b.setAttribute("data-gdir", k);
       b.setAttribute("aria-checked", GD === k ? "true" : "false"); b.setAttribute("aria-label", O.gaps.dir.opts[k].name); b.setAttribute("data-tip", "gdir");
       if (O.gaps.dir.pick === k) b.setAttribute("data-pick", "true");                 /* today's reading is the default and my pick: dashed (D-034) */
       var ic = document.createElementNS("http://www.w3.org/2000/svg", "svg"); ic.setAttribute("viewBox", "0 0 24 24"); ic.setAttribute("aria-hidden", "true"); ic.innerHTML = GICON[k]; b.appendChild(ic);
       b.addEventListener("click", function () { GD = k; S.gRef = null; try { window.localStorage.setItem(GKEY, k); } catch (e) {} tipOff(); renderOne(); applyEl(); }); dr.appendChild(b); });   /* the element light survives the turn */
-    G.appendChild(dr);
+    G.appendChild(dr); G.appendChild(carryBar("gaps"));                                     /* D-058: the switch, beside the way */
+    G.appendChild(el("p", "plain ainfo", W.carry.panels.gaps.plain)); G.lastChild.id = "gcv-plain";
     G.appendChild(el("p", "plain ainfo", O.gaps.status.plain)); G.lastChild.id = "gap-st-plain";          /* D-044 */
     G.appendChild(el("p", "plain ainfo", fill(O.gaps.status.count)));
     if (GD === "uni") { renderReverse(G, r); return; }
     G.appendChild(el("p", "plain ainfo", O.gaps.plain)); G.appendChild(el("div", "gcount", r.gaps.length || r.partly.length ? fill(O.gaps.count, { n: r.gaps.length }) + (r.partly.length ? " · " + r.partly.length + " " + O.gaps.partly : "") : O.gaps.none));
     /* a whole gap first, then one the card shows only part of here (its hover names what the card draws) */
     var gg = {}; r.gaps.forEach(function (a) { (gg[groupOfAttr(a)] = gg[groupOfAttr(a)] || []).push([a]); }); r.partly.forEach(function (x) { (gg[groupOfAttr(x[0])] = gg[groupOfAttr(x[0])] || []).push(x); });
+    /* D-058: a block BY MOMENT carries whole carries the mark itself, its head with it; in part, its head says how many of its gaps
+       are there (in hide), and an attribute carried in part how many of its elements */
+    var GA = r.gcv.a, hideG = PV.gaps === "hide";
     groupOrder().forEach(function (g) { if (!gg[g]) return; var bx = el("div", "gblk"); bx.setAttribute("data-block", g);
       var bh = el("div", "gbh"); bh.appendChild(markEl(g)); bh.appendChild(document.createTextNode(groupName(g))); if (D.marks[g] && D.marks[g].col) bh.style.setProperty("--bc", D.marks[g].col); bx.appendChild(bh);
+      var nc = gg[g].filter(function (x) { return GA[x[0]][0] === "c"; }).length, whole = nc === gg[g].length;
+      if (whole) bx.setAttribute("data-cv", "1"); else if (nc && hideG) bh.appendChild(pNote(nc));
       gg[g].forEach(function (x) { var a = x[0], it = el("div", "gap", D.attrs[a].label); it.setAttribute("data-attr", a); it.setAttribute("data-tip", "gap"); it.setAttribute("data-gw", "a|" + a);
-        if (x.length > 1) { it.setAttribute("data-part", x[1] + "/" + x[2]); it.appendChild(el("span", "pt", O.gaps.partly)); } bx.appendChild(it); }); G.appendChild(bx); });
+        if (x.length > 1) { it.setAttribute("data-part", x[1] + "/" + x[2]); it.appendChild(el("span", "pt", O.gaps.partly)); }
+        it.setAttribute("data-gcs", GA[a][0]); if (!whole && GA[a][0] === "c") it.setAttribute("data-cv", "1"); if (GA[a][0] === "p" && hideG) it.appendChild(pNote(GA[a][1]));
+        bx.appendChild(it); }); G.appendChild(bx); });
   }
   /* THE GAPS THE OTHER WAY (D-040): what the universe card shows here that the code map does not hold, grouped by the card's
      rows in its order, each group headed by the station's own icon for the row — the generator read them (reverse_gaps) */
@@ -1448,14 +1511,21 @@
   function renderReverse(G, r) { var O = W.one, nA = 0, nF = 0;
     r.rgaps.forEach(function (g) { nA += g[1].length + (g[2] ? 1 : 0); nF += g[3].length; });
     G.appendChild(el("p", "plain ainfo", O.gaps.plainB)); G.appendChild(el("div", "gcount", r.rgaps.length ? fill(O.gaps.countB, { n: nA, names: nF }) : O.gaps.noneB));
+    var GB = r.gcv.b, hideG = PV.gaps === "hide";
     r.rgaps.forEach(function (g, gi) { var u = r.uni.rows.filter(function (x) { return x.row === g[0]; })[0], bx = el("div", "gblk"); bx.setAttribute("data-row", g[0]);
       var bh = el("div", "gbh"), bm = el("span", "bm"); bm.appendChild(uIco(u.icon)); bh.appendChild(bm); bh.appendChild(document.createTextNode(u.title || US[g[0]].name)); bx.appendChild(bh);
-      if (g[2]) { var um = el("div", "gap gunm", O.gaps.unmapped); um.setAttribute("data-row", g[0]); um.setAttribute("data-tip", "rgap"); um.setAttribute("data-gw", "b|" + gi + "|u"); bx.appendChild(um); }
-      g[1].forEach(function (a, i) { var it = el("div", "gap", D.attrs[a].label); it.setAttribute("data-attr", a); it.setAttribute("data-row", g[0]); it.setAttribute("data-tip", "rgap"); it.setAttribute("data-gw", "b|" + gi + "|a|" + i); bx.appendChild(it); });
-      if (g[3].length) { var fs = el("div", "gfacts");
+      /* D-058: the row's gaps BY MOMENT carries — whole, the block goes with its head; in part, its head says how many (in hide) */
+      var cb = GB[gi], cs = (cb[0] ? [cb[0][0] === "c"] : []).concat(cb[1].map(function (x) { return x[0] === "c"; }), cb[2].map(function (f) { return !!f; })),
+        nc = cs.filter(Boolean).length, whole = cs.length > 0 && nc === cs.length, mk = function (n, it) { if (!it) return; n.setAttribute("data-gcs", it[0]); if (!whole && it[0] === "c") n.setAttribute("data-cv", "1"); if (it[0] === "p" && hideG) n.appendChild(pNote(it[1])); };
+      if (whole) bx.setAttribute("data-cv", "1"); else if (nc && hideG) bh.appendChild(pNote(nc));
+      if (g[2]) { var um = el("div", "gap gunm", O.gaps.unmapped); um.setAttribute("data-row", g[0]); um.setAttribute("data-tip", "rgap"); um.setAttribute("data-gw", "b|" + gi + "|u"); mk(um, cb[0]); bx.appendChild(um); }
+      g[1].forEach(function (a, i) { var it = el("div", "gap", D.attrs[a].label); it.setAttribute("data-attr", a); it.setAttribute("data-row", g[0]); it.setAttribute("data-tip", "rgap"); it.setAttribute("data-gw", "b|" + gi + "|a|" + i); mk(it, cb[1][i]); bx.appendChild(it); });
+      if (g[3].length) { var fs = el("div", "gfacts"), nv = 0;                                /* in hide, the cap counts what is left */
         g[3].forEach(function (f, i) { var c = skDeco(el("span", "gfact", f), (g[4] || [])[i]); c.setAttribute("data-fact", f);   /* D-052: its station glyph and label, */
-          [].forEach.call(c.querySelectorAll("[data-tip]"), function (x) { x.removeAttribute("data-tip"); });              /* under the gap's own hover (D-044) */ c.setAttribute("data-row", g[0]); c.setAttribute("data-tip", "rfact"); c.setAttribute("data-gw", "b|" + gi + "|f|" + i); if (i >= FCAP) c.hidden = true; fs.appendChild(c); });
-        if (g[3].length > FCAP) { var mb = el("button", "gfmore", fill(O.gaps.rmore, { n: g[3].length - FCAP })); mb.type = "button";
+          [].forEach.call(c.querySelectorAll("[data-tip]"), function (x) { x.removeAttribute("data-tip"); });              /* under the gap's own hover (D-044) */ c.setAttribute("data-row", g[0]); c.setAttribute("data-tip", "rfact"); c.setAttribute("data-gw", "b|" + gi + "|f|" + i);
+          c.setAttribute("data-gcs", cb[2][i] ? "c" : "b"); if (cb[2][i] && !whole) c.setAttribute("data-cv", "1");
+          if (!(hideG && cb[2][i])) { if (nv >= FCAP) c.hidden = true; nv++; } fs.appendChild(c); });
+        if (nv > FCAP) { var mb = el("button", "gfmore", fill(O.gaps.rmore, { n: nv - FCAP })); mb.type = "button";
           mb.addEventListener("click", function () { [].forEach.call(fs.querySelectorAll(".gfact[hidden]"), function (x) { x.hidden = false; }); mb.remove(); }); fs.appendChild(mb); }
         bx.appendChild(fs); }
       G.appendChild(bx); }); }
@@ -1800,6 +1870,12 @@
     if (e && e.status === "solved") h += "<span class=glk>" + refs.map(function (f) { return '<button type="button" class="elref" data-gref="' + esc(f) + '">' + esc(fieldWord(f)) + "</button>"; }).join(" ") + "</span>";
     return h + "</span>"; }
 
+  /* D-058: what BY MOMENT carries of a universe row or a gap, as a line of its hover — all of it, or n of its items */
+  function cvLine(PW, cv) { return !cv ? "" : cv[0] === "c" ? "<span class=pl>" + esc(PW.tipAll) + "</span>" : cv[0] === "p" ? "<span class=pl>" + esc(fill(PW.tipPart, { n: cv[1 + (cv.length > 3)], of: cv[2 + (cv.length > 3)] })) + "</span>" : ""; }
+  function gcvHtml(t, r) { var k = (t.getAttribute("data-gw") || "").split("|"); if (!r || !r.gcv || !k[0]) return "";
+    if (k[0] === "a") return cvLine(W.carry.panels.gaps, r.gcv.a[k[1]]);
+    var g = r.gcv.b[+k[1]]; if (!g) return ""; if (k[2] === "f") return g[2][+k[3]] ? cvLine(W.carry.panels.gaps, ["c", 1, 1]) : "";
+    return cvLine(W.carry.panels.gaps, k[2] === "u" ? g[0] : g[1][+k[3]]); }
   /* ── one tooltip ── */
   var tip = $("tip");
   function tipFor(t) {
@@ -1823,10 +1899,11 @@
       + (sr ? "<span class=pl>" + esc(fill(W.endings.sharedSource, { at: sr })) + "</span>" : ""); }
     if (kind === "gdir") { var gk = t.getAttribute("data-gdir"), gw = W.one.gaps.dir; return "<b>" + esc(gw.opts[gk].name) + "</b>" + (gw.pick === gk ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(gw.opts[gk].plain) + "</span>"; }
     if (kind === "rgap") { var ra = t.getAttribute("data-attr"), rr2 = US[t.getAttribute("data-row")];
-      return "<b>" + esc(ra ? D.attrs[ra].label : rr2.name) + "</b> · " + esc(rr2.title || rr2.name) + "<span class=ln>" + esc(ra ? W.one.gaps.rshows : W.one.gaps.unmapped) + "</span>" + gwHtml(t, r) + (ra ? "<span class=pl>" + esc(D.attrs[ra].plain) + "</span>" : ""); }
-    if (kind === "rfact") { var rr3 = US[t.getAttribute("data-row")]; return "<b>" + esc(rr3.title || rr3.name) + "</b><span class=ln>" + esc(t.getAttribute("data-fact")) + "</span><span class=pl>" + esc(W.one.gaps.rfact) + "</span>" + gwHtml(t, r); }
-    if (kind === "uni" && r) { var u = r.uni.rows.filter(function (x) { return x.row === t.getAttribute("data-row"); })[0], us = D.uspec.filter(function (x) { return x.row === u.row; })[0];
-      return "<b>" + esc(u.title || us.name) + "</b> · " + esc(W.one.uni.title) + "<span class=ln>" + esc(u.value) + "</span><span class=pl>" + esc(fill(W.one.attrOf, { v: us.attrs.map(function (a) { return D.attrs[a].label; }).join(" · ") || W.panel.none })) + " · " + esc(W.one.gaps.mine) + "</span>"; }
+      return "<b>" + esc(ra ? D.attrs[ra].label : rr2.name) + "</b> · " + esc(rr2.title || rr2.name) + "<span class=ln>" + esc(ra ? W.one.gaps.rshows : W.one.gaps.unmapped) + "</span>" + gwHtml(t, r) + (ra ? "<span class=pl>" + esc(D.attrs[ra].plain) + "</span>" : "") + gcvHtml(t, r); }
+    if (kind === "rfact") { var rr3 = US[t.getAttribute("data-row")]; return "<b>" + esc(rr3.title || rr3.name) + "</b><span class=ln>" + esc(t.getAttribute("data-fact")) + "</span><span class=pl>" + esc(W.one.gaps.rfact) + "</span>" + gwHtml(t, r) + gcvHtml(t, r); }
+    if (kind === "uni" && r) { var u = r.uni.rows.filter(function (x) { return x.row === t.getAttribute("data-row"); })[0], us = D.uspec.filter(function (x) { return x.row === u.row; })[0], ucv = r.ucv[r.uni.rows.indexOf(u)];
+      return "<b>" + esc(u.title || us.name) + "</b> · " + esc(W.one.uni.title) + "<span class=ln>" + esc(u.value) + "</span><span class=pl>" + esc(fill(W.one.attrOf, { v: us.attrs.map(function (a) { return D.attrs[a].label; }).join(" · ") || W.panel.none })) + " · " + esc(W.one.gaps.mine) + "</span>"
+        + cvLine(W.carry.panels.uni, ucv); }
     if (kind === "pair") { var as = t.getAttribute("data-attr").split(" ");
       var cvr = BYID[S.open] && BYID[S.open].cv ? BYID[S.open].cv[t.getAttribute("data-k")] : null;   /* D-055: what BY MOMENT carries of it */
       var sg = t.getAttribute("data-k") === "h:handler" && BYID[S.open] ? BYID[S.open].sig : null, SW = W.codemap.sig;   /* D-056 (11): its outline and docstring */
@@ -1838,8 +1915,8 @@
           : cvr && cvr[0] === "e" ? "<span class=pl>" + esc(W.carry.tipEmpty) + "</span>" : "")
         + (cvr && cvr[4] && cvr[4].length ? "<span class=pl>" + esc(fill(W.carry.tipBeyond, { n: cvr[4].length, names: cvr[4].join(", ") })) + "</span>" : ""); }
     if (kind === "gap") { var ga = t.getAttribute("data-attr"), at = D.attrs[ga], px = r && t.hasAttribute("data-part") ? r.partly.filter(function (x) { return x[0] === ga; })[0] : null;
-      if (px) return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.partly) + "<span class=ln>" + esc(fill(W.one.gaps.partlyTip, { names: px[3].join(", "), n: px[1], of: px[2] })) + "</span>" + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>";
-      return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.shows) + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>"; }
+      if (px) return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.partly) + "<span class=ln>" + esc(fill(W.one.gaps.partlyTip, { names: px[3].join(", "), n: px[1], of: px[2] })) + "</span>" + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>" + gcvHtml(t, r);
+      return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.shows) + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>" + gcvHtml(t, r); }
     if (kind === "copycmd") return esc(W.panel.copy);
     if (kind === "hookfile") return "<b>" + esc(t.textContent.trim()) + "</b><span class=pl>" + esc(W.panel.hookFile) + "</span>";   /* D-056 (9) */
     if (kind === "bhn") return "<b>" + esc(t.textContent.trim()) + "</b><span class=pl>" + esc(W.panel.behindNonamePlain) + "</span>";   /* D-056 (1) */
@@ -1847,7 +1924,8 @@
     if (kind === "hdrs") return "<b>" + esc(W.panel.headers) + "</b><span class=pl>" + esc(W.panel.headersPlain) + "</span>";   /* D-056 (7) */
     if (kind === "cmcopy") return "<b>" + esc(W.copy.cm) + "</b><span class=pl>" + esc(W.copy.cmPlain) + "</span>";
     if (kind === "mopt") { var mg = t.getAttribute("data-mopt"), mo = W.mo.opt[mg], mk3 = t.getAttribute("data-v"); return "<b>" + esc(mo.opts[mk3].name) + "</b>" + (mo.pick === mk3 ? " · " + esc(mo.ruled ? W.ruledMark : W.pickMark) : "") + "<span class=pl>" + esc(mo.opts[mk3].plain) + "</span>"; }
-    if (kind === "copt") { var cw = W.carry, cv3 = t.getAttribute("data-carry"); return "<b>" + esc(cw.opts[cv3].name) + "</b>" + (cw.pick === cv3 ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(cw.opts[cv3].plain) + "</span>"; }
+    if (kind === "copt") { var cw = W.carry, cv3 = t.getAttribute("data-carry"), pn = t.getAttribute("data-pnl");   /* D-058: a panel's own words */
+      return "<b>" + esc(cw.opts[cv3].name) + "</b>" + (cw.pick === cv3 ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(pn ? cw.panels[pn].opts[cv3] : cw.opts[cv3].plain) + "</span>"; }
     /* D-055: a path code's hover — its status (and what tells it from another of its status there), its kind; the moment it leaves at;
        what it says; its limiter; whether it is the path in force */
     if (kind === "mopath") { var pa = t.getAttribute("data-path"), rm = BYID[S.open], pon = t.getAttribute("aria-checked") === "true", pf = "<span class=pl>" + esc(pon ? W.mo.path.inForce : W.mo.path.pickIt) + "</span>";
@@ -1920,10 +1998,12 @@
   /* an option's line: where it sits, its words, and whether it is my pick, his ruled default (D-055) or his choice */
   function optLine(where, R, v) { return where + " · " + R.label + ": " + R.opts[v].name + " (" + (v === R.pick ? (R.ruled ? W.ruledMark : W.copy.pick) : W.copy.his) + ")"; }
   function cmLines() { var C = W.copy.lines; return [optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),
+    optLine(C.uni, W.carry, PV.uni), optLine(C.gaps, W.carry, PV.gaps),                   /* D-058: the two panels' own switches */
     optLine(C.mo, W.mo.opt.lay, MS.lay), optLine(C.mo, W.mo.opt.cell, MS.cell)]; }
   /* the code map's own copy (his ask 2026-09-26): the page, the endpoint, every option of the code map, then room for his words */
   function cmText(r) { var C = W.copy.lines; return [C.page + ": all-endpoints · " + T.app + " @ " + T.head, C.open + ": " + r.id,
-    optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV), "", C.your, ""].join("\n"); }
+    optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),
+    optLine(C.uni, W.carry, PV.uni), optLine(C.gaps, W.carry, PV.gaps), "", C.your, ""].join("\n"); }
   function writeOut(L, GS) {
     var C = W.copy.lines, lines = [C.page + ": all-endpoints · " + T.app + " @ " + T.head,
       C.layout + ": " + fill(W.rail.lay.opts[S.lay].name, { cards: D.layouts[S.lay] }), C.group + ": " + W.rail.grp.opts[S.grp].name + (S.grp !== "flat" ? " (" + GS.length + ")" : ""),
@@ -2008,6 +2088,7 @@
     if (hit) S.open = hit.id; else { $("onenote").hidden = false; $("onenote").textContent = fill(W.one.notFound, { ep: window.EPSLUG.valid(want) ? want : "?" }); } })();
   render();
   window.__allep = { ready: true, key: KEY, rails: RAILS, icons: ICON, data: D, state: S, render: render, bins: BINS, layout: layout, groups: groups, cellWords: cellWords, aggOf: aggOf, pick: pick, slug: slugOf, groupOfAttr: groupOfAttr, rowKeys: rowKeys, elName: elName,
-    mo: { key: MKEY, looks: MS, path: MPATH, fams: moFams, face: moFace }, carry: { key: CKEY, get: function () { return CV; } } };
+    mo: { key: MKEY, looks: MS, path: MPATH, fams: moFams, face: moFace }, carry: { key: CKEY, get: function () { return CV; } },
+    pcarry: { keys: PKEY, get: function (q) { return PV[q]; } } };
 })();
 </script>

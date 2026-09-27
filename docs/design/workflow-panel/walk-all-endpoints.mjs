@@ -596,6 +596,72 @@ await pic('more-information-open');
   await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
   await step('review-open-session-complete', '#board tr.row[data-ep="POST /cooking/sessions/{session_id}/complete"] td.id', 'the row POST /cooking/sessions/{session_id}/complete');
   await center('#mogrid td[data-mom="uncaught"][data-f="end"] .mc .vc-status'); await hoverSay('review hover the 500 of complete', '#mogrid td[data-mom="uncaught"][data-f="end"] .mc .vc-status'); }
+{ // D-058 (his ruling 2026-09-26), LAST: POST /cooking/sessions — the Gabe Universe's own switch (show all, dim with a hover, hide), then
+  // THE GAPS' own switch on the universe → code map way (dim with a hover on derive_restrictions, hide) and on the code map → universe
+  // way; each panel's count in its header, the "+n in BY MOMENT" notes; the page's copy text; both panels back to show all
+  const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
+  const shotOf = async (name, sel) => { await p.mouse.move(5, H - 10); await p.evaluate(() => { window.hoverHide && window.hoverHide(); window.scrollTo(0, 0); }); await wait(200);
+    const r = await p.$eval(sel, (e) => { const q = e.getBoundingClientRect(); return { x: Math.max(0, q.left + scrollX - 8), y: Math.max(0, q.top + scrollY - 8), width: q.width + 16, height: q.height + 16 }; });
+    n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + name + '.png'), clip: { x: r.x, y: r.y, width: Math.min(W - r.x, r.width), height: Math.min(8000, r.height) }, fullPage: true }); };
+  const hoverSay = async (label, sel) => { const e = await p.$(sel); if (!e) { say('MISSING ' + label, sel); return; } await e.scrollIntoViewIfNeeded(); const bx = await e.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(250);
+    say(label, await p.$eval('#tip', (t) => t.innerText.replace(/\n+/g, ' ┆ '))); n++;
+    const tb = await p.$eval('#tip', (t) => { const r = t.getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; });
+    const x0 = Math.max(0, Math.min(bx.x, tb.x) - 10), y0 = Math.max(0, Math.min(bx.y, tb.y) - 10);
+    await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + label.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 40) + '.png'),
+      clip: { x: x0, y: y0, width: Math.min(W - x0, Math.max(bx.x + bx.width, tb.x + tb.width) - x0 + 10), height: Math.min(H - y0, Math.max(bx.y + bx.height, tb.y + tb.height) - y0 + 10) } });
+    await p.mouse.move(5, H - 10); await wait(100); };
+  const pcSay = async (label) => say(label, await p.evaluate(() => { const U = document.getElementById('ocol-uni'), G = document.getElementById('ocol-gaps');
+    const where = (e) => { const r = e.closest('[data-row]') || e.closest('[data-block]'); return r ? (r.getAttribute('data-row') || r.getAttribute('data-block')) : '?'; };
+    return { universe: [U.getAttribute('data-carry'), document.getElementById('ucvcount').textContent], gaps: [G.getAttribute('data-carry'), G.getAttribute('data-dir'), document.getElementById('gcvcount').textContent],
+      notes: [...U.querySelectorAll('.cvn'), ...G.querySelectorAll('.cvn')].filter((e) => e.offsetParent).map((e) => where(e) + ' ' + e.textContent) }; }));
+  const sq = (pn, v) => '#ocol-' + pn + ' .opt[data-carry="' + v + '"]';
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('d058-open-cooking-sessions', '#board tr.row[data-ep="POST /cooking/sessions"] td.id', 'the row POST /cooking/sessions');
+  await pcSay('D-058 · both panels, show all'); await shotOf('d058-universe-show-all', '#ocol-uni');
+  await hoverSay('d058 hover the universe dim square', sq('uni', 'dim'));
+  await center(sq('uni', 'dim')); await step('d058-universe-dim', sq('uni', 'dim'), 'the square "' + (await txt(sq('uni', 'dim'))) + '" in the Gabe Universe');
+  await pcSay('D-058 · the universe, dim'); await shotOf('d058-universe-dim', '#ocol-uni');
+  await hoverSay('d058 hover the Accesses row title', '#ocol-uni .urow[data-row="ACCESSES"] .sechd');
+  await center(sq('uni', 'hide')); await step('d058-universe-hide', sq('uni', 'hide'), 'the square "' + (await txt(sq('uni', 'hide'))) + '" in the Gabe Universe');
+  await pcSay('D-058 · the universe, hide'); await shotOf('d058-universe-hide', '#ocol-uni');
+  await center('#ocol-gaps .opt[data-gdir="uni"]'); await step('d058-gaps-the-universe-way', '#ocol-gaps .opt[data-gdir="uni"]', 'the square "' + (await txt('#ocol-gaps .opt[data-gdir="uni"]')) + '"');
+  await center(sq('gaps', 'dim')); await step('d058-gaps-dim', sq('gaps', 'dim'), 'the square "' + (await txt(sq('gaps', 'dim'))) + '" in THE GAPS');
+  await pcSay('D-058 · the gaps (the universe way), dim'); await shotOf('d058-gaps-universe-way-dim', '#ocol-gaps');
+  await hoverSay('d058 hover derive_restrictions in the gaps', '#ocol-gaps .gfact[data-fact="derive_restrictions"]');
+  await hoverSay('d058 hover UserDietaryProfile in the gaps', '#ocol-gaps .gfact[data-fact="UserDietaryProfile"]');
+  await center(sq('gaps', 'hide')); await step('d058-gaps-hide', sq('gaps', 'hide'), 'the square "' + (await txt(sq('gaps', 'hide'))) + '" in THE GAPS');
+  await pcSay('D-058 · the gaps (the universe way), hide'); await shotOf('d058-gaps-universe-way-hide', '#ocol-gaps');
+  await center('#ocol-gaps .opt[data-gdir="cm"]'); await step('d058-gaps-the-code-map-way', '#ocol-gaps .opt[data-gdir="cm"]', 'the square "' + (await txt('#ocol-gaps .opt[data-gdir="cm"]')) + '"');
+  await pcSay('D-058 · the gaps (the code map way), hide'); await shotOf('d058-gaps-code-map-way-hide', '#ocol-gaps');
+  say('D-058 · the page\'s copy text, the three switches', (await p.$eval('#out', (e) => e.value)).split('\n').filter((l) => / · what BY MOMENT carries: /.test(l)));
+  await center(sq('uni', 'all')); await step('d058-universe-show-all-again', sq('uni', 'all'), 'the square "' + (await txt(sq('uni', 'all'))) + '" (my pick)');
+  await center(sq('gaps', 'all')); await step('d058-gaps-show-all-again', sq('gaps', 'all'), 'the square "' + (await txt(sq('gaps', 'all'))) + '" (my pick)');
+  await pcSay('D-058 · both panels, show all again');
+  // the review of D-058 (F1–F5), LAST, still on POST /cooking/sessions: the Gabe Universe dim → hide → show all (the head and the
+  // payload line read in hide: no stray " · "); THE GAPS on the universe → code map way, dim → hide → show all; then the code map's
+  // "copy the settings", the copied text recorded (the clipboard's writeText is watched, the button is clicked with the mouse)
+  const lineSay = async (label) => say(label, await p.evaluate(() => { const U = document.getElementById('ocol-uni'), vis = (q) => { const e = U.querySelector(q); return e ? e.innerText.replace(/\s+/g, ' ').trim() : null; };
+    return { head: vis('.ust .phead .ptype'), payload: vis('.ust .urow[data-row="PAYLOAD"] .sublbl'), accesses: [...U.querySelectorAll('.urow[data-row="ACCESSES"] .sublbl')].map((e) => [e.innerText.replace(/\s+/g, ' ').trim(), e.getAttribute('data-cv') === '1', getComputedStyle(e).display === 'none' ? 'gone' : getComputedStyle(e).opacity]) }; }));
+  const factSay = async (label) => say(label, await p.$$eval('#ocol-gaps .gfact', (fs) => fs.map((f) => f.getAttribute('data-fact') + (f.getAttribute('data-cv') === '1' || (f.closest('.gblk') || f).getAttribute('data-cv') === '1' ? ' · carried' : '') + (f.offsetParent ? '' : ' · gone'))));
+  if ((await p.$eval('#ocol-uni', (e) => e.getAttribute('data-ep'))) !== 'POST /cooking/sessions') say('MISSING POST /cooking/sessions open', '#ocol-uni');
+  await center(sq('uni', 'dim')); await step('d058-review-universe-dim', sq('uni', 'dim'), 'the square "' + (await txt(sq('uni', 'dim'))) + '" in the Gabe Universe');
+  await pcSay('D-058 review · the universe, dim'); await lineSay('D-058 review · the universe, dim — head · payload · accesses'); await shotOf('d058-review-universe-dim-panel', '#ocol-uni');
+  await center(sq('uni', 'hide')); await step('d058-review-universe-hide', sq('uni', 'hide'), 'the square "' + (await txt(sq('uni', 'hide'))) + '" in the Gabe Universe');
+  await pcSay('D-058 review · the universe, hide'); await lineSay('D-058 review · the universe, hide — head · payload · accesses'); await shotOf('d058-review-universe-hide-panel', '#ocol-uni');
+  await center(sq('uni', 'all')); await step('d058-review-universe-show-all', sq('uni', 'all'), 'the square "' + (await txt(sq('uni', 'all'))) + '" (my pick)');
+  await center('#ocol-gaps .opt[data-gdir="uni"]'); await step('d058-review-gaps-the-universe-way', '#ocol-gaps .opt[data-gdir="uni"]', 'the square "' + (await txt('#ocol-gaps .opt[data-gdir="uni"]')) + '"');
+  await center(sq('gaps', 'dim')); await step('d058-review-gaps-dim', sq('gaps', 'dim'), 'the square "' + (await txt(sq('gaps', 'dim'))) + '" in THE GAPS');
+  await pcSay('D-058 review · the gaps (the universe way), dim'); await factSay('D-058 review · the gaps\' names, dim'); await shotOf('d058-review-gaps-dim-panel', '#ocol-gaps');
+  await center(sq('gaps', 'hide')); await step('d058-review-gaps-hide', sq('gaps', 'hide'), 'the square "' + (await txt(sq('gaps', 'hide'))) + '" in THE GAPS');
+  await pcSay('D-058 review · the gaps (the universe way), hide'); await factSay('D-058 review · the gaps\' names, hide'); await shotOf('d058-review-gaps-hide-panel', '#ocol-gaps');
+  await center(sq('gaps', 'all')); await step('d058-review-gaps-show-all', sq('gaps', 'all'), 'the square "' + (await txt(sq('gaps', 'all'))) + '" (my pick)');
+  await p.evaluate(() => { window.__walkCopied = null; const c = navigator.clipboard, orig = c && c.writeText ? c.writeText.bind(c) : null;
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (s1) => { window.__walkCopied = s1; return orig ? orig(s1).catch(() => {}) : Promise.resolve(); } } }); });
+  await center('#cmcopy'); await step('d058-review-copy-the-settings', '#cmcopy', 'the button "' + (await txt('#cmcopy')) + '" of the code map');
+  say('D-058 review · the code map\'s copy, as copied', await p.evaluate(() => window.__walkCopied));
+  say('D-058 review · beside the button', await p.$eval('#cmsaid', (e) => e.textContent));
+  { const r = await p.$eval('#cmcopy', (e) => { const q = e.parentElement.getBoundingClientRect(); return { x: Math.max(0, q.left - 8), y: Math.max(0, q.top - 8), width: q.width + 16, height: q.height + 16 }; });
+    n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-d058-review-copied.png'), clip: { x: r.x, y: r.y, width: Math.min(W - r.x, r.width), height: Math.min(H - r.y, r.height) } }); } }
 say('rows at the end', await rows());
 say('page errors', errs);
 fs.writeFileSync(path.join(OUT, 'walk.json'), JSON.stringify({ viewport: [W, H], log }, null, 1));

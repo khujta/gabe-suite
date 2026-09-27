@@ -388,8 +388,9 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   // CHANGED 2026-09-26 (his ask): the copy text also carries the code map's settings and BY MOMENT's, each on its own line after the
   // endpoint's (the code map's two looks, BY MOMENT's two looks, the path) — set aside too; his paste is still compared line for line
   // CHANGED 2026-09-26 (D-055): the code map's switch "what BY MOMENT carries" adds its line among the code map's settings — six lines now
+  // CHANGED 2026-09-26 (D-058): the Gabe Universe's and the gaps' own switches add their lines after the code map's — eight lines now
   const CL = W8.copy.lines, isSlook = (l) => l.startsWith(CL.slook + ': '), isEp = (l) => l.startsWith(CL.open + ': ');
-  const isSet = (l) => l.startsWith(CL.cm + ' · ') || l.startsWith(CL.mo + ' · ');
+  const isSet = (l) => l.startsWith(CL.cm + ' · ') || l.startsWith(CL.mo + ' · ') || l.startsWith(CL.uni + ' · ') || l.startsWith(CL.gaps + ' · ');
   const asPaste = (out) => { const blk = out.slice(0, out.indexOf('')), his = blk.filter((l) => !isSlook(l) && !isEp(l) && !isSet(l));
     return { blk, his, same: his.length === paste.length && his[0] === 'page: all-endpoints · ' + D.tok.app + ' @ ' + D.tok.head && JSON.stringify(his.slice(1)) === JSON.stringify(paste.slice(1)) }; };
   await open(PAGE);
@@ -398,7 +399,7 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   const sl = a0.blk.filter(isSlook), colsAt = a0.blk.findIndex((l) => l.startsWith(CL.cols + ': ')), el0 = a0.blk.filter(isEp);
   ok(sl.length === 1 && a0.blk.indexOf(sl[0]) === colsAt + 1, 'the copy text puts the Shared treatment\'s line right under the columns line', a0.blk);
   const set0 = a0.blk.filter(isSet);
-  ok(el0.length === 1 && set0.length === 6 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-7)) === JSON.stringify([el0[0]].concat(set0)),
+  ok(el0.length === 1 && set0.length === 8 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-9)) === JSON.stringify([el0[0]].concat(set0)),
     'the copy text adds the endpoint shown, then the code map\'s and BY MOMENT\'s settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -1226,8 +1227,9 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   await p.$eval('#cmcopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#cmcopy'); await p.waitForTimeout(80);
   // CHANGED 2026-09-26 (D-055): a ruled default is copied as his default; the code map's switch adds its own line
   const optL = (R, v) => R.label + ': ' + R.opts[v].name + ' (' + (v === R.pick ? (R.ruled ? D.words.ruledMark : D.words.copy.pick) : D.words.copy.his) + ')';
+  // CHANGED 2026-09-26 (D-058): the Gabe Universe's and the gaps' switches are copied too, after the code map's
   const wantCopy = [CL.page + ': all-endpoints · ' + D.tok.app + ' @ ' + D.tok.head, CL.open + ': ' + E14, CL.cm + ' · ' + optL(EW.opt.mom, 'rows'), CL.cm + ' · ' + optL(EW.opt.chk, 'col'),
-    CL.cm + ' · ' + optL(D.words.carry, 'all'), '', CL.your, ''].join('\n');
+    CL.cm + ' · ' + optL(D.words.carry, 'all'), CL.uni + ' · ' + optL(D.words.carry, 'all'), CL.gaps + ' · ' + optL(D.words.carry, 'all'), '', CL.your, ''].join('\n');
   const got14 = await p.evaluate(() => window.__copied);
   ok(got14 === wantCopy, 'the code map\'s copy button copies the page, the endpoint, each of its options with whose pick it is, then room for your words', got14);
   await p.click('#ocol-cm .opt[data-eopt="chk"][data-v="line"]'); await p.waitForTimeout(80); await p.click('#cmcopy'); await p.waitForTimeout(80);
@@ -1802,6 +1804,156 @@ ok(!errs.length, 'no page error after the D-056 checks', errs);
     'review F3 · ' + E3 + ': ' + f3.filter((x) => x[2].length).length + ' of the ' + f3.length + ' functions joined to their caller say they may also run under ' + [...new Set(f3.flatMap((x) => x[2]))].join(', ') + ' (its list is cut); the rest say nothing of it', f3);
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-057 checks', errs);
+
+/* 18 · D-058 (his ruling 2026-09-26: "the same buttons to hide or dim the information that we already put below, but in the Gabe
+   universe ... see in both panels what is already on the by moment table"). Real clicks on POST /cooking/sessions, every expected
+   value read off the page's OTHER section — BY MOMENT's grid (the keys its chips carry, the names of its chips with no key, its heading)
+   — never from the generator's marks:
+   (a) both new switches open on "show all", my pick, dashed; the code map's too;
+   (b) the universe: every item (its "+N more" opened, each Tests tab visited) is marked carried exactly when its one key is a key
+       BY MOMENT's grid draws (a Code behind function with no key: when a grid chip with no key has its name; the endpoint: the
+       heading); a count, a line, a flag, the signature, Source's file (the file's length, not the handler line) stay bright;
+       the header's count is the items the page marks, of the items it draws, per row the generator's;
+   (c) dim fades exactly the marks, the Accesses rows for the tables BY MOMENT draws among them, the rest whole; hide takes them away,
+       each row carried in part says "+n in BY MOMENT"; the switches are independent and remembered apart (a reload);
+   (d) THE GAPS from the universe: derive_restrictions and ResolutionSnapshot.violations_for fade (the grid has them by name), C237 and
+       C267 fade exactly when the grid draws them, UserDietaryProfile, Source's file and the risk flags stay; hide takes the carried
+       away; the count is the page's own; from the code map: an attribute is carried exactly when every code-map pair naming it that
+       holds something here is carried whole (the code map's own marks); the count follows the way shown;
+   (e) both copy texts carry the two switches' lines. */
+{ const fillW = (s0, x) => String(s0).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  const E = 'POST /cooking/sessions', R = ROW[E], CW = D.words.carry, CL = D.words.copy.lines;
+  const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
+  await open(PAGE); await openEp(E);
+  const grid = await p.evaluate(() => ({ keys: [...new Set([...document.querySelectorAll('#mogrid .mc[data-keys]')].flatMap((c) => c.getAttribute('data-keys').split('\n')))],
+    names: [...document.querySelectorAll('#mogrid td[data-f="fn"] .mc')].map((c) => [((c.querySelector('.mt') || {}).textContent || '').trim(), (c.getAttribute('data-keys') || '').split('\n').filter((k) => k.startsWith('fn:'))[0] || '']),
+    ops: [...document.querySelectorAll('#mogrid .mc[data-f="data"][data-keys]')].flatMap((c) => { const o = c.querySelector('.vc[data-vc="op"]'); return o ? c.getAttribute('data-keys').split('\n').map((k) => o.getAttribute('data-vv') + '|' + k) : []; }),
+    head: document.querySelector('#mohead h3').getAttribute('aria-label') }));
+  /* F4 (review 2026-09-26): a name BY MOMENT draws — a function chip with no key, or a keyed one whose name no other function chip
+     there wears under another key; F1: a table's read or write by a data chip wearing that op */
+  const NK = {}; grid.names.forEach(([n, k]) => { (NK[n] = NK[n] || new Set()).add(k); });
+  const MK = new Set(grid.keys.concat(grid.head === E ? ['endpoint:' + E] : [])), MN = new Set(Object.keys(NK).filter((n) => NK[n].has('') || NK[n].size === 1)), GO = new Set(grid.ops);
+  const sq = (id) => p.evaluate((i) => ({ carry: document.getElementById(i).getAttribute('data-carry'),
+    squares: [...document.querySelectorAll('#' + i + ' .opt[data-carry]')].map((o) => [o.getAttribute('data-carry'), o.getAttribute('aria-checked'), getComputedStyle(o).borderTopStyle]) }), id);
+  const s0 = [await sq('ocol-uni'), await sq('ocol-gaps'), await sq('ocol-cm')];
+  ok(s0.every((x) => x.carry === CW.pick && x.squares.length === 3 && x.squares.every(([v, on0, dash]) => (on0 === 'true') === (v === CW.pick) && (dash === 'dashed') === (v === CW.pick))),
+    'D-058 · the Gabe Universe, THE GAPS and the code map each open their own switch on "' + CW.opts[CW.pick].name + '", my pick, dashed', s0);
+  /* (b) the universe's items, every one drawn: the lists opened, each Tests tab visited */
+  const readU = () => p.evaluate(() => { const U = document.getElementById('ocol-uni'), out = {};
+    const shown = (e) => !!e.getClientRects().length && getComputedStyle(e).display !== 'none';
+    const op = (e) => { let o = 1; for (let n = e; n && n !== U; n = n.parentElement) o *= +getComputedStyle(n).opacity; return o; };
+    U.querySelectorAll('.ust .xmore').forEach((b) => b.click());
+    const grab = (row) => { const rn = row.getAttribute('data-row'), o = out[rn] || (out[rn] = { st: row.getAttribute('data-ucs'), rowShown: shown(row), rowOp: op(row), note: [...row.querySelectorAll('.cvn')].filter(shown).map((e) => e.textContent), items: {} });
+      row.querySelectorAll('[data-ue]').forEach((n) => { const i = n.getAttribute('data-ue'), it = o.items[i] || (o.items[i] = { keys: new Set(), cv: false, text: '', op: 1, shown: false, chip: false });
+        [n, ...n.querySelectorAll('[data-keys]')].forEach((k) => (k.getAttribute('data-keys') || '').split('\n').filter(Boolean).forEach((x) => it.keys.add(x)));
+        if (n.getAttribute('data-cv') === '1') it.cv = true; if (n.classList.contains('xrow')) { it.chip = true; it.text = ((n.querySelector('.pchip') || {}).textContent || '').trim(); }
+        it.op = Math.min(it.op, op(n)); it.shown = it.shown || shown(n); }); };
+    U.querySelectorAll('.ust .urow[data-row]').forEach((row) => { const tabs = [...row.querySelectorAll('.tabbar .tab')];
+      if (tabs.length) { tabs.forEach((t) => { t.click(); grab(row); }); tabs[0].click(); } else grab(row); });
+    Object.values(out).forEach((o) => Object.values(o.items).forEach((it) => { it.keys = [...it.keys]; }));
+    return { rows: out, count: document.getElementById('ucvcount').textContent, carry: U.getAttribute('data-carry') }; });
+  const u0 = await readU(), UR = R.uni.rows.map((u) => u.row), UI = (rn) => (R.uni.rows.find((u) => u.row === rn) || { items: [] }).items || [];
+  const OPS = { ACCESSES: UI('ACCESSES').map((o) => o[0]), CONNECTIONS: UI('CONNECTIONS').flatMap((g) => g[3].concat(g[7]).map(() => ({ reads_from: 'r', writes_to: 'w' })[g[0]] || null)) };
+  const want = (rn, it, row, i) => { if (rn === 'SIGNATURE' || rn === 'RISK') return false;
+    const op = (OPS[rn] || [])[i]; if (op && it.keys.length === 1 && it.keys[0].startsWith('table:')) return GO.has(op + '|' + it.keys[0]);   /* F1: the access's own op */                 /* the def line, the flags: counted members none */
+    if (rn === 'CODE BEHIND' && !it.keys.length && !it.chip) { const ch = Object.values(row.items).filter((x) => x.chip);   /* its count: every callee named and drawn */
+      return ch.length === (R.uni.rows.find((u) => u.row === rn) || {}).count && ch.every((x) => want(rn, x, row)); }
+    if (rn === 'CODE BEHIND' && it.chip && !it.keys.length) return MN.has(it.text);
+    if (rn === 'JOURNEYS') return it.keys.length > 1 && it.keys.every((k) => MK.has(k)) && it.keys.some((k) => k.startsWith('case:'));
+    return it.keys.length === 1 && MK.has(it.keys[0]); };
+  const bad = [], per = [];
+  let nIt = 0, nC = 0;
+  UR.forEach((rn, ui) => { const row = u0.rows[rn]; if (!row) { bad.push([rn, 'not drawn']); return; }
+    const idx = Object.keys(row.items), mark = (it) => row.st === 'c' || it.cv;
+    idx.forEach((i) => { const it = row.items[i]; if (mark(it) !== want(rn, it, row, i)) bad.push([rn, i, it.keys.join(' ') || it.text, mark(it)]); });
+    const c = idx.filter((i) => mark(row.items[i])).length; nIt += idx.length; nC += c; per.push([rn, c, idx.length]);
+    if (idx.length !== R.ucv[ui][3] || c !== R.ucv[ui][2]) bad.push([rn, 'count', c + '/' + idx.length, R.ucv[ui].slice(2)]); });
+  ok(!bad.length && nC > 0 && nC < nIt, 'D-058 · the universe · every item is marked carried exactly when BY MOMENT\'s grid draws its key (a Code behind function by its name, the endpoint by the heading); counts, lines, flags, the signature and Source\'s file stay bright: ' + per.map((x) => x[0] + ' ' + x[1] + '/' + x[2]).join(' · '), bad.slice(0, 5));
+  const srcFile = (u0.rows.SOURCE || { items: {} }).items['0'];
+  ok(srcFile && !srcFile.cv && srcFile.keys[0] === 'file:' + R.file && (u0.rows.RISK || { st: 'b' }).st === 'b' && u0.rows.USAGE.st === 'b',
+    'D-058 · the universe · Source\'s file (' + R.file + ', the file\'s length, not the handler line), the risk flags and the usage count stay bright', { srcFile, risk: (u0.rows.RISK || {}).st });
+  ok(u0.count === fillW(CW.pcount, { carried: nC, items: nIt, left: nIt - nC }) && JSON.stringify([nC, nIt]) === JSON.stringify(R.ucn),
+    'D-058 · the universe\'s header count is the page\'s own marks: ' + u0.count, { count: u0.count, page: [nC, nIt], gen: R.ucn });
+  /* (c) dim, hide, independent, remembered */
+  await p.click('#ocol-uni .opt[data-carry="dim"]'); await p.waitForTimeout(150); await p.mouse.move(5, 5); await p.waitForTimeout(150);
+  const u1 = await readU(), acc = u1.rows.ACCESSES, accBad = Object.entries(acc.items).filter(([i, it]) => (it.op < 0.5) !== GO.has(OPS.ACCESSES[i] + '|' + it.keys[0]));
+  const dimBad = []; Object.entries(u1.rows).forEach(([rn, row]) => Object.entries(row.items).forEach(([i, it]) => { const m = row.st === 'c' || it.cv, o = row.st === 'c' ? row.rowOp : it.op;
+    if (m ? !(o < 0.5 && it.shown) : o !== 1) dimBad.push([rn, i, o]); }));
+  ok(u1.carry === 'dim' && !dimBad.length && !accBad.length && Object.values(acc.items).some((it) => it.op < 0.5) && Object.values(acc.items).some((it) => it.op === 1),
+    'D-058 · dim: the universe\'s carried items fade and stay drawn — the Accesses rows of the tables BY MOMENT draws (' + Object.values(acc.items).filter((it) => it.op < 0.5).length + ' of ' + Object.keys(acc.items).length + ') among them — every other item stays whole', { dimBad: dimBad.slice(0, 4), accBad });
+  await p.click('#ocol-uni .opt[data-carry="hide"]'); await p.waitForTimeout(150);
+  const u2 = await readU(), hideBad = [], notes = [];
+  UR.forEach((rn, ui) => { const row = u2.rows[rn], cv = R.ucv[ui]; if (!row) { if (cv[0] !== 'c') hideBad.push([rn, 'gone']); return; }
+    if (cv[0] === 'c' && row.rowShown) hideBad.push([rn, 'row shown']);
+    Object.entries(row.items).forEach(([i, it]) => { if (it.cv && it.shown) hideBad.push([rn, i, 'carried shown']); if (!it.cv && row.st !== 'c' && !it.shown && !(rn === 'TESTS')) hideBad.push([rn, i, 'bright hidden']); });
+    if (cv[0] === 'p') { notes.push(row.note[0]); if (JSON.stringify(row.note) !== JSON.stringify([fillW(CW.more, { n: cv[2] })])) hideBad.push([rn, 'note', row.note]); } });
+  const ind = await p.evaluate(() => [document.getElementById('ocol-gaps').getAttribute('data-carry'), document.getElementById('ocol-cm').getAttribute('data-carry'), localStorage.getItem('gabe:allep:carry:uni:v1')]);
+  ok(u2.carry === 'hide' && !hideBad.length && notes.length === R.ucv.filter((x) => x[0] === 'p').length && ind[0] === CW.pick && ind[1] === CW.pick && ind[2] === 'hide',
+    'D-058 · hide: the universe\'s carried items and whole rows leave, every bright item stays, each of the ' + notes.length + ' rows carried in part says how many are in BY MOMENT; THE GAPS and the code map keep their own look', { hideBad: hideBad.slice(0, 4), ind });
+  /* F5 (review 2026-09-26): a separator goes with the item BY MOMENT draws beside it — hide leaves no line starting or ending on " · " */
+  const f5 = await p.evaluate(() => { const U = document.getElementById('ocol-uni'), vis = (q) => { const e = U.querySelector(q); return e ? e.innerText.trim() : null; };
+    return [vis('.ust .phead .ptype'), vis('.ust .urow[data-row="PAYLOAD"] .sublbl')]; });
+  ok(f5[0] != null && !/^·/.test(f5[0]) && f5[1] != null && f5[1].length > 0 && !/·$/.test(f5[1]),
+    'F5 · hide leaves no stray separator: the head reads "' + String(f5[0]).replace(/\n/g, ' ') + '", the payload "' + f5[1] + '"', f5);
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await openEp(E);
+  const re0 = [await sq('ocol-uni'), await sq('ocol-gaps'), await sq('ocol-cm')].map((x) => x.carry);
+  ok(JSON.stringify(re0) === JSON.stringify(['hide', CW.pick, CW.pick]), 'D-058 · after a reload the universe stays on hide, THE GAPS and the code map on their own', re0);
+  /* (d) THE GAPS, from the universe */
+  await p.click('#ocol-gaps .opt[data-gdir="uni"]'); await p.waitForTimeout(80); await p.click('#ocol-gaps .opt[data-carry="dim"]'); await p.waitForTimeout(150); await p.mouse.move(5, 5); await p.waitForTimeout(150);
+  const readG = () => p.evaluate(() => { const G = document.getElementById('ocol-gaps'); G.querySelectorAll('.gfmore').forEach((b) => b.click());
+    const shown = (e) => !!e.getClientRects().length && getComputedStyle(e).display !== 'none';
+    const op = (e) => { let o = 1; for (let n = e; n && n !== G; n = n.parentElement) o *= +getComputedStyle(n).opacity; return o; };
+    const items = [...G.querySelectorAll('.gblk .gap, .gblk .gfact')].map((e) => ({ t: e.classList.contains('gfact') ? e.getAttribute('data-fact') : e.getAttribute('data-attr') || 'unmapped',
+      row: (e.closest('.gblk') || {}).getAttribute('data-row'), fact: e.classList.contains('gfact'),
+      m: e.getAttribute('data-cv') === '1' || e.closest('.gblk').getAttribute('data-cv') === '1', gcs: e.getAttribute('data-gcs'), op: op(e), shown: shown(e) }));
+    return { items, count: document.getElementById('gcvcount').textContent, carry: G.getAttribute('data-carry'), dir: G.getAttribute('data-dir') }; });
+  const g1 = await readG(), fct = (t) => g1.items.find((x) => x.fact && x.t === t) || {};
+  const byName = ['derive_restrictions', 'ResolutionSnapshot.violations_for'], cases = ['C237', 'C267'], stay = ['UserDietaryProfile', R.uni.rows.find((u) => u.row === 'SOURCE').kvs[0][2], 'conflict · large surface'];
+  /* what a name IS comes from the row's own record (its key, parallel to its name — the DOM draws the glyph, not the key) */
+  const FK = new Map(R.rgaps.flatMap((g) => g[3].map((n, i) => [g[0] + '|' + n, (g[4] || [])[i] || null])));
+  /* F2 (review 2026-09-26): a name stands for the card's items of its row named the same (a journey with its entities, a table's
+     read and its write) — carried exactly when each of them is, read off the grid as above */
+  const gWant = (x) => { const k = FK.get(x.row + '|' + x.t), row = u0.rows[x.row];
+    const its = row ? Object.entries(row.items).filter(([, it]) => (k ? it.keys.includes(k) : x.row === 'CODE BEHIND' && it.chip && !it.keys.length && it.text === x.t)) : [];
+    return its.length ? its.every(([i, it]) => want(x.row, it, row, i)) : k ? MK.has(k) : x.row === 'CODE BEHIND' && MN.has(x.t); };
+  const fBad = g1.items.filter((x) => x.fact).filter((x) => { const w = gWant(x); return x.m !== w || (x.m ? !(x.op < 0.5) : x.op !== 1); });
+  const gC = g1.items.filter((x) => x.m).length;
+  ok(g1.dir === 'uni' && g1.carry === 'dim' && byName.every((n) => fct(n).m && fct(n).op < 0.5 && MN.has(n)) && cases.every((c) => fct(c).m === MK.has('case:' + c) && (fct(c).op < 0.5) === MK.has('case:' + c))
+     && stay.every((n) => fct(n).t && !fct(n).m && fct(n).op === 1) && !fBad.length,
+    'D-058 · THE GAPS from the universe, dim: ' + byName.join(' and ') + ' fade (BY MOMENT names them), ' + cases.map((c) => c + (MK.has('case:' + c) ? ' fades' : ' stays')).join(', ') + '; ' + stay.join(', ') + ' stay whole — every name marked exactly as BY MOMENT\'s grid draws it',
+    { fBad: fBad.slice(0, 4), stay: stay.map((n) => [n, fct(n).m, fct(n).op]) });
+  ok(g1.count === fillW(CW.pcount, { carried: gC, items: g1.items.length, left: g1.items.length - gC }) && JSON.stringify([gC, g1.items.length]) === JSON.stringify(R.gcn.uni),
+    'D-058 · THE GAPS\' header count (from the universe) is the page\'s own marks: ' + g1.count, { count: g1.count, page: [gC, g1.items.length], gen: R.gcn.uni });
+  await p.click('#ocol-gaps .opt[data-carry="hide"]'); await p.waitForTimeout(150);
+  const g2 = await readG(), g2Bad = g2.items.filter((x) => x.m === x.shown);
+  const uStill = await p.evaluate(() => document.getElementById('ocol-uni').getAttribute('data-carry'));
+  ok(g2.carry === 'hide' && !g2Bad.length && uStill === 'hide', 'D-058 · hide: THE GAPS\' carried names leave (a block whose every gap is carried with its head), every bright one stays; the universe keeps its own look', { bad: g2Bad.slice(0, 4), uStill });
+  /* THE GAPS from the code map: an attribute is carried exactly when every code-map pair naming it that holds something here is
+     carried whole (the code map's own data-cvs: c, or x with items) */
+  await p.click('#ocol-gaps .opt[data-gdir="cm"]'); await p.waitForTimeout(150);
+  const g3 = await readG(), pairs = await p.evaluate(() => [...document.querySelectorAll('#ocol-cm .pair[data-k], #ocol-cm [data-sub][data-k]')].map((q) => [q.getAttribute('data-k'), (q.getAttribute('data-attr') || '').split(' '), q.getAttribute('data-cvs')]));
+  const aBad = g3.items.filter((x) => { const hold = pairs.filter(([k, as, st]) => as.includes(x.t) && st && st !== 'e'), cv = (k) => R.cv[k];
+    const whole = hold.length > 0 && hold.every(([k, , st]) => st === 'c' || (st === 'x' && cv(k)[3])); return x.m !== whole || x.m === x.shown; });
+  const aC = g3.items.filter((x) => x.m).length;
+  ok(g3.dir === 'cm' && !aBad.length && aC > 0 && g3.count === fillW(CW.pcount, { carried: aC, items: g3.items.length, left: g3.items.length - aC }) && JSON.stringify([aC, g3.items.length]) === JSON.stringify(R.gcn.cm),
+    'D-058 · THE GAPS from the code map, hide: an attribute leaves exactly when every code-map pair holding it is carried whole — ' + g3.count, { bad: aBad.slice(0, 4).map((x) => x.t), count: g3.count, gen: R.gcn.cm });
+  /* F3 (review 2026-09-26): an attribute carried in part never reads "n of its n" — a field that sums the endpoint up (the fates'
+     tally, the proof rank) is one element BY MOMENT leaves out */
+  const rxP = new RegExp(CW.panels.gaps.tipPart.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{(n|of)\}/g, '(\\d+)')), pAt = g3.items.filter((x) => x.gcs === 'p'), f3 = [];
+  for (const x of pAt) { const h = await p.$('#ocol-gaps .gap[data-attr="' + x.t + '"]'); await h.scrollIntoViewIfNeeded(); const bx = await h.boundingBox();
+    await p.mouse.move(bx.x + 4, bx.y + bx.height / 2); await p.waitForTimeout(90); const m = rxP.exec(await p.$eval('#tip', (e) => e.textContent)); f3.push([x.t, m && +m[1], m && +m[2]]); await p.mouse.move(5, 5); }
+  ok(pAt.length > 0 && f3.every(([, n, of]) => n != null && n < of),
+    'F3 · THE GAPS from the code map: every attribute carried in part says fewer than all its elements — ' + f3.map((x) => x[0] + ' ' + x[1] + '/' + x[2]).join(' · '), f3);
+  /* (e) the copy texts */
+  await p.evaluate(() => { window.__copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (s1) => { window.__copied = s1; return Promise.resolve(); } } }); });
+  await p.$eval('#cmcopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#cmcopy'); await p.waitForTimeout(80);
+  const optL = (v) => CW.label + ': ' + CW.opts[v].name + ' (' + (v === CW.pick ? D.words.copy.pick : D.words.copy.his) + ')';
+  const lines = [CL.uni + ' · ' + optL('hide'), CL.gaps + ' · ' + optL('hide')], cp = await p.evaluate(() => [window.__copied, document.getElementById('out').value]);
+  ok(cp[0] && lines.every((l) => cp[0].includes(l) && cp[1].includes(l)), 'D-058 · the code map\'s copy and the page\'s copy text both carry "' + lines.join('" and "') + '"', cp[0]);
+  await p.click('#ocol-uni .opt[data-carry="all"]'); await p.waitForTimeout(100); await p.click('#ocol-gaps .opt[data-carry="all"]'); await p.waitForTimeout(100);
+  ok((await sq('ocol-uni')).carry === 'all' && (await sq('ocol-gaps')).carry === 'all', 'D-058 · show all brings both panels back whole');
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the D-058 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));

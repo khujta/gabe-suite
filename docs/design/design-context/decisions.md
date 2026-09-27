@@ -746,3 +746,13 @@ code per PATH, not per ending, where several paths reach one ending (the replay 
 behind with no call edge or known by name only, as chips at the call that reaches them, on its paths as an upper bound · (e)
 escape-500 — the cause in the 500 chip's hover. The timeless fields (fate tally, step count, behind count, proof rank, the
 arranging tests, the entity) stay where they are.
+
+## D-058 — The universe and the gaps panels get the same "what BY MOMENT carries" switch
+Date: 2026-09-26 · Input: his message on the D-057 build, with a screenshot of THE GAPS on POST /cooking/sessions.
+Decision, his: "I want the same buttons to hide or dim the information that we already put below, but in the Gabe universe, I want
+to be able to see in both panels what is already on the by moment table."
+Consequence: THE GABE UNIVERSE and THE GAPS panels of ONE ENDPOINT each get the show all · dim · hide switch the code map has
+(D-055), over the same join: an element BY MOMENT draws — by its element key, or by name for a name-only chip — is carried; a row
+whose elements are all carried is carried whole; a count or text item stays bright unless every member it counts is carried. Each
+panel's header counts what BY MOMENT carries and what is left. One switch per panel (the agent's call, his to overturn: dim one
+panel while reading another whole). Both copy texts carry the switches.
