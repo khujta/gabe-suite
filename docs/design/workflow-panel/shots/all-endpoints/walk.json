@@ -1519,7 +1519,7 @@
    [
     "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
     "Endings refusal 429 refusal 429 framework 422 framework 400 refusal 401 refusal 401 validation 422 refusal 403 refusal 409 refusal 400 refusal 400 refusal 429 refusal 429",
-    "Proof C79 proves 429 C79 proves 429 C73 proves 400 C74 proves 400 C72 proves 401 C72 proves 401 C83 proves 422 C971 proves 403 C72 proves 403 C73 proves 400 C74 proves 40",
+    "Proof C81 1 step before C79 proves 429 C79 proves 429 C73 proves 400 C74 proves 400 C72 proves 401 C72 proves 401 C83 proves 422 C971 proves 403 C72 proves 403 C73 proves",
     "Gates and decisions sensitive global get_auth_context caller context.py:98 · translate 403 not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) 409 self.hous",
     "Data effects users R users W flush resolve_or_create_user accessor commit build_auth_context caller memberships R households R locations R recipe_creation_requests R cano",
     "Functions get_auth_context ↓1 caller build_auth_context ↓2 caller FirebaseTokenVerifier.verify ↓3 pure MockTokenVerifier.verify ↓3 pure load_household_context ↓3 accessor",
@@ -1570,6 +1570,7 @@
     "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it name",
     "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An end",
     "The last column, no moment, holds per block the facts no moment of a request holds: what the endpoint is (its method and",
+    "A test that walks across several endpoints, a journey, keeps each of its calls here where it is, and around each one has",
     "Across the 80 endpoints, what each block places:",
     "Endings: 727 with a moment, 1 the map cannot place, 0 with no moment by nature, of 728.",
     "Gates and decisions: 532 with a moment, 0 the map cannot place, 0 with no moment by nature, of 532.",
@@ -1584,7 +1585,8 @@
     "Overview and risk: 0 with a moment, 0 the map cannot place, 780 with no moment by nature, of 780.",
     "Data effects, how each step was placed on each path it is on (4559 in all): 95 on the handler's own line, 455 inside a c",
     "3 times a chain lists a call inside a catch its path never passes; that call is left off that path.",
-    "2 times a path lists a step that no call of its own reaches while another path places it; it is left off that path."
+    "2 times a path lists a step that no call of its own reaches while another path places it; it is left off that path.",
+    "Journeys: the Gabe Universe names 106 across the page's endpoints, on 37 of them, and counts 57 more on 8 of them that i"
    ]
   ],
   [
@@ -1695,7 +1697,7 @@
    [
     "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
     "Endings 2 2 2 1 3 8 1 1 ",
-    "Proof 2 2 2 1 4 10 11 2",
+    "Proof 1 2 2 2 1 4 10 11 2",
     "Gates and decisions 2 2 3 5 9 ",
     "Data effects 7 31 1 1",
     "Functions 10 3 30 1 1 3",
@@ -1742,7 +1744,7 @@
    [
     "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
     "Endings refusal 429 refusal 429 framework 422 framework 400 refusal 401 refusal 401 validation 422 refusal 403 refusal 409 refusal 400 refusal 400 refusal 429 refusal 429",
-    "Proof C80 proves 402 C81 proves 402 C89 arranges C90 arranges",
+    "Proof C81 1 step before C80 proves 402 C81 proves 402 C89 arranges C90 arranges",
     "Gates and decisions sensitive global get_auth_context caller 403 not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) 409 self.household is None 400 key is N",
     "Data effects users R users W saved flush resolve_or_create_user accessor commit build_auth_context caller memberships R households R locations R recipe_creation_requests ",
     "Functions get_auth_context ↓1 caller build_auth_context ↓2 caller FirebaseTokenVerifier.verify ↓3 pure MockTokenVerifier.verify ↓3 pure load_household_context ↓3 accessor",
@@ -2390,7 +2392,7 @@
    "picture · review-by-moment-path-to-the-201",
    {
     "pieces": 1,
-    "height": 2967
+    "height": 3013
    }
   ],
   [
@@ -2888,7 +2890,7 @@
    {
     "universe": [
      "all",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "all",
@@ -2900,7 +2902,7 @@
   ],
   [
    "d058 hover the universe dim square",
-   "dim what BY MOMENT carries ┆ An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name. A row whose items it draws, every one, fades with its title. Pointing at one brings it back."
+   "dim what BY MOMENT carries ┆ An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name; a journey BY MOMENT draws, at the outer moments or by name in its last column. A row whose items it draws, every one, fades with its title. Pointing at one brings it back."
   ],
   [
    "step 226 · d058-universe-dim",
@@ -2922,7 +2924,7 @@
    {
     "universe": [
      "dim",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "all",
@@ -2956,7 +2958,7 @@
    {
     "universe": [
      "hide",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "all",
@@ -3007,12 +3009,12 @@
    {
     "universe": [
      "hide",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "dim",
      "uni",
-     "8 of 16 carried by BY MOMENT · 8 left"
+     "11 of 16 carried by BY MOMENT · 5 left"
     ],
     "notes": [
      "GUARDS +1 in BY MOMENT",
@@ -3051,12 +3053,12 @@
    {
     "universe": [
      "hide",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "hide",
      "uni",
-     "8 of 16 carried by BY MOMENT · 8 left"
+     "11 of 16 carried by BY MOMENT · 5 left"
     ],
     "notes": [
      "GUARDS +1 in BY MOMENT",
@@ -3089,7 +3091,7 @@
    {
     "universe": [
      "hide",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "hide",
@@ -3148,7 +3150,7 @@
    {
     "universe": [
      "all",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "all",
@@ -3178,7 +3180,7 @@
    {
     "universe": [
      "dim",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "all",
@@ -3252,7 +3254,7 @@
    {
     "universe": [
      "hide",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "all",
@@ -3362,12 +3364,12 @@
    {
     "universe": [
      "all",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "dim",
      "uni",
-     "8 of 16 carried by BY MOMENT · 8 left"
+     "11 of 16 carried by BY MOMENT · 5 left"
     ],
     "notes": []
    }
@@ -3382,8 +3384,8 @@
     "C267 · carried",
     "11 case(s)",
     "6 case(s)",
-    "11 case(s)",
-    "6 case(s)",
+    "11 case(s) · carried",
+    "6 case(s) · carried",
     "endpoints",
     "apps/api/api/cooking.py:585 · carried",
     "conflict · large surface · carried"
@@ -3409,12 +3411,12 @@
    {
     "universe": [
      "all",
-     "51 of 64 carried by BY MOMENT · 13 left"
+     "56 of 64 carried by BY MOMENT · 8 left"
     ],
     "gaps": [
      "hide",
      "uni",
-     "8 of 16 carried by BY MOMENT · 8 left"
+     "11 of 16 carried by BY MOMENT · 5 left"
     ],
     "notes": [
      "TESTS +2 in BY MOMENT",
@@ -3432,8 +3434,8 @@
     "C267 · carried · gone",
     "11 case(s)",
     "6 case(s)",
-    "11 case(s)",
-    "6 case(s)",
+    "11 case(s) · carried · gone",
+    "6 case(s) · carried · gone",
     "endpoints",
     "apps/api/api/cooking.py:585 · carried · gone",
     "conflict · large surface · carried · gone"
@@ -3495,7 +3497,7 @@
   [
    "D-064 (2) · the no-moment column, cell by cell",
    [
-    "proof: C1087 arranges | C250 arranges | C283 arranges | C284 arranges | C555 arranges | C675 arranges | C266 arranges through a helper",
+    "proof: C1087 arranges | C250 arranges | C283 arranges | C284 arranges | C555 arranges | C675 arranges | C266 arranges through a helper | 11 case(s) e2e | 6 case(s) e2e",
     "data: saved 1 no own write 14",
     "fn: apps/api/api/cooking.py:114 def at line 119 | async · 53 lines · returns CookingSessionResponse | no docstring",
     "stage: 22 steps on its longest path",
@@ -3547,19 +3549,19 @@
   ],
   [
    "d064 hover the no-moment head",
-   "no moment ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+   "no moment ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
   ],
   [
    "d064 hover the handler file and line",
-   "the handler's file and line · Functions · no moment ┆ apps/api/api/cooking.py ┆ The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+   "the handler's file and line · Functions · no moment ┆ apps/api/api/cooking.py ┆ The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
   ],
   [
    "d064 hover the outline",
-   "the handler's outline · Functions · no moment ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ Async or not, how many lines it runs, the type it returns; its def in the hover. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+   "the handler's outline · Functions · no moment ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ Async or not, how many lines it runs, the type it returns; its def in the hover. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
   ],
   [
    "d064 hover the cluster",
-   "cluster · Overview and risk · no moment ┆ The group of endpoints the Gabe Universe draws it in, inside its entity. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+   "cluster · Overview and risk · no moment ┆ The group of endpoints the Gabe Universe draws it in, inside its entity. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
   ],
   [
    "step 265 · d064-path-the-replay-201",
@@ -3703,8 +3705,8 @@
   [
    "review of D-064 · BY MOMENT photographed from its top",
    {
-    "section": 3602,
-    "window": 3740,
+    "section": 3643,
+    "window": 3781,
     "box": {
      "box": 1854,
      "table": 2283,
@@ -3727,11 +3729,11 @@
   ],
   [
    "d064r hover the entity chip",
-   "entity · Overview and risk · no moment ┆ cooking ┆ The feature of the app that owns the endpoint. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+   "entity · Overview and risk · no moment ┆ cooking ┆ The feature of the app that owns the endpoint. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
   ],
   [
    "d064r hover the file and line",
-   "the handler's file and line · Functions · no moment ┆ apps/api/api/cooking.py ┆ The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+   "the handler's file and line · Functions · no moment ┆ apps/api/api/cooking.py ┆ The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
   ],
   [
    "step 274 · d064r-pick-the-replay-201",
@@ -3807,6 +3809,210 @@
     ],
     "note": "the square \"show all\" (my pick)"
    }
+  ],
+  [
+   "D-065 · BY MOMENT is open on",
+   "POST /cooking/sessions"
+  ],
+  [
+   "D-065 · the journeys' look, as the squares say",
+   [
+    "a chip per journey [pressed] {my pick}",
+    "every step a chip"
+   ]
+  ],
+  [
+   "D-065 · Proof at the outer moments, all paths",
+   [
+    "start: C250 2 steps before | C1087 2 steps before | C555 1 step before",
+    "after: C250 4 steps after | C1087 2 steps after | C555 3 steps after"
+   ]
+  ],
+  [
+   "D-065 · POST /cooking/sessions · chips cut or words broken at 1920 px",
+   {
+    "cut": [],
+    "broken": []
+   }
+  ],
+  [
+   "D-065 · d065-proof-before-any-request · BY MOMENT photographed from its top",
+   {
+    "section": 3643,
+    "window": 3781,
+    "box": {
+     "box": 1854,
+     "table": 2283,
+     "at": 0
+    }
+   }
+  ],
+  [
+   "D-065 · d065-proof-after-the-answer · BY MOMENT photographed from its top",
+   {
+    "section": 3643,
+    "window": 3781,
+    "box": {
+     "box": 1854,
+     "table": 2283,
+     "at": 429
+    }
+   }
+  ],
+  [
+   "d065 hover C250 before chip",
+   "C250 · a journey ┆ test_cook_complete_history_pantry_loop_C250 ┆ its requests up to this one, in order: ┆ 1 · POST /setup/complete · arranges, checks the status · asserts status 200 ┆ 2 · POST /recipe-creation/manual · arranges, checks the status · asserts status 201 ┆ 3 · this request · arranges, checks the status · asserts status 201 ┆ With a path picked, it stays on the paths ending 201. ┆ On each path to that ending: which one this request takes is not recorded. ┆ A journey is a test that calls this endpoint and others, one after another. Each of its calls here stays where it is: the proof at its ending, or its line among the cases that arrange through it. Around each one its other requests stand: the earlier ones before any request, the later ones after the answer. With a path picked, a call here keeps its chips when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded."
+  ],
+  [
+   "d065 hover C250 after chip",
+   "C250 · a journey ┆ test_cook_complete_history_pantry_loop_C250 ┆ its requests from this one on, in order: ┆ 3 · this request · arranges, checks the status · asserts status 201 ┆ 4 · POST /cooking/sessions/{session_id}/complete · acts · asserts status 200 ┆ 5 · GET /history/dishes · acts · asserts status 200 ┆ 6 · GET /pantry/overview · arranges, checks the status · asserts status 200 ┆ 7 · GET /profile/summary · acts · asserts status 200 ┆ With a path picked, it stays on the paths ending 201. ┆ On each path to that ending: which one this request takes is not recorded. ┆ A journey is a test that calls this endpoint and others, one after another. Each of its calls here stays where it is: the proof at its ending, or its line among the cases that arrange through it. Around each one its other requests stand: the earlier ones before any request, the later ones after the answer. With a path picked, a call here keeps its chips when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded."
+  ],
+  [
+   "step 284 · d065-every-step-a-chip",
+   {
+    "click": "every step a chip",
+    "at": [
+     1147,
+     536
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"every step a chip\""
+   }
+  ],
+  [
+   "D-065 · Proof at the outer moments, every step a chip",
+   [
+    "start: C250 1 /setup/complete POST 2 /recipe-creation/manual POST | C1087 1 /setup/complete POST 2 /recipe-creation/manual POST | C555 1 /setup/complete POST",
+    "after: C250 4 /cooking/sessions/{session_id}/complete POST 5 /history/dishes GET 6 /pantry/overview GET 7 /profile/summary GET | C1087 4 /cooking/sessions/{session_id}/complete POST 5 /profile/summary GET | C555 3 /cooking/reminders/due GET 4 /cooking/sessions/{session_id}/advance-stage POST 5 /cooking/reminders/due GET"
+   ]
+  ],
+  [
+   "D-065 · d065-proof-every-step-a-chip-after · BY MOMENT photographed from its top",
+   {
+    "section": 4441,
+    "window": 4579,
+    "box": {
+     "box": 1854,
+     "table": 2283,
+     "at": 285
+    }
+   }
+  ],
+  [
+   "step 286 · d065-back-to-a-chip-per-journey",
+   {
+    "click": "a chip per journey",
+    "at": [
+     1110,
+     536
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"a chip per journey\" (my pick)"
+   }
+  ],
+  [
+   "step 287 · d065-pick-the-404",
+   {
+    "click": "the path to 404 · refusal · after a call failed — start_session raised",
+    "at": [
+     565,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 404 · refusal · after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) · Recipe not found\""
+   }
+  ],
+  [
+   "D-065 · Proof at the outer moments, the 404 picked",
+   [
+    "start: ",
+    "after: "
+   ]
+  ],
+  [
+   "D-065 · d065-the-404-journeys-gone · BY MOMENT photographed from its top",
+   {
+    "section": 2896,
+    "window": 3034,
+    "box": {
+     "box": 1854,
+     "table": 1854,
+     "at": 0
+    }
+   }
+  ],
+  [
+   "step 289 · d065-all-paths-again",
+   {
+    "click": "all paths",
+    "at": [
+     32,
+     536
+    ],
+    "size": [
+     81,
+     26
+    ],
+    "note": "the square \"all paths\""
+   }
+  ],
+  [
+   "step 290 · d065-open-delete-pantry-item",
+   {
+    "click": "/pantry/items/{item_id}DELETE",
+    "at": [
+     33,
+     530
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row DELETE /pantry/items/{item_id}"
+   }
+  ],
+  [
+   "D-065 · BY MOMENT is open on",
+   "DELETE /pantry/items/{item_id}"
+  ],
+  [
+   "D-065 · DELETE /pantry/items/{item_id} · Proof at the outer moments",
+   [
+    "start: C705 3 steps before its step 4 | C705 3 steps before its step 5",
+    "after: "
+   ]
+  ],
+  [
+   "D-065 · DELETE /pantry/items/{item_id} · chips cut or words broken at 1920 px",
+   {
+    "cut": [],
+    "broken": []
+   }
+  ],
+  [
+   "D-065 · d065-delete-pantry-item-c705-two-calls · BY MOMENT photographed from its top",
+   {
+    "section": 2786,
+    "window": 2924,
+    "box": {
+     "box": 1854,
+     "table": 1869,
+     "at": 0
+    }
+   }
+  ],
+  [
+   "d065 hover C705 step 5 chip",
+   "C705 · a journey ┆ test_delete_item_cross_household_404_C705 ┆ its requests up to this one, in order: ┆ 1 · POST /setup/complete · arranges · asserts status 200 ┆ 2 · POST /pantry/items · arranges · asserts status 201 ┆ 3 · POST /setup/complete · arranges, checks the status · asserts status 200 ┆ 4 · this endpoint, another call, with chips of its own · acts · asserts status 404 ┆ 5 · this request · acts · asserts status 200 ┆ With a path picked, it stays on the paths ending 200. ┆ A journey is a test that calls this endpoint and others, one after another. Each of its calls here stays where it is: the proof at its ending, or its line among the cases that arrange through it. Around each one its other requests stand: the earlier ones before any request, the later ones after the answer. With a path picked, a call here keeps its chips when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded."
   ],
   [
    "rows at the end",

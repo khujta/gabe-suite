@@ -998,6 +998,97 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                 sr[(t.get("case"), t.get("line"))].add(x["id"])
     for (cid, ln), xs in sorted(sr.items(), key=lambda kv: (str(kv[0][0]), kv[0][1] or 0)):
         add("proof", ("xs", sorted(xs)), ["case:" + str(cid)], str(cid), proves(xs), ends_at(xs), ptxt(ln, xs), "p:" + str(cid) + ":" + str(ln) + ":raises")
+    # JOURNEYS (D-065, his ruling 2026-09-28 "build A and B") — the station's own journey list for this endpoint (the card's Journeys
+    # row, det.test_journeys, so the page and the card name the same ones). A journey the station names as one real case (its jReal)
+    # whose recorded calls (forms.json test_cases, IN ORDER) reach this endpoint AND others is the outer time around this request.
+    # EACH CALL HERE is a request of its own (review J1): it gets its own pair of chips — the journey's OTHER requests made before it at
+    # "before any request", the ones made after it at "after the answer" — with its own path mask. A call to this endpoint never
+    # stands among the outer steps: it is this endpoint's own step (the proof chip at its ending, or its arranging line). THE JOIN, per
+    # call here, for a picked path: the endings its refs prove (the proof chip's own join); else, for an ARRANGING call only (review J6),
+    # the one ending of the status it asserts, when exactly one ending has it; else no one path (drawn under all paths only). The join
+    # is per ending and the filter per path: an ending several paths reach keeps the chip on each of them, and which one the call took
+    # is not recorded (review J5 — said in the words, never guessed). A chip's hover is the walk on its side: its outer steps and the
+    # calls here on that side, this one among them, by place in the walk, each once — PROVEN to be exactly the recorded calls there,
+    # strictly increasing. PROVEN below: an acting call here IS a proof chip of this endpoint with those very endings; an arranging call
+    # here IS on the code map's arranging list; a status-joined call joins one success ending; a reason given to a journey that cannot
+    # be ordered is true of its record. The ones that cannot be ordered are named in Proof's no-moment cell (jnm)
+    jre, TCS, jnm = re.compile(X["jreal"]), fj.get("test_cases") or {}, []
+    pel = {e["id"]: e for e in els if e["f"] == "proof"}
+    arr_ids = {c0 for c0, _h in r["d"].get("arranged") or []}
+    t_corp = {tc0.get("corpus") for tc0 in TCS.values()}             # the corpora the tests arm reads (their cases are its records)
+    FEP = fj.get("endpoints") or {}
+
+    def jstep(c, i):                                             # [method, path, role, statuses asserted, endpoint key, here?, line, its place in the walk]
+        k = c.get("endpoint") if c.get("endpoint") in FEP else None
+        return [c.get("method"), k.split(" ", 1)[1] if k else c.get("path"), c.get("role"), sorted(set((c.get("asserts") or {}).get("status") or []), key=str),
+                k, 1 if k == E else 0, c.get("line"), i + 1]
+
+    def jjoin(cid, c):
+        """(how, the endings it joins, the endings of the status it asserts): refs · status · none · miss · many · act"""
+        xs = {q.get("exit") for q in c.get("refs") or [] if q.get("exit") in XS}
+        st = set((c.get("asserts") or {}).get("status") or [])
+        if c.get("role") == "act":
+            pe = pel.get("p:" + cid + ":" + str(c.get("line")))
+            if not pe or set(pe["w"][1]) != xs:
+                die(f"{lab}: D-065 — {cid}'s call here at line {c.get('line')} acts, and no proof chip of this endpoint proves its endings {sorted(xs)}")
+        elif cid not in arr_ids:
+            die(f"{lab}: D-065 — {cid}'s call here at line {c.get('line')} arranges, and the code map's arranging list does not hold it")
+        if xs:
+            return "refs", xs, xs
+        cand = {x for x in XS if XS[x].get("status") in st}
+        if not st or not cand:
+            return ("miss" if st else "none"), set(), cand
+        if c.get("role") == "act":                               # J6: an acting call the tests arm joins to no ending is not joined by its status
+            return "act", set(), cand
+        if len(cand) > 1:                                        # J6: several endings have the status it asserts — which one is not recorded
+            return "many", set(), cand
+        if any(XS[x]["kind"] != "success" for x in cand):
+            die(f"{lab}: D-065 — {cid}'s arranging call asserts {sorted(st)}, which joins an ending that is not a success: {sorted(cand)}")
+        return "status", cand, cand
+    for j in L["tests"].get("journeys") or []:
+        cid, corp = str(j.get("cid") or ""), j.get("corpus")
+        jid = UNI.jy_id(cid, corp)
+        tally["jy:rows"] += 1
+        if not jre.search(cid):                                   # a group the station counts from a report the tests arm does not read
+            if corp in t_corp:
+                die(f"{lab}: D-065 — the journey {cid} is a group of the {corp} corpus, which the tests arm reads: its reason would be false")
+            jnm.append([cid, jid, "agg", {"c": corp}]); tally["jy:agg"] += 1
+            continue
+        tc = TCS.get(cid)
+        calls = (tc or {}).get("calls") or []
+        here = [i for i, c in enumerate(calls) if c.get("endpoint") == E]
+        why = "norec" if not tc else "one" if len(calls) <= 1 else "nohere" if not here else "only" if len(here) == len(calls) else None
+        if why:
+            jnm.append([cid, jid, why, {"c": corp, "n": len(calls)}]); tally["jy:" + why] += 1
+            continue
+        tally["jy:ordered"] += 1; tally["jy:multi"] += len(here) > 1
+        outer = [i for i in range(len(calls)) if i not in here]
+        for k in here:
+            how, xs, cand = jjoin(cid, calls[k])
+            jp = ends_at(xs)
+            if bool(jp) != (how in ("refs", "status")):
+                die(f"{lab}: D-065 — {cid}'s call here at step {k + 1} joins by {how}, and rides {len(jp)} paths")
+            tally["jy:calls"] += 1; tally["jy:j:" + how] += 1; tally["jy:pm"] += len(jp) > len(xs)
+            jv = sorted({XS[x].get("status") for x in xs}, key=str)
+            for side, part in (("b", [i for i in outer if i < k]), ("a", [i for i in outer if i > k])):
+                if not part:
+                    continue
+                sts = [jstep(calls[i], i) for i in part]
+                if any(s[5] for s in sts):
+                    die(f"{lab}: D-065 — {cid} has a call to this endpoint among its outer steps")
+                # the hover's walk on this side: the outer steps, this call (1) and the other calls here on this side (2), by place
+                seq = sorted([s + [0] for s in sts] + [jstep(calls[i], i) + [1 if i == k else 2] for i in here if i == k or (i < k if side == "b" else i > k)],
+                             key=lambda s: s[7])
+                pl = [s[7] for s in seq]
+                if any(b0 <= a0 for a0, b0 in zip(pl, pl[1:])) or pl != (list(range(1, k + 2)) if side == "b" else list(range(k + 1, len(calls) + 1))) \
+                        or [s[6] for s in seq] != [calls[q - 1].get("line") for q in pl] or sum(1 for s in seq if s[8] == 1) != 1:
+                    die(f"{lab}: D-065 — {cid}'s walk {side} its step {k + 1} is not its recorded calls, each once, in strictly increasing order: {pl}")
+                e = add("proof", ("fix", "start" if side == "b" else "after"), ["case:" + cid] + list(dict.fromkeys(s[4] for s in sts if s[4])), cid,
+                        ["jy", side, len(sts)], set(jp), None, "j:" + jid + ":" + side + str(k + 1),
+                        x={"jy": {"id": jid, "c": cid, "s": side, "nm": tc.get("name"), "st": sts, "sq": seq, "k": k + 1, "nh": len(here), "j": how, "jv": jv,
+                              "jn": len(cand), "pm": 1 if len(jp) > len(xs) else 0, "of": len(calls)}})
+                e["jy"] = jid
+                tally["jy:chips"] += 1; tally["jy:steps"] += len(sts); tally["jy:noep"] += sum(1 for s in sts if not s[4])
     # STAGES AND ORDER — the app's middleware in the order the chains pass it; each 422 rule where FastAPI checks it
     mw = []
     for p in paths:
@@ -1771,6 +1862,16 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         if e["w"][0] == "nm":                                    # D-064 (2): no moment by nature — the last column, never the band
             nmv.append([e["f"], "piece", e["keys"], e["text"], e.get("x") or None]); rn[e["f"]].update(e["rec"])
             continue
+        if e.get("jy"):                                          # D-065: a journey's other requests, at an outer moment every path passes;
+            if e["si"] not in (SI["start"], SI["after"]) or any(e["si"] not in passed[p] for p in e["paths"]):   # on the paths its step here
+                die(f"{lab}: D-065 — the journey {e['jy']} stands at {e['si']}, not at an outer moment each of its paths passes")   # ends on
+            ends = sorted({PI[p] for p in e["paths"] if p in PI})
+            if len(ends) != len(e["paths"]):
+                die(f"{lab}: D-065 — the journey {e['jy']} rides a path the picker does not offer")
+            # its paths as bits (0: on no one path — drawn while every path is shown, gone once one is picked)
+            el.append([e["f"], e["si"], e["keys"], e["text"], e["chip"], None if set(ends) == live else sum(1 << i for i in ends), e["hint"], dict(e["x"]), e["o"]])
+            rp["proof"].update(e["rec"]); tally["jy:mask0"] += not ends
+            continue
         si = e.get("si")
         if isinstance(si, tuple) or e["w"][0] == "un" or si is None:
             why = si[1] if isinstance(si, tuple) else e["w"][1] if e["w"][0] == "un" else "nolink"
@@ -1882,7 +1983,15 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     arr_k = [x[3] for x in nmv if x[1] == "arr"]
     if arr_k != [c0 for c0, _h in r["d"].get("arranged") or []] or len(set(arr_k)) != len(arr_k):
         die(f"{lab}: Proof's no-moment cell holds {arr_k}, the code map's arranging cases {r['d'].get('arranged')}")
-    n_act = len({x for x in rp["proof"] | ru["proof"] if not x.endswith((":raises", ":arranged"))})
+    # D-065 (B): the journeys the station names here that cannot be ordered around this request, each with its reason, after the
+    # arranging cases. PROOF: every journey of the station's list stands once — placed at the outer moments or named here
+    for cid, jid, why, jx in jnm:
+        nmv.append(["proof", "jy", ["case:" + cid] if jre.search(cid) else [], cid, dict(jx, id=jid, w=why)]); rn["proof"].add("j:" + jid + ":nm")
+    j_all = [UNI.jy_id(str(j.get("cid") or ""), j.get("corpus")) for j in L["tests"].get("journeys") or []]
+    j_got = [x[4]["id"] for x in nmv if x[1] == "jy"] + list(dict.fromkeys(e["jy"] for e in els if e.get("jy")))
+    if sorted(j_got) != sorted(j_all) or len(set(j_all)) != len(j_all):
+        die(f"{lab}: D-065 — the station names the journeys {j_all}, BY MOMENT draws {j_got}")
+    n_act = len({x for x in rp["proof"] | ru["proof"] if x.startswith("p:") and not x.endswith((":raises", ":arranged"))})
     if n_act != ((F.get("tests") or {}).get("act") or 0):
         die(f"{lab}: the code map counts {(F.get('tests') or {}).get('act')} test calls acting on it, BY MOMENT holds {n_act}")
     if n_occ != sum(len(v) for v in occ.values()):
@@ -1952,6 +2061,8 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         if f == "inf":
             return [("inflight", v)]
         if f == "proof":
+            if rec.startswith("j:"):                              # D-065: a journey — no field of the code map names one
+                return [("journey", rec[2:].rsplit(":", 1)[0])]
             cid = (rec[:-len(":raises")] if rec.endswith(":raises") else rec)[2:].rsplit(":", 1)[0]
             return [("case", cid)] + ([] if rec.endswith(":raises") else [("act", rec)])
         if f == "stage":                                          # the middleware ("m:") is the chain's own step: no field names it
@@ -1960,8 +2071,9 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             return [("switch", v)] if p == "w" else [("piece", v)]
         return []
     PM, KM, byrec = set(), set(), {}
-    for x in el:                                                  # the placed elements, as drawn (keys, text) — their records are rp
-        KM.update(x[2])
+    for x in el:                                                  # the placed elements, as drawn (keys, text) — their records are rp;
+        if not (x[4] and x[4][0] == "jy"):                        # a journey's chips are no key of anything (review J3): its case and the
+            KM.update(x[2])                                       # endpoints it walks to are drawn by it, not placed — it carries by its id
     for f in rp:
         for rec in rp[f]:
             k0 = next((e["keys"][0] for e in els if rec in e["rec"] and e["f"] == f and e["keys"]), None) if f == "client" else None
@@ -1971,8 +2083,10 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     for f in rn:                                                  # D-064 (2): what the no-moment column draws of the code map's records
         for rec in rn[f]:
             PM.update(mem(f, rec, None) if not rec.endswith(":arranged") else [("arranged", rec[2:-len(":arranged")])])
-    KM.update(k for x in nmv for k in x[2])
-    return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "n": {f: [len(rp[f]), len(ru[f]), len(rn[f])] for f, _a in MO_FAM if rp[f] or ru[f] or rn[f]},
+    KM.update(k for x in nmv if x[1] != "jy" for k in x[2])
+    # the elements each block holds, counted — a journey is counted apart (review J7): its chips and its name are no element of Proof
+    ne = lambda xs: len([q for q in xs if not str(q).startswith("j:")])
+    return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "n": {f: [ne(rp[f]), ne(ru[f]), ne(rn[f])] for f, _a in MO_FAM if ne(rp[f]) or ne(ru[f]) or ne(rn[f])},
             "nm": nmv, "_P": PM | PX, "_Pw": PW, "_K": KM}
 
 
@@ -1991,9 +2105,11 @@ MO_ORDER = [f for f, _a in MO_FAM]
 NM_ATTR = (("ep", "method-path"), ("full", "method-path"), ("seg", "entity-cluster"), ("ent", "entity-cluster"), ("cl", "entity-cluster"),
            ("risk", "risk-flag"), ("behind", "functions-behind-walk-levels"), ("proof", "coverage-per-condition"), ("alarm", "findings"),
            ("file", "file-line"), ("sig", "signature"), ("doc", "the-handler"), ("fate", "fate-of-the-writes-per-ending"),
-           ("chain", "the-ordered-chain-per-ending"), ("arr", "case-role-on-this-endpoint"), ("piece", "how-common-this-piece-is"),
+           ("chain", "the-ordered-chain-per-ending"), ("arr", "case-role-on-this-endpoint"), ("jy", "case-role-on-this-endpoint"), ("piece", "how-common-this-piece-is"),
            ("lack", "how-common-this-piece-is"))
 NM_KINDS = [k for k, _a in NM_ATTR]
+JY_WHY = ("agg", "one", "norec", "nohere", "only")                      # D-065 (B): why a journey cannot be ordered around this request
+JY_JOIN = ("refs", "status", "none", "miss", "many", "act")             # D-065: how a journey's call here follows a picked path (review J6)
 NM_SUMS = ("fate", "chain", "behind", "proof")                          # the code-map fields that sum it up: one member each, drawn here
 
 
@@ -2099,7 +2215,7 @@ def no_moment(r: dict, L: dict, fj: dict, fep: dict, A: dict, tally: collections
     if len(d["lacks"]) != (r["k"].get("lacks") or 0):
         die(f"{lab}: D-064 — {len(d['lacks'])} norms drawn as lacking, the code map counts {r['k'].get('lacks')}")
     nm = sorted(mo["nm"] + out, key=lambda x: NM_KINDS.index(x[1]))       # stable: within one kind, the order read
-    tally["nm:facts"] += len(nm); tally["nm:rows"] += 1
+    tally["nm:facts"] += sum(1 for x in nm if x[1] != "jy"); tally["nm:rows"] += 1   # review J7: a journey named here is counted apart
     mo["nm"] = nm
     mo["_P"] |= P
     mo["_K"] |= {k for x in out for k in x[2]}
@@ -2326,8 +2442,10 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
     # F1: the tables read and the tables written, apart — carried()'s own members rtable · wtable, never the other op
     if ("endpoint", r["id"]) not in P:
         die(f"{r['id']}: D-058 — BY MOMENT's heading is read as drawing the endpoint, yet its members do not hold it")
+    # D-065: the journeys BY MOMENT draws (A's chips, B's names) — by the members its records place; the keys a journey is drawn with
+    # carry nothing (review J3: a Tests case is carried by a chip of its own, never by a journey wearing its case key)
     r["_by"] = (set(K) | {"endpoint:" + r["id"]}, fn_names(mo["el"]), {"table:" + str(m[1]) for m in P if m[0] == "rtable"},
-                {"table:" + str(m[1]) for m in P if m[0] == "wtable"}, nm_facts(mo["nm"]))
+                {"table:" + str(m[1]) for m in P if m[0] == "wtable"}, nm_facts(mo["nm"]), {m[1] for m in P if m[0] == "journey"})
 
 
 def fn_names(el: list) -> set:
@@ -2355,17 +2473,21 @@ def fn_names(el: list) -> set:
 # from its band; a table's access by a chip of ITS op; a function's name on a chip that draws it); every item left bright has a
 # member it does not draw; a gap's name is marked exactly as the universe's items it names are; the counts are the marks'.
 def panels_carried(r: dict, T: list, NT: dict, slots: list) -> None:
-    MK, MN, MR, MW, MM = r.pop("_by")
+    MK, MN, MR, MW, MM, MJ = r.pop("_by")
     el = r["mo"]["el"]
-    # the placed record and the no-moment column (D-064 (2): what it draws is carried too), re-read (the heading: see carried())
-    rk = {k for x in el for k in x[2]} | {k for x in r["mo"]["nm"] for k in x[2]} | {"endpoint:" + r["id"]}
+    # the placed record and the no-moment column (D-064 (2): what it draws is carried too), re-read (the heading: see carried()) — a
+    # journey's chips and names left out (review J3): a journey carries only through its own id, below
+    rk = {k for x in el if not (x[4] and x[4][0] == "jy") for k in x[2]} | {k for x in r["mo"]["nm"] if x[1] != "jy" for k in x[2]} | {"endpoint:" + r["id"]}
     rm = nm_facts(r["mo"]["nm"])
     fk = lambda x: {k for k in x[2] if str(k).startswith("fn:")}
     rn = {x[3] for x in el if x[0] == "fn" and (not x[2] or len({k for y in el if y[0] == "fn" and y[3] == x[3] for k in fk(y)}) == 1)}
     ro = {(x[4][1], k) for x in el if x[0] == "data" and x[4] and x[4][0] == "op" for k in x[2]}   # (r | w, table key) as each chip draws it
     band = {k for u in r["mo"]["un"] for k in u[1]} - rk                   # what BY MOMENT holds with no moment only
-    SET = {"k": MK, "n": MN, "r": MR, "w": MW, "m": MM}
-    drawn = lambda m: (m[1] in rk and m[1] not in band) if m[0] == "k" else (m[1] in rn) if m[0] == "n" else (m[1] in rm) if m[0] == "m" else ((m[0], m[1]) in ro)
+    # D-065: a journey, re-read off the drawn record — a chip at an outer moment (A), or its name in Proof's no-moment cell (B)
+    rj = {(x[7] or {}).get("jy", {}).get("id") for x in el if x[4] and x[4][0] == "jy"} | {(x[4] or {}).get("id") for x in r["mo"]["nm"] if x[1] == "jy"}
+    SET = {"k": MK, "n": MN, "r": MR, "w": MW, "m": MM, "j": MJ}
+    drawn = lambda m: (m[1] in rk and m[1] not in band) if m[0] == "k" else (m[1] in rn) if m[0] == "n" else (m[1] in rm) if m[0] == "m" \
+        else (m[1] in rj) if m[0] == "j" else ((m[0], m[1]) in ro)
 
     def mark(ms, where):
         f = 1 if ms and all(m[1] in SET[m[0]] for m in ms) else 0
@@ -2388,7 +2510,7 @@ def panels_carried(r: dict, T: list, NT: dict, slots: list) -> None:
     r["ucv"], r["ucn"] = ucv, [sum(x[2] for x in ucv), sum(x[3] for x in ucv)]
     # THE GAPS, from the universe (b): parallel to rgaps — [the unmapped row's [state, c, n] | None, [per attribute], [a flag per name]].
     # F2 (review 2026-09-26): a name stands for the universe items of its row that it names (its key, or a Code behind function's
-    # name) — their members, all of them: a journey's case AND its entities, both of a table's accesses (r and w); PROVEN marked as
+    # name) — their members, all of them: a journey by the journey BY MOMENT draws (D-065), both of a table's accesses (r and w); PROVEN marked as
     # those items are, item by item (a name no item of its row carries is read by its own member)
     gb, cb, nb = [], 0, 0
     for g in r["rgaps"]:
@@ -2449,7 +2571,7 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
         for f, (a, b, c) in r["mo"]["n"].items():
             cov[f][0] += a; cov[f][1] += b; cov[f][2] += c
         for x in r["mo"]["nm"]:                                    # D-064 (2): the column's facts the code map's records do not count
-            if x[1] not in ("arr", "piece"):
+            if x[1] not in ("arr", "jy", "piece"):                 # (the arranging cases, D-065's journeys, the pieces: by_moment counted them)
                 cov[x[0]][2] += 1
         whys.update(u[3] for u in r["mo"]["un"])
     # a block nothing of which acts at a moment on any endpoint (the Overview) is a row all the same: its facts stand in the column
@@ -2461,6 +2583,11 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
         die(f"BY MOMENT: flags drawn with no words of their own: {sorted(fl_ids - set(MW['nm']['k']['risk']['ids']))}")
     if sorted(MW["nm"]["k"]) != sorted(NM_KINDS):
         die(f"BY MOMENT: the no-moment column's words and its kinds differ: {sorted(set(MW['nm']['k']) ^ set(NM_KINDS))}")
+    if sorted(MW["nm"]["k"]["jy"]["why"]) != sorted(JY_WHY) or sorted(MW["jy"]["role"]) != sorted({s0[2] for r in rows for x in r["mo"]["el"] if x[4] and x[4][0] == "jy"
+                                                                                                    for s0 in x[7]["jy"]["sq"]} | {"act", "arrange", "arrange-checked"}):
+        die(f"D-065: the words' reasons a journey is not ordered {sorted(MW['nm']['k']['jy']['why'])} or its roles {sorted(MW['jy']['role'])} are not the build's")
+    if sorted(MW["jy"]["leave"]) != sorted(h for h in JY_JOIN if h not in ("refs", "status")):
+        die(f"D-065: the words say why a call here leaves a picked path for {sorted(MW['jy']['leave'])}, the build joins by {list(JY_JOIN)}")
     if sorted(MW["why"]) != sorted(MO_WHY) or set(whys) - set(MO_WHY):
         die(f"BY MOMENT: the reasons the words name and the build gives differ: {sorted(set(MW['why']) ^ set(MO_WHY))} {sorted(set(whys) - set(MO_WHY))}")
     if sorted(MW["moms"]) != sorted(MO_PRE + MO_POST + tuple(MO_RANK)):
@@ -3409,6 +3536,7 @@ def build(argv: list) -> tuple:
     X["lvcut"] = {n["id"].replace("#", "::"): (n.get("behind") or {}).get("names_more") for n in LV.get("fn_nodes") or [] if (n.get("behind") or {}).get("names_more")}
     # D-057 (b): what each client branch does, in the lab's own words (its doesWords, run over the site's does[] rows)
     X["dw"] = does_lift([s for L in facts for s in L["forms"]["frontend"].get("reason_sites") or []])
+    X["jreal"] = spec["_look"]["lift"]["jReal"][0]                     # D-065: the station's own test for a journey that is one real case
     # D-057: the handler chip's hover names the file without its directory — only where no other handler file has that name
     hb = collections.Counter(_short(f) for f in {r["file"] for r in rows if r.get("file")})
     for r in rows:
@@ -3555,7 +3683,38 @@ def build(argv: list) -> tuple:
     n_coded = sum(1 for x in own_ref if x.get("code"))
     if n_coded:
         die(f"mo.noCode says no refusal carries a code, and {n_coded} of the app's {len(own_ref)} do — reword it")
-    tok = {"app": app, "head": head, "uniHref": uni_href, "nRefusals": len(own_ref), "nCoded": n_coded, "nFeed": len(keys), "nRows": len(rows), "nCols": len(cols), "nBlocks": len(blocks),
+    # D-065: the station's journeys. Feed-wide, over every element the station credits one to (its det.test_journeys, each node once,
+    # the first home winning as the station draws it): the rows that name one real case (its jReal), how many of those the tests arm
+    # records a walk for (more than one call, forms.json test_cases) and how many it does not, and the groups it does not read. Then the
+    # page's: every journey the card names on the page's endpoints is placed at the outer moments or named in Proof's no-moment cell,
+    # each once (PROVEN per endpoint in by_moment), the page's rows are the station's rows on those endpoints, and the universe's
+    # Journeys items are carried exactly as BY MOMENT draws them — every journey it names, since each stands somewhere, and never the
+    # "+N" the station counts without naming (review J2: one item more, never carried, so that row reads carried in part)
+    jre_, TCS_, nodes_ = re.compile(X["jreal"]), fj.get("test_cases") or {}, {}
+    for e_ in (feeds["graph"].get("l2") or {}).values():
+        for n_ in e_.get("nodes") or []:
+            nodes_.setdefault(n_["id"], n_)
+    jrows = [(nid, j) for nid, n_ in nodes_.items() for j in (n_.get("det") or {}).get("test_journeys") or []]
+    st_named = [j for _n, j in jrows if jre_.search(str(j.get("cid") or ""))]
+    st_walk = sum(1 for j in st_named if len((TCS_.get(j["cid"]) or {}).get("calls") or []) > 1)
+    on_page = sum(len((nodes_.get("endpoint:" + r["id"], {}).get("det") or {}).get("test_journeys") or []) for r in rows)
+    jwhy = {w: MOT["jy:" + w] for w in JY_WHY}
+    if on_page != MOT["jy:rows"] or MOT["jy:ordered"] + sum(jwhy.values()) != MOT["jy:rows"]:
+        die(f"D-065: the station names {on_page} journeys on the page's endpoints, the page {MOT['jy:rows']} ({MOT['jy:ordered']} placed + {jwhy})")
+    if sum(MOT["jy:j:" + h] for h in JY_JOIN) != MOT["jy:calls"] or MOT["jy:calls"] < MOT["jy:ordered"]:
+        die("D-065: the joins of the placed journeys' calls here do not add up to those calls")
+    jmore = {r["id"]: (nodes_.get("endpoint:" + r["id"], {}).get("det") or {}).get("test_journeys_more") or 0 for r in rows}
+    uj = [(r["id"], x) for r in rows for u, x in zip(r["uni"]["rows"], r["ucv"]) if u["row"] == "JOURNEYS"]
+    if sum(x[3] - bool(jmore[i]) for i, x in uj) != MOT["jy:rows"] or any(x[2] != x[3] - bool(jmore[i]) for i, x in uj) \
+            or any(bool(jmore[i]) != (x[0] == "p") for i, x in uj):
+        die(f"D-065: the universe's Journeys items are {sum(x[3] for _i, x in uj)}, {sum(x[2] for _i, x in uj)} carried; BY MOMENT draws {MOT['jy:rows']} journeys, every one, "
+            f"and the station counts {sum(jmore.values())} more it does not name")
+    J65 = {"jyRows": MOT["jy:rows"], "jyOrd": MOT["jy:ordered"], "jyCalls": MOT["jy:calls"], "jyRefs": MOT["jy:j:refs"], "jyStat": MOT["jy:j:status"],
+           "jyNone": sum(MOT["jy:j:" + h] for h in JY_JOIN if h not in ("refs", "status")),
+           "jyAgg": jwhy["agg"], "jyNoRec": jwhy["norec"], "jyOne": jwhy["one"], "jyNoHere": jwhy["nohere"], "jyOnly": jwhy["only"],
+           "jyEps": sum(1 for r in rows if any(u["row"] == "JOURNEYS" for u in r["uni"]["rows"])), "jyMore": sum(jmore.values()),
+           "jyMoreEps": sum(1 for i, _x in uj if jmore[i])}
+    tok = {**J65, "app": app, "head": head, "uniHref": uni_href, "nRefusals": len(own_ref), "nCoded": n_coded, "nFeed": len(keys), "nRows": len(rows), "nCols": len(cols), "nBlocks": len(blocks),
            "formsSha": sha(forms)[:8], "archmapSha": sha(archmap)[:8], "formsPath": tilde(forms), "archmapPath": tilde(archmap),
            "arms": " · ".join(arms_on) or "none", "armsOff": " · ".join(arms_off) or "none",
            "nShare": n_share, "rTop": max(a["r"] for a in A.values()), "rLow": min(a["r"] for a in A.values()), "nR3": sum(1 for c in cols if c["r"] == max(a["r"] for a in A.values())),
@@ -3666,13 +3825,26 @@ def build(argv: list) -> tuple:
                 f"\n        review F1 · upper bound where the path leaves the function it hangs under partway: {MOT['f1:lqChips']} chips · {MOT['f1:lqPaths']} chip-paths"
                 f" ({MOT['f1:lq:i']} where the map shows the leaving point, {MOT['f1:lq:ii']} an error from where the map does not say, {MOT['f1:lq:p']} only inherited; calls named by line {MOT['f1:noname']}) · proven from positions: {MOT['f1:provenA']} routed chips, {MOT['f1:provenB']} hanging chips"
                 f" · review F7: {MOT['f7:own']} chain-called chips on the paths their own steps run on, {MOT['f7:trail']} trailing steps placed at their call"
-                f"\n        (2) the no-moment column: {MOT['nm:facts']} facts on {MOT['nm:rows']} endpoints (" + " · ".join(f"{k} {MOT['nm:' + k] or MOT['arrCol'] if k == 'arr' else MOT['nm:' + k]}" for k in NM_KINDS if k != "piece")
+                f"\n        (2) the no-moment column: {MOT['nm:facts']} facts on {MOT['nm:rows']} endpoints (" + " · ".join(f"{k} {MOT['nm:' + k] or MOT['arrCol'] if k == 'arr' else MOT['nm:' + k]}" for k in NM_KINDS if k not in ("piece", "jy"))
                 + f" · piece {sum(1 for r in rows for x in r['mo']['nm'] if x[1] == 'piece')})"
                 + f" · review F4: {MOT['f4:untestedOut']} 'no test covers this' flags left out where a test calls the endpoint"
                 + f" · review F5: {sum(1 for r in rows for x in r['mo']['nm'] if x[1] == 'file' and not (x[4] or {}).get('df'))} handlers with no def line in the feed"
                 + f" · review F6: {MOT['f6:seg']} first segments read from the served path"
                 + (f"\n        POST /cooking/sessions · the code map's hide header {cs['cvn'][0]} of {cs['cvn'][1]} carried · {cs['cvn'][1] - cs['cvn'][0] - cs['cvn'][2]} left · {cs['cvn'][2]} with nothing here"
                    f" · the universe {cs['ucn'][0]} of {cs['ucn'][1]}" if cs else ""))
+    # D-065: the journeys — the station feed-wide, then the page's
+    summary += (f"\nD-065 · the station names {len(jrows)} journeys across {len({n for n, _j in jrows})} elements: {len(st_named)} one real case each"
+                f" ({st_walk} with a recorded walk of more than one call, {len(st_named) - st_walk} without), {len(jrows) - len(st_named)} groups the tests arm does not read"
+                f"\n        the page's {len(rows)} endpoints: {MOT['jy:rows']} journeys on {J65['jyEps']} endpoints (+{J65['jyMore']} the station counts without naming)"
+                f" · placed at the outer moments {MOT['jy:ordered']} ({MOT['jy:calls']} calls here, each with its own chips — {MOT['jy:multi']} journeys call here more than once;"
+                f" {MOT['jy:chips']} chips, {MOT['jy:steps']} steps, {MOT['jy:noep']} to no endpoint the map knows) · a call here follows a picked path by the endings it proves"
+                f" {MOT['jy:j:refs']}, by the one ending of the status it asserts {MOT['jy:j:status']} ({MOT['jy:pm']} of all these on an ending several paths reach),"
+                f" on no one path " + " · ".join(f"{h} {MOT['jy:j:' + h]}" for h in JY_JOIN if h not in ("refs", "status")) + f" ({MOT['jy:mask0']} chips drawn under all paths only)"
+                f" · named in Proof's no-moment cell " + " · ".join(f"{w} {jwhy[w]}" for w in JY_WHY)
+                + f" · the universe's Journeys items carried {sum(x[2] for _i, x in uj)} of {sum(x[3] for _i, x in uj)} ({J65['jyMoreEps']} rows with a \"+N\" item never carried)"
+                + (f"\n        POST /cooking/sessions · the hide headers: the code map {cs['cvn'][0]} of {cs['cvn'][1]} · {cs['cvn'][1] - cs['cvn'][0] - cs['cvn'][2]} left · {cs['cvn'][2]} with nothing here"
+                   f" · the universe {cs['ucn'][0]} of {cs['ucn'][1]} · {cs['ucn'][1] - cs['ucn'][0]} left · THE GAPS from the universe {cs['gcn']['uni'][0]} of {cs['gcn']['uni'][1]}"
+                   f" · from the code map {cs['gcn']['cm'][0]} of {cs['gcn']['cm'][1]}" if cs else ""))
     return html, summary, out, check
 
 

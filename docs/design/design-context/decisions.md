@@ -839,3 +839,17 @@ metadata (method and path, entity, cluster, handler file and line, URL segment, 
 the timeless summaries (the fate tally, the step count, the behind count, the proof rank, the arranging tests, the alarms row); the
 NO MOMENT band keeps only what should have a moment but the feed cannot place. The column's placement is the agent's reading of "in
 the table at the end", his to correct. Page-only: D-037's light checks.
+
+## D-065 — Journeys enter BY MOMENT: a test's walk across endpoints is the outer time around one request
+Date: 2026-09-28 · Input: his question on why the tables show nothing of the Gabe Universe's journeys, and the agent's answer (a
+journey is a test that walks across several endpoints; the tables keep only the step it takes here; the D-055 evaluation's "not
+needed" was right for the web/e2e groups, wrong for the pytest journeys, whose ordered calls the feed holds — 191 of 306 named
+journey rows).
+Decision, his: "build A and B".
+Consequence: (A) BY MOMENT's Proof row gets each journey's OTHER steps at the outer moments — its earlier requests at "before any
+request", its later ones at "after the answer"; this endpoint's own step stays the proof chip at its ending; with a path picked,
+only the journeys whose step here ends on that path stay. Two looks, built as options (D-025.2): one chip per journey per side with
+the ordered steps in its hover (the agent's pick, dashed) · every step as its own endpoint chip, in order. (B) the "no moment"
+column's Proof cell names the journeys that cannot be ordered — the web/e2e groups the tests arm does not read, and tests with no
+recorded walk — each with the reason. The D-055 evaluation row "journeys · not needed" is superseded for the pytest journeys.
+Page-only: D-037's light checks. Reading the web/e2e reports is generation work, left for later.

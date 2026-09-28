@@ -774,6 +774,80 @@ await pic('more-information-open');
     const r = await p.$eval('#cvcount', (e) => { const h = e.closest('h3').getBoundingClientRect(); return { x: Math.max(0, h.left - 8), y: Math.max(0, h.top - 8), width: h.width + 16, height: h.height + 16 }; });
     n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-d064r-code-map-hide-header.png'), clip: { x: r.x, y: r.y, width: Math.min(W - r.x, r.width), height: Math.min(H - r.y, r.height) } }); }
   await center('#ocol-cm .opt[data-carry="all"]'); await step('d064r-code-map-show-all', '#ocol-cm .opt[data-carry="all"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="all"]')) + '" (my pick)'); }
+{ // D-065 (his ruling 2026-09-28, "build A and B") and its review (J1–J8), LAST, on POST /cooking/sessions: BY MOMENT photographed from
+  // the section's top with the box at its start ("before any request") and wheeled to "after the answer" (the Proof row's journey chips
+  // at the two outer moments); C250's before chip and its after chip hovered; "every step a chip" pressed, photographed, and back; the 404
+  // picked (the journeys gone), all paths again; then DELETE /pantry/items/{item_id}: C705's two calls here, each its own chip, photographed
+  // and the second one hovered. Which chip is which is read off the page's attributes; every click and hover is the mouse's
+  const E = 'POST /cooking/sessions', E705 = 'DELETE /pantry/items/{item_id}';
+  const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
+  const boxY = async () => { const g = await p.$('#mogrid'), bx = await g.boundingBox();
+    const pb = await p.evaluate(() => { const q = document.getElementById('pin'); return q && q.getBoundingClientRect().height ? q.getBoundingClientRect().bottom : 0; });
+    return { bx, y: Math.min(bx.y + bx.height - 20, Math.max(bx.y + 20, pb + 40, 60), (p.viewportSize() || { height: H }).height - 20) }; };
+  // the box wheeled sideways by the mouse: to its start, or until a target (a column head, a chip) stands inside it
+  const wheelBox = async (target) => { const { bx, y } = await boxY(); await p.mouse.move(bx.x + bx.width / 2, y);
+    for (let k = 0; k < 60; k++) { const st = await p.evaluate((t) => { const G = document.getElementById('mogrid'), g = G.getBoundingClientRect();
+        if (!t) return G.scrollLeft <= 0 ? 0 : -1; const e = document.querySelector(t); if (!e) return 0; const r = e.getBoundingClientRect(); return r.left < g.left + 4 ? -1 : r.right > g.right - 4 ? 1 : 0; }, target);
+      if (!st) break; await p.mouse.wheel(st * 240, 0); await wait(60); }
+    await p.mouse.move(5, 5); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120);
+    return p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, at: G.scrollLeft }; }); };
+  // BY MOMENT from the section's top: the window as tall as the section (a piece at most 8,000 px), the page at the section's top less the
+  // pinned row, the box wheeled where asked — a photo of the window, never a full-page capture (that resizes the window, and BY MOMENT redraws)
+  const secPics = async (name, target) => { const hs = await p.$eval('#sec-mo', (e) => Math.ceil(e.getBoundingClientRect().height)); const pieces = Math.ceil(hs / 8000);
+    for (let k = 0; k < pieces; k++) { const ph = Math.min(8000, hs - k * 8000);
+      const pinH = await p.evaluate(() => { const q = document.getElementById('pin'); return q ? Math.ceil(q.getBoundingClientRect().height) : 0; });
+      await p.setViewportSize({ width: W, height: ph + pinH + 16 }); await wait(500);
+      await p.evaluate(([k0, pinH0]) => { const t = document.getElementById('sec-mo').getBoundingClientRect().top + scrollY; window.scrollTo(0, Math.max(0, t + k0 * 8000 - pinH0 - 8)); }, [k, pinH]); await wait(250);
+      const sc = await wheelBox(target);
+      n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + name + (pieces > 1 ? '-' + (k + 1) : '') + '.png') });
+      say('D-065 · ' + name + ' · BY MOMENT photographed from its top' + (pieces > 1 ? ', piece ' + (k + 1) + ' of ' + pieces : ''), { section: hs, window: ph + pinH + 16, box: sc }); }
+    await p.setViewportSize({ width: W, height: H }); await wait(500); };
+  // at 1920 px: a chip whose words overflow it, and a journey chip's word broken across two lines — both should be none
+  const cutSay = async (label) => say(label, await p.evaluate(() => ({ cut: [...document.querySelectorAll('#mogrid .mc')].filter((c) => c.scrollWidth > c.clientWidth + 1).map((c) => c.innerText.slice(0, 40)),
+    broken: [...document.querySelectorAll('#mogrid [data-jy] .mt, #mogrid [data-jy] .mq')].filter((x) => x.getClientRects().length > 1).map((x) => x.textContent) })));
+  const proofSay = async (label) => say(label, await p.evaluate(() => ['start', 'after'].map((m) => m + ': ' + [...document.querySelectorAll('#mogrid td[data-mom="' + m + '"][data-f="proof"] [data-jy]')]
+    .filter((c) => !c.parentElement.closest('[data-jy]')).map((c) => c.innerText.replace(/\s+/g, ' ').trim()).join(' | '))));
+  const hoverPic = async (label, sel) => { const e = await p.$(sel); if (!e) { say('MISSING ' + label, sel); return; }
+    await p.$eval(sel, (x) => { const r = x.getBoundingClientRect(); if (r.top < 120 || r.bottom > innerHeight - 40) x.scrollIntoView({ block: 'center' }); }); await wait(120);
+    await wheelBox(sel); const bx = await e.boundingBox();
+    await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(250);
+    say(label, await p.$eval('#tip', (t) => t.innerText.replace(/\n+/g, ' ┆ '))); n++;
+    const tb = await p.$eval('#tip', (t) => { const r = t.getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; });
+    const x0 = Math.max(0, Math.min(bx.x, tb.x) - 10), y0 = Math.max(0, Math.min(bx.y, tb.y) - 10);
+    await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + label.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 44) + '.png'),
+      clip: { x: x0, y: y0, width: Math.min(W - x0, Math.max(bx.x + bx.width, tb.x + tb.width) - x0 + 10), height: Math.min(H - y0, Math.max(bx.y + bx.height, tb.y + tb.height) - y0 + 10) } });
+    await p.mouse.move(5, H - 10); await wait(100); };
+  const open0 = await p.$eval('#mohead h3', (h) => h.getAttribute('aria-label')).catch(() => null);
+  if (open0 !== E) { await p.evaluate(() => window.scrollTo(0, 0)); await wait(150); await step('d065-open-cooking-sessions', '#board tr.row[data-ep="' + E + '"] td.id', 'the row ' + E); }
+  say('D-065 · BY MOMENT is open on', await p.$eval('#mohead h3', (h) => h.getAttribute('aria-label')));
+  say('D-065 · the journeys\' look, as the squares say', await p.$$eval('#mobar .opt[data-mopt="jy"]', (os) => os.map((o) => o.getAttribute('aria-label') + (o.getAttribute('aria-checked') === 'true' ? ' [pressed]' : '') + (getComputedStyle(o).borderTopStyle === 'dashed' ? ' {my pick}' : ''))));
+  await proofSay('D-065 · Proof at the outer moments, all paths');
+  await cutSay('D-065 · ' + E + ' · chips cut or words broken at ' + W + ' px');
+  await secPics('d065-proof-before-any-request', null);
+  await secPics('d065-proof-after-the-answer', '#mogrid .mom[data-mom="after"]');
+  await center('#mogrid tr[data-f="proof"]');
+  await hoverPic('d065 hover C250 before chip', '#mogrid td[data-mom="start"][data-f="proof"] .mc[data-jy="C250|api"][data-side="b"]');
+  await hoverPic('d065 hover C250 after chip', '#mogrid td[data-mom="after"][data-f="proof"] .mc[data-jy="C250|api"][data-side="a"]');
+  const sqEach = '#mobar .opt[data-mopt="jy"][data-v="each"]', sqOne = '#mobar .opt[data-mopt="jy"][data-v="one"]';
+  await center('#mobar'); await step('d065-every-step-a-chip', sqEach, 'the square "' + (await txt(sqEach)) + '"');
+  await proofSay('D-065 · Proof at the outer moments, every step a chip');
+  await secPics('d065-proof-every-step-a-chip-after', '#mogrid .mom[data-mom="after"]');
+  await center('#mobar'); await step('d065-back-to-a-chip-per-journey', sqOne, 'the square "' + (await txt(sqOne)) + '" (my pick)');
+  // the 404: which square it is is read off the page's data; the click is the mouse's
+  const i404 = await p.evaluate((ep) => window.AE_DATA.rows.find((q) => q.id === ep).mo.ex.findIndex((x) => x[1] === 404), E), sel404 = '#mobar .mopath[data-path="' + i404 + '"]';
+  await center('#mobar'); await step('d065-pick-the-404', sel404, 'the code "' + (await txt(sel404)) + '"');
+  await proofSay('D-065 · Proof at the outer moments, the 404 picked');
+  await secPics('d065-the-404-journeys-gone', null);
+  await center('#mobar'); await step('d065-all-paths-again', '#mobar .mopath[data-path="all"]', 'the square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"');
+  // DELETE /pantry/items/{item_id}: C705 calls it twice (step 4 → 404, step 5 → 200), each call its own chip before any request
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('d065-open-delete-pantry-item', '#board tr.row[data-ep="' + E705 + '"] td.id', 'the row ' + E705);
+  say('D-065 · BY MOMENT is open on', await p.$eval('#mohead h3', (h) => h.getAttribute('aria-label')));
+  await proofSay('D-065 · ' + E705 + ' · Proof at the outer moments');
+  await cutSay('D-065 · ' + E705 + ' · chips cut or words broken at ' + W + ' px');
+  await secPics('d065-delete-pantry-item-c705-two-calls', null);
+  await center('#mogrid tr[data-f="proof"]');
+  await hoverPic('d065 hover C705 step 5 chip', '#mogrid td[data-mom="start"][data-f="proof"] .mc[data-jy="C705|api"][data-k="5"]'); }
 say('rows at the end', await rows());
 say('page errors', errs);
 fs.writeFileSync(path.join(OUT, 'walk.json'), JSON.stringify({ viewport: [W, H], log }, null, 1));

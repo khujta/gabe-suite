@@ -578,6 +578,8 @@ def universe(L: dict, spec: dict, feeds: dict, U: dict) -> dict:
         add("JOURNEYS", f"{len(js_)}+{mo}" if mo else len(js_), " · ".join(j["cid"] for j in js_[:3]) + (" …" if len(js_) > 3 else ""),
             [[j["cid"], j.get("corpus"), j.get("comp") or 0, list(j.get("entities") or [])] for j in js_])
         rows[-1]["home"] = ent
+        if mo:
+            rows[-1]["jMore"] = mo                               # review J2: the journeys it counts without naming them (its "+N")
     else:
         silent.append("JOURNEYS")
     fi = I.get("fanin") or 0
@@ -774,10 +776,18 @@ def names_drawn(u: dict) -> list:
     return []
 
 
+def jy_id(cid, corpus) -> str:
+    """D-065: a journey's identity on one endpoint — its id and its corpus (two web and end-to-end groups may share an id)"""
+    return f"{cid}|{corpus or ''}"
+
+
 def fact_named(u: dict, name: str):
     """D-064 (2): the ("m", fact) a key-less NAME the card draws stands for — a flag by its words, the cluster by its value, the def
-    text, the docstring (names_drawn's own names) — None for any other; THE GAPS' names join the card's items on it (F2)"""
+    text, the docstring (names_drawn's own names) — and D-065: a journey with no key of its own (a group of cases) by its name,
+    ("jn", name); None for any other; THE GAPS' names join the card's items on it (F2)"""
     r, it = u["row"], u.get("items") or []
+    if r == "JOURNEYS":
+        return ("jn", name) if any(j[0] == name for j in it) else None
     if r == "RISK":
         return next((("m", "risk:" + str(f[0])) for f in it if f[2] == name), None)
     if r == "ABOVE" and it and it[0] == name and not ((u.get("keys") or [None])[0]):
@@ -793,11 +803,15 @@ def uni_elements(u: dict, T: list, NT: dict) -> list:
     """D-058 · the ITEMS a universe row draws, in the order the page draws them (the template's uRow gives each the same index),
     each [its members, its attributes, what it is named by]. A member is ("k", key) — the D-041 key it is drawn with — or ("n",
     name) for a function Code behind names without a key (BY MOMENT places those by name, D-057); a table an access or a
-    connection reads or writes is ("r" | "w", key) — carried only by a BY MOMENT chip of that op (F1). An item whose members the
-    card does not name (a count, a line, a flag, a file's cases, an aggregate journey) has None: it can never be read as carried.
+    connection reads or writes is ("r" | "w", key) — carried only by a BY MOMENT chip of that op (F1); a journey is ("j", its
+    jy_id), carried when BY MOMENT draws that journey (D-065: its walk at the outer moments, or its name in Proof's no-moment
+    cell, a group of cases the tests arm does not read among them). An item whose members the card does not name (a count, a
+    line, a flag, a file's cases, the journeys the station counts past the ones it names — its "+N") has None: it can never be
+    read as carried.
     Its attributes come from the two why tables (a keyed item by its kind, a key-less one by its selector); None when neither lists
-    it (it may hold any attribute of its row). What it is named by — ("k", its key) or ("n", a callee's name), None for an item
-    with neither — is what THE GAPS' names join on (F2): a gap's name stands for the items of its row named the same.
+    it (it may hold any attribute of its row). What it is named by — ("k", its key), ("n", a callee's name) or ("jn", a key-less
+    journey's name), None for an item with none — is what THE GAPS' names join on (F2): a gap's name stands for the items of its
+    row named the same.
     D-064 (2): an item BY MOMENT's no-moment column draws that has no key — the cluster, the outline, the docstring, a flag, the count
     behind — is ("m", fact), the fact the column draws (gen-all-endpoints.nm_facts reads the same names off the column's record)."""
     r, it, ks = u["row"], u.get("items") or [], u.get("keys") or []
@@ -840,15 +854,12 @@ def uni_elements(u: dict, T: list, NT: dict) -> list:
             return [[None, None, None]]
         return ([one(at(i)) for i in range(len(it))] + [[None, attrs(None, "file"), None] for _f in u.get("files") or []]
                 + ([[None, None, None]] if u.get("casesMore") else []))
-    if r == "JOURNEYS":
-        out = []
+    if r == "JOURNEYS":                                          # D-065: a journey is carried by the journey BY MOMENT draws — its
+        out = []                                                 # walk at the outer moments, or its name in Proof's no-moment cell
         for i, j in enumerate(it):
             jk = ks[i] if i < len(ks) and ks[i] else [None, []]
-            faces = [e for n, e in enumerate(j[3]) if e and j[3].index(e) == n]
-            fk = list(jk[1] or [])
-            ms = [("k", jk[0])] + [("k", k) for k in fk] if jk[0] and len(fk) == len(faces) and all(fk) else None
-            out.append([ms, attrs(jk[0], "journey"), ("k", jk[0]) if jk[0] else None])
-        return out
+            out.append([[("j", jy_id(j[0], j[1]))], attrs(jk[0], "journey"), ("k", jk[0]) if jk[0] else ("jn", j[0])])
+        return out + ([[None, None, None]] if u.get("jMore") else [])   # review J2: the "+N" it counts without naming — never carried
     if r in ("IDENTITY", "SOURCE"):
         return [one(at(i), kv[1]) for i, kv in enumerate(u.get("kvs") or [])]
     if r == "SIGNATURE":                                         # the def text and the outline: both what the column's outline chip draws

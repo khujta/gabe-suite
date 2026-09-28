@@ -389,6 +389,7 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   // endpoint's (the code map's two looks, BY MOMENT's two looks, the path) — set aside too; his paste is still compared line for line
   // CHANGED 2026-09-26 (D-055): the code map's switch "what BY MOMENT carries" adds its line among the code map's settings — six lines now
   // CHANGED 2026-09-26 (D-058): the Gabe Universe's and the gaps' own switches add their lines after the code map's — eight lines now
+  // CHANGED 2026-09-28 (D-065): BY MOMENT's journeys look adds one more — nine lines now
   const CL = W8.copy.lines, isSlook = (l) => l.startsWith(CL.slook + ': '), isEp = (l) => l.startsWith(CL.open + ': ');
   const isSet = (l) => l.startsWith(CL.cm + ' · ') || l.startsWith(CL.mo + ' · ') || l.startsWith(CL.uni + ' · ') || l.startsWith(CL.gaps + ' · ');
   const asPaste = (out) => { const blk = out.slice(0, out.indexOf('')), his = blk.filter((l) => !isSlook(l) && !isEp(l) && !isSet(l));
@@ -399,7 +400,8 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   const sl = a0.blk.filter(isSlook), colsAt = a0.blk.findIndex((l) => l.startsWith(CL.cols + ': ')), el0 = a0.blk.filter(isEp);
   ok(sl.length === 1 && a0.blk.indexOf(sl[0]) === colsAt + 1, 'the copy text puts the Shared treatment\'s line right under the columns line', a0.blk);
   const set0 = a0.blk.filter(isSet);
-  ok(el0.length === 1 && set0.length === 8 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-9)) === JSON.stringify([el0[0]].concat(set0)),
+  // CHANGED 2026-09-28 (D-065): BY MOMENT's journeys look adds its line after BY MOMENT's two looks — nine lines now
+  ok(el0.length === 1 && set0.length === 9 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-10)) === JSON.stringify([el0[0]].concat(set0)),
     'the copy text adds the endpoint shown, then the code map\'s and BY MOMENT\'s settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -1228,10 +1230,11 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   // CHANGED 2026-09-26 (D-055): a ruled default is copied as his default; the code map's switch adds its own line
   const optL = (R, v) => R.label + ': ' + R.opts[v].name + ' (' + (v === R.pick ? (R.ruled ? D.words.ruledMark : D.words.copy.pick) : D.words.copy.his) + ')';
   // CHANGED 2026-09-26 (D-058): the Gabe Universe's and the gaps' switches are copied too, after the code map's
+  // CHANGED 2026-09-28 (review J8 of D-065): BY MOMENT's looks belong to the page's copy text, none of them to the code map's own copy
   const wantCopy = [CL.page + ': all-endpoints · ' + D.tok.app + ' @ ' + D.tok.head, CL.open + ': ' + E14, CL.cm + ' · ' + optL(EW.opt.mom, 'rows'), CL.cm + ' · ' + optL(EW.opt.chk, 'col'),
     CL.cm + ' · ' + optL(D.words.carry, 'all'), CL.uni + ' · ' + optL(D.words.carry, 'all'), CL.gaps + ' · ' + optL(D.words.carry, 'all'), '', CL.your, ''].join('\n');
   const got14 = await p.evaluate(() => window.__copied);
-  ok(got14 === wantCopy, 'the code map\'s copy button copies the page, the endpoint, each of its options with whose pick it is, then room for your words', got14);
+  ok(got14 === wantCopy && !got14.split('\n').some((l) => l.startsWith(CL.mo + ' · ')), 'the code map\'s copy button copies the page, the endpoint, the code map\'s three options and the Gabe Universe\'s and THE GAPS\' switches, each with whose pick it is, then room for your words — none of BY MOMENT\'s looks', got14);
   await p.click('#ocol-cm .opt[data-eopt="chk"][data-v="line"]'); await p.waitForTimeout(80); await p.click('#cmcopy'); await p.waitForTimeout(80);
   const got14b = await p.evaluate(() => window.__copied), out14 = await p.$eval('#out', (e) => e.value);
   ok(got14b && got14b.includes(CL.cm + ' · ' + optL(EW.opt.chk, 'line')) && out14.includes(CL.cm + ' · ' + optL(EW.opt.chk, 'line')) && out14.includes(CL.mo + ' · ' + optL(MW.opt.lay, 'cols'))
@@ -1286,8 +1289,10 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   /* (e) the two looks: HIS defaults (D-055: moments as columns, cells as chips) pressed on a cold start, marked ruled, no dash; each
      switches the grid; both remembered; back to his defaults */
   const pk = (g) => MW.opt[g].pick;
-  ok(MW.opt.lay.ruled === 'D-055' && MW.opt.cell.ruled === 'D-055' && m0.lay === 'cols' && m0.cell === 'chips' && m0.squares.length === 4
-     && m0.squares.every(([g, v, on, dash, ruled]) => (on === 'true') === (v === pk(g)) && dash !== 'dashed' && (ruled === 'true') === (v === pk(g))) && m0.bodyRows === m0.heads.length,
+  /* CHANGED 2026-09-28 (D-065): a third pair of squares, the journeys' look, is my pick (dashed) — read apart in section 19; his two here */
+  const sq55 = m0.squares.filter(([g]) => g === 'lay' || g === 'cell');
+  ok(MW.opt.lay.ruled === 'D-055' && MW.opt.cell.ruled === 'D-055' && m0.lay === 'cols' && m0.cell === 'chips' && sq55.length === 4
+     && sq55.every(([g, v, on, dash, ruled]) => (on === 'true') === (v === pk(g)) && dash !== 'dashed' && (ruled === 'true') === (v === pk(g))) && m0.bodyRows === m0.heads.length,
     'D-055 · BY MOMENT · his defaults on a cold start: moments as columns, cells as chips, pressed and marked ruled (no dash), a row per block', m0.squares);
   await p.hover('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(120);
   const tipR = await p.$eval('#tip', (e) => e.textContent);
@@ -1302,7 +1307,8 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   ok(m4.cell === 'counts' && !m4.chips && m4.counts > 0, 'BY MOMENT · cells as counts: a number in each cell, no chips', { counts: m4.counts, chips: m4.chips });
   await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E14); await p.waitForTimeout(100);
   const m5 = await readM();
-  ok(m5.lay === 'rows' && m5.cell === 'counts' && m5.squares.filter(([, , on]) => on === 'true').map(([g, v]) => g + ':' + v).sort().join(' ') === 'cell:counts lay:rows', 'BY MOMENT · both looks are remembered for this viewer', [m5.lay, m5.cell]);
+  // CHANGED 2026-09-28 (D-065): the journeys' squares are read apart (section 19)
+  ok(m5.lay === 'rows' && m5.cell === 'counts' && m5.squares.filter(([g, , on]) => on === 'true' && g !== 'jy').map(([g, v]) => g + ':' + v).sort().join(' ') === 'cell:counts lay:rows', 'BY MOMENT · both looks are remembered for this viewer', [m5.lay, m5.cell]);
   await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' }));
   await p.click('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(60); await p.click('#mobar .opt[data-mopt="cell"][data-v="chips"]'); await p.waitForTimeout(80);
   const m6 = await readM();
@@ -1627,7 +1633,9 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   const arrWant = [...new Set([...(FE.tests.arranged_by || []), ...(FE.tests.helper_arranged || [])])], arrPage = await p.$$eval('#ocol-cm .pair[data-k="d:arranged"] [data-key]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
   /* CHANGED 2026-09-28 (D-064 (2)): an arranging case has no moment by nature — every one stands in Proof's no-moment cell, in the
      code map's order, one chip each; none at a moment, none in the band */
-  const arrTxt = await p.$eval('#ocol-cm .pair[data-k="d:arranged"] .pk', (e) => e.textContent), inGrid = await p.$$eval('#mogrid td[data-mom] [data-keys]', (cs) => cs.flatMap((c) => c.getAttribute('data-keys').split('\n')));
+  /* CHANGED 2026-09-28 (D-065): a case that arranges here may be a JOURNEY too — its other requests stand at the outer moments, keyed by
+     the case; the case itself stands at no moment, so the journeys' chips are read apart */
+  const arrTxt = await p.$eval('#ocol-cm .pair[data-k="d:arranged"] .pk', (e) => e.textContent), inGrid = await p.$$eval('#mogrid td[data-mom] [data-keys]', (cs) => cs.filter((c) => !c.closest('[data-jy]')).flatMap((c) => c.getAttribute('data-keys').split('\n')));
   const moBandP = await p.$$eval('#moband .mbb[data-f="proof"] .mbr', (rs) => rs.map((r) => r.getAttribute('data-why')));
   const arrCell = await p.$$eval('#mogrid tr[data-f="proof"] td[data-nm] .mc[data-nmk="arr"]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
   ok(arrTxt === fillW(PW.arranged, { n: arrWant.length }) && JSON.stringify(arrPage) === JSON.stringify(arrWant) && arrWant.every((c) => !inGrid.includes('case:' + c)) && !moBandP.includes('arranged')
@@ -2032,12 +2040,16 @@ ok(!errs.length, 'no page error after the review-of-D-064 checks', errs);
   const E = 'POST /cooking/sessions', R = ROW[E], CW = D.words.carry, CL = D.words.copy.lines;
   const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
   await open(PAGE); await openEp(E);
-  const grid = await p.evaluate(() => ({ keys: [...new Set([...document.querySelectorAll('#mogrid .mc[data-keys]')].flatMap((c) => c.getAttribute('data-keys').split('\n')))],
+  /* CHANGED 2026-09-28 (review J3 of D-065): a journey's chips wear its case and the endpoints it walks to, and carry none of them — the
+     keys are read off the other chips only; a journey carries through its own id (grid.jy) */
+  const grid = await p.evaluate(() => ({ keys: [...new Set([...document.querySelectorAll('#mogrid .mc[data-keys]')].filter((c) => !c.closest('[data-jy]')).flatMap((c) => c.getAttribute('data-keys').split('\n')))],
     names: [...document.querySelectorAll('#mogrid td[data-f="fn"] .mc')].map((c) => [((c.querySelector('.mt') || {}).textContent || '').trim(), (c.getAttribute('data-keys') || '').split('\n').filter((k) => k.startsWith('fn:'))[0] || '']),
     ops: [...document.querySelectorAll('#mogrid .mc[data-f="data"][data-keys]')].flatMap((c) => { const o = c.querySelector('.vc[data-vc="op"]'); return o ? c.getAttribute('data-keys').split('\n').map((k) => o.getAttribute('data-vv') + '|' + k) : []; }),
     /* D-064 (2): the facts the no-moment column draws, by kind and words */
     nm: [...document.querySelectorAll('#mogrid td[data-nm] .mc[data-nmk]')].map((c) => [c.getAttribute('data-nmk'), c.innerText.replace(/\s+/g, ' ').trim()]),
-    head: document.querySelector('#mohead h3').getAttribute('aria-label') }));
+    head: document.querySelector('#mohead h3').getAttribute('aria-label'),
+    /* D-065: the journeys BY MOMENT draws — its chips at the outer moments, its names in Proof's last column */
+    jy: [...new Set([...document.querySelectorAll('#mogrid [data-jy]')].map((c) => c.getAttribute('data-jy')))] }));
   /* F4 (review 2026-09-26): a name BY MOMENT draws — a function chip with no key, or a keyed one whose name no other function chip
      there wears under another key; F1: a table's read or write by a data chip wearing that op */
   const NK = {}; grid.names.forEach(([n, k]) => { (NK[n] = NK[n] || new Set()).add(k); });
@@ -2069,7 +2081,7 @@ ok(!errs.length, 'no page error after the review-of-D-064 checks', errs);
   /* CHANGED 2026-09-28 (D-064 (2)): what the no-moment column draws is carried too — the outline (both of the Signature row's items), a
      flag by its words, the cluster (Above's first item, no key), the docstring, the count behind (Code behind's count, whether or not
      the card names every function it counts); read off the grid's no-moment chips */
-  const NMK = new Set(grid.nm.map((x) => x[0])), NMR = new Set(grid.nm.filter((x) => x[0] === 'risk').map((x) => x[1]));
+  const NMK = new Set(grid.nm.map((x) => x[0])), NMR = new Set(grid.nm.filter((x) => x[0] === 'risk').map((x) => x[1])), JY = new Set(grid.jy);
   const clOf = (UI('ABOVE') || [])[0], NMC = grid.nm.some((x) => x[0] === 'cl' && clOf != null && x[1].endsWith(' ' + clOf));
   const factWant = (rn, i, name) => rn === 'SIGNATURE' ? NMK.has('sig') : rn === 'RISK' ? NMR.has(name != null ? name : (UI('RISK')[i] || [])[2]) : rn === 'DOCSTRING' ? NMK.has('doc')
     : rn === 'ABOVE' ? NMC : null;
@@ -2077,7 +2089,9 @@ ok(!errs.length, 'no page error after the review-of-D-064 checks', errs);
     const op = (OPS[rn] || [])[i]; if (op && it.keys.length === 1 && it.keys[0].startsWith('table:')) return GO.has(op + '|' + it.keys[0]);   /* F1: the access's own op */                 /* the def line, the flags: counted members none */
     if (rn === 'CODE BEHIND' && !it.keys.length && !it.chip) return NMK.has('behind') && grid.nm.some((x) => x[0] === 'behind' && x[1].startsWith((R.uni.rows.find((u) => u.row === rn) || {}).count + ' '));   /* its count: the column's (D-064 (2)) */
     if (rn === 'CODE BEHIND' && it.chip && !it.keys.length) return MN.has(it.text);
-    if (rn === 'JOURNEYS') return it.keys.length > 1 && it.keys.every((k) => MK.has(k)) && it.keys.some((k) => k.startsWith('case:'));
+    /* CHANGED 2026-09-28 (D-065): a journey is carried when BY MOMENT draws that journey — its walk at the outer moments or its name in
+       Proof's last column (it was: its case and every entity it crosses drawn by key) */
+    if (rn === 'JOURNEYS') { const j = UI('JOURNEYS')[+i]; return !!j && JY.has(j[0] + '|' + (j[1] || '')); }
     return it.keys.length === 1 && MK.has(it.keys[0]); };
   const bad = [], per = [];
   let nIt = 0, nC = 0;
@@ -2140,7 +2154,9 @@ ok(!errs.length, 'no page error after the review-of-D-064 checks', errs);
   /* F2 (review 2026-09-26): a name stands for the card's items of its row named the same (a journey with its entities, a table's
      read and its write) — carried exactly when each of them is, read off the grid as above */
   const gWant = (x) => { const k = FK.get(x.row + '|' + x.t), row = u0.rows[x.row];
-    const its = row ? Object.entries(row.items).filter(([, it]) => (k ? it.keys.includes(k) : x.row === 'CODE BEHIND' && it.chip && !it.keys.length && it.text === x.t)) : [];
+    /* CHANGED 2026-09-28 (D-065): a journey with no key of its own (a group of cases) stands for the card's journeys of that name */
+    const its = row ? Object.entries(row.items).filter(([i, it]) => (k ? it.keys.includes(k) : x.row === 'CODE BEHIND' ? it.chip && !it.keys.length && it.text === x.t
+      : x.row === 'JOURNEYS' && (UI('JOURNEYS')[+i] || [])[0] === x.t)) : [];
     return its.length ? its.every(([i, it]) => want(x.row, it, row, i)) : k ? MK.has(k) : x.row === 'CODE BEHIND' ? MN.has(x.t) : !!factWant(x.row, -1, x.t); };
   const fBad = g1.items.filter((x) => x.fact).filter((x) => { const w = gWant(x); return x.m !== w || (x.m ? !(x.op < 0.5) : x.op !== 1); });
   const gC = g1.items.filter((x) => x.m).length;
@@ -2185,6 +2201,156 @@ ok(!errs.length, 'no page error after the review-of-D-064 checks', errs);
   ok((await sq('ocol-uni')).carry === 'all' && (await sq('ocol-gaps')).carry === 'all', 'D-058 · show all brings both panels back whole');
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-058 checks', errs);
+
+/* 19 · D-065 (his ruling 2026-09-28: "build A and B"). A journey — a pytest case that calls this endpoint AND others — has its other
+   requests at BY MOMENT's outer moments; the ones that cannot be ordered are named in Proof's last column. Real clicks and real hovers,
+   every expected value recomputed HERE from the station's own feed (c4-graph.js, the journeys it names for the endpoint) and forms.json
+   (each case's calls in order, their refs and asserted statuses; each path's ending and the endings' statuses) — never from the page's
+   record. CHANGED 2026-09-28 (review J1–J8): EACH CALL HERE has its own pair of chips, its own mask and its own before/after split; a
+   call here never stands among the outer steps; the hover is the walk on its side, each call once, in order. The rule, restated:
+   a call here follows a picked path by the endings its refs prove; else, for an ARRANGING call only, by the one ending of the status it
+   asserts when exactly one ending has it; else it leaves (J6); an ending several paths reach keeps it on each (J5).
+   (a) the journeys' look opens on "a chip per journey", my pick, dashed, not ruled;
+   (b) on POST /cooking/sessions, GET /settings, DELETE /pantry/items/{item_id} and PATCH /settings/preferences: Proof at "before any
+       request" and "after the answer" holds exactly the chips the rule gives, in the station's order, each face its count (and which
+       call here, when there are several); C250 · C1087 · C555 · C2137 · C705 (two calls here) · C1033 (two) hovered: the hover's lines
+       are EXACTLY the expected sequence;
+   (c) per path, on those four endpoints: every code picked keeps exactly the chips whose call here the rule puts on that path;
+   (d) the other look: every outer request an endpoint chip of its own, in order, grouped per call here; a click lights that endpoint;
+       remembered; the page's copy text carries the look, the code map's own copy does not (J8);
+   (e) the groups the tests arm does not read stand in Proof's last column: the face is the case and its tests (D-017), the reason in the
+       hover, with a line true of a journey (J7);
+   (f) J3: on GET /settings, C2137's own proof call sits in the band and its journey chips carry nothing — the Tests row's C2137 stays
+       bright, and the row's carried count is the other chips' keys'. */
+{ const fillW = (s0, x) => String(s0).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  const MW = D.words.mo, JW = MW.jy, JO = MW.opt.jy, NJ = MW.nm.k.jy, CL = D.words.copy.lines, XW = MW.x;
+  const C4w = {}; (await import('node:vm')).runInNewContext(fs.readFileSync(path.join(REPO, 'templates/center/shell/example/codebase-graph-station/c4-graph.js'), 'utf8'), { window: C4w });
+  const NODES = {}; Object.values(C4w.GABE_C4.l2 || {}).flatMap((e) => e.nodes || []).forEach((n) => { if (!NODES[n.id]) NODES[n.id] = n; });
+  const real = new RegExp(D.ulook.jReal), TC = FJ.test_cases || {}, FE = FJ.endpoints || {};
+  const sortS = (a) => [...new Set(a)].sort((x, y) => (String(x) < String(y) ? -1 : String(x) > String(y) ? 1 : 0));
+  const role = (c) => JW.role[c.role] || c.role, known = (c) => !!FE[c.endpoint], epPath = (c) => (known(c) ? c.endpoint.replace(/^endpoint:\S+ /, '') : c.path);
+  const asserts = (c) => { const v = sortS(((c.asserts || {}).status) || []); return v.length ? fillW(XW.asserts, { v: v.join(' · ') }) : XW.assertsNone; };
+  /* an endpoint's endings (each path's exit) with their statuses, and its paths, from forms.json */
+  const endingsOf = (EK) => { const e = FE[EK], st = {};
+    [...(e.produced || []), ...(e.framework_exits || []), ...(e.returns || [])].forEach((x) => { if (x.status != null) st[x.id] = x.status; });
+    const ends = [...new Set(e.paths.map((q) => q.exit.id))]; ends.forEach((x) => { if (st[x] == null && x.startsWith('r:')) st[x] = ((e.declared || {}).success || {}).status; });
+    return { ends, st, paths: e.paths.map((q) => [q.id, q.exit.id]) }; };
+  /* the journeys the rule orders around EK: per call here its join, the endings it rides, the paths to them, and its chips */
+  const journeysOf = (EK) => { const SJ = ((NODES[EK] || {}).det || {}).test_journeys || [], EN = endingsOf(EK);
+    const js = SJ.filter((j) => real.test(j.cid || '')).map((j) => { const t = TC[j.cid] || {}, cs = t.calls || [], here = cs.map((c, i) => (c.endpoint === EK ? i : -1)).filter((i) => i >= 0);
+      if (cs.length < 2 || !here.length || here.length === cs.length) return null;
+      const outer = cs.map((c, i) => i).filter((i) => !here.includes(i));
+      return { cid: j.cid, jid: j.cid + '|' + (j.corpus || ''), name: t.name, cs, here, calls: here.map((k) => { const c = cs[k], st = sortS(((c.asserts || {}).status) || []);
+        const refs = [...new Set((c.refs || []).map((q) => q.exit))].filter((x) => EN.ends.includes(x)), cand = EN.ends.filter((x) => st.includes(EN.st[x]));
+        const how = refs.length ? 'refs' : !st.length ? 'none' : !cand.length ? 'miss' : c.role === 'act' ? 'act' : cand.length > 1 ? 'many' : 'status';
+        const joined = how === 'refs' ? refs : how === 'status' ? cand : [];
+        return { k, c, st, how, joined, cand, on: EN.paths.filter(([, x]) => joined.includes(x)).map(([pid]) => pid),
+          b: outer.filter((i) => i < k), a: outer.filter((i) => i > k) }; }) }; }).filter(Boolean);
+    return { js, EN, aggs: SJ.filter((j) => !real.test(j.cid || '')).map((j) => [j.cid, j.corpus]) }; };
+  const face = (J, K, side) => { const n = (side === 'b' ? K.b : K.a).length;
+    return fillW(side === 'b' ? (n === 1 ? JW.before1 : JW.before) : (n === 1 ? JW.after1 : JW.after), { n }) + (J.here.length > 1 ? ' ' + fillW(JW.ofStep, { k: K.k + 1 }) : ''); };
+  const chipsWant = (G, side, pid) => G.js.flatMap((J) => J.calls.filter((K) => (side === 'b' ? K.b : K.a).length && (pid == null || K.on.includes(pid)))
+    .map((K) => [J.jid, side, K.k + 1, J.cid, face(J, K, side)]));
+  /* a chip's hover, line by line: its head, the test's name, the side, the walk on that side (this call, the other calls here, the
+     other endpoints — each once, in order), where it goes when a path is picked, each path to its ending when several reach it, the plain */
+  const tipWant = (EK, G, J, K, side) => { const rng = J.cs.map((c, i) => i).filter((i) => (side === 'b' ? i <= K.k : i >= K.k));
+    const line = (i) => { const c = J.cs[i], h = i === K.k ? 1 : c.endpoint === EK ? 2 : 0;
+      return fillW(h === 1 ? JW.here : h === 2 ? JW.hereAgain : JW.step, { i: i + 1, m: c.method, p: epPath(c), role: role(c) }) + ' · ' + asserts(c) + (known(c) ? '' : ' · ' + JW.noEp); };
+    const jv = sortS(K.joined.map((x) => G.EN.st[x])), go = jv.length ? fillW(JW.on, { v: jv.join(' · ') }) : fillW(JW.leave[K.how], { v: K.st.join(' · '), n: K.cand.length });
+    return [fillW(JW.head, { cid: J.cid })].concat(J.name ? [J.name] : [], [side === 'b' ? JW.sideB : JW.sideA], rng.map(line), [go], K.on.length > K.joined.length ? [JW.onEach] : [], [JW.plain]); };
+  const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
+  const tipLines = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
+    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
+    const t = await p.$eval('#tip', (e) => [...e.children].map((c) => c.textContent)); await p.mouse.move(5, 5); return t; };
+  const jyCell = (mom) => p.$$eval('#mogrid td[data-mom="' + mom + '"][data-f="proof"] .mc[data-jy]', (cs) => cs.map((c) => [c.getAttribute('data-jy'), c.getAttribute('data-side'), +c.getAttribute('data-k'),
+    ((c.querySelector('.mt') || {}).textContent || '').trim(), ((c.querySelector('.mq') || {}).textContent || '').trim()]));
+  const pickP = async (i) => { const sel = '#mobar .mopath[data-path="' + i + '"]'; await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await p.click(sel); await p.waitForTimeout(110); };
+  await open(PAGE);
+  const EPS = ['POST /cooking/sessions', 'GET /settings', 'DELETE /pantry/items/{item_id}', 'PATCH /settings/preferences'];
+  const HOV = { 'POST /cooking/sessions': ['C250', 'C1087', 'C555'], 'GET /settings': ['C2137'], 'DELETE /pantry/items/{item_id}': ['C705'], 'PATCH /settings/preferences': ['C1033'] };
+  const cellBad = [], tipBad = [], pathBad = [], seen = [];
+  let nTips = 0, nPaths = 0;
+  for (const E of EPS) { const EK = 'endpoint:' + E, G = journeysOf(EK), R = ROW[E];
+    await openEp(E); await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' })); await p.waitForTimeout(80);
+    if (E === EPS[0]) { /* (a) */
+      const sq = await p.$$eval('#mobar .opt[data-mopt="jy"]', (os) => os.map((o) => [o.getAttribute('data-v'), o.getAttribute('aria-checked'), getComputedStyle(o).borderTopStyle, o.getAttribute('data-ruled')]));
+      ok(!JO.ruled && JO.pick === 'one' && sq.length === 2 && sq.every(([v, on, dash, ruled]) => (on === 'true') === (v === JO.pick) && (dash === 'dashed') === (v === JO.pick) && !ruled),
+        'D-065 · the journeys\' look opens on "' + JO.opts[JO.pick].name + '", my pick, dashed, not ruled', sq); }
+    /* (b) the chips under all paths */
+    const js0 = await jyCell('start'), ja0 = await jyCell('after'), wB = chipsWant(G, 'b', null), wA = chipsWant(G, 'a', null);
+    if (JSON.stringify(js0) !== JSON.stringify(wB) || JSON.stringify(ja0) !== JSON.stringify(wA)) cellBad.push([E, { js0, wB, ja0, wA }]);
+    seen.push(E + ': ' + js0.map((x) => x[3] + ' · ' + x[4]).join(', ') + ' | ' + ja0.map((x) => x[3] + ' · ' + x[4]).join(', '));
+    /* the hovers, line for line */
+    for (const J of G.js.filter((j) => HOV[E].includes(j.cid))) for (const K of J.calls) for (const [side, mom] of [['b', 'start'], ['a', 'after']]) { if (!(side === 'b' ? K.b : K.a).length) continue;
+      const got = await tipLines('#mogrid td[data-mom="' + mom + '"][data-f="proof"] .mc[data-jy="' + J.jid + '"][data-side="' + side + '"][data-k="' + (K.k + 1) + '"]'), want = tipWant(EK, G, J, K, side);
+      nTips++; if (JSON.stringify(got) !== JSON.stringify(want)) tipBad.push([E, J.cid, side, K.k + 1, { got, want }]); }
+    /* (c) per path: the chips the rule puts on it, exactly */
+    for (let i = 0; i < R.mo.ex.length; i++) { const pid = R.mo.ex[i][8], pe = G.EN.paths.find(([q]) => q === pid);
+      if (!pe || pe[1] !== R.mo.ex[i][0]) { pathBad.push([E, i, 'the code is not a path of forms.json', R.mo.ex[i].slice(0, 2)]); continue; }
+      await pickP(i); const s1 = await jyCell('start'), a1 = await jyCell('after'); nPaths++;
+      if (JSON.stringify(s1) !== JSON.stringify(chipsWant(G, 'b', pid)) || JSON.stringify(a1) !== JSON.stringify(chipsWant(G, 'a', pid))) pathBad.push([E, i, R.mo.ex[i][1], { s1, a1, want: [chipsWant(G, 'b', pid), chipsWant(G, 'a', pid)] }]); }
+    await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(100); }
+  ok(!cellBad.length, 'D-065 (A) · review J1 · Proof at "' + MW.moms.start.name + '" and "' + MW.moms.after.name + '" holds one chip per call here per side, a call here never among the outer steps, in the station\'s order — ' + seen.join(' ; '), cellBad);
+  ok(!tipBad.length && nTips >= 12, 'D-065 (A) · review J1 · ' + nTips + ' journey hovers (C250 · C1087 · C555 · C2137 · C705 · C1033) read line for line: the walk on the chip\'s side, each call once, in order, this request and this endpoint again said apart, where it goes on a picked path', tipBad.slice(0, 3));
+  ok(!pathBad.length && nPaths > 30, 'D-065 (A) · reviews J5 · J6 · on ' + nPaths + ' paths of the four endpoints, every code picked keeps exactly the chips whose call here ends on it by the stated rule (refs, else an arranging call\'s one ending of its status, on each path to it)', pathBad.slice(0, 3));
+  /* a click on a journey chip lights its case everywhere — the universe's Journeys row among them */
+  const E = 'POST /cooking/sessions', G0 = journeysOf('endpoint:' + E);
+  await openEp(E); await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' }));
+  await p.click('#mogrid td[data-mom="start"][data-f="proof"] .mc[data-jy="C250|api"]'); await p.waitForTimeout(120);
+  const l0 = await p.evaluate(() => ({ el: window.__allep.state.el, uni: !!document.querySelector('#ocol-uni .urow[data-row="JOURNEYS"] .elon[data-key="case:C250"]'), mo: document.querySelectorAll('#sec-mo .elon[data-jy]').length }));
+  await p.click('#elclear'); await p.waitForTimeout(40);
+  ok(l0.el === 'case:C250' && l0.uni && l0.mo >= 2, 'D-065 (A) · a click on C250\'s chip lights the case: the universe\'s Journeys row and both its chips in BY MOMENT', l0);
+  /* (e) the ones that cannot be ordered, in Proof's last column: the case and its tests on the face, why in the hover (J7, D-017) */
+  const nmJ = await p.$$eval('#mogrid tr[data-f="proof"] td[data-nm] .mc[data-nmk="jy"]', (cs) => cs.map((c) => [c.getAttribute('data-jy'), c.getAttribute('data-why'), [...c.querySelectorAll('.mt, .mq')].map((x) => x.textContent.trim())]));
+  const tN = await tipLines('#mogrid tr[data-f="proof"] td[data-nm] .mc[data-nmk="jy"]') || [];
+  const whyNames = Object.values(NJ.why).map((w) => w.name);
+  ok(JSON.stringify(nmJ.map((x) => x[0])) === JSON.stringify(G0.aggs.map(([c, k]) => c + '|' + k)) && nmJ.every((x, i) => x[1] === 'agg' && JSON.stringify(x[2]) === JSON.stringify(G0.aggs[i]) && !whyNames.some((w) => x[2].includes(w)))
+     && G0.aggs.length === 2 && tN.includes(NJ.why.agg.name) && tN.includes(fillW(NJ.why.agg.plain, { corpus: G0.aggs[0][1] })) && tN.includes(NJ.col) && !tN.includes(MW.nm.plain),
+    'D-065 (B) · review J7 · ' + E + ' · Proof\'s "' + MW.nm.name + '" cell names ' + nmJ.map((x) => x[2].join(' ')).join(' and ') + ' — the case and its tests on the face; why, and a line true of a journey, in the hover', { nmJ, tN });
+  /* (d) the other look: every outer request its own endpoint chip, grouped per call here */
+  const grp = (mom) => p.$$eval('#mogrid td[data-mom="' + mom + '"][data-f="proof"] .mjg[data-jy]', (gs) => gs.map((g) => [g.getAttribute('data-jy'), +g.getAttribute('data-k'), [...g.querySelectorAll('.mc.mjs')].map((c) => [c.getAttribute('data-key'), +c.getAttribute('data-i'),
+    (c.querySelector('.skg') || { getAttribute: () => null }).getAttribute('data-sk'), [...c.querySelectorAll('.sksub')].map((v) => v.getAttribute('data-vc') + ':' + v.getAttribute('data-vv')).join(' ')])]));
+  const wantG = (G, side) => G.js.flatMap((J) => J.calls.filter((K) => (side === 'b' ? K.b : K.a).length).map((K) => [J.jid, K.k + 1, (side === 'b' ? K.b : K.a).map((i) => [J.cs[i].endpoint, i + 1, 'endpoint', 'method:' + J.cs[i].method])]));
+  await p.$eval('#mobar .opt[data-mopt="jy"][data-v="each"]', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#mobar .opt[data-mopt="jy"][data-v="each"]'); await p.waitForTimeout(150);
+  const gs = await grp('start'), ga = await grp('after');
+  const cut = await p.evaluate(() => [...document.querySelectorAll('#mogrid .mc')].filter((c) => c.scrollWidth > c.clientWidth + 1).length);
+  ok(JSON.stringify(gs) === JSON.stringify(wantG(G0, 'b')) && JSON.stringify(ga) === JSON.stringify(wantG(G0, 'a')) && !cut,
+    'D-065 (A) · "' + JO.opts.each.name + '" on ' + E + ': at both outer moments every outer request is an endpoint chip of its own in the order the case makes it (C250 after: ' + ((ga.find((g) => g[0] === 'C250|api') || [0, 0, []])[2].map((x) => x[1] + ' ' + x[0].replace('endpoint:', '')).join(' → ')) + '), with the station\'s endpoint glyph and method label; no chip cut at 1920 px', { gs: gs.length, ga: ga.length, cut });
+  const K2 = 'endpoint:GET /profile/summary', sel2 = '#mogrid td[data-mom="after"][data-f="proof"] .mjg[data-jy="C250|api"] .mc.mjs[data-key="' + K2 + '"]';
+  await p.$eval(sel2, (e) => e.scrollIntoView({ block: 'center' })); await p.click(sel2); await p.waitForTimeout(120);
+  const l2 = await p.evaluate((K) => ({ el: window.__allep.state.el, row: (document.querySelector('#board tr.row[data-ep="' + K.slice(9) + '"]') || { getAttribute: () => null }).getAttribute('data-el') }), K2);
+  await p.click('#elclear'); await p.waitForTimeout(40);
+  ok(l2.el === K2 && l2.row === 'on', 'D-065 (A) · a click on the GET /profile/summary chip in C250\'s walk lights that endpoint, its table row among the lit', l2);
+  /* the same look on DELETE /pantry/items/{item_id}: C705's two calls here, each its own group, its steps 1–3 and never step 4 */
+  const E705 = 'DELETE /pantry/items/{item_id}', G705 = journeysOf('endpoint:' + E705); await openEp(E705);
+  const g705 = (await grp('start')).filter((g) => g[0] === 'C705|api'), w705 = wantG(G705, 'b').filter((g) => g[0] === 'C705|api');
+  const lab705 = await p.$$eval('#mogrid td[data-mom="start"][data-f="proof"] .mjg[data-jy="C705|api"] .mjl .mq', (xs) => xs.map((x) => x.textContent));
+  ok(JSON.stringify(g705) === JSON.stringify(w705) && g705.length === 2 && JSON.stringify(lab705) === JSON.stringify([4, 5].map((k) => fillW(JW.around, { k }))),
+    'D-065 (A) · review J1 · ' + E705 + ' · "' + JO.opts.each.name + '": C705 calls here at steps 4 and 5, each call its own group (' + lab705.join(' · ') + '), its outer steps 1–3 only', { g705, w705, lab705 });
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await openEp(E);
+  const kept = await p.evaluate(() => [window.__allep.mo.looks.jy, document.querySelectorAll('#mogrid .mjg[data-jy]').length]);
+  await p.evaluate(() => { window.__copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (s1) => { window.__copied = s1; return Promise.resolve(); } } }); });
+  await p.$eval('#cmcopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#cmcopy'); await p.waitForTimeout(80);
+  const jl = CL.mo + ' · ' + JO.label + ': ' + JO.opts.each.name + ' (' + D.words.copy.his + ')', cp = await p.evaluate(() => [window.__copied, document.getElementById('out').value]);
+  ok(kept[0] === 'each' && kept[1] === gs.length + ga.length && cp[0] && !cp[0].split('\n').some((l) => l.startsWith(CL.mo + ' · ')) && cp[1].includes(jl),
+    'D-065 · review J8 · the journeys\' look is remembered for this viewer; the page\'s copy text carries it ("' + jl + '"), the code map\'s own copy carries none of BY MOMENT\'s looks', { kept, jl, cm: cp[0] });
+  await p.$eval('#mobar .opt[data-mopt="jy"][data-v="one"]', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#mobar .opt[data-mopt="jy"][data-v="one"]'); await p.waitForTimeout(100);
+  ok((await p.evaluate(() => window.__allep.mo.looks.jy)) === 'one', 'D-065 · back to my pick, one chip per journey');
+  /* (f) review J3 · GET /settings: C2137's own proof call is in the band; its journey chips wear its key and carry nothing */
+  const ES = 'GET /settings'; await openEp(ES);
+  const f3 = await p.evaluate(() => { const own = [...document.querySelectorAll('#mogrid .mc[data-keys]')].filter((c) => !c.closest('[data-jy]')).flatMap((c) => c.getAttribute('data-keys').split('\n'));
+    const band = [...document.querySelectorAll('#moband [data-keys]')].flatMap((c) => c.getAttribute('data-keys').split('\n'));
+    const row = document.querySelector('#ocol-uni .ust .urow[data-row="TESTS"]'), its = {}, tabs = [...row.querySelectorAll('.tabbar .tab')];
+    const grab = () => { row.querySelectorAll('span.more').forEach((m) => { if (m.style.display !== 'none' && /^\+/.test(m.textContent)) m.click(); });   /* every tab, past its "+N more" (as section 18 reads it) */
+      row.querySelectorAll('[data-ue]').forEach((n) => { const i = n.getAttribute('data-ue'), it = its[i] || (its[i] = { keys: new Set(), cv: false }); [n, ...n.querySelectorAll('[data-keys]')].forEach((k) => (k.getAttribute('data-keys') || '').split('\n').filter(Boolean).forEach((x) => it.keys.add(x))); if (n.getAttribute('data-cv') === '1') it.cv = true; }); };
+    if (tabs.length) { tabs.forEach((t) => { t.click(); grab(); }); tabs[0].click(); } else grab();
+    const L = Object.values(its).map((it) => [[...it.keys][0] || null, it.cv]);
+    return { own: [...new Set(own)], band: [...new Set(band)], items: L, jy: document.querySelectorAll('#mogrid .mc[data-jy*="C2137"]').length, st: row.getAttribute('data-ucs') }; });
+  const c2137 = f3.items.find((x) => x[0] === 'case:C2137') || [null, null], wantC = f3.items.filter((x) => x[0] && f3.own.includes(x[0])).length;
+  ok(f3.jy === 2 && f3.band.includes('case:C2137') && !f3.own.includes('case:C2137') && c2137[1] === false && f3.items.filter((x) => x[1]).length === wantC && wantC === 6 && f3.items.length === 10,
+    'D-065 · review J3 · ' + ES + ' · C2137 wears its case key on its ' + f3.jy + ' journey chips and its own call sits in the band: the Tests row\'s C2137 stays bright; ' + wantC + ' of ' + f3.items.length + ' carried, the other chips\' keys', f3);
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the D-065 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));

@@ -436,6 +436,11 @@
   .mc .mdp { color: var(--muted); font-variant-numeric: tabular-nums; }
   .mc .mrc { display: inline-flex; gap: 2px; align-items: center; color: var(--alert); font-weight: 650; }
   .mc .mnest { color: var(--muted); }
+  /* D-065 · a journey's requests at an outer moment: one chip per journey (its requests in its hover), or every request a chip of its
+     own, numbered by its place in the walk, grouped under the journey's case */
+  .mjg { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 2px 3px; padding: 1px 3px; border: 1px solid var(--rule-soft); border-radius: 6px;
+         background: color-mix(in srgb, var(--ink) 3%, var(--card)); max-width: 100%; box-sizing: border-box; }
+  .mjg .mjn { color: var(--muted); font-variant-numeric: tabular-nums; font-size: var(--fs-min); }
   .pair .bhl { margin-top: 2px; display: flex; flex-wrap: wrap; gap: 0 8px; align-items: baseline; } .pair .bhd, .pair .hlp, .pair .nsl { color: var(--muted); }
   #ocol-cm[data-carry="hide"] .bhl.bh:not(:has(> [data-ci]:not([data-cv="1"]))) { display: none; }   /* a level whose every function BY MOMENT carries (the behind levels only: another .bhl holds no per-item flags) */
   .pair .hdl { display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: center; margin-top: 2px; }
@@ -1387,7 +1392,10 @@
     else if (u.row === "JOURNEYS") { var js = el("div", "jsec"), real = new RegExp(UL.jReal);
       it.forEach(function (j, ji) { var ok = real.test(j[0] || ""), jk = ks[ji] || [null, []]; js.appendChild(ue(E("div", "jmeta" + (ok ? "" : " jagg"), kd(el("span", "jcid" + (ok ? "" : " noc"), j[0]), jk[0]), el("span", "corp", j[1]), el("span", "ncomp", j[2] + " " + D.ucard.comp)), ji));
         var fc = ue(el("div", "jfaces"), ji); j[3].filter(function (e, i, a) { return e && a.indexOf(e) === i; }).forEach(function (e, fi) { var f = E("span", "face" + (e === u.home ? " fhome" : ""), uIco(UL.faceIco)); f.title = e; f.style.color = UL.hue[e]; fc.appendChild(kd(f, jk[1][fi])); });
-        js.appendChild(fc); }); box.appendChild(js); }
+        js.appendChild(fc); }); box.appendChild(js);
+      /* review J2: the "+N" of its count — the journeys the station counts without naming them — is one item more, never carried */
+      var jc = u.jMore ? box.querySelector(":scope > .sechd .cnt") : null;
+      if (jc) { var jt = String(u.count), jm = "+" + u.jMore; if (jt.slice(-jm.length) === jm) { jc.textContent = jt.slice(0, -jm.length); jc.appendChild(ue(el("span", null, jm), it.length)); } } }
     else if (u.row === "IDENTITY" || u.row === "SOURCE") u.kvs.forEach(function (k, i) { var kv = ue(uKv(k[0], k[1], k[2]), i); kd(kv.querySelector(".v"), ks[i]); box.appendChild(kv); });
     else if (u.row === "SIGNATURE") { if (it[0]) { var sd = ue(styled("div", UL.sig[0], u.parts ? null : it[0]), 0); sd.className = "doc";
         (u.parts || []).forEach(function (q) { sd.appendChild(q[1] ? ksp(q[0], q[1]) : document.createTextNode(q[0])); }); box.appendChild(sd); }
@@ -1543,12 +1551,14 @@
      ending's path: the moments it passes (r.mo.pass) and the elements on it. What has no moment is in the band below, with its
      reason. The two looks' defaults are his (D-055: moments as columns, cells as chips), remembered per viewer; a look remembered before
      his ruling must not override it, so the old key is dropped. ══ */
-  var MW = W.mo, MO = D.mo, MKEY = "gabe:allep:moments:v2", MS = { lay: MW.opt.lay.pick, cell: MW.opt.cell.pick }, MPATH = { ep: null, i: null };
+  var MW = W.mo, MO = D.mo, MKEY = "gabe:allep:moments:v2", MS = { lay: MW.opt.lay.pick, cell: MW.opt.cell.pick, jy: MW.opt.jy.pick }, MPATH = { ep: null, i: null };   /* D-065: jy, the journeys' look */
   try { window.localStorage.removeItem("gabe:allep:moments:v1"); } catch (e) {}
   try { var mv = JSON.parse(window.localStorage.getItem(MKEY) || "null"); if (mv) Object.keys(MS).forEach(function (g) { if (mv[g] && MW.opt[g].opts[mv[g]]) MS[g] = mv[g]; }); } catch (e) {}
   /* their squares: a list of bars (rows) · the same bars standing (columns) · a cell of chips · a cell with a number */
   var MICON = { lay: { rows: '<rect x="3" y="3" width="6" height="18" rx="1.2"/><path d="M12 6h9M12 12h9M12 18h9"/>', cols: '<rect x="3" y="3" width="18" height="6" rx="1.2"/><path d="M6 12v9M12 12v9M18 12v9"/>' },
-                cell: { chips: '<rect x="3" y="6" width="8" height="5" rx="2"/><rect x="13" y="6" width="8" height="5" rx="2"/><rect x="3" y="13" width="11" height="5" rx="2"/>', counts: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5l2-1.5v8M10 16h4"/>' } };
+                cell: { chips: '<rect x="3" y="6" width="8" height="5" rx="2"/><rect x="13" y="6" width="8" height="5" rx="2"/><rect x="3" y="13" width="11" height="5" rx="2"/>', counts: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5l2-1.5v8M10 16h4"/>' },
+                /* D-065: a journey as one chip (a stack behind it: its requests) · every request a chip of its own, in a row */
+                jy: { one: '<rect x="3" y="9" width="14" height="7" rx="2"/><path d="M6 6h13a2 2 0 0 1 2 2v5"/>', each: '<rect x="2" y="9" width="5" height="6" rx="1.5"/><rect x="9.5" y="9" width="5" height="6" rx="1.5"/><rect x="17" y="9" width="5" height="6" rx="1.5"/>' } };
   var MSTAGE = { edge: "EDGE", body: "INPUT", gate: "GATE", fields: "INPUT", checks: "HANDLER", work: "HANDLER", fail: "HANDLER", save: "HANDLER", answer: "ANSWER", uncaught: "UNCAUGHT" };
   /* D-064 (2): every block is a row, the Overview's too — nothing of it acts at a moment, its facts stand in the no-moment column */
   function moFams() { var byB = {}; Object.keys(MO.fam).forEach(function (f) { byB[MO.fam[f]] = f; });
@@ -1629,7 +1639,37 @@
     if (X.in) ln(fill(XW.inside, { v: X.in }));
     if (X.fl) ln(XW.file);
     return h; }
-  function moChip(e) { var f = e[0], ch = e[4] || [], c = el("span", "mc"), X = e[7] || {}; c.setAttribute("data-f", f); c.setAttribute("data-tip", "mochip"); c._x = X;
+  /* D-065 · a journey's other requests at an outer moment, around ONE call it makes here (review J1: each call here has its own pair of
+     chips). e[7].jy: its id, case, side, test name; st, its outer requests on this side as [method, path, role, statuses asserted,
+     endpoint key, here?, line, place in the walk]; sq, the walk on this side — those requests and the calls here on this side, this one
+     among them, by place, each once (the generator proves it), each ending with 0 (another endpoint) · 1 (this request) · 2 (this
+     endpoint again, with chips of its own); k, the place of this call here; nh, how many calls it makes here; j, how this call follows a
+     picked path; jv, the statuses of the endings it stays on; jn, how many endings have the status it asserts; pm, an ending several
+     paths reach. MS.jy picks the look: one chip per journey per side saying how many requests it makes there, the walk in its hover (my
+     pick); or each request an endpoint chip of its own (the station's glyph and method label, its key: a click lights it), in order,
+     grouped under the journey's case */
+  function jyAsserts(s) { return s[3].length ? fill(MW.x.asserts, { v: s[3].join(" \u00b7 ") }) : MW.x.assertsNone; }
+  function jyLine(s, h) { var JW = MW.jy; return fill(h === 1 ? JW.here : h === 2 ? JW.hereAgain : JW.step, { i: s[7], m: s[0], p: s[1], role: JW.role[s[2]] || s[2] }) + " \u00b7 " + jyAsserts(s)
+    + (s[4] ? "" : " \u00b7 " + JW.noEp); }
+  function jyTip(J) { var JW = MW.jy, ln = function (t, b) { return "<span class=ln>" + (b ? "<b>" + esc(t) + "</b>" : esc(t)) + "</span>"; };
+    var me = J.sq.filter(function (s) { return s[8] === 1; })[0], asked = me ? me[3] : [];
+    var go = J.jv.length ? fill(JW.on, { v: J.jv.join(" \u00b7 ") }) : fill(JW.leave[J.j], { v: asked.join(" \u00b7 "), n: J.jn });
+    return "<b>" + esc(fill(JW.head, { cid: J.c })) + "</b>" + (J.nm ? ln(J.nm) : "") + ln(J.s === "b" ? JW.sideB : JW.sideA)
+      + J.sq.map(function (s) { return ln(jyLine(s, s[8]), !!s[8]); }).join("")
+      + "<span class=pl>" + esc(go) + "</span>" + (J.pm ? "<span class=pl>" + esc(JW.onEach) + "</span>" : "")
+      + "<span class=pl>" + esc(JW.plain) + "</span>"; }
+  function jyEl(e) { var J = e[7].jy, JW = MW.jy, kk = J.nh > 1 ? " " + fill(JW.ofStep, { k: J.k }) : "";   /* a journey calling here more than once: which call */
+    if (MS.jy !== "each") { var c = el("span", "mc mjy"); c.setAttribute("data-f", "proof"); c.setAttribute("data-tip", "mojy"); c.setAttribute("data-jy", J.id); c.setAttribute("data-side", J.s); c.setAttribute("data-k", String(J.k)); c._jy = J;
+      kd(c, moK(e[2])); c.appendChild(moTxt(el("span", "mt"), J.c));
+      c.appendChild(el("span", "mq", fill(J.s === "b" ? (J.st.length === 1 ? JW.before1 : JW.before) : (J.st.length === 1 ? JW.after1 : JW.after), { n: J.st.length }) + kk)); return c; }
+    var g = el("span", "mjg"), lb = el("span", "mc mjl"); g.setAttribute("data-f", "proof"); g.setAttribute("data-jy", J.id); g.setAttribute("data-side", J.s); g.setAttribute("data-k", String(J.k));
+    lb.setAttribute("data-tip", "mojy"); lb._jy = J; kd(lb, ["case:" + J.c]); lb.appendChild(moTxt(el("span", "mt"), J.c)); if (kk) lb.appendChild(el("span", "mq", fill(JW.around, { k: J.k }))); g.appendChild(lb);
+    J.st.forEach(function (s) { g.appendChild(el("span", "mjn", String(s[7]))); var sc = el("span", "mc mjs"); sc.setAttribute("data-f", "proof"); sc.setAttribute("data-tip", "mojs"); sc.setAttribute("data-i", String(s[7])); sc._js = [J, s];
+      if (s[4]) kd(sc, [s[4]]); else sc.appendChild(el("span", "mq", s[0]));
+      sc.appendChild(moTxt(el("span", "mt"), s[1])); g.appendChild(sc); });
+    return g; }
+  function moChip(e) { if ((e[4] || [])[0] === "jy") return jyEl(e);
+    var f = e[0], ch = e[4] || [], c = el("span", "mc"), X = e[7] || {}; c.setAttribute("data-f", f); c.setAttribute("data-tip", "mochip"); c._x = X;
     if (e[6] != null) c.setAttribute("data-hint", String(e[6])); var ks = moK(e[2]); if (ks.length) kd(c, ks);
     var txt = function (t, cls) { if (t) c.appendChild(moTxt(el("span", cls || "mt"), String(t))); };
     if (X.ho) { c.classList.add("hol"); c.setAttribute("data-ho", String(X.ho)); }
@@ -1674,10 +1714,11 @@
     else if (k === "fate") X.f.forEach(function (q) { c.appendChild(cFate(q[0], q[1])); });
     else if (k === "chain") txt(fill(K.text, { n: X.n }));
     else if (k === "arr") { txt(x[3]); txt(K.text, "mq"); if (X.h && X.h.indexOf("h") >= 0) txt(X.h === "ah" ? W.panel.arrangedBoth : W.panel.arrangedHelper, "mq"); }
+    else if (k === "jy") { txt(x[3]); if (X.c) txt(X.c, "mq"); c.setAttribute("data-jy", X.id); c.setAttribute("data-why", X.w); }   /* D-065 (B): a journey not ordered — the case and its tests (review J7, D-017: why, in the hover) */
     else if (k === "piece") c.appendChild(pieceWords(x[3], X.fk));
     else if (k === "lack") { txt(K.text, "mq"); c.appendChild(pieceWords(x[3], X.fk)); txt(X.n + "/" + X.of, "mq"); }
     return c; }
-  function moOpts(bar) { ["lay", "cell"].forEach(function (g) { var R = MW.opt[g], grp = el("div", "mgrp"), o = el("div", "opts"); grp.appendChild(el("span", "rl", R.label));
+  function moOpts(bar) { ["lay", "cell", "jy"].forEach(function (g) { var R = MW.opt[g], grp = el("div", "mgrp"), o = el("div", "opts"); grp.appendChild(el("span", "rl", R.label));
     o.setAttribute("role", "radiogroup"); o.setAttribute("aria-label", R.label);
     Object.keys(R.opts).forEach(function (v) { var bt = el("button", "opt"); bt.type = "button"; bt.setAttribute("role", "radio"); bt.setAttribute("data-mopt", g); bt.setAttribute("data-v", v);
       bt.setAttribute("aria-checked", MS[g] === v ? "true" : "false"); bt.setAttribute("aria-label", R.opts[v].name); bt.setAttribute("data-tip", "mopt");
@@ -1693,7 +1734,7 @@
     I.appendChild(el("p", "cap", fill(MW.covHead)));
     MO.timed.concat(MO.untimed).forEach(function (f) { var cv = MO.cov[f]; I.appendChild(el("p", "mocov", fill(MW.cov, { block: BLK[MO.fam[f]].name, placed: cv[0], un: cv[1], nm: cv[2], total: cv[0] + cv[1] + cv[2] }))); });
     I.appendChild(el("p", "cap", fill(MW.src, Object.assign({ occ: MO.occ }, MO.src)))); I.appendChild(el("p", "cap", fill(MW.off, { off: MO.off })));
-    I.appendChild(el("p", "cap", fill(MW.offocc, { offocc: MO.offocc })));
+    I.appendChild(el("p", "cap", fill(MW.offocc, { offocc: MO.offocc }))); I.appendChild(el("p", "cap", fill(MW.jy.feed)));   /* D-065: the journeys, feed-wide */
     /* the bar: the path, then the two looks */
     var bar = $("mobar"); bar.textContent = ""; var pg = el("div", "mgrp"), ps = el("div", "mopaths"); pg.appendChild(el("span", "rl", MW.path.label));
     ps.setAttribute("role", "radiogroup"); ps.setAttribute("aria-label", MW.path.label);
@@ -1987,7 +2028,11 @@
         + (nk === "full" && nx.mt ? "<span class=ln>" + esc(fill(NK.mount, { v: nx.mt })) + "</span>" : "")
         + (nk === "sig" && t.getAttribute("data-def") ? "<span class=ln><code>" + esc(t.getAttribute("data-def")) + "</code></span>" : "")
         + (nx.lb && NK.label ? "<span class=ln>" + esc(fill(NK.label, { v: nx.lb })) + "</span>" : "")   /* review F6: the map's own label for its path */
-        + "<span class=pl>" + esc(nk === "risk" && NK.ids[nx.id] ? NK.ids[nx.id].plain : NK.plain) + "</span>" + "<span class=pl>" + esc(W.mo.nm.plain) + "</span>"; }   /* review F4: each flag its own words */
+        + (nk === "jy" && NK.why[nx.w] ? "<span class=ln>" + esc(NK.why[nx.w].name) + "</span><span class=pl>" + esc(fill(NK.why[nx.w].plain, { corpus: nx.c, n: nx.n })) + "</span>" : "")   /* D-065 (B): its reason */
+        + "<span class=pl>" + esc(nk === "risk" && NK.ids[nx.id] ? NK.ids[nx.id].plain : NK.plain) + "</span>" + "<span class=pl>" + esc(nk === "jy" ? NK.col : W.mo.nm.plain) + "</span>"; }   /* review F4: each flag its own words; review J7: a journey's requests have moments */
+    if (kind === "mojy") return jyTip(t._jy);                                                    /* D-065: a journey, its requests in order */
+    if (kind === "mojs") { var js0 = t._js; return "<b>" + esc(js0[1][0] + " " + js0[1][1]) + "</b> \u00b7 " + esc(fill(W.mo.jy.stepOf, { i: js0[1][7], cid: js0[0].c }))
+      + "<span class=ln>" + esc(jyLine(js0[1], 0)) + "</span><span class=pl>" + esc(W.mo.jy.plain) + "</span>"; }
     if (kind === "mowhy") { var mw = W.mo.why[t.getAttribute("data-why")]; return "<b>" + esc(mw.name) + "</b> · " + esc(W.mo.band.title) + "<span class=pl>" + esc(mw.plain) + "</span>"; }
     if (kind === "mochip") { var mf = t.getAttribute("data-f"), mb = BLK[D.mo.fam[mf]], mks = keysOf(t), mh = t.getAttribute("data-hint");
       return "<b>" + esc(fill(W.mo.tip, { name: mks.length ? elName(mks[0]) : t.textContent.trim(), block: mb.name })) + "</b>" + (mh ? "<span class=ln>" + esc(mh) + "</span>" : "")
@@ -2048,11 +2093,11 @@
   function optLine(where, R, v) { return where + " · " + R.label + ": " + R.opts[v].name + " (" + (v === R.pick ? (R.ruled ? W.ruledMark : W.copy.pick) : W.copy.his) + ")"; }
   function cmLines() { var C = W.copy.lines; return [optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),
     optLine(C.uni, W.carry, PV.uni), optLine(C.gaps, W.carry, PV.gaps),                   /* D-058: the two panels' own switches */
-    optLine(C.mo, W.mo.opt.lay, MS.lay), optLine(C.mo, W.mo.opt.cell, MS.cell)]; }
+    optLine(C.mo, W.mo.opt.lay, MS.lay), optLine(C.mo, W.mo.opt.cell, MS.cell), optLine(C.mo, W.mo.opt.jy, MS.jy)]; }   /* D-065: the journeys' look */
   /* the code map's own copy (his ask 2026-09-26): the page, the endpoint, every option of the code map, then room for his words */
   function cmText(r) { var C = W.copy.lines; return [C.page + ": all-endpoints · " + T.app + " @ " + T.head, C.open + ": " + r.id,
     optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),
-    optLine(C.uni, W.carry, PV.uni), optLine(C.gaps, W.carry, PV.gaps), "", C.your, ""].join("\n"); }
+    optLine(C.uni, W.carry, PV.uni), optLine(C.gaps, W.carry, PV.gaps), "", C.your, ""].join("\n"); }   /* review J8: BY MOMENT's looks belong to the page's copy, none here */
   function writeOut(L, GS) {
     var C = W.copy.lines, lines = [C.page + ": all-endpoints · " + T.app + " @ " + T.head,
       C.layout + ": " + fill(W.rail.lay.opts[S.lay].name, { cards: D.layouts[S.lay] }), C.group + ": " + W.rail.grp.opts[S.grp].name + (S.grp !== "flat" ? " (" + GS.length + ")" : ""),
