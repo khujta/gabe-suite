@@ -16,6 +16,8 @@ from __future__ import annotations
 
 import datetime as _dt
 import json
+import os
+import subprocess
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -83,10 +85,92 @@ def load_junit(name: str) -> dict | None:
             rec["cases"].append({"name": case.get("name", "?"), "state": state,
                                  "cls": case.get("classname", ""),
                                  "time": float(case.get("time") or 0)})
+    written, how = report_written(path)
+    at = run_stamp(ranat, naive_zone(name))
+    # ONE rule for when the run happened, read by every page that shows it (index's Last run, the run-history line and
+    # so the test corpora, a feature page's "captured") — D-062: the report's own run time; when it names none, or one
+    # that does not parse, the time the report FILE was written (report_written), and the page says which.
+    run = {"at": at or written, "how": "ran" if at else how, "raw": None if (at or not ranat) else ranat}
     return {"files": files, "total": total, "failed": failures + errors,
-            "skipped": skipped, "ranAt": ranat,
-            "mtime": _dt.datetime.fromtimestamp(path.stat().st_mtime,
-                                                _dt.timezone.utc).isoformat()}
+            "skipped": skipped, "ranAt": ranat, "written": written, "run": run}
+
+
+def _git(cwd: Path, *args: str) -> str | None:
+    """One git READ (stdout) without optional locks — a build only reads the tree it reports on; None when git is
+    missing, the directory is no work tree, or the call fails."""
+    try:
+        r = subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, timeout=30,
+                           env={**os.environ, "GIT_OPTIONAL_LOCKS": "0"})
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return r.stdout if r.returncode == 0 else None
+
+
+def report_written(path: Path) -> tuple[str, str]:
+    """When a report FILE was written → ``(UTC "YYYY-MM-DDTHH:MM:SSZ", how)``, D-061's evidence rule for one file: a
+    report git tracks and the working tree has not changed since is dated by its last COMMIT — ``how`` "committed", the
+    same instant in a clone made on any day — and any other (untracked, changed since, or no git) by the file's time —
+    ``how`` "file". A tracked file's time is the checkout's, never the run's, which is why it only dates a file git
+    cannot (the D-062 review's F1)."""
+    d, name = path.parent, path.name
+    if (_git(d, "ls-files", "-z", "--", name) or "").strip("\0") \
+            and _git(d, "status", "--porcelain", "-z", "--untracked-files=no", "--", name) == "":
+        ct = (_git(d, "log", "-1", "--format=%ct", "--", name) or "").strip()
+        if ct.isdigit():
+            return _dt.datetime.fromtimestamp(int(ct), _dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "committed"
+    return (_dt.datetime.fromtimestamp(path.stat().st_mtime, _dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "file")
+
+
+_ZONES: dict = {}
+
+
+def naive_zone(key: str) -> _dt.tzinfo | None:
+    """The zone a corpus's runner writes a zone-less stamp in — ``naive_tz`` on its ``center.config.json`` corpora
+    entry: "utc" (jest-junit writes UTC with no zone marker), an offset "+HH:MM" / "-HH:MM", or an IANA name
+    ("America/Sao_Paulo"). None — the default — reads such a stamp as its date and time AS WRITTEN (a runner's local
+    time, zone unknown). A value that names no zone is said once and read as None."""
+    if key in _ZONES:
+        return _ZONES[key]
+    spec = next((c.get("naive_tz") for c in (_cd.CFG.get("corpora") or [])
+                 if isinstance(c, dict) and c.get("key") == key), None)
+    zone = None
+    if spec:
+        s = str(spec).strip()
+        try:
+            if s.lower() in ("utc", "z"):
+                zone = _dt.timezone.utc
+            elif s[:1] in "+-" and ":" in s:
+                h, m = s[1:].split(":", 1)
+                zone = _dt.timezone((-1 if s[0] == "-" else 1) * _dt.timedelta(hours=int(h), minutes=int(m)))
+            else:
+                from zoneinfo import ZoneInfo
+                zone = ZoneInfo(s)
+        except Exception:   # noqa: BLE001 — an unknown zone is a config error, said once; the stamp stays as written
+            print(f"  ⚠ center.config.json corpora[{key}].naive_tz {s!r} names no zone — its zone-less run times are "
+                  "read as written")
+            zone = None
+    _ZONES[key] = zone
+    return zone
+
+
+def run_stamp(raw: str | None, zone: _dt.tzinfo | None = None) -> str | None:
+    """When a report's run RAN, in the form the run-history records it (D-062) — the run's own clock, never the
+    build's: a stamp that names its zone becomes UTC ``YYYY-MM-DDTHH:MM:SSZ``; one that does not is read in ``zone``
+    (the corpus's ``naive_tz``, naive_zone) and becomes UTC the same way, else — a runner's local time, zone unknown —
+    keeps its date and time as written, to the second. None when the report names no time, or names one that does not
+    parse."""
+    if not raw:
+        return None
+    try:
+        ts = _dt.datetime.fromisoformat(str(raw).strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if ts.tzinfo is None and zone is not None:
+        ts = ts.replace(tzinfo=zone)
+    if ts.tzinfo is None:
+        return ts.strftime("%Y-%m-%dT%H:%M:%S")
+    return ts.astimezone(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def load_history() -> list[dict]:

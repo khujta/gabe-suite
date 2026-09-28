@@ -3,6 +3,7 @@
 
     days_check.py <snapshots.jsonl>              prints PASS/FAIL <id> <what> per assert; exit 1 on any FAIL
     days_check.py --evidence <snapshots.jsonl>   the same for the datefix --evidence feature page (review B-1 · B-4)
+    days_check.py --runs <index.jsonl> <corpora.jsonl>   the datefix --runs index and test corpora pages (D-062)
 
 The page's OWN script counted the days; these are the values a reader must see on each day. The pairs are the bounds
 the fixture straddles: a card crosses 7, 30 and 90 between the two days, so the SAME bytes must land it in different
@@ -12,12 +13,20 @@ import json
 import sys
 
 EVID = sys.argv[1] == "--evidence"
-snaps = {}
-for line in open(sys.argv[-1], encoding="utf-8"):
-    line = line.strip()
-    if line.startswith("{"):
-        d = json.loads(line)
-        snaps[d["day"]] = d
+RUNS = sys.argv[1] == "--runs"
+
+
+def load(path: str) -> dict:
+    out = {}
+    for line in open(path, encoding="utf-8"):
+        line = line.strip()
+        if line.startswith("{"):
+            d = json.loads(line)
+            out[d["day"]] = d
+    return out
+
+
+snaps = load(sys.argv[-1])
 fails = 0
 
 
@@ -42,6 +51,82 @@ def chip(s: dict, key: str) -> dict:
 def flag(s: dict, num: str, name: str):
     return next((f.get(name) for t, f in (s.get("flags") or {}).items() if t.startswith(num + " ")), None)
 
+
+if RUNS:
+    # D-062 · the run cells (datefix.py --runs). api-junit ran at 2026-09-21T01:30Z (22:30 on the 20th at UTC−3) and moved
+    # its totals, so the build appended a pytest line stamped with that RUN's time; web-junit names no zone (01:00 on the
+    # 24th, as written) and its vitest line is stamped 2026-09-24T12:00Z; jest-junit names no zone but its corpus says
+    # naive_tz utc — the instant 2026-09-21T01:30Z; pw-junit's run time does not parse and the report is committed at
+    # 2026-09-22T15:00Z (its file time a later checkout's); loose-junit names no run time and is untracked, its file time
+    # 2026-09-23T12:00Z. Four viewers: UTC at noon on the 27th and the 28th, America/Sao_Paulo at 23:45 on the 27th
+    # (02:45Z on the 28th), and UTC at 20:00 on the 23rd — BEFORE the web run's date as written and the vitest line.
+    IDX, CO = load(sys.argv[2]), load(sys.argv[3])
+    U27, U28, SP, V23 = "2026-09-27", "2026-09-28", "2026-09-28T02:45:00Z@America/Sao_Paulo", "2026-09-23T20:00:00Z@UTC"
+    ok = all(v in IDX and v in CO for v in (U27, U28, SP, V23))
+    check("R0", "every viewer opened both pages", ok, (sorted(IDX), sorted(CO)))
+    if not ok:
+        sys.exit(1)
+    for pg, S in (("index", IDX), ("corpora", CO)):
+        for v, tag in ((U27, "u27"), (U28, "u28"), (SP, "sp"), (V23, "v23")):
+            check(f"R1.{pg}.{tag}", "the page ran without a script error", not S[v].get("errors"), S[v].get("errors"))
+            check(f"R8.{pg}.{tag}", "no table says ago / today / yesterday / T−N, or counts below zero",
+                  not S[v].get("tblwords"), S[v].get("tblwords"))
+
+    def cell(S, v, row, i=-1):   # (text, title) of the i-th counted day on a table row — index: its Last run; the
+        ds = (S[v].get("rows") or {}).get(row) or []   # changelog: [Date, Last change]
+        try:
+            return ds[i].get("text"), ds[i].get("title")
+        except IndexError:
+            return None, None
+
+    check("R2", "the index counted its run days (the page loads a3-days.js)",
+          all((cell(IDX, v, k)[0] or "").endswith((" day", " days")) for v in (U27, U28, SP) for k in ("api", "web", "jest", "pw", "loose")),
+          {k: cell(IDX, U27, k) for k in ("api", "web", "jest", "pw", "loose")})
+    check("R3", "a run that names its zone counts from its instant: 6 days on the 27th, 7 on the 28th (UTC)",
+          (cell(IDX, U27, "api"), cell(IDX, U28, "api")) == (("6 days", "ran 2026-09-21 · 6 days"), ("7 days", "ran 2026-09-21 · 7 days")),
+          (cell(IDX, U27, "api"), cell(IDX, U28, "api")))
+    check("R4", "… on the viewer's own calendar: at 23:45 on the 27th in UTC−3 it ran on the 20th, 7 days back",
+          cell(IDX, SP, "api") == ("7 days", "ran 2026-09-20 · 7 days"), cell(IDX, SP, "api"))
+    check("R5", "a run that names no zone counts its date as written: 3 · 4 days (UTC), 3 days at UTC−3",
+          (cell(IDX, U27, "web"), cell(IDX, U28, "web")[0], cell(IDX, SP, "web")[0])
+          == (("3 days", "ran 2026-09-24 · 3 days"), "4 days", "3 days"), (cell(IDX, U27, "web"), cell(IDX, U28, "web"), cell(IDX, SP, "web")))
+    check("R6", "the changelog's appended line carries the RUN's day, counted by the page: 6 · 7 days (UTC), 7 at UTC−3",
+          (cell(CO, U27, "pytest"), cell(CO, U28, "pytest")[0], cell(CO, SP, "pytest"))
+          == (("6 days", "changed 2026-09-21 · 6 days"), "7 days", ("7 days", "changed 2026-09-20 · 7 days")),
+          (cell(CO, U27, "pytest"), cell(CO, U28, "pytest"), cell(CO, SP, "pytest")))
+    check("R7", "the vitest line (stamped 12:00Z on the 24th): 3 · 4 days (UTC), 3 days at UTC−3",
+          (cell(CO, U27, "vitest"), cell(CO, U28, "vitest")[0], cell(CO, SP, "vitest")[0])
+          == (("3 days", "changed 2026-09-24 · 3 days"), "4 days", "3 days"), (cell(CO, U27, "vitest"), cell(CO, U28, "vitest"), cell(CO, SP, "vitest")))
+    # review F3 (a) — a viewer whose today is BEFORE a date never reads a negative count: the date stays, the tooltip says why
+    check("R9", "a date after the viewer's today keeps its date and says why (index web · the changelog's vitest line)",
+          cell(IDX, V23, "web")[0] == "2026-09-24"
+          and (cell(IDX, V23, "web")[1] or "").startswith("ran 2026-09-24 — as written: the report names no zone, and this date is after")
+          and cell(CO, V23, "vitest")[0] == "2026-09-24" and "after this viewer" in (cell(CO, V23, "vitest")[1] or "")
+          and cell(CO, V23, "vitest", 0)[0] == "2026-09-24" and cell(IDX, V23, "loose")[0] == "0 days",
+          (cell(IDX, V23, "web"), cell(CO, V23, "vitest"), cell(CO, V23, "vitest", 0), cell(IDX, V23, "loose")))
+    # review F5 — the changelog's Date is the viewer's own day of the run, so one row never names two days
+    check("R10", "the changelog's Date is the viewer's day: the 21st in UTC, the 20th at 23:45 in UTC−3 (as its Last change says)",
+          cell(CO, U27, "pytest", 0)[0] == "2026-09-21" and cell(CO, SP, "pytest", 0)[0] == "2026-09-20"
+          and (cell(CO, SP, "pytest")[1] or "").startswith("changed 2026-09-20 "),
+          (cell(CO, U27, "pytest", 0), cell(CO, SP, "pytest", 0), cell(CO, SP, "pytest")))
+    # review F3 (b) — a corpus that names its zone-less stamps' zone (naive_tz) counts them as instants
+    check("R11", "the jest run (no zone marker, naive_tz utc) counts from its instant: 6 days (UTC), the 20th at UTC−3",
+          (cell(IDX, U27, "jest"), cell(IDX, SP, "jest")) == (("6 days", "ran 2026-09-21 · 6 days"), ("7 days", "ran 2026-09-20 · 7 days"))
+          and cell(CO, SP, "jest") == ("7 days", "changed 2026-09-20 · 7 days"),
+          (cell(IDX, U27, "jest"), cell(IDX, SP, "jest"), cell(CO, SP, "jest")))
+    # review F1 · F7 — a run time that does not parse dates a COMMITTED report by its commit (never the checkout's file
+    # time), said so, and the history line carries the same day (one rule, both pages)
+    check("R12", "the pw report: committed on the 22nd, 5 days (UTC), said so — and its changelog line the same day",
+          cell(IDX, U27, "pw") == ("5 days", "report committed 2026-09-22 — the run time does not parse: Tue, 22 Sep 2026 15:00:00 GMT · 5 days")
+          and cell(CO, U27, "playwright") == ("5 days", "changed 2026-09-22 · 5 days") and cell(CO, U27, "playwright", 0)[0] == "2026-09-22",
+          (cell(IDX, U27, "pw"), cell(CO, U27, "playwright"), cell(CO, U27, "playwright", 0)))
+    # review F2 — a report that names no run time and git does not track is dated by its file time, said so
+    check("R13", "the loose report: its file written on the 23rd, 4 days (UTC), said so — and its changelog line the same day",
+          cell(IDX, U27, "loose") == ("4 days", "report file written 2026-09-23 — the report names no run time · 4 days")
+          and cell(CO, U27, "mocha") == ("4 days", "changed 2026-09-23 · 4 days"),
+          (cell(IDX, U27, "loose"), cell(CO, U27, "mocha")))
+    print(f"days: {fails} failed")
+    sys.exit(1 if fails else 0)
 
 if EVID:
     # the Captured cell: `gadget-walk` committed at 2026-09-28T01:30Z (22:30 on the 27th at UTC−3), `gadget-draft`

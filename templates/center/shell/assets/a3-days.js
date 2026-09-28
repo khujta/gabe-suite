@@ -6,13 +6,15 @@
    never "today", "yesterday" or "ago". A page built once reads right on any later day, and
    its bytes do not move while the tree stands still. No fetch: works on file://.
 
-   The contract (the generators that write it: _a3_board.py · _a3_evidence.py):
+   The contract (the generators that write it: _a3_board.py · _a3_evidence.py · _a3_render.counted_day):
      [data-day="YYYY-MM-DD"]            the date — a calendar day, counted as written;
      [data-day="@<epoch seconds>"]      or an INSTANT, counted on the viewer's own calendar day of it (a capture at
                                         22:30 in UTC−3 is that evening's — never the next UTC day's)
        data-day-text="… {d} …"          its text   ({d} → "N days", {date} → the day, YYYY-MM-DD)
        data-day-title="… {d} …"         its tooltip
        data-day-class="a:7 b:30 c"      the first class whose bound holds N, else the unbounded one
+       data-day-ahead="… {date} …"      the tooltip when the date is AFTER the viewer's today: a negative count is never
+                                        written — a {d} text keeps the static date (D-062)
      .kpi[data-kpi-days="d1 d2 …"]      a tile counting the dates under data-kpi-rule
        data-kpi-rule="le:30|gt:90"      its value; data-kpi-alert="1" → .alert while it is not 0
        data-kpi-sub + -sub-text         a second count, "{n} …"
@@ -65,8 +67,15 @@
   each('[data-day]', null, function (el) {
     var v = el.getAttribute('data-day'), n = days(v);
     if (n === null) return;
-    if (el.hasAttribute('data-day-text')) el.textContent = fill(el.getAttribute('data-day-text'), n, v);
-    if (el.hasAttribute('data-day-title')) el.title = fill(el.getAttribute('data-day-title'), n, v);
+    var tx = el.getAttribute('data-day-text'), ti = el.getAttribute('data-day-title');
+    if (n < 0) {                           // a date AFTER the viewer's today (a stamp that names no zone, read east of
+      // where it was written; a clock behind): never a negative count — the date stays, the tooltip says why
+      if (tx !== null && tx.indexOf('{d}') < 0) el.textContent = fill(tx, 0, v);
+      el.title = fill(el.getAttribute('data-day-ahead') || '{date} — after this viewer\u2019s today', 0, v);
+    } else {
+      if (tx !== null) el.textContent = fill(tx, n, v);
+      if (ti !== null) el.title = fill(ti, n, v);
+    }
     var cls = pick(el.getAttribute('data-day-class'), n);
     if (cls) el.classList.add(cls);
   });

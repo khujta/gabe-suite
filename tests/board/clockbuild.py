@@ -5,7 +5,8 @@
 
 Every wallclock read the generators make goes through ``datetime.datetime.now`` / ``datetime.date.today`` (``import
 datetime as _dt`` everywhere), so both are replaced — before the build is imported — by a clock that reads 10:00 UTC of
-the given day. Two runs a day apart over the same tree must write the same board: whatever still differs was written
+the given day. Two runs a day apart over the same tree must write the same board (D-062: and the same index, test
+corpora and run history — datefix.py --runs): whatever still differs was written
 from the clock (the regen stamp, an absolute run time, is the one field the baseline normaliser strips).
 """
 import datetime as _real

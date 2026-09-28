@@ -801,3 +801,28 @@ places a function behind the handler on the paths of the caller it hangs under, 
 items: a project function literally named `delete`/`select` is no ORM verb; functions drawn by rule 2 get their qualified id (the id
 changes are listed); the contract arm's idioms and the model arm's guard-use check ask the shared verb rule; map-baseline's git
 status runs with GIT_OPTIONAL_LOCKS=0. Generation code takes the full proof (D-059); the page change takes D-037's.
+
+## D-062 — The center's other relative dates count at open; name-joined chips follow their caller; the suite board is rebuilt; the all-endpoints page is audited
+Date: 2026-09-27 · Input: the D-061 report's open list and the agent's recommendations 1–3.
+Decision, his: "I agree with the recommendations. Let's tackle the still open items with your recommendations. And once we do that,
+let's see if we need to update anything else in the all-endpoints HTML file."
+Consequence: (1) the "T−N" freshness cells on the center's index and test-corpora pages — and any other date text a center page
+computes at build time — are written as absolute dates and counted by the page when it opens (D-061's mechanism, a3-days.js), and
+the baseline checker's T−N rule goes if nothing needs it; full proof (D-059). (2) BY MOMENT's name-joined chips (D-057 (d)) stand on
+their caller chip's paths, like walk-placed functions (D-061 (2)); the upper-bound line only where the caller carries it. (3) the
+suite center's own board, index and test-corpora pages are rebuilt so the page he opens counts at open time. (4) the all-endpoints
+page is audited against the current feeds and generators — words, info texts, gap and band reasons, hovers, counts, references to
+states since resolved (the reach fix, the deferred item 13, "upper bound", "depth not known") — and every stale item is fixed; the
+page change takes D-037's light checks. Accepted by the agent (review F6, his to overturn): a report that used to read "never" or "?"
+in a Last-run cell gets ONE NEW badge the first time it is counted — no target has such a report today.
+
+## D-063 — Two proof regimes for generation code: full for what the map says, lighter for how it is shown
+Date: 2026-09-27 · Input: his question on why a fix takes 3–5 hours (measured: the reach fix 8.3 h, D-060 4.1 h, D-061 3.2 h — serial
+batteries, mutants, four-target A/B, the doctor, review loops) and the agent's proposal.
+Decision, his: "yes on lighter regime".
+Consequence: a generation change that alters WHAT THE MAP SAYS — ids, nodes, edges, steps, paths, reach, endpoint facts — keeps the
+full regime of D-059 (fixtures fire + silent, ≥3 mutants per item, every touched battery, A/B on the four targets, re-blessed
+baselines, the doctor). A DISPLAY-SIDE generation change — how a fact is rendered (dates, labels, page scripts, words) — takes the
+lighter regime: fixtures fire + silent, 1–2 mutants per item, only the batteries the changed files touch during build, the A/B on
+the gustify copy + tier3 only (gastify/keypro when the change touches what they exercise), and small fixes batched with ONE doctor
+run at the end. Design pages keep D-037. Runs already launched keep the regime they were briefed with (D-062 stays full).

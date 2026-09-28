@@ -31,8 +31,10 @@ at build time, so they can never drift from the truth.
 - `paths` — `center` · `kdbp` · `results` · `proof` · `e2e_spec_glob` ·
   `mermaid_renderer`: every loader resolves from here; nothing is hardcoded.
 - `corpora[]` — one per test suite: `key` · `runner` · `kind` · `kind_detail` ·
-  `tag_class` · `kpi_detail`. Drives junit loading, the estate totals, the
-  corpus matrix, the per-entity Tests tab, and run-history sources.
+  `tag_class` · `kpi_detail` (+ optional `naive_tz`: the zone a runner writes a
+  zone-less run time in — `utc` for jest-junit — else it is read as written).
+  Drives junit loading, the estate totals, the corpus matrix, the per-entity
+  Tests tab, and run-history sources.
   The Tests surfaces are CASE-LED (rulings 2026-07-24/25): the C-id is the
   row and `test-matrix.html#C<n>` is the canonical anchor every C-id pill
   lands on; code-side Tested-by folds aggregate (Kind · Tier · Volume ·

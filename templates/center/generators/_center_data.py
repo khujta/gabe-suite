@@ -72,39 +72,9 @@ KDBP = _rel("kdbp", ".kdbp")
 RESULTS_DIR = _rel("results", "tests/results")
 PROOF_DIR = _rel("proof", "tests/web-e2e/proof")
 
-NOW = _dt.datetime.now(_dt.timezone.utc)
-
-
-# --------------------------------------------------------------------------- #
-# Small helpers
-# --------------------------------------------------------------------------- #
-
-_SKEW_S = 1800          # a build that stamps a record after NOW was read runs at most this long (tier3 ≈ 5 min)
-
-
-def rel_age(iso: str | None) -> str:
-    """Mono freshness stamp: 'T-2h' style (never fabricated)."""
-    if not iso:
-        return "never"
-    try:
-        ts = _dt.datetime.fromisoformat(iso.replace("Z", "+00:00"))
-    except ValueError:
-        return "?"
-    if ts.tzinfo is None:
-        ts = ts.replace(tzinfo=_dt.timezone.utc)
-    delta = NOW - ts
-    mins = int(delta.total_seconds() // 60)
-    if mins < 0:
-        # NOW is read once, at import: a record this very build appends (a lab run's run-history row) is stamped
-        # seconds AFTER it — that is now, not the future (the D-061 review's B-6: it rendered "future?" and the
-        # next build's "T−1m" re-badged the row NEW). Past the skew, a clock skew or a hand-edited record.
-        return "T−1m" if delta.total_seconds() > -_SKEW_S else "future?"
-    if mins < 60:
-        return f"T−{max(mins, 1)}m"
-    hours = mins // 60
-    if hours < 48:
-        return f"T−{hours}h"
-    return f"T−{hours // 24}d"
+# No clock here (D-062): the data layer reads no wallclock. A distance from today is the PAGE's to count when it
+# opens (assets/a3-days.js over an absolute date — _a3_render.counted_day); the build's one clock read is its own
+# regen stamp (build_center_a3.STAMP).
 
 
 # --------------------------------------------------------------------------- #
@@ -697,4 +667,4 @@ def parse_card(path: Path) -> dict[str, list[str]]:
 # Imported LAST: _results_ingest reads the constants defined above.
 # --------------------------------------------------------------------------- #
 
-from _results_ingest import load_coverage, load_history, load_junit  # noqa: E402,F401
+from _results_ingest import load_coverage, load_history, load_junit, run_stamp  # noqa: E402,F401

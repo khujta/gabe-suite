@@ -22,10 +22,12 @@
 # Baseline bulk lives outside the repo ($GABE_BASELINE_DIR, default ~/.cache/gabe-map-baselines);
 # a per-file hash manifest is COMMITTED at tests/baselines/<name>.sha256 so re-blessing shows up in git.
 #
-# NORMALISATION is deliberately narrow — the ISO run timestamp and the T−N freshness cells (index · test
-# corpora). Anything else that differs is REAL and must be explained, never normalised away: since D-061 the
-# board and the Evidence tab write no wallclock-relative word (their dates are absolute; the page counts the
-# days when it is opened), so a day's tick no longer moves them and nothing here hides it.
+# NORMALISATION is deliberately narrow — the regen stamp (the build's own clock, where the pages and the archmap
+# carry it) and nothing else. Anything else that differs is REAL and must be explained, never normalised away: since
+# D-061 the board and the Evidence tab, and since D-062 the run cells of index and the test corpora, write no
+# wallclock-relative word (their dates are absolute; the page counts the days when it is opened), and every OTHER
+# date-time a build writes is content — a run-history line's run time, a feature page's "captured", a commit's date —
+# so a day's tick no longer moves them and nothing here hides one that starts to.
 #
 # COST: a full capture/check of all three targets is MINUTES (tier3 alone is 3.4k py + 2.6k ts).
 # Serial by design — this machine runs heavy work one job at a time.
@@ -68,16 +70,18 @@ WANT=("$@")
 
 _want() { [ ${#WANT[@]} -eq 0 ] && return 0; for w in "${WANT[@]}"; do [ "$w" = "$1" ] && return 0; done; return 1; }
 
-# Strip the two renderings that move WITHOUT the tree moving, so two runs of the SAME generators
-# compare equal: the ISO run timestamp (the regen stamp — when the build ran) and the T−N freshness
-# cells (_center_data.rel_age: how long ago a suite ran, rendered server-side on index and the test
-# corpora). Both are deliberately narrow — anything else that differs is REAL. D-061 retired the other
-# two: the board's "on the board N days" tooltip and the "N d ago" age cells (the board's closed chip,
-# the Evidence tab's Captured cell) — those pages now carry absolute dates and count the days in the
-# viewer's browser, so a normaliser for them would only hide a regression that wrote one back. (The
-# suite treats relative time as volatile too: _a3_render._VOLATILE_RX hashes it out of the row
-# fingerprint so a tick cannot re-badge a row NEW.) Proven by tests/board.
-_NORM_RX='s/[0-9]{4}-[0-9]{2}-[0-9]{2}[ T][0-9]{2}:[0-9]{2}(:[0-9]{2})?Z?//g; s/T\xe2\x88\x92[0-9]+[dhm]/T-AGE/g'
+# Strip the one rendering that moves WITHOUT the tree moving, so two runs of the SAME generators compare
+# equal: the regen stamp (build_center_a3.STAMP, "YYYY-MM-DD HH:MMZ" — when the build ran), ANCHORED where
+# it is written: a page's "regen <stamp>" / "regen · <stamp>" and the archmap's "generated". Deliberately
+# narrow — anything else that differs is REAL. D-062 anchored it: the old rule blanked EVERY ISO date-time
+# in every file, so a run-history line stamped with the build's clock, or a feature page "captured" at a
+# clone's time, compared equal. D-061 retired the board's "on the board N days" and the "N d ago" rules,
+# D-062 the T−N freshness rule (a suite run's age on index and the test corpora): those cells now carry
+# absolute dates — a run-history line its RUN's time, never the build's — and the viewer's browser counts
+# the days, so a normaliser for them would only hide a regression that wrote one back. (The suite treats
+# relative time as volatile too: _a3_render._VOLATILE_RX hashes it out of the row fingerprint so a tick
+# cannot re-badge a row NEW.) Proven by tests/board.
+_NORM_RX='s/(regen (· )?)[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}Z/\1STAMP/g; s/("generated": ")[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}Z"/\1STAMP"/g'
 _norm() { sed -E "$_NORM_RX" "$1"; }
 
 # the SEMANTIC census — what a reader of the map would actually lose or gain

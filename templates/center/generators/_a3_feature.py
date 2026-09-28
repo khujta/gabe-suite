@@ -104,7 +104,10 @@ def entity_corpus(rx: str, junit_by: dict, corpora: list) -> dict:
             # of asserting a currency ("at HEAD") nobody verified, and can tell a
             # missing file apart from a removed test.
             "present": j is not None,
-            "ran_at": (j or {}).get("mtime") or (j or {}).get("ranAt") or "",
+            # the loader's ONE rule (D-062): the report's own run time, else when its file was written — its commit
+            # for a tracked, unchanged report, never a clone's file time — the same time index and the history carry
+            "ran_at": ((j or {}).get("run") or {}).get("at") or "",
+            "ran_how": ((j or {}).get("run") or {}).get("how") or "",
         }
     return out
 
@@ -171,8 +174,12 @@ def kind_state(c: dict) -> str:
     if c["skipped"]:
         return f'<span class="tag s-med">{c["skipped"]} skipped</span>'
     when = str(c.get("ran_at") or "")[:16]
-    return (f'<span class="tag s-ok">captured {E(when)}</span>' if when
-            else '<span class="tag s-ok">captured · time unknown</span>')
+    how = {"committed": "the report names no run time the build can read — its commit time",
+           "file": "the report names no run time the build can read — its file's time"}.get(c.get("ran_how") or "")
+    if not when:
+        return '<span class="tag s-ok">captured · time unknown</span>'
+    tip = f' title="{E(how)}"' if how else ""
+    return f'<span class="tag s-ok"{tip}>captured {E(when)}</span>'
 
 
 # The Kinds table says HOW MUCH; the card says WHAT FOR. Same vocabulary, same

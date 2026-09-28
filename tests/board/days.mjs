@@ -8,8 +8,8 @@
 // (2026-09-28T02:45:00Z@America/Sao_Paulo): the clock reads that instant and the page runs in that IANA zone, so a
 // viewer west of Greenwich can be put at 23:45 of their evening. Date is replaced before any page script runs, so
 // "today" is that calendar day wherever the battery runs. Every [data-day] on the page is snapshotted (the board's
-// chips, a feature page's Captured cell). A real system chrome (GABE_CHROME_BIN) + the suite's Playwright resolver,
-// as tests/embed-pane does.
+// chips, a feature page's Captured cell, the run cells of index and the test corpora — D-062 — also per table row). A real system chrome
+// (GABE_CHROME_BIN) + the suite's Playwright resolver, as tests/embed-pane does.
 import path from 'path';
 import { pathToFileURL } from 'url';
 
@@ -75,7 +75,24 @@ try {
         const m = el.textContent.match(/\b(ago|today|yesterday)\b/i);
         if (m) words.push(m[0]);
       });
-      return { chips, cols, kpis, flags, words };
+      // D-062: the tables (index's corpus rollup, the test corpora's changelog) — no relative word, no T−N, and no
+      // negative count (review F3: a date after the viewer's today keeps its date) either
+      const tblwords = [];
+      document.querySelectorAll('table').forEach((el) => {
+        const m = el.textContent.match(/\b(ago|today|yesterday)\b|T−\d/i);
+        if (m) tblwords.push(m[0]);
+        el.querySelectorAll('[data-day]').forEach((d) => {       // a cell's own text: a table's joins its cells' digits
+          if (/^\s*-\d/.test(d.textContent) || /(^|\s)-\d+ days?\b/.test(d.title)) tblwords.push(d.textContent.trim());
+        });
+      });
+      // … and every table row that carries a counted day, keyed by its first cell: its days in order (a changelog row
+      // is Date, then Last change — two spans on one instant, which the chips above key together)
+      const rows = {};
+      document.querySelectorAll('table tr').forEach((tr) => {
+        const td = tr.querySelector('td'), ds = [...tr.querySelectorAll('[data-day]')];
+        if (td && ds.length) rows[txt(td)] = ds.map((el) => ({ text: txt(el), title: el.title }));
+      });
+      return { chips, cols, kpis, flags, words, tblwords, rows };
     });
     snap.day = day; snap.errors = errors;
     console.log(JSON.stringify(snap));

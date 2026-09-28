@@ -13,6 +13,7 @@
     "e2e_spec_glob": "tests/web-e2e/**/*.spec.ts",
     "mermaid_renderer": "scripts/_render_mermaid.mjs"
   },
+  "_corpora_comment": "One entry per test suite; <results>/<key>-junit.xml is its report. Optional `naive_tz`: the zone the runner writes a zone-less run time in (\"utc\" for jest-junit, an offset \"-03:00\", or an IANA name) — without it such a time is read as written. A report that names no run time is dated by its commit (tracked, unchanged) or its file time, and the pages say so.",
   "corpora": [
     {
       "key": "api",

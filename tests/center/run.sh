@@ -1889,13 +1889,79 @@ assert "t-new" not in R.table(["Set", "Captured"], [["f6-spike", cap + "<br><sma
     "the Captured cell's move from a relative age to a page-counted date must not re-badge the row"
 assert "t-new" in R.table(["Set", "Captured"], [["f6-spike", cap + "<br><small>python</small>"]]), \
     "the day span must not blind the digest to a real change beside it"
-# review B-6: a record stamped seconds AFTER the build read its clock (a lab run's run-history row) is "T−1m", never
-# "future?" — FIRE: past the skew it still says future?; and the word is a tick, so a row that read "future?" in one
-# build and "T−1m" in the next keeps its fingerprint (it was the tests/center flake: a stray NEW badge)
-import datetime as _ddt, _center_data as CD
-_iso = lambda s: (CD.NOW + _ddt.timedelta(seconds=s)).isoformat()
-assert (CD.rel_age(_iso(20)), CD.rel_age(_iso(1500)), CD.rel_age(_iso(4000)), CD.rel_age(_iso(-7200))) == ("T−1m", "T−1m", "future?", "T−2h"), \
-    (CD.rel_age(_iso(20)), CD.rel_age(_iso(4000)))
+# D-062: the run cells (index's Last run, the test corpora's Last change) no longer read the build's clock — rel_age
+# and the data layer's NOW are gone. A run-history line is stamped with the RUN's time (run_stamp: a zone → UTC …Z, no
+# zone → as written), and a run's day ships ABSOLUTE for the page to count (counted_day: an instant as @<epoch>, a
+# zone-less stamp as its date as written; proven at two simulated todays and across a UTC−3 evening by tests/board).
+import _center_data as CD
+assert not hasattr(CD, "rel_age") and not hasattr(CD, "NOW"), "the data layer reads no clock"
+assert CD.run_stamp("2026-09-20T22:30:00-03:00") == "2026-09-21T01:30:00Z", CD.run_stamp("2026-09-20T22:30:00-03:00")
+assert CD.run_stamp("2026-09-24T01:00:00.123") == "2026-09-24T01:00:00", CD.run_stamp("2026-09-24T01:00:00.123")
+assert CD.run_stamp(None) is None and CD.run_stamp("") is None and CD.run_stamp("soon") is None
+# review F3: a corpus whose runner writes UTC with no zone marker (jest-junit) names it — naive_tz — and its stamps are
+# instants; a zone that names nothing is said and read as written
+import datetime as _ddt, _results_ingest as RI
+assert CD.run_stamp("2026-09-28T01:30:00", _ddt.timezone.utc) == "2026-09-28T01:30:00Z"
+assert CD.run_stamp("2026-09-27T22:30:00", _ddt.timezone(-_ddt.timedelta(hours=3))) == "2026-09-28T01:30:00Z"
+assert CD.run_stamp("2026-09-27T22:30:00+02:00", _ddt.timezone.utc) == "2026-09-27T20:30:00Z", "a named zone wins"
+_keep = CD.CFG.get("corpora")
+CD.CFG["corpora"] = [{"key": "j", "naive_tz": "utc"}, {"key": "o", "naive_tz": "-03:00"}, {"key": "s", "naive_tz": "America/Sao_Paulo"},
+                     {"key": "x", "naive_tz": "Mars/Olympus"}, {"key": "n"}]
+RI._ZONES.clear()
+assert [CD.run_stamp("2026-09-27T22:30:00", RI.naive_zone(k)) for k in "josxn"] == [
+    "2026-09-27T22:30:00Z", "2026-09-28T01:30:00Z", "2026-09-28T01:30:00Z", "2026-09-27T22:30:00", "2026-09-27T22:30:00"]
+CD.CFG.pop("corpora", None) if _keep is None else CD.CFG.__setitem__("corpora", _keep); RI._ZONES.clear()
+# review F1: when a report FILE was written — its last COMMIT while git tracks it unchanged (a fresh clone's file time is
+# the checkout's, never the run's), its file time once a run rewrote it, when git does not track it, or with no git
+rr = pathlib.Path(tempfile.mkdtemp()); rep = rr / "api-junit.xml"; rep.write_text("<testsuites/>")
+_g(rr, "init", "-q"); _g(rr, "config", "user.email", "c@x"); _g(rr, "config", "user.name", "c"); _g(rr, "add", "-A")
+_g(rr, "commit", "-q", "-m", "report", env={"GIT_AUTHOR_DATE": "2026-09-22T15:00:00Z", "GIT_COMMITTER_DATE": "2026-09-22T15:00:00Z"})
+os.utime(rep, (1790500000, 1790500000))                           # a checkout's time — 2026-09-27
+assert RI.report_written(rep) == ("2026-09-22T15:00:00Z", "committed"), RI.report_written(rep)
+lz = rr / "web-junit.xml"; lz.write_text("<testsuites/>"); os.utime(lz, (1790164800, 1790164800))
+assert RI.report_written(lz) == ("2026-09-23T12:00:00Z", "file"), RI.report_written(lz)
+rep.write_text("<testsuites><testsuite/></testsuites>"); os.utime(rep, (1790164800, 1790164800))
+assert RI.report_written(rep) == ("2026-09-23T12:00:00Z", "file"), "a tracked report a run rewrote counts by its file time"
+nb = pathlib.Path(tempfile.mkdtemp()) / "api-junit.xml"; nb.write_text("<testsuites/>"); os.utime(nb, (1790164800, 1790164800))
+assert RI.report_written(nb) == ("2026-09-23T12:00:00Z", "file"), RI.report_written(nb)
+aw, nv = R.counted_day("2026-09-21T01:30:00Z", "ran"), R.counted_day("2026-09-24T01:00:00", "ran")
+assert aw == ('<span class="a3-day" data-day="@1789954200" data-day-text="{d}" data-day-title="ran {date} · {d}" '
+              'title="ran 2026-09-21 UTC">2026-09-21</span>'), aw
+# review F3: a date as written carries the tooltip a viewer BEFORE it sees (a3-days.js never writes a negative count)
+assert nv == ('<span class="a3-day" data-day="2026-09-24" data-day-text="{d}" data-day-title="ran {date} · {d}" '
+              'data-day-ahead="ran {date} — as written: the report names no zone, and this date is after the viewer&#x27;s '
+              'today" title="ran 2026-09-24">2026-09-24</span>'), nv
+# review F5: a Date column is the viewer's DAY of the run ({date}), the same span; a note rides both titles
+dv = R.counted_day("2026-09-21T01:30:00Z", "changed", text="{date}")
+assert dv == ('<span class="a3-day" data-day="@1789954200" data-day-text="{date}" data-day-title="changed {date} · {d}" '
+              'title="changed 2026-09-21 UTC">2026-09-21</span>'), dv
+wn = R.counted_day("2026-09-22T15:00:00Z", "report committed", note=" — the report names no run time")
+assert 'data-day-title="report committed {date} — the report names no run time · {d}"' in wn \
+    and 'title="report committed 2026-09-22 UTC — the report names no run time"' in wn, wn
+assert R.counted_day("2026-09-20T22:30:00-03:00", "ran") == aw, "one instant, one span, whatever zone wrote it"
+assert "no run time" in R.counted_day(None, "ran") and "data-day" not in R.counted_day(None, "ran")
+assert "does not parse: &lt;soon&gt;" in R.counted_day("<soon>", "ran"), R.counted_day("<soon>", "ran")
+# the move from a T−N cell to a counted day keeps the row's fingerprint (no NEW badge for the change itself) …
+base = snapshot_of(lambda: R.table(["Source", "Date", "Last change"], [["api", "2026-09-21", "T−2d"]]))
+R.init_rowmarks(base)
+assert "t-new" not in R.table(["Source", "Date", "Last change"], [["api", "2026-09-21", aw]]), \
+    "a Last-change cell's move from T−N to a page-counted day must not re-badge the row"
+# … and the day span does not blind the digest to a real change beside it (each table call is re-armed: a row's key
+# counts its occurrences within ONE build, so a second call in the same build is a second row, NEW by key alone)
+R.init_rowmarks(base)
+assert "t-new" in R.table(["Source", "Date", "Last change"], [["api", "2026-09-22", aw]]), \
+    "the day span must not blind the digest to the Date beside it"
+# review F5: the Date cell's move from a plain date to the viewer's day of the run keeps the fingerprint — its static
+# date IS the content — and a different run day still re-badges (a {date} span is not scrubbed like a counted one)
+R.init_rowmarks(base)
+assert "t-new" not in R.table(["Source", "Date", "Last change"], [["api", dv, aw]]), \
+    "a Date cell's move to a page-shown {date} span must not re-badge the row"
+R.init_rowmarks(base)
+assert "t-new" in R.table(["Source", "Date", "Last change"],
+                          [["api", R.counted_day("2026-09-22T01:30:00Z", "changed", text="{date}"), aw]]), \
+    "a {date} span must not blind the digest to the run's day"
+# review B-6 (kept: the scrub still hashes the words the builds used to write): a row that read "future?" in one build
+# and "T−1m" in the next keeps its fingerprint
 base = snapshot_of(lambda: R.table(["Source", "Date", "Last change"], [["api", "2026-09-27", "future?"]]))
 R.init_rowmarks(base)
 assert "t-new" not in R.table(["Source", "Date", "Last change"], [["api", "2026-09-27", "T−1m"]]), \

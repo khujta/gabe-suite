@@ -14,6 +14,7 @@ Every helper enforces one of the center's rendering rules:
 
 from __future__ import annotations
 
+import datetime as _dt
 import hashlib
 import html
 import re
@@ -227,13 +228,15 @@ _TAG_RX = re.compile(r"<[^>]+>")
 _VOLATILE_RX = re.compile(
     # A day the PAGE counts (D-061: `<span … data-day="YYYY-MM-DD" …>date</span>`, filled
     # by assets/a3-days.js) takes the placeholder a relative age took before it — so a row
-    # that used to read "31d ago" keeps its fingerprint, and is not badged NEW for the change.
-    r'<span\b[^>]*\bdata-day="[^"]*"[^>]*>[^<]*</span>|'
-    # `d` was missing from the T− class while the sibling "N ago" alternative had it, so a
-    # T−34d → T−35d tick DID re-badge — the exact failure this scrubber exists to prevent
-    # (caught on gastify by the golden master, 2026-09-11: one flipped day re-fingerprinted
-    # the api corpus row and stamped it NEW on an unchanged tree).
-    # `future?` is rel_age's word for a record stamped past the build's clock: a tick too (review B-6).
+    # that used to read "31d ago" or "T−2d" (D-062: the run freshness cells) keeps its
+    # fingerprint, and is not badged NEW for the change.
+    # A span whose text is only its DATE (``data-day-text="{date}"`` — a Date column the page shows on the viewer's own
+    # calendar) is not scrubbed: its static date is the row's content, and it reads as the plain date it replaced.
+    r'<span\b(?![^>]*\bdata-day-text="\{date\}")[^>]*\bdata-day="[^"]*"[^>]*>[^<]*</span>|'
+    # The words the builds used to write (T−N, N ago, `future?`) stay scrubbed: an authored
+    # cell may still carry one, and dropping the scrub would re-digest it. `d` was missing
+    # from the T− class once, so a T−34d → T−35d tick DID re-badge (caught on gastify by the
+    # golden master, 2026-09-11: one flipped day re-fingerprinted an unchanged corpus row).
     r"T−\d+\s*[dhm]|\b\d+\s*[dhm]\s+ago\b|\btoday\b|\byesterday\b|\bhoy\b|\bayer\b|\bfuture\?",
     re.IGNORECASE)
 _ROWMARKS: dict = {"baseline": None, "seen": {}, "counts": {}}
@@ -570,6 +573,34 @@ def legend(intro: str, items: list[tuple[str, str, str]]) -> str:
     chips = " ".join(f'<span class="tag {cls}">{E(label)}</span> {E(meaning)}'
                      for cls, label, meaning in items)
     return f'<div class="leg key">{E(intro)} {chips}</div>'
+
+
+def counted_day(stamp: str | None, verb: str, text: str = "{d}", note: str = "") -> str:
+    """A run's DAY, counted by the PAGE when it opens (assets/a3-days.js, D-061's counter — D-062): never a distance the
+    build reads off its own clock, so a page built on any day is the same bytes. A stamp that names its zone is an
+    INSTANT (``data-day="@<epoch>"``), counted on the viewer's own calendar day of it; its static text is the UTC date,
+    said as UTC. One that does not (a runner's local time) is its date AS WRITTEN (``data-day="YYYY-MM-DD"``) — a viewer
+    whose today falls BEFORE that date (east of the runner, or a clock behind) keeps the date and a tooltip saying why
+    (``data-day-ahead``), never a negative count. ``text`` is what the page writes: "{d}" → "N days" (the tooltip
+    "<verb> <date><note> · N days" — whole days only), "{date}" → the viewer's own day of it (a Date column). No stamp, or
+    one that does not parse, is an em dash that says why."""
+    if not stamp:
+        return '<span class="sub" title="the report names no run time">—</span>'
+    try:
+        ts = _dt.datetime.fromisoformat(str(stamp).strip().replace("Z", "+00:00"))
+    except ValueError:
+        return f'<span class="sub" title="the run time does not parse: {E(str(stamp))}">—</span>'
+    ahead = ""
+    if ts.tzinfo is None:
+        day = ts.date().isoformat()
+        data, said = day, day
+        ahead = (f' data-day-ahead="{E(verb)} {{date}}{E(note)} — as written: the report names no zone, and this date '
+                 'is after the viewer&#x27;s today"')
+    else:
+        day = ts.astimezone(_dt.timezone.utc).date().isoformat()
+        data, said = f"@{int(ts.timestamp())}", f"{day} UTC"
+    return (f'<span class="a3-day" data-day="{data}" data-day-text="{E(text)}" data-day-title="{E(verb)} {{date}}{E(note)} · '
+            f'{{d}}"{ahead} title="{E(verb)} {said}{E(note)}">{day}</span>')
 
 
 def gap(what: str, source: str) -> str:

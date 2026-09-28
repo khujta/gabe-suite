@@ -177,6 +177,7 @@ import _a3_render as R_MARKS  # noqa: E402  (rowmarks lifecycle — init + snaps
 from _a3_render import (  # noqa: E402  (helpers live beside this module)
     E,
     ENT_COL,
+    counted_day,
     entity_badge,
     entity_icon,
     legend,
@@ -276,9 +277,9 @@ t_skipped = sum((j or {}).get("skipped", 0) for j in junit_by.values())
 pass_pct = f"{100.0 * (t_total - t_failed) / t_total:.1f}%" if t_total else "—"
 
 HEAD_SHA = sh("git", "rev-parse", "--short", "HEAD") or "—"
-_NOW = _dt.datetime.now(_dt.timezone.utc)
-STAMP = _NOW.strftime("%Y-%m-%d %H:%MZ")
-STAMP_ISO = _NOW.strftime("%Y-%m-%dT%H:%M:%SZ")
+# The build's ONE clock read: its own regen stamp (every page's footer, the archmap's `generated`). Nothing a page
+# shows as a distance from today is computed here — the page counts that when it opens (D-061 · D-062).
+STAMP = _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%d %H:%MZ")
 adopted = sum(1 for s in sections if s["status"] == "approved")
 
 # --------------------------------------------------------------------------- #
@@ -288,7 +289,11 @@ adopted = sum(1 for s in sections if s["status"] == "approved")
 # writer, restored (adopt-spec §ephemeral/accumulator — the center's accumulator
 # is this file). A build appends a source's line ONLY when its totals moved
 # since that source's last line, so a regen that re-rendered identical junit adds
-# nothing and the cap holds real run history rather than regen noise.
+# nothing and the cap holds real run history rather than regen noise. The line is
+# stamped with the RUN's own time (D-062) — the report's timestamp, else when the
+# report file was written (its commit for a tracked, unchanged report: the loader's
+# one rule, j["run"]) — never the build's clock, so a lab build on any day, from any
+# clone, writes the same line, and the page counts its days when it opens.
 # --------------------------------------------------------------------------- #
 HISTORY_CAP = 50
 
@@ -306,7 +311,7 @@ def append_history() -> list[dict]:
         totals = {"passed": j["total"] - j["failed"] - j["skipped"],
                   "failed": j["failed"], "skipped": j["skipped"]}
         if last.get(src) != totals:
-            new.append({"ts": STAMP_ISO, "source": src, "totals": totals})
+            new.append({"ts": j["run"]["at"], "source": src, "totals": totals})
     if not new:
         return hist
     lines = (hist + new)[-HISTORY_CAP:]
@@ -332,8 +337,10 @@ def _verification_changelog() -> str:
         t = recs[-1].get("totals", {})
         rows.append([f"<b>{E(src)}</b>", str(t.get("passed", 0)),
                      str(t.get("failed", 0)), str(t.get("skipped", 0)),
-                     str(len(recs)), E((recs[-1].get("ts") or "")[:10] or "—"),
-                     E(D.rel_age(recs[-1].get("ts")))])
+                     str(len(recs)),
+                     # the Date too is the viewer's day of the run (a3-days.js), so one row never names two days
+                     counted_day(recs[-1].get("ts"), "changed", text="{date}") if recs[-1].get("ts") else "—",
+                     counted_day(recs[-1].get("ts"), "changed")])
     return table(
         ["Source", "Passed", "Failed", "Skipped", "Runs recorded", "Date",
          "Last change"],
@@ -882,7 +889,8 @@ _app_kind_rows = []
 for _c in CORPORA:
     _j = junit_by.get(_c["key"]) or {}
     _krec = {"cases": _j.get("total", 0), "failed": _j.get("failed", 0),
-             "skipped": _j.get("skipped", 0), "ran_at": _j.get("ranAt")}
+             "skipped": _j.get("skipped", 0),   # when it ran: the loader's one rule (D-062), as on the feature page
+             "ran_at": (_j.get("run") or {}).get("at"), "ran_how": (_j.get("run") or {}).get("how")}
     _app_kind_rows.append(
         [f'<span class="tag {_c["tag_class"]}">{kind_ic(_c["kind"])} '
          f'{_c["kind"]}</span>',
@@ -1214,13 +1222,26 @@ entity_grid = table(
 # --------------------------------------------------------------------------- #
 
 _corpus_meta = [(c["key"], c["runner"], junit_by.get(c["key"])) for c in CORPORA]
+_RUN_VERB = {"ran": "ran", "committed": "report committed", "file": "report file written"}
+
+
+def _run_cell(run: dict) -> str:
+    """A corpus's Last run, by the loader's one rule (j["run"], the same time its run-history line carries): the day it
+    RAN, else — the report names no run time, or one that does not parse — the day the report was committed or its
+    file written, said so."""
+    note = ("" if run["how"] == "ran" else f" — the run time does not parse: {run['raw']}" if run.get("raw")
+            else " — the report names no run time")
+    return counted_day(run["at"], _RUN_VERB[run["how"]], note=note)
+
+
 tab_tests = (
     '<p class="sub">Corpus rollup — one row per corpus. The estate dashboard '
     '(kinds &amp; coverage, the entity × kind matrix, the estate cards) '
     'lives on <a href="tests.html">Tests</a>.</p>'
     + table(["Corpus", "Runner", "Files", "Tests", "Failed", "Skipped", "Last run"],
             [[f"<b>{E(n)}</b>", E(runner), str(len(j["files"])), f'{j["total"]:,}',
-              str(j["failed"]), str(j["skipped"]), E(D.rel_age(j.get("ranAt")))]
+              str(j["failed"]), str(j["skipped"]),
+              _run_cell(j["run"])]
              for n, runner, j in _corpus_meta if j]
             + ([["<b>e2e</b>", E(E2E.get("runner", "playwright")), "—", "—", "—",
                  "—", '<span class="tag">not wired</span>']]
@@ -2589,19 +2610,19 @@ def main() -> int:
     if not (CENTER_OUT / "assets" / "rowclick.js").exists():
         print("  ⚠ assets/rowclick.js is missing — row-click-to-expand and the "
               "targeted-row (#dm-…) opener degrade; wire it into the skeletons.")
-    # D-061: the board and the Evidence tab ship their dates as dates and the PAGE counts the days — a shell without
-    # the counter leaves the board's age/done framings' cards in their hidden pool, its two date KPIs at "—", and a
-    # feature page's Captured cell at its static date. Every page that carries a counted date is checked.
+    # D-061 · D-062: the board, the Evidence tab and the run cells (index · test corpora) ship their dates as dates and
+    # the PAGE counts the days — a shell without the counter leaves the board's age/done framings' cards in their
+    # hidden pool, its two date KPIs at "—", and every other counted day at its static date. EVERY page that carries a
+    # counted day (an element with data-day / data-days) is checked, and the board always.
     _days_js = (CENTER_OUT / "assets" / "a3-days.js").exists()
     _blind = [pg.name for pg in sorted(CENTER_OUT.glob("*.html"))
-              if pg.name == "board.html" or pg.name.startswith("feature")
               if (_t := pg.read_text(encoding="utf-8", errors="replace"))
-              and ("data-day=" in _t or "data-days=" in _t or pg.name == "board.html")
+              and (pg.name == "board.html" or re.search(r'<[a-z][^>]*\sdata-days?="', _t))
               and ('src="assets/a3-days.js"' not in _t or not _days_js)]
     if _blind:
-        print(f"  ⚠ {', '.join(_blind[:6])}{' …' if len(_blind) > 6 else ''} does not load assets/a3-days.js — the "
-              "board's age and done framings and its two date KPIs stay empty, a feature page's Captured day stays "
-              "uncounted (the page counts the days, D-061); update the shell (propagate.sh ships it).")
+        print(f"  ⚠ {', '.join(_blind[:6])}{' …' if len(_blind) > 6 else ''} does not load assets/a3-days.js — its "
+              "counted days stay at their static dates (the board's age and done framings and its two date KPIs stay "
+              "empty) — the page counts the days, D-061; update the shell (propagate.sh ships it).")
     return 0
 
 
