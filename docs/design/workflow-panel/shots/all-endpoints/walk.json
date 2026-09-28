@@ -753,7 +753,7 @@
      "Household"
     ],
     "cm": [
-     "tables+14 in BY MOMENT15",
+     "tables15",
      "writes12",
      "households · RW"
     ],
@@ -830,7 +830,7 @@
     "rowsDim": 1,
     "uni": [],
     "cm": [
-     "tables+14 in BY MOMENT15",
+     "tables15",
      "users · RW",
      "users"
     ],
@@ -1527,20 +1527,21 @@
     "Client ",
     "In-flight state setting-once rate_limit_active setting-once trusted_proxy_hops built-once _sensitive setting-once rate_limit_sensitive_per_minute setting-once rate_limit_",
     "Standard or specialist flag environment, rate_limit_enabled binding TokenVerifier can answer 403 flag not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) re",
-    "Stages and order CORSMiddleware IdempotencyMiddleware body.mode missing body.mode string_too_long body.model_tier literal_error body missing "
+    "Stages and order CORSMiddleware IdempotencyMiddleware body.mode missing body.mode string_too_long body.model_tier literal_error body missing 22 steps on its longest path",
+    "Overview and risk /recipe-creation/gustify POST served at /api/v1/recipe-creation/gustify first segment /recipe-creation recipe cluster recipe-creation conflict · large s"
    ]
   ],
   [
    "BY MOMENT · fits its box",
    {
     "box": 1854,
-    "table": 1854,
-    "scrollsSideways": false
+    "table": 1994,
+    "scrollsSideways": true
    }
   ],
   [
    "BY MOMENT · no moment",
-   "NO MOMENT Overview and risk no time Functions 1 with no moment by name only _strip_port"
+   "NOT PLACED Functions 1 not placed by name only _strip_port"
   ],
   [
    "step 109 · by-moment-info-open",
@@ -1560,7 +1561,7 @@
   [
    "BY MOMENT · its info",
    [
-    "One endpoint's time, left to right, with every block that happens in time as a row (his default; the other look turns it",
+    "One endpoint's time, left to right, with every block as a row (his default; the other look turns it). A column is a mome",
     "The moments are D-053's, extended. Before the handler they are fixed: the server starting (before any request), the scre",
     "A handler moment that happens twice (checks, then a catch, then more checks) is drawn twice, in the order it happens, ne",
     "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs ",
@@ -1568,21 +1569,22 @@
     "The path: every path at once, or one path to its ending. Each path is a code, in the order its ending happens, a small g",
     "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it name",
     "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An end",
+    "The last column, no moment, holds per block the facts no moment of a request holds: what the endpoint is (its method and",
     "Across the 80 endpoints, what each block places:",
-    "Endings: 727 with a moment, 1 with none, of 728.",
-    "Gates and decisions: 532 with a moment, 0 with none, of 532.",
-    "Data effects: 1345 with a moment, 28 with none, of 1373.",
-    "Functions: 1494 with a moment, 53 with none, of 1547.",
-    "Structures: 339 with a moment, 0 with none, of 339.",
-    "Client: 174 with a moment, 0 with none, of 174.",
-    "In-flight state: 696 with a moment, 10 with none, of 706.",
-    "Proof: 368 with a moment, 33 with none, of 401.",
-    "Stages and order: 442 with a moment, 0 with none, of 442.",
-    "Standard or specialist: 223 with a moment, 15 with none, of 238.",
-    "Overview and risk: 0 with a moment, 0 with none, of 0.",
+    "Endings: 727 with a moment, 1 the map cannot place, 0 with no moment by nature, of 728.",
+    "Gates and decisions: 532 with a moment, 0 the map cannot place, 0 with no moment by nature, of 532.",
+    "Data effects: 1349 with a moment, 24 the map cannot place, 80 with no moment by nature, of 1453.",
+    "Functions: 1496 with a moment, 51 the map cannot place, 240 with no moment by nature, of 1787.",
+    "Structures: 339 with a moment, 0 the map cannot place, 0 with no moment by nature, of 339.",
+    "Client: 174 with a moment, 0 the map cannot place, 0 with no moment by nature, of 174.",
+    "In-flight state: 696 with a moment, 10 the map cannot place, 0 with no moment by nature, of 706.",
+    "Proof: 368 with a moment, 22 the map cannot place, 240 with no moment by nature, of 630.",
+    "Stages and order: 442 with a moment, 0 the map cannot place, 80 with no moment by nature, of 522.",
+    "Standard or specialist: 223 with a moment, 1 the map cannot place, 21 with no moment by nature, of 245.",
+    "Overview and risk: 0 with a moment, 0 the map cannot place, 780 with no moment by nature, of 780.",
     "Data effects, how each step was placed on each path it is on (4559 in all): 95 on the handler's own line, 455 inside a c",
     "3 times a chain lists a call inside a catch its path never passes; that call is left off that path.",
-    "4 times a path lists a step that no call of its own reaches while another path places it; it is left off that path."
+    "2 times a path lists a step that no call of its own reaches while another path places it; it is left off that path."
    ]
   ],
   [
@@ -1692,16 +1694,17 @@
    "BY MOMENT · cells as counts",
    [
     "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
-    "Endings 2 2 2 1 3 8 1 1",
-    "Proof 2 2 2 1 4 10 11 ",
+    "Endings 2 2 2 1 3 8 1 1 ",
+    "Proof 2 2 2 1 4 10 11 2",
     "Gates and decisions 2 2 3 5 9 ",
-    "Data effects 7 31 1 ",
-    "Functions 10 3 30 1 1 ",
+    "Data effects 7 31 1 1",
+    "Functions 10 3 30 1 1 3",
     "Structures 1 2 5 ",
     "Client ",
     "In-flight state 7 1 3 ",
     "Standard or specialist 1 1 3 4 3 ",
-    "Stages and order 2 4 "
+    "Stages and order 2 4 1",
+    "Overview and risk 12"
    ]
   ],
   [
@@ -1739,7 +1742,7 @@
    [
     "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
     "Endings refusal 429 refusal 429 framework 422 framework 400 refusal 401 refusal 401 validation 422 refusal 403 refusal 409 refusal 400 refusal 400 refusal 429 refusal 429",
-    "Proof C80 proves 402 C81 proves 402 ",
+    "Proof C80 proves 402 C81 proves 402 C89 arranges C90 arranges",
     "Gates and decisions sensitive global get_auth_context caller 403 not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) 409 self.household is None 400 key is N",
     "Data effects users R users W saved flush resolve_or_create_user accessor commit build_auth_context caller memberships R households R locations R recipe_creation_requests ",
     "Functions get_auth_context ↓1 caller build_auth_context ↓2 caller FirebaseTokenVerifier.verify ↓3 pure MockTokenVerifier.verify ↓3 pure load_household_context ↓3 accessor",
@@ -1747,7 +1750,8 @@
     "Client ",
     "In-flight state setting-once rate_limit_active setting-once trusted_proxy_hops built-once _sensitive setting-once rate_limit_sensitive_per_minute setting-once rate_limit_",
     "Standard or specialist flag environment, rate_limit_enabled binding TokenVerifier can answer 403 flag not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) re",
-    "Stages and order CORSMiddleware IdempotencyMiddleware body.mode missing body.mode string_too_long body.model_tier literal_error body missing "
+    "Stages and order CORSMiddleware IdempotencyMiddleware body.mode missing body.mode string_too_long body.model_tier literal_error body missing 22 steps on its longest path",
+    "Overview and risk /recipe-creation/gustify POST served at /api/v1/recipe-creation/gustify first segment /recipe-creation recipe cluster recipe-creation conflict · large s"
    ]
   ],
   [
@@ -1770,7 +1774,7 @@
    {
     "click": "householdsR",
     "at": [
-     611,
+     609,
      530
     ],
     "size": [
@@ -1960,16 +1964,9 @@
   [
    "D-055 · the code map, show all",
    {
-    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
+    "count": "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here",
     "carry": "all",
-    "left": [
-     "arranges 7 other cases",
-     "fate",
-     "steps",
-     "entity",
-     "alarms",
-     "the lab's proof rank"
-    ],
+    "left": [],
     "nothingHere": [
      "beyond",
      "lacks",
@@ -2000,16 +1997,9 @@
   [
    "D-055 · the code map, dim",
    {
-    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
+    "count": "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here",
     "carry": "dim",
-    "left": [
-     "arranges 7 other cases",
-     "fate",
-     "steps",
-     "entity",
-     "alarms",
-     "the lab's proof rank"
-    ],
+    "left": [],
     "nothingHere": [
      "beyond",
      "lacks",
@@ -2036,16 +2026,9 @@
   [
    "D-055 · the code map, hide",
    {
-    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
+    "count": "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here",
     "carry": "hide",
-    "left": [
-     "arranges 7 other cases",
-     "fate",
-     "steps",
-     "entity",
-     "alarms",
-     "the lab's proof rank"
-    ],
+    "left": [],
     "nothingHere": [
      "beyond",
      "lacks",
@@ -2091,20 +2074,12 @@
   [
    "D-055 · GET /recipe-creation/gustify/stream, hide",
    {
-    "count": "34 of 56 fields carried by BY MOMENT · 11 left · 11 with nothing here · 3 tables only in BY MOMENT",
+    "count": "42 of 56 fields carried by BY MOMENT · 3 left · 11 with nothing here · 3 tables only in BY MOMENT",
     "carry": "hide",
     "left": [
      "tables (BY MOMENT holds more)",
-     "fate",
      "the tables (BY MOMENT holds more)",
-     "lacks",
-     "norms it lacks",
-     "steps",
-     "entity",
-     "alarms",
-     "behind (part)",
-     "functions behind, and how deep (part)",
-     "the lab's proof rank"
+     "functions behind, and how deep (part)"
     ],
     "nothingHere": [
      "reply",
@@ -2122,7 +2097,6 @@
     "notes": [
      "+3 tables only in BY MOMENT",
      "+3 tables only in BY MOMENT",
-     "+26 in BY MOMENT",
      "+26 in BY MOMENT"
     ]
    }
@@ -2164,16 +2138,9 @@
   [
    "D-055 · the code map, show all again",
    {
-    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
+    "count": "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here",
     "carry": "all",
-    "left": [
-     "arranges 7 other cases",
-     "fate",
-     "steps",
-     "entity",
-     "alarms",
-     "the lab's proof rank"
-    ],
+    "left": [],
     "nothingHere": [
      "beyond",
      "lacks",
@@ -2423,7 +2390,7 @@
    "picture · review-by-moment-path-to-the-201",
    {
     "pieces": 1,
-    "height": 2269
+    "height": 2967
    }
   ],
   [
@@ -2504,7 +2471,7 @@
    "picture · review-the-stream-answer",
    {
     "pieces": 1,
-    "height": 4631
+    "height": 5284
    }
   ],
   [
@@ -2525,15 +2492,8 @@
   [
    "D-057 · the code map, show all",
    {
-    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
-    "left": [
-     "arranges 7 other cases",
-     "fate",
-     "steps",
-     "entity",
-     "alarms",
-     "the lab's proof rank"
-    ]
+    "count": "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here",
+    "left": []
    }
   ],
   [
@@ -2554,15 +2514,8 @@
   [
    "D-057 · the code map, hide",
    {
-    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
-    "left": [
-     "arranges 7 other cases",
-     "fate",
-     "steps",
-     "entity",
-     "alarms",
-     "the lab's proof rank"
-    ]
+    "count": "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here",
+    "left": []
    }
   ],
   [
@@ -2686,7 +2639,7 @@
   ],
   [
    "d057 hover derive_restrictions at the work",
-   "derive_restrictions · Functions ┆ The code that runs, sorted by how much it decides."
+   "derive_restrictions · Functions ┆ on 1 of its paths, assert_recipe_allergen_safe is left partway, maybe before calling it ┆ It is called somewhere inside assert_recipe_allergen_safe. A path that leaves assert_recipe_allergen_safe partway, at a check that fires or on an error, may leave before that call, so it may never run on that path. ┆ The code that runs, sorted by how much it decides."
   ],
   [
    "step 199 · d057-open-the-by-moment-info",
@@ -2801,15 +2754,8 @@
   [
    "review · the code map, hide",
    {
-    "count": "47 of 56 fields carried by BY MOMENT · 6 left · 3 with nothing here",
-    "left": [
-     "arranges 7 other cases",
-     "fate",
-     "steps",
-     "entity",
-     "alarms",
-     "the lab's proof rank"
-    ]
+    "count": "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here",
+    "left": []
    }
   ],
   [
@@ -2901,7 +2847,7 @@
   ],
   [
    "review hover a function known by name only",
-   "ResolutionSnapshot.violations_for · Functions ┆ The code that runs, sorted by how much it decides."
+   "ResolutionSnapshot.violations_for · Functions ┆ on 1 of its paths, assert_recipe_allergen_safe is left partway, maybe before calling it ┆ It is called somewhere inside assert_recipe_allergen_safe. A path that leaves assert_recipe_allergen_safe partway, at a check that fires or on an error, may leave before that call, so it may never run on that path. ┆ The code that runs, sorted by how much it decides."
   ],
   [
    "step 221 · review-open-session-complete",
@@ -2942,12 +2888,12 @@
    {
     "universe": [
      "all",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "all",
      "cm",
-     "17 of 22 carried by BY MOMENT · 5 left"
+     "22 of 22 carried by BY MOMENT · 0 left"
     ],
     "notes": []
    }
@@ -2976,12 +2922,12 @@
    {
     "universe": [
      "dim",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "all",
      "cm",
-     "17 of 22 carried by BY MOMENT · 5 left"
+     "22 of 22 carried by BY MOMENT · 0 left"
     ],
     "notes": []
    }
@@ -3010,20 +2956,19 @@
    {
     "universe": [
      "hide",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "all",
      "cm",
-     "17 of 22 carried by BY MOMENT · 5 left"
+     "22 of 22 carried by BY MOMENT · 0 left"
     ],
     "notes": [
-     "HEAD +1 in BY MOMENT",
      "GUARDS +1 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
-     "CODE BEHIND +12 in BY MOMENT",
-     "TESTS +2 in BY MOMENT",
-     "SOURCE +1 in BY MOMENT"
+     "TESTS +8 in BY MOMENT",
+     "IDENTITY +1 in BY MOMENT",
+     "ABOVE +2 in BY MOMENT"
     ]
    }
   ],
@@ -3062,20 +3007,19 @@
    {
     "universe": [
      "hide",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "dim",
      "uni",
-     "5 of 16 carried by BY MOMENT · 11 left"
+     "8 of 16 carried by BY MOMENT · 8 left"
     ],
     "notes": [
-     "HEAD +1 in BY MOMENT",
      "GUARDS +1 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
-     "CODE BEHIND +12 in BY MOMENT",
-     "TESTS +2 in BY MOMENT",
-     "SOURCE +1 in BY MOMENT"
+     "TESTS +8 in BY MOMENT",
+     "IDENTITY +1 in BY MOMENT",
+     "ABOVE +2 in BY MOMENT"
     ]
    }
   ],
@@ -3107,22 +3051,21 @@
    {
     "universe": [
      "hide",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "hide",
      "uni",
-     "5 of 16 carried by BY MOMENT · 11 left"
+     "8 of 16 carried by BY MOMENT · 8 left"
     ],
     "notes": [
-     "HEAD +1 in BY MOMENT",
      "GUARDS +1 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
-     "CODE BEHIND +12 in BY MOMENT",
+     "TESTS +8 in BY MOMENT",
+     "IDENTITY +1 in BY MOMENT",
+     "ABOVE +2 in BY MOMENT",
      "TESTS +2 in BY MOMENT",
-     "SOURCE +1 in BY MOMENT",
-     "TESTS +2 in BY MOMENT",
-     "TESTS +2 in BY MOMENT"
+     "TESTS +8 in BY MOMENT"
     ]
    }
   ],
@@ -3146,26 +3089,19 @@
    {
     "universe": [
      "hide",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "hide",
      "cm",
-     "17 of 22 carried by BY MOMENT · 5 left"
+     "22 of 22 carried by BY MOMENT · 0 left"
     ],
     "notes": [
-     "HEAD +1 in BY MOMENT",
      "GUARDS +1 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
-     "CODE BEHIND +12 in BY MOMENT",
-     "TESTS +2 in BY MOMENT",
-     "SOURCE +1 in BY MOMENT",
-     "c7 +2 in BY MOMENT",
-     "c1 +1 in BY MOMENT",
-     "c1 +15 in BY MOMENT",
-     "c6 +1 in BY MOMENT",
-     "c10 +10 in BY MOMENT",
-     "c10 +6 in BY MOMENT"
+     "TESTS +8 in BY MOMENT",
+     "IDENTITY +1 in BY MOMENT",
+     "ABOVE +2 in BY MOMENT"
     ]
    }
   ],
@@ -3212,12 +3148,12 @@
    {
     "universe": [
      "all",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "all",
      "cm",
-     "17 of 22 carried by BY MOMENT · 5 left"
+     "22 of 22 carried by BY MOMENT · 0 left"
     ],
     "notes": []
    }
@@ -3242,12 +3178,12 @@
    {
     "universe": [
      "dim",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "all",
      "cm",
-     "17 of 22 carried by BY MOMENT · 5 left"
+     "22 of 22 carried by BY MOMENT · 0 left"
     ],
     "notes": []
    }
@@ -3316,27 +3252,26 @@
    {
     "universe": [
      "hide",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "all",
      "cm",
-     "17 of 22 carried by BY MOMENT · 5 left"
+     "22 of 22 carried by BY MOMENT · 0 left"
     ],
     "notes": [
-     "HEAD +1 in BY MOMENT",
      "GUARDS +1 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
-     "CODE BEHIND +12 in BY MOMENT",
-     "TESTS +2 in BY MOMENT",
-     "SOURCE +1 in BY MOMENT"
+     "TESTS +8 in BY MOMENT",
+     "IDENTITY +1 in BY MOMENT",
+     "ABOVE +2 in BY MOMENT"
     ]
    }
   ],
   [
    "D-058 review · the universe, hide — head · payload · accesses",
    {
-    "head": "COOKING +1 IN BY MOMENT",
+    "head": "API endpoint · cooking",
     "payload": "18 fields ferried",
     "accesses": [
      [
@@ -3427,12 +3362,12 @@
    {
     "universe": [
      "all",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "dim",
      "uni",
-     "5 of 16 carried by BY MOMENT · 11 left"
+     "8 of 16 carried by BY MOMENT · 8 left"
     ],
     "notes": []
    }
@@ -3450,8 +3385,8 @@
     "11 case(s)",
     "6 case(s)",
     "endpoints",
-    "apps/api/api/cooking.py:585",
-    "conflict · large surface"
+    "apps/api/api/cooking.py:585 · carried",
+    "conflict · large surface · carried"
    ]
   ],
   [
@@ -3474,16 +3409,16 @@
    {
     "universe": [
      "all",
-     "36 of 64 carried by BY MOMENT · 28 left"
+     "51 of 64 carried by BY MOMENT · 13 left"
     ],
     "gaps": [
      "hide",
      "uni",
-     "5 of 16 carried by BY MOMENT · 11 left"
+     "8 of 16 carried by BY MOMENT · 8 left"
     ],
     "notes": [
      "TESTS +2 in BY MOMENT",
-     "TESTS +2 in BY MOMENT"
+     "TESTS +8 in BY MOMENT"
     ]
    }
   ],
@@ -3500,8 +3435,8 @@
     "11 case(s)",
     "6 case(s)",
     "endpoints",
-    "apps/api/api/cooking.py:585",
-    "conflict · large surface"
+    "apps/api/api/cooking.py:585 · carried · gone",
+    "conflict · large surface · carried · gone"
    ]
   ],
   [
@@ -3541,6 +3476,337 @@
   [
    "D-058 review · beside the button",
    "copied"
+  ],
+  [
+   "step 255 · d064-open-cooking-sessions",
+   {
+    "click": "/cooking/sessionsPOST",
+    "at": [
+     33,
+     660
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /cooking/sessions"
+   }
+  ],
+  [
+   "D-064 (2) · the no-moment column, cell by cell",
+   [
+    "proof: C1087 arranges | C250 arranges | C283 arranges | C284 arranges | C555 arranges | C675 arranges | C266 arranges through a helper",
+    "data: saved 1 no own write 14",
+    "fn: apps/api/api/cooking.py:114 def at line 119 | async · 53 lines · returns CookingSessionResponse | no docstring",
+    "stage: 22 steps on its longest path",
+    "over: /cooking/sessions POST | served at /api/v1/cooking/sessions | first segment /cooking | cooking | cluster cooking | conflict · large surface | 18 behind · 4 calls deep | 4/11 of its refusals named by a test, a test that fits several counted for each · rank 3–6 of 80 | race-500 | reason-collapsed | reason-lost | shared-status | text-only | undeclared"
+   ]
+  ],
+  [
+   "D-064 (2) · the band",
+   "NOT PLACED the map places every element that should have a moment"
+  ],
+  [
+   "D-064 (2) · the box scrolled to its end",
+   {
+    "box": 1854,
+    "table": 2283,
+    "at": 429,
+    "note": true
+   }
+  ],
+  [
+   "D-064 (2) · the no-moment cell of proof photographed",
+   {
+    "box": 429
+   }
+  ],
+  [
+   "D-064 (2) · the no-moment cell of data photographed",
+   {
+    "box": 429
+   }
+  ],
+  [
+   "D-064 (2) · the no-moment cell of fn photographed",
+   {
+    "box": 429
+   }
+  ],
+  [
+   "D-064 (2) · the no-moment cell of stage photographed",
+   {
+    "box": 429
+   }
+  ],
+  [
+   "D-064 (2) · the no-moment cell of over photographed",
+   {
+    "box": 429
+   }
+  ],
+  [
+   "d064 hover the no-moment head",
+   "no moment ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+  ],
+  [
+   "d064 hover the handler file and line",
+   "the handler's file and line · Functions · no moment ┆ apps/api/api/cooking.py ┆ The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+  ],
+  [
+   "d064 hover the outline",
+   "the handler's outline · Functions · no moment ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ Async or not, how many lines it runs, the type it returns; its def in the hover. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+  ],
+  [
+   "d064 hover the cluster",
+   "cluster · Overview and risk · no moment ┆ The group of endpoints the Gabe Universe draws it in, inside its entity. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+  ],
+  [
+   "step 265 · d064-path-the-replay-201",
+   {
+    "click": "the path to 201 · existing is not None · success · the answer",
+    "at": [
+     721,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 201 · existing is not None · success · the answer\""
+   }
+  ],
+  [
+   "D-064 (1) · the-replay-201 · the work's functions",
+   [
+    "subscription_tier_for",
+    "start_session",
+    "concurrent_cook_cap_for_tier"
+   ]
+  ],
+  [
+   "step 266 · d064-path-the-404",
+   {
+    "click": "the path to 404 · refusal · after a call failed — start_session raised",
+    "at": [
+     565,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 404 · refusal · after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) · Recipe not found\""
+   }
+  ],
+  [
+   "D-064 (1) · the-404 · the work's functions",
+   [
+    "subscription_tier_for",
+    "start_session"
+   ]
+  ],
+  [
+   "step 267 · d064-path-the-first-run-201",
+   {
+    "click": "the path to 201 · past every fork, to the end · success · the answer",
+    "at": [
+     766,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 201 · past every fork, to the end · success · the answer\""
+   }
+  ],
+  [
+   "D-064 (1) · the-first-run-201 · the work's functions",
+   [
+    "subscription_tier_for",
+    "load_resolution_snapshot",
+    "count_active_sessions",
+    "start_session",
+    "_schedule_next",
+    "seed_stage_schedule",
+    "assert_recipe_allergen_safe",
+    "_stages",
+    "_hold_hours",
+    "_label",
+    "ResolutionSnapshot.violations_for",
+    "derive_restrictions",
+    "concurrent_cook_cap_for_tier"
+   ]
+  ],
+  [
+   "step 268 · d064-all-paths-again",
+   {
+    "click": "all paths",
+    "at": [
+     32,
+     536
+    ],
+    "size": [
+     81,
+     26
+    ],
+    "note": "the square \"all paths\""
+   }
+  ],
+  [
+   "D-064 (2) · the code map's header, show all",
+   "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here"
+  ],
+  [
+   "step 269 · d064-carry-hide",
+   {
+    "click": "hide what BY MOMENT carries",
+    "at": [
+     1423,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"hide what BY MOMENT carries\""
+   }
+  ],
+  [
+   "D-064 (2) · the code map's header, hide",
+   "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here"
+  ],
+  [
+   "D-064 (2) · the code map's fields left in hide",
+   []
+  ],
+  [
+   "step 270 · d064-carry-show-all",
+   {
+    "click": "show all",
+    "at": [
+     1349,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"show all\" (my pick)"
+   }
+  ],
+  [
+   "review of D-064 · BY MOMENT is open on",
+   "POST /cooking/sessions"
+  ],
+  [
+   "review of D-064 · BY MOMENT photographed from its top",
+   {
+    "section": 3602,
+    "window": 3740,
+    "box": {
+     "box": 1854,
+     "table": 2283,
+     "at": 429
+    },
+    "lastColumn": {
+     "left": 1720,
+     "right": 1887,
+     "inWindow": true
+    }
+   }
+  ],
+  [
+   "review of D-064 · the box, wheeled",
+   {
+    "box": 1854,
+    "table": 2283,
+    "at": 429
+   }
+  ],
+  [
+   "d064r hover the entity chip",
+   "entity · Overview and risk · no moment ┆ cooking ┆ The feature of the app that owns the endpoint. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+  ],
+  [
+   "d064r hover the file and line",
+   "the handler's file and line · Functions · no moment ┆ apps/api/api/cooking.py ┆ The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it."
+  ],
+  [
+   "step 274 · d064r-pick-the-replay-201",
+   {
+    "click": "the path to 201 · existing is not None · success · the answer",
+    "at": [
+     721,
+     537
+    ],
+    "size": [
+     42,
+     24
+    ],
+    "note": "the code \"the path to 201 · existing is not None · success · the answer\""
+   }
+  ],
+  [
+   "review of D-064 · the replay 201 · the work's functions",
+   {
+    "work": [
+     "subscription_tier_for",
+     "start_session",
+     "concurrent_cook_cap_for_tier"
+    ],
+    "assertRecipeAllergenSafe": false
+   }
+  ],
+  [
+   "step 276 · d064r-all-paths-again",
+   {
+    "click": "all paths",
+    "at": [
+     32,
+     536
+    ],
+    "size": [
+     81,
+     26
+    ],
+    "note": "the square \"all paths\""
+   }
+  ],
+  [
+   "step 277 · d064r-code-map-hide",
+   {
+    "click": "hide what BY MOMENT carries",
+    "at": [
+     1423,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"hide what BY MOMENT carries\""
+   }
+  ],
+  [
+   "review of D-064 · the code map's header, hide",
+   "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here"
+  ],
+  [
+   "step 279 · d064r-code-map-show-all",
+   {
+    "click": "show all",
+    "at": [
+     1349,
+     524
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"show all\" (my pick)"
+   }
   ],
   [
    "rows at the end",

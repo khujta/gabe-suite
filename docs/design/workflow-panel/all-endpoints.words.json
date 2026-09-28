@@ -73,7 +73,11 @@
     "tbl",
     "st",
     "msg",
-    "op"
+    "op",
+    "nm",
+    "d",
+    "file",
+    "line"
   ],
   "eyebrow": "every endpoint of one app, side by side",
   "h1": "All {nRows} endpoints of {app}, one row each",
@@ -776,18 +780,19 @@
   },
   "mo": {
     "_about": "His ask 2026-09-26: are the moments universal, can every block be read on them. The spine, the moment words, the reasons and the path row are my proposals (D-025.2); the two looks' defaults, moments as columns and cells as chips, are his (D-055); where each element stands is read off the feed by gen-all-endpoints.py (by_moment) and proven there.",
-    "lede": "One endpoint's time, left to right, with every block that happens in time as a row (his default; the other look turns it). A column is a moment of the request; a cell holds that block's elements acting at that moment. Pick a code in the path row to follow only that path to its ending.",
+    "lede": "One endpoint's time, left to right, with every block as a row (his default; the other look turns it). A column is a moment of the request; a cell holds that block's elements acting at that moment. The last column, no moment, holds what is true of the endpoint at no moment of a request: what it is and what sums it up. Pick a code in the path row to follow only that path to its ending.",
     "how": [
       "The moments are D-053's, extended. Before the handler they are fixed: the server starting (before any request), the screen sending the request, the app's edge, FastAPI reading the body, the dependencies (the login check among them), FastAPI checking the fields. Inside the handler they are read from its own lines: its checks, and what it does among them; the work, the calls it makes after a check and before its next check, catch or commit; one moment for each catch that turns a failure into an ending; saving, its own commit. Then the answer, what happens after it, and the uncaught error last, because it can escape at any moment.",
       "A handler moment that happens twice (checks, then a catch, then more checks) is drawn twice, in the order it happens, never merged. The arms of one if and else are drawn the same way, as runs in line order, though a request passes only one of them: pick its ending to see which. A fixed moment the endpoint does not have is drawn empty where it would stand.",
-      "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs inside. A check stands where it is evaluated: on the paths whose chain carries it, and for a check inside a call, on the paths that make that call, less those the map shows leaving before it (on a path it rides only by the call, its hover says a path may skip it); its ending stands where the request leaves. A check the map ties only to a catch stands where that catch raises its ending. A test has no time inside the request: it rides the ending it proves. What the map does not place is left in the band below, with its reason.",
+      "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs inside. A check stands where it is evaluated: on the paths whose chain carries it, and for a check inside a call, on the paths that make that call, less those the map shows leaving before it (on a path it rides only by the call, its hover says a path may skip it); its ending stands where the request leaves. A check the map ties only to a catch stands where that catch raises its ending. A test has no time inside the request: it rides the ending it proves. What has no moment by nature stands in the last column, no moment; what should have a moment and the map cannot place is left in the band below, with its reason.",
       "A step is placed once for each path it is on: with the dependencies when a dependency runs it, else at the call that path makes. So one step can stand at more than one moment: the login dependency reads a table, and a handler call reads it again. When a path's own chain names no call reaching the step, it stands at the calls the endpoint's other paths make to its function, never after that path has left.",
       "The path: every path at once, or one path to its ending. Each path is a code, in the order its ending happens, a small gap between the moments they leave at; an ending several paths reach is several codes, told apart by the fork each takes, else by what FastAPI checks on it. A code's hover says the fork, the moment, what the ending says, its limiter, and whether it is the path in force. A picked path keeps only the moments it passes and the elements it passes there; an ending it passes by without leaving is kept.",
       "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it names one) and the class its except takes; the checks say so; the work names the first function it calls, and how many more; saving names what the handler's own step does there. Its full name, where the catch stands, its lines and its stage are in its hover.",
-      "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An ending's status is drawn hollow when the endpoint does not declare it. A test whose status fits endings at several moments rides each of them, its chip hollow and dashed. A function behind the handler stands at the handler call that reaches it, the arrow saying how many calls below the handler it is, on the paths of the function it hangs under. One the map reaches through no call stands where a function placed at a moment names it behind it (the Gabe Universe's behind lists), on that function's paths; its hover names any placed function whose list is cut that may also run it. One no placed function names stands in the band, and so does one that functions at different moments name. A path may leave the function it hangs under before this one runs, which its chip does not say; where that function's own paths are an upper bound, its hover says so, naming the same call."
+      "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An ending's status is drawn hollow when the endpoint does not declare it. A test whose status fits endings at several moments rides each of them, its chip hollow and dashed. A function behind the handler stands at the handler call that reaches it, the arrow saying how many calls below the handler it is, on the paths of the function it hangs under, less the paths the map shows leaving before it: a fork that returns, or a check that fires first, in the function that calls it (the rule a check inside a call follows); a call written inside an except stands only on the paths that enter that except. One the map reaches through no call stands where a function placed at a moment names it behind it (the Gabe Universe's behind lists), on that function's paths; its hover names any placed function whose list is cut that may also run it. One no placed function names stands in the band, and so does one that functions at different moments name. A raise called before it counts as a leaving point too, where the path's chain fires that raise or its ending was read to it. Where the map records no line the function is called at, no path can be dropped from it: on a path that leaves the function it hangs under partway, or that an error from the handler call ends with no line the map names for its raise, its hover says it may never be called there; where that function's own paths are an upper bound, its hover says so, naming the same call. A function called only inside an except the map records no path entering, while the uncaught 500 passes an error on through that except, stands in the band, on the way to the 500.",
+      "The last column, no moment, holds per block the facts no moment of a request holds: what the endpoint is (its method and path, the path it is served at, its first segment, its entity and the cluster the Gabe Universe draws it in, the station's flags, the handler's file with the line its route is declared at and the line its def stands at, its outline, its docstring) and what sums it up (how many functions stand behind it, its proof, its alarms, each path's fate, its longest path, the cases that only arrange through it, its rare pieces that name what it is, the norms it lacks), each in the row of the block it belongs to. The path row never hides it: each fact is true of every path."
     ],
     "covHead": "Across the {nRows} endpoints, what each block places:",
-    "cov": "{block}: {placed} with a moment, {un} with none, of {total}.",
+    "cov": "{block}: {placed} with a moment, {un} the map cannot place, {nm} with no moment by nature, of {total}.",
     "src": "Data effects, how each step was placed on each path it is on ({occ} in all): {own} on the handler's own line, {chain} inside a call the path's chain names, {reached} inside a call the map traces back to the handler on that path, {edges} through the Gabe Universe's call edges from the path's own calls, {wide} at the calls the endpoint's other paths make (the path's chain names none), {order} from the order the path records its steps in, {gate} as a dependency's work, {after} after the answer, {none} with none.",
     "off": "{off} times a chain lists a call inside a catch its path never passes; that call is left off that path.",
     "offocc": "{offocc} times a path lists a step that no call of its own reaches while another path places it; it is left off that path.",
@@ -848,14 +853,41 @@
       }
     },
     "band": {
-      "title": "no moment",
-      "plain": "Blocks that do not happen in time, and the elements of a timed block the map places at no moment, each with its reason.",
-      "untimed": {
-        "over": "It sums the whole endpoint up: sizes, ratios, ranks and alarms. Its members are the other columns' elements, each already at its moment."
-      },
-      "noTime": "no time",
-      "count": "{n} with no moment",
-      "all": "every element here has a moment"
+      "title": "not placed",
+      "plain": "What should have a moment and the map cannot place, each with its reason. What has no moment by nature stands in the table's last column, no moment.",
+      "count": "{n} not placed",
+      "all": "the map places every element that should have a moment"
+    },
+    "nm": {
+      "_about": "D-064 (2), his ruling 2026-09-28: the facts no moment holds, per block, as the table's last column (the last row when the moments are rows). Its place at the end, its name and these words are my proposal; which facts stand there, and in which block's row, is read from the ruled tree's homes by gen-all-endpoints.py (no_moment) and proven there. `only` names the blocks whose every fact has no moment.",
+      "name": "no moment",
+      "plain": "What is true of the endpoint at no moment of a request: what it is and what sums it up. Each fact is true of every path, so the path row never hides it.",
+      "empty": "nothing here without a moment",
+      "only": ["over"],
+      "k": {
+        "ep": { "name": "method and path", "plain": "The verb and the URL a client calls." },
+        "full": { "text": "served at {v}", "mount": "mounted at {v}", "name": "the path it is served at", "plain": "The path the app answers it on: its own path, with its router's mount before it." },
+        "seg": { "text": "first segment /{v}", "name": "the URL's first segment", "plain": "The first part of its path: the group of URLs it sits in.", "label": "the map labels its path {v}; the segment is read from the path it is served at" },
+        "ent": { "name": "entity", "plain": "The feature of the app that owns the endpoint." },
+        "cl": { "text": "cluster {v}", "name": "cluster", "plain": "The group of endpoints the Gabe Universe draws it in, inside its entity.", "label": "the Gabe Universe groups it by the path the map labels it with, {v}" },
+        "risk": { "name": "flag", "plain": "A warning the Gabe Universe draws on the endpoint.",
+          "ids": {
+            "untested": { "plain": "No test calls the endpoint: no case acts on it and none sets another test up through it." },
+            "conflict": { "plain": "A large surface: many functions stand behind the handler, or many pieces lead to it, so a change here reaches far." },
+            "god": { "plain": "Its handler is one of the app's oversized functions or classes." }
+          } },
+        "behind": { "text": "{n} behind · {d} calls deep", "text1": "{n} behind · {d} call deep", "name": "functions behind", "plain": "How many functions the handler's own calls reach, and how many calls below it the deepest one stands; the functions its dependencies run are not counted (the Functions row draws them at the moment the dependencies run)." },
+        "proof": { "name": "proof", "plain": "How many of its refusals a test names, and where that puts the endpoint among the app's." },
+        "alarm": { "name": "alarm", "plain": "An anomaly the form check found; the facts it reads stand at their moments." },
+        "file": { "text": "{file}:{line}", "def": "def at line {n}", "name": "the handler's file and line", "plain": "The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known." },
+        "sig": { "name": "the handler's outline", "plain": "Async or not, how many lines it runs, the type it returns; its def in the hover." },
+        "doc": { "name": "the handler's docstring", "plain": "The text the handler's author wrote at its top." },
+        "fate": { "name": "each path's fate", "plain": "What becomes of the endpoint's own writes, path by path, counted: saved, maybe saved, rolled back, left unsaved, after the answer, or no write of its own." },
+        "chain": { "text": "{n} steps on its longest path", "name": "the longest path", "plain": "How many steps the longest path a request can take runs through." },
+        "arr": { "text": "arranges", "name": "arranges another test", "plain": "A case that calls this endpoint only to set another test up. A test has no time inside the request, and this one proves no ending here." },
+        "piece": { "name": "a rare piece", "plain": "A piece few endpoints carry that names what the endpoint is (its method, its login, its limit), not something that acts." },
+        "lack": { "text": "lacks", "name": "a norm it lacks", "plain": "A piece nearly every endpoint carries that this one does not." }
+      }
     },
     "why": {
       "nolink": { "name": "no link to a call", "plain": "The map records no link from it to a call the handler makes, so where it happens inside the request is not known." },
@@ -865,14 +897,13 @@
       "spans": { "name": "several moments", "plain": "The endings it stands for leave at several moments, so it has no single one." },
       "member": { "name": "a member has no moment", "plain": "It stands for endings or catches, and one of them has no moment of its own." },
       "noend": { "name": "proves no ending", "plain": "The test sends the request but none of its assertions fits an ending." },
-      "timeless": { "name": "timeless", "plain": "It names what the endpoint is (its method, its login, its limit), not something that acts, so there is no moment." },
       "nosite": { "name": "outside the handler", "plain": "It stands at a line outside the handler's own code, and no call of the handler is recorded for it." },
       "pathsonly": { "name": "paths only", "plain": "The map says which paths it is on, but not where on them." },
       "fnnone": { "name": "no call reaches it", "plain": "The map names the function, but records no handler call that reaches it." },
       "swmoves": { "name": "moves with the path", "plain": "Its paths place it at different moments." },
       "nopath": { "name": "on no path", "plain": "The endpoint lists it, but none of its paths passes it, so no path can be followed to it." },
       "noname": { "name": "by name only", "plain": "It is named behind the handler, and no single function carries the name, so no call can be followed to it; and no function placed at a moment names it behind it." },
-      "arranged": { "name": "sets another test up", "plain": "The case calls this endpoint only to set another test up. A test has no time inside the request, and this one proves no ending here." }
+      "in500": { "name": "on the way to the 500", "plain": "It is called inside an except that passes the error on. The only way into that except the map knows ends in the uncaught 500, and the map does not follow that path through the handler's calls, so it has no moment to give it." }
     },
     "empty": "nothing here at this moment",
     "proves": "proves",
@@ -891,6 +922,9 @@
       "cutNearPlain": "{v} calls more functions than are listed; if this is one of them, it also runs where {v} runs, on its paths.",
       "callCheck": "checked inside {via}; a path picked here may skip it",
       "callCheckPlain": "It stands on the paths that call {via}, less those that leave {via} before it; a path may still skip it or leave before it, so a path picked here may not reach it.",
+      "leftIn": "this path leaves {via} partway, maybe before calling it",
+      "leftInAll": "on {n} of its paths, {via} is left partway, maybe before calling it",
+      "leftInPlain": "It is called somewhere inside {via}. A path that leaves {via} partway, at a check that fires or on an error, may leave before that call, so it may never run on that path.",
       "fate": "on this path: {v}",
       "fatePlain": "With one path picked, a write wears what the path does with it.",
       "race": "a race on {cons}",
@@ -949,7 +983,7 @@
           "dim": "An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name. A row whose items it draws, every one, fades with its title. Pointing at one brings it back.",
           "hide": "An item BY MOMENT draws leaves the card; a row whose items it draws, every one, leaves with its title; a row it draws in part says how many of its items are there."
         },
-        "plain": "Carried, on the universe card: an item BY MOMENT draws at a moment, on any path, found by the key the code map's switch reads, or, for a function Code behind names without a key, by its name (when that name is one function there); a table an access or a connection reads or writes, by a chip of that same op (a read never carries a write); the endpoint is BY MOMENT's heading. A count or a line (the usage, the fields a payload ferries, a file's cases, a flag, the signature) stays unless the card names every member it counts and BY MOMENT draws each one. What BY MOMENT holds only in its band, with no moment, is not carried.",
+        "plain": "Carried, on the universe card: an item BY MOMENT draws at a moment, on any path, or in its last column, found by the key the code map's switch reads, or, for a function Code behind names without a key, by its name (when that name is one function there); a table an access or a connection reads or writes, by a chip of that same op (a read never carries a write); the endpoint is BY MOMENT's heading. A count or a line (the usage, the fields a payload ferries, a file's cases, the layer, the fan-in) stays unless the card names every member it counts and BY MOMENT draws each one; the cluster, the signature, the docstring, a flag and the count behind are carried by BY MOMENT's last column, which draws them. What BY MOMENT holds only in its band, not placed, is not carried.",
         "tipAll": "BY MOMENT draws every item of this row.",
         "tipPart": "BY MOMENT draws {n} of its {of} items."
       },
@@ -959,12 +993,12 @@
           "dim": "A gap BY MOMENT already carries fades: a name it draws at a moment; an attribute of the universe card whose items it draws, every one; an attribute of the code map whose fields it carries whole. A block of such gaps fades with its head. Pointing at one brings it back.",
           "hide": "A gap BY MOMENT already carries leaves; a block it carries whole leaves with its head; a block or an attribute it carries in part says how many are there."
         },
-        "plain": "The switch reads whichever way the gaps are shown. From the code map: an attribute is carried when every code-map field that holds it is carried whole, as the code map's own switch reads it; a field with nothing here is passed over, and a field that sums the endpoint up counts as one element BY MOMENT leaves out. From the universe: a name is carried when BY MOMENT draws every item of the card it names (a journey with the entities it crosses, a table's read and its write); an attribute when BY MOMENT draws every item of the row that holds it; a row that maps to no attribute when it draws every item of that row.",
+        "plain": "The switch reads whichever way the gaps are shown. From the code map: an attribute is carried when every code-map field that holds it is carried whole, as the code map's own switch reads it; a field with nothing here is passed over, and a field that sums the endpoint up is one element, carried when BY MOMENT's last column draws it. From the universe: a name is carried when BY MOMENT draws every item of the card it names (a journey with the entities it crosses, a table's read and its write); an attribute when BY MOMENT draws every item of the row that holds it; a row that maps to no attribute when it draws every item of that row.",
         "tipAll": "BY MOMENT already carries all of it.",
         "tipPart": "BY MOMENT carries {n} of its {of} elements."
       }
     },
-    "plain": "Carried: an element BY MOMENT places at a moment, on any path, or a fact one of its elements draws. A table read is carried by a chip that reads it, a table written by one that writes it. A list carries each of its items apart: an alarm when every fact it reads stands at its moment, a path's fate when its writes wear it on its pick (or it writes nothing of its own). A count is carried when every member it counts is placed, in part when some are. A field that sums the whole endpoint up (the count of the fates, the alarms' dots, the longest chain, the proof's rank) stays as it is: it is what BY MOMENT leaves out. A field with nothing on this endpoint is counted apart, never as left. Where BY MOMENT's steps touch tables the code map does not list, the tables fields stay in every look and say how many, and the header counts them."
+    "plain": "Carried: an element BY MOMENT places at a moment, on any path, or a fact one of its elements draws. A table read is carried by a chip that reads it, a table written by one that writes it. A list carries each of its items apart: an alarm when every fact it reads stands at its moment, a path's fate when its writes wear it on its pick (or it writes nothing of its own). A count is carried when every member it counts is placed, in part when some are. A field that sums the whole endpoint up (the count of the fates, the alarms' dots, the longest chain, the count behind, the proof's rank) is carried by BY MOMENT's last column, no moment, which draws it; so is what the endpoint is there (its entity, the handler's file, the cases that only arrange through it, the norms it lacks). A field with nothing on this endpoint is counted apart, never as left. Where BY MOMENT's steps touch tables the code map does not list, the tables fields stay in every look and say how many, and the header counts them."
   },
   "authNoScheme": "own check",
   "authNoSchemePlain": "It asks for a login through its own check, with no declared scheme: the check reads the token itself, not from the usual header.",

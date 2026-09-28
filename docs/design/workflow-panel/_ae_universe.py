@@ -774,6 +774,21 @@ def names_drawn(u: dict) -> list:
     return []
 
 
+def fact_named(u: dict, name: str):
+    """D-064 (2): the ("m", fact) a key-less NAME the card draws stands for — a flag by its words, the cluster by its value, the def
+    text, the docstring (names_drawn's own names) — None for any other; THE GAPS' names join the card's items on it (F2)"""
+    r, it = u["row"], u.get("items") or []
+    if r == "RISK":
+        return next((("m", "risk:" + str(f[0])) for f in it if f[2] == name), None)
+    if r == "ABOVE" and it and it[0] == name and not ((u.get("keys") or [None])[0]):
+        return ("m", "cluster")
+    if r == "SIGNATURE" and it and it[0] == name:
+        return ("m", "sig")
+    if r == "DOCSTRING":
+        return ("m", "doc")
+    return None
+
+
 def uni_elements(u: dict, T: list, NT: dict) -> list:
     """D-058 · the ITEMS a universe row draws, in the order the page draws them (the template's uRow gives each the same index),
     each [its members, its attributes, what it is named by]. A member is ("k", key) — the D-041 key it is drawn with — or ("n",
@@ -782,7 +797,9 @@ def uni_elements(u: dict, T: list, NT: dict) -> list:
     card does not name (a count, a line, a flag, a file's cases, an aggregate journey) has None: it can never be read as carried.
     Its attributes come from the two why tables (a keyed item by its kind, a key-less one by its selector); None when neither lists
     it (it may hold any attribute of its row). What it is named by — ("k", its key) or ("n", a callee's name), None for an item
-    with neither — is what THE GAPS' names join on (F2): a gap's name stands for the items of its row named the same."""
+    with neither — is what THE GAPS' names join on (F2): a gap's name stands for the items of its row named the same.
+    D-064 (2): an item BY MOMENT's no-moment column draws that has no key — the cluster, the outline, the docstring, a flag, the count
+    behind — is ("m", fact), the fact the column draws (gen-all-endpoints.nm_facts reads the same names off the column's record)."""
     r, it, ks = u["row"], u.get("items") or [], u.get("keys") or []
     at = lambda i: ks[i] if i < len(ks) and isinstance(ks[i], str) else None
     def attrs(k=None, sel=None):
@@ -794,7 +811,9 @@ def uni_elements(u: dict, T: list, NT: dict) -> list:
     tab = lambda k, rw: rw if k and str(k).startswith("table:") and rw in ("r", "w") else None
     if r == "HEAD":
         return [one(at(0)), one(at(2))]
-    if r in ("USAGE", "DELIVERY", "DOCSTRING"):
+    if r == "DOCSTRING":
+        return [[[("m", "doc")], attrs(None, "value"), ("m", "doc")]]
+    if r in ("USAGE", "DELIVERY"):
         return [[None, attrs(None, "value"), None]]
     if r in ("EVIDENCE", "MODEL ROW"):
         return [[None, attrs(None, "value"), None]]
@@ -814,9 +833,8 @@ def uni_elements(u: dict, T: list, NT: dict) -> list:
     if r == "CODE BEHIND":
         names = it + (u.get("rest") or [])
         ch = [[[("k", at(i))] if at(i) else [("n", n)], attrs(at(i), "callee"), ("k", at(i)) if at(i) else ("n", n)] for i, n in enumerate(names)]
-        # the count counts u["count"] functions; its members are named only when the card lists every one of them
-        cnt = [m for c in ch for m in c[0]] if len(names) == u.get("count") else None
-        return [[cnt, attrs("fn:x"), None]] + ch
+        # the count is the count BY MOMENT's no-moment column draws (D-064 (2)), whether or not the card lists every function it counts
+        return [[[("m", "behind")], attrs("fn:x"), None]] + ch
     if r == "TESTS":
         if not u.get("tabs"):
             return [[None, None, None]]
@@ -833,12 +851,12 @@ def uni_elements(u: dict, T: list, NT: dict) -> list:
         return out
     if r in ("IDENTITY", "SOURCE"):
         return [one(at(i), kv[1]) for i, kv in enumerate(u.get("kvs") or [])]
-    if r == "SIGNATURE":
-        return ([[None, None, None]] if it and it[0] else []) + ([[None, None, None]] if u.get("value") else [])
+    if r == "SIGNATURE":                                         # the def text and the outline: both what the column's outline chip draws
+        return ([[[("m", "sig")], None, ("m", "sig")]] if it and it[0] else []) + ([[[("m", "sig")], None, ("m", "sig")]] if u.get("value") else [])
     if r == "RISK":
-        return [[None, attrs(None, f[0]), None] for f in it]
+        return [[[("m", "risk:" + str(f[0]))], attrs(None, f[0]), ("m", "risk:" + str(f[0]))] for f in it]
     if r == "ABOVE":
-        return [one(at(0), "cluster"), one(at(1)), [None, None, None]]
+        return [[[("m", "cluster")], attrs(None, "cluster"), ("m", "cluster")] if not at(0) else one(at(0), "cluster"), one(at(1)), [None, None, None]]
     return []
 
 

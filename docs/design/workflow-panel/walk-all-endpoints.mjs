@@ -466,7 +466,7 @@ await pic('more-information-open');
   await hoverSay('d056 hover the login check', '#mogrid td[data-mom="gate"][data-f="gate"] .mc[data-key^="fn:"] .mt');
   await hoverSay('d056 hover C237 hollow', '#mogrid .mc.hol .mt');
   await hoverSay('d056 hover C267', '#mogrid .mc[data-f="proof"][data-keys="case:C267"] .mt');
-  const fates = () => p.$$eval('#mogrid .mc:has(.vc-fate)', (cs) => cs.map((c) => c.innerText.replace(/\s+/g, ' ').trim()));
+  const fates = () => p.$$eval('#mogrid td[data-mom] .mc:has(.vc-fate)', (cs) => cs.map((c) => c.innerText.replace(/\s+/g, ' ').trim()));   /* the writes at their moments (D-064 (2): not the no-moment tally) */
   // CHANGED 2026-09-26 (D-057 c): a code is a path, and the 201 has two — the one whose path writes is looked for (read off the page's data)
   const writesAt = (s0) => p.evaluate((st) => { const R = window.AE_DATA.rows.find((q) => q.id === 'POST /cooking/sessions');
     return R.mo.ex.findIndex((x, i) => x[1] === st && R.mo.el.some((e) => e[7] && e[7].fa && e[7].fa[i])); }, s0);
@@ -665,6 +665,115 @@ await pic('more-information-open');
   say('D-058 review · beside the button', await p.$eval('#cmsaid', (e) => e.textContent));
   { const r = await p.$eval('#cmcopy', (e) => { const q = e.parentElement.getBoundingClientRect(); return { x: Math.max(0, q.left - 8), y: Math.max(0, q.top - 8), width: q.width + 16, height: q.height + 16 }; });
     n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-d058-review-copied.png'), clip: { x: r.x, y: r.y, width: Math.min(W - r.x, r.width), height: Math.min(H - r.y, r.height) } }); } }
+{ // D-064 (his ruling 2026-09-28), LAST: POST /cooking/sessions — (2) the table's last column, no moment: photographed, the box scrolled
+  // sideways by the mouse's wheel to reach it, its head and three of its chips hovered; the code map's hide header read before and after
+  // the square; (1) assert_recipe_allergen_safe looked for in the work on the replay 201, the 404 and the first-run 201, each code clicked
+  const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
+  const hoverSay = async (label, sel) => { const e = await p.$(sel); if (!e) { say('MISSING ' + label, sel); return; } await e.scrollIntoViewIfNeeded(); const bx = await e.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(250);
+    say(label, await p.$eval('#tip', (t) => t.innerText.replace(/\n+/g, ' ┆ '))); n++;
+    const tb = await p.$eval('#tip', (t) => { const r = t.getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; });
+    const x0 = Math.max(0, Math.min(bx.x, tb.x) - 10), y0 = Math.max(0, Math.min(bx.y, tb.y) - 10);
+    await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + label.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 40) + '.png'),
+      clip: { x: x0, y: y0, width: Math.min(W - x0, Math.max(bx.x + bx.width, tb.x + tb.width) - x0 + 10), height: Math.min(H - y0, Math.max(bx.y + bx.height, tb.y + tb.height) - y0 + 10) } });
+    await p.mouse.move(5, H - 10); await wait(100); };
+  const nmCells = () => p.$$eval('#mogrid td[data-nm]', (ts) => ts.map((t) => t.getAttribute('data-f') + ': ' + [...t.querySelectorAll('.mc')].map((c) => c.innerText.replace(/\s+/g, ' ').trim()).join(' | ')).filter((x) => !/: $/.test(x)));
+  const workFns = () => p.$$eval('#mogrid td[data-mom="work"][data-f="fn"] .mc', (cs) => cs.map((c) => ((c.querySelector('.mt') || c).textContent || '').replace(/\s+/g, ' ').trim()));
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('d064-open-cooking-sessions', '#board tr.row[data-ep="POST /cooking/sessions"] td.id', 'the row POST /cooking/sessions');
+  await center('#sec-mo'); say('D-064 (2) · the no-moment column, cell by cell', await nmCells());
+  say('D-064 (2) · the band', await p.$eval('#moband', (e) => e.innerText.replace(/\s+/g, ' ').slice(0, 300)));
+  { const g = await p.$('#mogrid'); await g.scrollIntoViewIfNeeded(); const bx = await g.boundingBox();   /* the box's own scroll, sideways, by the wheel, to its end */
+    await p.mouse.move(bx.x + bx.width / 2, Math.min(bx.y + bx.height - 20, Math.max(bx.y + 20, H / 2)));   /* inside the box, below the pinned row */
+    for (let k = 0; k < 40; k++) { await p.mouse.wheel(300, 0); await wait(60); if (await p.$eval('#mogrid', (G) => G.scrollLeft >= G.scrollWidth - G.clientWidth - 1)) break; }
+    say('D-064 (2) · the box scrolled to its end', await p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, at: G.scrollLeft, note: !document.getElementById('moscroll').hidden }; })); }
+  // photographed row by row, in the browser's own window: a full-page capture resizes the window, and the page redraws BY MOMENT on a
+  // resize (the box back at its start) — so each block row that holds a fact is brought into view and its right end photographed,
+  // below the pinned row
+  { await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide());
+    const fams = await p.$$eval('#mogrid td[data-nm]', (ts) => ts.filter((t) => t.querySelector('.mc')).map((t) => t.getAttribute('data-f')));
+    for (const f of fams) { await p.$eval('#mogrid tr[data-f="' + f + '"]', (e) => e.scrollIntoView({ block: 'center' })); await wait(150);
+      const r = await p.evaluate((f0) => { const tr = document.querySelector('#mogrid tr[data-f="' + f0 + '"]').getBoundingClientRect(), G = document.getElementById('mogrid').getBoundingClientRect(),
+        pin = document.getElementById('pin'), pb = pin && pin.getBoundingClientRect().height ? pin.getBoundingClientRect().bottom : 0, y = Math.max(tr.top - 4, pb, 0);
+        return { x: Math.max(0, G.right - 760), y, width: Math.min(760, G.right), height: Math.max(40, Math.min(tr.bottom + 4, innerHeight) - y), at: document.getElementById('mogrid').scrollLeft }; }, f);
+      n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-d064-no-moment-' + f + '.png'), clip: { x: r.x, y: r.y, width: r.width, height: r.height } });
+      say('D-064 (2) · the no-moment cell of ' + f + ' photographed', { box: r.at }); } }
+  await hoverSay('d064 hover the no-moment head', '#mogrid th.monmh');
+  await hoverSay('d064 hover the handler file and line', '#mogrid td[data-nm] .mc[data-nmk="file"] .mt');
+  await hoverSay('d064 hover the outline', '#mogrid td[data-nm] .mc[data-nmk="sig"] .mt');
+  await hoverSay('d064 hover the cluster', '#mogrid td[data-nm] .mc[data-nmk="cl"] .mt');
+  // (1) the allergen check behind start_session, per code (which square is which is read off the page's data; the clicks are the mouse's)
+  const codeOf = (pred) => p.evaluate((pr) => { const R = window.AE_DATA.rows.find((q) => q.id === 'POST /cooking/sessions'); return R.mo.ex.findIndex(pr === 404 ? (x) => x[1] === 404 : (x) => x[1] === 201 && JSON.stringify(x[9] || []).includes(pr)); }, pred);
+  for (const [name, pr] of [['the-replay-201', 'existing is not None'], ['the-404', 404], ['the-first-run-201', 'fall']]) { const i = await codeOf(pr), sel = '#mobar .mopath[data-path="' + i + '"]';
+    await center('#mobar'); await step('d064-path-' + name, sel, 'the code "' + (await txt(sel)) + '"');
+    say('D-064 (1) · ' + name + ' · the work\'s functions', await workFns()); }
+  await center('#mobar'); await step('d064-all-paths-again', '#mobar .mopath[data-path="all"]', 'the square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"');
+  // the code map's hide header, before and after the square (was "47 of 56 · 6 left · 3 with nothing here")
+  say('D-064 (2) · the code map\'s header, show all', await p.$eval('#cvcount', (e) => e.textContent));
+  await center('#ocol-cm .opt[data-carry="hide"]'); await step('d064-carry-hide', '#ocol-cm .opt[data-carry="hide"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="hide"]')) + '"');
+  say('D-064 (2) · the code map\'s header, hide', await p.$eval('#cvcount', (e) => e.textContent));
+  say('D-064 (2) · the code map\'s fields left in hide', await p.$$eval('#ocol-cm .pair[data-k]', (fs) => fs.filter((e) => e.offsetParent && !/^[ce]$/.test(e.getAttribute('data-cvs'))).map((e) => (e.querySelector('.pk') || {}).textContent)));
+  await center('#ocol-cm .opt[data-carry="all"]'); await step('d064-carry-show-all', '#ocol-cm .opt[data-carry="all"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="all"]')) + '" (my pick)'); }
+{ // the review of D-064 (2026-09-28), LAST, on POST /cooking/sessions: BY MOMENT photographed from the section's top with its last column,
+  // "no moment", in view (the box wheeled sideways to its end; a tall section in 8,000 px pieces); the entity chip and the file:line in
+  // that column hovered; the replay 201 picked (assert_recipe_allergen_safe no longer on it), all paths again; the code map in hide, its
+  // header photographed, then show all again
+  const E = 'POST /cooking/sessions';
+  const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
+  const wheelToEnd = async () => { const g = await p.$('#mogrid'); const bx = await g.boundingBox();
+    const pb = await p.evaluate(() => { const q = document.getElementById('pin'); return q && q.getBoundingClientRect().height ? q.getBoundingClientRect().bottom : 0; });
+    const y = Math.min(bx.y + bx.height - 20, Math.max(bx.y + 20, pb + 40, 60));   /* inside the box, below the pinned row */
+    await p.mouse.move(bx.x + bx.width / 2, Math.min(y, (p.viewportSize() || { height: H }).height - 20));
+    for (let k = 0; k < 40; k++) { await p.mouse.wheel(300, 0); await wait(60); if (await p.$eval('#mogrid', (G) => G.scrollLeft >= G.scrollWidth - G.clientWidth - 1)) break; }
+    await p.mouse.move(5, 5); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120);
+    return p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, at: G.scrollLeft }; }); };
+  const hoverPic = async (label, sel) => { const e = await p.$(sel); if (!e) { say('MISSING ' + label, sel); return; } await e.scrollIntoViewIfNeeded(); await wait(100); const bx = await e.boundingBox();
+    await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(250);
+    say(label, await p.$eval('#tip', (t) => t.innerText.replace(/\n+/g, ' ┆ '))); n++;
+    const tb = await p.$eval('#tip', (t) => { const r = t.getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; });
+    const x0 = Math.max(0, Math.min(bx.x, tb.x) - 10), y0 = Math.max(0, Math.min(bx.y, tb.y) - 10);
+    await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + label.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 44) + '.png'),
+      clip: { x: x0, y: y0, width: Math.min(W - x0, Math.max(bx.x + bx.width, tb.x + tb.width) - x0 + 10), height: Math.min(H - y0, Math.max(bx.y + bx.height, tb.y + tb.height) - y0 + 10) } });
+    await p.mouse.move(5, H - 10); await wait(100); };
+  // BY MOMENT from the section's top: the window as tall as the section (a piece at most 8,000 px), the page at the section's top less the
+  // pinned row, the box wheeled to its end — a photo of the window, never a full-page capture (that resizes the window, and BY MOMENT redraws)
+  const secPics = async (name) => { const hs = await p.$eval('#sec-mo', (e) => Math.ceil(e.getBoundingClientRect().height)); const pieces = Math.ceil(hs / 8000);
+    for (let k = 0; k < pieces; k++) { const ph = Math.min(8000, hs - k * 8000);
+      const pinH = await p.evaluate(() => { const q = document.getElementById('pin'); return q ? Math.ceil(q.getBoundingClientRect().height) : 0; });
+      await p.setViewportSize({ width: W, height: ph + pinH + 16 }); await wait(500);
+      await p.evaluate(([k0, pinH0]) => { const t = document.getElementById('sec-mo').getBoundingClientRect().top + scrollY; window.scrollTo(0, Math.max(0, t + k0 * 8000 - pinH0 - 8)); }, [k, pinH]); await wait(250);
+      const sc = await wheelToEnd();
+      n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + name + (pieces > 1 ? '-' + (k + 1) : '') + '.png') });
+      say('review of D-064 · BY MOMENT photographed from its top' + (pieces > 1 ? ', piece ' + (k + 1) + ' of ' + pieces : ''), { section: hs, window: ph + pinH + 16, box: sc,
+        lastColumn: await p.$eval('#mogrid th.monmh', (h) => { const r = h.getBoundingClientRect(); return { left: Math.round(r.left), right: Math.round(r.right), inWindow: r.right <= innerWidth && r.left >= 0 }; }) }); }
+    await p.setViewportSize({ width: W, height: H }); await wait(500); };
+  const open0 = await p.$eval('#mohead h3', (h) => h.getAttribute('aria-label')).catch(() => null);
+  if (open0 !== E) { await p.evaluate(() => window.scrollTo(0, 0)); await wait(150); await step('d064r-open-cooking-sessions', '#board tr.row[data-ep="' + E + '"] td.id', 'the row ' + E); }
+  say('review of D-064 · BY MOMENT is open on', await p.$eval('#mohead h3', (h) => h.getAttribute('aria-label')));
+  await secPics('d064r-by-moment-no-moment-column');
+  // the entity chip and the file:line in the last column, hovered with the mouse (the box wheeled to its end first, as a person would)
+  await center('#mogrid tr[data-f="over"]'); say('review of D-064 · the box, wheeled', await wheelToEnd());
+  await hoverPic('d064r hover the entity chip', '#mogrid td[data-nm] .mc[data-nmk="ent"]');
+  await center('#mogrid tr[data-f="fn"]'); await wheelToEnd();
+  await hoverPic('d064r hover the file and line', '#mogrid td[data-nm] .mc[data-nmk="file"]');
+  // the replay 201: which square is which is read off the page's data; the click is the mouse's
+  const iRe = await p.evaluate((ep) => { const R = window.AE_DATA.rows.find((q) => q.id === ep); return R.mo.ex.findIndex((x) => x[1] === 201 && JSON.stringify(x[9] || []).includes('existing is not None')); }, E);
+  const selRe = '#mobar .mopath[data-path="' + iRe + '"]';
+  await center('#mobar'); await step('d064r-pick-the-replay-201', selRe, 'the code "' + (await txt(selRe)) + '"');
+  const work = await p.$$eval('#mogrid td[data-mom="work"][data-f="fn"] .mc', (cs) => cs.map((c) => ((c.querySelector('.mt') || c).textContent || '').replace(/\s+/g, ' ').trim()));
+  say('review of D-064 · the replay 201 · the work\'s functions', { work, assertRecipeAllergenSafe: work.includes('assert_recipe_allergen_safe') });
+  { await center('#mogrid tr[data-f="fn"]'); await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(150);
+    const r = await p.evaluate(() => { const tr = document.querySelector('#mogrid tr[data-f="fn"]').getBoundingClientRect(), G = document.getElementById('mogrid').getBoundingClientRect(),
+      bar = document.getElementById('mobar').getBoundingClientRect(), pin = document.getElementById('pin'), pb = pin && pin.getBoundingClientRect().height ? pin.getBoundingClientRect().bottom : 0,
+      y = Math.max(Math.min(tr.top, bar.top) - 6, pb, 0); return { x: Math.max(0, G.left - 6), y, width: Math.min(innerWidth, G.right + 6) - Math.max(0, G.left - 6), height: Math.max(40, Math.min(tr.bottom + 6, innerHeight) - y) }; });
+    n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-d064r-replay-201-functions.png'), clip: r }); }
+  await center('#mobar'); await step('d064r-all-paths-again', '#mobar .mopath[data-path="all"]', 'the square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"');
+  // the code map in hide: its header photographed
+  await center('#ocol-cm .opt[data-carry="hide"]'); await step('d064r-code-map-hide', '#ocol-cm .opt[data-carry="hide"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="hide"]')) + '"');
+  say('review of D-064 · the code map\'s header, hide', await p.$eval('#cvcount', (e) => e.textContent));
+  { await center('#cvcount'); await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(150);
+    const r = await p.$eval('#cvcount', (e) => { const h = e.closest('h3').getBoundingClientRect(); return { x: Math.max(0, h.left - 8), y: Math.max(0, h.top - 8), width: h.width + 16, height: h.height + 16 }; });
+    n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-d064r-code-map-hide-header.png'), clip: { x: r.x, y: r.y, width: Math.min(W - r.x, r.width), height: Math.min(H - r.y, r.height) } }); }
+  await center('#ocol-cm .opt[data-carry="all"]'); await step('d064r-code-map-show-all', '#ocol-cm .opt[data-carry="all"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="all"]')) + '" (my pick)'); }
 say('rows at the end', await rows());
 say('page errors', errs);
 fs.writeFileSync(path.join(OUT, 'walk.json'), JSON.stringify({ viewport: [W, H], log }, null, 1));

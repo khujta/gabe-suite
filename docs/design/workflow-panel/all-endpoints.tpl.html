@@ -405,6 +405,11 @@
   table.motab thead th[data-block] { box-shadow: inset 0 3px 0 var(--bc, transparent); }
   table.motab th.mom { white-space: normal; overflow-wrap: anywhere; background: var(--raised); font-weight: 400; }
   table.motab td.mo0 { background: color-mix(in srgb, var(--ink) 2%, var(--card)); }
+  /* D-064 (2) · the last column, no moment: set apart from the moments by a double rule, its head in the moments' look */
+  table.motab th.monmh { white-space: normal; overflow-wrap: anywhere; background: var(--raised); font-weight: 400; }
+  table.motab th.monmh .mn { font-weight: 650; color: var(--ink); font-style: italic; }
+  table.motab[data-lay="cols"] th.monmh, table.motab[data-lay="cols"] td.monm { border-left: 3px double var(--rule); }
+  table.motab tr.monmr > th, table.motab tr.monmr > td { border-top: 3px double var(--rule); }
   table.motab tr[data-lit="true"] > th.mom { box-shadow: inset 4px 0 0 var(--accent); }
   /* an open slot (D-012's rule): a fixed moment nothing acts at is drawn, empty and dashed */
   .moempty { display: block; min-height: 14px; border: 1px dashed var(--rule); border-radius: 4px; }
@@ -1545,8 +1550,9 @@
   var MICON = { lay: { rows: '<rect x="3" y="3" width="6" height="18" rx="1.2"/><path d="M12 6h9M12 12h9M12 18h9"/>', cols: '<rect x="3" y="3" width="18" height="6" rx="1.2"/><path d="M6 12v9M12 12v9M18 12v9"/>' },
                 cell: { chips: '<rect x="3" y="6" width="8" height="5" rx="2"/><rect x="13" y="6" width="8" height="5" rx="2"/><rect x="3" y="13" width="11" height="5" rx="2"/>', counts: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5l2-1.5v8M10 16h4"/>' } };
   var MSTAGE = { edge: "EDGE", body: "INPUT", gate: "GATE", fields: "INPUT", checks: "HANDLER", work: "HANDLER", fail: "HANDLER", save: "HANDLER", answer: "ANSWER", uncaught: "UNCAUGHT" };
+  /* D-064 (2): every block is a row, the Overview's too — nothing of it acts at a moment, its facts stand in the no-moment column */
   function moFams() { var byB = {}; Object.keys(MO.fam).forEach(function (f) { byB[MO.fam[f]] = f; });
-    return D.orders[S.bord].map(function (b) { return byB[b]; }).filter(function (f) { return f && MO.timed.indexOf(f) >= 0; }); }
+    return D.orders[S.bord].map(function (b) { return byB[b]; }).filter(function (f) { return f; }); }
   function moK(ix) { return ix.map(function (i) { return MO.keys[i]; }); }
   function onPath(e) { return MPATH.i == null || e[5] == null || ((e[5] >>> MPATH.i) & 1) === 1; }
   /* a moment's words: its name; a catch's group names what raised and where it was caught (D-053's words); a handler run its lines */
@@ -1562,6 +1568,7 @@
      a call failed: the function the feed shows raising (when it names one) and the class its except takes; the checks; the work, the
      first function its run calls (+ how many more); saving, what the handler's own step does there. Any other moment: its short name */
   function moFace(r, x) { var m = x[0], xe = x[4] || [[], []], first = function (a) { return a.length ? a[0] + (a.length > 1 ? " +" + (a.length - 1) : "") : null; };
+    if (m === "nm") return [MW.nm.name];                          /* D-064 (2): the last column */
     if (m === "fail") { var g = r.d.exits.moms[x[1]], f = first(g[2]); return f ? [f, g[1]] : [g[1]]; }
     if (m === "work") return [first(xe[0]) || MW.moms.work.name];
     if (m === "save") return [xe[1].length ? xe[1].join(" · ") : MW.moms.save.name];
@@ -1597,6 +1604,10 @@
     if (X.cp) { ln(fill(XW.callPaths, { via: X.cp })); pl(fill(XW.callPathsPlain, { via: X.cp })); }   /* F3: on the call's paths, an upper bound */
     if (X.cn) { ln(fill(XW.cutNear, { v: X.cn })); pl(fill(XW.cutNearPlain, { v: X.cn })); }   /* review F3: a caller whose list is cut */
     if (X.cq && (MPATH.i == null || X.cq[1].indexOf(MPATH.i) >= 0)) { ln(fill(XW.callCheck, { via: X.cq[0] })); pl(fill(XW.callCheckPlain, { via: X.cq[0] })); }   /* review F1: a check inside a call, on the paths it rides only by that call */
+    /* review F1 (D-064 (1)): a function whose call line the map does not record, on the paths that leave the function it hangs under
+       partway — each named, on the picked path, or counted over all paths */
+    if (X.lq) X.lq.forEach(function (q) { if (MPATH.i != null && q[1].indexOf(MPATH.i) < 0) return;
+      ln(MPATH.i == null ? fill(XW.leftInAll, { via: q[0], n: q[1].length }) : fill(XW.leftIn, { via: q[0] })); pl(fill(XW.leftInPlain, { via: q[0] })); });
     if (X.fa && MPATH.i != null && X.fa[MPATH.i]) { ln(fill(XW.fate, { v: X.fa[MPATH.i].map(function (f) { return W.fates[f].name; }).join(" · ") })); pl(XW.fatePlain); }
     if (X.rc) { ln(fill(XW.race, { cons: X.rc[0] })); pl(fill(XW.racePlain, { cols: X.rc[2].join(", "), tbl: X.rc[1], st: X.rc[3] })); }
     /* D-057: (a) a check says the error it raises, with the words the code gives it · (e) the uncaught 500 says what escapes to it, and
@@ -1644,6 +1655,28 @@
     if (X.fa && MPATH.i != null && X.fa[MPATH.i]) X.fa[MPATH.i].forEach(function (fa) { c.appendChild(cFate(fa)); });   /* D-056 (4): this path's verdict */
     if (X.rc) { var rc = el("span", "mrc", MW.x.raceShort), rs = cStatus(X.rc[3]); kd(rs, ["status:" + X.rc[3]]); rc.appendChild(rs); c.appendChild(rc); }   /* D-056 (5) */
     return c; }
+  /* D-064 (2) · a fact of the endpoint no moment holds, in the table's last column: its words the words file's mo.nm.k, its values the
+     row record's (read and proven by the generator, no_moment); a keyed one wears the station's mark (D-052), the returned type of the
+     outline on its own name. Its hover (monm) says what it is and the block it belongs to */
+  function nmChip(x) { var k = x[1], X = x[4] || {}, K = MW.nm.k[k], c = el("span", "mc nmc"), ks = moK(x[2]), SW = W.codemap.sig;
+    c.setAttribute("data-f", x[0]); c.setAttribute("data-nmk", k); c.setAttribute("data-tip", "monm"); c._x = X; if (ks.length && k !== "sig") kd(c, ks);
+    var txt = function (t, cls) { if (t != null && t !== "") c.appendChild(moTxt(el("span", cls || "mt"), String(t))); };
+    if (k === "ep" || k === "ent" || k === "risk") txt(x[3]);
+    else if (k === "full" || k === "seg" || k === "cl") txt(fill(K.text, { v: x[3] }));
+    else if (k === "behind") txt(fill(X.dp === 1 ? K.text1 : K.text, { n: X.n, d: X.dp }));   /* review F8: one call deep, singular */
+    else if (k === "proof") txt(fill(W.panel.proofWords, { n: X.tested + "/" + X.produced, v: X.rank + (X.rank_to !== X.rank ? "\u2013" + X.rank_to : ""), of: X.of }));
+    else if (k === "alarm") c.appendChild(cAlarm(x[3]));
+    else if (k === "file") { txt(fill(K.text, { file: x[3], line: X.ln })); if (X.df != null) txt(fill(K.def, { n: X.df }), "mq"); }
+    else if (k === "sig") { txt([X.a ? SW.async : SW.sync, fill(SW.lines, { lines: X.n })].join(" \u00b7 ") + " \u00b7");
+      if (X.rt) { var rs = fill(SW.returns, { ret: "\u0000" }).split("\u0000"); txt(rs[0].trim()); var rn = el("span", "mt"); rn.textContent = X.rt; if (ks.length) kd(rn, ks); c.appendChild(rn); txt((rs[1] || "").trim()); }
+      c.setAttribute("data-def", x[3]); }
+    else if (k === "doc") txt(X.no ? SW.noDoc : fill(SW.doc, { v: x[3] }));
+    else if (k === "fate") X.f.forEach(function (q) { c.appendChild(cFate(q[0], q[1])); });
+    else if (k === "chain") txt(fill(K.text, { n: X.n }));
+    else if (k === "arr") { txt(x[3]); txt(K.text, "mq"); if (X.h && X.h.indexOf("h") >= 0) txt(X.h === "ah" ? W.panel.arrangedBoth : W.panel.arrangedHelper, "mq"); }
+    else if (k === "piece") c.appendChild(pieceWords(x[3], X.fk));
+    else if (k === "lack") { txt(K.text, "mq"); c.appendChild(pieceWords(x[3], X.fk)); txt(X.n + "/" + X.of, "mq"); }
+    return c; }
   function moOpts(bar) { ["lay", "cell"].forEach(function (g) { var R = MW.opt[g], grp = el("div", "mgrp"), o = el("div", "opts"); grp.appendChild(el("span", "rl", R.label));
     o.setAttribute("role", "radiogroup"); o.setAttribute("aria-label", R.label);
     Object.keys(R.opts).forEach(function (v) { var bt = el("button", "opt"); bt.type = "button"; bt.setAttribute("role", "radio"); bt.setAttribute("data-mopt", g); bt.setAttribute("data-v", v);
@@ -1658,7 +1691,7 @@
     /* behind the toggle (D-038): what a moment is, how the moments are read, what each block places across the feed */
     var I = $("info-mo"); I.textContent = ""; I.appendChild(el("p", "cap", MW.lede)); MW.how.forEach(function (l) { I.appendChild(el("p", "cap", l)); });
     I.appendChild(el("p", "cap", fill(MW.covHead)));
-    MO.timed.concat(MO.untimed).forEach(function (f) { var cv = MO.cov[f]; I.appendChild(el("p", "mocov", fill(MW.cov, { block: BLK[MO.fam[f]].name, placed: cv[0], un: cv[1], total: cv[0] + cv[1] }))); });
+    MO.timed.concat(MO.untimed).forEach(function (f) { var cv = MO.cov[f]; I.appendChild(el("p", "mocov", fill(MW.cov, { block: BLK[MO.fam[f]].name, placed: cv[0], un: cv[1], nm: cv[2], total: cv[0] + cv[1] + cv[2] }))); });
     I.appendChild(el("p", "cap", fill(MW.src, Object.assign({ occ: MO.occ }, MO.src)))); I.appendChild(el("p", "cap", fill(MW.off, { off: MO.off })));
     I.appendChild(el("p", "cap", fill(MW.offocc, { offocc: MO.offocc })));
     /* the bar: the path, then the two looks */
@@ -1687,20 +1720,30 @@
       if (!es.length) { t.className = "mo0"; var em = el("span", "moempty"); em.setAttribute("aria-label", MW.empty); em.setAttribute("title", MW.empty); t.appendChild(em); return t; }
       if (MS.cell === "counts") { var n = el("span", "mcount", String(es.length)); kd(n, [].concat.apply([], es.map(function (e) { return moK(e[2]); })), false); t.appendChild(n); return t; }
       var w = el("div", "mcs"); es.forEach(function (e) { w.appendChild(moChip(e)); }); t.appendChild(w); return t; }
+    /* D-064 (2) · the last column (a last row when the moments are rows): each block's facts no moment holds — the path row never hides
+       it, each fact is true of every path */
+    var nmBy = {}; (M.nm || []).forEach(function (x) { (nmBy[x[0]] = nmBy[x[0]] || []).push(x); });
+    function nmHead(tag) { var h = el(tag, "monmh"); h.setAttribute("data-tip", "nmhead"); h.setAttribute("data-mom", "nm"); h.setAttribute("aria-label", MW.nm.name);
+      var l1 = el("span", "mh1 wrap"); l1.appendChild(el("span", "mn", MW.nm.name)); h.appendChild(l1); return h; }
+    function tdNm(f) { var t = el("td", "monm"), xs = nmBy[f] || []; t.setAttribute("data-f", f); t.setAttribute("data-nm", "true");
+      if (!xs.length) { t.classList.add("mo0"); var em = el("span", "moempty"); em.setAttribute("aria-label", MW.nm.empty); em.setAttribute("title", MW.nm.empty); t.appendChild(em); return t; }
+      if (MS.cell === "counts") { var n = el("span", "mcount", String(xs.length)); kd(n, [].concat.apply([], xs.map(function (x) { return moK(x[2]); })), false); t.appendChild(n); return t; }
+      var w = el("div", "mcs"); xs.forEach(function (x) { w.appendChild(nmChip(x)); }); t.appendChild(w); return t; }
     function blockHead(f, tag) { var b = MO.fam[f], th = el(tag); th.setAttribute("data-block", b); th.setAttribute("data-f", f); th.setAttribute("data-tip", "block"); th.appendChild(markEl(b)); th.appendChild(document.createTextNode(BLK[b].name));
       if (f === "end") { var ni = el("span", "ainfo moinf", fill(MW.noCode)); ni.id = "mo-nocode"; th.appendChild(ni); }   /* D-057: true of every refusal the app sends, so no moment of its own */
       if (D.marks[b] && D.marks[b].col) th.style.setProperty("--bc", D.marks[b].col); return th; }
     var G = $("mogrid"); G.textContent = ""; var t = el("table", "motab"), th = el("thead"), hr = el("tr"), tb = el("tbody"), cg = el("colgroup");
     t.setAttribute("data-lay", MS.lay); t.setAttribute("data-cell", MS.cell); t.setAttribute("data-path", MPATH.i == null ? "all" : String(MPATH.i));
-    var nData = MS.lay === "rows" ? fams.length : rowsOn.length, dcs = []; cg.appendChild(el("col", "mhc")); for (var cj = 0; cj < nData; cj++) dcs.push(cg.appendChild(el("col")));
+    var nData = MS.lay === "rows" ? fams.length : rowsOn.length + 1, dcs = []; cg.appendChild(el("col", "mhc")); for (var cj = 0; cj < nData; cj++) dcs.push(cg.appendChild(el("col")));
     t.appendChild(cg); t.style.minWidth = "calc(" + (MS.lay === "rows" ? 11 : 9.5) + "em + " + nData + " * 6.5em)";   /* a column's floor */
-    var need = rowsOn.map(function (si) { return moNeed(r, M.sp[si]); });
+    var need = rowsOn.map(function (si) { return moNeed(r, M.sp[si]); }).concat([moNeed(r, ["nm"])]);   /* the moments', then the no-moment column's */
     if (MS.lay === "rows") { cg.firstChild.style.width = "max(11em, " + Math.max.apply(null, need.concat([0])) + "ch)";   /* the heads' column: its longest head */
       hr.appendChild(el("th", null, MW.opt.lay.label)); fams.forEach(function (f) { hr.appendChild(blockHead(f, "th")); });
       rowsOn.forEach(function (si) { var tr = el("tr"); tr.setAttribute("data-mom", M.sp[si][0]); tr.setAttribute("data-si", String(si)); tr.appendChild(moHead(r, M.sp[si], "th", si));
-        fams.forEach(function (f) { tr.appendChild(td(si, f)); }); tb.appendChild(tr); }); }
-    else { hr.appendChild(el("th", null, W.sec.mo)); rowsOn.forEach(function (si) { hr.appendChild(moHead(r, M.sp[si], "th", si)); });
-      fams.forEach(function (f) { var tr = el("tr"); tr.setAttribute("data-f", f); tr.appendChild(blockHead(f, "th")); rowsOn.forEach(function (si) { tr.appendChild(td(si, f)); }); tb.appendChild(tr); }); }
+        fams.forEach(function (f) { tr.appendChild(td(si, f)); }); tb.appendChild(tr); });
+      var trn = el("tr", "monmr"); trn.setAttribute("data-nm", "true"); trn.appendChild(nmHead("th")); fams.forEach(function (f) { trn.appendChild(tdNm(f)); }); tb.appendChild(trn); }
+    else { hr.appendChild(el("th", null, W.sec.mo)); rowsOn.forEach(function (si) { hr.appendChild(moHead(r, M.sp[si], "th", si)); }); hr.appendChild(nmHead("th"));
+      fams.forEach(function (f) { var tr = el("tr"); tr.setAttribute("data-f", f); tr.appendChild(blockHead(f, "th")); rowsOn.forEach(function (si) { tr.appendChild(td(si, f)); }); tr.appendChild(tdNm(f)); tb.appendChild(tr); }); }
     th.appendChild(hr); t.appendChild(th); t.appendChild(tb); G.appendChild(t);
     skAll(G);                                                   /* D-052 marks before the widths: moFloor measures the labels too */
     /* moments as columns: each column's share of the box follows what its head needs (D-055), so the heads' two lines fit where the box
@@ -1722,10 +1765,9 @@
         over = ww.reduce(function (a, b) { return a + b; }, 0) - room, slack = ww.map(function (w, j) { return Math.max(0, w - flo[j]); }), sl = slack.reduce(function (a, b) { return a + b; }, 0);
       if (over > 0 && sl > 0) dcs.forEach(function (c, j) { c.style.width = Math.floor(ww[j] - Math.min(slack[j], over * slack[j] / sl)) + "px"; }); }
     var sc = $("moscroll"); sc.hidden = !(G.scrollWidth > G.clientWidth + 2);
-    /* the band: the blocks that happen in no time, then each timed block's elements with no moment here, by reason, counted */
+    /* the band: each block's elements that should have a moment and the map cannot place here, by reason, counted — what has no moment
+       by nature stands in the table's last column (D-064 (2)) */
     var B = $("moband"); B.textContent = ""; B.appendChild(el("h3", null, MW.band.title)); B.appendChild(el("p", "plain ainfo", MW.band.plain));
-    MO.untimed.forEach(function (f) { var row = el("div", "mbb"); row.setAttribute("data-f", f); var n = el("span", "mbn"); n.appendChild(markEl(MO.fam[f])); n.appendChild(document.createTextNode(BLK[MO.fam[f]].name));
-      var bw = el("span"); bw.appendChild(el("b", null, MW.band.noTime)); bw.appendChild(el("span", "ainfo", " · " + MW.band.untimed[f])); row.appendChild(n); row.appendChild(bw); B.appendChild(row); });
     var any = 0;
     fams.forEach(function (f) { var us = M.un.filter(function (u) { return u[0] === f; }); if (!us.length) return; any += us.length;
       var row = el("div", "mbb"); row.setAttribute("data-f", f); var n = el("span", "mbn"); n.appendChild(markEl(MO.fam[f])); n.appendChild(document.createTextNode(BLK[MO.fam[f]].name));
@@ -1939,6 +1981,13 @@
       return "<b>" + esc(moName(rr0, x0)) + "</b>" + (t.getAttribute("data-lines") ? "<span class=ln>" + esc(t.getAttribute("data-lines")) + "</span>" : "")
         + (st0 ? "<span class=ln>" + esc(fill(W.mo.head.stage, { v: st0 })) + (W.stages[st0] ? " — " + esc(W.stages[st0]) : "") + "</span>" : "")
         + (cl0.length ? "<span class=ln>" + esc(fill(W.mo.head.calls, { v: cl0.join(" · ") })) + "</span>" : "") + "<span class=pl>" + esc(W.mo.moms[x0[0]].plain) + "</span>"; }
+    if (kind === "nmhead") return "<b>" + esc(W.mo.nm.name) + "</b><span class=pl>" + esc(W.mo.nm.plain) + "</span>";   /* D-064 (2) */
+    if (kind === "monm") { var nk = t.getAttribute("data-nmk"), NK = W.mo.nm.k[nk], nb = BLK[D.mo.fam[t.getAttribute("data-f")]], nx = t._x || {}, nks = keysOf(t);
+      return "<b>" + esc(NK.name) + "</b> · " + esc(nb.name) + " · " + esc(W.mo.nm.name) + (nks.length ? "<span class=ln>" + esc(elName(nks[0])) + "</span>" : "")
+        + (nk === "full" && nx.mt ? "<span class=ln>" + esc(fill(NK.mount, { v: nx.mt })) + "</span>" : "")
+        + (nk === "sig" && t.getAttribute("data-def") ? "<span class=ln><code>" + esc(t.getAttribute("data-def")) + "</code></span>" : "")
+        + (nx.lb && NK.label ? "<span class=ln>" + esc(fill(NK.label, { v: nx.lb })) + "</span>" : "")   /* review F6: the map's own label for its path */
+        + "<span class=pl>" + esc(nk === "risk" && NK.ids[nx.id] ? NK.ids[nx.id].plain : NK.plain) + "</span>" + "<span class=pl>" + esc(W.mo.nm.plain) + "</span>"; }   /* review F4: each flag its own words */
     if (kind === "mowhy") { var mw = W.mo.why[t.getAttribute("data-why")]; return "<b>" + esc(mw.name) + "</b> · " + esc(W.mo.band.title) + "<span class=pl>" + esc(mw.plain) + "</span>"; }
     if (kind === "mochip") { var mf = t.getAttribute("data-f"), mb = BLK[D.mo.fam[mf]], mks = keysOf(t), mh = t.getAttribute("data-hint");
       return "<b>" + esc(fill(W.mo.tip, { name: mks.length ? elName(mks[0]) : t.textContent.trim(), block: mb.name })) + "</b>" + (mh ? "<span class=ln>" + esc(mh) + "</span>" : "")

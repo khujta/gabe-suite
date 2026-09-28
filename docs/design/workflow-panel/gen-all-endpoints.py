@@ -470,8 +470,7 @@ MO_RANK = {"checks": 0, "work": 1, "fail": 2, "save": 3}
 MO_FAM = (("end", "kinds-of-ending"), ("gate", "deciding-branches"), ("data", "operation-per-table"), ("fn", "decision-point-functions"),
           ("shape", "request-shape"), ("client", "what-the-screen-does-on-this-ending"), ("inf", "in-flight-values"),
           ("proof", "case-role-on-this-endpoint"), ("stage", "the-ordered-chain-per-ending"), ("std", "switches"), ("over", "findings"))
-MO_WHY = ("nolink", "twomom", "notable", "firstcall", "spans", "member", "noend", "timeless", "nosite", "pathsonly", "fnnone", "swmoves", "nopath",
-          "noname", "arranged")
+MO_WHY = ("nolink", "twomom", "notable", "firstcall", "spans", "member", "noend", "nosite", "pathsonly", "fnnone", "swmoves", "nopath", "noname", "in500")
 MO_SRC = ("own", "chain", "reached", "edges", "wide", "order", "gate", "after", "none")
 CALL_REL = {"calls", "binds"}                                    # the station's call edges a function is reached through
 
@@ -699,18 +698,107 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                                                      and ((fbr.get(s.get("ref")) or {}).get("return") or (fbr.get(s.get("ref")) or {}).get("exit"))}
                                                     | {pre_at.get(s.get("at")) for s in ch if s.get("kind") == "gate" and s.get("hit")}) if T}
              for pid, ch in chains.items()}
+    left = lambda pid, aft: bool(taken[pid] & aft)               # THE rule (F1): the path met, and left at, a condition `aft` says must not hold
+    # D-064 (1) (his ruling 2026-09-28): a FUNCTION behind the handler follows the same rule. The feed records no `after` list for a
+    # call, so a function's is read from the same records the checks' lists are made of: the leaving points of the function that calls
+    # it (its reached_by route's `via`), between that function's def and the call site — each check with a condition (a precondition)
+    # at its line, each fork whose arm returns or leaves (a branch with a condition) at the line its chain step stands at — as the words
+    # `taken` holds for a path that leaves there ("not (P)"), and, up to the handler, the caller's own. A path the rule says leaves before
+    # it is dropped from its chip; one its own steps put there never is (PROOF, below). A route the handler makes itself adds nothing:
+    # the chain says which paths make the handler's call
+    LPT = [(_file(g0["at"]), _line(g0["at"]), "not (" + str(g0["pred"]) + ")") for g0 in fep.get("preconditions") or [] if g0.get("pred") and g0.get("at")]
+    lvb = lambda s: s.get("kind") == "branch" and bool((fbr.get(s.get("ref")) or {}).get("pred")) and bool((fbr.get(s.get("ref")) or {}).get("return") or (fbr.get(s.get("ref")) or {}).get("exit"))
+    LPT += sorted({(_file(s["at"]), _line(s["at"]), "not (" + str(fbr[s["ref"]]["pred"]) + ")") for ch in chains.values() for s in ch if lvb(s) and s.get("at")})
+    # where each path LEFT, by position: the forks it took that return or leave, the checks it fired (the positions `taken`'s words come
+    # from); and where a catch took it in (a raise caught there does not leave the function: the code after the except runs)
+    hitpos = {pid: {(_file(s["at"]), _line(s["at"])) for s in ch if s.get("hit") and s.get("at") and (lvb(s) or (s.get("kind") == "gate" and s["at"] in pre_at))}
+              for pid, ch in chains.items()}
+    catpos = {pid: {(_file(s["at"]), _line(s["at"])) for s in ch if s.get("kind") == "catch" and s.get("at")} for pid, ch in chains.items()}
+    # a call written inside an except body runs only on the paths that catch into it: the catch whose except holds the call's line
+    exb = [(c0.get("fn"), _file(c0.get("at")), _line(c0.get("at")), max([_line(c0.get("at")) or 0] + [x0.get("at") for x0 in c0.get("actions") or [] if isinstance(x0.get("at"), int)]))
+           for c0 in (fep.get("failure") or {}).get("catches") or [] if c0.get("at")]
+    # review F2 (D-064 (1)): a raise the forms feed records in a function (functions{} raises) is a leaving point of the function that
+    # calls it, at that call's site — read off the raising function's own reached_by routes (root this endpoint): its handler call, the
+    # function it is called in (`via`) and the site there. Two sites in one function order two calls without its def line. A path left
+    # there only where the map says so: its chain fires that raise, or its exit was read to it (effects read_to)
+    RZ = [(z["at"], b["via"], _line(b["root_site"]), _file(b["site"]), _line(b["site"]), None if b.get("paths") is None else set(b["paths"]))
+          for rec in fns.values() for z in rec.get("raises") or [] if z.get("at")
+          for rb in rec.get("reached_by") or [] if rb.get("root") == E
+          for b in _routes(rb) if inh(b.get("root_site")) and b.get("via") and b.get("site")]
+    zpos = {pid: {s["at"] for s in ch if s.get("kind") == "gate" and s.get("hit") and s.get("at")} | ({EFP[pid]["read_to"]} if EFP[pid].get("read_to") else set())
+            for pid, ch in chains.items()}
+
+    def before(f, q, seen=frozenset()):
+        """D-064 (1): where a path must leave for f NOT to run from handler call q — per route of f's reached_by records (root this
+        endpoint, root site q): {t: the words (`taken`'s), r: the (file, first line, call line) ranges they stand in, p: the paths the
+        route names (None: it names none), c: the catches (file, line) whose except body holds a call on the way, z: the raises called
+        before it (review F2: (the raise's line, file, the site it is called at, the call's site))}; None when no record places f at
+        that call. A call inside an except body counts the leaving points of that body alone. A caller's own route is joined on, up
+        to the handler"""
+        alts = []
+        for rb in (fns.get(f) or {}).get("reached_by") or []:
+            for b in _routes(rb) if rb.get("root") == E else ():
+                if _line(b.get("root_site")) != q or not inh(b.get("root_site")):
+                    continue
+                g0, S = b.get("via"), b.get("site")
+                bp = None if b.get("paths") is None else {x for x in b["paths"] if x in EXIT}
+                d0 = _line((fns.get(g0) or {}).get("at"))
+                if not g0 or g0 == H or not S or g0 in seen:
+                    alts.append({"t": set(), "r": [], "p": bp, "c": [], "z": set()})
+                    continue
+                fl0, s0 = _file(S), _line(S) or 0
+                ex = [(fl1, c1) for fn1, fl1, c1, e1 in exb if fn1 == g0 and fl1 == fl0 and c1 is not None and c1 < s0 <= e1]
+                lo = max([d0] + [c1 for _f1, c1 in ex]) if d0 is not None else max([c1 for _f1, c1 in ex], default=None)
+                rg = (fl0, lo, s0) if lo is not None else None
+                here = {t0 for fl, ln, t0 in LPT if rg and fl == rg[0] and rg[1] <= ln < rg[2]}
+                zs = {(za, fl0, sz, s0) for za, via, rq, sf, sz, _zp in RZ if rq == q and via == g0 and sf == fl0 and sz is not None and sz < s0 and (lo is None or lo <= sz)}
+                for up in before(g0, q, seen | {f}) or [{"t": set(), "r": [], "p": None, "c": [], "z": set()}]:
+                    alts.append({"t": up["t"] | here, "r": up["r"] + ([rg] if rg else []), "p": bp if up["p"] is None else up["p"] if bp is None else bp & up["p"],
+                                 "c": up["c"] + ex[-1:], "z": up["z"] | zs})
+        return alts or None
+
+    def zleft(pid, a):
+        """review F2: the path left at a raise called before f on this route — its chain fires it or its exit was read to it — and no
+        catch in the function between took it in before f's call"""
+        return any(za in zpos[pid] and not any(cf == fl and sz < cl <= s0 for cf, cl in catpos[pid]) for za, fl, sz, s0 in a["z"])
+
+    def leaves(pid, alts, why=None):
+        """on every route of f this path is on, it does not get to f: it enters no except body the call stands in (its chain carries no
+        step of that catch), or it met a leaving point before the call — the check rule's own test on the words, CONFIRMED by its chain:
+        it left at a line inside that route's ranges and no catch of that function took it in before the call; or (review F2) a raise
+        called before it that the map shows the path leaving at. Words met with no such line are counted (`why`), never taken for a
+        leaving"""
+        on = [a for a in alts or () if a["p"] is None or pid in a["p"]]
+        if not on:
+            return False
+        how = "catch"
+        for a in on:
+            if a["c"] and not set(a["c"]) <= catpos[pid]:
+                continue                                             # it never enters the except body the call is written in
+            if zleft(pid, a):
+                how = "raise"
+                continue
+            if not left(pid, a["t"]):
+                return False
+            if not any(fl == f0 and lo <= ln < hi and not any(cf == f0 and ln < cl <= hi for cf, cl in catpos[pid])
+                       for fl, ln in hitpos[pid] for f0, lo, hi in a["r"]):
+                if why is not None:
+                    why["d64:words"] += 1
+                return False
+            how = "left"
+        return how
     for i, t in enumerate(rows):
         for c in t["checks"]:
             g, q = pre[c], own_line(pre[c])
             w = (("h", q, "checks") if t["mom"] in ("checks", "unplaced") else ("h", q)) if q else row_when(i)
             onr = on_ref[t["x"]["id"]] if t["x"] is not None else set()
             aft = set((fpre.get(g["id"]) or g).get("after") or [])
-            cps = {pid for pid in site_paths.get(via_q(g), set()) if not (taken[pid] & aft)}
+            cps = {pid for pid in site_paths.get(via_q(g), set()) if not left(pid, aft)}
             gx = (fpre.get(g["id"]) or g).get("exit")               # the check's OWN step on a chain: a gate at its line, or its own ending's
             own_c = {pid for pid, ch in chains.items() if any((s.get("kind") == "gate" and g.get("at") and s.get("at") == g.get("at"))
                                                               or (gx and s.get("kind") in ("gate", "exit") and s.get("ref") == gx) for s in ch)}
-            if any(taken[pid] & aft for pid in own_c):
-                die(f"{lab}: the check {g['id']} is on a path's chain that the feed also shows leaving before it: {sorted(p0 for p0 in own_c if taken[p0] & aft)[:2]}")
+            if any(left(pid, aft) for pid in own_c):
+                die(f"{lab}: the check {g['id']} is on a path's chain that the feed also shows leaving before it: {sorted(p0 for p0 in own_c if left(p0, aft))[:2]}")
             tally["f1:drop"] += len(site_paths.get(via_q(g), set()) - cps - onr)
             pp = onr | cps
             # D-057 (a): a check that is a raise functions{} records says what it raises, and its words where the code writes them out
@@ -956,8 +1044,8 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                          for q in (sites(cl.get("fn"))[0] if cl.get("fn") != H else [_line(cl.get("at"))] if inh(cl.get("at")) else [])})
             w = ("hs", qs) if qs else ("un", "nolink")
         else:
-            w = ("un", "timeless")
-        add("std", w, ["piece:" + pr["key"]], pr["words"], None, None, None, "x:" + pr["key"])
+            w = ("nm",)                                          # D-064 (2): what the endpoint IS (its method, its login, its limit) has no moment by nature
+        add("std", w, ["piece:" + pr["key"]], pr["words"], None, None, None, "x:" + pr["key"], x={"fk": [pr.get("family"), (pr.get("key") or "").split(":", 1)[-1]]})
 
     # ── 3 · the handler's runs, from every handler line an element or a step occurrence acts at; then the spine ──
     items = {(q, c) for q, c in anchors}
@@ -1136,6 +1224,111 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     # ── 5 · each data occurrence on its path's spine: one moment, else the one between its recorded neighbours, else none; then
     # the data elements (one chip per read or write per moment — a step recorded twice, once conditional, is one chip) and the
     # functions the calls reach ──
+    # review F7 (a): the handler call a path LEAVES inside, where the map shows it — the raise its exit was read to (the routes of the
+    # function the forms feed records that raise in name one handler call), else the last handler call its chain makes before a check
+    # fires outside the handler's own lines
+    qleave = {}
+    for pid, ch in chains.items():
+        rt = EFP[pid].get("read_to")
+        qs0 = {rq for za, _v, rq, _sf, _sz, zp in RZ if za == rt and (zp is None or pid in zp)} if rt else set()
+        if not qs0:
+            last = None
+            for s in ch:
+                if s.get("kind") in ("call", "collapsed") and inh(s.get("at")):
+                    last = _line(s["at"])
+                elif last is not None and s.get("hit") and s.get("at") and not inh(s.get("at")) and (s.get("kind") == "gate" or lvb(s)):
+                    qs0 = {last}
+        if len(qs0) == 1:
+            qleave[pid] = next(iter(qs0))
+    # review F1 (D-064 (1)): a function behind the handler whose call line the map does not record (the walk's D-061, the name-joined
+    # D-062) cannot be dropped from a path — but a path the map shows leaving the function it hangs under PARTWAY may leave before it is
+    # called, and its chip says so on that path ("lq", an upper bound on those paths alone). Partway, where the map shows it: (i) a check
+    # fires or a fork returns inside that function's body (its def line from the forms feed, its length from the archmap), or inside a
+    # function the forms feed routes through it, or its exit was read to such a raise; no catch in that body took the path back in;
+    # (ii) the path's chain makes the handler call, then enters one of the handler's own excepts with nothing firing on the way — an
+    # error came out of that call and the map does not say where it was raised, so every function under the call may be left before
+    FL = X.get("fnlines") or {}
+
+    def gbody(g):
+        d0, n0 = _line((fns.get(g) or {}).get("at")), FL.get(g)
+        return (_file(fns[g]["at"]), d0, d0 + n0 - 1) if d0 is not None and n0 and _file(fns[g]["at"]) == g.split("::")[0] else None
+
+    def through(k, q, g, seen=frozenset()):
+        """the forms feed's routes take function k, from handler call q, through function g"""
+        for rb in (fns.get(k) or {}).get("reached_by") or []:
+            for b in _routes(rb) if rb.get("root") == E else ():
+                if _line(b.get("root_site")) == q and inh(b.get("root_site")):
+                    v = b.get("via")
+                    if v == g or (v and v != H and v not in seen and through(v, q, g, seen | {k})):
+                        return True
+        return False
+    zfn = collections.defaultdict(set)                             # a raise's line → the functions the forms feed records it in
+    for k0, rec in fns.items():
+        for z in rec.get("raises") or []:
+            if z.get("at"):
+                zfn[z["at"]].add(k0)
+    lvpos = {pid: [(i, _file(s["at"]), _line(s["at"])) for i, s in enumerate(ch) if s.get("hit") and s.get("at") and (s.get("kind") == "gate" or lvb(s))]
+            + ([(len(ch), _file(EFP[pid]["read_to"]), _line(EFP[pid]["read_to"]))] if EFP[pid].get("read_to") else []) for pid, ch in chains.items()}
+
+    # a catch on the chain inside a body that SWALLOWS the error (the function goes on); one that passes it on or translates it
+    # leaves the function all the same
+    swallowed = lambda s, b: s.get("kind") == "catch" and _file(s.get("at")) == b[0] and b[1] <= (_line(s.get("at")) or 0) <= b[2] \
+        and (cat_rec.get(s.get("at")) or {}).get("outcome") == "swallow"
+
+    def partway(pid, g, q):
+        """(i): the path leaves g partway — a leaving point inside g's body, or in a function routed through g (a raise the forms
+        feed records there, or a check in its body), and no catch later on the chain inside g's body takes it back in"""
+        b = gbody(g)
+        for i, fl, ln in lvpos[pid]:
+            inb = b is not None and fl == b[0] and b[1] <= ln <= b[2]
+            deep = any(through(k0, q, g) for k0 in zfn.get(f"{fl}:{ln}", ())) or any(
+                through(k0, q, g) for k0 in fns if k0 != g and (lambda b2: b2 is not None and fl == b2[0] and b2[1] <= ln <= b2[2])(gbody(k0)))
+            if not (inb or deep):
+                continue
+            if b is not None and any(swallowed(s, b) for s in chains[pid][i + 1:]):
+                continue                                             # a catch inside g took it back in and swallowed it: g went on
+            return True
+        return False
+    # (ii): per path, the handler calls an error came out of with no line the map names for its raise
+    unk = collections.defaultdict(set)
+    for pid, ch in chains.items():
+        if EFP[pid].get("read_to"):
+            continue
+        calls_, hits_ = [], []
+        for s in ch:
+            k = s.get("kind")
+            if k in ("call", "collapsed") and inh(s.get("at")):
+                calls_.append(_line(s["at"]))
+            elif k == "catch" and inh(s.get("at")):
+                c = _line(s["at"])
+                # a check firing outside the handler, or on a handler line before the except, names where it left: (i) reads it; one
+                # on a line after the except is the except's own answer
+                if not any(not inh(a) or (_line(a) or 0) < c for a in hits_):
+                    unk[pid] |= {q0 for q0 in calls_ if q0 < c}
+                calls_, hits_ = [], []
+            elif s.get("hit") and s.get("at") and (k == "gate" or lvb(s)):
+                hits_.append(s["at"])
+    # the function a handler call calls (the chains' own callees at that line): the one an error of (ii) came out of
+    callee_at = lambda q: ", ".join(sorted({nm(f0) for f0, qs0 in direct.items() if q in qs0})) or f"@ {q}"
+    # review F3: the uncaught 500's record names an error it passes on at a re-raise — the line of that `raise`
+    pt500 = [(_file(u[len("pass-through raise "):]), _line(u[len("pass-through raise "):])) for x in fep.get("produced") or [] if x.get("phase") == "uncaught"
+             for u in x.get("unknown_causes") or [] if str(u).startswith("pass-through raise ")]
+
+    def lq_add(e, name, pids, how="p"):
+        """how: i — it leaves that function partway where the map shows it · ii — an error out of the call, raised where the map does
+        not say · p — its parent's or caller's own such paths"""
+        if pids:
+            e["x"].setdefault("lq", {}).setdefault(name, set()).update(pids)
+            for p0 in pids:
+                e.setdefault("_lqh", {}).setdefault(p0, set()).add(how)
+
+    def route_broken(k, q, seen=frozenset()):
+        """the forms feed's routes do not carry function k from handler call q all the way up to the handler: somewhere on the way a
+        function has no route of its own, so the line it is called at is not recorded"""
+        rs = [b for rb in (fns.get(k) or {}).get("reached_by") or [] if rb.get("root") == E for b in _routes(rb) if _line(b.get("root_site")) == q and inh(b.get("root_site"))]
+        return not rs or any(b.get("via") and b["via"] != H and (b["via"] in seen or route_broken(b["via"], q, seen | {k})) for b in rs)
+    # the functions a handler call calls (the chains' own callees there): what a function under that call hangs under, where nothing nearer is known
+    at_q = lambda q: {f0 for f0, qs0 in direct.items() if q in qs0}
     place, miss = {}, {}
     for pid, lst in occ.items():
         xe = xe_of(pid)
@@ -1165,6 +1358,10 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                     place[(pid, j)] = (next(iter(inr)), next(iter(inr.values())), "order", lst[j][3] == "wide"); del miss[(pid, j)]
             elif prev and nxt and prev[1] is not None and prev[1] == nxt[1]:
                 place[(pid, j)] = (prev[0], prev[1], "order", prev[3] or nxt[3]); del miss[(pid, j)]
+            elif prev and not nxt and prev[1] is not None and prev[1] == qleave.get(pid):
+                # review F7 (a): a step the path records after its last placed one, with none after it, where the path leaves inside
+                # the very call that last one stands at — it ran inside that call, before the path left
+                place[(pid, j)] = (prev[0], prev[1], "order", prev[3]); del miss[(pid, j)]; tally["f7:trail"] += 1
         seen_si = [place[(pid, j)][0] for j in range(len(lst)) if (pid, j) in place and lst[j][2] != "after"]
         if any(b < a for a, b in zip(seen_si, seen_si[1:])):                # PROOF: the recorded order is the spine's
             die(f"{lab} {pid}: its steps, placed, run against the order the path records them in: {seen_si}")
@@ -1261,12 +1458,17 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             if (f, q) not in fq or not fq[(f, q)][2]:
                 x = fq.setdefault((f, q), [set(), set(), False])
                 x[0] |= (ps if ps is not None else site_paths.get(q, set()))
+    fown = collections.defaultdict(set)                          # D-064 (1): per (function, call), the paths its own steps put there
     for (pid, j), (si, q, src, wd) in place.items():
         f = (steps.get(occ[pid][j][0]) or {}).get("fn")
         if q is None or not f or f == H or src == "own":
             continue
+        fown[(f, q)].add(pid)
         x = fq.setdefault((f, q), [set(), set(), False])
-        if not x[2]:
+        # review F7 (b, c): a function a chain calls stands on the paths its call is on AND on those its own steps run on (a chain that
+        # leaves the call out, the path's own step there says it ran) — as a data chip there already does
+        if not x[2] or pid not in x[0]:
+            tally["f7:own"] += bool(x[2])
             x[0].add(pid)
             if wd:
                 x[1].add(pid)
@@ -1279,8 +1481,32 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         die(f"{lab}: the code map says the depth of {near[:3]} is not known, yet the map's call edges reach them from the handler")
     depth = {f: dp for f, dp, _dep in BH["walk"]}
     for (f, q), (ps, pw, dr) in sorted(fq.items(), key=lambda kv: (kv[0][1], kv[0][0])):
-        add("fn", ("h", q), [fk(f)], nm(f), None, ps, f"@ {q}" if dr else None, "f:" + f, x={"dp": depth[f]} if f in depth else None)
-        els[-1]["pw"] = pw
+        # D-064 (1): a function the chain does not call itself (a reached_by record, a step of its own under the call) stands on the
+        # call's paths LESS those that leave before it inside the functions between (the check rule). PROOF: never a path its own steps
+        # put there
+        lv = None if dr else before(f, q)
+        gone = {pid: w0 for pid in ps for w0 in [leaves(pid, lv, tally) if lv else False] if w0}
+        if set(gone) & fown.get((f, q), set()):
+            die(f"{lab}: {nm(f)}'s own steps run on {sorted(set(gone) & fown[(f, q)])[:2]}, which the check rule says do not reach it")
+        e = add("fn", ("h", q), [fk(f)], nm(f), None, ps - set(gone), f"@ {q}" if dr else None, "f:" + f, x={"dp": depth[f]} if f in depth else None)
+        e["pw"] = pw - set(gone)
+        e["_q"], e["_par"], e["_dr"] = q, set(), dr
+        if not dr:                                                   # review F1 (ii): an error out of the call, raised where the map does not say
+            lq_add(e, callee_at(q), {pid for pid in e["paths"] - fown.get((f, q), set()) if q in unk[pid]}, "ii")
+            if route_broken(f, q):                                   # (i): a route that stops short of the handler hangs under the call's callee
+                e["_par"] = at_q(q)
+                for G in sorted(e["_par"]):
+                    lq_add(e, nm(G), {pid for pid in e["paths"] - fown.get((f, q), set()) if partway(pid, G, q)}, "i")
+        if gone:
+            e["_pre"] = set(ps)
+            tally["d64:chips"] += 1
+            for w0 in gone.values():
+                tally["d64:" + w0] += 1
+            # review F3: a call written in an except no chain enters, where the uncaught 500 says an error passes through that except
+            # (its record names the except's re-raise): it runs on the way to the 500, a path the map does not follow step by step
+            if not e["paths"] and set(gone.values()) == {"catch"} and any(
+                    fl == pf and c1 < pl <= e1 for a in lv or () for fl, c1 in a["c"] for fn1, fl1, c1b, e1 in exb if fl1 == fl and c1b == c1 for pf, pl in pt500):
+                e["_why"] = "in500"; tally["f3:in500"] += 1
     # D-056 (1): every function behind the handler that no call above already places — the lab's walk over the station's call edges
     # (levels.json fn_edges), each with its depth, then the card's other callees (no depth). Where each stands: the handler calls that
     # reach it (the chains', functions{}.reached_by, the call edges); else, under a dependency, the dependencies; else the moment a
@@ -1322,8 +1548,10 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                 pe = [e0 for e0 in els if e0["f"] == "fn" and e0["keys"][:1] == [fk(BH["par"][f])] and e0["w"][0] != "un"
                       and isinstance(e0.get("paths"), set) and e0["paths"]] if BH["par"].get(f) else []
                 pp = set().union(*(e0["paths"] for e0 in pe)) if pe else set()
+                ppre = set().union(*(e0.get("_pre") or e0["paths"] for e0 in pe)) if pe else set()   # D-064 (1): the parent's paths before its drop
                 pcp = next(((e0.get("x") or {}).get("cp") for e0 in pe if (e0.get("x") or {}).get("cp")), None)
                 par_exact = bool(ps & pp) and not pcp
+                pre64 = ps & ppre if ps & ppre != ps & pp else None
                 if ps & pp:
                     ps &= pp
                     inf &= ps
@@ -1343,7 +1571,21 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                     xq["cp"] = ", ".join(nm(g) for g in via) or None
                     tally["beh:cp"] += 1
                 if ps:
-                    add("fn", ("h", min(qq)), [fk(f)], nm(f), None, ps, None, "f:" + f, x=xq or None)
+                    e1 = add("fn", ("h", min(qq)), [fk(f)], nm(f), None, ps, None, "f:" + f, x=xq or None)
+                    if pre64 is not None and pre64 != ps:        # D-064 (1): it follows its parent's drop
+                        e1["_pre"] = pre64; tally["d64:follow"] += 1
+                    # review F1: the map records no line its parent calls it at — on a path that leaves the parent partway it may never
+                    # be called (i), or (ii) an error came out of the handler call from where the map does not say; its parent's own
+                    # such paths are its too. Never on a path its own steps run on
+                    q0 = min(qq)
+                    Gs = {BH["par"][f]} if BH["par"].get(f) else at_q(q0)     # no walk parent (the card's other callees): the call's callee
+                    for e0 in pe:
+                        for k0, s0 in (e0["x"].get("lq") or {}).items():
+                            lq_add(e1, k0, (s0 & ps) - own)
+                    for G in sorted(Gs):
+                        lq_add(e1, nm(G), {pid for pid in ps - own if partway(pid, G, q0)}, "i")
+                    lq_add(e1, callee_at(q0), {pid for pid in ps - own if q0 in unk[pid]}, "ii")
+                    e1["_q"], e1["_par"], e1["_own"] = q0, Gs, own
                 else:
                     add("fn", ("un", "nopath"), [fk(f)], nm(f), None, None, None, "f:" + f, x=xq or None)
             tally["beh:call"] += 1
@@ -1390,6 +1632,9 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             if len({ge["si"] for _g, ge in c}) == 1:
                 e["si"] = c[0][1]["si"]; e["w"] = ("si", e["si"]); moved += 1
                 e["paths"] = set().union(*[ge["paths"] for _g, ge in c]); e["pw"] = set().union(*[ge["pw"] for _g, ge in c])
+                p64 = set().union(*[ge.get("_pre") or ge["paths"] for _g, ge in c])
+                if p64 != e["paths"]:                            # D-064 (1): its caller dropped the paths that leave before it; so does it
+                    e["_pre"] = p64; tally["d64:join"] += 1
                 ccp = sorted({(ge.get("x") or {}).get("cp") for _g, ge in c} - {None})
                 if ccp:
                     e["x"]["cp"] = ", ".join(ccp)
@@ -1399,6 +1644,20 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                     tally["join:exact"] += 1                     # its callers' paths are their own: no upper-bound line
                 e["o"] = min(ge["o"] for _g, ge in c)
                 e["_jc"] = {g for g, _ge in c}
+                # review F1: as a walk function under its parent — its callers' partway paths are its, and so are the paths that leave a
+                # caller partway (i) or bring an error out of the handler call from where the map does not say (ii); never a path its
+                # own steps run on
+                own_j = {pid for e2 in dstep.get(e["keys"][0][3:], []) for pid in e2["paths"]} if e["keys"] and e["keys"][0].startswith("fn:") else set()
+                for g, ge in c:
+                    for k0, s0 in (ge["x"].get("lq") or {}).items():
+                        lq_add(e, k0, (s0 & e["paths"]) - own_j)
+                    qg = ge.get("_q")
+                    if qg is not None:
+                        lq_add(e, nm(g), {pid for pid in ge["paths"] - own_j if partway(pid, g, qg)}, "i")
+                        lq_add(e, callee_at(qg), {pid for pid in ge["paths"] - own_j if qg in unk[pid]}, "ii")
+                qgs = {ge.get("_q") for _g, ge in c}
+                e["_q"] = next(iter(qgs)) if len(qgs) == 1 else None
+                e["_par"], e["_own"] = {g for g, _ge in c}, own_j
                 tally["join:name" if e["id"].startswith("n:") else "join:fn"] += 1
         if not moved:
             break
@@ -1425,6 +1684,59 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             if e["f"] == "fn" and any(k in ("fn:" + g.replace("#", "::") for g in rf) for k in e["keys"]):
                 e["x"].setdefault("ru", []).append([c0, _short(a0)])
                 e.setdefault("m", []).append(("raise", a0))
+    # D-064 (1) PROOF: no function stands on a path that leaves before it — every function chip at a handler call is read again from its
+    # own records (the walk's and the name-joined chips stand inside their caller's paths, each such caller read here in turn)
+    for e in els:
+        if e["f"] == "fn" and e["w"][0] == "h" and e["w"][1] and isinstance(e.get("paths"), set) and e["keys"][:1] and e["keys"][0] != fk(H):
+            lv = before(e["keys"][0][3:], e["w"][1])
+            bad = sorted(pid for pid in e["paths"] if lv and leaves(pid, lv))
+            if bad:
+                die(f"{lab}: {e['text']} stands on {bad[:2]}, which leave before it (D-064 (1))")
+            tally["d64:proven"] += 1
+    # review F1 · F2 PROOF, read from POSITIONS — never through before()/leaves() or partway(): every function chip under a handler call
+    # (A) that the forms feed routes from that call (via V, site S) stands on no path that, on every route it is on, never enters the
+    # except its call is written in, or leaves V before S — a check firing or a fork returning in V between its def (or that except) and
+    # S, or a raise the feed routes through V at a site before S that the path's chain fires or its exit was read to — with no catch in
+    # V between; (B) one whose call line the map does not record carries the upper-bound line on every path its own steps do not run on
+    # that leaves the function it hangs under partway (a leaving point in that function's body, or a raise the feed routes through it),
+    # and (ii) on every such path an error came out of the handler call from where the map does not say
+    for e in els:
+        if not (e["f"] == "fn" and isinstance(e.get("paths"), set) and e["keys"][:1] and e["keys"][0].startswith("fn:") and e["keys"][0] != fk(H)):
+            continue
+        f, q = e["keys"][0][3:], e.get("_q")
+        if q is None:
+            continue
+        lqs = {p0 for v0 in (e["x"].get("lq") or {}).values() for p0 in v0}
+        routes = [b for rb in (fns.get(f) or {}).get("reached_by") or [] if rb.get("root") == E for b in _routes(rb) if _line(b.get("root_site")) == q and inh(b.get("root_site"))]
+        if routes and e["w"] == ("h", q):
+            for pid in e["paths"]:
+                outs = []
+                for b in [b for b in routes if b.get("paths") is None or pid in b["paths"]]:
+                    V, S = b.get("via"), b.get("site")
+                    if not V or V == H or not S:
+                        outs.append(False); continue
+                    fl, s0 = _file(S), _line(S)
+                    ex = [c1 for fn1, fl1, c1, e1 in exb if fn1 == V and fl1 == fl and c1 < s0 <= e1]
+                    if ex and (fl, ex[-1]) not in catpos[pid]:
+                        outs.append(True); continue
+                    bV = gbody(V)
+                    lo = ex[-1] if ex else (bV[1] if bV and bV[0] == fl else _line((fns.get(V) or {}).get("at")))
+                    pts = [(i, l_) for i, f_, l_ in lvpos[pid] if f_ == fl and lo is not None and lo <= l_ < s0]
+                    pts += [(len(chains[pid]), sz) for za in zpos[pid] for za2, via, rq, sf, sz, _zp in RZ
+                            if za2 == za and via == V and rq == q and sf == fl and sz < s0 and (lo is None or lo <= sz)]
+                    outs.append(any(not any(cf == fl and l_ < cl <= s0 for cf, cl in catpos[pid]) for _i, l_ in pts))
+                if outs and all(outs):
+                    die(f"{lab}: {e['text']} stands on {pid}, which never gets to its call (read from the positions) — review F1/F2")
+            tally["f1:provenA"] += 1
+        if e.get("_par") is not None:
+            own = e.get("_own") or fown.get((f, q), set())
+            for pid in e["paths"] - own:
+                why = [g for g in e["_par"] if (lambda b: any(b and f_ == b[0] and b[1] <= l_ <= b[2] and not any(
+                    s.get("kind") == "catch" and _file(s.get("at")) == b[0] and b[1] <= (_line(s.get("at")) or 0) <= b[2] and (cat_rec.get(s.get("at")) or {}).get("outcome") == "swallow"
+                    for s in chains[pid][i + 1:]) for i, f_, l_ in lvpos[pid]))(gbody(g)) or any(za in zpos[pid] and via == g and rq == q for za, via, rq, *_r in RZ)]
+                if (why or (q in unk[pid] and not e.get("_dr"))) and pid not in lqs:
+                    die(f"{lab}: {e['text']} stands on {pid}, which leaves {', '.join(nm(g) for g in why) or 'the call at ' + str(q)} partway, and its chip does not say so — review F1")
+            tally["f1:provenB"] += 1
 
     # ── 6 · each element's paths → the endings it is on; PROOF: every path it is on passes its moment (a "wide" step: never after the
     # path left); an element on no path goes to the band; each block's records, placed or not, are the code map's own ──
@@ -1453,9 +1765,12 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         els.extend(subs)
         tally["hollow"] += len(subs); tally["hollowCases"] += 1
     els[:] = [e for e in els if e is not None]
-    el, un = [], []
-    rp, ru = collections.defaultdict(set), collections.defaultdict(set)
+    el, un, nmv, gone_fn = [], [], [], []
+    rp, ru, rn = collections.defaultdict(set), collections.defaultdict(set), collections.defaultdict(set)
     for e in els:
+        if e["w"][0] == "nm":                                    # D-064 (2): no moment by nature — the last column, never the band
+            nmv.append([e["f"], "piece", e["keys"], e["text"], e.get("x") or None]); rn[e["f"]].update(e["rec"])
+            continue
         si = e.get("si")
         if isinstance(si, tuple) or e["w"][0] == "un" or si is None:
             why = si[1] if isinstance(si, tuple) else e["w"][1] if e["w"][0] == "un" else "nolink"
@@ -1471,6 +1786,9 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         if e["f"] == "end":                                      # an ending: the paths that end at it, and those that pass its check AND its moment
             pp = {p for p in pp if si in passed[p]} | {p for p in PIDS if EXIT[p] == e["id"]}
         if not pp:
+            if e["f"] == "fn":                                   # review F2: a function on no path at THIS call may stand at another
+                gone_fn.append(e)
+                continue
             un.append([e["f"], e["keys"], e["text"], "nopath"]); ru[e["f"]].update(e["rec"])
             continue
         bad = sorted(p for p in pp - e["pw"] if si not in passed[p])
@@ -1492,12 +1810,28 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             xx["cq"] = [xx["cq"][0], sorted(PI[q0] for q0 in xx["cq"][1] if q0 in PI and q0 in pp)]
             if not xx["cq"][1]:
                 del xx["cq"]
+        if "lq" in xx:                                           # review F1: per function it may be left inside, the picker's indices
+            xx["lq"] = [q0 for q0 in ([k0, sorted(PI[p0] for p0 in v0 if p0 in PI and p0 in pp)] for k0, v0 in sorted(xx["lq"].items())) if q0[1]]
+            tally["f1:lqChips"] += bool(xx["lq"]); tally["f1:lqPaths"] += len({p0 for q0 in xx["lq"] for p0 in q0[1]})
+            tally["f1:noname"] += sum(1 for q0 in xx["lq"] if q0[0].startswith("@ "))
+            for p0 in pp & set().union(*[set(v0) for v0 in e["x"]["lq"].values()]):
+                hw = e["_lqh"].get(p0) or set()                  # each chip-path once: i before ii before p (inherited only)
+                tally["f1:lq:" + ("i" if "i" in hw else "ii" if "ii" in hw else "p")] += p0 in PI
+            if not xx["lq"]:
+                del xx["lq"]
         if "rc" in xx:                                           # D-056 (5): the ending the race escapes to — its status
             xx["rc"] = xx["rc"][:3] + [XS[xx["rc"][3]].get("status")]
         el.append([e["f"], si, e["keys"], e["text"], e["chip"], mask, e["hint"], xx or None, e["o"]]); rp[e["f"]].update(e["rec"])
         PX.update(e.get("m") or [])
         if e["f"] == "data":
             PX.update(("step", q[2:]) for q in e["rec"] if q.startswith("s:"))
+    # review F2 · F3: a function on no path at one call is not drawn there when a call of the endpoint places it (it stands at that
+    # one); else it goes to the band — with the reason the except it is called in gives, where that is why (review F3), else on no path
+    for e in gone_fn:
+        if set(e["rec"]) <= rp["fn"]:
+            tally["d64:gonecall"] += 1
+            continue
+        un.append([e["f"], e["keys"], e["text"], e.get("_why") or "nopath"]); ru[e["f"]].update(e["rec"])
     # D-057 · each path's fate, drawn: a path with no write of its own shows none (the fate "none"); a path whose own writes all stand at
     # their moments wearing its fate on its pick (saved · maybe · rolled back · left unsaved); a path whose writes all run after the
     # answer, each standing after the answer on it
@@ -1532,27 +1866,22 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
            "fn": {"f:" + f for f in ms("datafns", []) | (ms("deciders", []) - deps)},
            "client": {"s:" + s for s in ms("reasons", [])}}
     for f, _a in MO_FAM:
-        got = rp[f] | ru[f]
-        if rp[f] & ru[f]:
-            die(f"{lab}: {f}: {sorted(rp[f] & ru[f])[:3]} both placed and with no moment")
+        got = rp[f] | ru[f] | rn[f]
+        if rp[f] & ru[f] or (rp[f] | ru[f]) & rn[f]:
+            die(f"{lab}: {f}: {sorted((rp[f] & ru[f]) | ((rp[f] | ru[f]) & rn[f]))[:3]} stand in two of: a moment, the band, the no-moment column")
         if f in want and got != want[f]:
             die(f"{lab}: {f}: the records BY MOMENT holds differ from the code map's: only here {sorted(got - want[f])[:3]}, only there {sorted(want[f] - got)[:3]}")
         if f in sub and not sub[f] <= got:
             die(f"{lab}: {f}: the code map counts {sorted(sub[f] - got)[:3]}, which BY MOMENT does not hold")
-    # D-056 (2): the cases that call it only to set another test up have no moment — they join the band only where it already lists
-    # Proof's unplaced (never a Proof row of their own, never a moment invented); a case the band already holds under another reason
-    # (an acting call that proves no ending) is not drawn there a second time. PROOF: no arranging chip repeats a case of the band
-    if any(u[0] == "proof" for u in un):
-        inband = {k0 for u in un if u[0] == "proof" for k0 in u[1]}
-        for cid, how in r["d"].get("arranged") or []:
-            if "case:" + cid in inband:
-                tally["arrHeld"] += 1
-                continue
-            un.append(["proof", ["case:" + cid], cid, "arranged"]); ru["proof"].add("p:" + cid + ":arranged")
-            tally["arrBand"] += 1
-        arr_k = [u[1][0] for u in un if u[0] == "proof" and u[3] == "arranged"]
-        if len(set(arr_k)) != len(arr_k) or set(arr_k) & {k0 for u in un if u[0] == "proof" and u[3] != "arranged" for k0 in u[1]}:
-            die(f"{lab}: an arranging case stands in the band twice")
+    # D-056 (2) · D-064 (2): the cases that call it only to set another test up have no moment by nature — every one of them stands in
+    # Proof's no-moment cell (the band no longer holds them), one chip per case, as the code map names them. PROOF: exactly the code
+    # map's list, each once
+    for cid, how in r["d"].get("arranged") or []:
+        nmv.append(["proof", "arr", ["case:" + cid], cid, {"h": how}]); rn["proof"].add("p:" + cid + ":arranged")
+        tally["arrCol"] += 1
+    arr_k = [x[3] for x in nmv if x[1] == "arr"]
+    if arr_k != [c0 for c0, _h in r["d"].get("arranged") or []] or len(set(arr_k)) != len(arr_k):
+        die(f"{lab}: Proof's no-moment cell holds {arr_k}, the code map's arranging cases {r['d'].get('arranged')}")
     n_act = len({x for x in rp["proof"] | ru["proof"] if not x.endswith((":raises", ":arranged"))})
     if n_act != ((F.get("tests") or {}).get("act") or 0):
         die(f"{lab}: the code map counts {(F.get('tests') or {}).get('act')} test calls acting on it, BY MOMENT holds {n_act}")
@@ -1639,11 +1968,142 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             byrec[(f, rec)] = mem(f, rec, k0)
             PM.update(byrec[(f, rec)])
     PW = {m for f in rp for rec in rp[f] if rec in (want.get(f, set()) | sub.get(f, set())) for m in byrec[(f, rec)]}
-    return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "n": {f: [len(rp[f]), len(ru[f])] for f, _a in MO_FAM if rp[f] or ru[f]},
-            "_P": PM | PX, "_Pw": PW, "_K": KM}
+    for f in rn:                                                  # D-064 (2): what the no-moment column draws of the code map's records
+        for rec in rn[f]:
+            PM.update(mem(f, rec, None) if not rec.endswith(":arranged") else [("arranged", rec[2:-len(":arranged")])])
+    KM.update(k for x in nmv for k in x[2])
+    return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "n": {f: [len(rp[f]), len(ru[f]), len(rn[f])] for f, _a in MO_FAM if rp[f] or ru[f] or rn[f]},
+            "nm": nmv, "_P": PM | PX, "_Pw": PW, "_K": KM}
 
 
 MO_ORDER = [f for f, _a in MO_FAM]
+
+
+# ── 2c′ · D-064 (2) (his ruling 2026-09-28: "in the table at the end the [metadata] which is naturally not associated to any moment,
+# but there could be things like cluster, entity, file and line and so on"): BY MOMENT's LAST column, "no moment" (the last row when
+# the moments are rows). One cell per block: that block's facts that have NO moment by nature — what the endpoint IS (its method and
+# path, the path it is served at, its first segment, its entity and the Gabe Universe's cluster, the handler's file and line with its
+# def line, its outline and its docstring, the station's flags) and what SUMS it up (the fates of its paths, its longest chain, how
+# many functions stand behind it, its proof, its alarms, the cases that only arrange through it, its rare pieces that name what it is,
+# the norms it lacks). Each fact's block is read from the ruled tree: the block its attribute is homed in (NM_ATTR, never a block id).
+# The band keeps only what SHOULD have a moment and the map cannot place. The path choice never hides the column: each fact is true
+# of every path. Every number is read from the same record the code map draws it from, and PROVEN equal to its other readings below.
+NM_ATTR = (("ep", "method-path"), ("full", "method-path"), ("seg", "entity-cluster"), ("ent", "entity-cluster"), ("cl", "entity-cluster"),
+           ("risk", "risk-flag"), ("behind", "functions-behind-walk-levels"), ("proof", "coverage-per-condition"), ("alarm", "findings"),
+           ("file", "file-line"), ("sig", "signature"), ("doc", "the-handler"), ("fate", "fate-of-the-writes-per-ending"),
+           ("chain", "the-ordered-chain-per-ending"), ("arr", "case-role-on-this-endpoint"), ("piece", "how-common-this-piece-is"),
+           ("lack", "how-common-this-piece-is"))
+NM_KINDS = [k for k, _a in NM_ATTR]
+NM_SUMS = ("fate", "chain", "behind", "proof")                          # the code-map fields that sum it up: one member each, drawn here
+
+
+def nm_facts(nm: list) -> set:
+    """the universe card's items the column draws that carry no key (D-058's ("m", fact) members): the cluster, the outline, the
+    docstring, a flag, the count behind — re-read from the column's own record"""
+    out = set()
+    for x in nm:
+        if x[1] in ("cl", "sig", "doc", "behind"):
+            out.add({"cl": "cluster"}.get(x[1], x[1]))
+        elif x[1] == "risk":
+            out.add("risk:" + str((x[4] or {}).get("id")))
+    return out
+
+
+def no_moment(r: dict, L: dict, fj: dict, fep: dict, A: dict, tally: collections.Counter, mounts: list) -> None:
+    mo, v, d, I, lab = r["mo"], r["v"], r["d"], L["identity"], r["id"]
+    fam = {A[a]["home"]: f for f, a in MO_FAM}
+    fam_of = {}
+    for k, a in NM_ATTR:
+        fam_of[k] = fam.get((A.get(a) or {}).get("home")) or die(f"D-064: the no-moment fact {k} names attribute {a}, homed in no block BY MOMENT draws")
+    for x in mo["nm"]:                                                    # the band's two (a timeless piece, an arranging case): their block is by_moment's
+        if fam_of[x[1]] != x[0]:
+            die(f"{lab}: D-064 — by_moment put a {x[1]} in {x[0]}, the ruled tree homes it in {fam_of[x[1]]}")
+    out, P = [], set()
+
+    def put(kind, keys, text, x=None, members=()):
+        out.append([fam_of[kind], kind, [k for k in keys if k], text, x or None]); P.update(members)
+        tally["nm:" + kind] += 1
+    uni = {u["row"]: u for u in r["uni"]["rows"]}
+    # WHAT IT IS — the method and path (its glyph and method label are the station's, D-052), the path it is served at and the mount
+    # before it, the URL's first segment, the entity, the cluster the Gabe Universe draws it in (its Above row), the station's flags
+    put("ep", ["endpoint:" + lab], r["p"], members=[("endpoint", lab)])
+    full = r.get("full")
+    # review F6: a route the map labels "/" while it is served at a longer path (a path built from a constant): its own path and first
+    # segment are read from the served path, less the longest of the app's mounts it starts with — and the hover says the map's label
+    own = r["p"] if full and full.endswith(r["p"]) and r["p"] != "/" else None
+    mt = full[:len(full) - len(own)] if own else next((m for m in mounts if full and full.startswith(m) and len(full) > len(m) + 1), None)
+    if full and full != r["p"]:                                           # the mount before it
+        put("full", [], full, {"mt": mt} if mt else None)
+        tally["nm:fullOdd"] += own is None
+    lb = r["p"] if own is None and mt is not None and full else None
+    seg = full[len(mt):].strip("/").split("/")[0] if lb else r["seg"]
+    if lb and not seg:
+        die(f"{lab}: review F6 — the served path {full} less its mount {mt} leaves no segment")
+    put("seg", [], seg, {"lb": lb} if lb else None, members=[("segment", r["seg"])])
+    tally["f6:seg"] += bool(lb)
+    if r.get("ent"):
+        put("ent", ["entity:" + r["ent"]], r["ent"], members=[("entity", r["ent"])])
+    if uni.get("ABOVE") and uni["ABOVE"]["items"]:
+        put("cl", [], uni["ABOVE"]["items"][0], {"lb": lb} if lb else None)
+    # the station's flags — each with its own words (review F4). "no test covers this" is the station's reading of its case index; where
+    # a test calls the endpoint (an acting call, or a case that arranges through it) the code says otherwise, and the column, which
+    # holds facts about the code, leaves the flag out (the universe panel still draws it)
+    called = bool((L["forms"].get("tests") or {}).get("act")) or bool(d.get("arranged")) or bool((d.get("proof") or {}).get("tested"))
+    for fl in (uni.get("RISK") or {}).get("items") or []:
+        if fl[0] == "untested" and called:
+            tally["f4:untestedOut"] += 1
+            continue
+        put("risk", [], fl[2], {"id": fl[0]})
+    # WHAT SUMS IT UP (the Overview's) — how many functions stand behind it and how deep, its proof, its alarms
+    if isinstance(v.get("behind"), int) and v["behind"] > 0:
+        cb = uni.get("CODE BEHIND")
+        if d["behind"][0] != v["behind"] or (cb and cb["count"] != v["behind"]):
+            die(f"{lab}: D-064 — {v['behind']} behind in the code map, {d['behind'][0]} in its pair, {cb and cb['count']} on the card")
+        put("behind", [], str(v["behind"]), {"n": v["behind"], "dp": d["behind"][1]}, [("sum", "behind")])
+    if d.get("proof") and d["proof"].get("of"):
+        put("proof", [], "", dict(d["proof"]), [("sum", "proof")])
+    al = v["alarms"] if isinstance(v.get("alarms"), list) else []
+    if len(al) != (r["k"].get("alarms") or 0):
+        die(f"{lab}: D-064 — {len(al)} alarms drawn, the code map counts {r['k'].get('alarms')}")
+    for a in al:
+        put("alarm", [], a, None, [("finding", a)])
+    # THE HANDLER — its file and the line its route is declared at (the code map's pair), the line its def stands at, its outline, its
+    # docstring. PROVEN: the file and line are the lab's own place for it; the def line is the forms feed's record of the handler
+    df = _line((((fj.get("functions") or {}).get(fep.get("handler")) or {}).get("at")))
+    if r.get("file"):
+        if I.get("at") and I["at"] != f"{r['file']}:{r['line']}":
+            die(f"{lab}: D-064 — the code map says {r['file']}:{r['line']}, the lab's place for it {I.get('at')}")
+        if df is not None and df < (r["line"] or 0):
+            die(f"{lab}: D-064 — its def stands at line {df}, above the line its route is declared at ({r['line']})")
+        put("file", ["file:" + r["file"]], r["file"], {"ln": r["line"], "df": df if df != r["line"] else None}, [("file", r["file"])])
+    sg = r.get("sig") or [None] * 5
+    if sg[1] is not None:
+        if sg[1] != (I.get("sig") or {}).get("lines"):
+            die(f"{lab}: D-064 — the outline's {sg[1]} lines are not the lab's {(I.get('sig') or {}).get('lines')}")
+        rk = r["dk"].get("response") if sg[2] and sg[2] == (d.get("response") or [None])[0] else None
+        put("sig", [rk] if rk else [], sg[3] or "", {"a": 1 if sg[0] else 0, "n": sg[1], "rt": sg[2]})
+    if r.get("file"):
+        put("doc", [], sg[4] or "", {"no": 1} if not sg[4] else None)
+    # WHAT SUMS IT UP (its blocks') — the fates of its paths (each fate with the paths that meet it), its longest chain
+    if isinstance(v.get("fate"), dict):
+        if sum(v["fate"].values()) != len(L["forms"]["paths"]):
+            die(f"{lab}: D-064 — the fates count {sum(v['fate'].values())} paths, the endpoint has {len(L['forms']['paths'])}")
+        put("fate", [], "", {"f": [[f, v["fate"][f]] for f in FATES if v["fate"].get(f)]}, [("sum", "fate")])
+    if isinstance(v.get("chain"), int):
+        if v["chain"] != L["forms"]["counts"]["steps_max"]:
+            die(f"{lab}: D-064 — the longest chain is {v['chain']} steps in the code map, {L['forms']['counts']['steps_max']} in the facts")
+        put("chain", [], str(v["chain"]), {"n": v["chain"]}, [("sum", "chain")])
+    # the norms it lacks (the Standard or specialist block's; its rare pieces that name what it is came from by_moment)
+    for (words, n, of), fk in zip(d["lacks"], r["xd"]["lacks"]):
+        put("lack", [], words, {"n": n, "of": of, "fk": fk}, [("lack", words)])
+    if len(d["lacks"]) != (r["k"].get("lacks") or 0):
+        die(f"{lab}: D-064 — {len(d['lacks'])} norms drawn as lacking, the code map counts {r['k'].get('lacks')}")
+    nm = sorted(mo["nm"] + out, key=lambda x: NM_KINDS.index(x[1]))       # stable: within one kind, the order read
+    tally["nm:facts"] += len(nm); tally["nm:rows"] += 1
+    mo["nm"] = nm
+    mo["_P"] |= P
+    mo["_K"] |= {k for x in out for k in x[2]}
+    mo["_nmsum"] = {m[1] for m in P if m[0] == "sum"}
 
 
 # ── 2d · D-055: WHAT BY MOMENT CARRIES OF THE CODE MAP ─────────────────────────────────────────────────────────────────
@@ -1666,15 +2126,18 @@ MO_ORDER = [f for f, _a in MO_FAM]
 # every look and say how many tables only BY MOMENT holds (state x), and the header counts them.
 # Per field: [state, the drawn items' flags, carried, of, the tables only BY MOMENT holds (state x, or p with some)]; states c · p · b,
 # e = the field holds nothing on this endpoint (nothing to carry, nothing left out — counted apart, never "left"), x = every element it
-# lists is carried AND BY MOMENT holds more of its kind. Three fields hold nothing BY MOMENT could place by construction (the tally
-# of the paths' fates, the chain's length, the proof rank): they are never e, they are what BY MOMENT leaves out.
+# lists is carried AND BY MOMENT holds more of its kind. Three fields hold nothing a moment could place by construction (the tally
+# of the paths' fates, the chain's length, the proof rank): they are never e. D-064 (2): each is ONE member, the sum itself, and
+# BY MOMENT's no-moment column draws it (no_moment) — carried; the count behind (c:behind) is read the same way. The column also
+# draws the endpoint's entity (h:entity), the handler's file, its alarms (c:alarms), the cases that only arrange through it, its
+# rare pieces that name what it is and the norms it lacks — their members join P there, PROVEN by (A) · (B) below like any other.
 CV_KINDLESS = ("c:fate", "c:chain", "d:proof")
 CV_TABLES = ("c:tables", "d:tables")
 
 
 def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
     mo, F, U, d, dk, v = r["mo"], L["forms"], r["u"], r["d"], r["dk"], r["v"]
-    P, PW, K = mo.pop("_P"), mo.pop("_Pw"), mo.pop("_K")
+    P, PW, K, SUMS = mo.pop("_P"), mo.pop("_Pw"), mo.pop("_K"), mo.pop("_nmsum")
     XS = {x["id"]: x for x in F["exits"]}
     pre, TO = F.get("preconditions") or [], r["_to"]
     un = lambda k0, pfx: k0[len(pfx):] if isinstance(k0, str) and k0.startswith(pfx) else None
@@ -1690,6 +2153,9 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
     lims = [("limiter", str(l0.get("limiter") or l0.get("class") or "?").lstrip("_")) for l0 in (F.get("rate") or {}).get("limits") or []]
     pieces = [("piece", p["key"]) for p in L["feedwide"]["pieces"]["rows"] if p["word"] in ("rare", "only here")]
     fields = [("field", f) for f in req_fields or []] if d.get("request") else []
+    # D-064 (2): a field that sums the endpoint up (the fates' tally, the longest chain, the count behind, the proof's rank) is ONE
+    # member, the sum itself — carried when BY MOMENT's no-moment column draws it (a field whose arm is absent: nothing to draw, left)
+    sm1 = lambda k0: [("sum", k0)] if (k0 == "proof" or live(k0)) and k0 in SUMS else []
     # ── every field, as (key, "n" count over members | "i" one entry per drawn item, members) ──
     spec = [("h:method", "n", [("endpoint", r["id"])]),
             ("h:handler", "i", [[("fn", fep.get("handler") or "")], [("file", r.get("file"))]]),
@@ -1701,13 +2167,13 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
     COLM = {"all": ends, "stage": ends if live("stage") else [], "tables": uu("tables", "table"), "written": uu("written", "wtable"), "guards": uu("guards", "guard"),
             "auth": gates if live("auth") else [], "response": [("reply",)] if d.get("response") else [], "acts": acts if live("acts") else [],
             "asserted": cases(True) if live("asserted") else [], "proof": cases(False) if live("proof") else [],
-            "branches": uu("branches", "fork"), "catches": uu("catches", "catch"), "rate": lims if live("rate") else [], "fate": [],
+            "branches": uu("branches", "fork"), "catches": uu("catches", "catch"), "rate": lims if live("rate") else [], "fate": sm1("fate"),
             "deciders": uu("deciders", "fn"), "datafns": uu("datafns", "fn"), "request": fields,
             "fetched": [("sender", fb.get("id")) for fb in L["widening"]["fetched_by"]] if live("fetched") else [],
-            "reasons": uu("reasons", "reason"), "chain": [], "cases422": uu("cases422", "rule"),
+            "reasons": uu("reasons", "reason"), "chain": sm1("chain"), "cases422": uu("cases422", "rule"),
             "inf_answer": uu("inf_answer", "inflight"), "inf_server": uu("inf_server", "inflight"),
             "alarms": [("finding", a) for a in (v["alarms"] if isinstance(v["alarms"], list) else [])],
-            "behind": [("fn", un(k0, "fn:")) for k0 in dk.get("behind") or []], "switches": uu("switches", "switch"),
+            "behind": sm1("behind"), "switches": uu("switches", "switch"),
             "pieces": pieces if live("pieces") else [], "lacks": [("lack", x[0]) for x in d["lacks"]]}
     # D-057 · an alarm's members are the facts it reads, each where BY MOMENT draws it (never the verdict word, which has no moment):
     # undeclared — the endings it names, hollow · text-only — its endings, their words in their hovers · shared-status — its endings ·
@@ -1774,7 +2240,8 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
            "response": ([("reply",)] + [("nested", k0) for k0 in dk["repNest"]] if d.get("response") else []) + [("end", h[3]) for h in r["xd"]["hdr"]],
            "cases": uu("cases422", "rule"), "deciders": [one(("fn", un(k0, "fn:"))) for k0 in dk["deciders"]],
            # D-056 (1) every function behind, by name · (9) every piece or file that sends it, every screen above · (2) each case it arranges
-           "switches": [[("switch", un(x[0], "switch:"))] for x in dk["switches"]], "behind": [[m] for m in COLM["behind"]], "proof": [],
+           "switches": [[("switch", un(x[0], "switch:"))] for x in dk["switches"]], "behind": [[("fn", un(k0, "fn:"))] for k0 in dk.get("behind") or []],
+           "proof": sm1("proof"),
            "inflight": [[("inflight", un(k0, "inflight:"))] for k0 in dk["inflight"]], "hook": [[("sender", k0)] for k0 in dk["hook"]],
            "screens": [[("screen", k0)] for k0 in dk["screens"]],
            # an arranging call has no moment: its member is its own ("arranged", case), never the acting case's ("case", …), so a case
@@ -1841,8 +2308,8 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
             a, n = sum(1 for m in ms if m in P), len(ms)
         st = "c" if n and a == n else "p" if a else "b"
         if k0 in CV_KINDLESS:
-            if n:
-                die(f"{r['id']}: D-055 — {k0} was read as holding nothing BY MOMENT could place, yet names {n} members")
+            if n > 1 or ms != (sm1(k0[2:]) if t == "n" else ms):
+                die(f"{r['id']}: D-064 — {k0} sums the endpoint up: its one member is the sum the no-moment column draws, not {ms}")
         elif not n:
             st = "e"
         cv[k0] = [st, fl, a, n]
@@ -1860,7 +2327,7 @@ def carried(r: dict, L: dict, fj: dict, fep: dict, W: dict) -> None:
     if ("endpoint", r["id"]) not in P:
         die(f"{r['id']}: D-058 — BY MOMENT's heading is read as drawing the endpoint, yet its members do not hold it")
     r["_by"] = (set(K) | {"endpoint:" + r["id"]}, fn_names(mo["el"]), {"table:" + str(m[1]) for m in P if m[0] == "rtable"},
-                {"table:" + str(m[1]) for m in P if m[0] == "wtable"})
+                {"table:" + str(m[1]) for m in P if m[0] == "wtable"}, nm_facts(mo["nm"]))
 
 
 def fn_names(el: list) -> set:
@@ -1888,15 +2355,17 @@ def fn_names(el: list) -> set:
 # from its band; a table's access by a chip of ITS op; a function's name on a chip that draws it); every item left bright has a
 # member it does not draw; a gap's name is marked exactly as the universe's items it names are; the counts are the marks'.
 def panels_carried(r: dict, T: list, NT: dict, slots: list) -> None:
-    MK, MN, MR, MW = r.pop("_by")
+    MK, MN, MR, MW, MM = r.pop("_by")
     el = r["mo"]["el"]
-    rk = {k for x in el for k in x[2]} | {"endpoint:" + r["id"]}          # the placed record, re-read (the heading: see carried())
+    # the placed record and the no-moment column (D-064 (2): what it draws is carried too), re-read (the heading: see carried())
+    rk = {k for x in el for k in x[2]} | {k for x in r["mo"]["nm"] for k in x[2]} | {"endpoint:" + r["id"]}
+    rm = nm_facts(r["mo"]["nm"])
     fk = lambda x: {k for k in x[2] if str(k).startswith("fn:")}
     rn = {x[3] for x in el if x[0] == "fn" and (not x[2] or len({k for y in el if y[0] == "fn" and y[3] == x[3] for k in fk(y)}) == 1)}
     ro = {(x[4][1], k) for x in el if x[0] == "data" and x[4] and x[4][0] == "op" for k in x[2]}   # (r | w, table key) as each chip draws it
     band = {k for u in r["mo"]["un"] for k in u[1]} - rk                   # what BY MOMENT holds with no moment only
-    SET = {"k": MK, "n": MN, "r": MR, "w": MW}
-    drawn = lambda m: (m[1] in rk and m[1] not in band) if m[0] == "k" else (m[1] in rn) if m[0] == "n" else ((m[0], m[1]) in ro)
+    SET = {"k": MK, "n": MN, "r": MR, "w": MW, "m": MM}
+    drawn = lambda m: (m[1] in rk and m[1] not in band) if m[0] == "k" else (m[1] in rn) if m[0] == "n" else (m[1] in rm) if m[0] == "m" else ((m[0], m[1]) in ro)
 
     def mark(ms, where):
         f = 1 if ms and all(m[1] in SET[m[0]] for m in ms) else 0
@@ -1931,7 +2400,7 @@ def panels_carried(r: dict, T: list, NT: dict, slots: list) -> None:
             a_it.append([state(sum(fl[i] for i in mem), len(mem)), sum(fl[i] for i in mem), len(mem)])
         f_it = []
         for nm_, K in zip(g[3], g[4]):
-            gid = ("k", K) if K else ("n", nm_) if g[0] == "CODE BEHIND" else None
+            gid = ("k", K) if K else ("n", nm_) if g[0] == "CODE BEHIND" else UNI.fact_named(next(u for u in r["uni"]["rows"] if u["row"] == g[0]), nm_)
             its = [i for i, e in enumerate(es) if gid and e[2] == gid]
             if not its:
                 ms = [gid] if gid else None
@@ -1975,14 +2444,23 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
         fam[f] = at["home"]
     if sorted(fam.values()) != sorted(b["key"] for b in blocks):
         die(f"BY MOMENT: every block needs exactly one element family — {sorted(fam.values())}")
-    cov, whys = {f: [0, 0] for f, _a in MO_FAM}, collections.Counter()
+    cov, whys = {f: [0, 0, 0] for f, _a in MO_FAM}, collections.Counter()
     for r in rows:
-        for f, (a, b) in r["mo"]["n"].items():
-            cov[f][0] += a; cov[f][1] += b
+        for f, (a, b, c) in r["mo"]["n"].items():
+            cov[f][0] += a; cov[f][1] += b; cov[f][2] += c
+        for x in r["mo"]["nm"]:                                    # D-064 (2): the column's facts the code map's records do not count
+            if x[1] not in ("arr", "piece"):
+                cov[x[0]][2] += 1
         whys.update(u[3] for u in r["mo"]["un"])
-    untimed = [f for f, _a in MO_FAM if not sum(cov[f])]
-    if sorted(untimed) != sorted(MW["band"]["untimed"]):
-        die(f"BY MOMENT: the words say {sorted(MW['band']['untimed'])} happen in no time, the feed places nothing for {untimed}")
+    # a block nothing of which acts at a moment on any endpoint (the Overview) is a row all the same: its facts stand in the column
+    untimed = [f for f, _a in MO_FAM if not cov[f][0] + cov[f][1]]
+    if sorted(untimed) != sorted(MW["nm"]["only"]):
+        die(f"BY MOMENT: the words say {sorted(MW['nm']['only'])} have no moment at all, the feed places nothing at a moment for {untimed}")
+    fl_ids = {(x[4] or {}).get("id") for r in rows for x in r["mo"]["nm"] if x[1] == "risk"}
+    if fl_ids - set(MW["nm"]["k"]["risk"]["ids"]):                   # review F4: every flag drawn has its own words
+        die(f"BY MOMENT: flags drawn with no words of their own: {sorted(fl_ids - set(MW['nm']['k']['risk']['ids']))}")
+    if sorted(MW["nm"]["k"]) != sorted(NM_KINDS):
+        die(f"BY MOMENT: the no-moment column's words and its kinds differ: {sorted(set(MW['nm']['k']) ^ set(NM_KINDS))}")
     if sorted(MW["why"]) != sorted(MO_WHY) or set(whys) - set(MO_WHY):
         die(f"BY MOMENT: the reasons the words name and the build gives differ: {sorted(set(MW['why']) ^ set(MO_WHY))} {sorted(set(whys) - set(MO_WHY))}")
     if sorted(MW["moms"]) != sorted(MO_PRE + MO_POST + tuple(MO_RANK)):
@@ -2001,6 +2479,8 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
             x[2] = [KT.setdefault(k, len(KT)) for k in x[2]]
         for x in r["mo"]["un"]:
             x[1] = [KT.setdefault(k, len(KT)) for k in x[1]]
+        for x in r["mo"]["nm"]:
+            x[2] = [KT.setdefault(k, len(KT)) for k in x[2]]
     # how each step occurrence (a step on one path) was placed — once per path it is on, so the sum is the occurrences, not the steps
     src = {k: tally.get("src:" + k, 0) for k in MO_SRC}
     if sum(src.values()) != tally["occ"]:
@@ -2451,8 +2931,10 @@ def key_index(fj: dict, am: dict, feeds: dict) -> dict:
         for c in t.get("calls") or []:
             if c.get("role") == "act" and c.get("endpoint"):
                 acts[c["endpoint"]].add(cid); act_calls[c["endpoint"]] += 1
+    # review F1 (D-064 (1)): each function's length, so a function the forms feed records the def line of has its body's last line
+    fnlines = {k: v["lines"] for k, v in (am.get("function_insight") or {}).items() if isinstance(v, dict) and isinstance(v.get("lines"), int)}
     return {"m2t": m2t, "node_t": node_t, "schemas": schemas, "short": short, "settings": settings, "nAlias": len(m2t), "nAliasC4": n_c4,
-            "acts": acts, "actCalls": act_calls,
+            "acts": acts, "actCalls": act_calls, "fnlines": fnlines,
             "flags": (set(am.get("flags") or {}) | flags) - settings, "unkeyed": set(), "names": set()}
 
 
@@ -2783,7 +3265,7 @@ def enc_lift(W: dict) -> tuple:
 
 def mo_keys(r: dict) -> set:
     """every key BY MOMENT draws for one row (placed or not) — they wear the station's marks too (D-052)"""
-    return {k for x in r["mo"]["el"] for k in x[2]} | {k for x in r["mo"]["un"] for k in x[1]}
+    return {k for x in r["mo"]["el"] for k in x[2]} | {k for x in r["mo"]["un"] for k in x[1]} | {k for x in r["mo"]["nm"] for k in x[2]}
 
 
 def station_marks(W: dict, rows: list, feeds: dict) -> tuple:
@@ -2931,8 +3413,13 @@ def build(argv: list) -> tuple:
     hb = collections.Counter(_short(f) for f in {r["file"] for r in rows if r.get("file")})
     for r in rows:
         r["_fileOne"] = bool(r.get("file")) and hb[_short(r["file"])] == 1
+    # review F6: the mounts the app serves its routes under — each endpoint whose served path ends with its own path gives one; the
+    # longest first, so a route whose own path the map mislabels ("/") is read from the path it is served at
+    MOUNTS = sorted({ep0["full_path"][:len(ep0["full_path"]) - len(ep0["path"])] for ep0 in (fj.get("endpoints") or {}).values()
+                     if ep0.get("full_path") and ep0.get("path") and ep0["path"] != "/" and ep0["full_path"].endswith(ep0["path"])}, key=lambda m: (-len(m), m))
     for L, r in zip(facts, rows):
         r["mo"] = by_moment(L, fj, fj["endpoints"]["endpoint:" + r["id"]], r, X, ADJ, MEMO, MOT)
+        no_moment(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], sm["attrs"], MOT, MOUNTS)   # D-064 (2): the last column
         carried(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], W)      # D-055: what BY MOMENT carries of the code map, proven
     # D-055: the switch's words, and per code-map field, across the feed, how many endpoints leave it bright (whole, or in part)
     CW = W["carry"]
@@ -3134,7 +3621,7 @@ def build(argv: list) -> tuple:
                 f" ({sm56(lambda r: sum(len(lv) for lv in r['d']['behind'][2]))} by level, {sm56(lambda r: len(r['d']['behind'][3]))} depth not known),"
                 f" BY MOMENT at a call {MOT['beh:call']} (on its walk parent's paths {MOT['beh:parent']}; its own steps name its paths {MOT['beh:own']}, on the parent's own paths {MOT['beh:pexact']}, on the call's paths {MOT['beh:cp']}) · the dependencies {MOT['beh:gate']} · a step {MOT['beh:step']} · none {MOT['beh:none']};"
                 f" by name only {n56(lambda r: r['d']['behind'][4])} · {sm56(lambda r: r['d']['behind'][4])}"
-                f" · (2) arranges {n56(lambda r: r['d']['arranged'])} · {sm56(lambda r: len(r['d']['arranged']))} cases ({MOT['arrBand']} in the band, {MOT['arrHeld']} already there)"
+                f" · (2) arranges {n56(lambda r: r['d']['arranged'])} · {sm56(lambda r: len(r['d']['arranged']))} cases ({MOT['arrCol']} in BY MOMENT's no-moment column, D-064)"
                 f" · (3) endings declared {sum(1 for x in ex56 if x[5])} · not {sum(1 for x in ex56 if not x[5])} on {n56(lambda r: any(x[5] == 0 for x in r['xd']['exits']))}"
                 f" · (4) write chips with a fate {sm56(lambda r: sum(1 for x in r['mo']['el'] if x[7] and 'fa' in x[7]))}"
                 f" · (5) races {n56(lambda r: any(x[7] and 'rc' in x[7] for x in r['mo']['el']))} · {MOT['race']}"
@@ -3168,6 +3655,24 @@ def build(argv: list) -> tuple:
                 f" · THE GAPS from the code map {a58[0]} of {a58[1]} · {a58[1] - a58[0]} left, from the universe {b58[0]} of {b58[1]} · {b58[1] - b58[0]} left"
                 + (f"\n        POST /cooking/sessions · universe {cs['ucn'][0]} of {cs['ucn'][1]} · {cs['ucn'][1] - cs['ucn'][0]} left"
                    f" · gaps from the code map {cs['gcn']['cm'][0]} of {cs['gcn']['cm'][1]} · from the universe {cs['gcn']['uni'][0]} of {cs['gcn']['uni'][1]}" if cs else ""))
+    # D-064 (1): the functions behind that the check rule narrows — their own chips, the walk's that follow a narrowed parent, the ones
+    # joined by name that follow a narrowed caller; the paths dropped; every function chip at a call proven
+    summary += (f"\nD-064 · (1) functions behind narrowed {MOT['d64:chips']} ({MOT['d64:left']} paths dropped that leave before them, {MOT['d64:raise']} at a raise called"
+                f" before them (review F2), {MOT['d64:catch']} that never enter the except body the call is written in; {MOT['d64:words']} times the words"
+                f" matched and the chain left elsewhere: kept) · following a narrowed caller: the walk's {MOT['d64:follow']}, by name {MOT['d64:join']}"
+                f" · {MOT['d64:gonecall']} left on no path at one call and standing at another (not drawn at the first)"
+                f" · {MOT['f3:in500']} on the way to the 500 (review F3)"
+                f" · {MOT['d64:proven']} function chips at a call proven on no path that leaves before them"
+                f"\n        review F1 · upper bound where the path leaves the function it hangs under partway: {MOT['f1:lqChips']} chips · {MOT['f1:lqPaths']} chip-paths"
+                f" ({MOT['f1:lq:i']} where the map shows the leaving point, {MOT['f1:lq:ii']} an error from where the map does not say, {MOT['f1:lq:p']} only inherited; calls named by line {MOT['f1:noname']}) · proven from positions: {MOT['f1:provenA']} routed chips, {MOT['f1:provenB']} hanging chips"
+                f" · review F7: {MOT['f7:own']} chain-called chips on the paths their own steps run on, {MOT['f7:trail']} trailing steps placed at their call"
+                f"\n        (2) the no-moment column: {MOT['nm:facts']} facts on {MOT['nm:rows']} endpoints (" + " · ".join(f"{k} {MOT['nm:' + k] or MOT['arrCol'] if k == 'arr' else MOT['nm:' + k]}" for k in NM_KINDS if k != "piece")
+                + f" · piece {sum(1 for r in rows for x in r['mo']['nm'] if x[1] == 'piece')})"
+                + f" · review F4: {MOT['f4:untestedOut']} 'no test covers this' flags left out where a test calls the endpoint"
+                + f" · review F5: {sum(1 for r in rows for x in r['mo']['nm'] if x[1] == 'file' and not (x[4] or {}).get('df'))} handlers with no def line in the feed"
+                + f" · review F6: {MOT['f6:seg']} first segments read from the served path"
+                + (f"\n        POST /cooking/sessions · the code map's hide header {cs['cvn'][0]} of {cs['cvn'][1]} carried · {cs['cvn'][1] - cs['cvn'][0] - cs['cvn'][2]} left · {cs['cvn'][2]} with nothing here"
+                   f" · the universe {cs['ucn'][0]} of {cs['ucn'][1]}" if cs else ""))
     return html, summary, out, check
 
 

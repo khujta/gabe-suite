@@ -1253,6 +1253,8 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
     heads: [...t.querySelectorAll('th[data-block]')].map((h) => [...h.childNodes].filter((q) => !(q.classList && q.classList.contains('ainfo'))).map((q) => q.textContent).join('').trim()), bodyRows: t.querySelectorAll('tbody tr').length,
     ends: [...t.querySelectorAll('td[data-f="end"]')].map((td) => [...td.querySelectorAll('.vc-status')].map((c) => c.textContent)),
     chips: t.querySelectorAll('.mc').length, counts: t.querySelectorAll('.mcount').length,
+    /* D-064 (2): the last column's head, and its cells (one per block row, or the last row's) */
+    nmh: (t.querySelector('th.monmh') || {}).textContent || null, nmc: t.querySelectorAll('td[data-nm]').length, lastRow: (t.querySelector('tbody tr:last-child') || { getAttribute: () => null }).getAttribute('data-nm'),
     band: [...document.querySelectorAll('#moband .mbb')].map((b) => [b.getAttribute('data-f'), b.textContent.slice(0, 80)]),
     squares: [...document.querySelectorAll('#mobar .opt[data-mopt]')].map((o) => [o.getAttribute('data-mopt'), o.getAttribute('data-v'), o.getAttribute('aria-checked'), getComputedStyle(o).borderTopStyle, o.getAttribute('data-ruled')]) }; });
   await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' })); await p.waitForTimeout(60);
@@ -1260,12 +1262,14 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   ok(JSON.stringify(rowsW) === JSON.stringify(want14.map((w) => (w[1] ? w : [w[0]]))), 'BY MOMENT · ' + E14 + ' · the moments read top to bottom as the feed has them: before any request, the screen, the edge, the body, the login, the fields, then the handler\'s checks (' + span(chk) + '), the work (' + span(work) + '), the catch (' + span(failL) + '), saving (' + span(save) + '), the answer, after it, escapes', { page: m0.rows, want: want14 });
   /* (c) the columns, the band, the Endings column against the code map's own endings table */
   const byB = {}; Object.entries(D.mo.fam).forEach(([f, b0]) => { byB[b0] = f; }); const ov = D.blocks.find((b0) => byB[b0.key] === 'over');
-  const wantHeads = D.orders[D.words.rail.bord.pick].filter((k) => k !== ov.key).map((k) => D.blocks.find((b0) => b0.key === k).name);
+  /* CHANGED 2026-09-28 (D-064 (2)): every block is a row, the Overview too — nothing of it acts at a moment, its facts stand in the
+     last column, no moment; the band holds no line of it */
+  const wantHeads = D.orders[D.words.rail.bord.pick].map((k) => D.blocks.find((b0) => b0.key === k).name);
   const cmEnds = await p.$$eval('#ocol-cm .pair[data-k="d:exits"] table.etab tr.erow .vc-status', (cs) => cs.map((c) => c.textContent));
   const failRow = m0.rows.findIndex((r) => r[0] === 'fail'), grp = ROW[E14].xd.exits.map((x, i) => [x, ROW[E14].d.exits.items[i]]).filter(([x]) => typeof x[0] === 'number').map(([, e]) => String(e[2]));
-  ok(JSON.stringify(m0.heads) === JSON.stringify(wantHeads) && m0.band.some(([f, t]) => f === 'over' && t.includes(ov.name) && t.includes(MW.band.untimed.over.slice(0, 30)))
+  ok(JSON.stringify(m0.heads) === JSON.stringify(wantHeads) && !m0.band.some(([f]) => f === 'over') && ov && m0.nmh === MW.nm.name && m0.nmc === wantHeads.length
      && JSON.stringify(m0.ends.flat()) === JSON.stringify(cmEnds) && JSON.stringify(m0.ends[failRow]) === JSON.stringify(grp) && grp.length === 8,
-    'BY MOMENT · the columns are the blocks in the page\'s order less Overview and risk, which stands in the band with its reason; the Endings column is the code map\'s endings in its own order, the catch\'s row its eight', { heads: m0.heads, want: wantHeads, ends: m0.ends.flat().length, cm: cmEnds.length, fail: m0.ends[failRow] });
+    'BY MOMENT · the rows are the blocks in the page\'s order, ' + ov.name + ' among them (D-064 (2): nothing of it at a moment, no line of it in the band), each ending in a "' + MW.nm.name + '" cell; the Endings row is the code map\'s endings in its own order, the catch\'s cell its eight', { heads: m0.heads, want: wantHeads, nmh: m0.nmh, nmc: m0.nmc, ends: m0.ends.flat().length, cm: cmEnds.length, fail: m0.ends[failRow] });
   /* (d) the path to the 403: the moments its chain passes, recomputed from that chain; fewer chips; the 403 there, no 402 */
   const X403 = (FE.produced || []).find((x) => x.status === 403), P403 = FE.paths.find((q) => q.exit.id === X403.id);
   const PH = { middleware: 'edge', 'body-parse': 'body', security: 'gate', dependency: 'gate', validation: 'fields', handler: 'checks' };
@@ -1290,7 +1294,9 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   ok(tipR.includes(D.words.ruledMark) && !tipR.includes(D.words.pickMark), 'D-055 · BY MOMENT · his default\'s hover says it is his, not my pick', tipR);
   await p.click('#mobar .opt[data-mopt="lay"][data-v="rows"]'); await p.waitForTimeout(80);
   const m3 = await readM();
-  ok(m3.lay === 'rows' && JSON.stringify(m3.rows) === JSON.stringify(m0.rows) && m3.bodyRows === m0.rows.length, 'BY MOMENT · moments as rows: the moments top to bottom in the same order, a row per moment', { moms: m3.rows.length, rows: m3.bodyRows });
+  // CHANGED 2026-09-28 (D-064 (2)): the no-moment row closes the table in this look
+  ok(m3.lay === 'rows' && JSON.stringify(m3.rows) === JSON.stringify(m0.rows) && m3.bodyRows === m0.rows.length + 1 && m3.lastRow === 'true' && m3.nmc === m0.heads.length,
+    'BY MOMENT · moments as rows: the moments top to bottom in the same order, a row per moment, the "' + MW.nm.name + '" row last with a cell per block', { moms: m3.rows.length, rows: m3.bodyRows, last: m3.lastRow, nmc: m3.nmc });
   await p.click('#mobar .opt[data-mopt="cell"][data-v="counts"]'); await p.waitForTimeout(80);
   const m4 = await readM();
   ok(m4.cell === 'counts' && !m4.chips && m4.counts > 0, 'BY MOMENT · cells as counts: a number in each cell, no chips', { counts: m4.counts, chips: m4.chips });
@@ -1321,13 +1327,20 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E14 + '"] td.id'); await p.waitForTimeout(120);
   const g0 = await fit(); await p.click('#mobar .opt[data-mopt="lay"][data-v="rows"]'); await p.waitForTimeout(80); const g1 = await fit();
   await p.click('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(80);
-  ok(g0.over <= 1 && g1.over <= 1 && !g0.cut && !g1.cut && !g0.note && !g1.note, 'BY MOMENT · at 1920 px the matrix fits its box in both looks and no chip is cut: chips wrap inside their cells', { cols: g0, rows: g1 });
+  /* CHANGED 2026-09-28 (D-064 (2)): the no-moment column is one more column under moFloor — on this endpoint the columns look's floors
+     now pass the 1920 px box (its fifteen columns at their widest badge or their two-line head), so the box scrolls and says so, a
+     chip never cut; the rows look still fits */
+  ok(g1.over <= 1 && !g1.note && !g0.cut && !g1.cut && (g0.over <= 1 ? !g0.note : g0.note), 'BY MOMENT · at 1920 px no chip is cut in either look: the rows look fits its box, the columns look ' + (g0.over <= 1 ? 'fits too' : 'scrolls ' + g0.over + ' px and says so'), { cols: g0, rows: g1 });
   // CHANGED 2026-09-26 (D-055): the path picker is ONE row of codes; the moment and the words that told two of one status apart are in
   // each code's hover — read below, on POST /cooking/sessions (section 15)
   const p87 = await p.$$eval('#mogrid td[data-f="proof"] .mc', (cs) => cs.filter((c) => /^C87/.test(c.textContent.trim())).map((c) => [...c.querySelectorAll('.vc-status')].map((x) => x.textContent)));
-  const ubox = await p.$eval('#moband .mbb[data-f="over"]', (b) => { const inf = b.querySelector('.ainfo'); return { word: b.querySelector('b').textContent, infoHidden: inf ? getComputedStyle(inf).display === 'none' : null, info: inf ? inf.textContent : '' }; });
-  ok(p87.length === 1 && p87[0].length >= 1 && p87[0].every((x) => x === '502') && ubox.word === MW.band.noTime && ubox.infoHidden === true && ubox.info.includes(MW.band.untimed.over.slice(0, 30)),
-    'BY MOMENT · a test proving two endings of one status says it (C87 proves 502); the untimed block says "' + MW.band.noTime + '", its reason behind the info toggle', { p87, ubox });
+  /* CHANGED 2026-09-28 (D-064 (2)): the Overview left the band — its row holds nothing at a moment, and its no-moment cell draws the
+     endpoint (its station glyph and method label); the band's words say what it keeps */
+  const ubox = await p.evaluate((ep) => { const c = document.querySelector('#mogrid tr[data-f="over"] td[data-nm]'), k = c && c.querySelector('.mc[data-keys="endpoint:' + ep + '"]');
+    return { ep: !!k, glyph: !!(k && k.querySelector('.skg')), moments: document.querySelectorAll('#mogrid tr[data-f="over"] td[data-mom] .mc').length, band: !!document.querySelector('#moband .mbb[data-f="over"]'),
+      title: (document.querySelector('#moband h3') || {}).textContent }; }, E14);
+  ok(p87.length === 1 && p87[0].length >= 1 && p87[0].every((x) => x === '502') && ubox.ep && ubox.glyph && ubox.moments === 0 && !ubox.band && ubox.title === MW.band.title,
+    'BY MOMENT · a test proving two endings of one status says it (C87 proves 502); the Overview holds nothing at a moment and draws the endpoint in its "' + MW.nm.name + '" cell; the band, "' + MW.band.title + '", holds no line of it', { p87, ubox });
   const E16 = 'POST /setup/complete', FE16 = FJ.endpoints['endpoint:' + E16];
   const readMem = (sid) => { const at = new Set(); FE16.paths.forEach((q) => (q.effects.steps || []).forEach((e) => { if (e.step === sid) at.add(e.dependency ? 'gate' : 'handler'); })); return at; };
   const memSid = Object.keys(STEPS).find((k) => STEPS[k].table === 'memberships' && STEPS[k].op === 'read' && /load_household_context$/.test(STEPS[k].fn));
@@ -1439,14 +1452,28 @@ ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
      && c0.empty > 0 && c0.cveOp.length === c0.empty,
     'D-055 · the header\'s count is the page\'s own, the fields with nothing here counted apart from what is left: ' + c0.count, { count: c0.count, whole: c0.whole, fields: c0.fields, empty: c0.empty, gen: R.cvn });
   const jBad = c0.join.filter(([, cv, inMo]) => cv !== inMo);
-  ok(c0.join.length > 10 && !jBad.length && c0.join.some(([, cv]) => cv) && c0.join.some(([, cv]) => !cv),
+  /* CHANGED 2026-09-28 (D-064 (2)): on this endpoint BY MOMENT now carries every field that holds something — so a keyed item left
+     bright is asked for only where a field is left */
+  ok(c0.join.length > 10 && !jBad.length && c0.join.some(([, cv]) => cv) && (c0.join.some(([, cv]) => !cv) || R.cvn[0] + R.cvn[2] === R.cvn[1]),
     'D-055 · every keyed item the switch marks carried is drawn in BY MOMENT\'s grid, every keyed item it leaves bright is not (' + c0.join.length + ' items)', jBad.slice(0, 4));
   ok(c0.cvOp.every(([o, sh]) => o === 1 && sh) && c0.cveOp.every(([o, sh]) => o === 1 && sh), 'D-055 · show all: nothing faded, nothing hidden', c0.cvOp.filter(([o, sh]) => o !== 1 || !sh).length);
+  /* D-064 (2) (his ruling 2026-09-28): the six fields the hide header left on this endpoint (was "47 of 56 · 6 left · 3 with nothing
+     here") are drawn by BY MOMENT's last column now — the entity, the fates' tally, the longest chain, the alarms, the proof's rank,
+     the cases that only arrange through it — so each is carried whole, and nothing is left: read off the page's own marks, and each
+     field's column fact read off the grid (its no-moment cell draws it) */
+  const six = ['h:entity', 'c:fate', 'c:chain', 'c:alarms', 'd:proof', 'd:arranged'], NMK = { 'h:entity': 'ent', 'c:fate': 'fate', 'c:chain': 'chain', 'c:alarms': 'alarm', 'd:proof': 'proof', 'd:arranged': 'arr' };
+  const sixOn = await p.evaluate((six) => six.map((k) => [k, ([...document.querySelectorAll('#ocol-cm .pair[data-k], #ocol-cm [data-sub][data-k]')].find((q) => q.getAttribute('data-k') === k) || { getAttribute: () => null }).getAttribute('data-cvs')]), six);
+  const nmKinds = await p.$$eval('#mogrid td[data-nm] .mc[data-nmk]', (cs) => [...new Set(cs.map((c) => c.getAttribute('data-nmk')))]);
+  ok(sixOn.every(([, st]) => st === 'c') && six.every((k) => nmKinds.includes(NMK[k])) && c0.fields - c0.whole - c0.empty === 0
+     && c0.count === fillW(CW.count, { covered: c0.fields - c0.empty, fields: c0.fields, left: 0, empty: c0.empty }),
+    'D-064 (2) · ' + E + ' · the hide header reads "' + c0.count + '" (was 47 of 56 · 6 left · 3 with nothing here): ' + six.join(' · ') + ' are carried whole, each drawn in the "' + MW.nm.name + '" column', { sixOn, nmKinds });
   await p.click('#ocol-cm .opt[data-carry="dim"]'); await p.waitForTimeout(150); await p.mouse.move(5, 5); await p.waitForTimeout(150);
   const c1 = await readC();
   ok(c1.carry === 'dim' && c1.cvOp.length > 0 && c1.cvOp.every(([o, sh]) => o < 0.5 && sh) && c1.brightOp.every(([o]) => o === 1) && c1.cveOp.every(([o, sh]) => o < 1 && sh),
     'D-055 · dim: the ' + c1.cvOp.length + ' carried marks fade and stay drawn, every bright item stays whole', { faded: c1.cvOp.filter(([o]) => o >= 0.5).length, dimBright: c1.brightOp.filter(([o]) => o !== 1).length });
-  await p.click('#ocol-cm .opt[data-carry="hide"]'); await p.waitForTimeout(150);
+  /* CHANGED 2026-09-28 (D-064 (2)): hide now takes away every field that holds something on this endpoint, so the empty field below the
+     square rises under the pointer — pointed at, it comes back whole (by design); the pointer is moved off before the read */
+  await p.click('#ocol-cm .opt[data-carry="hide"]'); await p.waitForTimeout(150); await p.mouse.move(5, 5); await p.waitForTimeout(150);
   const c2 = await readC(), partly = Object.values(R.cv).filter((v) => v[0] === 'p');
   ok(c2.carry === 'hide' && c2.cvOp.every(([, sh]) => !sh) && c2.brightOp.every(([, sh]) => sh) && c2.switchShown && c2.notes.length === partly.length
      && c2.cveOp.length === c0.empty && c2.cveOp.every(([o, sh]) => o < 1 && sh) && !c2.xnotes.length
@@ -1598,16 +1625,22 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
       { deep: deep.map(([n, pa, o, po]) => [n, pa, o && o.on, po && po.on]), call: call && call.on, tips61: tips61.map((t) => (t || '').slice(0, 100)), bad61: bad61.slice(0, 5) }); }
   /* (2) the cases it arranges */
   const arrWant = [...new Set([...(FE.tests.arranged_by || []), ...(FE.tests.helper_arranged || [])])], arrPage = await p.$$eval('#ocol-cm .pair[data-k="d:arranged"] [data-key]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
-  const arrTxt = await p.$eval('#ocol-cm .pair[data-k="d:arranged"] .pk', (e) => e.textContent), inGrid = await p.$$eval('#mogrid [data-keys]', (cs) => cs.flatMap((c) => c.getAttribute('data-keys').split('\n')));
+  /* CHANGED 2026-09-28 (D-064 (2)): an arranging case has no moment by nature — every one stands in Proof's no-moment cell, in the
+     code map's order, one chip each; none at a moment, none in the band */
+  const arrTxt = await p.$eval('#ocol-cm .pair[data-k="d:arranged"] .pk', (e) => e.textContent), inGrid = await p.$$eval('#mogrid td[data-mom] [data-keys]', (cs) => cs.flatMap((c) => c.getAttribute('data-keys').split('\n')));
   const moBandP = await p.$$eval('#moband .mbb[data-f="proof"] .mbr', (rs) => rs.map((r) => r.getAttribute('data-why')));
-  ok(arrTxt === fillW(PW.arranged, { n: arrWant.length }) && JSON.stringify(arrPage) === JSON.stringify(arrWant) && arrWant.every((c) => !inGrid.includes('case:' + c)) && !moBandP.includes('arranged'),
-    'D-056 (2) · ' + E + ' · "' + fillW(PW.arranged, { n: arrWant.length }) + '" names the ' + arrWant.length + ' cases the feed lists (' + arrWant.join(' ') + '); none stands at a moment, and the band holds no Proof row to join', { arrPage, moBandP });
-  const EB = FEED.find((ep) => ROW[ep].mo.un.some((u) => u[0] === 'proof' && u[3] !== 'arranged') && ROW[ep].d.arranged.length);
-  if (EB) { await openEp(EB); const bb = await p.$$eval('#moband .mbb[data-f="proof"] .mbr[data-why="arranged"] .mc', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
-    /* review F2: a case the band already holds under another reason (an acting call proving no ending) is not drawn there twice */
-    const held = new Set(await p.$$eval('#moband .mbb[data-f="proof"] .mbr:not([data-why="arranged"]) .mc', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5))));
-    const want2 = ROW[EB].d.arranged.map((x) => x[0]).filter((c) => !held.has(c));
-    ok(JSON.stringify(bb) === JSON.stringify(want2) && bb.every((c) => !held.has(c)), 'D-056 (2) · ' + EB + ' · where the band already lists Proof\'s unplaced, the arranging cases join it, "' + D.words.mo.why.arranged.name + '" — each once, never beside the same case under another reason (' + [...held].filter((c) => ROW[EB].d.arranged.some((x) => x[0] === c)).join(' ') + ' already there)', { bb, want2 });
+  const arrCell = await p.$$eval('#mogrid tr[data-f="proof"] td[data-nm] .mc[data-nmk="arr"]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
+  ok(arrTxt === fillW(PW.arranged, { n: arrWant.length }) && JSON.stringify(arrPage) === JSON.stringify(arrWant) && arrWant.every((c) => !inGrid.includes('case:' + c)) && !moBandP.includes('arranged')
+     && JSON.stringify(arrCell) === JSON.stringify(arrWant),
+    'D-056 (2) · D-064 (2) · ' + E + ' · "' + fillW(PW.arranged, { n: arrWant.length }) + '" names the ' + arrWant.length + ' cases the feed lists (' + arrWant.join(' ') + '); none stands at a moment or in the band — each stands once in Proof\'s "' + D.words.mo.nm.name + '" cell', { arrPage, arrCell, moBandP });
+  /* CHANGED 2026-09-28 (D-064 (2)): where the band lists Proof's unplaced, the arranging cases no longer join it: they stand in the
+     no-moment cell, every one — a case the band holds under another reason (an acting call proving no ending) stands there as its
+     acting call, and in the cell as the case that arranges */
+  const EB = FEED.find((ep) => ROW[ep].mo.un.some((u) => u[0] === 'proof') && ROW[ep].d.arranged.length);
+  if (EB) { await openEp(EB); const bb = await p.$$eval('#mogrid tr[data-f="proof"] td[data-nm] .mc[data-nmk="arr"]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
+    const whys = await p.$$eval('#moband .mbb[data-f="proof"] .mbr', (rs) => rs.map((r) => r.getAttribute('data-why')));
+    const want2 = ROW[EB].d.arranged.map((x) => x[0]);
+    ok(JSON.stringify(bb) === JSON.stringify(want2) && whys.length > 0 && !whys.includes('arranged'), 'D-056 (2) · D-064 (2) · ' + EB + ' · the band keeps Proof\'s unplaced (' + whys.join(', ') + ') and none of its ' + want2.length + ' arranging cases, which stand in the "' + D.words.mo.nm.name + '" cell, each once', { bb, want2, whys });
     await openEp(E); }
   /* review F1: a case the feed lists as arranging both ways (arranged_by and helper_arranged) is ONE item, counted once */
   const EA = FEED.find((ep) => { const t = (FJ.endpoints['endpoint:' + ep] || {}).tests || {}; return (t.arranged_by || []).some((c) => (t.helper_arranged || []).includes(c)); });
@@ -1640,7 +1673,7 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
      (it wore "left unsaved", a claim the fix found false) */
   const p403 = FE.paths.filter((q) => q.exit.id === X403), f201 = await fateOn((FE.paths.find((q) => q.exit.id === X201 && addSt(q.id)) || {}).id);
   const f403 = p403.length === 1 ? await fateOn(p403[0].id) : ['more than one path'];
-  await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(120); const fAll = await p.$$eval('#mogrid .vc-fate', (cs) => cs.length);
+  await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(120); const fAll = await p.$$eval('#mogrid td[data-mom] .vc-fate', (cs) => cs.length);   /* CHANGED 2026-09-28 (D-064 (2)): the no-moment cell's tally of fates is not a write's fate */
   ok(JSON.stringify(f201) === JSON.stringify(w201) && w201[0] === 'saved' && p403.length === 1 && !addSt(p403[0].id) && p403[0].effects.read_to
      && (!f403 || !f403.length) && fAll === 0,
     'D-056 (4) · ' + E + ' · the add to cooking_sessions wears "' + D.words.fates.saved.name + '" on the path to the 201 (the feed\'s bucket); the 403\'s path stops at the raise at ' + (p403[0] || { effects: {} }).effects.read_to + ', before the add — no fate there; all paths, no fate', { f201, f403, fAll });
@@ -1741,11 +1774,12 @@ ok(!errs.length, 'no page error after the D-056 checks', errs);
       arm: C.querySelectorAll('.pair[data-k="d:alarms"] [data-vc="arm"]').length, list: [...C.querySelectorAll('.pair[data-k="d:alarms"] li [data-vc="alarm"]')].map((v) => v.getAttribute('data-vv')),
       hint: hc ? hc.getAttribute('data-hint') : null, filled: [...document.querySelectorAll('#mogrid td[data-f="end"] .vc-status[data-decl="1"]')].map((v) => v.textContent) }; }, 'fn:' + FE.handler);
   const al1 = [...(FE.findings || []), ...Object.values(FE.arm_findings || {}).flat(), ...((FJ.arm_findings || {}).frontend || []).filter((f) => f.endpoint === EK)].map((f) => f.id);
-  ok(['h:method', 'h:segment', 'h:declared', 'h:handler', 'd:fates', 'd:alarms'].every((k) => g1.st[k] === 'c') && g1.st['c:alarms'] === 'b' && g1.st['c:fate'] === 'b'
+  /* CHANGED 2026-09-28 (D-064 (2)): the fates' count and the alarms' dots are drawn by BY MOMENT's last column now — carried */
+  ok(['h:method', 'h:segment', 'h:declared', 'h:handler', 'd:fates', 'd:alarms', 'c:alarms', 'c:fate'].every((k) => g1.st[k] === 'c')
      && g1.fates.length === FE.paths.length && g1.fates.every(Boolean) && g1.alarms.length === al1.length && g1.alarms.every(Boolean) && g1.handler.every(Boolean)
      && g1.head.includes(FE.path) && FE.path.split('/')[1] === R.seg && g1.filled.includes(String(FE.declared.success.status)) && g1.hint === base(FE.file) + ':' + FE.line
      && !g1.arm && JSON.stringify([...g1.list].sort()) === JSON.stringify([...al1].sort()) && g1.list.includes('reason-collapsed'),
-    'D-057 · group 1 · ' + E + ': the method, the segment, the declared ' + FE.declared.success.status + ', the handler and its file (' + g1.hint + '), the ' + FE.paths.length + ' fates and the ' + al1.length + ' alarms (' + al1.join(' ') + ') are carried, each fact drawn in BY MOMENT; the fates count and the alarm dots stay; no arm word',
+    'D-057 · group 1 · ' + E + ': the method, the segment, the declared ' + FE.declared.success.status + ', the handler and its file (' + g1.hint + '), the ' + FE.paths.length + ' fates and the ' + al1.length + ' alarms (' + al1.join(' ') + ') are carried, each fact drawn in BY MOMENT; the fates count and the alarm dots too, in its no-moment column (D-064 (2)); no arm word',
     { st: g1.st, head: g1.head, hint: g1.hint, list: g1.list, fates: g1.fates.filter((x) => !x).length, alarms: g1.alarms });
   const own = FJ.endpoints ? Object.values(FJ.endpoints).flatMap((e0) => e0.produced || []).filter((x) => x.phase !== 'uncaught' && x.state === 'defined') : [];
   await p.click('#itog-mo'); await p.waitForTimeout(80);
@@ -1820,6 +1854,24 @@ ok(!errs.length, 'no page error after the D-056 checks', errs);
      && onCodes.every(([, ws, par]) => ws.every((w) => w === par)) && onCodes.some(([, , par]) => par)
      && JSON.stringify(deepD) === JSON.stringify([['_stages', 3, true], ['_label', 4, true], ['_hold_hours', 4, true]]),
     'D-057 (d) · D-062 (2) · ' + E + ': ' + gotD.map((x) => x[0] + ' under ' + x[4].join(',') + ' on codes ' + (x[7] || []).map((i) => R.mo.ex[i][1]).join(' ')).join(' · ') + ' — exactly its caller\'s, picked code by code — with no "on every path that calls" (the caller says none), no key and no glyph; ' + deepD.map((x) => x[0] + ' ↓' + x[1]).join(' · ') + ' stand there by their call edges (D-060 (3)); the band holds no function', { gotD, onCodes, deepD, bandD });
+  /* D-064 (1) (his ruling 2026-09-28): assert_recipe_allergen_safe — and the two chips joined under it by name — stand only on the paths
+     that reach it. Recomputed HERE from the feed: its reached_by route (the call inside start_session, on the handler call it rides),
+     the paths that route names, less those whose chain meets a fork that returns or fires a check inside start_session between its
+     def and that call; the codes it stands on are the ones the real clicks above found it on. Checked against the source at 05007957:
+     start_session returns the replay at `if existing is not None` and raises `recipe is None` before it calls the allergen check */
+  const L64 = (at) => +String(at || '').replace(/^.*:(\d+)$/, '$1'), F64 = (at) => String(at || '').replace(/:\d+$/, '');
+  const rt64 = FJ.functions['apps/api/services/recipes.py::assert_recipe_allergen_safe'].reached_by.find((b) => b.root === EK);
+  const def64 = L64(FJ.functions[rt64.via].at), site64 = L64(rt64.site), file64 = F64(rt64.site);
+  const brs64 = new Map(FE.branches.map((b) => [b.id, b])), preAt64 = new Set(FE.preconditions.map((g) => g.at));
+  const leaves64 = (q) => q.chain.some((st) => st.hit && F64(st.at) === file64 && L64(st.at) >= def64 && L64(st.at) < site64
+    && ((st.kind === 'branch' && (brs64.get(st.ref) || {}).pred && ((brs64.get(st.ref) || {}).return || (brs64.get(st.ref) || {}).exit)) || (st.kind === 'gate' && preAt64.has(st.at))));
+  const want64 = FE.paths.filter((q) => rt64.paths.includes(q.id) && !leaves64(q)).map((q) => q.id).sort(), gone64 = rt64.paths.filter((pid) => !want64.includes(pid));
+  const on64 = onCodes.filter(([, , par]) => par).map(([i]) => R.mo.ex[i][8]).sort(), st64 = (pid) => (R.mo.ex.find((x) => x[8] === pid) || [])[1];
+  const replay64 = gone64.find((pid) => ((R.mo.ex.find((x) => x[8] === pid) || [])[9] || []).some((d) => d[1] === 'existing is not None'));
+  ok(JSON.stringify(on64) === JSON.stringify(want64) && gone64.length === 2 && gone64.map(st64).sort().join(' ') === '201 404' && !!replay64 && on64.length === 3
+     && onCodes.every(([, ws, par]) => ws.every((w) => w === par)),
+    'D-064 (1) · ' + E + ' · assert_recipe_allergen_safe stands on codes ' + on64.map(st64).join(' ') + ', not on ' + gone64.map(st64).join(' and ') + ' (the replay returns at "existing is not None", the 404 fires "recipe is None" first, both inside start_session before its call at ' + rt64.site.split('/').pop() + '); derive_restrictions and ResolutionSnapshot.violations_for stand on the same codes',
+    { on64, want64, gone64 });
   /* (e) an error nothing catches */
   const ET = 'PATCH /cooking/sessions/{session_id}/timer', FT = FJ.endpoints['endpoint:' + ET], fT = FT.findings.find((f) => f.id === 'escape-500');
   const rfT = Object.entries(FJ.functions).filter(([, f0]) => (f0.raises || []).some((q) => q.at === fT.at && q.cls === fT.cls)).map(([k]) => k);
@@ -1894,6 +1946,72 @@ ok(!errs.length, 'no page error after the D-056 checks', errs);
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-057 checks', errs);
 
+/* the review of D-064 (2026-09-28) — each finding read against the feed here, then clicked */
+{ const fillW = (s0, x) => String(s0).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  const MX = D.words.mo.x, NK = D.words.mo.nm.k, L_ = (at) => +String(at || '').replace(/^.*:(\d+)$/, '$1'), F_ = (at) => String(at || '').replace(/:\d+$/, '');
+  const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
+  const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
+    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+  const pickP = async (i) => { await p.click('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(120); };
+  const idx = (ep, pid) => ROW[ep].mo.ex.findIndex((x) => x[8] === pid);
+  const onP = (e, i) => e[5] == null || !!((e[5] >> i) & 1);
+  const fnOf = (ep, key) => ROW[ep].mo.el.filter((e) => e[0] === 'fn' && e[2].some((ki) => D.mo.keys[ki] === key));
+  /* F1 · relief-accept: the 404 fires "req is None" inside relief_accept's body (its def line from the forms feed, its length from the
+     archmap); build_candidate_resolutions (no call line recorded) stays on that path, and its hover says the path may leave first; on the
+     path that runs relief_accept to its last return it says nothing */
+  const E1 = 'POST /recipe-creation/{request_id}/relief-accept', FE1 = FJ.endpoints['endpoint:' + E1], AM = JSON.parse(fs.readFileSync(ARCHMAP, 'utf8'));
+  const RA = 'apps/api/services/ai_recipes.py::relief_accept', d0 = L_(FJ.functions[RA].at), d1 = d0 + AM.function_insight[RA].lines - 1;
+  const inRA = (st) => st.hit && F_(st.at) === 'apps/api/services/ai_recipes.py' && L_(st.at) >= d0 && L_(st.at) <= d1;
+  const pLeft = FE1.paths.filter((q) => q.chain.some((st) => inRA(st) && (st.kind === 'gate' || (FE1.branches.find((b0) => b0.id === st.ref) || {}).pred))).map((q) => q.id);
+  const pFull = FE1.paths.find((q) => q.chain.some((st) => st.kind === 'branch' && st.hit && (FE1.branches.find((b0) => b0.id === st.ref) || {}).token === 'fall-through'));
+  const KB = 'fn:apps/api/services/ai_recipes.py::build_candidate_resolutions', lin = fillW(MX.leftIn, { via: 'relief_accept' });
+  await open(PAGE); await openEp(E1);
+  const tl = []; for (const pid of pLeft) { await pickP(idx(E1, pid)); tl.push([ROW[E1].mo.ex[idx(E1, pid)][1], await tipAt('#mogrid td[data-f="fn"] .mc[data-key="' + KB + '"]')]); }
+  await pickP(idx(E1, pFull.id)); const tFull = await tipAt('#mogrid td[data-f="fn"] .mc[data-key="' + KB + '"]');
+  await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(100);
+  ok(pLeft.length === 2 && tl.every(([, t]) => t && t.includes(lin)) && tFull && !tFull.includes(lin),
+    'review F1 · ' + E1 + ': on the ' + tl.map((x) => x[0]).join(' and ') + ' (they leave relief_accept at a line inside its body, ' + d0 + '–' + d1 + ') build_candidate_resolutions says "' + lin + '"; on the ' + ROW[E1].mo.ex[idx(E1, pFull.id)][1] + ' that runs relief_accept to its last return it says nothing', { tl: tl.map(([c, t]) => [c, (t || '').slice(0, 160)]) });
+  /* F2 · POST /recipes/{recipe_id}/plan: the "Cupo not found" 404 was read to owned_mode's raise, called inside plan_into_cupo before plan_recipe
+     (two sites of one function, from their own routes) — no chip of plan_recipe or of assert_recipe_allergen_safe stands on it */
+  const E2 = 'POST /recipes/{recipe_id}/plan', FE2 = FJ.endpoints['endpoint:' + E2];
+  const OM = FJ.functions['apps/api/services/recipe_filter_modes.py::owned_mode'], zat = OM.raises[0].at;
+  const rOM = OM.reached_by.find((b0) => b0.root === 'endpoint:' + E2), rPR = FJ.functions['apps/api/services/recipes.py::plan_recipe'].reached_by.find((b0) => b0.root === 'endpoint:' + E2).routes.find((b0) => b0.root_site === rOM.root_site);
+  const pCupo = FE2.paths.find((q) => (q.effects || {}).read_to === zat), iC = idx(E2, pCupo.id);
+  const on2 = ['plan_recipe', 'assert_recipe_allergen_safe'].map((n) => fnOf(E2, 'fn:apps/api/services/recipes.py::' + n).filter((e) => onP(e, iC)).length);
+  ok(rOM.via === rPR.via && L_(rOM.site) < L_(rPR.site) && on2.every((n) => n === 0) && fnOf(E2, 'fn:apps/api/services/recipes.py::plan_recipe').length === 1,
+    'review F2 · ' + E2 + ': the ' + ROW[E2].mo.ex[iC][1] + ' leaves at owned_mode (' + zat.split('/').pop() + ', its ending read to it), called at ' + rOM.site.split('/').pop() + ' before plan_recipe at ' + rPR.site.split('/').pop() + ' — neither plan_recipe nor assert_recipe_allergen_safe stands on it; plan_recipe stands once, at the call that reaches it', { on2 });
+  /* F3 · POST /_e2e/seed: _discard_claim is called inside complete_setup's except (it passes the error on); the uncaught 500's record
+     names that except's re-raise; no chain enters the except — the band says it runs on the way to the 500, not "on no path" */
+  const E3 = 'POST /_e2e/seed', FE3 = FJ.endpoints['endpoint:' + E3];
+  const c3 = FE3.failure.catches.find((c0) => (c0.actions || []).some((a) => a.call === '_discard_claim')), u3 = (FE3.produced || []).find((x) => x.phase === 'uncaught');
+  const pt3 = (u3.unknown_causes || []).map((u) => u.replace(/^pass-through raise /, '')).find((a) => F_(a) === F_(c3.at) && L_(a) > L_(c3.at) && L_(a) <= Math.max(...c3.actions.map((a) => a.at)));
+  await openEp(E3);
+  const band3 = await p.$$eval('#moband .mbb[data-f="fn"] .mbr', (rs) => rs.map((r) => [r.getAttribute('data-why'), [...r.querySelectorAll('.mc')].map((c) => c.textContent.trim())]));
+  ok(!!pt3 && !FE3.paths.some((q) => q.chain.some((st) => st.kind === 'catch' && st.at === c3.at)) && band3.some(([w, ns]) => w === 'in500' && ns.some((n) => n.includes('_discard_claim'))) && !band3.some(([w, ns]) => w === 'nopath' && ns.some((n) => n.includes('_discard_claim'))),
+    'review F3 · ' + E3 + ': _discard_claim, called in the except at ' + c3.at.split('/').pop() + ' that the 500\'s re-raise at ' + (pt3 || '?').split('/').pop() + ' passes through, stands in the band as "' + D.words.mo.why.in500.name + '"', { band3 });
+  /* F4 · a flag says its own words; "no test covers this" is left out of the column where a test calls the endpoint */
+  const E4 = 'GET /recipes/explore', acts4 = Object.values(FJ.test_cases).reduce((a, t) => a + (t.calls || []).filter((c) => c.endpoint === 'endpoint:' + E4 && c.role === 'act').length, 0);
+  const uR4 = (ROW[E4].uni.rows.find((u) => u.row === 'RISK') || { items: [] }).items.map((x) => x[0]), nm4 = ROW[E4].mo.nm.filter((x) => x[1] === 'risk').map((x) => (x[4] || {}).id);
+  await openEp('POST /cooking/sessions'); const tFl = await tipAt('#mogrid td.monm .mc[data-nmk="risk"]');
+  ok(acts4 > 0 && uR4.includes('untested') && !nm4.includes('untested') && tFl && tFl.includes(NK.risk.ids.conflict.plain) && !tFl.includes(NK.risk.ids.untested.plain),
+    'review F4 · ' + E4 + ': the Gabe Universe flags "no test covers this", ' + acts4 + ' test calls act on it — the no-moment column leaves the flag out; on POST /cooking/sessions the flag\'s hover says the conflict flag\'s own words', { uR4, nm4, tFl: (tFl || '').slice(0, 200) });
+  /* F6 · DELETE /: the map labels the route "/"; the first segment is read from the path it is served at, less the app's mount */
+  const E6 = 'DELETE /', FE6 = FJ.endpoints['endpoint:' + E6]; await openEp(E6);
+  const seg6 = await p.$eval('#mogrid td.monm .mc[data-nmk="seg"]', (c) => c.textContent.replace(/\s+/g, ' ').trim()), tSeg6 = await tipAt('#mogrid td.monm .mc[data-nmk="seg"]');
+  const want6 = FE6.full_path.replace(/^\/api\/v1/, '').split('/').filter(Boolean)[0];
+  ok(seg6 === fillW(NK.seg.text, { v: want6 }) && tSeg6 && tSeg6.includes(fillW(NK.seg.label, { v: '/' })),
+    'review F6 · ' + E6 + ': served at ' + FE6.full_path + ', its first segment reads "' + seg6 + '" (not "//"), and its hover says the map labels its path /', { seg6 });
+  /* F7 · POST /cooking/sessions: load_resolution_snapshot reads before the 403 raise, inside the same call — it stands on the 403 */
+  const E7 = 'POST /cooking/sessions', FE7 = FJ.endpoints['endpoint:' + E7], p403 = FE7.paths.find((q) => q.exit.id && (FE7.produced || []).some((x) => x.id === q.exit.id && x.status === 403));
+  const lrs = fnOf(E7, 'fn:apps/api/reference/resolution.py::load_resolution_snapshot'), fe7 = (p403.effects.steps || []).some((e) => (STEPS[e.step] || {}).fn === 'apps/api/reference/resolution.py::load_resolution_snapshot');
+  ok(fe7 && lrs.length >= 1 && lrs.some((e) => onP(e, idx(E7, p403.id))), 'review F7 · ' + E7 + ': the 403\'s steps read load_resolution_snapshot\'s tables before it leaves; its chip stands on the 403', { n: lrs.length });
+  /* F8 · one call deep, in the singular; the dependencies' functions are not counted, and the hover says so */
+  const E8 = 'POST /account/export'; await openEp(E8);
+  const b8 = await p.$eval('#mogrid td.monm .mc[data-nmk="behind"]', (c) => c.textContent.replace(/\s+/g, ' ').trim()), tb8 = await tipAt('#mogrid td.monm .mc[data-nmk="behind"]');
+  ok(b8 === fillW(NK.behind.text1, { n: 1, d: 1 }) && tb8 && tb8.includes(NK.behind.plain), 'review F8 · ' + E8 + ': "' + b8 + '", its hover saying the dependencies\' functions are not counted', { b8 });
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the review-of-D-064 checks', errs);
+
 /* 18 · D-058 (his ruling 2026-09-26: "the same buttons to hide or dim the information that we already put below, but in the Gabe
    universe ... see in both panels what is already on the by moment table"). Real clicks on POST /cooking/sessions, every expected
    value read off the page's OTHER section — BY MOMENT's grid (the keys its chips carry, the names of its chips with no key, its heading)
@@ -1917,6 +2035,8 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
   const grid = await p.evaluate(() => ({ keys: [...new Set([...document.querySelectorAll('#mogrid .mc[data-keys]')].flatMap((c) => c.getAttribute('data-keys').split('\n')))],
     names: [...document.querySelectorAll('#mogrid td[data-f="fn"] .mc')].map((c) => [((c.querySelector('.mt') || {}).textContent || '').trim(), (c.getAttribute('data-keys') || '').split('\n').filter((k) => k.startsWith('fn:'))[0] || '']),
     ops: [...document.querySelectorAll('#mogrid .mc[data-f="data"][data-keys]')].flatMap((c) => { const o = c.querySelector('.vc[data-vc="op"]'); return o ? c.getAttribute('data-keys').split('\n').map((k) => o.getAttribute('data-vv') + '|' + k) : []; }),
+    /* D-064 (2): the facts the no-moment column draws, by kind and words */
+    nm: [...document.querySelectorAll('#mogrid td[data-nm] .mc[data-nmk]')].map((c) => [c.getAttribute('data-nmk'), c.innerText.replace(/\s+/g, ' ').trim()]),
     head: document.querySelector('#mohead h3').getAttribute('aria-label') }));
   /* F4 (review 2026-09-26): a name BY MOMENT draws — a function chip with no key, or a keyed one whose name no other function chip
      there wears under another key; F1: a table's read or write by a data chip wearing that op */
@@ -1937,16 +2057,25 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
         [n, ...n.querySelectorAll('[data-keys]')].forEach((k) => (k.getAttribute('data-keys') || '').split('\n').filter(Boolean).forEach((x) => it.keys.add(x)));
         if (n.getAttribute('data-cv') === '1') it.cv = true; if (n.classList.contains('xrow')) { it.chip = true; it.text = ((n.querySelector('.pchip') || {}).textContent || '').trim(); }
         it.op = Math.min(it.op, op(n)); it.shown = it.shown || shown(n); }); };
+    /* CHANGED 2026-09-28 (D-064 (2)): the cases past the Tests row's cap ("+N more") are carried now (the column draws the ones that
+       only arrange) — each tab's "+N more" is opened before its items are read */
+    const more = (row) => row.querySelectorAll('span.more').forEach((m) => { if (m.style.display !== 'none' && /^\+/.test(m.textContent)) m.click(); });
     U.querySelectorAll('.ust .urow[data-row]').forEach((row) => { const tabs = [...row.querySelectorAll('.tabbar .tab')];
-      if (tabs.length) { tabs.forEach((t) => { t.click(); grab(row); }); tabs[0].click(); } else grab(row); });
+      if (tabs.length) { tabs.forEach((t) => { t.click(); more(row); grab(row); }); tabs[0].click(); } else { more(row); grab(row); } });
     Object.values(out).forEach((o) => Object.values(o.items).forEach((it) => { it.keys = [...it.keys]; }));
     return { rows: out, count: document.getElementById('ucvcount').textContent, carry: U.getAttribute('data-carry') }; });
   const u0 = await readU(), UR = R.uni.rows.map((u) => u.row), UI = (rn) => (R.uni.rows.find((u) => u.row === rn) || { items: [] }).items || [];
   const OPS = { ACCESSES: UI('ACCESSES').map((o) => o[0]), CONNECTIONS: UI('CONNECTIONS').flatMap((g) => g[3].concat(g[7]).map(() => ({ reads_from: 'r', writes_to: 'w' })[g[0]] || null)) };
-  const want = (rn, it, row, i) => { if (rn === 'SIGNATURE' || rn === 'RISK') return false;
+  /* CHANGED 2026-09-28 (D-064 (2)): what the no-moment column draws is carried too — the outline (both of the Signature row's items), a
+     flag by its words, the cluster (Above's first item, no key), the docstring, the count behind (Code behind's count, whether or not
+     the card names every function it counts); read off the grid's no-moment chips */
+  const NMK = new Set(grid.nm.map((x) => x[0])), NMR = new Set(grid.nm.filter((x) => x[0] === 'risk').map((x) => x[1]));
+  const clOf = (UI('ABOVE') || [])[0], NMC = grid.nm.some((x) => x[0] === 'cl' && clOf != null && x[1].endsWith(' ' + clOf));
+  const factWant = (rn, i, name) => rn === 'SIGNATURE' ? NMK.has('sig') : rn === 'RISK' ? NMR.has(name != null ? name : (UI('RISK')[i] || [])[2]) : rn === 'DOCSTRING' ? NMK.has('doc')
+    : rn === 'ABOVE' ? NMC : null;
+  const want = (rn, it, row, i) => { if (['SIGNATURE', 'RISK', 'DOCSTRING'].includes(rn) || (rn === 'ABOVE' && String(i) === '0' && !it.keys.length)) return factWant(rn, +i);
     const op = (OPS[rn] || [])[i]; if (op && it.keys.length === 1 && it.keys[0].startsWith('table:')) return GO.has(op + '|' + it.keys[0]);   /* F1: the access's own op */                 /* the def line, the flags: counted members none */
-    if (rn === 'CODE BEHIND' && !it.keys.length && !it.chip) { const ch = Object.values(row.items).filter((x) => x.chip);   /* its count: every callee named and drawn */
-      return ch.length === (R.uni.rows.find((u) => u.row === rn) || {}).count && ch.every((x) => want(rn, x, row)); }
+    if (rn === 'CODE BEHIND' && !it.keys.length && !it.chip) return NMK.has('behind') && grid.nm.some((x) => x[0] === 'behind' && x[1].startsWith((R.uni.rows.find((u) => u.row === rn) || {}).count + ' '));   /* its count: the column's (D-064 (2)) */
     if (rn === 'CODE BEHIND' && it.chip && !it.keys.length) return MN.has(it.text);
     if (rn === 'JOURNEYS') return it.keys.length > 1 && it.keys.every((k) => MK.has(k)) && it.keys.some((k) => k.startsWith('case:'));
     return it.keys.length === 1 && MK.has(it.keys[0]); };
@@ -1957,10 +2086,12 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
     idx.forEach((i) => { const it = row.items[i]; if (mark(it) !== want(rn, it, row, i)) bad.push([rn, i, it.keys.join(' ') || it.text, mark(it)]); });
     const c = idx.filter((i) => mark(row.items[i])).length; nIt += idx.length; nC += c; per.push([rn, c, idx.length]);
     if (idx.length !== R.ucv[ui][3] || c !== R.ucv[ui][2]) bad.push([rn, 'count', c + '/' + idx.length, R.ucv[ui].slice(2)]); });
-  ok(!bad.length && nC > 0 && nC < nIt, 'D-058 · the universe · every item is marked carried exactly when BY MOMENT\'s grid draws its key (a Code behind function by its name, the endpoint by the heading); counts, lines, flags, the signature and Source\'s file stay bright: ' + per.map((x) => x[0] + ' ' + x[1] + '/' + x[2]).join(' · '), bad.slice(0, 5));
+  ok(!bad.length && nC > 0 && nC < nIt, 'D-058 · D-064 (2) · the universe · every item is marked carried exactly when BY MOMENT\'s grid draws its key (a Code behind function by its name, the endpoint by the heading) or its last column draws the fact (the outline, a flag, the cluster, the count behind); counts and lines it draws nowhere stay bright: ' + per.map((x) => x[0] + ' ' + x[1] + '/' + x[2]).join(' · '), bad.slice(0, 5));
+  /* CHANGED 2026-09-28 (D-064 (2)): Source's file and the risk flag are carried now — the no-moment column draws the handler's file (with
+     the line its route is declared at, not the file's length the card shows) and the flag; the usage count stays bright */
   const srcFile = (u0.rows.SOURCE || { items: {} }).items['0'];
-  ok(srcFile && !srcFile.cv && srcFile.keys[0] === 'file:' + R.file && (u0.rows.RISK || { st: 'b' }).st === 'b' && u0.rows.USAGE.st === 'b',
-    'D-058 · the universe · Source\'s file (' + R.file + ', the file\'s length, not the handler line), the risk flags and the usage count stay bright', { srcFile, risk: (u0.rows.RISK || {}).st });
+  ok(srcFile && (srcFile.cv || u0.rows.SOURCE.st === 'c') && srcFile.keys[0] === 'file:' + R.file && (u0.rows.RISK || { st: 'c' }).st === 'c' && u0.rows.USAGE.st === 'b' && (u0.rows.SIGNATURE || {}).st === 'c',
+    'D-064 (2) · the universe · Source\'s file (' + R.file + '), the risk flags and the signature are carried by the no-moment column; the usage count stays bright', { srcFile, risk: (u0.rows.RISK || {}).st, sig: (u0.rows.SIGNATURE || {}).st });
   ok(u0.count === fillW(CW.pcount, { carried: nC, items: nIt, left: nIt - nC }) && JSON.stringify([nC, nIt]) === JSON.stringify(R.ucn),
     'D-058 · the universe\'s header count is the page\'s own marks: ' + u0.count, { count: u0.count, page: [nC, nIt], gen: R.ucn });
   /* (c) dim, hide, independent, remembered */
@@ -2001,19 +2132,21 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
     return { items, count: document.getElementById('gcvcount').textContent, carry: G.getAttribute('data-carry'), dir: G.getAttribute('data-dir') }; });
   const g1 = await readG(), fct = (t) => g1.items.find((x) => x.fact && x.t === t) || {};
   /* CHANGED 2026-09-27 (the scoped-import fix): UserDietaryProfile moved from "stays whole" to "fades" — BY MOMENT draws its table now */
-  const byName = ['derive_restrictions', 'ResolutionSnapshot.violations_for'], cases = ['C237', 'C267'], stay = [R.uni.rows.find((u) => u.row === 'SOURCE').kvs[0][2], 'conflict · large surface'], nowDrawn = ['UserDietaryProfile'];
+  /* CHANGED 2026-09-28 (D-064 (2)): Source's file and the flag fade now (the no-moment column draws them); the layer (Identity) stays */
+  const byName = ['derive_restrictions', 'ResolutionSnapshot.violations_for'], cases = ['C237', 'C267'], stay = [R.uni.rows.find((u) => u.row === 'IDENTITY').kvs[1][2]],
+    nowDrawn = ['UserDietaryProfile', R.uni.rows.find((u) => u.row === 'SOURCE').kvs[0][2], 'conflict · large surface'];
   /* what a name IS comes from the row's own record (its key, parallel to its name — the DOM draws the glyph, not the key) */
   const FK = new Map(R.rgaps.flatMap((g) => g[3].map((n, i) => [g[0] + '|' + n, (g[4] || [])[i] || null])));
   /* F2 (review 2026-09-26): a name stands for the card's items of its row named the same (a journey with its entities, a table's
      read and its write) — carried exactly when each of them is, read off the grid as above */
   const gWant = (x) => { const k = FK.get(x.row + '|' + x.t), row = u0.rows[x.row];
     const its = row ? Object.entries(row.items).filter(([, it]) => (k ? it.keys.includes(k) : x.row === 'CODE BEHIND' && it.chip && !it.keys.length && it.text === x.t)) : [];
-    return its.length ? its.every(([i, it]) => want(x.row, it, row, i)) : k ? MK.has(k) : x.row === 'CODE BEHIND' && MN.has(x.t); };
+    return its.length ? its.every(([i, it]) => want(x.row, it, row, i)) : k ? MK.has(k) : x.row === 'CODE BEHIND' ? MN.has(x.t) : !!factWant(x.row, -1, x.t); };
   const fBad = g1.items.filter((x) => x.fact).filter((x) => { const w = gWant(x); return x.m !== w || (x.m ? !(x.op < 0.5) : x.op !== 1); });
   const gC = g1.items.filter((x) => x.m).length;
   ok(g1.dir === 'uni' && g1.carry === 'dim' && byName.every((n) => fct(n).m && fct(n).op < 0.5 && MN.has(n)) && cases.every((c) => fct(c).m === MK.has('case:' + c) && (fct(c).op < 0.5) === MK.has('case:' + c))
      && stay.every((n) => fct(n).t && !fct(n).m && fct(n).op === 1) && nowDrawn.every((n) => fct(n).t && fct(n).m && fct(n).op < 0.5) && !fBad.length,
-    'D-058 · THE GAPS from the universe, dim: ' + byName.join(' and ') + ' fade (BY MOMENT names them), ' + nowDrawn.join(', ') + ' fades (BY MOMENT draws its table), ' + cases.map((c) => c + (MK.has('case:' + c) ? ' fades' : ' stays')).join(', ') + '; ' + stay.join(', ') + ' stay whole — every name marked exactly as BY MOMENT\'s grid draws it',
+    'D-058 · THE GAPS from the universe, dim: ' + byName.join(' and ') + ' fade (BY MOMENT names them), ' + nowDrawn.join(', ') + ' fade (BY MOMENT draws its table, the handler\'s file, the flag), ' + cases.map((c) => c + (MK.has('case:' + c) ? ' fades' : ' stays')).join(', ') + '; ' + stay.join(', ') + ' stay whole — every name marked exactly as BY MOMENT\'s grid draws it',
     { fBad: fBad.slice(0, 4), stay: stay.map((n) => [n, fct(n).m, fct(n).op]) });
   ok(g1.count === fillW(CW.pcount, { carried: gC, items: g1.items.length, left: g1.items.length - gC }) && JSON.stringify([gC, g1.items.length]) === JSON.stringify(R.gcn.uni),
     'D-058 · THE GAPS\' header count (from the universe) is the page\'s own marks: ' + g1.count, { count: g1.count, page: [gC, g1.items.length], gen: R.gcn.uni });
@@ -2032,11 +2165,16 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
     'D-058 · THE GAPS from the code map, hide: an attribute leaves exactly when every code-map pair holding it is carried whole — ' + g3.count, { bad: aBad.slice(0, 4).map((x) => x.t), count: g3.count, gen: R.gcn.cm });
   /* F3 (review 2026-09-26): an attribute carried in part never reads "n of its n" — a field that sums the endpoint up (the fates'
      tally, the proof rank) is one element BY MOMENT leaves out */
-  const rxP = new RegExp(CW.panels.gaps.tipPart.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{(n|of)\}/g, '(\\d+)')), pAt = g3.items.filter((x) => x.gcs === 'p'), f3 = [];
+  /* CHANGED 2026-09-28 (D-064 (2)): on this endpoint every attribute is now carried whole — the first endpoint that carries one in part
+     is opened for the reading (the panel keeps its look), then this one again */
+  let pAt = g3.items.filter((x) => x.gcs === 'p'), F3E = E;
+  if (!pAt.length) { F3E = FEED.find((ep) => Object.values(ROW[ep].gcv.a).some((a) => a[0] === 'p')); if (F3E) { await openEp(F3E); pAt = (await readG()).items.filter((x) => x.gcs === 'p'); } }
+  const rxP = new RegExp(CW.panels.gaps.tipPart.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{(n|of)\}/g, '(\\d+)')), f3 = [];
   for (const x of pAt) { const h = await p.$('#ocol-gaps .gap[data-attr="' + x.t + '"]'); await h.scrollIntoViewIfNeeded(); const bx = await h.boundingBox();
     await p.mouse.move(bx.x + 4, bx.y + bx.height / 2); await p.waitForTimeout(90); const m = rxP.exec(await p.$eval('#tip', (e) => e.textContent)); f3.push([x.t, m && +m[1], m && +m[2]]); await p.mouse.move(5, 5); }
   ok(pAt.length > 0 && f3.every(([, n, of]) => n != null && n < of),
-    'F3 · THE GAPS from the code map: every attribute carried in part says fewer than all its elements — ' + f3.map((x) => x[0] + ' ' + x[1] + '/' + x[2]).join(' · '), f3);
+    'F3 · THE GAPS from the code map (' + F3E + '): every attribute carried in part says fewer than all its elements — ' + f3.map((x) => x[0] + ' ' + x[1] + '/' + x[2]).join(' · '), f3);
+  if (F3E !== E) await openEp(E);
   /* (e) the copy texts */
   await p.evaluate(() => { window.__copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (s1) => { window.__copied = s1; return Promise.resolve(); } } }); });
   await p.$eval('#cmcopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#cmcopy'); await p.waitForTimeout(80);

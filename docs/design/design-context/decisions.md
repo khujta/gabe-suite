@@ -826,3 +826,16 @@ baselines, the doctor). A DISPLAY-SIDE generation change — how a fact is rende
 lighter regime: fixtures fire + silent, 1–2 mutants per item, only the batteries the changed files touch during build, the A/B on
 the gustify copy + tier3 only (gastify/keypro when the change touches what they exercise), and small fixes batched with ONE doctor
 run at the end. Design pages keep D-037. Runs already launched keep the regime they were briefed with (D-062 stays full).
+
+## D-064 — A function behind drops the paths that leave before it; BY MOMENT ends with a "no moment" column of metadata
+Date: 2026-09-28 · Input: the D-062 audit's open overstatement and his look at the all-endpoints page.
+Decision, his: "apply the recommendation, and also in all endpoints I think we are missing in the table at the end the [metadata]
+which is naturally not associated to any moment, but there could be things like cluster, entity, file and line and so on".
+Consequence: (1) a function behind the handler stands only on the paths that reach it — the paths the map shows leaving before it
+(a returning fork, a check that fires first) are dropped, the rule checks inside a call already follow (e.g. on POST
+/cooking/sessions, assert_recipe_allergen_safe and the chips under it leave the replay 201 and the 404). (2) BY MOMENT's table ends
+with a "no moment" column (a last row when moments are rows): per block, the facts that have no moment by nature — the endpoint's
+metadata (method and path, entity, cluster, handler file and line, URL segment, signature, docstring, and the like the feeds hold) and
+the timeless summaries (the fate tally, the step count, the behind count, the proof rank, the arranging tests, the alarms row); the
+NO MOMENT band keeps only what should have a moment but the feed cannot place. The column's placement is the agent's reading of "in
+the table at the end", his to correct. Page-only: D-037's light checks.
