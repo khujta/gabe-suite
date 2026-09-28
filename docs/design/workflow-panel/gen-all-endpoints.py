@@ -1271,6 +1271,12 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             if wd:
                 x[1].add(pid)
     BH = r["_beh"]                                               # D-056 (1): the functions behind the handler, by name
+    # PROOF (D-062 (4), the code map's "depth not known", panel.behindExtraPlain): a function the card names behind the handler that
+    # the lab's walk does not hold is reached from the handler through no call edge the map draws — so its depth is the map's to lack,
+    # never a walk cut short
+    near = sorted(f for f in BH["extra"] if f in reach_of(adj, H, memo))
+    if near:
+        die(f"{lab}: the code map says the depth of {near[:3]} is not known, yet the map's call edges reach them from the handler")
     depth = {f: dp for f, dp, _dep in BH["walk"]}
     for (f, q), (ps, pw, dr) in sorted(fq.items(), key=lambda kv: (kv[0][1], kv[0][0])):
         add("fn", ("h", q), [fk(f)], nm(f), None, ps, f"@ {q}" if dr else None, "f:" + f, x={"dp": depth[f]} if f in depth else None)
@@ -1363,8 +1369,11 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     # D-057 (d): a function behind the handler no call edge places (the walk's own with no link, the card's other callees, the names no
     # function carries) stands where the function that calls it stands — the placed functions (the handler's own chip apart: it stands
     # where the handler starts, not at a call) whose station behind list (levels.json fn_nodes behind.names) names it, less any of them
-    # another of them is behind (so the one nearest it). One moment: there, on that function's paths — an upper bound, as its hover
-    # says; several moments: the band says so; none: it stays where it was. A name no function carries is placed by name, no key, no glyph.
+    # another of them is behind (so the one nearest it). One moment: there, on that function's paths; several moments: the band says so;
+    # none: it stays where it was. A name no function carries is placed by name, no key, no glyph.
+    # D-062 (2): its paths are its CALLER chip's paths (each caller chip already stands inside the call it is placed at), exactly as
+    # D-061 (2) places a walk function on its parent's — and they are an upper bound only where the caller's are: the "on every path
+    # that calls" line is the caller's own, naming the same call, and a caller that carries none gives none.
     # Rounds, until nothing more is placed: a function placed this way can place the ones behind it
     LB = X.get("lvbeh") or {}
     unjoined = lambda e: e["f"] == "fn" and e["w"] in (("un", "nolink"), ("un", "noname"))
@@ -1381,7 +1390,13 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             if len({ge["si"] for _g, ge in c}) == 1:
                 e["si"] = c[0][1]["si"]; e["w"] = ("si", e["si"]); moved += 1
                 e["paths"] = set().union(*[ge["paths"] for _g, ge in c]); e["pw"] = set().union(*[ge["pw"] for _g, ge in c])
-                e["x"]["cp"] = ", ".join(sorted({nm(g) for g, _ge in c}))
+                ccp = sorted({(ge.get("x") or {}).get("cp") for _g, ge in c} - {None})
+                if ccp:
+                    e["x"]["cp"] = ", ".join(ccp)
+                    tally["join:cp"] += 1                        # a caller whose own paths are an upper bound: said, naming its call
+                else:
+                    e["x"].pop("cp", None)
+                    tally["join:exact"] += 1                     # its callers' paths are their own: no upper-bound line
                 e["o"] = min(ge["o"] for _g, ge in c)
                 e["_jc"] = {g for g, _ge in c}
                 tally["join:name" if e["id"].startswith("n:") else "join:fn"] += 1
@@ -2240,6 +2255,9 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
     put("switches", len(sw), len(sw), Z["switches"]["zero"], [w["id"] for w in sw])
 
     fb = L["widening"]["fetched_by"]
+    # PROOF (D-062 (4), cols.fetched.name): the column counts the frontend pieces that fetch it, each a hook or a component
+    if any(q.get("kind") not in ("hook", "component") for q in fb):
+        die(f"{ident.get('label')}: the screen column says it counts hooks and components, yet a {sorted({str(q.get('kind')) for q in fb} - {'hook', 'component'})} piece fetches it")
     put("fetched", len(fb), len(fb), Z["fetched"]["zero"])
     rs = F["frontend"].get("reason_sites") or []
     put("reasons", len(rs), len(rs), Z["reasons"]["zero"], [s2["id"] for s2 in rs])
@@ -3139,6 +3157,8 @@ def build(argv: list) -> tuple:
                 f" · (b) reason chips {sum(1 for r in rows for x in r['mo']['el'] if x[4] and x[4][0] == 'rsn')}"
                 f" · (c) endings two paths reach {MOT['forkEnds']} ({MOT['forkPaths']} codes); a check inside a call left off {MOT['f1:drop']} paths that leave before it, {MOT['f1:up']} said on the call's paths"
                 f" · (d) out of the band: {MOT['join:fn']} functions behind + {MOT['join:name']} by name only ({MOT['join:cut']} of them may also run under a function whose list is cut), {MOT['join:several']} at several moments, {MOT['join:left']} left"
+                f"; on their callers' own paths {MOT['join:exact']}, on a caller's upper bound {MOT['join:cp']} (D-062 (2))"
+                f" · upper-bound hovers page-wide {sum(1 for r in rows for x in r['mo']['el'] if x[7] and 'cp' in x[7])}"
                 f" · (e) 500s with a cause {sum(1 for r in rows for x in r['mo']['el'] if x[7] and 'cz' in x[7])}, raising chips {sum(1 for r in rows for x in r['mo']['el'] if x[7] and 'ru' in x[7])}")
     # D-058: what BY MOMENT carries in the other two panels — items carried of items, summed over the feed, and on his example
     s58 = lambda f: [sum(f(r)[0] for r in rows), sum(f(r)[1] for r in rows)]

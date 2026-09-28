@@ -1544,7 +1544,9 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
      so: read on the first endpoint the page draws one, from the page's record of it (e[7].cp).
      CHANGED 2026-09-27 (D-061 (2)): a function in the walk now stands on its walk PARENT's paths and says "on every path that calls"
      only where the parent's paths are themselves an upper bound — on this feed no parent's are, so the first chip that says it is one
-     joined to its caller by name (D-057 (d), which keeps its line); the read below is unchanged */
+     joined to its caller by name (D-057 (d), which keeps its line); the read below is unchanged.
+     CHANGED 2026-09-27 (D-062 (2)): a function joined by name now keeps its caller's line only where the caller carries one, so on
+     this feed no chip says it (page-wide 87 → 0): where one does, its hover says so; where none does, the count is read as zero */
   const onOwn = (fid) => { const e0 = R.mo.el.find((e) => e[0] === 'fn' && e[2].some((ki) => MK[ki] === 'fn:' + fid)); if (!e0) return null;
     return { on: R.mo.ex.map((x, i) => [x[0], e0[5] == null || !!((e0[5] >> i) & 1)]).filter(([, on]) => on).map(([x]) => x),
       paths: FE.paths.filter((q) => (q.effects.steps || []).some((e) => (STEPS[e.step] || {}).fn === fid)).map((q) => q.exit.id), cp: (e0[7] || {}).cp || null }; };
@@ -1557,11 +1559,13 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   let tUp = null, eUp = null;
   if (EU) { eUp = ROW[EU].mo.el.find(upK); await openEp(EU);
     const kUp = MK[eUp[2][0]]; tUp = await tipAt('#mogrid td[data-f="fn"] .mc[data-keys^="' + kUp + '"] .mt'); await openEp(E); }
+  const nUp = FEED.reduce((a, ep) => a + ROW[ep].mo.el.filter((e) => e[0] === 'fn' && (e[7] || {}).cp).length, 0);
   ok(oSeed && oCount && tSeed && tCount && !oSeed.cp && !oCount.cp && same(oSeed.paths, oSeed.on) && same(oCount.paths, oCount.on) && oSeed.paths.length > 0
      && !tSeed.includes(fillW(MX.callPaths, { via: 'start_session' })) && !tCount.includes(fillW(MX.callPaths, { via: 'start_session' }))
-     && !!EU && !!tUp && tUp.includes(fillW(MX.callPaths, { via: eUp[7].cp })),
-    'review F3 · ' + E + ' · seed_stage_schedule and count_active_sessions stand on exactly the endings their own steps are on and say nothing more; on ' + EU + ' a function with no steps of its own stands on the paths of ' + (eUp && eUp[7].cp) + ', and its hover says so',
-    { oSeed, oCount, EU, tUp: (tUp || '').slice(0, 160) });
+     && (EU ? !!tUp && tUp.includes(fillW(MX.callPaths, { via: eUp[7].cp })) : nUp === 0),
+    'review F3 · ' + E + ' · seed_stage_schedule and count_active_sessions stand on exactly the endings their own steps are on and say nothing more; '
+      + (EU ? 'on ' + EU + ' a function with no steps of its own stands on the paths of ' + eUp[7].cp + ', and its hover says so' : 'no chip on the page says "on every path that calls" (' + nUp + ')'),
+    { oSeed, oCount, EU, nUp, tUp: (tUp || '').slice(0, 160) });
   /* D-061 (2) (his ruling 2026-09-27): a function behind the handler stands on the paths of the CALLER it hangs under in the walk
      (its walk parent's chip), not on every path of the handler call — _stages under seed_stage_schedule, _label and _hold_hours
      under _schedule_next stand on exactly their parent's endings, fewer than the start_session call's; and the hover's "on every
@@ -1796,14 +1800,26 @@ ok(!errs.length, 'no page error after the D-056 checks', errs);
      stand at the work with their depth (↓3 · ↓4 · ↓4), read below; the lists join only the two known by name */
   const wantD = [['derive_restrictions', 0], ['ResolutionSnapshot.violations_for', 0]].map(([n, keyed]) => [n, keyed, nearest(n)]);
   const deepD = ['_stages', '_label', '_hold_hours'].map((n) => { const c = work.find((x) => x.name === n); return [n, c ? +((c.t.match(/\u2193(\d+)/) || [])[1]) : null, c ? !!c.keys : null]; });
+  /* CHANGED 2026-09-27 (D-062 (2), his ruling "I agree with the recommendations"): a function joined by name stands on its CALLER
+     chip's codes — exactly them — and says "on every path that calls" only where the caller's chip carries that line; here
+     assert_recipe_allergen_safe's does not (D-061 (2): its parent start_session's paths are its own), so neither does it. The codes
+     each chip stands on are read by real clicks on the path row, one code at a time */
+  const MKd = D.mo.keys, codesOf = (e0) => R.mo.ex.map((x, i) => [i, e0[5] == null || !!((e0[5] >> i) & 1)]).filter(([, on]) => on).map(([i]) => i);
   const gotD = [];
   for (const [n, keyed, via] of wantD) { const c = work.find((x) => x.name === n); const i = work.indexOf(c);
     const t = c ? await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc:nth-child(' + (i + 1) + ') .mt') : null;
-    gotD.push([n, !!c, c ? !!c.keys : null, c ? c.glyph : null, via, t && via.length === 1 && t.includes(fillW(MX.callPaths, { via: via[0] }))]); }
+    const me = R.mo.el.find((e0) => e0[0] === 'fn' && e0[3] === n), cfid = via.length === 1 ? placedFns.find((g) => g.split('::').pop() === via[0]) : null;
+    const cr = me && cfid ? R.mo.el.find((e0) => e0[0] === 'fn' && e0[1] === me[1] && (e0[2] || []).some((ki) => MKd[ki] === 'fn:' + cfid)) : null;   /* its caller's chip, at its moment */
+    gotD.push([n, !!c, c ? !!c.keys : null, c ? c.glyph : null, via, !!t && !!cr && !(cr[7] || {}).cp && !t.includes(MX.callPaths.split('{via}')[0]), cr && me ? JSON.stringify(codesOf(me)) === JSON.stringify(codesOf(cr)) : false, me ? codesOf(me) : null]); }
+  const onCodes = [];                                            /* the same, by real clicks: each code picked, which of the two stand */
+  for (const i of R.mo.ex.map((_x, j) => j)) { await p.click('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(100);
+    const w0 = (await cell('work', 'fn')).map((x) => x.name); onCodes.push([i, wantD.map(([n]) => w0.includes(n)), w0.includes('assert_recipe_allergen_safe')]); }
+  await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(100);
   const bandD = await p.$$eval('#moband .mbb[data-f="fn"] .mbr', (rs) => rs.map((r) => r.getAttribute('data-why')));
-  ok(gotD.every(([n, here, hasKey, glyph, via, tipOk], j) => here && via.length === 1 && tipOk && (wantD[j][1] ? hasKey : !hasKey && !glyph)) && !bandD.length
+  ok(gotD.every(([n, here, hasKey, glyph, via, tipOk, sameCodes], j) => here && via.length === 1 && tipOk && sameCodes && (wantD[j][1] ? hasKey : !hasKey && !glyph)) && !bandD.length
+     && onCodes.every(([, ws, par]) => ws.every((w) => w === par)) && onCodes.some(([, , par]) => par)
      && JSON.stringify(deepD) === JSON.stringify([['_stages', 3, true], ['_label', 4, true], ['_hold_hours', 4, true]]),
-    'D-057 (d) · ' + E + ': ' + gotD.map((x) => x[0] + ' under ' + x[4].join(',')).join(' · ') + ' stand at the work on their caller\'s paths (the hover says so) and carry no key and no glyph; ' + deepD.map((x) => x[0] + ' ↓' + x[1]).join(' · ') + ' stand there by their call edges (D-060 (3)); the band holds no function', { gotD, deepD, bandD });
+    'D-057 (d) · D-062 (2) · ' + E + ': ' + gotD.map((x) => x[0] + ' under ' + x[4].join(',') + ' on codes ' + (x[7] || []).map((i) => R.mo.ex[i][1]).join(' ')).join(' · ') + ' — exactly its caller\'s, picked code by code — with no "on every path that calls" (the caller says none), no key and no glyph; ' + deepD.map((x) => x[0] + ' ↓' + x[1]).join(' · ') + ' stand there by their call edges (D-060 (3)); the band holds no function', { gotD, onCodes, deepD, bandD });
   /* (e) an error nothing catches */
   const ET = 'PATCH /cooking/sessions/{session_id}/timer', FT = FJ.endpoints['endpoint:' + ET], fT = FT.findings.find((f) => f.id === 'escape-500');
   const rfT = Object.entries(FJ.functions).filter(([, f0]) => (f0.raises || []).some((q) => q.at === fT.at && q.cls === fT.cls)).map(([k]) => k);
@@ -1851,15 +1867,25 @@ ok(!errs.length, 'no page error after the D-056 checks', errs);
   const allFn = await p.$$eval('#mogrid td[data-f="fn"] .mc', (cs) => cs.map((c) => c.getAttribute('data-keys'))), w3 = await cell('work', 'fn');
   const placed3 = [...new Set(allFn.filter((k) => k && k.startsWith('fn:')).map((k) => k.split('\n')[0].slice(3)).filter((k) => k !== HF3 && LB.has(k)))];
   const near3 = (n) => { const c0 = placed3.filter((g) => LB.get(g).includes(n)); return c0.filter((g) => !c0.some((h) => h !== g && LB.get(g).includes(h.split('::').pop()))); };
-  const cpPre = MX.callPaths.split('{via}')[0], cpNext = MX.callPathsPlain.split('{via}')[0], cnPre = MX.cutNear.split('{v}')[0];
+  const cpPre = MX.callPaths.split('{via}')[0], cnPre = MX.cutNear.split('{v}')[0];
+  /* CHANGED 2026-09-27 (D-062 (2)): the joined chips no longer name their caller in an upper-bound line (their callers carry none), so
+     a joined chip is found by its own records instead: a work chip with no depth mark whose function no call of this endpoint's
+     chains, no step of its paths and no reached_by record of it names, and that a placed function's list names; it says no
+     "on every path that calls" (its callers say none) and the cut-near line exactly as before */
+  const F3 = FJ.endpoints['endpoint:' + E3], MK3 = D.mo.keys;
+  const own3 = new Set([...(F3.paths || []).flatMap((q) => q.chain || []).filter((st) => (st.kind === 'call' || st.kind === 'collapsed') && st.fn).map((st) => st.fn),
+    ...(F3.paths || []).flatMap((q) => ((q.effects || {}).steps || []).map((x) => (STEPS[x.step] || {}).fn)).filter(Boolean),
+    ...Object.entries(FJ.functions || {}).filter(([, f0]) => (f0.reached_by || []).some((rb) => rb.root === 'endpoint:' + E3)).map(([k]) => k)].map((f) => f.replace('#', '::')));
+  const cp3 = (g) => ROW[E3].mo.el.some((e0) => e0[0] === 'fn' && (e0[2] || []).some((ki) => MK3[ki] === 'fn:' + g) && (e0[7] || {}).cp);
   const f3 = [];
   for (let i = 0; i < w3.length; i++) { if (/\u2193/.test(w3[i].t)) continue;                       /* a depth mark: placed by its call edges, not by the lists */
-    const t = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc:nth-child(' + (i + 1) + ') .mt'); if (!t || !t.includes(cpPre)) continue;
     const n0 = w3[i].name, own = w3[i].keys ? w3[i].keys.split('\n')[0].slice(3) : null, jc = near3(n0);
-    const via = t.slice(t.indexOf(cpPre) + cpPre.length).split(cpNext)[0].split(', ').sort();
-    if (JSON.stringify(via) !== JSON.stringify(jc.map((g) => g.split('::').pop()).sort())) continue;
+    if ((own && own3.has(own)) || !jc.length) continue;
+    const t = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc:nth-child(' + (i + 1) + ') .mt'); if (!t) continue;
+    const via = jc.map((g) => g.split('::').pop()).sort();
     const hid = [...new Set(placed3.filter((h) => CUT.has(h) && !LB.get(h).includes(n0) && !jc.includes(h) && h !== own).map((h) => h.split('::').pop()))].sort();
-    f3.push([n0, via, hid, hid.length ? t.includes(fillW(MX.cutNear, { v: hid.join(', ') })) && t.includes(fillW(MX.cutNearPlain, { v: hid.join(', ') })) : !t.includes(cnPre)]); }
+    f3.push([n0, via, hid, (hid.length ? t.includes(fillW(MX.cutNear, { v: hid.join(', ') })) && t.includes(fillW(MX.cutNearPlain, { v: hid.join(', ') })) : !t.includes(cnPre))
+      && t.includes(cpPre) === jc.some(cp3)]); }
   /* CHANGED 2026-09-27 (D-060 (3)): _error_event and _result_event, same-file calls of _finalize_stream, stand by their call edges now
      (↓2) — no longer joined through the lists, so 5 functions are read here (4 cut-near) where 7 (6) were */
   const byEdge3 = ['_error_event', '_result_event'].map((n) => { const c = w3.find((x) => x.name === n); return [n, c ? +((c.t.match(/\u2193(\d+)/) || [])[1]) : null]; });

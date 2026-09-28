@@ -337,7 +337,7 @@
     },
     "framework": {
       "name": "framework",
-      "plain": "An ending the framework produces while it reads the body, before any code of the app runs."
+      "plain": "An ending the framework produces while it reads the body: after the app's edge, before any dependency or code of the endpoint runs."
     },
     "validation": {
       "name": "validation",
@@ -371,7 +371,7 @@
     },
     "none": {
       "name": "no own write",
-      "plain": "The path writes nothing of its own. The login check's writes are the gate's, named apart in the side panel."
+      "plain": "The path writes nothing of its own. The login check's writes are the gate's, named apart in the endpoint section's code map."
     }
   },
   "pieceWords": {
@@ -523,7 +523,7 @@
     },
     "fetched": {
       "head": "screen",
-      "name": "frontend hooks that call it",
+      "name": "frontend pieces that call it: a hook or a component",
       "zero": "no screen of the app calls it",
       "icon": "hook"
     },
@@ -776,15 +776,15 @@
   },
   "mo": {
     "_about": "His ask 2026-09-26: are the moments universal, can every block be read on them. The spine, the moment words, the reasons and the path row are my proposals (D-025.2); the two looks' defaults, moments as columns and cells as chips, are his (D-055); where each element stands is read off the feed by gen-all-endpoints.py (by_moment) and proven there.",
-    "lede": "One endpoint's time, left to right, with every block that happens in time as a row (his default; the other look turns it). A column is a moment of the request; a cell holds that block's elements acting at that moment. Pick an ending to follow only the path to it.",
+    "lede": "One endpoint's time, left to right, with every block that happens in time as a row (his default; the other look turns it). A column is a moment of the request; a cell holds that block's elements acting at that moment. Pick a code in the path row to follow only that path to its ending.",
     "how": [
       "The moments are D-053's, extended. Before the handler they are fixed: the server starting (before any request), the screen sending the request, the app's edge, FastAPI reading the body, the dependencies (the login check among them), FastAPI checking the fields. Inside the handler they are read from its own lines: its checks, and what it does among them; the work, the calls it makes after a check and before its next check, catch or commit; one moment for each catch that turns a failure into an ending; saving, its own commit. Then the answer, what happens after it, and the uncaught error last, because it can escape at any moment.",
       "A handler moment that happens twice (checks, then a catch, then more checks) is drawn twice, in the order it happens, never merged. The arms of one if and else are drawn the same way, as runs in line order, though a request passes only one of them: pick its ending to see which. A fixed moment the endpoint does not have is drawn empty where it would stand.",
-      "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs inside. A check stands where it is evaluated, on every path that makes the call it sits in; its ending stands where the request leaves. A check the map ties only to a catch stands where that catch raises its ending. A test has no time inside the request: it rides the ending it proves. What the map does not place is left in the band below, with its reason.",
+      "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs inside. A check stands where it is evaluated: on the paths whose chain carries it, and for a check inside a call, on the paths that make that call, less those the map shows leaving before it (on a path it rides only by the call, its hover says a path may skip it); its ending stands where the request leaves. A check the map ties only to a catch stands where that catch raises its ending. A test has no time inside the request: it rides the ending it proves. What the map does not place is left in the band below, with its reason.",
       "A step is placed once for each path it is on: with the dependencies when a dependency runs it, else at the call that path makes. So one step can stand at more than one moment: the login dependency reads a table, and a handler call reads it again. When a path's own chain names no call reaching the step, it stands at the calls the endpoint's other paths make to its function, never after that path has left.",
-      "The path: every path at once, or the path to one ending. Each ending is a code, in the order they happen, a small gap between the moments they leave at; its hover says the moment, what the ending says, its limiter, and whether it is the path in force. A picked path keeps only the moments it passes and the elements it passes there; an ending it passes by without leaving is kept.",
+      "The path: every path at once, or one path to its ending. Each path is a code, in the order its ending happens, a small gap between the moments they leave at; an ending several paths reach is several codes, told apart by the fork each takes, else by what FastAPI checks on it. A code's hover says the fork, the moment, what the ending says, its limiter, and whether it is the path in force. A picked path keeps only the moments it passes and the elements it passes there; an ending it passes by without leaving is kept.",
       "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it names one) and the class its except takes; the checks say so; the work names the first function it calls, and how many more; saving names what the handler's own step does there. Its full name, where the catch stands, its lines and its stage are in its hover.",
-      "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An ending's status is drawn hollow when the endpoint does not declare it. A test whose status fits endings at several moments rides each of them, its chip hollow and dashed. A function behind the handler stands at the handler call that reaches it, the arrow saying how many calls below the handler it is; one the map reaches through no call stands in the band."
+      "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An ending's status is drawn hollow when the endpoint does not declare it. A test whose status fits endings at several moments rides each of them, its chip hollow and dashed. A function behind the handler stands at the handler call that reaches it, the arrow saying how many calls below the handler it is, on the paths of the function it hangs under. One the map reaches through no call stands where a function placed at a moment names it behind it (the Gabe Universe's behind lists), on that function's paths; its hover names any placed function whose list is cut that may also run it. One no placed function names stands in the band, and so does one that functions at different moments name. A path may leave the function it hangs under before this one runs, which its chip does not say; where that function's own paths are an upper bound, its hover says so, naming the same call."
     ],
     "covHead": "Across the {nRows} endpoints, what each block places:",
     "cov": "{block}: {placed} with a moment, {un} with none, of {total}.",
@@ -871,7 +871,7 @@
       "fnnone": { "name": "no call reaches it", "plain": "The map names the function, but records no handler call that reaches it." },
       "swmoves": { "name": "moves with the path", "plain": "Its paths place it at different moments." },
       "nopath": { "name": "on no path", "plain": "The endpoint lists it, but none of its paths passes it, so no path can be followed to it." },
-      "noname": { "name": "by name only", "plain": "It is named behind the handler, and no single function carries the name, so no call can be followed to it." },
+      "noname": { "name": "by name only", "plain": "It is named behind the handler, and no single function carries the name, so no call can be followed to it; and no function placed at a moment names it behind it." },
       "arranged": { "name": "sets another test up", "plain": "The case calls this endpoint only to set another test up. A test has no time inside the request, and this one proves no ending here." }
     },
     "empty": "nothing here at this moment",
@@ -1047,7 +1047,7 @@
           { "dir": "b", "at": "tables-touched @ CONNECTIONS", "why": "gap", "q": "none drawn", "status": "not", "line": "Nothing to solve here: the card's Connections draw no table and the code map holds none. The item comes from reading the row as showing tables on every endpoint, the gaps' own proposal (D-040)." },
           { "dir": "b", "at": "operation-per-table @ CONNECTIONS", "why": "gap", "q": "none drawn", "status": "not", "line": "Nothing to solve here: the card's Connections draw no table and the code map holds none. The item comes from reading the row as showing tables on every endpoint, the gaps' own proposal (D-040)." },
           { "dir": "b", "at": "who-fetches-it @ CONNECTIONS", "why": "gap", "q": "none drawn", "status": "not", "line": "Nothing to solve here: the card's Connections draw no fetcher and the code map counts none. The item comes from reading the row as showing who fetches the endpoint on every endpoint, the gaps' own proposal (D-040)." },
-          { "dir": "b", "at": "who-fetches-it @ USAGE", "why": "gap", "q": "none drawn", "status": "open", "line": "The card's Usage counts the handler's callers (api and internal, the station graph's det.usage from the function insight); the code map counts the frontend pieces that fetch the endpoint, and finds none here. Carrying the card's count needs the code map to read det.usage, which the lab's facts already hold (identity.usage)." },
+          { "dir": "b", "at": "who-fetches-it @ USAGE", "why": "gap", "q": "none drawn", "status": "open", "line": "The card's Usage counts the handler's callers (api and internal, the station graph's det.usage from the function insight); the code map names the frontend pieces that fetch the endpoint (what sends it) and counts them, and finds none here. Carrying the card's count needs the code map to read det.usage, which the lab's facts already hold (identity.usage)." },
           { "dir": "b", "at": "where-this-endpoint-sits-in-the-app @ ABOVE", "why": "gap", "status": "open", "line": "No field of the code map is filed under this attribute; the nearest it holds is the place for one measure, coverage, as a rank in the proof pair. Carrying the place for every measure needs a rank per column over the feed's endpoints; the table above already sorts each column." },
           { "dir": "b", "at": "risk-flag @ RISK", "why": "gap", "q": "none drawn", "status": "not", "line": "A flag is a verdict read from facts, and the code map draws facts, not verdicts (D-025, analysis not diagnosis): each flag below says which field holds the facts it is read from." },
           { "dir": "b", "at": "untested @ RISK", "why": "alt", "status": "solved", "line": "The flag reads the case counts the station holds for this endpoint; the code map holds its own reading of the same fact, the endings a test proves of all, in the field linked here." },
@@ -1088,7 +1088,7 @@
     },
     "cm": {
       "title": "the code map",
-      "plain": "What the code map knows about this endpoint, under the card's blocks: everything the side panel held."
+      "plain": "What the code map knows about this endpoint, under the card's blocks."
     },
     "attrOf": "attribute: {v}"
   },
@@ -1539,7 +1539,7 @@
       "cm": "the code map",
       "mo": "by moment"
     },
-    "plain": "Click an element in either column (a chip, a pair, a list item, a name) and it lights everywhere it appears: the table rows whose endpoint holds it (the rest dim), the cells of the columns that count it, and every place either column draws it. A column that does not hold it says so at its top. Click it again, press Escape or clear to put it out; choosing another endpoint keeps it lit.",
+    "plain": "Click an element in either column or in BY MOMENT (a chip, a pair, a list item, a name) and it lights everywhere it appears: the table rows whose endpoint holds it (the rest dim), the cells of the columns that count it, and every place either column or BY MOMENT draws it. A column, or BY MOMENT, that does not hold it says so at its top. Click it again, press Escape or clear to put it out; choosing another endpoint keeps it lit.",
     "alias": "Which things are one element is my reading. Every element carries one key ({nKeys} on this page). A model class and its database table are one element, joined by the station graph's model-to-table map and the forms feed's models ({nAlias} classes). A function is its file and qualified name; a callee name for which the feeds hold no single function carries no key and cannot be lit ({nUnkeyed} of {nNames} names). A name a condition reads is a setting of the forms feed, else a flag; a guard, a switch or an in-flight value holds the settings and flags its condition reads. A row is lit when its endpoint holds the element anywhere on this page: in the table, its universe card or its code map.",
     "kinds": {
       "table": "table",

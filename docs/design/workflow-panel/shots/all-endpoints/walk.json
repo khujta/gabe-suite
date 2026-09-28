@@ -1565,7 +1565,7 @@
     "A handler moment that happens twice (checks, then a catch, then more checks) is drawn twice, in the order it happens, ne",
     "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs ",
     "A step is placed once for each path it is on: with the dependencies when a dependency runs it, else at the call that pat",
-    "The path: every path at once, or the path to one ending. Each ending is a code, in the order they happen, a small gap be",
+    "The path: every path at once, or one path to its ending. Each path is a code, in the order its ending happens, a small g",
     "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it name",
     "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An end",
     "Across the 80 endpoints, what each block places:",
@@ -2686,7 +2686,7 @@
   ],
   [
    "d057 hover derive_restrictions at the work",
-   "derive_restrictions · Functions ┆ on every path that calls assert_recipe_allergen_safe ┆ It runs inside assert_recipe_allergen_safe, and a path may leave assert_recipe_allergen_safe before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+   "derive_restrictions · Functions ┆ The code that runs, sorted by how much it decides."
   ],
   [
    "step 199 · d057-open-the-by-moment-info",
@@ -2901,7 +2901,7 @@
   ],
   [
    "review hover a function known by name only",
-   "ResolutionSnapshot.violations_for · Functions ┆ on every path that calls assert_recipe_allergen_safe ┆ It runs inside assert_recipe_allergen_safe, and a path may leave assert_recipe_allergen_safe before it runs, so a path picked here may not reach it. ┆ The code that runs, sorted by how much it decides."
+   "ResolutionSnapshot.violations_for · Functions ┆ The code that runs, sorted by how much it decides."
   ],
   [
    "step 221 · review-open-session-complete",
