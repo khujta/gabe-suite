@@ -1,0 +1,1853 @@
+[
+ {
+  "lens": "LENS 1 \u2014 HIS ITEMS (L-01..L-23 and his six questions), read as a human with one hover at a time on POST /cooking/sessions (?ep=post-cooking-sessions, 1920\u00d71200, default options), checked against gustify @05007957",
+  "verdicts": [
+   {
+    "item": "L-01",
+    "verdict": "partly",
+    "remains": "The Endings chips are fixed. The same kind of repetition is still elsewhere: all 20 ENDPOINT METADATA hovers end with one identical paragraph about the page. Every gate host's role label still repeats the role's definition ('orchestrates \u2014 calls other functions\u2026'). The Gates legend says 'My proposal: the station draws no node for this' five times."
+   },
+   {
+    "item": "L-02",
+    "verdict": "partly",
+    "remains": "Chips in the Endings row have one hover each. The host heads in the Gates row (RateLimitMiddleware, get_auth_context, build_auth_context, require_household, post_start_session \u00d74, start_session) and the Client's describeStartCookingError head are still three hover targets each: name, glyph and role label. The name's hover gives only 'X \u00b7 function'."
+   },
+   {
+    "item": "L-03",
+    "verdict": "answered",
+    "remains": "His two 429s now lead with sensitive 20/60s versus global 120/60s. The twins come back elsewhere: the in-flight lane read at the edge says '429 Rate limit exceeded\u2026 \u00b7 429 Rate limit exceeded\u2026', and the bench ENDING selector lists '429 \u00b7 Rate limit exceeded. Try again shortly.' twice."
+   },
+   {
+    "item": "L-04",
+    "verdict": "answered",
+    "remains": "The legend sits on the row name as he asked. In its LABELS list, one sample chip stands for a whole class but carries that class's count: '[429] \u2026 10 here' when there are two 429s."
+   },
+   {
+    "item": "L-05",
+    "verdict": "answered",
+    "remains": "The stage band and the 'one of 4' bracket are there. 'INPUT 1 of 2' has a bare count pill '2' next to it, so two numbers sit side by side with no unit. The column head 'subscription_tier_for +2' names a function, but its moment is 'the work'."
+   },
+   {
+    "item": "L-06",
+    "verdict": "answered",
+    "remains": "The 'no moment' column is gone. The metadata cards sit after the table."
+   },
+   {
+    "item": "L-07",
+    "verdict": "answered",
+    "remains": "Overview and risk is out of the table. 'conflict \u00b7 large surface' explains only 'large surface'. The six alarm chips share one identical hover."
+   },
+   {
+    "item": "L-08",
+    "verdict": "partly",
+    "remains": "The bench TEST column is built, but it is an option. On the page, 7 of the 8 'proves 404' chips are tests of other functions (cancel_session, set timer, step progress). C237 is said to send 'no headers' when it sends auth_headers. Its bench chain offers a body-parse 400 although the test's JSON body is written out in the test, and says 'the body it sends' is not known. The 'arranges' chips give no test name."
+   },
+   {
+    "item": "L-09",
+    "verdict": "answered",
+    "remains": "Gates name their host (glyph + role) and wear icons: sensitive/global now read 'rate limiter \u00b7 runs in RateLimitMiddleware'. The legend lists a gate's kind name in KINDS with no icon, and its icon in LABELS under a second, different definition."
+   },
+   {
+    "item": "L-10",
+    "verdict": "partly",
+    "remains": "function \u2192 condition \u2192 effect is drawn. Four things still read wrong or vague. (1) Raises one call down say 'the answer it becomes is not known' although the handler's except in the same row answers them. (2) The InvalidTokenError catch claims it 'commits, at context.py:79'; that commit never runs on that path. (3) The rate-limit switch just says 'decides the 429'. (4) TokenVerifier's face says 'can end at 401' but its hover says 'decides the 401'."
+   },
+   {
+    "item": "L-11",
+    "verdict": "answered",
+    "remains": "Where-it-decides labels (app-wide \u00b7 at login \u00b7 inside a call \u00b7 in the handler) are built as an option, and the bench's nine-role filter is built. His to pick."
+   },
+   {
+    "item": "L-12",
+    "verdict": "answered",
+    "remains": "The function\u2192table map is built (option; my pick is the default): green reads, orange writes, commit rules, the race on its link. Table chips still say 'only when a condition there holds' and never name the condition."
+   },
+   {
+    "item": "L-13",
+    "verdict": "partly",
+    "remains": "Function blocks exist only on the bench (option). The block's 'WHAT IT DOES' is category words ('decides an ending \u00b7 reads or writes data'). The four functions of L-14 plus load_resolution_snapshot are not in the bench's function list (25 there, 28 in the row). In BY MOMENT, 8 function hovers have no checks or gives line at all."
+   },
+   {
+    "item": "L-14",
+    "verdict": "partly",
+    "remains": "They now wear the glyph, but still no role and no call depth. violations_for, derive_restrictions and load_resolution_snapshot say 'called at cooking.py:150' although assert_recipe_allergen_safe calls them. Why they have no role is answered only in D-069, not on the page."
+   },
+   {
+    "item": "L-15",
+    "verdict": "answered",
+    "remains": "The refresh chip names its trigger, the hooks that fetch again, each GET, the reply and the tables behind it. useStartCooking still wears the role 'fetcher' next to 'mutation', though it sends a POST."
+   },
+   {
+    "item": "L-16",
+    "verdict": "partly",
+    "remains": "The client cell now names describeStartCookingError, where the error comes from, and 'reads 403 \u2192 \u2026'. The Endings hovers still say 'the screen reads it at cookingSessionModel.ts:389', and the reason-site hover titles are file:line. The text shown is a translation key ('cooking.error.start_allergen'), not the words the user sees. What the screen then does is not recorded."
+   },
+   {
+    "item": "L-17",
+    "verdict": "answered",
+    "remains": "The hourglass icon, the glyph per kind and the lifelines (option) show what each value affects: 429s, the 400, the 409, the claim on cooking_sessions, the commit. The idempotency_key chip wears 'on the request' next to 'request'. The legend counts 'server 1' where the row head says 'server 7'."
+   },
+   {
+    "item": "L-18",
+    "verdict": "partly",
+    "remains": "By default the row is folded into Gates. Its question appears as an unlabelled second sentence in the Gates head hover. Switches never say they are standard (79 of 80 endpoints carry them). The metadata card's 'pieces 3' does not name the three pieces. Two different rare pieces wear the same face 'rare \u00b7 6 of 80'."
+   },
+   {
+    "item": "L-19",
+    "verdict": "not",
+    "remains": "No gap analysis between the page's blocks and the lab's six parts exists on any page. docs/design/design-context/legibility/ holds only the measure script and JSON."
+   },
+   {
+    "item": "L-20",
+    "verdict": "partly",
+    "remains": "Every pinned-row sub-column is on its row head, and a click lights its members. On the Client head, 'screen 1' counts the hook useStartCooking (and the refresh chip), not RecipeBrowseContainer \u2014 the chip the row's legend calls 'screen'. Standard or specialist's columns sit on the Gates head without that name."
+   },
+   {
+    "item": "L-21",
+    "verdict": "partly",
+    "remains": "Widen, hide and fit are built. The default view still overflows (2300px table in an 1854px box), and names still break mid-word (the measure went from 12 to 13): SessionNotFoundEr|ror, InvalidTokenErro|r, RecipeBrowseCont|ainer, FirebaseTokenVerifi|er.verify."
+   },
+   {
+    "item": "L-22",
+    "verdict": "partly",
+    "remains": "Chip hovers are before \u00b7 checks \u00b7 gives. Host heads, middleware (CORSMiddleware, RateLimitMiddleware), RecipeBrowseContainer and every metadata item still describe the kind, not the item. Several hovers carry sentences about the map ('It stands on the paths that call\u2026', 'With a path picked\u2026'). Several give code instead of values ('str(exc)', 'pydantic error type')."
+   },
+   {
+    "item": "L-23",
+    "verdict": "answered",
+    "remains": "The bench is built: 8 columns in his order, selector, role filter, block, parts/size/colour, reset, copy. At 1920 the element names inside the blocks are cut off ('sensiti\u2026', 'useStartCoo\u2026', 'Rate limit exceeded\u2026'). The ending selector has twin entries. Four functions are missing from the function list."
+   },
+   {
+    "item": "Q: why no icon?",
+    "verdict": "partly",
+    "remains": "Gates: answered; they wear icons, and the legend says the station draws no node for them. Functions without a role (violations_for, derive_restrictions, get_idempotency_key): the page never says why."
+   },
+   {
+    "item": "Q: what is this \u2014 a function?",
+    "verdict": "answered",
+    "remains": "'sensitive \u00b7 rate limiter \u2014 runs in RateLimitMiddleware' under the RateLimitMiddleware head. Every gate names its host."
+   },
+   {
+    "item": "Q: what is fetching and from where?",
+    "verdict": "answered",
+    "remains": "The refresh chip names useActiveCooking \u2192 GET /cooking/active and useRemindersDue \u2192 GET /cooking/reminders/due, each reply and its tables. The sending hook is still labelled 'fetcher'."
+   },
+   {
+    "item": "Q: why do 403/404 trigger?",
+    "verdict": "partly",
+    "remains": "Client side: the hover gives the server ending that reaches each branch. Server side: the 403's raiser and its condition (assert_recipe_allergen_safe, `derived & set(user_allergens)`, only when the user has allergens) appear nowhere, and its raise is labelled 'answer not known'. The 404's second cause (replaying another member's key, services/cooking.py:129) shows as 'ending not recorded'."
+   },
+   {
+    "item": "Q: what are we representing in standard or specialist?",
+    "verdict": "partly",
+    "remains": "The answer ('Is this endpoint built like the others, and what is unusual about it?') is in the Gates head hover. Nothing there says it belongs to Standard or specialist, and the 'standard' half (switches shared by 79 of 80 endpoints) is never drawn."
+   },
+   {
+    "item": "Q: what does in-flight affect?",
+    "verdict": "answered",
+    "remains": "The lifelines put, on each value's line, the endings its reads can decide (429 \u00d72, 400, 409), the claim on cooking_sessions and the commit. The rate limiter's 429 read is the one twin left."
+   }
+  ],
+  "findings": [
+   {
+    "id": "F01",
+    "where": "BY MOMENT \u00b7 Proof \u00b7 moment 'start_session SessionNotFoundError' \u00b7 chips C225 C226 C228 C231 C235 C275 C276 'proves 404' (and their bench TEST blocks)",
+    "what": "A reader believes 8 tests prove this endpoint's 404 'Recipe not found'. 7 of them test other service functions and never touch this endpoint's code.",
+    "evidence": "Hover: 'calls the code behind the endpoint directly, not the endpoint \u00b7 proves the 404 from cooking.py:156: Recipe not found'. Source tests/test_cooking.py: C225/C226 call cancel_session, C228 calls update_step_progress, C231 complete, C235 update stage, C275/C276 set timer \u2014 each with pytest.raises(SessionNotFoundError). Only C221 calls start_session. The bench's own C225 block says 'It calls cancel_session directly', yet its hover still says 'OUT proves 404 here'.",
+    "severity": "misleading",
+    "fix": "Join a pytest.raises test to an ending only when the function it calls is on this endpoint's path (start_session here). Drop the rest from this endpoint, or draw them apart as 'raises the same error in another function'.",
+    "item": "L-08",
+    "pattern": "proof-joined-by-error-class"
+   },
+   {
+    "id": "F02",
+    "where": "BY MOMENT \u00b7 Proof \u00b7 C237 chips (reads the body \u00b7 checks \u00b7 SessionNotFoundError column), hover BEFORE",
+    "what": "The reader is told the test sends no headers, so it cannot tell how the test gets past the login check.",
+    "evidence": "Hover: 'sends no headers'. Source test_cooking.py:375-385: client.post(..., json={recipe_id, planned_portions: 2}, headers=auth_headers). The bench says 'sends no header it names' \u2014 a different, closer wording.",
+    "severity": "misleading",
+    "fix": "When headers= is a fixture variable, say 'sends the headers of the fixture auth_headers (their names are not read)'. Never say 'no headers'.",
+    "item": "L-08",
+    "pattern": "unread-value-stated-as-none"
+   },
+   {
+    "id": "F03",
+    "where": "BY MOMENT \u00b7 Proof \u00b7 reads the body \u00b7 'C237 proves 400' (hollow chip); bench TEST \u00b7 C237 \u00b7 'WAY 4 OF 4 \u00b7 400' and 'NOT KNOWN FROM THE TEST \u00b7 the body it sends'",
+    "what": "The face says 'proves' on a chip that only fits. The ending it sits on is a JSON parse error that this test cannot produce. The bench says the body is unknown although it is written out in the test.",
+    "evidence": "The face reads 'C237 proves 400'; only the hover says 'fits 4 endings; this is one of them'. The test sends json={\"recipe_id\": str(uuid4()), \"planned_portions\": 2} \u2014 valid JSON, so 'There was an error parsing the body' is impossible. The bench chain lists that as way 4 of 4. Its 'checks it passes' lines are named by endings ('\u2713 429 Rate limit exceeded'), which read as statuses the test received.",
+    "severity": "misleading",
+    "fix": "Put 'fits' on the face of hollow chips and keep 'proves' for solid ones. Read a literal json= argument as the body, and drop the ways it rules out (body parse, missing field). Name each passed check by its condition ('under the rate limit', 'token accepted'), not by the ending it would give.",
+    "item": "L-08",
+    "pattern": "hedge-in-hover-claim-on-face"
+   },
+   {
+    "id": "F04",
+    "where": "BY MOMENT \u00b7 Functions (start_session, assert_recipe_allergen_safe, _get_firebase_app, _firebase_credential) \u00b7 Gates \u00b7 the work \u00b7 guard 'existing is not None and existing.user_id != user_id \u2192 404'",
+    "what": "Raises are labelled 'the answer it becomes is not known' or 'the ending it becomes is not recorded', while the handler's except that answers them is drawn in the same row. The guard's face even says \u2192 404.",
+    "evidence": "start_session: 'raises SessionNotFoundError at cooking.py:129; the answer it becomes is not known'. assert_recipe_allergen_safe: '\u2026AllergenConflictError at recipes.py:234; the answer it becomes is not known'. _get_firebase_app: '\u2026InvalidTokenError at verifier.py:89; the answer it becomes is not known'. Source: api/cooking.py:149-166 wraps start_session in try/except SessionNotFoundError\u2192404 / AllergenConflictError\u2192403 / ConcurrentCookCapError\u2192409. auth/context.py:96-99 wraps build_auth_context (which calls verify) in except InvalidTokenError\u2192401 'invalid token'.",
+    "severity": "misleading",
+    "fix": "Carry each raise up the call chain to the first except of its class on this endpoint's path (the page already holds both ends). Write 'becomes 403 Recipe contains your allergen restrictions (caught at cooking.py:159)'. Keep 'not known' only when no except of that class is on the path, and then behind 'more information' (D-017).",
+    "item": "L-10",
+    "pattern": "map-limit-stated-as-code-fact"
+   },
+   {
+    "id": "F05",
+    "where": "BY MOMENT \u00b7 Endings \u00b7 403 chip hover; Gates \u00b7 the work; bench FUNCTION \u00b7 assert_recipe_allergen_safe; bench ENDING \u00b7 403",
+    "what": "His question 'why does the 403 trigger?' has no answer anywhere: no raiser, no condition, and not the fact that it runs only when the user has allergens.",
+    "evidence": "403 hover BEFORE: 'when AllergenConflictError is raised' only. The Gates row has no chip for recipes.py:233 `if derived & set(user_allergens)` or for services/cooking.py:142 `if user_allergens:`. The bench block lists 'RAISES AllergenConflictError services/recipes.py:234' with no condition and no 'becomes 403 here', and 'WHAT IT DOES: decides an ending \u00b7 reads or writes data'.",
+    "severity": "costly",
+    "fix": "Draw the raise's own if as a gate 'check two calls down' under assert_recipe_allergen_safe \u2192 403. On the 403 ending, BEFORE should read: 'when assert_recipe_allergen_safe finds the recipe's ingredient-derived restrictions overlap the user's allergens (checked only when the user's profile lists allergens)'.",
+    "item": "Q: why do 403/404 trigger?",
+    "pattern": "effect-without-its-cause"
+   },
+   {
+    "id": "F06",
+    "where": "BY MOMENT \u00b7 Endings \u00b7 404 chip; Gates \u00b7 except SessionNotFoundError \u2192 404",
+    "what": "The 404 has two causes; the page tells a reader only one.",
+    "evidence": "Catch hover: 'when SessionNotFoundError is raised, at cooking.py:140' (the recipe-is-None raise). Source services/cooking.py:124-130: replaying an Idempotency-Key that belongs to another household member's session raises SessionNotFoundError('Cooking session not found'). The handler also answers that with 404 'Recipe not found'. The page marks that raise's ending 'not recorded'.",
+    "severity": "costly",
+    "fix": "List both causes on the 404's BEFORE: 'the recipe is missing or not active (:140) \u00b7 the key belongs to another member's session (:129)'. Say the second is answered with 'Recipe not found' too.",
+    "item": "Q: why do 403/404 trigger?",
+    "pattern": "one-ending-many-causes-shown-as-one"
+   },
+   {
+    "id": "F07",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 the dependencies \u00b7 'except InvalidTokenError \u2192 401' hover GIVES",
+    "what": "The reader is told a rejected token commits something to the database.",
+    "evidence": "Hover: 'answers 401: invalid token \u00b7 commits, at context.py:79'. Source auth/context.py:77-79: verifier.verify(token) raises InvalidTokenError before resolve_or_create_user and before the commit at :79. That commit belongs to build_auth_context's success path.",
+    "severity": "misleading",
+    "fix": "List a commit under a catch only when it runs inside the except body, or after the except on a path that went through it.",
+    "item": "L-10",
+    "pattern": "effect-attached-to-wrong-branch"
+   },
+   {
+    "id": "F08",
+    "where": "BY MOMENT \u00b7 Functions / Gates \u00b7 FirebaseTokenVerifier.verify; ending 401 'invalid token'",
+    "what": "The main reason a request gets 401 'invalid token' \u2014 the token fails Firebase verification \u2014 is missing. The only raisers shown are two configuration errors.",
+    "evidence": "FirebaseTokenVerifier.verify's hover has only 'called by build_auth_context \u00b7 3 calls below'. Source auth/verifier.py:115-118 has `except Exception as exc: raise InvalidTokenError('firebase token verification failed') from exc`, and :107 has 'firebase-admin not installed'. The page shows only _get_firebase_app 'project id not set' (:89) and _firebase_credential 'malformed JSON' (:80).",
+    "severity": "costly",
+    "fix": "Read raises inside except handlers (raise \u2026 from exc) as the function's own raises, and show them on the host and on the 401 ending's BEFORE.",
+    "item": "L-22",
+    "pattern": "raise-inside-except-unread"
+   },
+   {
+    "id": "F09",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 every host head (RateLimitMiddleware, get_auth_context, build_auth_context, AuthContext.require_household, post_start_session \u00d74, start_session); Client \u00b7 describeStartCookingError head",
+    "what": "One item still has three hovers (name, glyph, role label). The name's hover says only its kind, and the role label repeats the role's definition on every host.",
+    "evidence": "Dump: 'post_start_session \u00b7 function' (name), 'Function \u0192' (glyph), 'function role caller \u00b7 function role / orchestrates \u2014 calls other functions, no store of its own' (role label), repeated on 4 heads. 'describeStartCookingError \u00b7 frontend piece' plus 'Function \u0192'.",
+    "severity": "costly",
+    "fix": "Apply oneTip to the host heads (.mgh0) and give each head ONE hover: the before \u00b7 checks \u00b7 gives it already has in the Functions row. The role's meaning stays in the row legend.",
+    "item": "L-02",
+    "pattern": "one-item-three-hovers"
+   },
+   {
+    "id": "F10",
+    "where": "BY MOMENT \u00b7 ENDPOINT METADATA \u00b7 every chip, count and card item (20 hovers)",
+    "what": "Every metadata hover ends with the same paragraph, and it describes the page, not the endpoint.",
+    "evidence": "Each ends: 'Facts with no moment: what the endpoint is and what sums it up, one card per block. Each is true of every path, so the path row never hides it; and, on Proof's card, the journeys whose requests cannot be set in order around this one, each with its reason.'",
+    "severity": "costly",
+    "fix": "Say it once, on the ENDPOINT METADATA title, and drop it from every item.",
+    "item": "L-01",
+    "pattern": "static-text-repeated-in-hovers"
+   },
+   {
+    "id": "F11",
+    "where": "BY MOMENT \u00b7 ENDPOINT METADATA \u00b7 Overview and risk \u00b7 alarms race-500 \u00b7 reason-collapsed \u00b7 reason-lost \u00b7 shared-status \u00b7 text-only \u00b7 undeclared",
+    "what": "Six different alarms share one identical hover, so a reader cannot tell what any of them found.",
+    "evidence": "All six: 'alarm \u00b7 Overview and risk \u00b7 endpoint metadata / An anomaly the form check found; the facts it reads stand at their moments.' The pinned-row cell lists the names only.",
+    "severity": "costly",
+    "fix": "Give each alarm its own words about THIS endpoint (e.g. reason-collapsed: 'the screen shows one message for 409 setup required and 409 too many concurrent cooks'; undeclared: 'answers 10 statuses its route does not declare'). A click should light the chips the alarm reads.",
+    "item": "L-03",
+    "pattern": "twin-items-indistinguishable"
+   },
+   {
+    "id": "F12",
+    "where": "BY MOMENT \u00b7 ENDPOINT METADATA \u00b7 Proof \u00b7 'C1087 arranges' \u2026 'C266 arranges through a helper' (7 chips)",
+    "what": "The chips show no test name and not what the test sets up, so a reader cannot tell one arranging test from another.",
+    "evidence": "All seven hovers: 'arranges another test \u00b7 \u2026 A case that calls this endpoint only to set another test up\u2026' with only the id changing. The names are on the bench ('C283 \u00b7 timer patch api round trip').",
+    "severity": "costly",
+    "fix": "Lead each hover with the test's name and the request it sets up for (e.g. 'then PATCH /cooking/sessions/{id}/timer').",
+    "item": "L-08",
+    "pattern": "id-without-name"
+   },
+   {
+    "id": "F13",
+    "where": "BY MOMENT \u00b7 row legends (hover on the row name) \u00b7 LABELS: Endings '[429] \u2026 10 here', Gates '[429] \u2026 14 here', Proof '[400] \u2026 12 here'",
+    "what": "The sample chip stands for a whole class of statuses but carries the class's count, so a reader reads 'ten 429s'.",
+    "evidence": "Endings legend: '429 a client error status \u2026 hollow: The endpoint does not declare this status \u2026 10 here'. The row holds two 429s among ten undeclared client errors (picture h_leg_end.png).",
+    "severity": "misleading",
+    "fix": "Draw the class sample without a real number (a blank or '4xx' status square), or list each status with its own count.",
+    "item": "L-04",
+    "pattern": "sample-read-as-the-count"
+   },
+   {
+    "id": "F14",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 row legend",
+    "what": "A reader cannot match a gate's icon to its kind: kind names and kind icons are in two sections with two different definitions.",
+    "evidence": "KINDS: 'rate limiter \u2014 A speed limit\u2026', 'own guard \u2014 A check the endpoint's own code makes\u2026' (no icons). LABELS: '[gauge] kind of gate \u2014 It counts a caller's requests\u2026 My proposal: the station draws no node for this.' and '[shield] kind of gate \u2014 A condition in the code\u2026' \u2014 five times, each with the same page-provenance line (picture h_leg_gate.png).",
+    "severity": "costly",
+    "fix": "One line per kind: icon + name + one definition. Drop 'My proposal: the station draws no node for this' from the legend (D-017, behind 'more information').",
+    "item": "L-09",
+    "pattern": "kind-name-and-mark-split"
+   },
+   {
+    "id": "F15",
+    "where": "BY MOMENT \u00b7 Gates \u00b7 4 'inside a call' guards; Functions \u00b7 ResolutionSnapshot.violations_for, derive_restrictions; Proof \u00b7 journeys C250 C1087 C555; Gates \u00b7 guards raising SessionNotFoundError/ConcurrentCookCapError",
+    "what": "Item hovers carry long sentences about how the page places paths or what the map could not read. They say nothing about the code.",
+    "evidence": "'It stands on the paths that call AuthContext.require_household, less those that leave \u2026 so a path picked here may not reach it.' \u00b7 'checked inside X; a path picked here may skip it' \u00b7 'With a path picked, it stays on the paths ending 201. On each path to that ending: which one this request takes is not recorded.' \u00b7 'its words are no fixed text: built as it raises, or none given'.",
+    "severity": "costly",
+    "fix": "Move these behind the 'more information' toggle (D-017). In the hover keep only the code fact (e.g. 'only when the household exists').",
+    "item": "L-22",
+    "pattern": "map-talk-in-code-hover"
+   },
+   {
+    "id": "F16",
+    "where": "BY MOMENT \u00b7 Endings 409 (fail) \u00b7 Gates catch ConcurrentCookCapError \u00b7 Proof C237 \u00b7 Client 'reached by 409 str(exc)' \u00b7 bench ENDING list; Endings 422 validation",
+    "what": "The words the caller gets are shown as code or as a placeholder, not as the actual text.",
+    "evidence": "'answers 409: str(exc)'. Source services/cooking.py:89-90: super().__init__(f\"too many concurrent cooks ({attempted} would exceed cap {cap})\"). 'answers 422: pydantic error type', where the body is a list of field errors.",
+    "severity": "costly",
+    "fix": "Resolve str(exc) through the exception class's __init__ message and show the template ('too many concurrent cooks (N would exceed cap M)'). For the 422 write 'a list of what is wrong per field (type \u00b7 where \u00b7 message)'.",
+    "item": "L-22",
+    "pattern": "expression-instead-of-value"
+   },
+   {
+    "id": "F17",
+    "where": "BY MOMENT \u00b7 hovers across Functions, Gates, Data effects, Stages (every 'at cooking.py:N')",
+    "what": "One short file name stands for three different files, so the same 'cooking.py:119' points to two different lines of code.",
+    "evidence": "Functions: 'post_start_session \u2026 defined at cooking.py:119' (api/cooking.py). Data effects: 'cooking_sessions \u00b7 read CookingSession, at cooking.py:119' (services/cooking.py). Gates: 'key is None, at cooking.py:128' (api) beside 'existing \u2026 at cooking.py:129' (services). 422 rules: 'missing, at cooking.py:15' (schemas). The bench already writes 'services/cooking.py:119'.",
+    "severity": "misleading",
+    "fix": "When a basename is shared by more than one file on the endpoint, print the folder too (api/cooking.py:119 \u00b7 services/cooking.py:119), as the bench does.",
+    "item": "L-16",
+    "pattern": "ambiguous-short-location"
+   },
+   {
+    "id": "F18",
+    "where": "BY MOMENT \u00b7 Endings hovers (403, 404, 409 \u00d72 'the screen reads it at cookingSessionModel.ts:\u2026'); Client \u00b7 after the answer \u00b7 reason-site hovers",
+    "what": "Client reads are still located by file and line, not by function. The 'text' is a translation key, not the words the user sees.",
+    "evidence": "Ending hover: 'the screen reads it at cookingSessionModel.ts:389'. Reason-site hover title: 'cookingSessionModel.ts:381 \u00b7 reason site'. GIVES: 'hands back the text \u201ccooking.error.start_allergen\u201d'. Where that text is then shown is not recorded.",
+    "severity": "costly",
+    "fix": "In the ending hover write 'describeStartCookingError reads it: shows \u201c\u2026\u201d'. Title the reason-site hover by its branch ('reads 403'). Resolve the i18n key to its English string when the locale file is in the repo.",
+    "item": "L-16",
+    "pattern": "location-without-actor"
+   },
+   {
+    "id": "F19",
+    "where": "BY MOMENT \u00b7 Functions \u00b7 the work \u00b7 ResolutionSnapshot.violations_for, derive_restrictions, load_resolution_snapshot; checks \u00b7 get_idempotency_key; bench FUNCTION list",
+    "what": "The functions he named still have no role and no call depth, their caller is misstated, the why is not on the page, and he cannot open them on the bench.",
+    "evidence": "Hovers: 'called at cooking.py:150' (the handler's start_session line). Source: services/recipes.py:216-231 \u2014 assert_recipe_allergen_safe calls load_resolution_snapshot and derive_restrictions. No \u2193N label on any of the four. Bench FUNCTION 'all 25' leaves out all four (the row draws 28).",
+    "severity": "costly",
+    "fix": "Write 'called by assert_recipe_allergen_safe \u00b7 3 calls below'. Put a one-line why ('its folder is not read by the code map') behind 'more information'. Include every function the row draws in the bench list.",
+    "item": "L-14",
+    "pattern": "element-without-identity"
+   },
+   {
+    "id": "F20",
+    "where": "BY MOMENT \u00b7 Functions \u00b7 FirebaseTokenVerifier.verify, MockTokenVerifier.verify, identity_from_firebase_claims, _stages, _hold_hours, _label, concurrent_cook_cap_for_tier, _attach_photos; bench FUNCTION blocks",
+    "what": "A reader cannot tell what these functions do; the hover has only who calls it and how deep.",
+    "evidence": "e.g. FirebaseTokenVerifier.verify: 'called by build_auth_context \u00b7 3 calls below the handler \u00b7 counted in: behind'. The bench's post_start_session block says 'DOES faces the web \u00b7 decides an ending \u00b7 reads or writes data'. The source has docstrings (build_auth_context: 'Verify a raw token, persist the identity, and load the household read-only.'; _attach_photos: 'Populate resp.photos \u2026').",
+    "severity": "costly",
+    "fix": "Add a GIVES built from the docstring's first line when there is one (the handler's docstring is already read for the metadata), the return type and the raise list.",
+    "item": "L-13",
+    "pattern": "name-only-chip"
+   },
+   {
+    "id": "F21",
+    "where": "BY MOMENT \u00b7 Data effects \u00b7 table chips users W, households R, locations R, recipe_ingredients R, canonical_ingredients R, ingredient_aliases R, ingredient_restrictions R, cooking_photos R, recipes R (answer)",
+    "what": "'only when a condition there holds' never names the condition. For the allergen tables the condition is not even 'there'.",
+    "evidence": "'recipe_ingredients \u00b7 BEFORE in assert_recipe_allergen_safe, only when a condition there holds'. Source: the read runs only because start_session checks `if user_allergens:` (services/cooking.py:142), one call up.",
+    "severity": "costly",
+    "fix": "Print the guard's text and its function ('only when the user has allergens \u2014 if user_allergens, in start_session').",
+    "item": "L-12",
+    "pattern": "condition-not-named"
+   },
+   {
+    "id": "F22",
+    "where": "BY MOMENT \u00b7 Gates \u00b7 at the edge \u00b7 switch 'environment, rate_limit_enabled'; the dependencies \u00b7 switch 'TokenVerifier'",
+    "what": "The switches do not say what each setting does to the request.",
+    "evidence": "Rate switch GIVES 'decides the 429'. Its own BEFORE says the defaults are rate_limit_enabled False and environment LOCAL, which means no limit and no 429 locally, but the page never says so. TokenVerifier's face says 'can end at 401', its hover 'decides the 401'.",
+    "severity": "costly",
+    "fix": "Write GIVES per arm: 'off (default, local): no rate limit, no 429 \u00b7 on, or in production: both limits run'. For TokenVerifier: 'REAL \u2192 FirebaseTokenVerifier \u00b7 otherwise MockTokenVerifier; either can end at 401 invalid token'.",
+    "item": "L-10",
+    "pattern": "effect-verb-without-its-arms"
+   },
+   {
+    "id": "F23",
+    "where": "BY MOMENT \u00b7 Gates and decisions head (Standard or specialist folded in); ENDPOINT METADATA \u00b7 Standard or specialist card; labels 'rare \u00b7 6 of 80' on the 403 ending and on idempotency_key",
+    "what": "The Standard or specialist row answers its question without saying it is that row. The 'standard' half is never drawn, and the rare pieces go unnamed on their labels and in the card.",
+    "evidence": "The Gates head hover's second sentence is 'Is this endpoint built like the others\u2026' with no row name. The switches wear only 'set by settings' (D-069: 79 of 80 carry them). The card shows 'pieces 3 \u00b7 lacks 0' with no names; a click lights three labels. Two of those labels read 'rare \u00b7 6 of 80' but are different pieces ('can answer 403' and 'reads a repeat key').",
+    "severity": "costly",
+    "fix": "Head hover: 'Standard or specialist (drawn in this row): \u2026'. Switches wear 'standard \u00b7 79 of 80'. Each rare label names its piece ('rare \u00b7 reads a repeat key \u00b7 6 of 80'). The card lists the three pieces by name.",
+    "item": "L-18",
+    "pattern": "concept-never-explained"
+   },
+   {
+    "id": "F24",
+    "where": "BY MOMENT \u00b7 Client head 'screen 1' vs the chip RecipeBrowseContainer",
+    "what": "'screen 1' does not count the chip the legend calls the screen.",
+    "evidence": "useStartCooking's hover and the refresh chip's hover both end 'counted in: screen'. RecipeBrowseContainer is labelled 'screen' in the row legend and is not counted. D-069 left the rename to 'sends it' open.",
+    "severity": "misleading",
+    "fix": "Rename the head to 'sends it' (the pending proposal), or count the screen. A cache write should not be counted as a screen.",
+    "item": "L-20",
+    "pattern": "same-word-two-things"
+   },
+   {
+    "id": "F25",
+    "where": "BY MOMENT \u00b7 In-flight state \u00b7 idempotency_key chip; row legend",
+    "what": "One chip carries two near-identical labels, and the legend's count does not match the row head's.",
+    "evidence": "The chip face reads 'idempotency_key \u00b7 on the request \u00b7 (request) \u00b7 rare \u00b7 6 of 80': 'on the request' is where it is kept, 'request' is how long it lives. The legend says 'server \u2026 1 here'; the head says 'server 7'.",
+    "severity": "costly",
+    "fix": "Use lifetime words that cannot collide ('gone with the answer' / 'kept by the server'). Count in the unit the head uses (7 values, or 1 lane of 7).",
+    "item": "L-17",
+    "pattern": "two-labels-one-word"
+   },
+   {
+    "id": "F26",
+    "where": "BY MOMENT \u00b7 In-flight \u00b7 rate limiter lane read at the edge; bench ENDING selector; Client 'any other status 429 \u00d72'",
+    "what": "The two 429s he complained about can still not be told apart outside the Endings and Gates rows.",
+    "evidence": "Lane read hover: 'can end the request with 429 Rate limit exceeded. Try again shortly. \u00b7 429 Rate limit exceeded. Try again shortly.'. The bench select lists '429 \u00b7 Rate limit exceeded. Try again shortly.' twice.",
+    "severity": "costly",
+    "fix": "Carry the limit's name wherever a 429 is named ('429 \u00b7 sensitive 20/60s', '429 \u00b7 global 120/60s'). The build check that stops on twin items should also cover lane reads and the bench option lists.",
+    "item": "L-03",
+    "pattern": "twin-items-indistinguishable"
+   },
+   {
+    "id": "F27",
+    "where": "BY MOMENT \u00b7 the whole table at 1920\u00d71200, default options",
+    "what": "At the opening width, names are still cut in half.",
+    "evidence": "The 2300px table sits in an 1854px box. Faces break mid-word: 'except SessionNotFoundEr|ror', 'InvalidTokenErro|r', 'RecipeBrowseCont|ainer', 'useCookingLoopAc|tions', 'FirebaseTokenVerifi|er.verify', 'cooking_phot|os'. measures.json midWord: before 12 \u2192 after 13.",
+    "severity": "costly",
+    "fix": "Apply the 'names whole' break rule (break only after _ . / or at a space) to every cell, not only widened ones. Or open with fit on when the table overflows.",
+    "item": "L-21",
+    "pattern": "cramped-columns"
+   },
+   {
+    "id": "F28",
+    "where": "EXAMPLES bench \u00b7 block titles in the ENDING, TEST, GATE OR DECISION, CLIENT HOOK and IN-FLIGHT VALUE columns at 1920",
+    "what": "The element being shown is not readable in its own block.",
+    "evidence": "Picture ex.png: 'Rate limit exceeded\u2026', 'start session response car', 'sensiti\u2026', 'useStartCoo\u2026', 'rate_limit\u2026', 'the serv'. The selectors are cut too ('cooking_sessio', 'post_start_ses').",
+    "severity": "costly",
+    "fix": "Wrap the title line, or give the 'one row across the page' option a minimum column width that holds the name and let the row scroll sideways.",
+    "item": "L-23",
+    "pattern": "cramped-columns"
+   },
+   {
+    "id": "F29",
+    "where": "L-19 \u00b7 no page",
+    "what": "The gap analysis he asked for (the page's blocks against the lab's six parts, and whether security is missing) does not exist.",
+    "evidence": "legibility-feedback.md L-19 status 'logged (analysis)'. docs/design/design-context/legibility/ holds only measure-legibility.mjs and two JSON files.",
+    "severity": "costly",
+    "fix": "Generate the two-column page: each lab part \u2192 where it lives on the page (or nothing). Name security's EDGE/GATE facts (rate limit, CORS, login, idempotency) and where each is drawn now.",
+    "item": "L-19",
+    "pattern": "two-vocabularies-for-one-thing"
+   },
+   {
+    "id": "F30",
+    "where": "BY MOMENT \u00b7 stage band 'INPUT 1 of 2 [2]', 'INPUT 2 of 2 [1]'; moment head 'subscription_tier_for +2'",
+    "what": "Two numbers sit side by side with no units. One moment head names a function instead of the moment.",
+    "evidence": "The band draws 'INPUT 1 of 2' with a pill '2' (endings that leave) wrapped under it. The head face is 'subscription_tier_for +2'; its hover title is 'the work'.",
+    "severity": "minor",
+    "fix": "The pill says '2 endings'. The head reads 'the work', with the calls as a small subtitle.",
+    "item": "L-05",
+    "pattern": "numbers-without-units"
+   },
+   {
+    "id": "F31",
+    "where": "BY MOMENT \u00b7 ENDPOINT METADATA \u00b7 Overview and risk \u00b7 'conflict \u00b7 large surface'",
+    "what": "Half the label is never explained.",
+    "evidence": "Hover: 'flag \u2026 A large surface: many functions stand behind the handler\u2026'. Nothing says what 'conflict' means.",
+    "severity": "minor",
+    "fix": "Explain 'conflict' in the same hover, or split it into its own chip.",
+    "item": "L-07",
+    "pattern": "half-explained-label"
+   },
+   {
+    "id": "F32",
+    "where": "BY MOMENT \u00b7 Client \u00b7 the screen sends it \u00b7 useStartCooking 'mutation \u00b7 fetcher'",
+    "what": "The hook that sends the POST is labelled 'fetcher' \u2014 the same confusion he raised in L-15.",
+    "evidence": "Face: 'useStartCooking \u00b7 mutation \u00b7 fetcher'. Hover: 'sends POST /api/v1/cooking/sessions'. Legend: 'fetcher \u2014 calls the API'.",
+    "severity": "minor",
+    "fix": "For a mutation hook, show 'sends' beside the station role, or label it 'fetcher \u00b7 sends POST'.",
+    "item": "L-15",
+    "pattern": "role-word-contradicts-action"
+   },
+   {
+    "id": "F33",
+    "where": "BY MOMENT \u00b7 Stages and order \u00b7 CORSMiddleware, IdempotencyMiddleware; Gates \u00b7 RateLimitMiddleware head; Client \u00b7 RecipeBrowseContainer",
+    "what": "These hovers name the item and its kind but not what it does.",
+    "evidence": "'CORSMiddleware \u00b7 middleware' (nothing else). 'IdempotencyMiddleware \u00b7 BEFORE runs 2 of 3 \u00b7 CHECKS IdempotencyMiddleware.dispatch, registered at main.py:124': it never says it copies the Idempotency-Key header into the request (the in-flight lane says so). 'RecipeBrowseContainer \u00b7 screen'.",
+    "severity": "minor",
+    "fix": "Give each a checks \u00b7 gives line: what it reads, what it sets or answers (e.g. 'reads the Idempotency-Key header \u00b7 keeps it on the request for get_idempotency_key').",
+    "item": "L-22",
+    "pattern": "hover-describes-the-kind-not-the-item"
+   }
+  ],
+  "pictures": [
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/mo_00.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/mo_01.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/mo_02.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/mo_03.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/mo_04.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/mo_05.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/mogrid_wide.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/wr_top.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/wr_bot.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/h_leg_end.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/h_leg_gate.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/h_leg_inf.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/h_end429a.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/h_meta_alarm.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/ex.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/exb_C225.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/exb_C237.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/exb_fn_allergen.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/exb_fn_firebase.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/exb_end403.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/tips.json",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens1/ex_tips.json"
+  ]
+ },
+ {
+  "lens": "LENS 2 \u2014 a cold human reader, on POST /cooking/sessions and GET /recipes (built page at 2ee6ab5, 1920 px, frozen feeds). Every candidate the build agents listed is still on the page; the numbers were re-measured here, and 19 of 80 endpoints now scroll sideways, not 16. New defects found: tests drawn as proofs that call other functions; a Python set.add drawn as a database write; two \"counted in\" joins that contradict the page's own column definitions; moments that carry two names; the pinned table's heads sitting above BY MOMENT's columns; and the bench's unlabelled numbers and cut text.",
+  "verdicts": [
+   {
+    "item": "L-01",
+    "verdict": "partly",
+    "remains": "Item hovers no longer carry a kind's definition, but every ENDPOINT METADATA fact's hover ends with the same 3-line paragraph (about 25 times). The six alarm chips share one hover, and so do the seven 'arranges' chips."
+   },
+   {
+    "item": "L-02",
+    "verdict": "answered",
+    "remains": "One hover per chip in BY MOMENT holds. The function heads inside the gate chains hover apart with only 'name \u00b7 function'."
+   },
+   {
+    "item": "L-03",
+    "verdict": "partly",
+    "remains": "The hovers now differ, but the faces are still twins. POST shows 'refusal 429' twice and a '429 429' dot on the lifeline; its path bar shows 429, 429, 401, 401. The bench select and the test chain list two identical 429 lines. GET /recipes shows 7 identical 'refusal 400' chips and 28 identical 'C823 proves 400' chips in one cell."
+   },
+   {
+    "item": "L-04",
+    "verdict": "partly",
+    "remains": "The legend is on the row name. A status entry stands for a whole class ('429 \u2026 14 here', where two 429s exist). Labels 'Model', 'Hook (FE)' and 'API endpoint' carry no meaning, and the hollow R is not explained."
+   },
+   {
+    "item": "L-05",
+    "verdict": "partly",
+    "remains": "The band is built. The count beside each stage says nothing on its face, and 'INPUT 1 of 2' sits next to a bare '2'. 'one of 4' has no noun. Moments carry different names in the heads, the hovers and the map ('subscription_tier_for +2' vs 'the work'; 'commit' vs 'saving' vs 'way 4: saving'). GET /recipes has three heads named 'checks', and 'INPUT 1 of\u2026' is cut."
+   },
+   {
+    "item": "L-06",
+    "verdict": "answered",
+    "remains": "The column left the table. The metadata hovers repeat one paragraph that talks about the page."
+   },
+   {
+    "item": "L-07",
+    "verdict": "partly",
+    "remains": "'rank 3\u20136 of 80' does not say which end is good. 'conflict \u00b7 large surface' uses the word the gate roles use for a 409. The 'lacks' head hover carries the definition of 'pieces'."
+   },
+   {
+    "item": "L-08",
+    "verdict": "partly",
+    "remains": "The bench chain exists, but it lists the checks passed by their error endings with a \u2713. Eight service-side tests of other functions read 'Cxxx proves 404' and count toward 'proven'. C237 says 'sends no headers' although it passes auth_headers. The bench shows raw assert code."
+   },
+   {
+    "item": "L-09",
+    "verdict": "partly",
+    "remains": "Every gate names its function, but the function heads' hovers say only 'build_auth_context \u00b7 function' and 'RateLimitMiddleware \u00b7 middleware'."
+   },
+   {
+    "item": "L-10",
+    "verdict": "partly",
+    "remains": "The chain function \u2192 condition \u2192 effect is built. Conditions are raw code, and the hovers use code negations ('only when not (existing is not None)'). Answers show source text (str(exc) and 16 f-strings on GET /recipes). Raises say 'the answer it becomes is not known' next to the catch that answers them."
+   },
+   {
+    "item": "L-11",
+    "verdict": "answered",
+    "remains": "The role labels ('inside a call', 'in the handler', 'app-wide', 'at login') are drawn. They are explained only in the legend and the row options."
+   },
+   {
+    "item": "L-12",
+    "verdict": "partly",
+    "remains": "The map is built, but the chips stay in the cells, so every read and write is drawn twice with no note. The map's 'saving' band holds only its label. On GET /recipes a Python set.add is drawn as a save step and counted 'left unsaved 7' on a GET whose head says 'writes 0'."
+   },
+   {
+    "item": "L-13",
+    "verdict": "partly",
+    "remains": "The bench function block says 'faces the web \u00b7 decides an ending \u00b7 reads or writes data' (generic). BY MOMENT's function hovers use feed verbs ('read: households \u00b7 memberships', 'add: users')."
+   },
+   {
+    "item": "L-14",
+    "verdict": "answered",
+    "remains": "Every function wears the glyph. 13+ names break mid-word."
+   },
+   {
+    "item": "L-15",
+    "verdict": "answered",
+    "remains": "The refresh names its hooks and GETs. Each GET is drawn twice (the path, then a 'GET' pill)."
+   },
+   {
+    "item": "L-16",
+    "verdict": "partly",
+    "remains": "Branches sit under describeStartCookingError, but a reason site's hover title is still 'cookingSessionModel.ts:381 \u00b7 reason site'. The 'text' shown is an i18n key, not the words the user sees. The alarm face reads 'reason-collapsed'."
+   },
+   {
+    "item": "L-17",
+    "verdict": "partly",
+    "remains": "The lifelines are built. 'rate limiter \u00b7 7' wraps onto three lines. idempotency_key reads 'on the request \u00b7 request'. The opened lane shows the private names '_sensitive' and '_global', and the lane hover says 'set at before any request'."
+   },
+   {
+    "item": "L-18",
+    "verdict": "partly",
+    "remains": "'rare \u00b7 6 of 80' and 'rare \u00b7 3 of 80' do not say 6 of 80 what. The Gates legend opens with two questions. pieces/lacks are drawn in both the Gates head and a metadata card."
+   },
+   {
+    "item": "L-20",
+    "verdict": "partly",
+    "remains": "The heads carry the pinned-row columns, but the 'counted in' joins run by status code: the Idempotency-Key 400 claims 'body', and two 422s claim 'shape 1'. Dependency functions claim 'behind' although the behind card says they are not counted. 'screen 1' counts a hook. The Gates head is about 480 px tall with 8 count pills."
+   },
+   {
+    "item": "L-21",
+    "verdict": "partly",
+    "remains": "19 of 80 endpoints still scroll sideways at 1920 px, POST /cooking/sessions among them (2300 px vs 1854). Below the top of the table the moment heads are gone and the pinned table's heads (endings, stages, tables\u2026) sit over BY MOMENT's columns. Names still break mid-word."
+   },
+   {
+    "item": "L-22",
+    "verdict": "partly",
+    "remains": "before \u00b7 checks \u00b7 gives is present on most items. Several hovers are still name + kind only (screen, middleware, frontend piece, the function heads), and the alarm, arranges and metadata hovers describe the kind."
+   },
+   {
+    "item": "L-23",
+    "verdict": "partly",
+    "remains": "The bench is built. Text is cut in every column. A bare number means fields, lines, ways, tests, reactions or readers depending on the column, with no label. It uses different words from BY MOMENT for the same kinds, shows raw code and assert expressions, and its copy lines are config syntax with 'block block' and 'D-027'."
+   }
+  ],
+  "findings": [
+   {
+    "id": "CR-01",
+    "where": "BY MOMENT \u00b7 Proof row \u00b7 the 'start_session SessionNotFoundError' column \u00b7 chips C225 C226 C228 C231 C235 C275 C276 \u00b7 POST /cooking/sessions; ENDPOINT METADATA \u00b7 proven 2/14",
+    "what": "Eight tests that never call this endpoint or start_session are drawn as 'Cxxx proves 404' on POST /cooking/sessions, and the 404 then counts as proven. A reader believes eight tests prove this endpoint's 404 'Recipe not found'.",
+    "evidence": "The face shows 'C225 proves 404'. The hover says 'calls the code behind the endpoint directly, not the endpoint \u00b7 proves the 404 from cooking.py:156: Recipe not found'. The gustify source at 05007957 (tests/test_cooking.py:156) shows test_cancel_session_is_ownership_scoped_C225 doing pytest.raises(SessionNotFoundError) around cancel_session. C226 also tests cancel_session, C228 update_step_progress, C275 and C276 the timer. Only C221 calls start_session. The join is by exception class and file, not by the function on this endpoint's path.",
+    "severity": "misleading",
+    "fix": "Draw a service-side test only when the function that raises is on this endpoint's path (start_session). Otherwise put it in the metadata as 'raises SessionNotFoundError from cancel_session, the error this endpoint translates', and leave it out of 'proven'. Label the face 'C221 \u00b7 service' rather than 'proves'.",
+    "item": "L-08",
+    "pattern": "proof-joined-by-error-class"
+   },
+   {
+    "id": "CR-02",
+    "where": "BY MOMENT \u00b7 Proof \u00b7 C237 chips (reads the body \u00b7 checks \u00b7 ConcurrentCookCapError) \u00b7 hover BEFORE line \u00b7 POST /cooking/sessions",
+    "what": "The hover states the test sends no headers, but it does: its auth headers come from a fixture. A reader then expects C237 to hit the 401, not the 400 or 409 it asserts.",
+    "evidence": "The hover says 'test_session_requires_idempotency_key_C237, at test_cooking.py:375 \u00b7 sends no headers'. The source at 05007957 (test_cooking.py:375-386) passes headers=auth_headers to client.post.",
+    "severity": "misleading",
+    "fix": "When the headers argument is a name and not a literal dict, write 'sends headers from auth_headers (values not read)', the bench's own 'what the test does not tell' wording. Never write 'sends no headers'.",
+    "item": "L-08",
+    "pattern": "unread-read-as-empty"
+   },
+   {
+    "id": "CR-03",
+    "where": "BY MOMENT \u00b7 Proof row \u00b7 every chip whose status fits several endings (C237 \u00d74 on POST; C316, C574, C811, C813 and C823 on GET /recipes)",
+    "what": "The face says 'proves' on chips that prove 'one of them, not which'. The same chip's hover says it is 'counted in: tests \u00b7 proven', while the metadata defines proven as 'a test whose status fits several endings proves none of them'. On GET /recipes C823 appears 28 times in one cell with the same face.",
+    "evidence": "POST: 'C237 proves 400' at 'reads the body', with hover 'fits 4 endings; this is one of them \u00b7 counted in: tests \u00b7 proven'. The 'proven' head hover says a test that fits several endings proves none. GET /recipes, the 'checks' column: 28 chips read 'C823 proves 400'. Their hovers differ only in the ending line (recipes.py:331, :355, :379 \u2026), although the test calls GET /api/v1/recipes?exclude_textures=crunchy.",
+    "severity": "misleading",
+    "fix": "Use a different verb on the face: 'C237 fits 400 (1 of 4)'. Drop 'proven' from its 'counted in'. Fold a test's chips in one cell into one chip, 'C823 \u00b7 fits 7 endings here', with the endings in its hover.",
+    "item": "L-08",
+    "pattern": "face-verb-stronger-than-the-fact"
+   },
+   {
+    "id": "CR-04",
+    "where": "BY MOMENT \u00b7 Data effects \u00b7 column after the first 'one of 2' fork \u00b7 'add search_recipes caller'; ENDPOINT METADATA \u00b7 Data effects card \u00b7 GET /recipes",
+    "what": "A Python set's .add() is drawn as a database save step on a GET endpoint and counted as a write left unsaved. The row head and pinned row say 'writes 0' while the card says 'left unsaved 7', so the page contradicts itself.",
+    "evidence": "The chip hover says 'search_recipes \u00b7 save step \u00b7 add, at recipes.py:459'. The source at 05007957 (api/recipes.py:459) is `seen_tx.add(norm)`. forms.json step st:7d81ac54f1 has {op: add, table: null} and sits in 'uncommitted' on 7 of 22 paths. The metadata fate reads 'saved 0 \u2026 left unsaved 7 \u00b7 no own write 15', and the 'writes 0' hover reads 'tables its own code writes'.",
+    "severity": "misleading",
+    "fix": "Do not draw a save step whose table is null as a database step. Show it as 'an add the map could not tie to a table', or drop it, and keep it out of fate. Route the feed defect (set.add read as session.add) to the effects arm under D-023.",
+    "item": "L-12",
+    "pattern": "language-builtin-read-as-db-write"
+   },
+   {
+    "id": "CR-05",
+    "where": "BY MOMENT \u00b7 Functions row \u00b7 'the dependencies' column (get_auth_context \u21931 \u2026 _firebase_credential \u21935) and their Data effects chips; ENDPOINT METADATA \u00b7 behind 18 \u00b7 4 calls deep \u00b7 POST /cooking/sessions",
+    "what": "Two things are wrong. Functions FastAPI runs as dependencies are labelled as called by the handler ('\u21931 one call below the handler'). They also claim 'counted in: behind', while the behind card says dependency functions are not counted.",
+    "evidence": "get_auth_context's hover says 'BEFORE one call below the handler \u2026 counted in: login \u00b7 behind', and _firebase_credential shows \u21935. The '4 calls deep' hover says 'the functions its dependencies run are not counted'. 24 function chips say 'counted in \u2026 behind', but the cell reads 18. users R (in resolve_or_create_user) also says 'counted in: tables \u00b7 behind'.",
+    "severity": "misleading",
+    "fix": "Give dependency functions a depth from their dependency, e.g. 'run by FastAPI before the handler \u00b7 2 calls inside get_auth_context', not '\u2193N below the handler'. Remove 'behind' from their 'counted in', so the click lights exactly 18.",
+    "item": "L-20",
+    "pattern": "counted-in-disagrees-with-column-rule"
+   },
+   {
+    "id": "CR-06",
+    "where": "BY MOMENT \u00b7 Endings chips \u00b7 the 'counted in' line of the Idempotency-Key 400, the validation 422 and the framework 422 \u00b7 POST /cooking/sessions",
+    "what": "'counted in' is joined by status code, not by the ending. A header check claims the body column, and two 422s claim a 'shape' column that counts 1. A click on 'body 2' lights four chips.",
+    "evidence": "The 400 'Idempotency-Key required' (key is None, cooking.py:128, a header) says 'counted in: endings \u00b7 refused \u00b7 body'. The body head defines body as 'endings the framework produces while it reads the body' and counts 2. The framework 422 (JSON decode) and the validation 422 both say 'counted in: endings \u00b7 body \u00b7 shape', but shape = 1.",
+    "severity": "misleading",
+    "fix": "Join each ending to the pinned-row column by the ending's own id (its kind and stage), never by status. The key-is-None 400 belongs to refused only. The framework 422 belongs to body, and the validation 422 to shape.",
+    "item": "L-20",
+    "pattern": "membership-joined-by-status-code"
+   },
+   {
+    "id": "CR-07",
+    "where": "BY MOMENT \u00b7 any row below the top of the table (e.g. Functions) at 1920 px \u00b7 POST /cooking/sessions",
+    "what": "Once the reader scrolls past the band, the only column heads in view are the pinned THE ENDPOINTS row's (Shared \u00b7 endings stages tables guards login reply \u00b7 Endings ok refused body \u2026). They sit directly above BY MOMENT's moment columns and read as their heads. The moment heads and the stage band do not stick.",
+    "evidence": "fn-viewport.png: the Functions row sits under the pinned heads 'endings stages tables guards login reply ok refused body shape uncaught \u2026'. None of the moment names (the dependencies, checks, subscription_tier_for +2) is visible. The table is about 5,000 px tall on POST and 7,700 px on GET /recipes.",
+    "severity": "misleading",
+    "fix": "Make the stage band and moment heads sticky under the pin while BY MOMENT is in view, or collapse the pin to its one endpoint line inside BY MOMENT.",
+    "item": "L-21",
+    "pattern": "foreign-heads-over-a-grid"
+   },
+   {
+    "id": "CR-08",
+    "where": "EXAMPLES \u00b7 TEST column \u00b7 the list a click opens \u00b7 'checks it passes \u00b7 8' \u00b7 C267 on POST /cooking/sessions",
+    "what": "The checks a test passes are listed by the error each one could have caused, each with a \u2713. '\u2713 401 invalid token' and '\u2713 422 JSON decode error' read as 'got 401', 'got 422'. The two rate limits read the same line twice.",
+    "evidence": "The list reads '\u2713 429 Rate limit exceeded. Try again shortly. RateLimitMiddleware' twice, then '\u2713 422 JSON decode error', '\u2713 400 There was an error parsing the body', '\u2713 401 Not authenticated HTTPBearer bearer_scheme', '\u2713 401 invalid token except InvalidTokenError' and '\u2713 422 pydantic error type'.",
+    "severity": "misleading",
+    "fix": "List each check by what it checks, with the refusal it avoided dimmed: '\u2713 under the sensitive limit (20 per 60 s) \u2014 else 429', '\u2713 under the global limit (120 per 60 s) \u2014 else 429', '\u2713 body is valid JSON \u2014 else 422', '\u2713 bearer token present \u2014 else 401'.",
+    "item": "L-08",
+    "pattern": "passed-check-named-by-its-failure"
+   },
+   {
+    "id": "CR-09",
+    "where": "BY MOMENT \u00b7 Functions row \u00b7 start_session, assert_recipe_allergen_safe, _get_firebase_app and _firebase_credential hovers \u00b7 POST /cooking/sessions",
+    "what": "A raise is labelled 'the answer it becomes is not known' while the catch for that same exception class stands in the same row and its hover gives the status.",
+    "evidence": "start_session: 'raises SessionNotFoundError at cooking.py:129; the answer it becomes is not known', next to the gate chip 'except SessionNotFoundError \u2192 404'. assert_recipe_allergen_safe: 'raises AllergenConflictError \u2026 not known', next to 'except AllergenConflictError \u2192 403'. _get_firebase_app: 'raises InvalidTokenError \u2026 not known', next to 'except InvalidTokenError \u2192 401' in the same column. D-069 records these as feed gaps.",
+    "severity": "misleading",
+    "fix": "On the page, join the raise to the endpoint's own except of the same class when that except wraps the call (the fork already knows the try). Say 'caught by except SessionNotFoundError at cooking.py:155 \u2192 404', and keep 'not known' only when no except of that class is on the path.",
+    "item": "L-10",
+    "pattern": "not-known-beside-the-answer"
+   },
+   {
+    "id": "CR-10",
+    "where": "BY MOMENT \u00b7 Endings, gate and client hovers \u00b7 path bar \u00b7 EXAMPLES ENDING select \u00b7 POST /cooking/sessions and GET /recipes",
+    "what": "The answer a caller gets is shown as the source expression that builds it. The reader cannot tell what the message says.",
+    "evidence": "POST shows 'answers 409: str(exc)', and the reason site says 'reached by \u2026 409 str(exc)'. Its ConcurrentCookCapError builds 'too many concurrent cooks ({attempted} would exceed cap {cap})' (services/cooking.py:90). GET /recipes shows 16 refusals as source, e.g. 'answers 400: f\"Invalid allergen_safe code '{allergen_safe}'. Valid: {', '.join(sorted(allergen_codes()))}\"', and the bench select lists them the same way. The validation 422 reads 'answers 422: pydantic error type', and 'any other status' reads '422 pydantic error type'.",
+    "severity": "costly",
+    "fix": "Render the message as a template: 'Invalid allergen_safe code \u2018\u2026\u2019. Valid: \u2026'. For str(exc), follow the class's __init__ one hop and show its f-string as a template, 'too many concurrent cooks (N would exceed cap M)'. For the 422, write 'a list of the fields that failed, each with its rule'.",
+    "item": "new",
+    "pattern": "source-expression-as-message"
+   },
+   {
+    "id": "CR-11",
+    "where": "BY MOMENT \u00b7 every row legend (point at a row name) \u00b7 status labels",
+    "what": "A status label stands for its whole class and counts the class. A reader believes there are 14 429s in the Gates row.",
+    "evidence": "Gates legend: '429 \u2014 a client error status \u2026 14 here' (two 429s are drawn). Endings: '429 \u2026 hollow \u2026 10 here'. Proof: '400 \u2026 12 here'. Functions: '400 \u2026 3 here' (chips show 400 403 404 409). Client: '403 \u2026 4 here'.",
+    "severity": "misleading",
+    "fix": "Clone one example per class, labelled '4xx \u2014 a client error status', or list each status drawn with its own count: '429 \u00d72 \u00b7 401 \u00d72 \u00b7 409 \u00d74 \u2026'.",
+    "item": "L-04",
+    "pattern": "one-example-stands-for-a-class"
+   },
+   {
+    "id": "CR-12",
+    "where": "ENDPOINT METADATA \u00b7 Standard or specialist card \u00b7 the 'lacks' head hover (also the pinned row)",
+    "what": "The hover on 'lacks' gives the definition of 'pieces'.",
+    "evidence": "The lacks hover reads 'lacks \u00b7 pieces nearly every endpoint carries that it does not || How common this piece is \u2014 The count of other endpoints that use the same piece, so the odd one out is visible.' The second line is word for word the pieces head's line.",
+    "severity": "misleading",
+    "fix": "Give lacks its own second line: 'What it lacks \u2014 pieces 9 in 10 endpoints carry and this one does not.'",
+    "item": "L-07",
+    "pattern": "hover-copied-from-sibling"
+   },
+   {
+    "id": "CR-13",
+    "where": "ENDPOINT METADATA \u00b7 Overview and risk \u00b7 'conflict \u00b7 large surface'",
+    "what": "The overview flag's word 'conflict' is the same word the gate roles use for a 409. A reader takes it for an HTTP conflict.",
+    "evidence": "The face shows 'conflict \u00b7 large surface', and the hover says 'A large surface: many functions stand behind the handler \u2026'. The words file names 409 'conflict' in enc.fam.gdc.vals.409.name, and the endpoint has two 409 endings.",
+    "severity": "misleading",
+    "fix": "Drop the id and show only 'large surface' (or 'wide reach'). Keep 'conflict' for the 409 label.",
+    "item": "L-07",
+    "pattern": "one-word-two-meanings"
+   },
+   {
+    "id": "CR-14",
+    "where": "BY MOMENT \u00b7 Client \u00b7 after the answer \u00b7 the reason lines under describeStartCookingError; EXAMPLES \u00b7 CLIENT HOOK list",
+    "what": "'hands back the text' shows an i18n key. The reader cannot see what the user reads, and so cannot see why the reason-collapsed alarm matters: a user with no household is told they have too many cooks.",
+    "evidence": "'reads 409 \u00d72 \u2192 \u201ccooking.error.start_concurrent_cap\u201d'. The hover reads 'what it does: hands back the text \u201ccooking.error.start_concurrent_cap\u201d'. shared/locale/en-US.json:476 at 05007957 holds 'You have too many cooks going at once. Finish or cancel one before starting another.' One of the two 409s it serves is 'setup required'.",
+    "severity": "costly",
+    "fix": "Resolve the key through the app's default locale file and show the sentence, with the key in the hover: \u201cYou have too many cooks going at once\u2026\u201d.",
+    "item": "L-16",
+    "pattern": "key-shown-as-text"
+   },
+   {
+    "id": "CR-15",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 own guards and switch hovers \u00b7 both endpoints",
+    "what": "Conditions are raw Python, and a guard's precondition is a code negation.",
+    "evidence": "The recipe is None hover reads 'only when not (existing is not None)'. The concurrent cap guard reads 'only when not (existing is not None) \u00b7 not (recipe is None)'. The TokenVerifier hover reads 'not (settings.auth_provider is ProviderMode.REAL) \u2192 MockTokenVerifier'. Faces show 'concurrent_cap is not None and active + 1 > concurrent_cap', and on GET /recipes 'taste and not 1 <= minimum <= 5'.",
+    "severity": "costly",
+    "fix": "Invert simple negations ('only when no session has this key yet \u00b7 the recipe exists'; 'otherwise \u2192 MockTokenVerifier'). Keep the code as the hover's last line, 'as written: \u2026'.",
+    "item": "L-10",
+    "pattern": "code-negation-as-condition"
+   },
+   {
+    "id": "CR-16",
+    "where": "BY MOMENT \u00b7 Endings and Proof cells, the path bar, the lifeline dots \u00b7 GET /recipes and POST /cooking/sessions",
+    "what": "Items in one cell with identical faces. The page stops on twin hovers but not on twin faces, so a reader must hover each chip to tell them apart.",
+    "evidence": "GET /recipes: the 'checks' column has 7 identical 'refusal 400' chips. The same cell holds 28\u00d7 'C823 proves 400', 7\u00d7 each of C316, C574, C811 and C813, and 24\u00d7 C823 in the next 'checks'. The path bar shows 16 identical '400' chips. The Data effects cell shows 'recipe_ingredients R' \u00d73 and 'recipe_equipment R' \u00d72, and the Functions cell 'texture_codes' \u00d72 (hovers differ only by 'called at recipes.py:447' vs ':479'). POST: 'refusal 429' \u00d72, '401' \u00d72, and a dot labelled '429 429' whose hover repeats 'Rate limit exceeded. Try again shortly.' twice.",
+    "severity": "costly",
+    "fix": "Put the distinguishing word on the face: 'refusal 400 \u00b7 allergen_safe', 'refusal 400 \u00b7 diet', '429 \u00b7 sensitive', '429 \u00b7 global', and 'recipe_ingredients R \u00b7 by exclusion_conditions'. Extend the build's twin stop to faces.",
+    "item": "L-03",
+    "pattern": "twin-faces"
+   },
+   {
+    "id": "CR-17",
+    "where": "BY MOMENT \u00b7 moment heads vs hovers, lifelines, the Data effects map and fork hovers \u00b7 POST /cooking/sessions",
+    "what": "One moment carries two names. The head says one thing, and the hovers, the map bands and the fork list say another, so a reader cannot find 'the work' or 'saving' among the heads.",
+    "evidence": "The head 'subscription_tier_for +2' has hover title 'the work'. The map band and the lifeline hovers ('session \u00b7 the work') say 'the work'. The head 'commit' has hover title 'saving', the map band says 'saving', and the fork hover says 'way 4: saving'. On GET /recipes the head 'load_user_allergens +4' is 'the work' in the hovers.",
+    "severity": "costly",
+    "fix": "Use one name everywhere: 'the work (subscription_tier_for +2 calls)' and 'saving (commit)'. Or give the head the plain name, with the calls on a second line.",
+    "item": "L-05",
+    "pattern": "one-moment-two-names"
+   },
+   {
+    "id": "CR-18",
+    "where": "BY MOMENT \u00b7 moment heads and the fork hover \u00b7 GET /recipes",
+    "what": "Three different moments are all headed 'checks', and the fork's hover names its other way 'way 2: checks', so a reader cannot tell which one.",
+    "evidence": "The heads read checks \u00b7 one of 2 [ValueError | checks] \u00b7 one of 2 [ValueError | checks]. Their hovers say lines 328\u2013424, lines 436\u2013514 and line 526. The fork hover says 'way 1: after a call failed \u2014 caught at recipes.py:430 (except ValueError) || way 2: checks'. The ValueError heads never say which call raised.",
+    "severity": "costly",
+    "fix": "Number or bound them: 'checks \u00b7 328\u2013424', 'checks \u00b7 436\u2013514', 'checks \u00b7 526'. Name the raising call in the except head, as POST does ('start_session SessionNotFoundError').",
+    "item": "L-05",
+    "pattern": "same-name-different-places"
+   },
+   {
+    "id": "CR-19",
+    "where": "BY MOMENT \u00b7 stage band and fork bracket",
+    "what": "Some band marks say nothing on their face. The number beside each stage is explained only in its hover. INPUT reads '1 of 2' next to a bare '2', and the bracket says 'one of 4' with no noun. On GET /recipes the band cuts 'INPUT 1 of\u2026'.",
+    "evidence": "The faces read 'EDGE 2', 'INPUT 1 of 2 2', 'GATE 2', 'INPUT 2 of 2 1' and 'HANDLER 5', with hover '2 endings leave from here'. The bracket face is 'one of 4', and only its hover says 'A request takes one of these 4 ways'. GET /recipes: 'INPUT 1 of\u2026' (z-thead.png, gr_0.png).",
+    "severity": "costly",
+    "fix": "Put the noun on the face: 'EDGE \u00b7 2 endings', 'INPUT (1 of 2) \u00b7 2 endings', 'one of 4 ways'. Give the band cell the width to show 'INPUT 1 of 2' uncut.",
+    "item": "L-05",
+    "pattern": "count-without-noun"
+   },
+   {
+    "id": "CR-20",
+    "where": "BY MOMENT \u00b7 column 'before any request' (Proof and In-flight rows)",
+    "what": "One column holds two unrelated times: values the server builds when it starts, and requests a test made earlier. Journey chips 'C250 2 steps before' sit under a moment the band calls 'the server starting'.",
+    "evidence": "The head hover reads 'Values the server builds once, when it starts; every request then reads them. In Proof, the requests a test makes before this one.' The band hover for 'outside the request' reads 'the server starting before any request \u2026'. The Proof cell holds C250, C1087 and C555 as '\u2026 steps before'.",
+    "severity": "costly",
+    "fix": "Give journeys their own 'before this request (in the test)' column, or put the journey chips in the Proof row's head area. Keep 'before any request' for the server start.",
+    "item": "L-05",
+    "pattern": "one-column-two-times"
+   },
+   {
+    "id": "CR-21",
+    "where": "ENDPOINT METADATA \u00b7 every fact's hover (Overview, Proof, Data effects, Functions cards)",
+    "what": "Every metadata fact's hover ends with the same paragraph, which describes the page, not the fact. The six alarm chips share one hover that says what an alarm is, not what this alarm found. The seven 'arranges' chips share one hover.",
+    "evidence": "About 25 hovers end with 'Facts with no moment: what the endpoint is and what sums it up, one card per block. Each is true of every path, so the path row never hides it; and, on Proof's card, the journeys \u2026'. race-500, reason-collapsed, reason-lost, shared-status, text-only and undeclared all read 'An anomaly the form check found; the facts it reads stand at their moments.' C1087, C250, C283, C284, C555, C675 and C266 all read 'A case that calls this endpoint only to set another test up \u2026'.",
+    "severity": "costly",
+    "fix": "Move the paragraph to the ENDPOINT METADATA head's hover only (it is already there). Give each alarm its own finding, e.g. race-500: 'two requests with one Idempotency-Key both pass the check and the second breaks uq_cooking_sessions_hh_key \u2192 500'. Give each arranges chip the test's name and the step it sets up.",
+    "item": "L-01",
+    "pattern": "static-text-repeated-in-hovers"
+   },
+   {
+    "id": "CR-22",
+    "where": "ENDPOINT METADATA \u00b7 Overview and risk \u00b7 alarms chips",
+    "what": "The alarm chips wear machine ids as their face.",
+    "evidence": "The faces read race-500, reason-collapsed, reason-lost, shared-status, text-only and undeclared (also the Client cell's 'reason-collapsed' chip).",
+    "severity": "costly",
+    "fix": "Use plain faces: 'a retry can end in 500', 'two reasons, one message on screen', 'reason lost', 'two refusals share a status', 'message is text only', 'status not declared'. Keep the id in the hover.",
+    "item": "L-16",
+    "pattern": "machine-id-on-face"
+   },
+   {
+    "id": "CR-23",
+    "where": "ENDPOINT METADATA \u00b7 Overview and risk \u00b7 named \u00b7 both endpoints",
+    "what": "The rank has no direction and no scale: a reader cannot tell whether 3\u20136 is good or bad, or why it is a range.",
+    "evidence": "POST: '4/11 of its refusals named by a test, a test that fits several counted for each \u00b7 rank 3\u20136 of 80'. GET /recipes: 'rank 1 of 80'. The hover reads 'where that puts the endpoint among the app's'.",
+    "severity": "costly",
+    "fix": "'tied 3rd\u20136th best of 80 endpoints by refusals a test names (1st = most named)'.",
+    "item": "L-07",
+    "pattern": "rank-without-direction"
+   },
+   {
+    "id": "CR-24",
+    "where": "BY MOMENT \u00b7 rare labels on Endings 403, Data effects cooking_sessions W and In-flight idempotency_key",
+    "what": "'rare \u00b7 N of 80' does not say what is rare.",
+    "evidence": "The faces read 'rare \u00b7 6 of 80' (403), 'rare \u00b7 3 of 80' (cooking_sessions W) and 'rare \u00b7 6 of 80' (idempotency_key). The subject appears only in the hover: 'can answer 403', 'claims its key with get-or-create', 'reads a repeat key'.",
+    "severity": "costly",
+    "fix": "'rare: 6 of 80 endpoints can answer 403', 'rare: 3 of 80 claim a key with get-or-create', 'rare: 6 of 80 read a repeat key'.",
+    "item": "L-18",
+    "pattern": "label-without-subject"
+   },
+   {
+    "id": "CR-25",
+    "where": "EXAMPLES \u00b7 every column's block \u00b7 the number part",
+    "what": "Each block wears a bare number whose meaning changes by column. Neither the face nor the block's single hover names it.",
+    "evidence": "TABLE cooking_sessions shows '17' (fields: 10 + 7 more), and GET /recipes users shows '6'. SCHEMA shows '2' (fields), FUNCTION '53' and '628' (lines), ENDING '1' (ways), GATE '0' (tests), CLIENT HOOK '4' (reactions) and IN-FLIGHT '1' (readers). The part names live only in the words file (ex.parts.*.count.name). The table hover gives 'functions that write it across the app: 6', a different number.",
+    "severity": "costly",
+    "fix": "Suffix the unit on the face ('17 fields', '53 lines', '0 tests', '4 endings answered', '1 reader'), or add the part's name to the block's IN \u00b7 DOES \u00b7 OUT hover.",
+    "item": "L-23",
+    "pattern": "bare-number-meaning-varies"
+   },
+   {
+    "id": "CR-26",
+    "where": "EXAMPLES \u00b7 all eight columns (faces, selects, pills)",
+    "what": "Text is cut in every column, so the element named in a block cannot be read.",
+    "evidence": "From the bench pictures: 'Rate limit exceeded.\u2026', 'middleware/rate_limit.py' cut, 'sensiti\u2026', 'rate_limit\u2026', 'useStartCoo\u2026', 'start session response car', 'Author 201 \u00b7 re', 'api/cooking.p', 'RateLimitMiddleware.__in', the lifetime pill 'the serv'. The selects read '429 \u00b7 Rate lim', 'cooking_sessio', 'SessionCreateR', 'post_start_ses', 'C267 \u00b7 start s' and 'rate_limit_act'. The copy lines are clipped.",
+    "severity": "costly",
+    "fix": "Let a block's lines wrap at _ . / (the 'names whole' rule BY MOMENT uses) and widen the selects to the column. Or default to 'wrapped rows' so each column gets its width.",
+    "item": "L-23",
+    "pattern": "text-cut-with-ellipsis"
+   },
+   {
+    "id": "CR-27",
+    "where": "EXAMPLES vs BY MOMENT \u00b7 in-flight kinds, gate branch names, lifetimes",
+    "what": "The bench names the same kinds with different words from BY MOMENT, one screen above it.",
+    "evidence": "In-flight kinds: bench 'setting read once / built once / request state / dependency value' vs BY MOMENT 'setting at start / built at start / on the request / from a dependency'. The branch: bench 'fall-through' vs BY MOMENT 'otherwise' (and 'past every fork, to the end' in the path hover). Lifetime: bench 'the server', 'lives with the server' vs BY MOMENT 'server', 'lasts with the server process', 'kept by the server for the next request'.",
+    "severity": "costly",
+    "fix": "Take the bench's role names from the same words entries BY MOMENT uses (mo.* in-flight kinds, 'otherwise'), and use one lifetime phrase.",
+    "item": "L-19",
+    "pattern": "two-vocabularies-for-one-thing"
+   },
+   {
+    "id": "CR-28",
+    "where": "EXAMPLES \u00b7 ENDING, GATE OR DECISION and TEST blocks and lists",
+    "what": "The bench shows raw code as the condition, raw pydantic type names as rules, and a raw assert expression as what the test checks.",
+    "evidence": "The ENDING hover reads 'IN not self._sensitive.allow(key, now)' (GET /recipes: 'not self._global.allow(gkey, now)'). The GATE list reads 'body.planned_portions \u00b7 greater_than_equal ge=1' and 'body \u00b7 missing'. The TEST hover reads 'checks 201 \u00b7 resp.json()['recipe_title'] == 'R'', and on GET /recipes 'all((r['match_score'] is None for r in body['recipes']))', with the face '200 \u00b7 recipes \u00b7 recipes'.",
+    "severity": "costly",
+    "fix": "Plain lines first, code last: 'IN the caller is over the sensitive limit', 'planned_portions at least 1', 'the body is missing', 'checks the answer's recipe_title is \u201cR\u201d', 'checks every recipe's match_score is empty'.",
+    "item": "L-23",
+    "pattern": "raw-code-as-condition"
+   },
+   {
+    "id": "CR-29",
+    "where": "EXAMPLES \u00b7 FUNCTION column \u00b7 post_start_session and search_recipes blocks",
+    "what": "The function's 'what it does' is generic words that fit any handler, and the face mark 'CALL' is unexplained.",
+    "evidence": "Hover: 'DOES faces the web \u00b7 decides an ending \u00b7 reads or writes data'. The list says 'WHAT IT DOES faces the web \u00b7 decides an ending \u00b7 reads or writes data'. The face pill is 'CALL' while the hover role is 'caller'.",
+    "severity": "costly",
+    "fix": "Build DOES from its facts: 'checks the Idempotency-Key (400), starts the session (404 \u00b7 403 \u00b7 409), commits, returns CookingSessionResponse'. Show the role word 'caller', not 'CALL'.",
+    "item": "L-13",
+    "pattern": "generic-verbs-for-the-item"
+   },
+   {
+    "id": "CR-30",
+    "where": "BY MOMENT \u00b7 Functions row hovers; the function heads in the Gates chains; Client screen and frontend piece; the middleware in Stages and order",
+    "what": "Many hovers are name + kind only, or feed verbs with a colon, so they say nothing about this item.",
+    "evidence": "'build_auth_context \u00b7 function', 'post_start_session \u00b7 function', 'start_session \u00b7 function', 'RateLimitMiddleware \u00b7 middleware', 'CORSMiddleware \u00b7 middleware', 'RecipeBrowseContainer \u00b7 screen', 'describeStartCookingError \u00b7 frontend piece'. On GET /recipes: 'texture_codes \u00b7 function || BEFORE called at recipes.py:447'. Functions: 'read: households \u00b7 memberships', 'add: users || read: users', 'update: cooking_sessions'.",
+    "severity": "costly",
+    "fix": "Reuse the chip's own before \u00b7 checks \u00b7 gives in the function heads. Write sentences: 'reads households and memberships', 'reads users, may add one'. For middleware: 'adds CORS headers; runs 1 of 3'.",
+    "item": "L-22",
+    "pattern": "hover-says-only-the-kind"
+   },
+   {
+    "id": "CR-31",
+    "where": "BY MOMENT \u00b7 Data effects row with the map option on (the default pick) \u00b7 POST /cooking/sessions",
+    "what": "Every read and write is drawn twice, as chips in the cells and as lines in the map, and nothing says they are the same facts. The map's 'saving' band holds only its label, with the commit rule below it.",
+    "evidence": "mo_1.png and mo_2.png: the chips users R/W, memberships R \u2026 appear in the cells, and the same links appear in the map under the row. The option text says 'one map for the endpoint \u00b7 my pick' but the chips stay. The band 'saving' has no function line, only the rule 'commit post_start_session caller cooking.py:167'.",
+    "severity": "costly",
+    "fix": "With the map on, fold the cells to a count ('3 tables') or hide them. Put the commit rule inside the 'saving' band, or drop an empty band and let the rule carry the moment name.",
+    "item": "L-12",
+    "pattern": "same-fact-drawn-twice"
+   },
+   {
+    "id": "CR-32",
+    "where": "BY MOMENT \u00b7 In-flight state \u00b7 idempotency_key chip, the folded lane, the opened lane \u00b7 POST /cooking/sessions",
+    "what": "Several faces in this row cannot be read as they stand. The kind and the lifetime both say 'request', and the folded lane wraps onto three lines. The opened lane shows private attribute names, and the lane's hover grammar is broken. The dot on the shared window value reads '429 429'.",
+    "evidence": "The idempotency_key face reads 'on the request \u00b7 request \u00b7 rare \u00b7 6 of 80'. Its hover says 'lasts with the answer' and its cross says 'gone once the answer is sent', so the lifetime is said three ways. 'rate / limiter \u00b7 / 7' wraps in a 90 px cell. The opened lane shows '_sensitive' and '_global' ('SlidingWindowLimit er'). The lane hover reads 'set at before any request'. The rate_limit_window_seconds dot reads '429 429', and its hover repeats 'Rate limit exceeded. Try again shortly.' twice.",
+    "severity": "costly",
+    "fix": "Kind 'on the request (request.state)', lifetime 'gone with the answer'. Give the lane 'rate limiter \u00b7 7 values' one line or a wider first cell. Show 'sensitive limiter' and 'global limiter' as faces. 'set before any request'. The dot: '429 sensitive \u00b7 429 global'.",
+    "item": "L-17",
+    "pattern": "kind-and-lifetime-same-word"
+   },
+   {
+    "id": "CR-33",
+    "where": "BY MOMENT \u00b7 Stages and order row \u00b7 422 rules \u00b7 POST /cooking/sessions (and 14 rules on GET /recipes)",
+    "what": "The rule chips show pydantic error-type identifiers, not the rule, and the rule count disagrees between hovers.",
+    "evidence": "Faces: 'body.planned_portions \u00b7 greater_than_equal', 'less_than_equal', 'body.recipe_id \u00b7 missing', 'body \u00b7 missing'; on GET /recipes 'query.q \u00b7 string_too_long'. Hover: 'BEFORE the payload parameter \u00b7 CHECKS ge=1'. SessionCreateRequest says 'a 422 on any of its 3 rules', but the validation 422 says 'FastAPI checks the input against 4 rules' and the head says 'rules 4'.",
+    "severity": "costly",
+    "fix": "Face the rule: 'planned_portions \u2265 1', 'planned_portions \u2264 50', 'recipe_id required', 'body required'. Put the error type in the hover. Say '3 field rules + the body itself = 4'.",
+    "item": "new",
+    "pattern": "library-error-id-as-rule"
+   },
+   {
+    "id": "CR-34",
+    "where": "BY MOMENT \u00b7 Gates and decisions head and legend; ENDPOINT METADATA \u00b7 Standard or specialist card",
+    "what": "The Gates row head carries Standard or specialist's 'pieces 3 \u00b7 lacks 0' (8 count pills, about 480 px tall). The metadata card repeats the same two counts. The Gates legend opens with three sentences answering different questions.",
+    "evidence": "The head reads 'guards 5 \u00b7 login HTTPBearer \u00b7 forks 2 \u00b7 catches 4 \u00b7 rate global \u00b7 sensitive \u00b7 switches 2 \u00b7 pieces 3 \u00b7 lacks 0'. The metadata card reads 'Standard or specialist \u00b7 pieces 3 \u00b7 lacks 0'. The legend: 'Where can the request be stopped \u2026? || Is this endpoint built like the others, and what is unusual about it? \u2026 || The checks that stop a request and the forks that decide its ending.'",
+    "severity": "costly",
+    "fix": "Keep pieces and lacks in the metadata card only (the rare labels on items already point to them). Keep one question in the Gates legend and give the other its own titled line, 'also here: what is unusual (switches, rare pieces)'.",
+    "item": "L-18",
+    "pattern": "same-count-in-two-places"
+   },
+   {
+    "id": "CR-35",
+    "where": "BY MOMENT \u00b7 Functions and Client legends; function chips' marks",
+    "what": "Some legend labels have no meaning line. The hollow R on the login check's tables is explained only inside the row's options slot. The status marks on a function chip are not said to be the statuses its own code decides.",
+    "evidence": "Functions legend: 'Model 13 here'. Client legend: 'Hook (FE) 1 here', 'API endpoint 1 here'. The chips load_household_context 'R households R memberships' are hollow, and only the options hover says 'the login check's own tables are hollow'. The post_start_session chip reads '400 403 404 409 commit R user_dietary_profile caller'.",
+    "severity": "costly",
+    "fix": "Give every legend label a plain line: 'Model \u2014 the table's model class', 'Hook (FE) \u2014 a frontend hook', 'hollow R \u2014 a table the login check reads, not this endpoint's code'. Head the status marks 'its code answers: 400 403 404 409'.",
+    "item": "L-04",
+    "pattern": "mark-without-its-meaning"
+   },
+   {
+    "id": "CR-36",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 the rate-limiter hovers",
+    "what": "The limiter's key is raw f-string code, and the header value is elided.",
+    "evidence": "'20 per 60 seconds, keyed f'{ip}:sensitive'' and 'sends Retry-After: \u2026'.",
+    "severity": "minor",
+    "fix": "'counted per caller IP, separately for the sensitive routes'. 'sends Retry-After with the seconds left in the window' (or its value when the feed has it).",
+    "item": "L-03",
+    "pattern": "raw-code-in-a-fact"
+   },
+   {
+    "id": "CR-37",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 the 'otherwise' branch chip",
+    "what": "The fall-through branch's hover title is named by the function it sits in, not by the branch.",
+    "evidence": "The face reads 'otherwise \u2192 returns 201', but the hover title is 'start_session \u00b7 deciding branch \u00b7 CHECKS when no branch before it holds \u00b7 GIVES start_session returns cs, at cooking.py:173'. The path bar calls it 'past every fork, to the end', and the bench 'fall-through'.",
+    "severity": "costly",
+    "fix": "Title it 'otherwise (no earlier session with this key) \u00b7 deciding branch', and use 'otherwise' in all three places.",
+    "item": "L-10",
+    "pattern": "branch-named-by-its-host"
+   },
+   {
+    "id": "CR-38",
+    "where": "BY MOMENT \u00b7 Client \u00b7 the reason-site hovers",
+    "what": "A reason site's hover title is still a file and line.",
+    "evidence": "'cookingSessionModel.ts:381 \u00b7 reason site', ':384', ':389'.",
+    "severity": "costly",
+    "fix": "Title it by what it reads and does: 'if status is 403 \u2192 the allergen message \u00b7 in describeStartCookingError'. Keep the file:line on the CHECKS line.",
+    "item": "L-16",
+    "pattern": "location-as-title"
+   },
+   {
+    "id": "CR-39",
+    "where": "BY MOMENT \u00b7 names in chips and heads \u00b7 both endpoints",
+    "what": "Names break in the middle of a word.",
+    "evidence": "'except InvalidTokenErro/r', 'SessionNotFoundEr/ror', 'AllergenConflictEr/ror', 'ConcurrentCookCapEr/ror', 'FirebaseTokenVerifi/er.verify', 'user_dietary_profil/e', 'RecipeBrowseCont/ainer', 'useCookingLoopAc/tions', 'IdempotencyMiddl/eware', 'SlidingWindowLimit/er', and on GET /recipes 'ingredient_restriction/s', 'RecipeBrows/eContainer', 'useRecipeSe/arch'. The measure counts midWord 13.",
+    "severity": "costly",
+    "fix": "Allow breaks only at _ . / and between camel-case humps (insert <wbr> at case changes). Give chip columns a min-width that fits the longest class-name segment.",
+    "item": "L-21",
+    "pattern": "word-broken-mid-word"
+   },
+   {
+    "id": "CR-40",
+    "where": "BY MOMENT at 1920 px \u00b7 all endpoints",
+    "what": "The grid still scrolls sideways on 19 of 80 endpoints, including both endpoints reviewed here.",
+    "evidence": "Measured with __allep.pick over the 80 rows: 19 have a mogrid scrollWidth greater than clientWidth (1854). POST /cooking/sessions is 2300, GET /recipes 2247 and POST /recipes/{recipe_id}/plan 2365. The page itself says 'The columns do not fit this width: the box scrolls sideways for the rest.'",
+    "severity": "costly",
+    "fix": "Open the table with 'fit to the box' on when the columns overflow, or cap the widest chip columns (the 'checks' and 'the work' gate chains) and let them wrap.",
+    "item": "L-21",
+    "pattern": "cramped-columns"
+   },
+   {
+    "id": "CR-41",
+    "where": "BY MOMENT \u00b7 Client row head 'screen 1'; pinned row 'screen'",
+    "what": "'screen' counts the hook, not the screen drawn in the same cell.",
+    "evidence": "'screen 1 \u00b7 frontend pieces that call it: a hook or a component'. useStartCooking says 'counted in: screen', and RecipeBrowseContainer (the screen glyph) is not counted. D-069 proposed renaming it 'sends it', which is not yet ruled.",
+    "severity": "minor",
+    "fix": "Rename the column 'sends it' (D-069's proposal), or count the screen.",
+    "item": "L-20",
+    "pattern": "column-name-vs-member"
+   },
+   {
+    "id": "CR-42",
+    "where": "BY MOMENT \u00b7 Client \u00b7 after the answer \u00b7 the refresh chip",
+    "what": "Each refetched GET is drawn twice: the method in the path, then a GET pill.",
+    "evidence": "'GET /cooking/active \u2193GET' and 'GET /cooking/ reminders/due \u2193GET'.",
+    "severity": "minor",
+    "fix": "Draw the method once, as the pill before the path.",
+    "item": "L-15",
+    "pattern": "same-fact-drawn-twice"
+   },
+   {
+    "id": "CR-43",
+    "where": "BY MOMENT \u00b7 Proof journeys vs ENDPOINT METADATA \u00b7 steps",
+    "what": "'steps' means two things on one page.",
+    "evidence": "A journey chip reads 'C250 2 steps before' (steps = requests in the test). The metadata reads 'steps 22 \u00b7 steps on its longest path' (steps = checks, calls and forks inside one request).",
+    "severity": "minor",
+    "fix": "Journey chips: 'C250 \u00b7 2 requests before'.",
+    "item": "L-08",
+    "pattern": "one-word-two-meanings"
+   },
+   {
+    "id": "CR-44",
+    "where": "BY MOMENT \u00b7 NOT PLACED \u00b7 Proof \u00b7 GET /recipes",
+    "what": "The chips read 'C571 proves' with no object, twice each, and the lane words describe the map, not the code.",
+    "evidence": "'proves no ending  C571 proves  C571 proves  C573 proves  C573 proves  C859 proves \u2026'. The lanes read 'no link to a call', 'by name only' and 'filled on a first call'.",
+    "severity": "minor",
+    "fix": "'C571 \u00b7 proves no ending here' once per case. Move the map-reading lanes behind 'more information' (D-017).",
+    "item": "L-22",
+    "pattern": "verb-without-object"
+   }
+  ],
+  "pictures": [
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/post-cooking-sessions-sec-mo.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/mo_0.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/mo_1.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/mo_2.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/mo_3.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/mo_4.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/mo_5.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/get-recipes-sec-mo.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/gr_0.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/gr_2.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/gr_3.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/gr_4.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/gr_7.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/gr_8.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/post-cooking-sessions-sec-ex.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/post-cooking-sessions-bench-open.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/get-recipes-sec-ex.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/fn-viewport.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/post-cooking-sessions-right.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/z-thead.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/z-proof.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/z-gate-work.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/z-client-after.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/z-bench.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/inf-open.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/cold/ropt-gate.png"
+  ]
+ },
+ {
+  "lens": "LENS 3 \u2014 numbers true. I checked the numbers on POST /cooking/sessions, GET /recipes and GET /cooking/active (the simple GET) against forms.json, archmap.json, levels.json and gustify@05007957. These hold: the row-head values match the pinned row on all three endpoints, and every head's members are either drawn or listed under NOT PLACED. Also true: the stage-band counts (POST 2\u00b72\u00b72\u00b71\u00b75\u00b70\u00b71\u00b71 = 14; GET /recipes 22; GET /cooking/active 6) and \"one of 4\" with its four ways. The limiter numbers are true (20/120 per 60 s, 23 and 79 endpoints, env names, defaults at config.py:137-140). So are fate, steps (22/16/14), proven (2/14, 5/22, 2/6), rank, pieces and lacks, and the file and line facts (def at 119, 53 lines; 628 lines; 26 lines). The refresh hooks, GETs and tables are true, as are the client reads (403/404/409\u00d72 at cookingSessionModel.ts:381/384/389) and the lifeline set and read lines. The data-map read and write lines match the source, and the bench role counts for ending, table, schema and in-flight are right. What is wrong is below.",
+  "verdicts": [
+   {
+    "item": "L-03",
+    "verdict": "answered",
+    "remains": "The two 429s now differ by their own limit (7 path prefixes, 23 endpoints, 20/60 s; every request but /healthz, 79 endpoints, 120/60 s), and all of it matches the feed and rate_limit.py. Left: '7 routes' are really 7 path prefixes, and the 'counts at :117/:121' lines are the 429 return lines (the count itself is at :116/:120). The bench chain still shows the two 429 rows with the same words."
+   },
+   {
+    "item": "L-05",
+    "verdict": "answered",
+    "remains": "The stage band counts are true on all three endpoints. The fork 'one of 4' names the right four ways (except SessionNotFoundError :155, AllergenConflictError :159, ConcurrentCookCapError :164, and saving :167)."
+   },
+   {
+    "item": "L-07",
+    "verdict": "partly",
+    "remains": "'named 4/11 of its refusals' divides by the produced rows, which include the 500 and leave out the body-parse endings. True figures: 5/12 on POST, 19/20 on GET /recipes, 1/4 on GET /cooking/active. On POST, 'behind 18' is lit on a different set of 24 functions. On GET /recipes, the Proof card calls C859 and C867 set-up-only cases, but both test the endpoint."
+   },
+   {
+    "item": "L-08",
+    "verdict": "partly",
+    "remains": "7 of the 8 service-side 404 proofs test other functions. 'sends no headers' is shown where the feed simply did not read the headers (C237, C283). 'beyond' ignores body assertions. The C267/C250 'checks it passes' lists leave out the checks inside calls. The bench says C250 and C237 'prove' endings that the metadata says they do not prove. On GET /recipes, C574/C316/C811/C813/C823 each show as proving all 16 400s, though each request's query names one."
+   },
+   {
+    "item": "L-09",
+    "verdict": "partly",
+    "remains": "The hosts are right except the TokenVerifier switch: 'runs in build_auth_context \u00b7 at context.py:97', but line 97 is in get_auth_context (the verify call is at :77)."
+   },
+   {
+    "item": "L-10",
+    "verdict": "partly",
+    "remains": "'HTTPBearer \u2192 401 \u00d72' credits the invalid-token 401 to HTTPBearer. The except InvalidTokenError hover says 'commits, at context.py:79', but no path through that catch commits. The TokenVerifier hover says 'decides the 401' while its chip says 'can end at'. The guards 'taste \u2192 400' and 'taste_max \u2192 400' name the enclosing if, not the real condition (the value is not an integer)."
+   },
+   {
+    "item": "L-11",
+    "verdict": "partly",
+    "remains": "On the bench's GATE OR DECISION column, 'except InvalidTokenError' is counted twice (login check and catch). So 'all 21' should be 20, 'all 38' should be 37, and 'all 6' should be 5 on the simple GET."
+   },
+   {
+    "item": "L-12",
+    "verdict": "partly",
+    "remains": "The links, ticks and commit rules are true. But only the idempotency race is drawn. The users race at ownership.py:50 is missing, even though the feed records it and the bench's users table names it. On GET /recipes, a Python set.add is drawn as a save step, and that inflates the data-fns count (should be 13) and the fate count ('left unsaved 7' should be 0)."
+   },
+   {
+    "item": "L-13",
+    "verdict": "partly",
+    "remains": "The bench says start_session 'ends a database transaction', but it only flushes; the commit belongs to post_start_session, and the bench does not say so. The bench's 'all 25' functions leaves out load_resolution_snapshot, get_idempotency_key, violations_for and derive_restrictions, which BY MOMENT draws. load_resolution_snapshot's hover says it is 'called at cooking.py:150'."
+   },
+   {
+    "item": "L-15",
+    "verdict": "answered",
+    "remains": "The refresh is right: useStartCooking on success invalidates ['cooking'] (useCookingSessions.ts:99), which re-fetches useActiveCooking (GET /cooking/active) and useRemindersDue (GET /cooking/reminders/due); the tables are right too. The only slip is 'a failed send is not tried again', since apiFetch re-sends once after a 401."
+   },
+   {
+    "item": "L-16",
+    "verdict": "partly",
+    "remains": "The branches, lines and \u00d72 are right. But 'any other status' lists 7 endings, and together with the 4 routed ones that makes 11 of the 13 non-success endings. The two body-parse endings are missing without a word."
+   },
+   {
+    "item": "L-17",
+    "verdict": "answered",
+    "remains": "The set moments, the read lines (session 137/148/151/167/171; ctx 125/139/148/151/171) and what each read decides (400 at :128, 409 at :125, the claim at :157) are true. Only 'handed to' misses a call when the argument sits on a continuation line."
+   },
+   {
+    "item": "L-20",
+    "verdict": "partly",
+    "remains": "Every head value equals its pinned-row cell. But the labels of two columns are false: 'beyond' counts only the proofs that matched the detail, and 'tests 44' counts calls, while a click lights 32 test cases."
+   },
+   {
+    "item": "L-23",
+    "verdict": "partly",
+    "remains": "The ending, table, schema, in-flight and hook counts are true. Three are not: TEST 'from the service side 8' should be 1, gate 'all 21' should be 20, and FUNCTION 'all 25' leaves out 4 functions this endpoint runs."
+   }
+  ],
+  "findings": [
+   {
+    "id": "N3-01",
+    "where": "BY MOMENT \u00b7 Proof \u00b7 the SessionNotFoundError fail moment \u00b7 8 chips 'C221\u2026C276 proves 404'; Endings \u00b7 404 hover 'proven by C221 \u00b7 C225 \u00b7 C226 \u00b7 +5'; EXAMPLES \u00b7 TEST \u00b7 'from the service side 8' \u00b7 POST /cooking/sessions",
+    "what": "Seven tests of other functions are shown as proving this endpoint's 404 'Recipe not found'.",
+    "evidence": "feed test_cases[].raises[].root: C225 and C226 call cancel_session, C228 update_step_progress, C231 complete_session, C235 update_stage, C275 and C276 set_session_timer; the source matches (test_cooking.py:156-170). None of these runs on POST /cooking/sessions. Only C221 calls start_session. On the bench, C225's own list says 'It calls cancel_session directly', yet its hover says 'proves 404 here'. True value: one service-side proof (C221), so 'from the service side' is 1.",
+    "severity": "misleading",
+    "fix": "Keep a service-raise join only when its raises[].root is the handler or in its behind walk (start_session here). Otherwise leave the case off this endpoint, or show it as 'raises SessionNotFoundError in cancel_session, which this endpoint never calls'.",
+    "item": "L-08",
+    "pattern": "same-exception-other-function-join"
+   },
+   {
+    "id": "N3-02",
+    "where": "BY MOMENT \u00b7 Proof \u00b7 C237 hovers (POST /cooking/sessions) and C283 hover (GET /cooking/active) \u00b7 'sends no headers'",
+    "what": "The hovers say the test sends no headers, but it sends Authorization.",
+    "evidence": "test_cooking.py:375-386 posts with headers=auth_headers, and test_cooking_timer.py:348 GETs with headers=auth_headers; the fixture sets Authorization: Bearer MOCK_TOKEN. The feed's calls[].sends is null for both (headers not read), while C957, which truly sends none, has []. The page draws null and [] with the same words. The bench gets it right: 'sends no header it names'.",
+    "severity": "misleading",
+    "fix": "Draw sends:null as 'headers not read (a fixture sets them)' and keep 'sends no headers' for [].",
+    "item": "L-08",
+    "pattern": "unknown-rendered-as-none"
+   },
+   {
+    "id": "N3-03",
+    "where": "BY MOMENT \u00b7 Proof row head 'beyond' (same value as the pinned-row cell), on all three endpoints",
+    "what": "'beyond \u00b7 proofs that check more than the status code' counts only proofs the feed matched on the detail text (a '+' in conf). Body assertions are ignored, and one status-only proof is counted.",
+    "evidence": "POST shows 'beyond 0' with the why 'every proof checks the status code alone', but C267 asserts resp.json()['recipe_title'] == 'R', and its own hover says 'and asserts on the body (1)': true value 1. GET /recipes shows 3, but another 14 proofs on the 200 assert the body (C569, C798, C802, C809, C810, C815, C816, C823, C824, C831\u00d72, C839, C844\u00d72): 17. GET /cooking/active shows 1 by counting C236 (conf 'status+shape'), which asserts only status in (401, 403) (test_cooking.py:368-371): true value 0.",
+    "severity": "misleading",
+    "fix": "Count a proof as 'beyond' when its call's asserts carry attrs or detail. Drop '+shape' from the rule, and rewrite the why text to match.",
+    "item": "L-20",
+    "pattern": "count-rule-differs-from-its-label"
+   },
+   {
+    "id": "N3-04",
+    "where": "ENDPOINT METADATA \u00b7 Overview and risk \u00b7 'named 4/11 of its refusals \u2026 rank 3\u20136 of 80' (and 19/21 on GET /recipes, 1/5 on GET /cooking/active)",
+    "what": "The denominator is not the endpoint's refusals.",
+    "evidence": "_ep_pieces.proof_rank divides by len(produced). For POST those 11 rows include the uncaught 500 and leave out the two body-parse endings, one of which C237 names. The Endings head counts refused 9 + body 2 + shape 1 = 12 refusals, and 5 of them are named (C237 \u00d74, C221). True values: POST 5/12, GET /recipes 19/20 (the 21 includes the 500), GET /cooking/active 1/4.",
+    "severity": "misleading",
+    "fix": "Either recount over the refusals (produced + framework_exits \u2212 uncaught, with the framework tests) and re-rank on that, or relabel: 'of its 11 produced endings (the 500 in, the 2 body-parse endings out)'.",
+    "item": "L-07",
+    "pattern": "denominator-from-a-different-set"
+   },
+   {
+    "id": "N3-05",
+    "where": "ENDPOINT METADATA \u00b7 'behind 18 \u00b7 4 calls deep' vs 'counted in: behind' on chips in Functions, Data effects and Gates \u00b7 POST /cooking/sessions",
+    "what": "The count and the set it lights are different sets of functions.",
+    "evidence": "18 is levels.json fn_nodes[post_start_session].behind, which covers the handler's calls only; the hover itself says dependencies are not counted. Yet 'counted in: behind' is on 10 dependency functions (get_auth_context, build_auth_context, both verify, load_household_context, resolve_or_create_user, _get_firebase_app, identity_from_firebase_claims, get_principal_location, _firebase_credential), and on the users, memberships, households and locations table chips. It is missing on ResolutionSnapshot.violations_for and derive_restrictions, which the station's 18 includes (dk.behind holds 24 keys). The dependency chips also say 'one call below the handler' down to '\u21935 \u00b7 5 calls below the handler' (_firebase_credential), next to '4 calls deep'; FastAPI runs them, the handler does not call them.",
+    "severity": "misleading",
+    "fix": "Key 'behind' membership on the station's behind list (handler calls only). Word dependency depth as 'n calls inside get_auth_context, run before the handler'.",
+    "item": "L-07",
+    "pattern": "member-set-differs-from-its-count"
+   },
+   {
+    "id": "N3-06",
+    "where": "GET /recipes \u00b7 Data effects \u00b7 checks \u00b7 'add / search_recipes' save step; Functions head 'data fns 14'; ENDPOINT METADATA \u00b7 Data effects 'left unsaved 7'",
+    "what": "A Python set add is drawn as a database write.",
+    "evidence": "recipes.py:459 is `seen_tx.add(norm)` on a local set. The feed step st:7d81ac54f1 has op add and table null, and it drives fate unsaved 7 and search_recipes' place among the data fns. The bench already drops steps with no table (_ae_bench._paths). True values: data fns 13, fate 'no own write 22 \u00b7 left unsaved 0'.",
+    "severity": "misleading",
+    "fix": "Drop add/flush-less steps that have no table (a non-session receiver) from the Data effects chips, the data-fns members and the fate tally, as the bench does.",
+    "item": "L-12",
+    "pattern": "python-set-add-read-as-db-write"
+   },
+   {
+    "id": "N3-07",
+    "where": "EXAMPLES \u00b7 GATE OR DECISION \u00b7 role counts ('login check 1', 'catch that translates 4', 'all 21') \u00b7 all three endpoints",
+    "what": "One try/except is counted as two gates.",
+    "evidence": "The list shows 'except InvalidTokenError' twice: as the login check (context.py:99) and as a catch that translates (context.py:98). Both are the except in get_auth_context (context.py:96-99) and give the same 401 'invalid token'. _ae_bench makes a login gate for every dependency-phase exit and a catch gate for every catch. True totals: 20 distinct on POST (not 21), 37 on GET /recipes, 5 on GET /cooking/active.",
+    "severity": "misleading",
+    "fix": "Make the login-check gate the dependency function (get_auth_context, as BY MOMENT does), or fold the dependency exit into its catch.",
+    "item": "L-11",
+    "pattern": "one-element-two-roles"
+   },
+   {
+    "id": "N3-08",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 the dependencies \u00b7 'get_auth_context \u00b7 HTTPBearer \u2192 401 \u00d72' beside 'except InvalidTokenError \u2192 401'",
+    "what": "The invalid-token 401 is credited to the HTTPBearer condition and drawn twice in one cell.",
+    "evidence": "HTTPBearer (context.py:23) gives one 401, 'Not authenticated'. The second 401, 'invalid token', comes from the except at context.py:98-99, which already has its own chip next to it. Only 2 endings leave GATE, but the cell shows three 401 effects.",
+    "severity": "misleading",
+    "fix": "'HTTPBearer \u2192 401' (once). Let the catch chip carry the invalid-token 401.",
+    "item": "L-10",
+    "pattern": "effect-attributed-to-wrong-condition"
+   },
+   {
+    "id": "N3-09",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 the dependencies \u00b7 'except InvalidTokenError' hover \u00b7 GIVES 'commits, at context.py:79'",
+    "what": "The hover says this catch commits, but no path through it does.",
+    "evidence": "InvalidTokenError can only come from verifier.verify at context.py:77, which runs before build_auth_context's commit at :79. The feed's failure.catches[].commits (st:925411811a) lists the commits in the try body, not commits made on the catch path.",
+    "severity": "misleading",
+    "fix": "Drop the line, or say 'the try's body commits at context.py:79; the raise comes at :77, so nothing is saved on this way'.",
+    "item": "L-10",
+    "pattern": "field-meaning-inverted"
+   },
+   {
+    "id": "N3-10",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 the dependencies \u00b7 'TokenVerifier' switch chip and hover (all three endpoints)",
+    "what": "The chip and its hover disagree, and the host and line do not match.",
+    "evidence": "The chip says 'can end at 401'; the hover says 'decides the 401', but the feed has changes_exit: false (both verifiers end the same). The hover says 'runs in build_auth_context \u00b7 picks the TokenVerifier, at context.py:97', but line 97 is inside get_auth_context (build_auth_context spans 64-87). The verifier is picked by get_verifier through the _resolve_verifier dependency, and is called at context.py:77 (feed site).",
+    "severity": "misleading",
+    "fix": "Hover: 'either choice can end at 401'. Anchor at context.py:77 (build_auth_context), with 'picked by get_verifier (a dependency)'.",
+    "item": "L-09",
+    "pattern": "host-and-line-disagree"
+   },
+   {
+    "id": "N3-11",
+    "where": "BY MOMENT \u00b7 Stages and order \u00b7 at the edge \u00b7 IdempotencyMiddleware hover 'runs 2 of 3' (all three endpoints)",
+    "what": "The run position is off by one.",
+    "evidence": "The feed's middleware order.runs is 0-based: CORS 0, RateLimit 1, Idempotency 2 (of 3). main.py:119-124: 'outer\u2192inner: CORS \u2192 rate-limit \u2192 idempotency'. True value: runs 3 of 3 (innermost, after the rate limiter).",
+    "severity": "misleading",
+    "fix": "Show order.runs + 1.",
+    "item": "new",
+    "pattern": "zero-based-index-shown-as-ordinal"
+   },
+   {
+    "id": "N3-12",
+    "where": "BY MOMENT \u00b7 every hover's 'at cooking.py:N' (Endings, Gates, Data effects, Structures rules) \u00b7 POST /cooking/sessions",
+    "what": "Three files are called cooking.py, so one label points to different code.",
+    "evidence": "'cooking.py:166' is api/cooking.py:166 (the 409 raise in except ConcurrentCookCapError) in Endings and Gates, but services/cooking.py:166 (the flush where the race breaks) in Data effects. 'cooking.py:119' is the handler def in one place and start_session's read in another. The 422 rules say 'at cooking.py:15/16', which is schemas/cooking.py. The bench uses two segments (services/cooking.py:129).",
+    "severity": "misleading",
+    "fix": "Use folder/file:line (as the bench does), at least whenever an endpoint touches two files with the same name.",
+    "item": "new",
+    "pattern": "basename-collision"
+   },
+   {
+    "id": "N3-13",
+    "where": "EXAMPLES \u00b7 TEST \u00b7 C267 and C250 \u00b7 the chain \u00b7 'checks it passes \u00b7 8' (way 1) and '\u00b7 9' (way 2)",
+    "what": "The counts leave out the checks that sit inside calls.",
+    "evidence": "The chain lists only the feed chain's gate rows. Both 201 ways also pass self.household is None (409, context.py:55, via require_household at cooking.py:125). Way 1 also passes the ownership check (services/cooking.py:128-129, 404). Way 2 also passes the concurrent cap (services/cooking.py:154-155, 409), plus the allergen check (recipes.py:233, 403) when the user has allergens. True counts: way 1 is 10; way 2 is 11, or 12 with allergens. Also: the chain lists concurrent_cook_cap_for_tier after start_session, but it runs first (it is an argument, at cooking.py:153), and the two 429 rows have the same words.",
+    "severity": "misleading",
+    "fix": "Put the endpoint's preconditions with depth \u2265 1 (their 'via' call site) under the call row they hang from, and count them. Name each 429 by its limit.",
+    "item": "L-08",
+    "pattern": "chain-drops-checks-inside-calls"
+   },
+   {
+    "id": "N3-14",
+    "where": "EXAMPLES \u00b7 TEST \u00b7 C250 hover 'OUT proves 201 here' and C237 'proves 400 \u00b7 409 here' \u00b7 POST /cooking/sessions",
+    "what": "The bench's verdict contradicts BY MOMENT and the metadata.",
+    "evidence": "The metadata's Proof card says C250 'arranges another test \u2026 this one proves no ending here'; its call here is arrange-checked, with no refs. BY MOMENT says C237 'proves one of them, not which' (feed: ambiguous of 4). 'proven 2/14' counts neither case.",
+    "severity": "misleading",
+    "fix": "Bench words: C250 'checks 201 while setting up'; C237 'fits 4 endings: 400 \u00b7 409'.",
+    "item": "L-08",
+    "pattern": "two-sections-two-verdicts"
+   },
+   {
+    "id": "N3-15",
+    "where": "GET /recipes \u00b7 ENDPOINT METADATA \u00b7 Proof card \u00b7 'C859 arranges \u00b7 itself and through a helper', 'C867 arranges \u00b7 through a helper'",
+    "what": "Two cases that test the endpoint are described as set-up only.",
+    "evidence": "The hover says 'calls this endpoint only to set another test up \u2026 proves no ending here'. But C859 has an act call at line 211 (it asserts an archived recipe is left out of the list), and C867 has act calls at 384 and 395 (asserting count and total). The feed lists both under tests.unjoined, and the bench marks C859 'tests it'.",
+    "severity": "misleading",
+    "fix": "Call a case 'arranges' only when it has no act call on this endpoint. Otherwise: 'tests it; also sets up'.",
+    "item": "L-08",
+    "pattern": "role-from-one-of-many-calls"
+   },
+   {
+    "id": "N3-16",
+    "where": "GET /recipes \u00b7 BY MOMENT \u00b7 Proof row head 'tests 44' (same value as the pinned-row cell)",
+    "what": "The value counts calls, but the words say tests.",
+    "evidence": "44 is forms tests.act, the number of act calls. The head says 'tests that call it to test it', and a click lights 32 cases (ck acts). The bench says 'tests it 29'. True value: 32 tests (44 calls).",
+    "severity": "misleading",
+    "fix": "'tests 32' with '44 calls' in the hover, or rename the head to 'calls'.",
+    "item": "L-20",
+    "pattern": "calls-counted-as-tests"
+   },
+   {
+    "id": "N3-17",
+    "where": "GET /recipes \u00b7 BY MOMENT \u00b7 Proof \u00b7 checks cells \u00b7 chips 'C574 / C316 / C811 / C813 / C823 proves 400' repeated on each of the 16 400s",
+    "what": "Each request names the one 400 it can reach, but the page draws it as proving all 16.",
+    "evidence": "One hover reads 'calls GET /api/v1/recipes?mode=bogus \u2026 proves the 400 from recipes.py:355: Invalid technique code'. mode=bogus can only reach :363. C316 sends exclude_equipment=teleport-oven and asserts it in the detail, so :379. C811 ?taste=savory:3 goes to :424, C813 ?textures=crunchy to :453, and C823's four calls to :485, :499, :514 and :526. The feed says 'ambiguous of 16'. True value: one ending per call.",
+    "severity": "misleading",
+    "fix": "Narrow an ambiguous join by the query parameter the call sends, which the guard's condition names. Otherwise draw one chip, 'one of 16 400s', not 16 'proves' chips.",
+    "item": "L-08",
+    "pattern": "ambiguity-not-narrowed-by-request"
+   },
+   {
+    "id": "N3-18",
+    "where": "BY MOMENT \u00b7 Data effects \u00b7 the map (and chips) \u00b7 resolve_or_create_user \u2192 users \u00b7 flush at ownership.py:50 \u00b7 all three endpoints",
+    "what": "A second uncaught race on every login path is not drawn.",
+    "evidence": "Feed step st:ba597dd4f4 (add User at ownership.py:49) carries race {at: ownership.py:50, keys: [auth_provider, auth_provider_id], state: uncaught}. get_auth_context catches only InvalidTokenError, so a race here ends in a 500. The bench's users table hover says this collision ends in a 500. The map draws races only from repeat.claims (1 of the feed's 26 step races on POST's paths).",
+    "severity": "misleading",
+    "fix": "Also read steps[].race when drawing the race on a link, and join it to the uncaught ending.",
+    "item": "L-12",
+    "pattern": "second-source-ignored"
+   },
+   {
+    "id": "N3-19",
+    "where": "EXAMPLES \u00b7 FUNCTION \u00b7 start_session hover 'DOES \u2026 ends a database transaction'; post_start_session hover \u00b7 POST /cooking/sessions",
+    "what": "The bench credits the commit to the wrong function.",
+    "evidence": "start_session only flushes (services/cooking.py:166, 172); the flag comes from levels.json access.commits: true. The commit is post_start_session's, at api/cooking.py:167, and its bench hover does not say it commits. BY MOMENT is right (start_session 'flush', post_start_session 'commit').",
+    "severity": "misleading",
+    "fix": "Take 'commits' from the forms feed's steps (op commit), grouped by fn, not from the station's access flag.",
+    "item": "L-13",
+    "pattern": "station-flag-contradicts-feed"
+   },
+   {
+    "id": "N3-20",
+    "where": "BY MOMENT \u00b7 Client \u00b7 after the answer \u00b7 describeStartCookingError \u00b7 'any other status: 401 \u00d72 \u00b7 422 \u00b7 429 \u00d72 \u00b7 500 \u00b7 400' \u00b7 POST /cooking/sessions",
+    "what": "The 'any other' line is not the whole remainder.",
+    "evidence": "4 endings are routed and 7 are listed, 11 in all, but the endpoint has 13 non-success endings. The 422 'JSON decode error' and the 400 'There was an error parsing the body' are missing: the feed's reader routes hold 11 exits and leave out framework_exits. Also, 'what the code does then is not recorded' \u2013 it returns 'cooking.error.start_generic' (cookingSessionModel.ts:393).",
+    "severity": "costly",
+    "fix": "Add '+2 body-parse endings the feed does not route', or route the framework exits to the rest line.",
+    "item": "L-16",
+    "pattern": "remainder-not-complete"
+   },
+   {
+    "id": "N3-21",
+    "where": "BY MOMENT \u00b7 Client \u00b7 the screen sends it \u00b7 useStartCooking hover 'a failed send is not tried again (client.ts:23)'",
+    "what": "Only one of the two retry layers is described.",
+    "evidence": "lib/query/client.ts:35 sets mutations retry: false. But lib/api/client.ts:96-100 re-sends once after a 401 with a refreshed token, reusing the same Idempotency-Key (useCookingSessions.ts:131-132). 'client.ts' is also ambiguous between lib/query and lib/api.",
+    "severity": "minor",
+    "fix": "'TanStack does not retry (lib/query/client.ts:35); apiFetch re-sends once after a 401 (lib/api/client.ts:100)'.",
+    "item": "L-15",
+    "pattern": "one-retry-layer-of-two"
+   },
+   {
+    "id": "N3-22",
+    "where": "BY MOMENT \u00b7 Endings and Gates \u00b7 limiter hovers 'counts each caller's requests \u2026 at rate_limit.py:117 / :121' and 'on requests to 7 routes'",
+    "what": "The hover gives the line that returns the 429 as the line that counts, and calls 7 path prefixes 'routes'.",
+    "evidence": "allow() runs at rate_limit.py:116 (sensitive) and :120 (global); :117 and :121 return the 429, and the JSONResponse is built at :127. The 7 entries are SENSITIVE_PREFIXES (rate_limit.py:27-37), matched with startswith, covering 23 endpoints.",
+    "severity": "minor",
+    "fix": "'counts at :116, answers 429 at :117'; 'on paths starting with one of 7 prefixes (23 endpoints)'.",
+    "item": "L-03",
+    "pattern": "line-of-effect-shown-as-line-of-check"
+   },
+   {
+    "id": "N3-23",
+    "where": "BY MOMENT \u00b7 In-flight state \u00b7 read-dot hovers 'handed to \u2026' (session and ctx)",
+    "what": "A call is missed when the value is passed on a continuation line.",
+    "evidence": "On POST, session and ctx are read at cooking.py:151 inside start_session( at :150, but the hover says 'handed to subscription_tier_for' only. On GET /cooking/active, the session read at :186 goes to list_photo_refs( at :185, but the hover lists get_active_sessions, get_completed_step_ids and _recipe_titles.",
+    "severity": "minor",
+    "fix": "Join a read to the call whose span covers its line.",
+    "item": "L-17",
+    "pattern": "call-span-joined-by-first-line"
+   },
+   {
+    "id": "N3-24",
+    "where": "BY MOMENT \u00b7 Functions \u00b7 the work \u00b7 load_resolution_snapshot / violations_for / derive_restrictions hovers 'called at cooking.py:150'; EXAMPLES \u00b7 FUNCTION 'all 25'",
+    "what": "The call site is wrong, and the bench's list is incomplete.",
+    "evidence": "cooking.py:150 calls start_session. load_resolution_snapshot is called by assert_recipe_allergen_safe at recipes.py:225, 3 calls below the handler, and violations_for by derive_restrictions (resolution.py:166). The bench's FUNCTION list (25) leaves out these three and get_idempotency_key, although BY MOMENT draws them and counts load_resolution_snapshot among its 'data fns 10'.",
+    "severity": "minor",
+    "fix": "'called by assert_recipe_allergen_safe (recipes.py:225), under the handler's call at :150'. Build the bench's function list from the same members as BY MOMENT.",
+    "item": "L-13",
+    "pattern": "call-site-of-the-root-not-the-caller"
+   },
+   {
+    "id": "N3-25",
+    "where": "GET /recipes \u00b7 Gates and decisions \u00b7 fail moments \u00b7 guards 'taste \u2192 400' (recipes.py:431) and 'taste_max \u2192 400' (:521); head 'guards 16'",
+    "what": "The condition shown is the enclosing if, not what refuses.",
+    "evidence": "The 400 is raised inside except ValueError when int(raw_min) or int(raw_max) fails (recipes.py:428-434, 518-524), and the catch chip is drawn in the same cell. The feed precondition's pred is just 'taste' / 'taste_max'. True: 14 own checks, plus 2 raises inside the two catches.",
+    "severity": "minor",
+    "fix": "Fold these two into their catches ('except ValueError: the threshold is not an integer \u2192 400'), or give them that condition.",
+    "item": "L-10",
+    "pattern": "enclosing-if-shown-as-condition"
+   },
+   {
+    "id": "N3-26",
+    "where": "BY MOMENT \u00b7 Functions \u00b7 assert_recipe_allergen_safe and start_session hovers 'the answer it becomes is not known'; head 'deciders 3' \u00b7 POST /cooking/sessions",
+    "what": "The page says the ending is unknown although it draws the catch that makes it.",
+    "evidence": "The same table draws 'except AllergenConflictError \u2192 403' (cooking.py:159) and 'except SessionNotFoundError \u2192 404' (:155). AllergenConflictError is raised at recipes.py:234 and SessionNotFoundError at services/cooking.py:129. Joined by class name, deciders is 4 (assert_recipe_allergen_safe included). This is the feed gap D-069 left in place.",
+    "severity": "minor",
+    "fix": "Join a raise to the handler's own except that names its class, marking the join 'by class name'. Recount deciders.",
+    "item": "L-13",
+    "pattern": "join-available-on-the-page"
+   }
+  ],
+  "pictures": [
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/meta-post-cooking-sessions.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/meta-get-recipes.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/meta-get-cooking-active.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/band-post-cooking-sessions.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-post-cooking-sessions-proof.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-post-cooking-sessions-gate.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-post-cooking-sessions-data.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-post-cooking-sessions-datamap.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-post-cooking-sessions-fn.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-post-cooking-sessions-inf.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-post-cooking-sessions-stage.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-get-recipes-proof.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-get-recipes-gate.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-get-recipes-data.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/row-get-cooking-active-proof.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/bench-post-cooking-sessions-test-C267.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/bench-post-cooking-sessions-test-C250.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/bench-post-cooking-sessions-test-C225.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/bench-post-cooking-sessions-gate-10b6b2a3ba.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/bench-post-cooking-sessions-gate-18e726cdeb.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens3/bench-post-cooking-sessions-fn-start_session.png"
+  ]
+ },
+ {
+  "lens": "LENS 4: the standing rules (D-017 \u00b7 one hover per item D-067 \u00b7 D-052 \u00b7 D-025.2 \u00b7 D-025.3 \u00b7 the 12px floor \u00b7 words, D-018) checked on the round's new surfaces. Page: all-endpoints.html?ep=post-cooking-sessions (checked with DELETE /me for catches). Evidence comes from 4 headless runs under heavy.lock, 0 page errors (review/lens4/collect.json, probe2-4.json), and from reading _ae_io/_ae_els/_ae_rel/_ae_bench.py, _ae-bench.js, the template and the words file.",
+  "verdicts": [
+   {
+    "item": "(1) D-017: hovers that talk about the page or the map",
+    "verdict": "partly",
+    "remains": "30 measured = 22 THE GAPS status lines + 1 gaps 'my reading' + 5 bench 'whose look' chips (these 28 are legitimate: their subject is the map or a pick) + 1 'what BY MOMENT carries' option ('found by its key \u2026 found by its name': trim that clause) + 1 BY MOMENT Gates-row legend ('My proposal: the station draws no node for this', on 5 lines: must go). The regex misses more on the new surfaces: 'not recorded' on 5 journey chips and the client 'any other status' chip; the metadata's 'the Gabe Universe draws/names', 'report not read' and 'the form check found'."
+   },
+   {
+    "item": "(2) one hover per item: 621 nested targets, 45 native titles",
+    "verdict": "partly",
+    "remains": "Nested, by section: other 173 (139 histogram bins in the pinned head copy, 33 cells in the pinned row, 1 id) \u00b7 sec-board 139 (bins in column heads) \u00b7 sec-one 236 (114 code-map items in a field, 38 status chips inside endings-table rows, 33 value cells inside a field, 22 stage chips, 7 'shared code' chips inside endings rows, 13 options or buttons) \u00b7 sec-mo 73 (29 row-head columns, 15 \u00d7 buttons, 9 row-option buttons, 9 station glyphs + 7 role labels inside the new gate host heads, 4 fork brackets) \u00b7 sec-ex 0. Breaking the rule: the 16 glyph and role hovers inside host heads, the 38+7+1 chips inside endings-table rows, and the 33 value cells that repeat their field's meaning. Legitimate: the bins, row-head columns, fork brackets and controls, which are distinct items or controls. All 45 titles are in the universe column: 23 entity faces, 11 identical 'In the Gabe Universe this arrow\u2026', 6 test chips, 5 'inferred \u2014 a graft-call / web-bridge floor' or 'structural \u2014 an exact archmap / FK join'. The last 5 are map talk in a second hover system."
+   },
+   {
+    "item": "(3) D-052 glyph + kind colour + subcategory on new elements",
+    "verdict": "partly",
+    "remains": "The data map's nodes and rules, the gate hosts and the in-flight chips comply. Four gaps: CORSMiddleware and IdempotencyMiddleware in Stages and order wear no middleware glyph; the bench names an endpoint (hook 'request') and a middleware (in-flight 'set by') with generic link or arrow icons; the bench's test-chain list names functions and tables as bare text; the test glyph appears on the bench but not on BY MOMENT's proof chips, and the Proof legend does not say it is the page's own mark. Lifeline dots, caps and data-map links are marks, not elements, and are right to be bare."
+   },
+   {
+    "item": "(4) D-025.2: choices made alone as options, pick dashed and default, carried in copy",
+    "verdict": "partly",
+    "remains": "Every visible option group has one pick, and it is the default on a fresh load. Missing from the copy text: the bench's 'the columns' and 'the element lit', the display mode of the five my-pick kinds, the glyph colour of schema and function, and the role filter. Choices made alone with no option: the bench hover's form and labels, the bench's single gate icon, orange for writes where his words said red (D-070), and the in-flight fold. 'The lab's look' has a solid border, so it reads as ruled."
+   },
+   {
+    "item": "(5) D-025.3: numbers in authored words are {tokens}",
+    "verdict": "partly",
+    "remains": "The new Python and JS put no sentences with typed numbers on the page (the build line goes to stdout only). Three leaks remain. The lab's part notes lifted into bench hovers are never swept ('ringed red over the 50-line flag'). The bench race line types '500' and was bent to 'first requests' to get past the number-word sweep. The test chain types step markers '1' and '2'."
+   },
+   {
+    "item": "(6) 12px floor on the new surfaces",
+    "verdict": "not",
+    "remains": "BY MOMENT, the data map, the lifelines and the metadata have 0 text under 12px. The bench draws 21 texts at 11px, and only the table's 2 (rw 11, count 11) are his ruled DATA line. The size slider lets 'glyph' parts (status, stage, count, role, result, lifetime) go down to 9px."
+   },
+   {
+    "item": "(7) D-018 banned words and one term per concept",
+    "verdict": "partly",
+    "remains": "door/lock: none in the drawn text, hovers or titles for this endpoint. One term per concept is broken in 9 places: in-flight kinds (2 vocabularies), lifetime (\u22656 phrasings), own check (5 names), fork (4), hover parts (before\u00b7checks\u00b7gives vs in\u00b7does\u00b7out), reply vs answer, the race (retry vs second request vs sent at once), 'model' as the kind-colour word, and 'stations' for stages. Two labels are false: the bench's 'catch that translates' on 19 catches that do not translate, and its gate 'role' part defined as 'At which level it decides'."
+   },
+   {
+    "item": "L-01 (repeated static text as hover)",
+    "verdict": "partly",
+    "remains": "BY MOMENT chips are fixed. The new metadata block puts one static tail on 25 of 27 hovers. Bench controls repeat the same hover 8\u201324 times, and BY MOMENT's \u00d7 does 15 times."
+   },
+   {
+    "item": "L-02 (one hover per item)",
+    "verdict": "partly",
+    "remains": "The new D-069 gate host heads bring back a separate hover for the glyph and for the role label."
+   },
+   {
+    "item": "L-03 (twins read the same)",
+    "verdict": "partly",
+    "remains": "The chips are fixed. The six metadata alarm chips have byte-identical hovers. The rate-limiter lifeline dot shows '429 429' with the same words twice."
+   },
+   {
+    "item": "L-22 (in \u2192 process \u2192 out hover)",
+    "verdict": "partly",
+    "remains": "Built on both surfaces, but with different labels, and the bench ignores the page's hover-form option."
+   }
+  ],
+  "findings": [
+   {
+    "id": "S4-01",
+    "where": "EXAMPLES \u00b7 gate or decision column \u00b7 role filter 'catch that translates' and the block's role chip \u00b7 e.g. DELETE /me, except Exception at api/setup.py:248",
+    "what": "Every catch is labelled 'catch that translates', including catches that swallow the error or let it pass. A reader believes the error becomes an ending when it does not.",
+    "evidence": "forms.json has 142 translate, 12 pass-through and 7 swallow catches. On DELETE /me the bench block reads 'except Exception \u00b7 catch that translates \u00b7 delete_me CALL', and its own hover title says 'gate or decision \u00b7 catch that translates' but ends 'OUT its effect is not an ending'. BY MOMENT's chip for the same catch says 'goes on'. _ae_bench.py always gives role 'catch'. The words file defines it: roles.gate.catch 'catch that translates' / 'Catches an error a call raised and turns it into an ending.'",
+    "severity": "misleading",
+    "fix": "Take the role word from the catch's outcome (translate \u00b7 pass-through \u00b7 swallow) with 'catch' as the family, or name the role 'catch' and put the outcome at the chip's end as BY MOMENT's R1 does.",
+    "item": "L-11",
+    "pattern": "role name asserts the common case"
+   },
+   {
+    "id": "S4-02",
+    "where": "EXAMPLES \u00b7 gate or decision column \u00b7 the 'role' part (its hover under 'parts') and the role chip on every gate block",
+    "what": "The part's definition says it shows the level the gate decides at, but it shows the gate's kind. BY MOMENT uses 'role' for the level (app-wide \u00b7 at login \u00b7 in the handler \u00b7 inside a call), so one word names two different axes.",
+    "evidence": "words ex.parts.gate.role.plain = 'At which level it decides.' The chip draws xRoleName('gate', it.role), i.e. 'rate limiter', 'field rule', 'check one call down'. BY MOMENT's grl pick 'where' labels the same gates 'app-wide', 'at login', 'inside a call'.",
+    "severity": "misleading",
+    "fix": "Rename the bench part 'kind' and define it 'what sort of gate it is'. Add a separate 'where it decides' part that reads the same gl value as BY MOMENT's label.",
+    "item": "L-11",
+    "pattern": "one word, two axes"
+   },
+   {
+    "id": "S4-03",
+    "where": "BY MOMENT \u00b7 In-flight state \u00b7 the row name's legend hover",
+    "what": "The row's definition says its values live only while the request runs, directly under a question and a head that count values the server keeps.",
+    "evidence": "Hover: 'What does the request carry while it runs, and how long does each value live: until the answer is sent, or as long as the server runs?' then 'The values that stay alive only while the request runs.' The row head shows 'request 3 \u00b7 server 7', and the fold chip 'rate limiter \u00b7 7' is marked 'server'. The second line is lifted unchanged from the lab's section words.",
+    "severity": "misleading",
+    "fix": "Drop the lifted lab sentence from this row's legend, or reword it in the words file: 'the values the request reads while it runs \u2014 its own, and the ones the server keeps'.",
+    "item": "L-17",
+    "pattern": "lifted definition contradicts the row"
+   },
+   {
+    "id": "S4-04",
+    "where": "EXAMPLES \u00b7 the 'whose look' chip on the schema and function columns ('the lab's look')",
+    "what": "A look nobody ruled is drawn with a solid border. The page's own key says only a dashed border marks a look he has not ruled, so these unruled looks read as settled.",
+    "evidence": "_ae-bench.css: .exwho has a solid border, [data-whose=mine] is dashed and [data-whose=his] is accent. The pick key hover says 'A dashed border marks my pick on a rail you have not ruled. The rails without a dash start where you set them.' D-071 says the schema and function looks are the lab's SCHCFG/FNCFG, 'not ruled'.",
+    "severity": "misleading",
+    "fix": "Dash 'the lab's look' like 'my pick' (booting on the lab's look was the agent's choice), or give it a third, legend-explained mark. Never draw it solid.",
+    "item": "L-23",
+    "pattern": "unruled drawn as ruled"
+   },
+   {
+    "id": "S4-05",
+    "where": "EXAMPLES \u00b7 copy line of ending, test, gate, client hook and in-flight columns (size \u2192 'shown as') and of schema and function (colour \u2192 'glyph colour')",
+    "what": "After he changes a part's display mode or the glyph colour, the copy line still describes the default look, labelled '(your choice)'. What he pastes back does not carry what he chose.",
+    "evidence": "Probe: setting end.count to 'words' changes only the tail to '(your choice)'; the line still reads '\u2026count on\u2026'. Setting the function's glyph colour to ink leaves '(glyph on, \u2026)'. _ae-bench.js xBlockLine writes a mode only when EX.parts[k] (the three lab kinds) and writes iconCol only for the table and my-pick kinds.",
+    "severity": "misleading",
+    "fix": "In xBlockLine, write '<part> <mode>' for every part that has a mode on any kind, and write iconCol for every kind. Add a check that the copy line differs whenever the look differs.",
+    "item": "L-23",
+    "pattern": "copy line drops a choice"
+   },
+   {
+    "id": "S4-06",
+    "where": "EXAMPLES \u00b7 bar options 'the columns' (one row \u00b7 wrapped rows \u00b7 upper and lower row) and 'the element lit' (follow it \u00b7 stay), plus each column's role filter",
+    "what": "These options never reach the copy text, so his pick of a bench layout cannot be pasted back (D-025.2).",
+    "evidence": "Probe: clicking 'wrapped rows', then 'stay', then role 'catch' left #out unchanged each time (layChanged false, followChanged false, roleChanged false). writeOut's lines have no ex lay/follow. exLines() \u2192 xCopy has scope and element, not role.",
+    "severity": "costly",
+    "fix": "Add 'examples \u00b7 the columns: \u2026 (pick/his)' and 'examples \u00b7 the element lit: \u2026' through optLine(XW.opt.lay/follow), and the role filter on each kind's line while one is set.",
+    "item": "L-23",
+    "pattern": "option not in copy text"
+   },
+   {
+    "id": "S4-07",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 the new function or middleware host heads (RateLimitMiddleware, get_auth_context, build_auth_context, post_start_session, \u2026) and one client host (describeStartCookingError)",
+    "what": "Inside the host head, the station glyph and the role label each show a hover of their own, so pointing across one head gives three different cards. This is what D-067 (1) removed from the chips, and it is back on the new heads.",
+    "evidence": "Nested targets: 9 \u00d7 data-tip='sk' inside mgh0 (for example the glyph in 'RateLimitMiddleware' shows 'Middleware (app-wide)', the glyph in describeStartCookingError shows 'Function \u0192') and 7 \u00d7 data-tip='vc' role labels ('caller' \u2192 'function role caller \u00b7 function role / orchestrates \u2014 calls other functions, no store of its own'). The head's own hover is only 'RateLimitMiddleware \u00b7 middleware'.",
+    "severity": "costly",
+    "fix": "Strip data-tip from the .skg and .vc inside a host head (as xBlock does on the bench) and put the head's own facts in its one hover: where it runs and what it decides. The kind's and role's meaning belongs in the row legend.",
+    "item": "L-02",
+    "pattern": "nested hover returns on a new element"
+   },
+   {
+    "id": "S4-08",
+    "where": "ONE ENDPOINT \u00b7 code map \u00b7 the endings table rows (and the 'headers per ending' line)",
+    "what": "An endings-table row is meant to be one hover (D-067 (6)), but its status chip and its 'shared code' chip hover separately, with kind definitions.",
+    "evidence": "38 \u00d7 a '429'/'401'\u2026 chip inside an erow shows '429 \u00b7 exit status / 429 \u00b7 a client error status \u00b7 not declared \u00b7 sends Retry-After'. 7 \u00d7 'shared code' inside an erow shows 'Decided by code the endpoint shares with others, not by a check of its own.' (the same words every time). 1 \u00d7 get_auth_context sits inside 'shared code' inside the row, three hovers deep. 3 more status chips sit inside the headers line.",
+    "severity": "costly",
+    "fix": "Drop data-tip on vc-status and .shd inside .erow and .hdl, and fold 'not declared' and 'sends Retry-After' into the row's one hover. Kind meanings go to the legend.",
+    "item": "L-02",
+    "pattern": "nested hover returns on a new element"
+   },
+   {
+    "id": "S4-09",
+    "where": "BY MOMENT \u00b7 endpoint metadata \u00b7 the six alarm chips (race-500 \u00b7 reason-collapsed \u00b7 reason-lost \u00b7 shared-status \u00b7 text-only \u00b7 undeclared) and all 27 metadata items",
+    "what": "All six alarms show one identical hover, so a reader cannot tell what any alarm means for this endpoint. 25 of 27 metadata hovers also end with the same paragraph about the section.",
+    "evidence": "6\u00d7 byte-identical text: 'An anomaly the form check found; the facts it reads stand at their moments.' followed by 'Facts with no moment: what the endpoint is and what sums it up, one card per block. Each is true of every path, so the path row never hides it; and, on Proof's card, the journeys\u2026'. The build's twin check covers only items at a moment, not the metadata.",
+    "severity": "costly",
+    "fix": "Give each alarm its own line from the feed (what it found on this endpoint: the status it shares, the reason lost, the unique key). Move the section paragraph to the metadata head's hover. Extend _ae_io.twins to the metadata cards.",
+    "item": "L-03",
+    "pattern": "twins outside the twin check"
+   },
+   {
+    "id": "S4-10",
+    "where": "BY MOMENT \u00b7 In-flight state \u00b7 the rate-limiter lane's read dot at the edge",
+    "what": "The dot shows '429 429', and its hover repeats the same words twice. The two 429s (sensitive and global) that L-03 separated look identical again on the new lifeline.",
+    "evidence": "Dot text '429429'. Hover: 'can end the request with 429 Rate limit exceeded. Try again shortly. \u00b7 429 Rate limit exceeded. Try again shortly.' The chips name them 'sensitive 20/60s \u2192 429' and 'global 120/60s \u2192 429'.",
+    "severity": "costly",
+    "fix": "Label each decided ending on a dot as the chips do (limiter name \u00b7 status), and fill C2.il.decides with the ending's distinguishing words, not only its detail.",
+    "item": "L-03",
+    "pattern": "twins outside the twin check"
+   },
+   {
+    "id": "S4-11",
+    "where": "BY MOMENT \u00b7 Gates and decisions \u00b7 the row name's legend, 'kind of gate' lines",
+    "what": "Five legend lines say where the page got the gate icon ('My proposal: the station draws no node for this.'). This is the page talking about itself, which D-067 (5) forbids. It is the one sec-mo pageTalk hit.",
+    "evidence": "Legend: 'kind of gate \u2014 It counts a caller's requests over a window\u2026 My proposal: the station draws no node for this. 2 here' (and the same for switch, catch, check, fork). Source: words enc.fam.gdk.vals.*.plain.",
+    "severity": "minor",
+    "fix": "Delete the 'My proposal: the station draws no node for this.' sentence from the five gdk plains. The option's own hover (gic, dashed) already says the icons are a pick.",
+    "item": "L-01",
+    "pattern": "legend says where the look came from"
+   },
+   {
+    "id": "S4-12",
+    "where": "BY MOMENT \u00b7 Proof \u00b7 journey chips (C250 2 steps before, C1087\u2026, C555\u2026) \u00b7 Client \u00b7 'any other status' chip \u00b7 endpoint metadata \u00b7 'cluster', the e2e journeys ('11 case(s) e2e')",
+    "what": "Hovers on the new surfaces still describe what the map did not record rather than what the code does. The regex misses them.",
+    "evidence": "Journey chips: 'On each path to that ending: which one this request takes is not recorded.' (\u00d75) \u00b7 client: 'what the code does then is not recorded' \u00b7 cluster: 'The group of endpoints the Gabe Universe draws it in' \u00b7 e2e journeys: 'report not read \u2026 Only the pytest report is read \u2026 A journey the Gabe Universe names for this endpoint\u2026'. The bench states the same fact as a fact about the test: 'not known from the test: which of the n ways to 201 it takes'.",
+    "severity": "minor",
+    "fix": "Restate each as the code or test fact ('the test does not show which way it takes'; 'no branch of describeStartCookingError handles it'). Move 'not recorded / not read / the Gabe Universe names' behind the D-017 more-information toggle.",
+    "item": "new",
+    "pattern": "map talk on new surfaces"
+   },
+   {
+    "id": "S4-13",
+    "where": "ONE ENDPOINT \u00b7 the 'what BY MOMENT carries' option (code map, universe and gaps panels)",
+    "what": "An option's hover explains how the page matches items ('found by its key \u2026 found by its name'): mechanism, not what fades.",
+    "evidence": "Hover: 'An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name; \u2026'. It is the measure's first pageTalk example, and 'Code behind' is capitalised mid-sentence.",
+    "severity": "minor",
+    "fix": "Keep 'An item BY MOMENT already draws fades; a row whose items it draws, every one, fades with its title.' Drop the 'found by \u2026' clauses (D-017).",
+    "item": "new",
+    "pattern": "map talk on new surfaces"
+   },
+   {
+    "id": "S4-14",
+    "where": "ONE ENDPOINT \u00b7 universe column (ocol-uni) \u00b7 45 native title= tooltips",
+    "what": "A second hover system is still on the page, and part of it is map jargon or one line repeated 11 times.",
+    "evidence": "All 45 titles are in ocol-uni: 18+5 entity faces, 11 \u00d7 'In the Gabe Universe this arrow opens the piece's own connections.', 6 test chips ('passing \u00b7 test_\u2026_C237'), 3 \u00d7 'inferred \u2014 a graft-call / web-bridge floor (kind-level, not per-edge proof)', 2 \u00d7 'structural \u2014 an exact archmap / FK join'. None sits inside a data-tip.",
+    "severity": "minor",
+    "fix": "Convert the faces and test chips to data-tip (one hover each). Say the arrow's meaning once in the column's legend. Drop or hide the ttag titles (D-017: how the map joined).",
+    "item": "L-01",
+    "pattern": "second hover system"
+   },
+   {
+    "id": "S4-15",
+    "where": "BY MOMENT \u00b7 Stages and order \u00b7 CORSMiddleware and IdempotencyMiddleware chips",
+    "what": "The same kind of element is drawn two ways: these middleware chips wear no station glyph, while RateLimitMiddleware in Gates and decisions wears the station's middleware glyph (D-052). IdempotencyMiddleware also breaks mid-word.",
+    "evidence": "Stage-row picture: plain boxes 'CORSMiddleware' and 'IdempotencyMiddl|eware'. Their hovers read 'CORSMiddleware \u00b7 middleware'. The measure's bare list has stage 2. The gate host head has an .skg with 'Middleware (app-wide)'.",
+    "severity": "costly",
+    "fix": "Give the mw chip (_ae_io kind 'mw') the same xk/station key as the gate host (middleware:<name>) so it draws the middleware glyph, and use moTxt word breaks on the name.",
+    "item": "L-14",
+    "pattern": "same kind, two looks"
+   },
+   {
+    "id": "S4-16",
+    "where": "EXAMPLES \u00b7 gate or decision column (title and every block glyph) vs BY MOMENT's gate icons",
+    "what": "On the bench every gate wears one shield. In BY MOMENT, by his option's pick, the same gates wear a gauge, shield, key, split, reply or sliders, and the 'one icon' option would use a diamond. The same rate limiter has two different icons on one page, and the gate-icons option does not reach the bench.",
+    "evidence": "_ae-bench.js XICO.gate returns XW.icons.gate = 'shield' for all roles. words enc.fam.gdk: l pg:gauge, g pg:shield-check, a key, b pg:split, c pg:reply, w config, one pg:diamond. mo.opt.gic pick 'each'.",
+    "severity": "costly",
+    "fix": "Draw the bench gate glyph from EN.gdk by the gate's kind and follow MS.gic, so one option decides both surfaces.",
+    "item": "L-23",
+    "pattern": "same kind, two looks"
+   },
+   {
+    "id": "S4-17",
+    "where": "EXAMPLES \u00b7 in-flight value column (title icon, 'kind' part, role filter) vs BY MOMENT \u00b7 In-flight state chips and legend",
+    "what": "The same eight in-flight kinds have two vocabularies (and two row marks) on one page, so a value is 'setting at start' in BY MOMENT and 'setting read once' on the bench.",
+    "evidence": "BY MOMENT (enc.fam.ifk): on the request \u00b7 in context \u00b7 from a dependency \u00b7 after the answer \u00b7 built at start \u00b7 setting at start \u00b7 cached. Bench (ex.roles.inf): request state \u00b7 context value \u00b7 dependency value \u00b7 background task \u00b7 built once \u00b7 setting read once \u00b7 cache. The row mark is an hourglass (pg:hourglass); the bench column icon is 'wave'.",
+    "severity": "costly",
+    "fix": "Make ex.roles.inf read EN.ifk names (one source). Give the bench column the row's hourglass.",
+    "item": "L-17",
+    "pattern": "one concept, two vocabularies"
+   },
+   {
+    "id": "S4-18",
+    "where": "BY MOMENT \u00b7 In-flight chips, lane caps and hovers \u00b7 EXAMPLES \u00b7 in-flight 'lifetime' chip and hover",
+    "what": "One fact, how long a value lives, has at least six phrasings. On a chip the kind word and the lifetime word collide, so 'idempotency_key on the request request' reads as a stutter.",
+    "evidence": "Chip end 'request' / 'server'; chip hover 'lasts with the answer' (feed word; the server case is 'lasts with the server process'); lane cap '\u2715 gone once the answer is sent' / '\u27a4 kept by the server for the next request'; legend 'It is gone when the reply is sent'; bench chip 'this request' / 'the server'; bench hover 'goes with the answer' / 'lives with the server'.",
+    "severity": "costly",
+    "fix": "Pick one pair in the words file, e.g. 'until the answer' / 'kept by the server', and use it on the chip, the hover, the cap, the legend and the bench. Drop the feed word from the lasts line.",
+    "item": "L-17",
+    "pattern": "one concept, many phrasings"
+   },
+   {
+    "id": "S4-19",
+    "where": "BY MOMENT \u00b7 Gates and decisions legend, chips and row head \u00b7 EXAMPLES \u00b7 gate roles \u00b7 ONE ENDPOINT \u00b7 code map",
+    "what": "The endpoint's own check has five names and a deciding fork has four, so a reader cannot tell they are the same thing across surfaces.",
+    "evidence": "Own check: 'own guard' (legend kind), 'check' (gdk icon), 'own check' (bench role), 'guards 5' (row head), 'its own checks' (code map). Fork: 'deciding branch' (legend), 'fork' (gdk), 'branch that picks the answer' (bench), 'one of N' / 'forks 2' (bracket and head). Rate limit: 'rate limiter' plus 'rate limit' (gdk), and the plain calls it 'A speed limit'.",
+    "severity": "costly",
+    "fix": "Choose one noun per gate kind (e.g. check \u00b7 fork \u00b7 catch \u00b7 rate limit \u00b7 switch \u00b7 login check) in one words table that the legend, gdk, the bench roles and the row-head columns all read.",
+    "item": "L-11",
+    "pattern": "one concept, many names"
+   },
+   {
+    "id": "S4-20",
+    "where": "BY MOMENT hovers (every chip) vs EXAMPLES block hovers \u00b7 page option 'the hovers' (labelled lines \u00b7 one sentence)",
+    "what": "The three hover parts are labelled BEFORE \u00b7 CHECKS \u00b7 GIVES in BY MOMENT and IN \u00b7 DOES \u00b7 OUT on the bench. The page's hover-form option changes only BY MOMENT, so on the bench both the form and the labels are choices made alone.",
+    "evidence": "Probe: after clicking 'one sentence' (ipo=sent), a BY MOMENT chip reads '\u2026 \u2192 RateLimitMiddleware counts \u2026' but the bench block still reads 'IN not self._sensitive.allow(key, now) / DOES produced at \u2026 / OUT answers 429 \u2026'. words mo.io.parts {before, checks, gives} vs ex.tip {in, does, out}.",
+    "severity": "costly",
+    "fix": "Use one part-label set (his L-22 words: input \u00b7 process \u00b7 output, or before \u00b7 checks \u00b7 gives) for both, and make xTipBlock honour MS.ipo.",
+    "item": "L-22",
+    "pattern": "one concept, two vocabularies"
+   },
+   {
+    "id": "S4-21",
+    "where": "EXAMPLES \u00b7 table column hover 'race' line vs BY MOMENT \u00b7 data map race badge and legend",
+    "what": "The same race is described three incompatible ways: as a retry, as a second request, and as 'first requests sent at once'. The bench line types its status and was bent to get past the number-word sweep.",
+    "evidence": "ex.tip.table.race: 'first requests sent at once with the same key can collide on its unique key and end in a 500' (no {token}; '500' passes the sweep because it looks like a status label). mo.x.racePlain / mo.leg.race: 'a first call and its retry with the same key can both pass the check'. c2.dx.race: 'a second request with the same key breaks {cons} ({cols}) at {at} and ends in {st}'.",
+    "severity": "costly",
+    "fix": "One race sentence in the words file, with {st} and {cols} tokens filled from the table's race facts, reused on the bench and in BY MOMENT, e.g. 'two requests with the same key, close together, can both pass the check; the later one breaks {cons} and ends in {st}' ({n} for the count if 'two' must be a token).",
+    "item": "L-12",
+    "pattern": "sweep-driven contortion"
+   },
+   {
+    "id": "S4-22",
+    "where": "EXAMPLES \u00b7 function column 'size' part hover (lifted from the lab's FNPART note); all lab-lifted part notes, colour words and field-kind plains",
+    "what": "Strings lifted from the lab reach the page without the words sweep, so a typed number in an authored sentence gets through.",
+    "evidence": "Page data D.ex.parts.fn count note: 'how many lines its body runs \u2014 ringed red over the 50-line flag'. gen-all-endpoints.py runs sweep(W) on the words file only, while _ae_bench.lift() injects BKPART/SCHPART/FNPART notes, BKICOL words and TYPEC plains unswept.",
+    "severity": "minor",
+    "fix": "Run sweep() over lk['parts'], lk['icol'] and lk['sq'] inside bench(). Replace the 50 with a token filled from the god-function threshold the feed uses.",
+    "item": "L-23",
+    "pattern": "lifted words bypass the sweep"
+   },
+   {
+    "id": "S4-23",
+    "where": "EXAMPLES \u00b7 test column \u00b7 the opened list 'what the test runs through, in order'",
+    "what": "Step markers '1' and '2' are typed in code, the other steps use symbols, and the step number sits in front of a count ('2 checks it passes \u00b7 3'). The list above also numbers requests 1..n, so '1' means two different things.",
+    "evidence": "_ae-bench.js xTestChain: el('span','exk','1') then CH.request; el('span','exk','2') then CH.checks + ' \u00b7 ' + gates.length; later steps use '\u2192', '\u0192', '\u25a4', '~', '\u25a0'. The requests list above uses String(i + 1).",
+    "severity": "minor",
+    "fix": "Use symbols for every chain step (or number them all from one counter), and put the count in its own badge.",
+    "item": "L-08",
+    "pattern": "typed ordinal in code"
+   },
+   {
+    "id": "S4-24",
+    "where": "EXAMPLES \u00b7 the my-pick blocks of every column (status, stage, count badge, role chip, result, endings, headers, lifetime) and the schema/function chips",
+    "what": "The bench draws its own parts below the 12px floor. Only the table's 11px parts are his ruled DATA line; the rest are the agent's or the lab's unruled sizes. The size slider allows these text parts down to 9px.",
+    "evidence": "21 texts at 11px in #exgrid: '429', 'EDGE', '201', 'pass', 'tests it', 'Authorization', 'Idempotency-Key', 'rate limiter', 'fetcher', 'the server', 'IN', 'CALL', count badges. MINE sizes status/stage/count/role/state/proves/sends/life = 11. XTEXT omits status, stage, count, role, state, life and proves, so xRange's minimum is 9. 'sends' defaults to 11 although XTEXT sets its minimum at 12. BY MOMENT, data map and lifelines: 0 texts under 12px. The picture also shows chips cut: 'the serv', 'sensiti\u2026'.",
+    "severity": "costly",
+    "fix": "Set the my-pick defaults to 12. Treat every part that renders text as text in xCtl (minimum 12), keeping 9 only for pure glyphs. Leave the table at his ruled 11 but name that exception in the column's 'whose look' hover.",
+    "item": "L-23",
+    "pattern": "floor overridden for look-sized text"
+   },
+   {
+    "id": "S4-25",
+    "where": "EXAMPLES \u00b7 copy line of ending, test, gate, hook and in-flight ('glyph on model') \u00b7 'glyph colour' picker words on non-table columns",
+    "what": "'model' is the word for 'this kind's own colour', so an ending's or test's copy line reads 'glyph on model' and the picker offers 'the model colour' for a function or gate. Both read as the Model kind's colour.",
+    "evidence": "Copy: 'examples \u00b7 ending \u00b7 429 \u2026 (glyph on model, chip on, words on \u2026)'. The icol words, lifted from the table's BKICOL: model 'the model colour' \u2014 'one colour for every table \u2014 the graph's own colour for a model', shown on every column.",
+    "severity": "costly",
+    "fix": "Rename the iconCol value 'kind' (keeping 'model' only for the table, where his DATA line says it) and add kind-neutral picker words.",
+    "item": "L-23",
+    "pattern": "table word generalised to every kind"
+   },
+   {
+    "id": "S4-26",
+    "where": "EXAMPLES \u00b7 copy line vs the controls under each block",
+    "what": "The copy line names parts with three vocabularies: the controls' words, separate copy words, and raw keys. What he reads in 'parts' does not match what he pastes back.",
+    "evidence": "Ending: the control chips say 'status', 'ways', 'where'; the copy says 'chip on', 'count on', 'where on'; the lines and sizes use keys 'icon status | stage / name | count / via'. The in-flight line has 'ikind', and the hook line has 'fkind' and 'sends' for the part the controls call 'request'. The test line has 'cid'.",
+    "severity": "minor",
+    "fix": "Write the copy line with the part names the controls show (XW.parts[k][p].name) everywhere, keys only in a trailing machine segment if the lab needs them.",
+    "item": "L-23",
+    "pattern": "one concept, many names"
+   },
+   {
+    "id": "S4-27",
+    "where": "EXAMPLES \u00b7 schema column roles ('answer', 'inside the answer') and faces vs BY MOMENT \u00b7 Structures ('reply') and the pinned-row head 'reply 18'",
+    "what": "The response body is called 'reply' in BY MOMENT and the table, but 'answer' on the bench.",
+    "evidence": "mo.io.k.reply name 'reply'; the row head says 'reply 18 \u00b7 fields in the body a success answers with'; ex.roles.schema.out 'answer' and ex.face.reply 'answer'; the EN.life plain says 'gone when the reply is sent' while the lane cap says 'once the answer is sent'.",
+    "severity": "minor",
+    "fix": "Pick 'reply' for the response body (the table's and BY MOMENT's word) and keep 'answer' for the whole response, or the reverse, in one words table.",
+    "item": "new",
+    "pattern": "one concept, two vocabularies"
+   },
+   {
+    "id": "S4-28",
+    "where": "BY MOMENT \u00b7 Stages and order \u00b7 the row name's legend hover",
+    "what": "The stages a request passes are called 'stations', while 'the station' on this page always means the Gabe Universe (glyphs, 'the station draws no node').",
+    "evidence": "Legend: 'Stages and order \u2014 The stations a request passes, and the order in which things run.' (lifted from the lab's section words in _lab-ep.js, outside the words file). D-001 and the band call them stages; words station.*, gdk plains and the universe column use 'the station' for the Gabe Universe.",
+    "severity": "minor",
+    "fix": "Override the lifted plain in the words file: 'The stages a request passes, and the order in which things run.'",
+    "item": "new",
+    "pattern": "one word, two meanings"
+   },
+   {
+    "id": "S4-29",
+    "where": "BY MOMENT \u00b7 Data effects map (option 'data effects', dfx) \u00b7 read and write line colours",
+    "what": "He asked for writes in red. The agent drew them orange, and no option offers his red, so a choice made alone against his words is not switchable (D-025.2).",
+    "evidence": "D-070: 'His colours, read as \"write red, read green\": the page's own read green and write orange'. dfx plain: 'A green line reads, an orange line writes'. No option in mo.opt.dfx or elsewhere switches to red.",
+    "severity": "costly",
+    "fix": "Add a 'write colour' option (his red \u00b7 the page's orange, the orange dashed as my pick) to the Data effects row's options slot and carry it in the copy text.",
+    "item": "L-12",
+    "pattern": "choice made alone, not an option"
+   },
+   {
+    "id": "S4-30",
+    "where": "Page-wide \u00b7 dashed borders: the pick key, the bench's drop zones, the lifetime 'unknown' outline",
+    "what": "'Dashed' is the page's sign for 'my pick', but it is also drawn on the bench's part drop zones and on in-flight values whose lifetime is unknown. A reader cannot rely on the pick key.",
+    "evidence": "Pick-key hover: 'A dashed border marks my pick on a rail you have not ruled.' _ae-bench.css: .exz { border: 1px dashed var(--rule) } and .exctl border-top dashed. D-069 (7): 'an unknown one dashed' (the .milg.u lane and chip), with 0 unknown on gustify but present on other twins.",
+    "severity": "minor",
+    "fix": "Keep dashed for 'my pick' only: draw drop zones with a dotted or tinted ground and the unknown lifetime with a gap or '?' mark, and say both in their legends.",
+    "item": "new",
+    "pattern": "overloaded mark"
+   },
+   {
+    "id": "S4-31",
+    "where": "EXAMPLES \u00b7 client hook 'request' part \u00b7 in-flight 'set by' part \u00b7 test and function lists (functions it runs, tables it touches, calls)",
+    "what": "Station elements named inside the bench (an endpoint, a middleware, functions, tables) appear as bare text or with a generic icon instead of their glyph, kind colour and subcategory (D-052).",
+    "evidence": "Hook: xMeta('up', 'POST /api/v1/cooking/sessions') draws an arrow, not the endpoint glyph with its method label. In-flight: xMeta('link', 'RateLimitMiddleware.__init__ \u00b7') draws a link icon, not the middleware glyph. xTestChain's 'functions it runs' joins bare names with ' \u00b7 '. The function block's 'calls' rows use a '\u0192' character.",
+    "severity": "minor",
+    "fix": "Use xStation(key) (as xFnRef does) for endpoints, middleware, functions and tables named inside a block or its list.",
+    "item": "L-14",
+    "pattern": "named element without its glyph"
+   },
+   {
+    "id": "S4-32",
+    "where": "BY MOMENT \u00b7 Proof \u00b7 test-case and journey chips vs EXAMPLES \u00b7 test column",
+    "what": "A test wears the page's test glyph on the bench and no glyph at all in BY MOMENT's Proof row, and the Proof legend does not say the station draws no node for a test (D-052's 'says so').",
+    "evidence": "Measure bare: proof 19 (e.g. 'C237 proves 400', 'C250 2 steps before'). The bench block has an svg 'test' glyph in the read-green colour. The Proof row legend lists 'journey' and 'test case' kinds with no mark note.",
+    "severity": "minor",
+    "fix": "Draw the bench's test glyph on BY MOMENT's case and journey chips, or neither, and add one legend line: 'a test is the page's own mark \u2014 the Gabe Universe draws no node for it'.",
+    "item": "L-08",
+    "pattern": "same kind, two looks"
+   },
+   {
+    "id": "S4-33",
+    "where": "EXAMPLES \u00b7 per-column control hovers (parts \u00b7 size \u00b7 colour \u00b7 back to the default \u00b7 copy \u00b7 this endpoint \u00b7 every endpoint) \u00b7 BY MOMENT \u00b7 the \u00d7 on every moment head",
+    "what": "The same control hover repeats in every column and on every head: the static-text-as-hover pattern he named in L-01, now on the new controls.",
+    "evidence": "'Opens this group of controls; the others close.' \u00d724; 'this endpoint \u00b7 my pick / The elements of the endpoint the table has open.' \u00d78; 'every endpoint \u2026' \u00d78; 'Puts this block back on its default look.' \u00d78; 'Copy this block's settings as one line\u2026' \u00d78; 'Hide this moment; the bar keeps it, to bring it back.' \u00d715.",
+    "severity": "minor",
+    "fix": "Say each control's meaning once in the section's info line (ex.how or mo.how) and leave the controls with their label only, or with a hover that names the column or moment it acts on.",
+    "item": "L-01",
+    "pattern": "static text as repeated hover"
+   }
+  ],
+  "pictures": [
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens4/pics/bench.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens4/pics/gate-swallow.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens4/pics/stage-row.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens4/pics/inflight-row.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens4/pics/proof-row.png",
+   "/tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/review/lens4/pics/datamap.png"
+  ]
+ }
+]
