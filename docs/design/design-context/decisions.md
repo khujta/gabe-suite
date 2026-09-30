@@ -853,3 +853,20 @@ the ordered steps in its hover (the agent's pick, dashed) · every step as its o
 column's Proof cell names the journeys that cannot be ordered — the web/e2e groups the tests arm does not read, and tests with no
 recorded walk — each with the reason. The D-055 evaluation row "journeys · not needed" is superseded for the pytest journeys.
 Page-only: D-037's light checks. Reading the web/e2e reports is generation work, left for later.
+
+## D-066 — His human-reader feedback on the all-endpoints page: fix each item, and name the pattern behind it
+Date: 2026-09-30 · Input: his message at the handoff, and his dictated note "API Hover Legend Consolidation" (Wispr Flow,
+2026-09-30), read on POST /cooking/sessions, BY MOMENT.
+Decision, his: "I took my time to look at it as a human, and I ended up having a lot of feedback about it. The idea is to take
+that feedback and work on it, but also identify the patterns, because we reach a point where we created all these endpoints
+screens. Probably, for you as a model or machine reading all this information, it was there and well contextualized. … there
+are a lot of things that were not obvious for the human reading this. Those things I would like to carry over later to identify
+the patterns, so that we try to avoid that in the future. I don't expect that to be perfect, but we can build towards it,
+including some of it in the GABE SUITE".
+Consequence: every item of the note is logged in `legibility-feedback.md` BEFORE it is fixed — his words verbatim, where on the
+page, what a human could not tell, the fix, a pattern tag named from that item's evidence, a status (round 1: 23 items, L-01 …
+L-23). Each item is fixed under D-037's light checks; each ruling the note makes goes into this file in the commit that acts on
+it (D-025.5); a representation he asks for is built as options with the agent's pick dashed (D-025.2). When the items are
+worked, the tags are grouped into patterns — count, example items, why it was clear to the model and not to him — each with a
+proposal for how the suite could catch or prevent it, shown on a generated page (D-025.8). Carrying a pattern into the suite is
+a meta change: drafted, and nothing lands before his "land it".
