@@ -402,7 +402,8 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   const set0 = a0.blk.filter(isSet);
   // CHANGED 2026-09-28 (D-065): BY MOMENT's journeys look adds its line after BY MOMENT's two looks — nine lines now
   // CHANGED 2026-09-30 (D-067): BY MOMENT's legend place and its hovers' form add theirs after the journeys' — eleven lines now
-  ok(el0.length === 1 && set0.length === 11 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-12)) === JSON.stringify([el0[0]].concat(set0)),
+  // CHANGED 2026-09-30 (D-068): its header, saving's stage, the metadata's place, a head's click and fit add theirs after those — sixteen
+  ok(el0.length === 1 && set0.length === 16 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-17)) === JSON.stringify([el0[0]].concat(set0)),
     'the copy text adds the endpoint shown, then the code map\'s and BY MOMENT\'s settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -1254,11 +1255,13 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
     // order, which is time order in both looks; a head's lines are its hover's now (data-lines)
     rows: [...t.querySelectorAll('th.mom')].map((h) => [h.getAttribute('data-mom'), h.getAttribute('data-lines')]),
     /* CHANGED 2026-09-26 (D-057): the Endings head holds an info line behind the toggle — a head's name is its text less that line */
-    heads: [...t.querySelectorAll('th[data-block]')].map((h) => [...h.childNodes].filter((q) => !(q.classList && q.classList.contains('ainfo'))).map((q) => q.textContent).join('').trim()), bodyRows: t.querySelectorAll('tbody tr').length,
+    /* CHANGED 2026-09-30 (D-068): a row's head holds its name, its options slot and its columns of the pinned row — its name is .mbn */
+    heads: [...t.querySelectorAll('th[data-block]')].map((h) => (h.querySelector('.mbn') || h).textContent.trim()), bodyRows: t.querySelectorAll('tbody tr').length,
     ends: [...t.querySelectorAll('td[data-f="end"]')].map((td) => [...td.querySelectorAll('.vc-status')].map((c) => c.textContent)),
     chips: t.querySelectorAll('.mc').length, counts: t.querySelectorAll('.mcount').length,
-    /* D-064 (2): the last column's head, and its cells (one per block row, or the last row's) */
-    nmh: (t.querySelector('th.monmh') || {}).textContent || null, nmc: t.querySelectorAll('td[data-nm]').length, lastRow: (t.querySelector('tbody tr:last-child') || { getAttribute: () => null }).getAttribute('data-nm'),
+    /* CHANGED 2026-09-30 (D-068): the no-moment column left the table — the endpoint metadata's title and its cards; the table's last row */
+    nmh: (document.querySelector('#mometa > h3') || {}).textContent || null, nmc: document.querySelectorAll('#mometa .mcard').length, lastRow: (t.querySelector('tbody tr:last-child') || { getAttribute: () => null }).getAttribute('data-mom'),
+    stg: [...t.querySelectorAll('thead th.mosb')].map((c) => [c.getAttribute('data-stage'), c.colSpan, (c.querySelector('.mosp') || {}).textContent || null]),
     band: [...document.querySelectorAll('#moband .mbb')].map((b) => [b.getAttribute('data-f'), b.textContent.slice(0, 80)]),
     squares: [...document.querySelectorAll('#mobar .opt[data-mopt]')].map((o) => [o.getAttribute('data-mopt'), o.getAttribute('data-v'), o.getAttribute('aria-checked'), getComputedStyle(o).borderTopStyle, o.getAttribute('data-ruled')]) }; });
   await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' })); await p.waitForTimeout(60);
@@ -1266,14 +1269,15 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   ok(JSON.stringify(rowsW) === JSON.stringify(want14.map((w) => (w[1] ? w : [w[0]]))), 'BY MOMENT · ' + E14 + ' · the moments read top to bottom as the feed has them: before any request, the screen, the edge, the body, the login, the fields, then the handler\'s checks (' + span(chk) + '), the work (' + span(work) + '), the catch (' + span(failL) + '), saving (' + span(save) + '), the answer, after it, escapes', { page: m0.rows, want: want14 });
   /* (c) the columns, the band, the Endings column against the code map's own endings table */
   const byB = {}; Object.entries(D.mo.fam).forEach(([f, b0]) => { byB[b0] = f; }); const ov = D.blocks.find((b0) => byB[b0.key] === 'over');
-  /* CHANGED 2026-09-28 (D-064 (2)): every block is a row, the Overview too — nothing of it acts at a moment, its facts stand in the
-     last column, no moment; the band holds no line of it */
-  const wantHeads = D.orders[D.words.rail.bord.pick].map((k) => D.blocks.find((b0) => b0.key === k).name);
+  /* CHANGED 2026-09-30 (D-068, his L-07): the Overview is no row — nothing of it acts at a moment; its facts stand in the endpoint
+     metadata, one card per block that has any; the band holds no line of it */
+  const wantHeads = D.orders[D.words.rail.bord.pick].filter((k) => !D.mo.untimed.includes(byB[k])).map((k) => D.blocks.find((b0) => b0.key === k).name);
+  const wantCards = new Set(ROW[E14].mo.nm.map((x) => x[0]).concat(Object.keys(D.mo.meta).map((b0) => byB[b0]))).size;
   const cmEnds = await p.$$eval('#ocol-cm .pair[data-k="d:exits"] table.etab tr.erow .vc-status', (cs) => cs.map((c) => c.textContent));
   const failRow = m0.rows.findIndex((r) => r[0] === 'fail'), grp = ROW[E14].xd.exits.map((x, i) => [x, ROW[E14].d.exits.items[i]]).filter(([x]) => typeof x[0] === 'number').map(([, e]) => String(e[2]));
-  ok(JSON.stringify(m0.heads) === JSON.stringify(wantHeads) && !m0.band.some(([f]) => f === 'over') && ov && m0.nmh === MW.nm.name && m0.nmc === wantHeads.length
+  ok(JSON.stringify(m0.heads) === JSON.stringify(wantHeads) && !m0.band.some(([f]) => f === 'over') && ov && m0.nmh === MW.nm.name && m0.nmc === wantCards
      && JSON.stringify(m0.ends.flat()) === JSON.stringify(cmEnds) && JSON.stringify(m0.ends[failRow]) === JSON.stringify(grp) && grp.length === 8,
-    'BY MOMENT · the rows are the blocks in the page\'s order, ' + ov.name + ' among them (D-064 (2): nothing of it at a moment, no line of it in the band), each ending in a "' + MW.nm.name + '" cell; the Endings row is the code map\'s endings in its own order, the catch\'s cell its eight', { heads: m0.heads, want: wantHeads, nmh: m0.nmh, nmc: m0.nmc, ends: m0.ends.flat().length, cm: cmEnds.length, fail: m0.ends[failRow] });
+    'BY MOMENT · the rows are the blocks in the page\'s order, ' + ov.name + ' not among them (D-068: nothing of it at a moment, no line of it in the band), ' + wantCards + ' cards in the "' + MW.nm.name + '"; the Endings row is the code map\'s endings in its own order, the catch\'s cell its eight', { heads: m0.heads, want: wantHeads, nmh: m0.nmh, nmc: m0.nmc, ends: m0.ends.flat().length, cm: cmEnds.length, fail: m0.ends[failRow] });
   /* (d) the path to the 403: the moments its chain passes, recomputed from that chain; fewer chips; the 403 there, no 402 */
   const X403 = (FE.produced || []).find((x) => x.status === 403), P403 = FE.paths.find((q) => q.exit.id === X403.id);
   const PH = { middleware: 'edge', 'body-parse': 'body', security: 'gate', dependency: 'gate', validation: 'fields', handler: 'checks' };
@@ -1300,9 +1304,9 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   ok(tipR.includes(D.words.ruledMark) && !tipR.includes(D.words.pickMark), 'D-055 · BY MOMENT · his default\'s hover says it is his, not my pick', tipR);
   await p.click('#mobar .opt[data-mopt="lay"][data-v="rows"]'); await p.waitForTimeout(80);
   const m3 = await readM();
-  // CHANGED 2026-09-28 (D-064 (2)): the no-moment row closes the table in this look
-  ok(m3.lay === 'rows' && JSON.stringify(m3.rows) === JSON.stringify(m0.rows) && m3.bodyRows === m0.rows.length + 1 && m3.lastRow === 'true' && m3.nmc === m0.heads.length,
-    'BY MOMENT · moments as rows: the moments top to bottom in the same order, a row per moment, the "' + MW.nm.name + '" row last with a cell per block', { moms: m3.rows.length, rows: m3.bodyRows, last: m3.lastRow, nmc: m3.nmc });
+  // CHANGED 2026-09-30 (D-068): no metadata row closes the table in this look — the moments end with the one that escapes; the metadata stands apart, the same cards
+  ok(m3.lay === 'rows' && JSON.stringify(m3.rows) === JSON.stringify(m0.rows) && m3.bodyRows === m0.rows.length && m3.lastRow === 'uncaught' && m3.nmc === m0.nmc,
+    'BY MOMENT · moments as rows: the moments top to bottom in the same order, a row per moment, the last the one that escapes; the "' + MW.nm.name + '" keeps its ' + m0.nmc + ' cards', { moms: m3.rows.length, rows: m3.bodyRows, last: m3.lastRow, nmc: m3.nmc });
   await p.click('#mobar .opt[data-mopt="cell"][data-v="counts"]'); await p.waitForTimeout(80);
   const m4 = await readM();
   ok(m4.cell === 'counts' && !m4.chips && m4.counts > 0, 'BY MOMENT · cells as counts: a number in each cell, no chips', { counts: m4.counts, chips: m4.chips });
@@ -1344,11 +1348,12 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   const p87 = await p.$$eval('#mogrid td[data-f="proof"] .mc', (cs) => cs.filter((c) => /^C87/.test(c.textContent.trim())).map((c) => [...c.querySelectorAll('.vc-status')].map((x) => x.textContent)));
   /* CHANGED 2026-09-28 (D-064 (2)): the Overview left the band — its row holds nothing at a moment, and its no-moment cell draws the
      endpoint (its station glyph and method label); the band's words say what it keeps */
-  const ubox = await p.evaluate((ep) => { const c = document.querySelector('#mogrid tr[data-f="over"] td[data-nm]'), k = c && c.querySelector('.mc[data-keys="endpoint:' + ep + '"]');
-    return { ep: !!k, glyph: !!(k && k.querySelector('.skg')), moments: document.querySelectorAll('#mogrid tr[data-f="over"] td[data-mom] .mc').length, band: !!document.querySelector('#moband .mbb[data-f="over"]'),
+  /* CHANGED 2026-09-30 (D-068): the Overview's card in the endpoint metadata draws the endpoint; the table has no Overview row */
+  const ubox = await p.evaluate((ep) => { const c = document.querySelector('#mometa .mcard[data-f="over"]'), k = c && c.querySelector('.mc[data-keys="endpoint:' + ep + '"]');
+    return { ep: !!k, glyph: !!(k && k.querySelector('.skg')), moments: document.querySelectorAll('#mogrid tr[data-f="over"]').length, band: !!document.querySelector('#moband .mbb[data-f="over"]'),
       title: (document.querySelector('#moband h3') || {}).textContent }; }, E14);
   ok(p87.length === 1 && p87[0].length >= 1 && p87[0].every((x) => x === '502') && ubox.ep && ubox.glyph && ubox.moments === 0 && !ubox.band && ubox.title === MW.band.title,
-    'BY MOMENT · a test proving two endings of one status says it (C87 proves 502); the Overview holds nothing at a moment and draws the endpoint in its "' + MW.nm.name + '" cell; the band, "' + MW.band.title + '", holds no line of it', { p87, ubox });
+    'BY MOMENT · a test proving two endings of one status says it (C87 proves 502); the Overview has no row and draws the endpoint on its card in the "' + MW.nm.name + '"; the band, "' + MW.band.title + '", holds no line of it', { p87, ubox });
   const E16 = 'POST /setup/complete', FE16 = FJ.endpoints['endpoint:' + E16];
   const readMem = (sid) => { const at = new Set(); FE16.paths.forEach((q) => (q.effects.steps || []).forEach((e) => { if (e.step === sid) at.add(e.dependency ? 'gate' : 'handler'); })); return at; };
   const memSid = Object.keys(STEPS).find((k) => STEPS[k].table === 'memberships' && STEPS[k].op === 'read' && /load_household_context$/.test(STEPS[k].fn));
@@ -1439,7 +1444,7 @@ ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
   ok(ftip.includes(momName(fh.si)) && ftip.includes(R.d.exits.moms[0][0]), 'D-055 · a failure head\'s hover holds its full name, the catch\'s place among it', ftip);
   /* (c) the switch */
   await p.$eval('#ocol-cm', (e) => e.scrollIntoView({ block: 'start' })); await p.mouse.move(5, 5); await p.waitForTimeout(60);
-  const readC = () => p.evaluate(() => { const C = document.getElementById('ocol-cm'), mk = new Set([...document.querySelectorAll('#mogrid [data-keys]')].flatMap((e) => e.getAttribute('data-keys').split('\n')));
+  const readC = () => p.evaluate(() => { const C = document.getElementById('ocol-cm'), mk = new Set([...document.querySelectorAll('#mogrid [data-keys], #mometa [data-keys]')].flatMap((e) => e.getAttribute('data-keys').split('\n')));   /* CHANGED 2026-09-30 (D-068): the metadata is BY MOMENT's too */
     /* a path's fate is keyed by its ending's status, not by a member of its own: it is left out of the key join */
     /* CHANGED 2026-09-26 (D-057): an alarm is carried by the facts it reads and the handler's file by its chip's hover — neither is a
        key BY MOMENT's grid draws, so both are left out of the key join too */
@@ -1471,7 +1476,7 @@ ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
      field's column fact read off the grid (its no-moment cell draws it) */
   const six = ['h:entity', 'c:fate', 'c:chain', 'c:alarms', 'd:proof', 'd:arranged'], NMK = { 'h:entity': 'ent', 'c:fate': 'fate', 'c:chain': 'chain', 'c:alarms': 'alarm', 'd:proof': 'proof', 'd:arranged': 'arr' };
   const sixOn = await p.evaluate((six) => six.map((k) => [k, ([...document.querySelectorAll('#ocol-cm .pair[data-k], #ocol-cm [data-sub][data-k]')].find((q) => q.getAttribute('data-k') === k) || { getAttribute: () => null }).getAttribute('data-cvs')]), six);
-  const nmKinds = await p.$$eval('#mogrid td[data-nm] .mc[data-nmk]', (cs) => [...new Set(cs.map((c) => c.getAttribute('data-nmk')))]);
+  const nmKinds = await p.$$eval('#mometa [data-nmk]', (cs) => [...new Set(cs.map((c) => c.getAttribute('data-nmk')))]);   /* CHANGED 2026-09-30 (D-068): the endpoint metadata */
   ok(sixOn.every(([, st]) => st === 'c') && six.every((k) => nmKinds.includes(NMK[k])) && c0.fields - c0.whole - c0.empty === 0
      && c0.count === fillW(CW.count, { covered: c0.fields - c0.empty, fields: c0.fields, left: 0, empty: c0.empty }),
     'D-064 (2) · ' + E + ' · the hide header reads "' + c0.count + '" (was 47 of 56 · 6 left · 3 with nothing here): ' + six.join(' · ') + ' are carried whole, each drawn in the "' + MW.nm.name + '" column', { sixOn, nmKinds });
@@ -1639,7 +1644,7 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
      the case; the case itself stands at no moment, so the journeys' chips are read apart */
   const arrTxt = await p.$eval('#ocol-cm .pair[data-k="d:arranged"] .pk', (e) => e.textContent), inGrid = await p.$$eval('#mogrid td[data-mom] [data-keys]', (cs) => cs.filter((c) => !c.closest('[data-jy]')).flatMap((c) => c.getAttribute('data-keys').split('\n')));
   const moBandP = await p.$$eval('#moband .mbb[data-f="proof"] .mbr', (rs) => rs.map((r) => r.getAttribute('data-why')));
-  const arrCell = await p.$$eval('#mogrid tr[data-f="proof"] td[data-nm] .mc[data-nmk="arr"]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
+  const arrCell = await p.$$eval('#mometa .mcard[data-f="proof"] .mc[data-nmk="arr"]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
   ok(arrTxt === fillW(PW.arranged, { n: arrWant.length }) && JSON.stringify(arrPage) === JSON.stringify(arrWant) && arrWant.every((c) => !inGrid.includes('case:' + c)) && !moBandP.includes('arranged')
      && JSON.stringify(arrCell) === JSON.stringify(arrWant),
     'D-056 (2) · D-064 (2) · ' + E + ' · "' + fillW(PW.arranged, { n: arrWant.length }) + '" names the ' + arrWant.length + ' cases the feed lists (' + arrWant.join(' ') + '); none stands at a moment or in the band — each stands once in Proof\'s "' + D.words.mo.nm.name + '" cell', { arrPage, arrCell, moBandP });
@@ -1647,7 +1652,7 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
      no-moment cell, every one — a case the band holds under another reason (an acting call proving no ending) stands there as its
      acting call, and in the cell as the case that arranges */
   const EB = FEED.find((ep) => ROW[ep].mo.un.some((u) => u[0] === 'proof') && ROW[ep].d.arranged.length);
-  if (EB) { await openEp(EB); const bb = await p.$$eval('#mogrid tr[data-f="proof"] td[data-nm] .mc[data-nmk="arr"]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
+  if (EB) { await openEp(EB); const bb = await p.$$eval('#mometa .mcard[data-f="proof"] .mc[data-nmk="arr"]', (cs) => cs.map((c) => c.getAttribute('data-key').slice(5)));
     const whys = await p.$$eval('#moband .mbb[data-f="proof"] .mbr', (rs) => rs.map((r) => r.getAttribute('data-why')));
     const want2 = ROW[EB].d.arranged.map((x) => x[0]);
     ok(JSON.stringify(bb) === JSON.stringify(want2) && whys.length > 0 && !whys.includes('arranged'), 'D-056 (2) · D-064 (2) · ' + EB + ' · the band keeps Proof\'s unplaced (' + whys.join(', ') + ') and none of its ' + want2.length + ' arranging cases, which stand in the "' + D.words.mo.nm.name + '" cell, each once', { bb, want2, whys });
@@ -2002,12 +2007,12 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
   /* F4 · a flag says its own words; "no test covers this" is left out of the column where a test calls the endpoint */
   const E4 = 'GET /recipes/explore', acts4 = Object.values(FJ.test_cases).reduce((a, t) => a + (t.calls || []).filter((c) => c.endpoint === 'endpoint:' + E4 && c.role === 'act').length, 0);
   const uR4 = (ROW[E4].uni.rows.find((u) => u.row === 'RISK') || { items: [] }).items.map((x) => x[0]), nm4 = ROW[E4].mo.nm.filter((x) => x[1] === 'risk').map((x) => (x[4] || {}).id);
-  await openEp('POST /cooking/sessions'); const tFl = await tipAt('#mogrid td.monm .mc[data-nmk="risk"]');
+  await openEp('POST /cooking/sessions'); const tFl = await tipAt('#mometa .mc[data-nmk="risk"]');
   ok(acts4 > 0 && uR4.includes('untested') && !nm4.includes('untested') && tFl && tFl.includes(NK.risk.ids.conflict.plain) && !tFl.includes(NK.risk.ids.untested.plain),
     'review F4 · ' + E4 + ': the Gabe Universe flags "no test covers this", ' + acts4 + ' test calls act on it — the no-moment column leaves the flag out; on POST /cooking/sessions the flag\'s hover says the conflict flag\'s own words', { uR4, nm4, tFl: (tFl || '').slice(0, 200) });
   /* F6 · DELETE /: the map labels the route "/"; the first segment is read from the path it is served at, less the app's mount */
   const E6 = 'DELETE /', FE6 = FJ.endpoints['endpoint:' + E6]; await openEp(E6);
-  const seg6 = await p.$eval('#mogrid td.monm .mc[data-nmk="seg"]', (c) => c.textContent.replace(/\s+/g, ' ').trim()), tSeg6 = await tipAt('#mogrid td.monm .mc[data-nmk="seg"]');
+  const seg6 = await p.$eval('#mometa .mc[data-nmk="seg"]', (c) => c.textContent.replace(/\s+/g, ' ').trim()), tSeg6 = await tipAt('#mometa .mc[data-nmk="seg"]');
   const want6 = FE6.full_path.replace(/^\/api\/v1/, '').split('/').filter(Boolean)[0];
   ok(seg6 === fillW(NK.seg.text, { v: want6 }) && tSeg6 && tSeg6.includes(fillW(NK.seg.label, { v: '/' })),
     'review F6 · ' + E6 + ': served at ' + FE6.full_path + ', its first segment reads "' + seg6 + '" (not "//"), and its hover says the map labels its path /', { seg6 });
@@ -2017,8 +2022,9 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
   ok(fe7 && lrs.length >= 1 && lrs.some((e) => onP(e, idx(E7, p403.id))), 'review F7 · ' + E7 + ': the 403\'s steps read load_resolution_snapshot\'s tables before it leaves; its chip stands on the 403', { n: lrs.length });
   /* F8 · one call deep, in the singular; the dependencies' functions are not counted, and the hover says so */
   const E8 = 'POST /account/export'; await openEp(E8);
-  const b8 = await p.$eval('#mogrid td.monm .mc[data-nmk="behind"]', (c) => c.textContent.replace(/\s+/g, ' ').trim()), tb8 = await tipAt('#mogrid td.monm .mc[data-nmk="behind"]');
-  ok(b8 === fillW(NK.behind.text1, { n: 1, d: 1 }) && tb8 && tb8.includes(NK.behind.plain), 'review F8 · ' + E8 + ': "' + b8 + '", its hover saying the dependencies\' functions are not counted', { b8 });
+  /* CHANGED 2026-09-30 (D-068): the count behind is drawn as the pinned row draws it (its head word, its cell), how deep beside it */
+  const b8 = await p.$eval('#mometa .msum[data-nmk="behind"]', (c) => [(c.querySelector('.msh') || {}).textContent, (c.querySelector('[data-tip="cell"]') || {}).textContent, (c.querySelector('.msd') || {}).textContent]), tb8 = await tipAt('#mometa .msum[data-nmk="behind"] .msd');
+  ok(JSON.stringify(b8) === JSON.stringify([D.words.cols.behind.head, '1', fillW(D.words.mo.nm.deep1, { d: 1 })]) && tb8 && tb8.includes(NK.behind.plain), 'review F8 · ' + E8 + ': "' + b8.join(' ') + '", its hover saying the dependencies\' functions are not counted', { b8 });
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the review-of-D-064 checks', errs);
 
@@ -2044,14 +2050,15 @@ ok(!errs.length, 'no page error after the review-of-D-064 checks', errs);
   await open(PAGE); await openEp(E);
   /* CHANGED 2026-09-28 (review J3 of D-065): a journey's chips wear its case and the endpoints it walks to, and carry none of them — the
      keys are read off the other chips only; a journey carries through its own id (grid.jy) */
-  const grid = await p.evaluate(() => ({ keys: [...new Set([...document.querySelectorAll('#mogrid .mc[data-keys]')].filter((c) => !c.closest('[data-jy]')).flatMap((c) => c.getAttribute('data-keys').split('\n')))],
+  /* CHANGED 2026-09-30 (D-068): what the no-moment column drew stands in the endpoint metadata — its keys, its facts and its journeys are read there */
+  const grid = await p.evaluate(() => ({ keys: [...new Set([...document.querySelectorAll('#mogrid .mc[data-keys], #mometa .mc[data-keys]')].filter((c) => !c.closest('[data-jy]')).flatMap((c) => c.getAttribute('data-keys').split('\n')))],
     names: [...document.querySelectorAll('#mogrid td[data-f="fn"] .mc')].map((c) => [((c.querySelector('.mt') || {}).textContent || '').trim(), (c.getAttribute('data-keys') || '').split('\n').filter((k) => k.startsWith('fn:'))[0] || '']),
     ops: [...document.querySelectorAll('#mogrid .mc[data-f="data"][data-keys]')].flatMap((c) => { const o = c.querySelector('.vc[data-vc="op"]'); return o ? c.getAttribute('data-keys').split('\n').map((k) => o.getAttribute('data-vv') + '|' + k) : []; }),
     /* D-064 (2): the facts the no-moment column draws, by kind and words */
-    nm: [...document.querySelectorAll('#mogrid td[data-nm] .mc[data-nmk]')].map((c) => [c.getAttribute('data-nmk'), c.innerText.replace(/\s+/g, ' ').trim()]),
+    nm: [...document.querySelectorAll('#mometa .mc[data-nmk], #mometa .msum[data-nmk]')].map((c) => [c.getAttribute('data-nmk'), (c.matches('.msum') ? [...c.querySelectorAll('[data-tip="cell"], .msd')].map((x) => x.innerText).join(' ') : c.innerText).replace(/\s+/g, ' ').trim()]),
     head: document.querySelector('#mohead h3').getAttribute('aria-label'),
     /* D-065: the journeys BY MOMENT draws — its chips at the outer moments, its names in Proof's last column */
-    jy: [...new Set([...document.querySelectorAll('#mogrid [data-jy]')].map((c) => c.getAttribute('data-jy')))] }));
+    jy: [...new Set([...document.querySelectorAll('#mogrid [data-jy], #mometa [data-jy]')].map((c) => c.getAttribute('data-jy')))] }));
   /* F4 (review 2026-09-26): a name BY MOMENT draws — a function chip with no key, or a keyed one whose name no other function chip
      there wears under another key; F1: a table's read or write by a data chip wearing that op */
   const NK = {}; grid.names.forEach(([n, k]) => { (NK[n] = NK[n] || new Set()).add(k); });
@@ -2308,8 +2315,8 @@ ok(!errs.length, 'no page error after the D-058 checks', errs);
   await p.click('#elclear'); await p.waitForTimeout(40);
   ok(l0.el === 'case:C250' && l0.uni && l0.mo >= 2, 'D-065 (A) · a click on C250\'s chip lights the case: the universe\'s Journeys row and both its chips in BY MOMENT', l0);
   /* (e) the ones that cannot be ordered, in Proof's last column: the case and its tests on the face, why in the hover (J7, D-017) */
-  const nmJ = await p.$$eval('#mogrid tr[data-f="proof"] td[data-nm] .mc[data-nmk="jy"]', (cs) => cs.map((c) => [c.getAttribute('data-jy'), c.getAttribute('data-why'), [...c.querySelectorAll('.mt, .mq')].map((x) => x.textContent.trim())]));
-  const tN = await tipLines('#mogrid tr[data-f="proof"] td[data-nm] .mc[data-nmk="jy"]') || [];
+  const nmJ = await p.$$eval('#mometa .mcard[data-f="proof"] .mc[data-nmk="jy"]', (cs) => cs.map((c) => [c.getAttribute('data-jy'), c.getAttribute('data-why'), [...c.querySelectorAll('.mt, .mq')].map((x) => x.textContent.trim())]));
+  const tN = await tipLines('#mometa .mcard[data-f="proof"] .mc[data-nmk="jy"]') || [];
   const whyNames = Object.values(NJ.why).map((w) => w.name);
   ok(JSON.stringify(nmJ.map((x) => x[0])) === JSON.stringify(G0.aggs.map(([c, k]) => c + '|' + k)) && nmJ.every((x, i) => x[1] === 'agg' && JSON.stringify(x[2]) === JSON.stringify(G0.aggs[i]) && !whyNames.some((w) => x[2].includes(w)))
      && G0.aggs.length === 2 && tN.includes(NJ.why.agg.name) && tN.includes(fillW(NJ.why.agg.plain, { corpus: G0.aggs[0][1] })) && tN.includes(NJ.col) && !tN.includes(MW.nm.plain),
@@ -2345,7 +2352,7 @@ ok(!errs.length, 'no page error after the D-058 checks', errs);
   ok((await p.evaluate(() => window.__allep.mo.looks.jy)) === 'one', 'D-065 · back to my pick, one chip per journey');
   /* (f) review J3 · GET /settings: C2137's own proof call is in the band; its journey chips wear its key and carry nothing */
   const ES = 'GET /settings'; await openEp(ES);
-  const f3 = await p.evaluate(() => { const own = [...document.querySelectorAll('#mogrid .mc[data-keys]')].filter((c) => !c.closest('[data-jy]')).flatMap((c) => c.getAttribute('data-keys').split('\n'));
+  const f3 = await p.evaluate(() => { const own = [...document.querySelectorAll('#mogrid .mc[data-keys], #mometa .mc[data-keys]')].filter((c) => !c.closest('[data-jy]')).flatMap((c) => c.getAttribute('data-keys').split('\n'));
     const band = [...document.querySelectorAll('#moband [data-keys]')].flatMap((c) => c.getAttribute('data-keys').split('\n'));
     const row = document.querySelector('#ocol-uni .ust .urow[data-row="TESTS"]'), its = {}, tabs = [...row.querySelectorAll('.tabbar .tab')];
     const grab = () => { row.querySelectorAll('span.more').forEach((m) => { if (m.style.display !== 'none' && /^\+/.test(m.textContent)) m.click(); });   /* every tab, past its "+N more" (as section 18 reads it) */
@@ -2370,7 +2377,7 @@ ok(!errs.length, 'no page error after the D-065 checks', errs);
     const t = await p.$eval('#tip', (e) => ({ text: e.textContent, html: e.innerHTML })); await p.mouse.move(5, 5); return t; };
   await open(PAGE); await openEp(E);
   /* (1) one hover per item */
-  const nest = await p.evaluate(() => [document.querySelectorAll('#mogrid .mc [data-tip], #mogrid .nmc [data-tip], #moband .mc [data-tip]').length, document.querySelectorAll('#mogrid .mc').length,
+  const nest = await p.evaluate(() => [document.querySelectorAll('#mogrid .mc [data-tip], #mometa .nmc [data-tip], #moband .mc [data-tip]').length, document.querySelectorAll('#mogrid .mc').length,
     document.querySelectorAll('#mogrid td [title], #mogrid td[title]').length, document.querySelectorAll('#board .idc [data-tip]').length]);
   ok(nest[0] === 0 && nest[1] > 100 && nest[2] === 0 && nest[3] === 0, 'D-067 (P1 · P5) · ' + E + ' · no hover inside any of the ' + nest[1] + ' BY MOMENT chips, no native tooltip on a cell, none inside the table\'s id cells', nest);
   /* (2) the two 429s read apart: each names its limit, the line it is checked at, its scope and its numbers (read from forms.json) */
@@ -2388,7 +2395,7 @@ ok(!errs.length, 'no page error after the D-065 checks', errs);
   const tEnd = await tipAt('#mogrid td[data-mom="body"][data-f="end"] .mc'), prov = Object.values(D.words.enc.from).concat([D.words.station.glyph, D.words.station.card, D.words.kinds.framework.plain]);
   ok(tEnd && !prov.some((w) => tEnd.text.includes(w)), 'D-067 (P4) · the framework ending\'s hover says no "as … draws it", no station words and not what "framework" means', (tEnd || {}).text);
   /* (5) the row's legend on the row's name (his placement, ruled): the kinds and labels drawn, each cloned, with how many */
-  const tLeg = await tipAt('#mogrid th[data-f="end"]'), nKinds = new Set(R.mo.el.filter((e) => e[0] === 'end').map((e) => e[4][1])).size;
+  const tLeg = await tipAt('#mogrid th[data-f="end"] .mbn'), nKinds = new Set(R.mo.el.filter((e) => e[0] === 'end').map((e) => e[4][1])).size;
   ok(MW.opt.leg.ruled === 'D-067' && MW.opt.leg.pick === 'hover' && tLeg && tLeg.text.includes(MW.leg.kinds) && tLeg.text.includes(MW.leg.marks) && (tLeg.html.match(/class="lg"/g) || []).length >= nKinds
      && ['refusal', 'framework'].every((k) => tLeg.text.includes(D.words.kinds[k].plain)),
     'D-067 (P2 B1) · the Endings row\'s name carries its legend: the ' + nKinds + ' kinds of ending, each with what it means, and the status labels', (tLeg || {}).text.slice(0, 160));
@@ -2396,7 +2403,7 @@ ok(!errs.length, 'no page error after the D-065 checks', errs);
   const sq = await p.$$eval('#mobar .opt[data-mopt="leg"], #mobar .opt[data-mopt="ipo"]', (os) => os.map((o) => [o.getAttribute('data-mopt'), o.getAttribute('data-v'), o.getAttribute('aria-checked'), o.getAttribute('data-ruled'), o.getAttribute('data-pick')]));
   await p.click('#mobar .opt[data-mopt="leg"][data-v="strip"]'); await p.waitForTimeout(150);
   const strip = await p.evaluate(() => { const L = document.getElementById('moleg'); return [L.hidden, L.querySelectorAll('.mlr').length, document.querySelectorAll('#mogrid tbody tr[data-f]').length]; });
-  const tLeg2 = await tipAt('#mogrid th[data-f="end"]');
+  const tLeg2 = await tipAt('#mogrid th[data-f="end"] .mbn');
   await p.click('#mobar .opt[data-mopt="leg"][data-v="hover"]'); await p.click('#mobar .opt[data-mopt="ipo"][data-v="sent"]'); await p.waitForTimeout(150);
   const tSent = await tipAt('#mogrid td[data-mom="edge"][data-f="end"] .mc');
   await p.click('#mobar .opt[data-mopt="ipo"][data-v="lines"]'); await p.waitForTimeout(100);
@@ -2414,6 +2421,125 @@ ok(!errs.length, 'no page error after the D-065 checks', errs);
     'D-067 (P5) · a table named in the code map hovers as that table, the field\'s own words stay on the field\'s name; nothing inside an item hovers apart', (tIt || {}).text);
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-067 checks', errs);
+
+/* 22 · D-068 (his note, L-05 · L-06 · L-07 · L-20 · L-21): BY MOMENT's structure. Real clicks on POST /cooking/sessions:
+   (a) a band of stages over the moments — outside the request · EDGE · INPUT 1 of 2 · GATE · INPUT 2 of 2 · HANDLER · EFFECTS · ANSWER ·
+       outside the request · UNCAUGHT — its spans cover every moment head, each stage's count is the endings its moments hold, summed
+       per stage it is the pinned row's stages column; no head wears the old stage mark;
+   (b) the try at cooking.py:149 is a fork: a bracket over its three excepts and the save, "one of 4"; every path the generator
+       lists takes at most one of its ways; the road row (the header's option) says it too; saving under HANDLER (its option) leaves an
+       EFFECTS outline and no EFFECTS cell;
+   (c) the endpoint metadata stands after the table (my pick), one card per block, the Overview first; the proof's two counts stand
+       apart, each labelled; its option moves it before the table;
+   (d) a row's head repeats its columns of the pinned row with the pinned row's head words and values; a click lights exactly the
+       members of that column BY MOMENT draws, and its pinned-row cell; a chip's hover ends with the columns that count it;
+   (e) a click on a head widens its column, the × hides it and the bar brings it back; fit leaves no sideways scroll; the state survives
+       a resize and a reload; the copy text says the columns only when they are not as they open; a row's options slot hides that row */
+{ const E = 'POST /cooking/sessions', R = ROW[E], MW = D.words.mo, SG = MW.stg, fillW = (s0, x) => String(s0).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
+  const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
+    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
+    const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+  const outCols = async () => (await p.$eval('#out', (e) => e.value)).split('\n').filter((l) => l.startsWith(D.words.copy.lines.mo + ' · ' + MW.col.copy + ':'));
+  const clk = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await p.click(sel); await p.waitForTimeout(130); };
+  await open(PAGE); await openEp(E); await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' }));
+  /* (a) the stage band */
+  const band = await p.evaluate(() => { const t = document.querySelector('#mogrid table.motab');
+    return { cells: [...t.querySelectorAll('thead th.mosb')].map((c) => [c.getAttribute('data-stage'), c.colSpan, (c.querySelector('.mosp') || {}).textContent || null, +((c.querySelector('.mosc') || {}).textContent || 0)]),
+      heads: t.querySelectorAll('thead th.mom').length, glyph: t.querySelectorAll('th.mom .mstg').length, moms: [...t.querySelectorAll('thead th.mom')].map((h) => h.getAttribute('data-mom')) }; });
+  const wantSt = ['out', 'EDGE', 'INPUT', 'GATE', 'INPUT', 'HANDLER', 'EFFECTS', 'ANSWER', 'out', 'UNCAUGHT'], perSt = {};
+  band.cells.forEach(([st, , , n]) => { if (st !== 'out') perSt[st] = (perSt[st] || 0) + n; });
+  const colSt = Object.fromEntries(Object.entries(R.v.stage).filter(([, n]) => n));
+  ok(JSON.stringify(band.cells.map((c) => c[0])) === JSON.stringify(wantSt) && band.cells.reduce((a, c) => a + c[1], 0) === band.heads && !band.glyph
+     && band.cells.filter((c) => c[0] === 'INPUT').map((c) => c[2]).join('|') === [1, 2].map((i) => fillW(SG.part, { i, k: 2 })).join('|') && JSON.stringify(perSt) === JSON.stringify(Object.fromEntries(Object.keys(perSt).map((k) => [k, colSt[k] || 0])))
+     && Object.keys(colSt).every((k) => perSt[k] === colSt[k]),
+    'D-068 (L-05) · the stages over the moments: ' + band.cells.map((c) => (c[0] === 'out' ? SG.out.name : c[0]) + (c[2] ? ' ' + c[2] : '') + (c[3] ? ' ·' + c[3] : '')).join(' | ') + ' — the endings each holds are the pinned row\'s stages; no stage mark left on a head', { band, colSt });
+  const tOut = await tipAt('#mogrid th.mosb[data-stage="out"]'), tIn = await tipAt('#mogrid th.mosb[data-stage="INPUT"]');
+  ok(tOut && tOut.includes(SG.out.plain) && tIn && tIn.includes(SG.why.INPUT) && tIn.includes(fillW(SG.partPlain, { i: 1, k: 2 })), 'D-068 (L-05) · the band says what lies outside the request, and why INPUT comes back', { tOut, tIn });
+  /* (b) the fork */
+  const FK = R.mo.fk, fails = band.moms.map((m, i) => [m, i]).filter(([m]) => m === 'fail').map(([, i]) => i);
+  const fk = await p.evaluate(() => [...document.querySelectorAll('#mogrid th.mom')].map((h) => [h.getAttribute('data-mom'), h.getAttribute('data-fk'), (h.querySelector('.mfk') || { getAttribute: () => null }).getAttribute('data-fkp'), (h.querySelector('.mfkl') || {}).textContent || null]));
+  const ways = FK.length === 1 ? FK[0][0].concat(FK[0][1] == null ? [] : [FK[0][1]]) : [];
+  const takeOk = FK.every((f) => f[2].length === R.mo.ex.length && f[2].every((t, i) => t == null || (f[0].concat(f[1] == null ? [] : [f[1]]).includes(t) && R.mo.pass[i].includes(t))));
+  ok(FK.length === 1 && ways.length === 4 && JSON.stringify(ways.map((si) => R.mo.sp[si][0])) === JSON.stringify(['fail', 'fail', 'fail', 'save']) && takeOk
+     && JSON.stringify(fk.filter((h) => h[1] != null).map((h) => [h[0], h[2]])) === JSON.stringify([['fail', 'first'], ['fail', 'mid'], ['fail', 'mid'], ['save', 'last']]) && fk.find((h) => h[2] === 'first')[3] === fillW(SG.fork.name, { n: 4 }) && fails.length === 3,
+    'D-068 (L-05) · the try around start_session is a fork of ' + ways.length + ' ways — its three excepts and the save — under one bracket, "' + fillW(SG.fork.name, { n: 4 }) + '"; each path takes at most one way, one it passes', { FK, fk });
+  const tFk = await tipAt('#mogrid th.mom .mfk[data-fkp="first"]');
+  ok(tFk && tFk.includes(fillW(SG.fork.plain, { n: 4 })) && tFk.includes(fillW(SG.fork.way, { i: 4, v: MW.moms.save.name })), 'D-068 (L-05) · the bracket\'s hover names its ways in order', tFk);
+  await clk('#mobar .opt[data-mopt="hdr"][data-v="road"]'); await clk('#mobar .opt[data-mopt="save"][data-v="hand"]');
+  const rd = await p.evaluate(() => ({ road: [...document.querySelectorAll('#mogrid thead th.mord')].map((c) => [c.textContent, c.colSpan]), brk: document.querySelectorAll('#mogrid th.mom .mfk').length,
+    eff: document.querySelectorAll('#mogrid th.mosb[data-stage="EFFECTS"]').length, outline: document.querySelectorAll('#mogrid th.mosb[data-stage="HANDLER"] .moseff').length,
+    sq: ['hdr', 'save'].map((g) => [...document.querySelectorAll('#mobar .opt[data-mopt="' + g + '"]')].map((o) => [o.getAttribute('data-v'), o.getAttribute('aria-checked'), o.getAttribute('data-pick')])) }));
+  ok(JSON.stringify(rd.road) === JSON.stringify([[SG.road.seq, 8], [fillW(SG.fork.name, { n: 4 }), 4], [SG.road.seq, 3]]) && !rd.brk && !rd.eff && rd.outline === 1
+     && rd.sq.every((g) => g.some(([, , pk]) => pk === 'true')) && rd.sq[0].find(([v]) => v === MW.opt.hdr.pick)[2] === 'true',
+    'D-068 (L-05) · the options: the road row says "' + SG.road.seq + '" and "' + fillW(SG.fork.name, { n: 4 }) + '" where the bracket stood; saving under HANDLER leaves an EFFECTS outline and no EFFECTS cell; my picks dashed', rd);
+  await clk('#mobar .opt[data-mopt="lay"][data-v="rows"]');
+  const rw = await p.evaluate(() => ({ st: [...document.querySelectorAll('#mogrid tbody th.mosb')].map((c) => [c.getAttribute('data-stage'), c.rowSpan]), road: document.querySelectorAll('#mogrid tbody th.mord').length }));
+  ok(rw.st.length >= 9 && rw.st.reduce((a, c) => a + c[1], 0) === band.heads && rw.road === 3, 'D-068 (L-05) · moments as rows: the stages and the roads a column of their own, spanning the moments', rw);
+  await clk('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await clk('#mobar .opt[data-mopt="hdr"][data-v="band"]'); await clk('#mobar .opt[data-mopt="save"][data-v="eff"]');
+  /* (c) the endpoint metadata */
+  const mt = await p.evaluate(() => { const M = document.getElementById('mometa');
+    return { after: M.previousElementSibling.id, cards: [...M.querySelectorAll('.mcard')].map((c) => c.getAttribute('data-f')), sums: [...M.querySelectorAll('.msum')].map((l) => [l.getAttribute('data-mcol'), (l.querySelector('.msh') || {}).textContent]),
+      proofWords: (M.querySelector('.msum[data-mcol="proof"] .msw') || {}).textContent || null, named: (M.querySelector('.msum[data-nmk="proof"] .nmc') || {}).textContent || null }; });
+  const proofNm = R.mo.nm.find((x) => x[1] === 'proof')[4];
+  ok(mt.after === 'mogrid' && mt.cards[0] === 'over' && mt.cards.length === new Set(R.mo.nm.map((x) => x[0]).concat(Object.keys(D.mo.meta).map((b0) => Object.keys(D.mo.fam).find((f) => D.mo.fam[f] === b0)))).size
+     && mt.sums.filter(([, h]) => h !== MW.nm.named).every(([cid, h]) => D.words.cols[cid] && h === D.words.cols[cid].head) && mt.sums.some(([cid]) => cid === 'fate') && mt.proofWords === D.words.cols.proof.name
+     && mt.named && mt.named.includes(proofNm.tested + '/' + proofNm.produced) && mt.sums.filter(([cid]) => cid === 'proof').map(([, h]) => h).join('|') === [D.words.cols.proof.head, MW.nm.named].join('|'),
+    'D-068 (L-06/L-07) · the endpoint metadata after the table: ' + mt.cards.length + ' cards, the Overview first; what sums it up under the pinned row\'s own head words (' + mt.sums.map((x) => x[1]).join(' · ') + '); the proof\'s two counts each labelled', mt);
+  await clk('#mobar .opt[data-mopt="meta"][data-v="before"]');
+  const mt2 = await p.evaluate(() => document.getElementById('mometa').nextElementSibling.id);
+  await clk('#mobar .opt[data-mopt="meta"][data-v="after"]');
+  ok(mt2 === 'moscroll', 'D-068 (L-06) · its option moves the metadata before the table', mt2);
+  /* (d) the row heads */
+  const rh = await p.evaluate(() => [...document.querySelectorAll('#mogrid tbody th[data-block]')].map((h) => [h.getAttribute('data-f'), [...h.querySelectorAll('.msc')].map((b) => [b.getAttribute('data-mcol'), b.querySelector('.msh').textContent, b.querySelector('.msv').textContent]), !!h.querySelector('.mro')]));
+  const pinVal = async (cid) => p.$eval('#pin tbody [data-col="' + cid + '"]', (e) => e.textContent.trim()).catch(() => null);
+  const fnRow = rh.find((x) => x[0] === 'fn'), wantFn = D.mo.cols.fn.map((cid) => [cid, D.words.cols[cid].head, String(R.k[cid])]);
+  ok(rh.every((x) => x[2] && JSON.stringify(x[1].map((b) => b[0])) === JSON.stringify(D.mo.cols[x[0]])) && JSON.stringify(fnRow[1]) === JSON.stringify(wantFn) && wantFn.some(([c]) => c === 'deciders') && wantFn.some(([c]) => c === 'datafns')
+     && (await pinVal('deciders')) === String(R.k.deciders),
+    'D-068 (L-20) · every row\'s head carries its options slot and its columns of the pinned row, in the pinned row\'s words — Functions: ' + fnRow[1].map((b) => b[1] + ' ' + b[2]).join(' · '), rh.map((x) => [x[0], x[1].map((b) => b[1] + ' ' + b[2]).join(' · ')]));
+  await clk('#mogrid tbody th[data-f="fn"] .msc[data-mcol="deciders"]');
+  const lit = await p.evaluate((ks) => { const K = new Set(ks), on = [...document.querySelectorAll('#mogrid .colon[data-keys]')], all = [...document.querySelectorAll('#mogrid [data-keys]')];
+    return { on: on.length, onOk: on.every((e) => e.getAttribute('data-keys').split('\n').some((k) => K.has(k))), missed: all.filter((e) => !e.classList.contains('colon') && e.getAttribute('data-keys').split('\n').some((k) => K.has(k))).length,
+      pin: !!document.querySelector('#pin tbody td[data-mocol] [data-col="deciders"]'), pressed: document.querySelector('#mogrid .msc[data-mcol="deciders"]').getAttribute('aria-pressed') }; }, R.ck.deciders);
+  const tCh = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc[data-key="fn:apps/api/services/cooking.py::start_session"]');
+  ok(lit.on >= 3 && lit.onOk && !lit.missed && lit.pin && lit.pressed === 'true' && tCh && tCh.trim().endsWith(fillW(MW.rowh.cnt, { v: ['deciders', 'datafns', 'behind'].map((c) => D.words.cols[c].head).join(' · ') })),
+    'D-068 (L-20) · "' + D.words.cols.deciders.head + ' ' + R.k.deciders + '" lights the ' + lit.on + ' chips that draw its members, none else, and its cell in the pinned row; start_session\'s hover ends with the columns that count it', { lit, tCh: (tCh || '').slice(-80) });
+  await clk('#mogrid tbody th[data-f="fn"] .msc[data-mcol="deciders"]');
+  /* (e) the columns */
+  const colW = () => p.evaluate(() => { const cs = [...document.querySelectorAll('#mogrid colgroup col')].slice(1).map((c) => parseFloat(c.style.width)), hs = [...document.querySelectorAll('#mogrid thead th.mom')];
+    return { w: Object.fromEntries(hs.map((h, i) => [h.getAttribute('data-si'), cs[i]])), moms: hs.map((h) => h.getAttribute('data-mom')), over: document.getElementById('mogrid').scrollWidth - document.getElementById('mogrid').clientWidth,
+      mini: document.querySelectorAll('#mogrid th.mom.mmin').length }; });
+  const siE = String(R.mo.sp.findIndex((x) => x[0] === 'edge')), c0 = await colW();
+  await clk('#mogrid th.mom[data-mom="edge"]');
+  const c1 = await colW(), wideP = await p.$eval('#mogrid th.mom[data-mom="edge"]', (h) => h.getAttribute('aria-pressed'));
+  const brk = await p.evaluate(() => [...document.querySelectorAll('#mogrid td[data-mom="edge"] .mc .mt')].filter((t) => { const rs = t.getClientRects(); if (rs.length < 2) return false;
+    const txt = t.textContent; return !/[_./\s]/.test(txt); }).length);
+  ok(c1.w[siE] > c0.w[siE] && wideP === 'true' && !brk, 'D-068 (L-21) · a click on "' + MW.moms.edge.name + '" widens its column (' + c0.w[siE] + ' → ' + c1.w[siE] + ' px) until no name there breaks inside a word', { c0: c0.w[siE], c1: c1.w[siE], brk });
+  await clk('#mogrid th.mom[data-mom="start"] .mohx');
+  const h1 = await p.evaluate(() => ({ moms: [...document.querySelectorAll('#mogrid th.mom')].map((h) => h.getAttribute('data-mom')), strip: [...document.querySelectorAll('#mobar [data-unhide]')].map((b) => b.getAttribute('data-unhide')) }));
+  ok(!h1.moms.includes('start') && JSON.stringify(h1.strip) === JSON.stringify(['f:start', '*']), 'D-068 (L-21) · its × hides "' + MW.moms.start.name + '", and the bar lists it to bring back', h1);
+  await clk('#mofit');
+  const f1 = await colW();
+  const out1 = await outCols();
+  ok(f1.over <= 1 && f1.mini >= 1 && out1.length === 1 && out1[0].includes(fillW(MW.col.cHid, { v: MW.moms.start.name })) && out1[0].includes(fillW(MW.col.cFit, { v: MW.opt.fit.opts[MW.opt.fit.pick].name })),
+    'D-068 (L-21) · fit: no sideways scroll, ' + f1.mini + ' column(s) narrowed to a strip of counts; the copy text says the columns — ' + (out1[0] || ''), { over: f1.over, mini: f1.mini, out1 });
+  await p.setViewportSize({ width: 1600, height: 1080 }); await p.waitForTimeout(250);
+  const rz = await colW(); await p.setViewportSize({ width: 1920, height: 1080 }); await p.waitForTimeout(250);
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(200);
+  const rl = await colW(), rlS = await p.evaluate(() => ({ fit: document.getElementById('mofit').getAttribute('aria-pressed'), wide: document.querySelector('#mogrid th.mom[data-mom="edge"]').getAttribute('aria-pressed') }));
+  ok(rz.over <= 1 && !rz.moms.includes('start') && !rl.moms.includes('start') && rl.over <= 1 && rlS.fit === 'true' && rlS.wide === 'true',
+    'D-068 (L-21) · the columns keep their state through a resize and a reload (hidden, widened, fit)', { rz: [rz.over, rz.mini], rl: [rl.over, rl.mini], rlS });
+  await clk('#mogrid tbody th[data-f="data"] .mro');
+  const pop = await p.$$eval('#mogrid tbody th[data-f="data"] .mrop [data-hiderow]', (bs) => bs.map((b) => b.textContent));
+  await clk('#mogrid tbody th[data-f="data"] [data-hiderow="data"]');
+  const hr = await p.evaluate(() => ({ rows: [...document.querySelectorAll('#mogrid tbody tr[data-f]')].map((r) => r.getAttribute('data-f')), strip: [...document.querySelectorAll('#mobar [data-unhide]')].map((b) => b.getAttribute('data-unhide')) }));
+  ok(JSON.stringify(pop) === JSON.stringify([MW.col.hideRow]) && !hr.rows.includes('data') && hr.strip.includes('r:data'), 'D-068 · a row\'s options slot opens its own options — "' + MW.col.hideRow + '" takes Data effects out, the bar keeps it', { pop, hr });
+  await clk('#mobar .mohall'); await clk('#mofit'); await clk('#mogrid th.mom[data-mom="edge"]');
+  const back = await p.evaluate(() => ({ moms: document.querySelectorAll('#mogrid th.mom').length, rows: document.querySelectorAll('#mogrid tbody tr[data-f]').length, strip: document.querySelectorAll('#mobar [data-unhide]').length }));
+  const out2 = (await outCols()).length;
+  ok(back.moms === band.heads && back.rows === rh.length && !back.strip && !out2, 'D-068 · show all, fit off and the width given back: the table as it opens, and the copy text no longer names the columns', { back, out2 });
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the D-068 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));

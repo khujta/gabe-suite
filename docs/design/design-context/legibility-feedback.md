@@ -83,10 +83,11 @@ deferred + trigger).
 - **where:** BY MOMENT · the column headers
 - **could not tell:** why some columns wear the mark and others do not, which moments belong to which core stage, and that
   some columns are branches of one stage.
-- **fix:** a header row of core stages over the moments; each moment under its stage; branches visible as branches; the
-  moments outside the request grouped and said so.
+- **fix:** BUILT — a band of stages over the moments (INPUT 1 of 2 · 2 of 2 around GATE, the save under EFFECTS, the moments outside
+  the request in a cell of their own, each stage counting the endings that leave it); the excepts of one try and where it goes on under
+  one bracket, "one of 4", proven per path by gen-all-endpoints.py; the stage mark left the heads (all-endpoints.tpl.html `moRuns`/`moForks`).
 - **tag:** `mark-without-its-meaning`
-- **status:** logged
+- **status:** built (D-068); the header's form and the stage saving stands in — option, his to pick (D-068)
 
 ### L-06
 - **words:** "the final column, the one that says "no moment", in that column we might just remove it. I mean, not remove it
@@ -95,10 +96,10 @@ deferred + trigger).
   and so on. But there is no need to have this "no moment" section there."
 - **where:** BY MOMENT · the last column, "no moment"
 - **could not tell:** that a column in a time table holds no time — it reads as one more moment and takes width from the rest.
-- **fix:** out of the table into a metadata section of the endpoint, each fact labelled with the block it belongs to (after the
-  table or before it — an option).
+- **fix:** BUILT — the column left the table for the ENDPOINT METADATA inside BY MOMENT: one card per block, its mark and name on top;
+  what sums it up in the pinned row's own cells and head words, what it is as chips (all-endpoints.tpl.html `renderMeta`).
 - **tag:** `timeless-facts-inside-a-timeline`
-- **status:** logged
+- **status:** built (D-068); after the table or before it — option, his to pick (D-068)
 
 ### L-07
 - **words:** "Same thing for "overview" and "risk". That is also metadata information. So this is metadata for the whole API
@@ -107,9 +108,10 @@ deferred + trigger).
   are selecting"
 - **where:** BY MOMENT · the rows Overview and Risk
 - **could not tell:** same as L-06 — rows of timeless facts inside the timeline.
-- **fix:** into the same metadata section as L-06.
+- **fix:** BUILT — the Overview and risk row left the table; its facts are the metadata's first card, the proof's two counts one under
+  the other, each saying what it counts (proven 2/14 · named 4/11, rank 3–6 of 80).
 - **tag:** `timeless-facts-inside-a-timeline`
-- **status:** logged
+- **status:** built (D-068)
 
 ### L-08
 - **words:** "proof is a different monster because it encodes a lot of information. A lot. Information. So ideally we should
@@ -279,9 +281,10 @@ deferred + trigger).
   specialist → switches, pieces, lacks
 - **where:** THE ENDPOINTS' pinned row (its sub-columns) against the rows of BY MOMENT
 - **could not tell:** where those counts live in the timeline.
-- **fix:** each such column shown in BY MOMENT, or its place there named.
+- **fix:** BUILT — each row's head repeats its block's columns of the pinned row with the same words and this endpoint's values
+  ("Functions · deciders 3 · data fns 10"); a click lights their members and the pinned cell; each hover ends "counted in: …".
 - **tag:** `lost-between-views`
-- **status:** logged
+- **status:** built (D-068)
 
 ### L-21
 - **words:** "we are going to remove the no moment column but still the layout is awful it's difficult to read we don't give a
@@ -292,9 +295,10 @@ deferred + trigger).
   around"
 - **where:** BY MOMENT · the whole table
 - **could not tell:** a cell's contents — names wrap letter by letter in columns too narrow for them.
-- **fix:** click a column to widen it to its content · hide a column · one button that fits the table by narrowing the rest.
+- **fix:** BUILT — a click on a head widens its column to what it holds; its × hides it and the bar brings it back; "fit to the box"
+  narrows the columns that do not fit to strips of counts; kept through a resize and a reload, said in the copy text.
 - **tag:** `cramped-columns`
-- **status:** logged
+- **status:** built (D-068); what a head's click gives and what fit does — option, his to pick (D-068)
 
 ### L-22
 - **words:** "we were basically missing okay we have too many hovers too many repetitive hovers describing things that were

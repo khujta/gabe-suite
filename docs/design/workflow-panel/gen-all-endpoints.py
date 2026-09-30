@@ -471,6 +471,16 @@ MO_RANK = {"checks": 0, "work": 1, "fail": 2, "save": 3}
 MO_FAM = (("end", "kinds-of-ending"), ("gate", "deciding-branches"), ("data", "operation-per-table"), ("fn", "decision-point-functions"),
           ("shape", "request-shape"), ("client", "what-the-screen-does-on-this-ending"), ("inf", "in-flight-values"),
           ("proof", "case-role-on-this-endpoint"), ("stage", "the-ordered-chain-per-ending"), ("std", "switches"), ("over", "findings"))
+# D-068 (his L-05: "another header row for principal moments, like the core stages, and inside we can put branches of those stages"):
+# the stage each moment stands in — D-001's stages over the spine, INPUT twice around GATE (D-053: FastAPI reads the body before the
+# dependencies run and checks the fields after them), the handler's own save under EFFECTS (my pick; its option keeps it under
+# HANDLER, MO_STAGE_ALT). The server starting, the screen and what follows the answer are outside the request: no stage (MO_OUT).
+# PROVEN per endpoint (by_moment): every ending placed at a moment leaves from the stage that moment stands in, the stage the code
+# map's column reads for it (save aside, where no ending leaves)
+MO_STAGE = {"edge": "EDGE", "body": "INPUT", "gate": "GATE", "fields": "INPUT", "checks": "HANDLER", "work": "HANDLER", "fail": "HANDLER",
+            "save": "EFFECTS", "answer": "ANSWER", "uncaught": "UNCAUGHT"}
+MO_STAGE_ALT = {"save": "HANDLER"}
+MO_OUT = ("start", "send", "after")
 MO_WHY = ("nolink", "twomom", "notable", "firstcall", "spans", "member", "noend", "nosite", "pathsonly", "fnnone", "swmoves", "nopath", "noname", "in500")
 MO_SRC = ("own", "chain", "reached", "edges", "wide", "order", "gate", "after", "none")
 CALL_REL = {"calls", "binds"}                                    # the station's call edges a function is reached through
@@ -2047,6 +2057,45 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     for i, x in enumerate(ex):                                    # D-055: what a path code's hover says — the ending's own words, its limiter
         x += [says(XS[x[0]]) or None, lim.get(x[0]) or None, picks[i], fork.get(picks[i])]   # D-057: the path, the forks that tell it apart
     pas = [sorted(seen[pid]) for pid in picks]
+    # ── D-068 · the stage each ending's moment stands in is the stage it leaves from (the code map's stages column, read per ending) ──
+    for xid, si_ in x_si.items():
+        if isinstance(si_, int):
+            m_ = sp[si_][0]
+            want_ = "ANSWER" if XS[xid]["kind"] == "success" else "UNCAUGHT" if XS[xid]["kind"] == "uncaught" else PHASE_STAGE.get(XS[xid].get("phase"), "HANDLER")
+            if m_ in MO_OUT or m_ == "save" or MO_STAGE[m_] != want_:
+                die(f"{lab} {xid}: D-068 — it leaves at '{m_}', drawn under {MO_STAGE.get(m_)}, and leaves from {want_}")
+    # ── D-068 · the handler's forks (his L-05: "in the handler section we might have different branches … we need to have visibility of
+    # that"): the excepts of ONE try side by side (its catches, grouped by the paths the feed records through that try), then where the
+    # try goes on when nothing is raised (the next moment, or none when that is another try's except). A request takes ONE of them —
+    # PROVEN per path through the try: the excepts its chain enters, plus the next moment when it gets there; two, and the build stops ──
+    ctry = {at: frozenset(c.get("paths") or []) for at, c in cat_rec.items()}
+    fks, i_ = [], H0
+    while i_ < SI["answer"]:
+        if sp[i_][0] != "fail":
+            i_ += 1
+            continue
+        tp = ctry.get(TO["gat"][sp[i_][1]])
+        if tp is None:
+            die(f"{lab}: D-068 — failure group {sp[i_][1]} ({TO['gat'][sp[i_][1]]}) names a catch the feed does not record")
+        j_ = i_
+        while j_ + 1 < SI["answer"] and sp[j_ + 1][0] == "fail" and ctry.get(TO["gat"][sp[j_ + 1][1]]) == tp:
+            j_ += 1
+        arms = list(range(i_, j_ + 1))
+        go = j_ + 1
+        while go < SI["answer"] and sp[go][2] is None:              # an open slot (a moment the handler does not have) is passed by none
+            go += 1
+        go = go if sp[go][0] != "fail" else None                     # where it goes on: a moment of its own, or another try's except
+        take = []
+        for pid in picks:
+            t_ = [a for a in arms if TO["gat"][sp[a][1]] in cats_of[pid]] + ([go] if go is not None and pid in tp and go in seen[pid] else [])
+            if len(t_) > 1:
+                die(f"{lab} {pid}: D-068 — a path takes {len(t_)} ways of the try whose excepts stand at {[TO['gat'][sp[a][1]] for a in arms]}: {t_}")
+            if pid in tp and not t_ and go is not None and not unc(pid) and (xe_of(pid) is None or xe_of(pid) >= arms[0]):
+                die(f"{lab} {pid}: D-068 — a path through the try at {TO['gat'][sp[i_][1]]} takes none of its ways and does not leave inside it")
+            take.append(t_[0] if t_ else None)
+        fks.append([arms, go, take])
+        tally["fk"] += 1; tally["fkArms"] += len(arms) + (go is not None)
+        i_ = j_ + 1
     # D-055: the code-map members BY MOMENT places, read through the RECORDS the build check above joins (each placed element's
     # records, turned into the member the code map names: an ending, a guard, a table a step touches, a function …); the members of
     # the records that check counts as the code map's own (want · sub); and the keys every placed element is drawn with
@@ -2096,7 +2145,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     KM.update(k for x in nmv if x[1] != "jy" for k in x[2])
     # the elements each block holds, counted — a journey is counted apart (review J7): its chips and its name are no element of Proof
     ne = lambda xs: len([q for q in xs if not str(q).startswith("j:")])
-    return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "n": {f: [ne(rp[f]), ne(ru[f]), ne(rn[f])] for f, _a in MO_FAM if ne(rp[f]) or ne(ru[f]) or ne(rn[f])},
+    return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "fk": fks, "n": {f: [ne(rp[f]), ne(ru[f]), ne(rn[f])] for f, _a in MO_FAM if ne(rp[f]) or ne(ru[f]) or ne(rn[f])},
             "nm": nmv, "_P": PM | PX, "_Pw": PW, "_K": KM}
 
 
@@ -2104,7 +2153,8 @@ MO_ORDER = [f for f, _a in MO_FAM]
 
 
 # ── 2c′ · D-064 (2) (his ruling 2026-09-28: "in the table at the end the [metadata] which is naturally not associated to any moment,
-# but there could be things like cluster, entity, file and line and so on"): BY MOMENT's LAST column, "no moment" (the last row when
+# but there could be things like cluster, entity, file and line and so on") — D-068 (his L-06/L-07) moved it out of the table into
+# the ENDPOINT METADATA inside BY MOMENT, one card per block; the record below is unchanged. It was: BY MOMENT's LAST column, "no moment" (the last row when
 # the moments are rows). One cell per block: that block's facts that have NO moment by nature — what the endpoint IS (its method and
 # path, the path it is served at, its first segment, its entity and the Gabe Universe's cluster, the handler's file and line with its
 # def line, its outline and its docstring, the station's flags) and what SUMS it up (the fates of its paths, its longest chain, how
@@ -2120,7 +2170,9 @@ NM_ATTR = (("ep", "method-path"), ("full", "method-path"), ("seg", "entity-clust
 NM_KINDS = [k for k, _a in NM_ATTR]
 JY_WHY = ("agg", "one", "norec", "nohere", "only")                      # D-065 (B): why a journey cannot be ordered around this request
 JY_JOIN = ("refs", "status", "none", "miss", "many", "act")             # D-065: how a journey's call here follows a picked path (review J6)
-NM_SUMS = ("fate", "chain", "behind", "proof")                          # the code-map fields that sum it up: one member each, drawn here
+NM_SUMS = ("fate", "chain", "behind", "proof")
+NM_SUM_K = ("behind", "proof", "alarm", "fate", "chain", "piece", "lack")  # D-068: the facts that sum it up — their columns join the metadata
+NM_COL = {"behind": "behind", "proof": "proof", "alarm": "alarms", "fate": "fate", "chain": "chain", "lack": "lacks"}   # D-068: the column each details there                          # the code-map fields that sum it up: one member each, drawn here
 
 
 def nm_facts(nm: list) -> set:
@@ -2564,7 +2616,7 @@ def panels_carried(r: dict, T: list, NT: dict, slots: list) -> None:
     r["gcn"] = {"cm": [sum(x[0] == "c" for x in ga.values()), len(ga)], "uni": [cb, nb]}
 
 
-def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Counter) -> dict:
+def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Counter, cols: list) -> dict:
     """The page's BY MOMENT record: each element family's block (read from the ruled tree's homes), the families that are columns,
     the feed-wide counts the info text says; the words file's claims checked against them. Each row's keys become indices into ONE
     list of keys (the same key recurs on many endpoints)."""
@@ -2613,6 +2665,56 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
     bad = IO.words_check(W, rows)                                  # D-067: every hover line has words, and shows every value it is given
     if bad:
         die(f"BY MOMENT: hover lines whose words are missing or do not use what they are given (mo.io): {sorted(set(map(str, bad)))[:4]}")
+    # ── D-068 (his L-20: "some sections … that I don't see in this table … I would like to see reflected here somehow"): each column
+    # of the pinned row on the BY MOMENT row that draws what it counts — a column homed in a block on that block's row; a shared one on
+    # the row, of the blocks it is shared by, that draws the most of its members across the feed (never none: the build stops); the
+    # stages column is the stage band over the moments (the table's shape, not a row). A column that sums the endpoint up (its
+    # attribute is one the metadata's summing facts are homed by, NM_SUM_K) also stands, drawn as the pinned row draws it, in the
+    # endpoint's metadata under its block; a block with no moment (the Overview) keeps its columns there only ──
+    sum_a = {a for k, a in NM_ATTR if k in NM_SUM_K}
+    hits = collections.defaultdict(collections.Counter)
+    for r in rows:
+        at_ = collections.defaultdict(set)
+        for x in r["mo"]["el"]:
+            if not (x[4] and x[4][0] == "jy"):
+                for k in x[2]:
+                    at_[k].add(x[0])
+        for c in cols:
+            for k in r["ck"].get(c["id"]) or []:
+                for f in at_.get(k, ()):
+                    hits[c["id"]][f] += 1
+    mrow, meta, band = {f: [] for f in fam if f not in untimed}, {}, None
+    for c in cols:
+        if c["kind"] == "spine":
+            if band:
+                die(f"D-068: two stage columns, {band} and {c['id']}")
+            band = c["id"]
+            continue
+        if c["attr"] in sum_a:
+            if c["shared"] or not c["home"]:
+                die(f"D-068: column {c['id']} sums the endpoint up and is homed in no block of its own")
+            meta.setdefault(c["home"], []).append(c["id"])
+        if c["shared"]:
+            fs_ = [f for f in fam if fam[f] in c["sharedIn"] and hits[c["id"]][f]]
+            if not fs_:
+                die(f"D-068: the shared column {c['id']} — no row of the blocks sharing it ({c['sharedIn']}) draws any of its members")
+            f0 = max(fs_, key=lambda f: (hits[c["id"]][f], -MO_ORDER.index(f)))
+        else:
+            f0 = next(f for f, b in fam.items() if b == c["home"])
+        if f0 in untimed:
+            if c["attr"] not in sum_a:
+                die(f"D-068: column {c['id']} is homed in {fam[f0]}, which has no moment, and does not sum the endpoint up")
+        else:
+            mrow[f0].append(c["id"])
+    if not band:
+        die("D-068: no stages column — the stage band has nothing to count")
+    na = dict(NM_ATTR)
+    for k, cid in NM_COL.items():                                  # a fact drawn beside a column's cell details THAT column: one attribute
+        c = next((c for c in cols if c["id"] == cid), None)
+        if not c or c["attr"] != na[k] or cid not in meta.get(c["home"], []):
+            die(f"D-068: the metadata draws {k} beside column {cid}, which is not the column of its attribute {na[k]}")
+    if sorted(MO_STAGE) != sorted(set(MO_PRE + MO_POST + tuple(MO_RANK)) - set(MO_OUT)) or set(MO_STAGE_ALT) - set(MO_STAGE):
+        die("D-068: the stages the moments stand in do not name every moment inside the request")
     KT = {}
     for r in rows:
         for x in r["mo"]["el"]:
@@ -2628,7 +2730,9 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
     if sorted(TOKEN.findall(MW["src"])) != sorted(["{occ}"] + ["{" + k + "}" for k in MO_SRC]):
         die(f"BY MOMENT: the words' source line says {sorted(TOKEN.findall(MW['src']))}, the build counts {list(MO_SRC)}")
     return {"fam": fam, "timed": [f for f, _a in MO_FAM if f not in untimed], "untimed": untimed, "cov": cov, "why": dict(whys),
-            "src": src, "occ": tally["occ"], "off": tally["off"], "offocc": tally["offocc"], "faces": tally["faces"], "keys": list(KT)}
+            "src": src, "occ": tally["occ"], "off": tally["off"], "offocc": tally["offocc"], "faces": tally["faces"], "keys": list(KT),
+            "cols": mrow, "meta": meta, "band": band, "stg": MO_STAGE, "stgAlt": MO_STAGE_ALT, "out": list(MO_OUT), "fixed": list(MO_PRE + MO_POST),
+            "nmCol": NM_COL, "fk": [tally["fk"], tally["fkArms"]]}
 
 
 def run_facts(target: str, forms: Path, archmap: Path, tmp: Path, cache: Path | None, key: str) -> dict:
@@ -3560,7 +3664,7 @@ def build(argv: list) -> tuple:
                      if ep0.get("full_path") and ep0.get("path") and ep0["path"] != "/" and ep0["full_path"].endswith(ep0["path"])}, key=lambda m: (-len(m), m))
     for L, r in zip(facts, rows):
         r["mo"] = by_moment(L, fj, fj["endpoints"]["endpoint:" + r["id"]], r, X, ADJ, MEMO, MOT)
-        no_moment(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], sm["attrs"], MOT, MOUNTS)   # D-064 (2): the last column
+        no_moment(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], sm["attrs"], MOT, MOUNTS)   # D-064 (2) · D-068: the endpoint metadata
         carried(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], W)      # D-055: what BY MOMENT carries of the code map, proven
     # D-055: the switch's words, and per code-map field, across the feed, how many endpoints leave it bright (whole, or in part)
     CW = W["carry"]
@@ -3674,7 +3778,7 @@ def build(argv: list) -> tuple:
     for r in rows:
         r.pop("ro")                                                     # the roles now ride the station's marks (D.sk.keys)
     icon_names |= enc_icons
-    MO = mo_block(rows, W, A, blocks, MOT)                              # BY MOMENT: the blocks, the coverage, the keys once
+    MO = mo_block(rows, W, A, blocks, MOT, cols)                              # BY MOMENT: the blocks, the coverage, the keys once
     got = UNI.harvest(icon_names, colour_refs, HERE)                  # + every lab part's own icon
     lab = UNI.lab_marks()
     marks = UNI.marks(blocks, got["parts"], W, lab)
@@ -3780,7 +3884,7 @@ def build(argv: list) -> tuple:
                f"\nBY MOMENT · " + " · ".join(f"{f} {MO['cov'][f][0]}/{sum(MO['cov'][f])}" for f in MO['timed']) + f" · untimed {', '.join(MO['untimed'])}"
                f" · longest spine {max(len(r['mo']['sp']) for r in rows)} moments · {MO['off']} calls left off a path they never enter"
                f" · {MO['occ']} step occurrences ({MO['src']['wide']} at other paths' calls, {MO['offocc']} left off a path, {MO['src']['none']} with none)"
-               f" · {len(MO['keys'])} keys"
+               f" · {len(MO['keys'])} keys · D-068 {MO['fk'][0]} tries drawn as forks ({MO['fk'][1]} ways, each path through one taking one)"
                f"\nD-055 · the code map's {rows[0]['cvn'][1]} fields: BY MOMENT carries {min(r['cvn'][0] for r in rows)}–{max(r['cvn'][0] for r in rows)} whole per endpoint"
                f" · {sum(1 for x in cv_left.values() if not x[2])} fields it carries whole on no endpoint · {sum(1 for x in cv_left.values() if x[2] == len(rows))} on every one"
                f" · {cv_beyond} tables its steps touch that the code map does not list (on {sum(1 for r in rows if r['cvn'][3])} of the endpoints)"
@@ -3838,7 +3942,7 @@ def build(argv: list) -> tuple:
                 f"\n        review F1 · upper bound where the path leaves the function it hangs under partway: {MOT['f1:lqChips']} chips · {MOT['f1:lqPaths']} chip-paths"
                 f" ({MOT['f1:lq:i']} where the map shows the leaving point, {MOT['f1:lq:ii']} an error from where the map does not say, {MOT['f1:lq:p']} only inherited; calls named by line {MOT['f1:noname']}) · proven from positions: {MOT['f1:provenA']} routed chips, {MOT['f1:provenB']} hanging chips"
                 f" · review F7: {MOT['f7:own']} chain-called chips on the paths their own steps run on, {MOT['f7:trail']} trailing steps placed at their call"
-                f"\n        (2) the no-moment column: {MOT['nm:facts']} facts on {MOT['nm:rows']} endpoints (" + " · ".join(f"{k} {MOT['nm:' + k] or MOT['arrCol'] if k == 'arr' else MOT['nm:' + k]}" for k in NM_KINDS if k not in ("piece", "jy"))
+                f"\n        (2) the endpoint metadata (D-068): {MOT['nm:facts']} facts on {MOT['nm:rows']} endpoints (" + " · ".join(f"{k} {MOT['nm:' + k] or MOT['arrCol'] if k == 'arr' else MOT['nm:' + k]}" for k in NM_KINDS if k not in ("piece", "jy"))
                 + f" · piece {sum(1 for r in rows for x in r['mo']['nm'] if x[1] == 'piece')})"
                 + f" · review F4: {MOT['f4:untestedOut']} 'no test covers this' flags left out where a test calls the endpoint"
                 + f" · review F5: {sum(1 for r in rows for x in r['mo']['nm'] if x[1] == 'file' and not (x[4] or {}).get('df'))} handlers with no def line in the feed"

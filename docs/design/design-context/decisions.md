@@ -902,3 +902,39 @@ endings table) is one hover of its own, so pointing at a name no longer shows th
 Options built (D-025.2): the legend's place — on the row's name (his, ruled, the default) · above the table, one line per row (the
 external legend he named as the other option); the hovers' form — labelled lines, top to bottom (the agent's pick, dashed) · one
 sentence, the parts joined by arrows. His to pick by seeing. Page-only: D-037's light checks.
+
+## D-068 — BY MOMENT's shape: stages over the moments with the forks bracketed; the endpoint metadata out of the table; each row's head carries its pinned-row columns; the columns widen, hide and fit
+Date: 2026-09-30 · Input: his note "API Hover Legend Consolidation", legibility-feedback.md L-05, L-06, L-07, L-20, L-21; the table and
+lost-columns investigations.
+Decision, his: "We can probably have another header row for principal moments, like the— the core stages, and inside we can put branches
+of those stages … we need to have visibility of that" (L-05) · "put it in a different— in another row, separate from the table at the end.
+Or at the beginning. With the metadata. And we can put labels on that metadata saying that some data pertains to the proof section, or the
+data effects" (L-06) · "Same thing for "overview" and "risk". That is also metadata information" (L-07) · "those are interesting pieces that
+I would like to see reflected here somehow" (L-20) · "Click the columns for accommodation … give a little more width … and to also hide
+other columns … a button that will force accommodation by minimizing or moving the other columns around" (L-21).
+Consequence: (1) his words — a row of stages over the moments; my reading of it — neighbouring moments of one stage share a cell, INPUT is
+drawn twice in time order ("1 of 2", "2 of 2", D-053), the handler's own save stands under EFFECTS, the server starting, the screen and
+what follows the answer share a cell named "outside the request", and each stage cell counts the endings that leave it. The generator
+PROVES the stage of every ending's moment is the stage the pinned row's stages column reads for it. The seven-bar stage mark left the
+moment heads. (2) his words — branches visible; my reading — the excepts of ONE try (its catches, grouped by the paths the feed records
+through that try) and the moment the handler goes on to when nothing is raised are one fork, under a bracket "one of N" whose hover names
+each way; the generator derives it per endpoint and STOPS when a path takes two ways of one fork, or a path through the try takes none
+and does not leave inside it (55 tries, 119 ways on the feed). (3) his words — the no-moment column and the Overview and risk row leave the
+table; my reading — an ENDPOINT METADATA block inside BY MOMENT, one card per block that has facts, headed by its mark and name, the
+Overview first; what sums the endpoint up is drawn with the pinned row's own cell and head word (fate, steps, proven, alarms, behind,
+pieces, lacks), what it is as chips; the proof's two counts stand one under the other, each saying what it counts (proven 2/14 — endings;
+named 4/11, rank 3–6 of 80 — refusals). "Carried" is unchanged: the proofs read the record (r.mo.nm), not the drawing; the carry words
+that said "stands at a moment" or "last column" now say "or in its endpoint metadata". (4) his words — the pinned row's sub-columns
+reflected; my reading — each row's head repeats its block's columns of the pinned row with the same head words and this endpoint's values
+(a shared column on the row that draws the most of its members — endings on Endings, tables on Data effects, guards and login on Gates
+and decisions, reply on Structures; the stages column is the band), a click lights the members BY MOMENT draws and outlines the pinned-row
+cell, and every chip's hover ends "counted in: …". Each row's head also carries an options slot for that row alone (for now, "hide this
+row"); the table's options stay in the bar, grouped under labels (the table · the items · the columns). (5) his words — widen, hide, a
+fitting button; my reading — a click on a head widens its column to what it holds (again gives it back), its × hides it, the bar lists
+what is hidden with "show all", "fit to the box" makes the table fit; the state is kept through a resize and a reload, and the copy text
+says the columns only when they are not as they open.
+Options built (D-025.2), my picks dashed: the header — stages over moments with a bracket over the ways (my pick) · three rows, stage ·
+road · moment; saving — under EFFECTS (my pick) · under HANDLER with an empty EFFECTS outline; the metadata — after the table (my pick, his
+first words) · before it; a head's click — names whole (my pick) · every item on one line; fit — narrow the rest to strips of counts (my
+pick) · wrap into bands. His to pick by seeing. The forks and the stage proof are display-side generation (D-063's lighter regime);
+the rest is page-only: D-037's light checks.

@@ -796,17 +796,17 @@
   },
   "mo": {
     "_about": "His ask 2026-09-26: are the moments universal, can every block be read on them. The spine, the moment words, the reasons and the path row are my proposals (D-025.2); the two looks' defaults, moments as columns and cells as chips, are his (D-055); where each element stands is read off the feed by gen-all-endpoints.py (by_moment) and proven there.",
-    "lede": "One endpoint's time, left to right, with every block as a row (his default; the other look turns it). A column is a moment of the request; a cell holds that block's elements acting at that moment. The last column, no moment, holds what is true of the endpoint at no moment of a request: what it is and what sums it up. Pick a code in the path row to follow only that path to its ending.",
+    "lede": "One endpoint's time, left to right, with every block as a row (his default; the other look turns it). The top row names the stage each moment stands in; a column is a moment of the request; a cell holds that block's elements acting at that moment. What is true of the endpoint at no moment stands in the endpoint metadata, after the table. Pick a code in the path row to follow only that path to its ending.",
     "how": [
       "The moments are D-053's, extended. Before the handler they are fixed: the server starting (before any request), the screen sending the request, the app's edge, FastAPI reading the body, the dependencies (the login check among them), FastAPI checking the fields. Inside the handler they are read from its own lines: its checks, and what it does among them; the work, the calls it makes after a check and before its next check, catch or commit; one moment for each catch that turns a failure into an ending; saving, its own commit. Then the answer, what happens after it, and the uncaught error last, because it can escape at any moment.",
-      "A handler moment that happens twice (checks, then a catch, then more checks) is drawn twice, in the order it happens, never merged. The arms of one if and else are drawn the same way, as runs in line order, though a request passes only one of them: pick its ending to see which. A fixed moment the endpoint does not have is drawn empty where it would stand.",
-      "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs inside. A check stands where it is evaluated: on the paths whose chain carries it, and for a check inside a call, on the paths that make that call, less those the map shows leaving before it (on a path it rides only by the call, its hover says a path may skip it); its ending stands where the request leaves. A check the map ties only to a catch stands where that catch raises its ending. A test has no time inside the request: it rides the ending it proves. What has no moment by nature stands in the last column, no moment; what should have a moment and the map cannot place is left in the band below, with its reason.",
+      "A handler moment that happens twice (checks, then a catch, then more checks) is drawn twice, in the order it happens, never merged. The excepts of one try stand side by side, then the moment the handler goes on to when nothing is raised: a request takes one of them, and a bracket over their heads says how many ways there are (in the header with a road row, that row says it). The arms of one if and else are drawn as runs in line order, though a request passes only one of them: pick its ending to see which. A fixed moment the endpoint does not have is drawn empty where it would stand.",
+      "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs inside. A check stands where it is evaluated: on the paths whose chain carries it, and for a check inside a call, on the paths that make that call, less those the map shows leaving before it (on a path it rides only by the call, its hover says a path may skip it); its ending stands where the request leaves. A check the map ties only to a catch stands where that catch raises its ending. A test has no time inside the request: it rides the ending it proves. What has no moment by nature stands in the endpoint metadata; what should have a moment and the map cannot place is left in the band below, with its reason.",
       "A step is placed once for each path it is on: with the dependencies when a dependency runs it, else at the call that path makes. So one step can stand at more than one moment: the login dependency reads a table, and a handler call reads it again. When a path's own chain names no call reaching the step, it stands at the calls the endpoint's other paths make to its function, never after that path has left.",
       "The path: every path at once, or one path to its ending. Each path is a code, in the order its ending happens, a small gap between the moments they leave at; an ending several paths reach is several codes, told apart by the fork each takes, else by what FastAPI checks on it. A code's hover says the fork, the moment, what the ending says, its limiter, and whether it is the path in force. A picked path keeps only the moments it passes and the elements it passes there; an ending it passes by without leaving is kept.",
-      "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it names one) and the class its except takes; the checks say so; the work names the first function it calls, and how many more; saving names what the handler's own step does there. Its full name, where the catch stands, its lines and its stage are in its hover.",
+      "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it names one) and the class its except takes; the checks say so; the work names the first function it calls, and how many more; saving names what the handler's own step does there. Its full name, where the catch stands and its lines are in its hover; its stage is the band above it. Clicking a head widens its column to what it holds, again gives the width back; its × hides it, and the bar brings it back.",
       "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An ending's status is drawn hollow when the endpoint does not declare it. A test whose status fits endings at several moments rides each of them, its chip hollow and dashed. A function behind the handler stands at the handler call that reaches it, the arrow saying how many calls below the handler it is, on the paths of the function it hangs under, less the paths the map shows leaving before it: a fork that returns, or a check that fires first, in the function that calls it (the rule a check inside a call follows); a call written inside an except stands only on the paths that enter that except. One the map reaches through no call stands where a function placed at a moment names it behind it (the Gabe Universe's behind lists), on that function's paths; its hover names any placed function whose list is cut that may also run it. One no placed function names stands in the band, and so does one that functions at different moments name. A raise called before it counts as a leaving point too, where the path's chain fires that raise or its ending was read to it. Where the map records no line the function is called at, no path can be dropped from it: on a path that leaves the function it hangs under partway, or that an error from the handler call ends with no line the map names for its raise, its hover says it may never be called there; where that function's own paths are an upper bound, its hover says so, naming the same call. A function called only inside an except the map records no path entering, while the uncaught 500 passes an error on through that except, stands in the band, on the way to the 500.",
-      "The last column, no moment, holds per block the facts no moment of a request holds: what the endpoint is (its method and path, the path it is served at, its first segment, its entity and the cluster the Gabe Universe draws it in, the station's flags, the handler's file with the line its route is declared at and the line its def stands at, its outline, its docstring) and what sums it up (how many functions stand behind it, its proof, its alarms, each path's fate, its longest path, the cases that only arrange through it, its rare pieces that name what it is, the norms it lacks), each in the row of the block it belongs to. The path row never hides it: each fact is true of every path.",
-      "A test that walks across several endpoints, a journey, keeps each of its calls here where it is, and around each one has its other requests at the outer moments of Proof: the ones it makes earlier before any request, the later ones after the answer, one chip per journey on each side (the walk in its hover) or each request a chip of its own; a call here is never drawn among them. With a path picked, a call here keeps its chips only when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded. A journey whose requests cannot be set in order here is named in Proof's last column with its reason: a group of web or end-to-end cases whose report is not read, a test with no record of its requests, one that records one request, one none of whose recorded requests calls this endpoint, or one whose every request calls it."
+      "The endpoint metadata, after the table (or before it, its option), holds per block the facts no moment of a request holds: what the endpoint is (its method and path, the path it is served at, its first segment, its entity and the cluster the Gabe Universe draws it in, the station's flags, the handler's file with the line its route is declared at and the line its def stands at, its outline, its docstring) and what sums it up (how many functions stand behind it, its proof, its alarms, each path's fate, its longest path, the cases that only arrange through it, its rare pieces that name what it is, the norms it lacks), each on the card of the block it belongs to; what sums it up drawn as the pinned row draws it, under the same head word. The path row never hides it: each fact is true of every path.",
+      "A test that walks across several endpoints, a journey, keeps each of its calls here where it is, and around each one has its other requests at the outer moments of Proof: the ones it makes earlier before any request, the later ones after the answer, one chip per journey on each side (the walk in its hover) or each request a chip of its own; a call here is never drawn among them. With a path picked, a call here keeps its chips only when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded. A journey whose requests cannot be set in order here is named in the endpoint metadata, on Proof's card, with its reason: a group of web or end-to-end cases whose report is not read, a test with no record of its requests, one that records one request, one none of whose recorded requests calls this endpoint, or one whose every request calls it."
     ],
     "covHead": "Across the {nRows} endpoints, what each block places:",
     "cov": "{block}: {placed} with a moment, {un} the map cannot place, {nm} with no moment by nature, of {total}.",
@@ -892,10 +892,102 @@
           "lines": { "name": "labelled lines", "plain": "An item's hover as labelled lines, top to bottom: what comes before it, what it checks, what it gives." },
           "sent": { "name": "one sentence", "plain": "An item's hover as one line: what comes before it, then what it checks, then what it gives, joined by arrows." }
         }
+      },
+      "hdr": {
+        "_about": "D-068, his L-05 (\"another header row for principal moments, like the core stages, and inside we can put branches of those stages\"). Both looks are my proposal (D-025.2); two rows with a bracket over the ways is my pick, dashed.",
+        "label": "the header",
+        "pick": "band",
+        "opts": {
+          "band": { "name": "stages over moments", "plain": "A row of stages above the moments. Where a request takes one of several ways (the excepts of one try, or going on), a bracket over their heads says how many." },
+          "road": { "name": "stages, roads, moments", "plain": "A row of stages; under it the road, whether the moments below come in turn or are ways a request takes one of; then the moments." }
+        }
+      },
+      "save": {
+        "_about": "D-068, his L-05: the stage the handler's own save stands in. Both are my proposal; saving under EFFECTS is my pick, dashed, so every stage the station draws has a moment.",
+        "label": "saving",
+        "pick": "eff",
+        "opts": {
+          "eff": { "name": "saving under EFFECTS", "plain": "The handler's own commit stands under EFFECTS, the writes it leaves behind, after the handler's other moments." },
+          "hand": { "name": "saving under HANDLER", "plain": "The handler's own commit stays under HANDLER, the handler's code; EFFECTS is drawn as an empty outline beside it." }
+        }
+      },
+      "meta": {
+        "_about": "D-068, his L-06 (\"separate from the table at the end. Or at the beginning\"): where the endpoint metadata stands. After the table, his first words, is my pick, dashed.",
+        "label": "the metadata",
+        "pick": "after",
+        "opts": {
+          "after": { "name": "metadata after the table", "plain": "The endpoint metadata stands under the table, before what the map cannot place." },
+          "before": { "name": "metadata before the table", "plain": "The endpoint metadata stands above the table, under the bar." }
+        }
+      },
+      "wid": {
+        "_about": "D-068, his L-21 (\"click the columns for accommodation … give a little more width to put the contents as is expected\"): what a click on a head gives its column. Both are my proposal; names whole is my pick, dashed.",
+        "label": "a head's click",
+        "pick": "names",
+        "opts": {
+          "names": { "name": "names whole", "plain": "Clicking a moment's head widens its column until no name inside breaks in the middle of a word; a name still breaks after its _ . / or at a space." },
+          "line": { "name": "every item on one line", "plain": "Clicking a moment's head widens its column until every item inside stands on one line." }
+        }
+      },
+      "fit": {
+        "_about": "D-068, his L-21 (\"a button that will force accommodation by minimizing or moving the other columns around\"): what the fit button does. Both are my proposal; narrowing the rest is my pick, dashed.",
+        "label": "fit",
+        "pick": "min",
+        "opts": {
+          "min": { "name": "narrow the rest", "plain": "The fit button narrows the columns that do not fit, the ones with fewest items first, to a strip where each cell says how many items it holds; click a strip to widen it. A widened column keeps its width." },
+          "bands": { "name": "wrap into bands", "plain": "The fit button wraps the table into bands of moments that fit the box, one under the other: time runs left to right, then down." }
+        }
       }
     },
+    "sets": { "table": "the table", "items": "the items", "cols": "the columns" },
+    "stg": {
+      "_about": "D-068, his L-05: the stage band over the moments. Which stage each moment stands in is gen-all-endpoints.py's (MO_STAGE, proven against each ending's stage); the words, the numbering and the bracket are my proposal.",
+      "head": "stage",
+      "out": { "name": "outside the request", "plain": "Not a stage of the request: the server starting before any request, the screen that sends it, and what happens once the answer has left." },
+      "part": "{i} of {k}",
+      "partPlain": "The request comes back to this stage later: this is part {i} of {k}, in time order.",
+      "why": { "INPUT": "FastAPI reads the body before the dependencies run, and checks the fields after them." },
+      "n": "{n} endings leave from here",
+      "n1": "one ending leaves from here",
+      "n0": "no ending leaves from here",
+      "eff": { "name": "EFFECTS", "plain": "In this look the handler's own save stays under HANDLER, so EFFECTS has no moment of its own: the writes land inside the handler's moments, and the Data effects row shows them." },
+      "fork": {
+        "name": "one of {n}",
+        "one": "one way of {n}",
+        "plain": "A request takes one of these {n} ways: an except of this try turns the error its call raised into an ending, or nothing is raised and the handler goes on.",
+        "way": "way {i}: {v}",
+        "this": "this path: {v}",
+        "none": "this path takes none of them: it leaves before the try, or its error escapes"
+      },
+      "road": { "head": "road", "seq": "in turn", "seqPlain": "These moments come one after another; a request can end at any of them." }
+    },
+    "col": {
+      "_about": "D-068, his L-21: the columns' controls. Their words are my proposal; what widening and fit do are options (mo.opt.wid, mo.opt.fit).",
+      "hide": "hide {v}",
+      "hidePlain": "Hide this moment; the bar keeps it, to bring it back.",
+      "hideRow": "hide this row",
+      "hideRowPlain": "Hide this row; the bar keeps it, to bring it back.",
+      "hid": "hidden",
+      "restore": "show {v} again",
+      "all": "show all",
+      "fit": "fit to the box",
+      "fitPlain": "Make the table fit its box, the way the squares beside it say; again to turn it off.",
+      "widen": "Click: widen this column to what it holds; again: give the width back.",
+      "wide": "widened",
+      "mini": "Narrowed to fit: each cell says how many items it holds. Click to widen it.",
+      "copy": "the columns",
+      "cWid": "widened {v}",
+      "cHid": "hidden {v}",
+      "cFit": "fit on, {v}"
+    },
+    "rowh": {
+      "_about": "D-068, his L-20 (\"those are interesting pieces that I would like to see reflected here\"): a row's head repeats its block's columns of the pinned row, with the same head words and this endpoint's values. The options slot holds what is the row's alone. Both are my proposal.",
+      "opts": "{v}: this row's options",
+      "light": "Click: light what this column counts, here and in its cell of the pinned row; again: turn it off.",
+      "cnt": "counted in: {v}"
+    },
     "jy": {
-      "_about": "D-065, his ruling 2026-09-28 (\"build A and B\"): a journey's other requests at the outer moments of Proof, and the journeys that cannot be ordered named in Proof's last column. The two looks, the chip's words and the hover are my proposal (D-025.2): one chip per journey per side of each call it makes here is my pick (review J1: each call here has its own pair). Which journeys, their steps, the path join and the reasons are read and proven by gen-all-endpoints.py (by_moment).",
+      "_about": "D-065, his ruling 2026-09-28 (\"build A and B\"): a journey's other requests at the outer moments of Proof, and the journeys that cannot be ordered named in the endpoint metadata. The two looks, the chip's words and the hover are my proposal (D-025.2): one chip per journey per side of each call it makes here is my pick (review J1: each call here has its own pair). Which journeys, their steps, the path join and the reasons are read and proven by gen-all-endpoints.py (by_moment).",
       "before": "{n} steps before",
       "before1": "{n} step before",
       "after": "{n} steps after",
@@ -920,19 +1012,21 @@
       },
       "role": { "act": "acts", "arrange": "arranges", "arrange-checked": "arranges, checks the status" },
       "plain": "A journey is a test that calls this endpoint and others, one after another. Each of its calls here stays where it is: the proof at its ending, or its line among the cases that arrange through it. Around each one its other requests stand: the earlier ones before any request, the later ones after the answer. With a path picked, a call here keeps its chips when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded.",
-      "feed": "Journeys: the Gabe Universe names {jyRows} across the page's endpoints, on {jyEps} of them, and counts {jyMore} more on {jyMoreEps} of them that it does not name. {jyOrd} walk across their endpoint and others and stand at the outer moments, around each of the {jyCalls} calls they make to it: with a path picked, {jyRefs} of those calls keep their chips by the ending the call proves, {jyStat} by the one ending of the status it asserts, and {jyNone} leave. The rest are named in Proof's last column with the reason: {jyAgg} groups of web or end-to-end cases whose report is not read, {jyNoRec} tests with no record of their requests, {jyOne} that record one request, {jyNoHere} none of whose recorded requests calls their endpoint, and {jyOnly} whose every request calls it."
+      "feed": "Journeys: the Gabe Universe names {jyRows} across the page's endpoints, on {jyEps} of them, and counts {jyMore} more on {jyMoreEps} of them that it does not name. {jyOrd} walk across their endpoint and others and stand at the outer moments, around each of the {jyCalls} calls they make to it: with a path picked, {jyRefs} of those calls keep their chips by the ending the call proves, {jyStat} by the one ending of the status it asserts, and {jyNone} leave. The rest are named in the endpoint metadata, on Proof's card with the reason: {jyAgg} groups of web or end-to-end cases whose report is not read, {jyNoRec} tests with no record of their requests, {jyOne} that record one request, {jyNoHere} none of whose recorded requests calls their endpoint, and {jyOnly} whose every request calls it."
     },
     "band": {
       "title": "not placed",
-      "plain": "What should have a moment and the map cannot place, each with its reason. What has no moment by nature stands in the table's last column, no moment, beside the journeys whose requests cannot be set in order around this one.",
+      "plain": "What should have a moment and the map cannot place, each with its reason. What has no moment by nature stands in the endpoint metadata, beside the journeys whose requests cannot be set in order around this one.",
       "count": "{n} not placed",
       "all": "the map places every element that should have a moment"
     },
     "nm": {
-      "_about": "D-064 (2), his ruling 2026-09-28: the facts no moment holds, per block, as the table's last column (the last row when the moments are rows). Its place at the end, its name and these words are my proposal; which facts stand there, and in which block's row, is read from the ruled tree's homes by gen-all-endpoints.py (no_moment) and proven there. `only` names the blocks whose every fact has no moment.",
-      "name": "no moment",
-      "plain": "What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it.",
-      "empty": "nothing here without a moment",
+      "_about": "D-064 (2), his ruling 2026-09-28: the facts no moment holds, per block. D-068, his ruling 2026-09-30 (L-06, L-07): out of the table, into the endpoint metadata, one card per block. Its place (after the table, my pick; before it, its option), its name and these words are my proposal; which facts stand there, and on which block's card, is read from the ruled tree's homes by gen-all-endpoints.py (no_moment) and proven there. `only` names the blocks whose every fact has no moment.",
+      "name": "endpoint metadata",
+      "plain": "Facts with no moment: what the endpoint is and what sums it up, one card per block. Each is true of every path, so the path row never hides it; and, on Proof's card, the journeys whose requests cannot be set in order around this one, each with its reason.",
+      "deep": "{d} calls deep",
+      "deep1": "{d} call deep",
+      "named": "named",
       "only": ["over"],
       "k": {
         "ep": { "name": "method and path", "plain": "The verb and the URL a client calls." },
@@ -956,7 +1050,7 @@
         "chain": { "text": "{n} steps on its longest path", "name": "the longest path", "plain": "How many steps the longest path a request can take runs through." },
         "arr": { "text": "arranges", "name": "arranges another test", "plain": "A case that calls this endpoint only to set another test up. A test has no time inside the request, and this one proves no ending here." },
         "jy": { "name": "a journey not ordered", "plain": "A journey the Gabe Universe names for this endpoint whose requests cannot be set in order around this one; the reason says why.",
-          "col": "Its requests happen at moments like any request's; it stands in this column only because they cannot be set in order around this one. The path row never hides it.",
+          "col": "Its requests happen at moments like any request's; it stands in the metadata only because they cannot be set in order around this one. The path row never hides it.",
           "why": {
             "agg": { "name": "report not read", "plain": "A group of cases from the {corpus} tests. Only the pytest report is read, so which requests they make, and in what order, is not known." },
             "one": { "name": "no walk", "plain": "The test records {n} request(s), so there is no walk across endpoints to set around this one." },
@@ -1200,7 +1294,7 @@
     "beyondCount": "{n} tables only in BY MOMENT",
     "more": "+{n} in BY MOMENT",
     "beyond": "+{n} tables only in BY MOMENT",
-    "tipAll": "BY MOMENT carries this field whole: each of its elements stands at a moment there.",
+    "tipAll": "BY MOMENT carries this field whole: each of its elements stands at a moment there, or in its endpoint metadata.",
     "tipPart": "BY MOMENT carries {n} of its {of} elements.",
     "tipEmpty": "This field holds nothing on this endpoint: nothing for BY MOMENT to carry, and nothing it leaves out. Dim and hide fade it, and the header counts it apart.",
     "tipBeyond": "BY MOMENT's steps also touch {n} tables this field does not list: {names}. The code map is short of them.",
@@ -1210,10 +1304,10 @@
       "uni": {
         "opts": {
           "all": "Every row of the universe card, as it is.",
-          "dim": "An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name; a journey BY MOMENT draws, at the outer moments or by name in its last column. A row whose items it draws, every one, fades with its title. Pointing at one brings it back.",
+          "dim": "An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name; a journey BY MOMENT draws, at the outer moments or by name in its endpoint metadata. A row whose items it draws, every one, fades with its title. Pointing at one brings it back.",
           "hide": "An item BY MOMENT draws leaves the card; a row whose items it draws, every one, leaves with its title; a row it draws in part says how many of its items are there."
         },
-        "plain": "Carried, on the universe card: an item BY MOMENT draws at a moment, on any path, or in its last column, found by the key the code map's switch reads, or, for a function Code behind names without a key, by its name (when that name is one function there); a table an access or a connection reads or writes, by a chip of that same op (a read never carries a write); the endpoint is BY MOMENT's heading. A count or a line (the usage, the fields a payload ferries, a file's cases, the layer, the fan-in) stays unless the card names every member it counts and BY MOMENT draws each one; the cluster, the signature, the docstring, a flag and the count behind are carried by BY MOMENT's last column, which draws them. A journey is carried when BY MOMENT draws it: its other requests at the outer moments of Proof, or, when they cannot be set in order, its name in Proof's last column; the journeys the Gabe Universe counts without naming them (the +N of that row's count) never are, so that row is carried in part at most. What BY MOMENT holds only in its band, not placed, is not carried.",
+        "plain": "Carried, on the universe card: an item BY MOMENT draws at a moment, on any path, or in its endpoint metadata, found by the key the code map's switch reads, or, for a function Code behind names without a key, by its name (when that name is one function there); a table an access or a connection reads or writes, by a chip of that same op (a read never carries a write); the endpoint is BY MOMENT's heading. A count or a line (the usage, the fields a payload ferries, a file's cases, the layer, the fan-in) stays unless the card names every member it counts and BY MOMENT draws each one; the cluster, the signature, the docstring, a flag and the count behind are carried by BY MOMENT's endpoint metadata, which draws them. A journey is carried when BY MOMENT draws it: its other requests at the outer moments of Proof, or, when they cannot be set in order, its name in the endpoint metadata; the journeys the Gabe Universe counts without naming them (the +N of that row's count) never are, so that row is carried in part at most. What BY MOMENT holds only in its band, not placed, is not carried.",
         "tipAll": "BY MOMENT draws every item of this row.",
         "tipPart": "BY MOMENT draws {n} of its {of} items."
       },
@@ -1223,12 +1317,12 @@
           "dim": "A gap BY MOMENT already carries fades: a name it draws at a moment; an attribute of the universe card whose items it draws, every one; an attribute of the code map whose fields it carries whole. A block of such gaps fades with its head. Pointing at one brings it back.",
           "hide": "A gap BY MOMENT already carries leaves; a block it carries whole leaves with its head; a block or an attribute it carries in part says how many are there."
         },
-        "plain": "The switch reads whichever way the gaps are shown. From the code map: an attribute is carried when every code-map field that holds it is carried whole, as the code map's own switch reads it; a field with nothing here is passed over, and a field that sums the endpoint up is one element, carried when BY MOMENT's last column draws it. From the universe: a name is carried when BY MOMENT draws every item of the card it names (a journey, by the journey BY MOMENT draws; a table's read and its write); an attribute when BY MOMENT draws every item of the row that holds it; a row that maps to no attribute when it draws every item of that row.",
+        "plain": "The switch reads whichever way the gaps are shown. From the code map: an attribute is carried when every code-map field that holds it is carried whole, as the code map's own switch reads it; a field with nothing here is passed over, and a field that sums the endpoint up is one element, carried when BY MOMENT's endpoint metadata draws it. From the universe: a name is carried when BY MOMENT draws every item of the card it names (a journey, by the journey BY MOMENT draws; a table's read and its write); an attribute when BY MOMENT draws every item of the row that holds it; a row that maps to no attribute when it draws every item of that row.",
         "tipAll": "BY MOMENT already carries all of it.",
         "tipPart": "BY MOMENT carries {n} of its {of} elements."
       }
     },
-    "plain": "Carried: an element BY MOMENT places at a moment, on any path, or a fact one of its elements draws. A table read is carried by a chip that reads it, a table written by one that writes it. A list carries each of its items apart: an alarm when every fact it reads stands at its moment, a path's fate when its writes wear it on its pick (or it writes nothing of its own). A count is carried when every member it counts is placed, in part when some are. A field that sums the whole endpoint up (the count of the fates, the alarms' dots, the longest chain, the count behind, the proof's rank) is carried by BY MOMENT's last column, no moment, which draws it; so is what the endpoint is there (its entity, the handler's file, the cases that only arrange through it, the norms it lacks). A field with nothing on this endpoint is counted apart, never as left. Where BY MOMENT's steps touch tables the code map does not list, the tables fields stay in every look and say how many, and the header counts them."
+    "plain": "Carried: an element BY MOMENT places at a moment, on any path, or a fact one of its elements draws. A table read is carried by a chip that reads it, a table written by one that writes it. A list carries each of its items apart: an alarm when every fact it reads stands at its moment, a path's fate when its writes wear it on its pick (or it writes nothing of its own). A count is carried when every member it counts is placed, in part when some are. A field that sums the whole endpoint up (the count of the fates, the alarms' dots, the longest chain, the count behind, the proof's rank) is carried by BY MOMENT's endpoint metadata, which draws it; so is what the endpoint is there (its entity, the handler's file, the cases that only arrange through it, the norms it lacks). A field with nothing on this endpoint is counted apart, never as left. Where BY MOMENT's steps touch tables the code map does not list, the tables fields stay in every look and say how many, and the header counts them."
   },
   "authNoScheme": "own check",
   "authNoSchemePlain": "It asks for a login through its own check, with no declared scheme: the check reads the token itself, not from the usual header.",
@@ -1295,17 +1389,17 @@
         "table": [
           { "dir": "b", "at": "callee @ CODE BEHIND", "why": "cnt", "status": "solved", "line": "The code map counts this callee among the functions behind the handler, linked here. The feeds hold no single function for the name, so it cannot be named on its own." },
           { "dir": "b", "at": "case @ TESTS", "why": "cnt", "status": "solved", "line": "The code map counts this case in the fields linked here — the calls that act on this endpoint and, where a call proves an ending, that ending — without naming it." },
-          { "dir": "b", "at": "case @ JOURNEYS", "why": "cnt", "status": "solved", "line": "The code map counts this journey's case in the fields linked here — the calls that act on this endpoint and, where a call proves an ending, that ending — without naming it. BY MOMENT draws the journey itself (D-065): its other requests at the outer moments of Proof, or, where they cannot be set in order, its name in Proof's last column with the reason." },
-          { "dir": "b", "at": "case @ TESTS", "why": "gap", "q": "other", "status": "open", "line": "The tests arm read this case's calls, and none of them reaches this endpoint (forms.json test_cases, each call's endpoint); the station credits the case here from its test ledger (the station graph's det.cases, by the handler or its route). Which reading holds is not measured yet: the measurement owed is whether the case reaches the endpoint through a call the extractor does not follow. Where the Gabe Universe also names this case as a journey here, BY MOMENT names that journey in Proof's last column with the reason no call here (D-065): that carries the journey, never this case." },
-          { "dir": "b", "at": "case @ JOURNEYS", "why": "gap", "q": "other", "status": "open", "line": "The tests arm read this journey's calls, and none of them reaches this endpoint (forms.json test_cases, each call's endpoint); the station credits it here from its test ledger (the station graph's det.cases). Which reading holds is not measured yet: the measurement owed is whether the case reaches the endpoint through a call the extractor does not follow. BY MOMENT names it in Proof's last column with that reason, no call here (D-065)." },
+          { "dir": "b", "at": "case @ JOURNEYS", "why": "cnt", "status": "solved", "line": "The code map counts this journey's case in the fields linked here — the calls that act on this endpoint and, where a call proves an ending, that ending — without naming it. BY MOMENT draws the journey itself (D-065): its other requests at the outer moments of Proof, or, where they cannot be set in order, its name in the endpoint metadata, on Proof's card, with the reason." },
+          { "dir": "b", "at": "case @ TESTS", "why": "gap", "q": "other", "status": "open", "line": "The tests arm read this case's calls, and none of them reaches this endpoint (forms.json test_cases, each call's endpoint); the station credits the case here from its test ledger (the station graph's det.cases, by the handler or its route). Which reading holds is not measured yet: the measurement owed is whether the case reaches the endpoint through a call the extractor does not follow. Where the Gabe Universe also names this case as a journey here, BY MOMENT names that journey in the endpoint metadata, on Proof's card with the reason no call here (D-065): that carries the journey, never this case." },
+          { "dir": "b", "at": "case @ JOURNEYS", "why": "gap", "q": "other", "status": "open", "line": "The tests arm read this journey's calls, and none of them reaches this endpoint (forms.json test_cases, each call's endpoint); the station credits it here from its test ledger (the station graph's det.cases). Which reading holds is not measured yet: the measurement owed is whether the case reaches the endpoint through a call the extractor does not follow. BY MOMENT names it in the endpoint metadata, on Proof's card with that reason, no call here (D-065)." },
           { "dir": "b", "at": "case @ TESTS", "why": "gap", "q": "no calls", "status": "open", "line": "The tests arm read no call in this case (its forms.json record lists none), so nothing joins it to an ending. Carrying it needs the test extractor of the tests arm to read the call the case makes; which call shape it misses is not measured yet." },
           { "dir": "b", "at": "cases @ TESTS", "why": "cnt", "status": "solved", "line": "The code map counts the cases that prove each ending, per ending and in the test columns linked here, without naming them. Each case below carries its own status." },
-          { "dir": "b", "at": "cases @ JOURNEYS", "why": "cnt", "status": "solved", "line": "The code map counts the journeys' cases whose calls act on this endpoint, in the fields linked here, without naming them; BY MOMENT draws each journey around this request, or names it in Proof's last column (D-065). Each journey below carries its own status." },
+          { "dir": "b", "at": "cases @ JOURNEYS", "why": "cnt", "status": "solved", "line": "The code map counts the journeys' cases whose calls act on this endpoint, in the fields linked here, without naming them; BY MOMENT draws each journey around this request, or names it in the endpoint metadata, on Proof's card (D-065). Each journey below carries its own status." },
           { "dir": "b", "at": "cases @ TESTS", "why": "gap", "q": "drawn", "status": "open", "line": "None of the cases the card names here makes a call that acts on this endpoint, and the code map counts act calls only. Each case below carries its own status: where it is held, and what carrying it needs." },
           { "dir": "b", "at": "cases @ TESTS", "why": "gap", "q": "none drawn", "status": "open", "line": "The card names no case here, and the code map names none either: it counts the calls of the pytest corpus that act on this endpoint, if any, in the test columns. Naming the cases that prove an ending needs the code map to list the case ids forms.json puts on each ending's tests refs (the tests arm)." },
-          { "dir": "b", "at": "cases @ JOURNEYS", "why": "gap", "q": "drawn", "status": "open", "line": "None of the journeys the card names here makes a call that acts on this endpoint, and the code map counts act calls only; BY MOMENT draws each journey around this request, or names it in Proof's last column (D-065). Each journey below carries its own status: where it is held, and what carrying it needs." },
+          { "dir": "b", "at": "cases @ JOURNEYS", "why": "gap", "q": "drawn", "status": "open", "line": "None of the journeys the card names here makes a call that acts on this endpoint, and the code map counts act calls only; BY MOMENT draws each journey around this request, or names it in the endpoint metadata, on Proof's card (D-065). Each journey below carries its own status: where it is held, and what carrying it needs." },
           { "dir": "b", "at": "file @ TESTS", "why": "gap", "status": "open", "line": "A test file of a corpus the tests arm does not read names this route (the tests arm reads pytest junit only); the station counts its cases by that file, the test ledger's route credit (the station graph's det.case_files). Carrying it needs the tests arm to read that corpus's report, or the code map to take the same route credit." },
-          { "dir": "b", "at": "journey @ JOURNEYS", "why": "gap", "status": "open", "line": "A journey of a corpus the tests arm does not read (it reads pytest junit only); the station takes it from its test ledger. BY MOMENT names it in Proof's last column with that reason (D-065). Setting its requests in order around this one needs the tests arm to read that corpus's report: generation work, left for later." },
+          { "dir": "b", "at": "journey @ JOURNEYS", "why": "gap", "status": "open", "line": "A journey of a corpus the tests arm does not read (it reads pytest junit only); the station takes it from its test ledger. BY MOMENT names it in the endpoint metadata, on Proof's card with that reason (D-065). Setting its requests in order around this one needs the tests arm to read that corpus's report: generation work, left for later." },
           { "dir": "b", "at": "schema @ CONNECTIONS", "why": "gap", "q": "other", "status": "open", "line": "It is neither the body nor the reply nor inside them, so forms.json does not tie it to this endpoint; the station draws the handler's structural touches edge to it (the station's graph feed). Which use that edge reads is not measured yet: that is the measurement owed." },
           { "dir": "b", "at": "table @ CONNECTIONS", "why": "alt", "status": "solved", "line": "The code map holds the same table among the endpoint's reads and writes, in the field linked here; the station's Connections draw it from the same kind of read." },
           { "dir": "b", "at": "tables-touched @ CONNECTIONS", "why": "gap", "q": "none drawn", "status": "not", "line": "Nothing to solve here: the card's Connections draw no table and the code map holds none. The item comes from reading the row as showing tables on every endpoint, the gaps' own proposal (D-040)." },
