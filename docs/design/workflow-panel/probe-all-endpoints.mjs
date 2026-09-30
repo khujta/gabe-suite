@@ -326,7 +326,9 @@ ok(labSha() === LAB0, 'the lab\'s own facts file is untouched by the sample');
   await shot('one-endpoint');
   const full = await p.evaluate(() => { document.getElementById('more-btn').click(); return document.body.innerText; });
   ok(!/\b(door|doors|lock|locks)\b/i.test(full), 'no string on the page says a word D-018 took out', (full.match(/.{30}\b(door|lock)s?\b.{30}/i) || [''])[0]);
-  const small = await p.evaluate(() => { const bad = []; document.querySelectorAll('body *').forEach((e) => { if (!e.offsetParent && e.tagName !== 'BODY') return;
+  // CHANGED 2026-09-30 (D-071): a part of an examples block is sized by its look — his DATA line (D-027) sizes the channel chip and the count
+  // at 11px, his choice below the floor as in the lab — so those parts are set aside here; the bench's controls and lists keep the floor
+  const small = await p.evaluate(() => { const bad = []; document.querySelectorAll('body *').forEach((e) => { if (!e.offsetParent && e.tagName !== 'BODY') return; if (e.closest('#sec-ex .blk .bkhd [data-part]')) return;
     const own = [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); if (!own) return; const fs = parseFloat(getComputedStyle(e).fontSize); if (fs < 12) bad.push(e.tagName + '.' + e.className + ' ' + fs); }); return bad; });
   ok(!small.length, 'no visible text under the 12px floor', small.slice(0, 4));
   // REMOVED 2026-09-23 (D-036): "Escape closes the side panel" — there is no panel to close; the section stays on the page
@@ -391,7 +393,8 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   // CHANGED 2026-09-26 (D-058): the Gabe Universe's and the gaps' own switches add their lines after the code map's — eight lines now
   // CHANGED 2026-09-28 (D-065): BY MOMENT's journeys look adds one more — nine lines now
   const CL = W8.copy.lines, isSlook = (l) => l.startsWith(CL.slook + ': '), isEp = (l) => l.startsWith(CL.open + ': ');
-  const isSet = (l) => l.startsWith(CL.cm + ' · ') || l.startsWith(CL.mo + ' · ') || l.startsWith(CL.uni + ' · ') || l.startsWith(CL.gaps + ' · ');
+  // CHANGED 2026-09-30 (D-071): the examples bench adds one line per kind ("examples · <kind> · …") after BY MOMENT's — set aside too
+  const isSet = (l) => l.startsWith(CL.cm + ' · ') || l.startsWith(CL.mo + ' · ') || l.startsWith(CL.uni + ' · ') || l.startsWith(CL.gaps + ' · ') || l.startsWith(W8.ex.copy.where + ' · ');
   const asPaste = (out) => { const blk = out.slice(0, out.indexOf('')), his = blk.filter((l) => !isSlook(l) && !isEp(l) && !isSet(l));
     return { blk, his, same: his.length === paste.length && his[0] === 'page: all-endpoints · ' + D.tok.app + ' @ ' + D.tok.head && JSON.stringify(his.slice(1)) === JSON.stringify(paste.slice(1)) }; };
   await open(PAGE);
@@ -401,8 +404,10 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   ok(sl.length === 1 && a0.blk.indexOf(sl[0]) === colsAt + 1, 'the copy text puts the Shared treatment\'s line right under the columns line', a0.blk);
   const set0 = a0.blk.filter(isSet);
   // CHANGED 2026-09-28 (D-065): BY MOMENT's journeys look adds its line after BY MOMENT's two looks — nine lines now
-  ok(el0.length === 1 && set0.length === 9 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-10)) === JSON.stringify([el0[0]].concat(set0)),
-    'the copy text adds the endpoint shown, then the code map\'s and BY MOMENT\'s settings, last', a0.blk);
+  // CHANGED 2026-09-30 (D-071): and the examples bench's eight lines after them — seventeen lines now
+  ok(el0.length === 1 && set0.length === 9 + D.ex.kinds.length && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-(1 + set0.length))) === JSON.stringify([el0[0]].concat(set0))
+     && set0.slice(9).every((l) => l.startsWith(W8.ex.copy.where + ' · ')),
+    'the copy text adds the endpoint shown, then the code map\'s, BY MOMENT\'s and the examples\' settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
   const OLD = { lay: 'three', grp: 'method', alone: 'own', gord: 'name', shared: 'first', bord: 'card', cols: 'top', heat: 'plain', norm: 'full', sort: { col: 'tables', dir: -1 } };
@@ -553,7 +558,8 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
   /* the page's sections, in order: the endpoints, one endpoint, the copy text, and more information LAST */
   const secs = await p.evaluate(() => [...document.querySelectorAll('section')].map((s) => s.id));
   /* CHANGED 2026-09-26 (his ask): BY MOMENT stands right after ONE ENDPOINT, the endpoint it follows */
-  ok(JSON.stringify(secs) === JSON.stringify(['sec-board', 'sec-one', 'sec-mo', 'sec-copy', 'sec-more']), 'the page is the endpoints, then one endpoint, then by moment, then the copy text, then more information', secs);
+  /* CHANGED 2026-09-30 (D-071, his L-23): the examples bench stands between ONE ENDPOINT and BY MOMENT */
+  ok(JSON.stringify(secs) === JSON.stringify(['sec-board', 'sec-one', 'sec-ex', 'sec-mo', 'sec-copy', 'sec-more']), 'the page is the endpoints, then one endpoint, then the examples, then by moment, then the copy text, then more information', secs);
   ok(await p.evaluate(() => { const m = document.getElementById('sec-more'), all = [...document.querySelectorAll('.artifact-page *')];
     return all.filter((x) => x.offsetParent !== null && !m.contains(x) && (m.compareDocumentPosition(x) & Node.DOCUMENT_POSITION_FOLLOWING)).length === 0; }), 'nothing on the page is drawn after more information');
   /* a cold start shows the first row drawn */
@@ -2369,6 +2375,71 @@ ok(!errs.length, 'no page error after the D-065 checks', errs);
   ok(await p.isVisible('#partial'), 'a fixture page says it draws part of the feed');
   ok(labSha() === LAB0, 'the lab\'s own facts file is untouched by the fixture build'); }
 ok(!errs.length, 'no page error on the fixture', errs);
+
+/* 8 · D-071 · THE EXAMPLES BENCH (his L-23 · L-08 · L-13 · L-11) — smoke checks (D-037): the fixture's in-flight column says absent;
+   then on the page: eight columns in his order between ONE ENDPOINT and BY MOMENT, each drawing a block; the table's copy line carries his
+   DATA line's block segment word for word; a real drag moves a part in the drawn block and in the copy line; a part dragged into "not drawn"
+   leaves the block; the gate column's role filter narrows its list; C267's test block names 201 and the two headers it sends and opens
+   on the ordered chain; ONE hover per block, in → does → out; the page's copy text carries one line per kind */
+{ const WX = D.words.ex, EXD = D.ex, CX = '#exgrid .excol';
+  /* the fixture still open from section 7: its in-flight arm is off, so the column says absent and draws no block */
+  const fx8 = await p.evaluate((a) => { const c = document.querySelector('#exgrid .excol[data-k="inf"]'); return c ? { say: (c.querySelector('.exnone') || {}).textContent || '', blk: !!c.querySelector('.blk') } : null; }, null);
+  ok(fx8 && !fx8.blk && fx8.say.startsWith(D.words.absent), 'D-071 · on the arms-off fixture the in-flight column says absent and draws no block', fx8);
+  await open(PAGE); await p.click('#board tr.row[data-ep="POST /cooking/sessions"] td.id'); await p.waitForTimeout(200);
+  await p.$eval('#sec-ex', (e) => e.scrollIntoView({ block: 'start' })); await p.waitForTimeout(80);
+  const c8 = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol')].map((c) => [c.getAttribute('data-k'), !!c.querySelector('.blk'), (c.querySelector('.exline') || {}).textContent || '']));
+  ok(JSON.stringify(c8.map((x) => x[0])) === JSON.stringify(['end', 'table', 'schema', 'fn', 'test', 'gate', 'hook', 'inf']) && JSON.stringify(EXD.kinds) === JSON.stringify(c8.map((x) => x[0])),
+    'D-071 · eight columns across the page in his order: ending · table · schema · function · test · gate or decision · client hook · in-flight', c8.map((x) => x[0]));
+  ok(c8.every((x) => x[1] && x[2].startsWith(WX.copy.where + ' · ')), 'D-071 · every column draws its example as a block, with its copy line under it', c8.filter((x) => !x[1]).map((x) => x[0]));
+  const tl = c8[1][2];
+  ok(tl.includes(' · ' + EXD.his + ' · ') && tl.endsWith('(' + WX.whose.his.name + ', ' + WX.look.table.ruled + ')') && EXD.his.startsWith('block block (icon on model, chip on, name on, entity both, count badge, model both) · edge left solid 2px'),
+    'D-071 · the table boots on his DATA line: its copy line carries the block segment he pasted, word for word, and says whose it is', tl);
+  const tb0 = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol[data-k="table"] .blk .bkln')].map((l) => [...l.querySelectorAll(':scope > .bkcol.l > [data-part]')].map((n) => n.getAttribute('data-part')).join(' ') + ' | ' + [...l.querySelectorAll(':scope > .bkcol.r > [data-part]')].map((n) => n.getAttribute('data-part')).join(' ')));
+  ok(JSON.stringify(tb0) === JSON.stringify(['icon name | ', 'ent | count rw', 'model | ']), 'D-071 · the table block draws its parts on his three lines', tb0);
+  /* a real drag: the channel chip from line 2's right side to line 1's right side */
+  await p.click(CX + '[data-k="table"] .exfold[data-fold="parts"]'); await p.waitForTimeout(80);
+  await p.dragAndDrop(CX + '[data-k="table"] .exz[data-line="1"][data-side="r"] .expc[data-part="rw"]', CX + '[data-k="table"] .exz[data-line="0"][data-side="r"]'); await p.waitForTimeout(120);
+  const dr = await p.evaluate(() => ({ l1: [...document.querySelectorAll('#exgrid .excol[data-k="table"] .blk .bkln:first-child [data-part]')].map((n) => n.getAttribute('data-part')),
+    cp: document.querySelector('#exgrid .excol[data-k="table"] .exline').textContent }));
+  ok(dr.l1.join(' ') === 'icon name rw' && dr.cp.includes(' · lines icon name | rw / ent | count / model | — · ') && dr.cp.endsWith('(' + D.words.copy.his + ')'),
+    'D-071 · dragging the channel chip to line 1 moves it in the drawn block and in the copy line, which now says the look is his choice', dr);
+  await p.evaluate(() => window.__allepEx.move('table', 'model', 'off')); await p.waitForTimeout(80);
+  const off = await p.evaluate(() => ({ drawn: !!document.querySelector('#exgrid .excol[data-k="table"] .blk [data-part="model"]'), tray: [...document.querySelectorAll('#exgrid .excol[data-k="table"] .exz.exoff .expc')].map((n) => n.getAttribute('data-part')),
+    cp: document.querySelector('#exgrid .excol[data-k="table"] .exline').textContent }));
+  ok(!off.drawn && off.tray.join() === 'model' && off.cp.includes(', model off)') && off.cp.includes(' · ' + WX.ctl.tray + ' model '), 'D-071 · a part dragged into not drawn leaves the block, and the copy line says so', off);
+  await p.click(CX + '[data-k="table"] .exreset'); await p.waitForTimeout(80);
+  ok((await p.$eval(CX + '[data-k="table"] .exline', (e) => e.textContent)).includes(' · ' + EXD.his + ' · '), 'D-071 · back to the default puts the table on his DATA line again');
+  /* EX-4 · the gate column's role filter narrows its list */
+  const g0 = await p.$$eval(CX + '[data-k="gate"] .exselect option', (o) => o.length);
+  await p.click(CX + '[data-k="gate"] .exrc[data-role="rule"]'); await p.waitForTimeout(80);
+  const g1 = await p.evaluate(() => ({ n: document.querySelectorAll('#exgrid .excol[data-k="gate"] .exselect option').length, roles: window.__allepEx.items('gate').map((x) => x.role) }));
+  const nRule = (D.rows.find((r) => r.id === 'POST /cooking/sessions').ex.gate || []).filter((e) => e[1] === 'rule').length;
+  ok(g1.n === nRule && nRule > 0 && g1.n < g0 && g1.roles.every((r) => r === 'rule'), 'D-071 · EX-4 · a role chip narrows the gate column to that role (' + nRule + ' field rules of ' + g0 + ')', { g0, g1 });
+  await p.click(CX + '[data-k="gate"] .exrc[data-role="rule"]'); await p.waitForTimeout(60);
+  /* EX-3 · C267: the face names what it proves and the headers it sends; the click opens the ordered chain */
+  await p.selectOption(CX + '[data-k="test"] .exselect', 'case:C267'); await p.waitForTimeout(100);
+  const t8 = await p.$eval(CX + '[data-k="test"] .blk .bkhd', (e) => e.innerText);
+  ok(/\b201\b/.test(t8) && t8.includes('Authorization') && t8.includes('Idempotency-Key') && t8.includes('C267'), 'D-071 · EX-3 · C267\'s block names the case, the 201 it proves and the two headers it sends', t8);
+  await p.click(CX + '[data-k="test"] .blk .bkhd'); await p.waitForTimeout(100);
+  const ch8 = await p.$eval(CX + '[data-k="test"] .exfl', (e) => e.innerText);
+  const CH = WX.chain, order = [CH.request, CH.checks, CH.fns, CH.tables, CH.ending].map((w) => ch8.indexOf(w));
+  ok(order.every((i, j) => i >= 0 && (!j || i > order[j - 1])) && ch8.toLowerCase().includes(WX.notKnown.title)
+     && ch8.includes('Authorization') && ch8.includes(WX.notKnown.which.replace('{n}', '2').replace('{status}', '201')),
+    'D-071 · EX-3 · the open block reads in order: the request → the checks it passes → the functions → the tables → the ending, and says what the test does not tell (which of the 2 ways to 201)', order);
+  /* ONE hover per block (L-02 · L-22): nothing inside the title lines carries a hover of its own; the card reads in → does → out */
+  const inner = await p.$$eval('#exgrid .blk .bkhd [data-tip]', (n) => n.length);
+  await p.hover(CX + '[data-k="table"] .blk .bkhd [data-part="name"]'); await p.waitForTimeout(120);
+  const tp = await p.$eval('#tip', (e) => ({ show: e.getAttribute('data-show'), io: [...e.querySelectorAll('.exio')].map((i) => i.textContent) }));
+  ok(!inner && tp.show === 'true' && JSON.stringify(tp.io) === JSON.stringify([WX.tip.in, WX.tip.do, WX.tip.out]), 'D-071 · one hover per block, reading in → does → out', { inner, tp });
+  /* the page's copy text: one line per kind, after BY MOMENT's */
+  const cp8 = (await p.$eval('#out', (e) => e.value)).split('\n').filter((l) => l.startsWith(WX.copy.where + ' · '));
+  ok(cp8.length === 8 && cp8[1] === (await p.$eval(CX + '[data-k="table"] .exline', (e) => e.textContent)), 'D-071 · the page\'s copy text carries each example\'s line, the table\'s as its column shows it', cp8.length);
+  /* the layout options: my pick dashed; wrapped rows wraps */
+  await p.click('#exbar .opt[data-xopt="lay"][data-v="wrap"]'); await p.waitForTimeout(80);
+  const ly = await p.evaluate(() => [document.getElementById('exgrid').getAttribute('data-lay'), document.querySelector('#exbar .opt[data-xopt="lay"][data-v="row"]').getAttribute('data-pick')]);
+  ok(ly[0] === 'wrap' && ly[1] === 'true', 'D-071 · the column layouts are options, one row across the page my pick (dashed)', ly);
+  await p.click('#exbar .opt[data-xopt="lay"][data-v="row"]'); await p.waitForTimeout(60);
+  ok(!errs.length, 'D-071 · no page error on the examples bench', errs); }
 
 await b.close();
 console.log((fail ? 'FAIL ✗' : 'PASS ✓') + ` probe-all-endpoints · ${pass} passed · ${fail} failed · ${FEED.length} endpoints · sample ${SAMPLE.length} · page ${path.basename(PAGE)}`);

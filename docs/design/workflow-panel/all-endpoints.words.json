@@ -1750,527 +1750,168 @@
     "how": "A block reads top to bottom: its title lines, then a strip of marks — a table's or a schema's fields, the tables a function touches, the requests a test makes, the checks on an ending's way, what a gate waits for, the endings a hook answers, the places a value is read — then a list that opens when you click the block. Its hover says what goes in, what it does and what comes out.",
     "whoseTitle": "whose look",
     "whose": {
-      "his": {
-        "name": "your DATA line",
-        "plain": "The table block boots on the DATA line you pasted in the endpoint lab, word for word ({v})."
-      },
-      "lab": {
-        "name": "the lab's look",
-        "plain": "The block boots on the endpoint lab's own settings for this kind; its edge, chips and marks are the table's, as the lab shares them."
-      },
-      "mine": {
-        "name": "my pick",
-        "plain": "The parts, their lines and their sizes are my proposal. Change them below the block and copy the line."
-      }
+      "his": { "name": "your DATA line", "plain": "The table block boots on the DATA line you pasted in the endpoint lab, word for word ({v})." },
+      "lab": { "name": "the lab's look", "plain": "The block boots on the endpoint lab's own settings for this kind; its edge, chips and marks are the table's, as the lab shares them." },
+      "mine": { "name": "my pick", "plain": "The parts, their lines and their sizes are my proposal. Change them below the block and copy the line." }
     },
-    "look": {
-      "table": {
-        "ruled": "D-027"
-      }
-    },
+    "look": { "table": { "ruled": "D-027" } },
     "kinds": {
-      "end": {
-        "name": "ending",
-        "plain": "One way a request to this endpoint ends: its status, its words, and the code that produces it."
-      },
-      "table": {
-        "name": "table",
-        "plain": "A database table the endpoint reads or writes, with its fields."
-      },
-      "schema": {
-        "name": "schema",
-        "plain": "A shape the request body or the answer must have, with its fields."
-      },
-      "fn": {
-        "name": "function",
-        "plain": "The handler, or a function it calls on the way."
-      },
-      "test": {
-        "name": "test",
-        "plain": "A test that sends this request, or calls the code behind it."
-      }
+      "end": { "name": "ending", "plain": "One way a request to this endpoint ends: its status, its words, and the code that produces it." },
+      "table": { "name": "table", "plain": "A database table the endpoint reads or writes, with its fields." },
+      "schema": { "name": "schema", "plain": "A shape the request body or the answer must have, with its fields." },
+      "fn": { "name": "function", "plain": "The handler, or a function it calls on the way." },
+      "test": { "name": "test", "plain": "A test that sends this request, or calls the code behind it." },
+      "gate": { "name": "gate or decision", "plain": "A place in the code that checks something and decides what happens next." },
+      "hook": { "name": "client hook", "plain": "The piece of the web app that calls this endpoint." },
+      "inf": { "name": "in-flight value", "plain": "A value that is alive while the request runs." }
     },
-    "icons": {
-      "end": "target",
-      "test": "test",
-      "file": "file",
-      "link": "link",
-      "up": "up",
-      "down": "down",
-      "entity": "entity",
-      "doc": "doc",
-      "key": "key",
-      "info": "info",
-      "role": "role",
-      "journey": "journey",
-      "target": "target",
-      "schema": "schema",
-      "function": "function"
-    },
+    "icons": { "end": "target", "test": "test", "gate": "shield", "hook": "hook", "inf": "wave", "file": "file", "link": "link", "up": "up", "down": "down",
+               "entity": "entity", "doc": "doc", "key": "key", "info": "info", "role": "role", "journey": "journey", "target": "target", "schema": "schema", "function": "function" },
     "opt": {
-      "lay": {
-        "label": "the columns",
-        "pick": "row",
-        "opts": {
-          "row": {
-            "name": "one row across the page",
-            "plain": "Every kind side by side, left to right; the row scrolls sideways when the page is narrower."
-          },
-          "wrap": {
-            "name": "wrapped rows",
-            "plain": "The columns wrap onto a new row when the page runs out of width."
-          },
-          "half": {
-            "name": "an upper and a lower row",
-            "plain": "The first half of the kinds on top, the second half below."
-          }
-        }
-      },
-      "follow": {
-        "label": "the element lit",
-        "pick": "on",
-        "opts": {
-          "on": {
-            "name": "follow it",
-            "plain": "Clicking an element in ONE ENDPOINT or BY MOMENT shows it in its kind's column, when the column holds it."
-          },
-          "off": {
-            "name": "stay",
-            "plain": "The columns keep the element you picked."
-          }
-        }
-      },
-      "scope": {
-        "label": "which elements",
-        "pick": "here",
-        "opts": {
-          "here": {
-            "name": "this endpoint",
-            "plain": "The elements of the endpoint the table has open."
-          },
-          "all": {
-            "name": "every endpoint",
-            "plain": "Every element of this kind on any endpoint. One that is not on the open endpoint is drawn as it is on the first endpoint that has it."
-          }
-        }
-      }
+      "lay": { "label": "the columns", "pick": "row", "opts": {
+        "row": { "name": "one row across the page", "plain": "Every kind side by side, left to right; the row scrolls sideways when the page is narrower." },
+        "wrap": { "name": "wrapped rows", "plain": "The columns wrap onto a new row when the page runs out of width." },
+        "half": { "name": "an upper and a lower row", "plain": "The first half of the kinds on top, the second half below." } } },
+      "follow": { "label": "the element lit", "pick": "on", "opts": {
+        "on": { "name": "follow it", "plain": "Clicking an element in ONE ENDPOINT or BY MOMENT shows it in its kind's column, when the column holds it." },
+        "off": { "name": "stay", "plain": "The columns keep the element you picked." } } },
+      "scope": { "label": "which elements", "pick": "here", "opts": {
+        "here": { "name": "this endpoint", "plain": "The elements of the endpoint the table has open." },
+        "all": { "name": "every endpoint", "plain": "Every element of this kind on any endpoint. One that is not on the open endpoint is drawn as it is on the first endpoint that has it." } } }
     },
     "roles": {
-      "table": {
-        "r": {
-          "name": "reads"
-        },
-        "w": {
-          "name": "writes"
-        },
-        "rw": {
-          "name": "reads and writes"
-        }
-      },
-      "schema": {
-        "in": {
-          "name": "request body"
-        },
-        "out": {
-          "name": "answer"
-        },
-        "in-nested": {
-          "name": "inside the request body"
-        },
-        "out-nested": {
-          "name": "inside the answer"
-        }
-      },
-      "fn": {
-        "accessor": {
-          "name": "accessor"
-        },
-        "caller": {
-          "name": "caller"
-        },
-        "gate": {
-          "name": "gate"
-        },
-        "pure": {
-          "name": "pure"
-        },
-        "none": {
-          "name": "no role known"
-        }
-      },
+      "table": { "r": { "name": "reads" }, "w": { "name": "writes" }, "rw": { "name": "reads and writes" } },
+      "schema": { "in": { "name": "request body" }, "out": { "name": "answer" }, "in-nested": { "name": "inside the request body" }, "out-nested": { "name": "inside the answer" } },
+      "fn": { "accessor": { "name": "accessor" }, "caller": { "name": "caller" }, "gate": { "name": "gate" }, "pure": { "name": "pure" }, "none": { "name": "no role known" } },
       "test": {
-        "act": {
-          "name": "tests it",
-          "plain": "It sends this request to test it; what it checks on the answer is what it proves."
-        },
-        "check": {
-          "name": "sets up and checks",
-          "plain": "It sends this request to set something up, and checks the status it gets."
-        },
-        "arrange": {
-          "name": "sets up",
-          "plain": "It sends this request only to set something up for a later request."
-        },
-        "service": {
-          "name": "from the service side",
-          "plain": "It never sends this request: it calls the code behind it and checks what that code raises."
-        },
-        "helper": {
-          "name": "through a helper",
-          "plain": "A helper it calls sends this request to set something up."
-        }
-      }
+        "act": { "name": "tests it", "plain": "It sends this request to test it; what it checks on the answer is what it proves." },
+        "check": { "name": "sets up and checks", "plain": "It sends this request to set something up, and checks the status it gets." },
+        "arrange": { "name": "sets up", "plain": "It sends this request only to set something up for a later request." },
+        "service": { "name": "from the service side", "plain": "It never sends this request: it calls the code behind it and checks what that code raises." },
+        "helper": { "name": "through a helper", "plain": "A helper it calls sends this request to set something up." } },
+      "gate": {
+        "limiter": { "name": "rate limiter", "plain": "Counts the requests from one caller and says no when there are too many." },
+        "scheme": { "name": "login scheme", "plain": "Reads the login header before any code of the endpoint runs." },
+        "login": { "name": "login check", "plain": "The dependency that checks who is calling." },
+        "rule": { "name": "field rule", "plain": "A rule on one field of the body; breaking it answers with a list of what is wrong." },
+        "own": { "name": "own check", "plain": "A check written in the handler itself." },
+        "down": { "name": "check one call down", "plain": "A check inside a function the handler calls." },
+        "branch": { "name": "branch that picks the answer", "plain": "A fork in a called function that decides which answer comes back." },
+        "catch": { "name": "catch that translates", "plain": "Catches an error a call raised and turns it into an ending." },
+        "switch": { "name": "switch", "plain": "A setting or a binding that decides which code runs." } },
+      "hook": { "fetcher": { "name": "fetcher" }, "streamer": { "name": "streamer" }, "store": { "name": "store" }, "orchestrator": { "name": "orchestrator" },
+                "effect": { "name": "effect" }, "deriver": { "name": "deriver" }, "none": { "name": "no role known" } },
+      "inf": { "state": { "name": "request state" }, "dependency-value": { "name": "dependency value" }, "setting-once": { "name": "setting read once" },
+               "built-once": { "name": "built once" }, "cache": { "name": "cache" }, "contextvar": { "name": "context value" }, "background": { "name": "background task" },
+               "unknown": { "name": "kind not known" } }
     },
     "parts": {
-      "table": {
-        "icon": {
-          "name": "glyph"
-        },
-        "rw": {
-          "name": "channel"
-        },
-        "name": {
-          "name": "name"
-        },
-        "ent": {
-          "name": "entity"
-        },
-        "count": {
-          "name": "fields"
-        },
-        "model": {
-          "name": "class"
-        }
-      },
-      "schema": {
-        "icon": {
-          "name": "glyph"
-        },
-        "dir": {
-          "name": "direction"
-        },
-        "name": {
-          "name": "name"
-        },
-        "ent": {
-          "name": "entity"
-        },
-        "count": {
-          "name": "fields"
-        },
-        "via": {
-          "name": "where"
-        }
-      },
-      "fn": {
-        "icon": {
-          "name": "glyph"
-        },
-        "role": {
-          "name": "role"
-        },
-        "name": {
-          "name": "name"
-        },
-        "commit": {
-          "name": "commit"
-        },
-        "file": {
-          "name": "file"
-        },
-        "count": {
-          "name": "lines"
-        },
-        "via": {
-          "name": "where"
-        }
-      },
+      "table": { "icon": { "name": "glyph" }, "rw": { "name": "channel" }, "name": { "name": "name" }, "ent": { "name": "entity" }, "count": { "name": "fields" }, "model": { "name": "class" } },
+      "schema": { "icon": { "name": "glyph" }, "dir": { "name": "direction" }, "name": { "name": "name" }, "ent": { "name": "entity" }, "count": { "name": "fields" }, "via": { "name": "where" } },
+      "fn": { "icon": { "name": "glyph" }, "role": { "name": "role" }, "name": { "name": "name" }, "commit": { "name": "commit" }, "file": { "name": "file" }, "count": { "name": "lines" }, "via": { "name": "where" } },
       "end": {
-        "icon": {
-          "name": "glyph",
-          "plain": "The kind of ending, as its glyph."
-        },
-        "status": {
-          "name": "status",
-          "plain": "The status the caller gets."
-        },
-        "name": {
-          "name": "words",
-          "plain": "What the ending says to the caller."
-        },
-        "stage": {
-          "name": "stage",
-          "plain": "Where in the request it leaves: at the edge, the gate, the input, the handler or the answer."
-        },
-        "count": {
-          "name": "ways",
-          "plain": "How many ways through the code reach it."
-        },
-        "via": {
-          "name": "where",
-          "plain": "The file and line that produce it."
-        }
-      },
+        "icon": { "name": "glyph", "plain": "The kind of ending, as its glyph." },
+        "status": { "name": "status", "plain": "The status the caller gets." },
+        "name": { "name": "words", "plain": "What the ending says to the caller." },
+        "stage": { "name": "stage", "plain": "Where in the request it leaves: at the edge, the gate, the input, the handler or the answer." },
+        "count": { "name": "ways", "plain": "How many ways through the code reach it." },
+        "via": { "name": "where", "plain": "The file and line that produce it." } },
       "test": {
-        "icon": {
-          "name": "glyph",
-          "plain": "The test glyph."
-        },
-        "cid": {
-          "name": "case",
-          "plain": "The test's case id."
-        },
-        "state": {
-          "name": "result",
-          "plain": "Whether it passed in the last run."
-        },
-        "proves": {
-          "name": "endings",
-          "plain": "The statuses of the endings it proves here."
-        },
-        "role": {
-          "name": "role here",
-          "plain": "What the test does with this endpoint."
-        },
-        "name": {
-          "name": "name",
-          "plain": "The test's name, without its prefix and its case id."
-        },
-        "file": {
-          "name": "file",
-          "plain": "The test's file and line."
-        },
-        "sends": {
-          "name": "headers",
-          "plain": "The headers its requests here send."
-        },
-        "asserts": {
-          "name": "checks",
-          "plain": "What it checks on the answer here: the status, and the answer's fields it reads."
-        }
-      }
+        "icon": { "name": "glyph", "plain": "The test glyph." },
+        "cid": { "name": "case", "plain": "The test's case id." },
+        "state": { "name": "result", "plain": "Whether it passed in the last run." },
+        "proves": { "name": "endings", "plain": "The statuses of the endings it proves here." },
+        "role": { "name": "role here", "plain": "What the test does with this endpoint." },
+        "name": { "name": "name", "plain": "The test's name, without its prefix and its case id." },
+        "file": { "name": "file", "plain": "The test's file and line." },
+        "sends": { "name": "headers", "plain": "The headers its requests here send." },
+        "asserts": { "name": "checks", "plain": "What it checks on the answer here: the status, and the answer's fields it reads." } },
+      "gate": {
+        "icon": { "name": "glyph", "plain": "The gate glyph." },
+        "role": { "name": "role", "plain": "At which level it decides." },
+        "cond": { "name": "condition", "plain": "What it checks, as the code writes it." },
+        "fn": { "name": "function", "plain": "The function it runs in, with its role." },
+        "effect": { "name": "effect", "plain": "What happens when it decides: an ending, a returned answer, a translation." },
+        "via": { "name": "where", "plain": "The file and line." },
+        "count": { "name": "tests", "plain": "How many tests prove its effect." } },
+      "hook": {
+        "icon": { "name": "glyph", "plain": "The hook glyph." },
+        "role": { "name": "role", "plain": "The hook's role in the web app." },
+        "name": { "name": "name", "plain": "The hook's name." },
+        "fkind": { "name": "kind", "plain": "A mutation sends a change; a query reads." },
+        "sends": { "name": "request", "plain": "The method and the path it sends." },
+        "file": { "name": "file", "plain": "The file the hook lives in." },
+        "count": { "name": "reactions", "plain": "How many endings the screen answers in a branch of its own." } },
+      "inf": {
+        "icon": { "name": "glyph", "plain": "The glyph of its kind." },
+        "life": { "name": "lifetime", "plain": "Whether it goes with the answer or lives with the server." },
+        "name": { "name": "name", "plain": "The value's name in the code." },
+        "ikind": { "name": "kind", "plain": "What kind of value it is." },
+        "set": { "name": "set by", "plain": "Who sets it, and where." },
+        "count": { "name": "reads", "plain": "How many places read it." } }
     },
     "cp": {
-      "table": {
-        "icon": "icon",
-        "rw": "chip",
-        "name": "name",
-        "ent": "entity",
-        "count": "count",
-        "model": "model"
-      },
-      "schema": {
-        "icon": "glyph",
-        "dir": "chip",
-        "name": "name",
-        "ent": "entity",
-        "count": "count",
-        "via": "where"
-      },
-      "fn": {
-        "icon": "glyph",
-        "role": "chip",
-        "name": "name",
-        "commit": "commit",
-        "file": "file",
-        "count": "count",
-        "via": "where"
-      },
-      "end": {
-        "icon": "glyph",
-        "status": "chip",
-        "name": "words",
-        "stage": "stage",
-        "count": "count",
-        "via": "where"
-      },
-      "test": {
-        "icon": "glyph",
-        "cid": "case",
-        "state": "result",
-        "proves": "endings",
-        "role": "chip",
-        "name": "name",
-        "file": "file",
-        "sends": "headers",
-        "asserts": "checks"
-      }
+      "table": { "icon": "icon", "rw": "chip", "name": "name", "ent": "entity", "count": "count", "model": "model" },
+      "schema": { "icon": "glyph", "dir": "chip", "name": "name", "ent": "entity", "count": "count", "via": "where" },
+      "fn": { "icon": "glyph", "role": "chip", "name": "name", "commit": "commit", "file": "file", "count": "count", "via": "where" },
+      "end": { "icon": "glyph", "status": "chip", "name": "words", "stage": "stage", "count": "count", "via": "where" },
+      "test": { "icon": "glyph", "cid": "case", "state": "result", "proves": "endings", "role": "chip", "name": "name", "file": "file", "sends": "headers", "asserts": "checks" },
+      "gate": { "icon": "glyph", "role": "chip", "cond": "condition", "fn": "function", "effect": "effect", "via": "where", "count": "count" },
+      "hook": { "icon": "glyph", "role": "chip", "name": "name", "fkind": "kind", "sends": "request", "file": "file", "count": "count" },
+      "inf": { "icon": "glyph", "life": "chip", "name": "name", "ikind": "kind", "set": "set by", "count": "count" }
     },
-    "chipWord": {
-      "end": "status",
-      "table": "channel",
-      "schema": "direction",
-      "fn": "role",
-      "test": "role"
-    },
+    "chipWord": { "end": "status", "table": "channel", "schema": "direction", "fn": "role", "test": "role", "gate": "role", "hook": "role", "inf": "lifetime" },
     "ctl": {
-      "parts": "parts",
-      "size": "size",
-      "colour": "colour",
-      "tray": "not drawn",
-      "line": "line {i}",
-      "left": "left",
-      "right": "right",
+      "parts": "parts", "size": "size", "colour": "colour", "tray": "not drawn", "line": "line {i}", "left": "left", "right": "right",
       "partsPlain": "Drag a part to another line or side, or into not drawn to hide it. Click a part to size it.",
-      "sizeOf": "size of {name}",
-      "pickPart": "Click a part under parts to size it.",
-      "mode": "shown as",
-      "markSize": "mark size",
-      "gap": "gap between marks",
-      "glyph": "glyph colour",
-      "edgeSide": "edge",
-      "edgePat": "edge pattern",
-      "edgeW": "edge thickness",
-      "chipBox": "chip box",
-      "chipFill": "chip fill",
-      "cntBox": "count box",
-      "cntFill": "count fill",
-      "enc": "marks drawn as",
-      "pal": "marks coloured by",
-      "shape": "mark corners",
-      "copy": "copy",
-      "copied": "copied",
-      "copyPlain": "Copy this block's settings as one line, to paste back with your words.",
-      "reset": "back to the default",
-      "resetPlain": "Puts this block back on its default look.",
-      "prev": "the element before",
-      "next": "the element after",
-      "all": "all",
-      "allPlain": "Every role.",
-      "none": "nothing of this kind on this endpoint",
-      "noneRole": "no element of this kind has this role here",
-      "on": "drawn as it is on {ep}",
-      "pickEl": "pick the element to draw",
-      "foldPlain": "Opens this group of controls; the others close."
+      "sizeOf": "size of {name}", "pickPart": "Click a part under parts to size it.", "mode": "shown as", "markSize": "mark size", "gap": "gap between marks",
+      "glyph": "glyph colour", "edgeSide": "edge", "edgePat": "edge pattern", "edgeW": "edge thickness", "chipBox": "chip box", "chipFill": "chip fill",
+      "cntBox": "count box", "cntFill": "count fill", "enc": "marks drawn as", "pal": "marks coloured by", "shape": "mark corners",
+      "copy": "copy", "copied": "copied", "copyPlain": "Copy this block's settings as one line, to paste back with your words.",
+      "reset": "back to the default", "resetPlain": "Puts this block back on its default look.",
+      "prev": "the element before", "next": "the element after", "all": "all", "allPlain": "Every role.",
+      "none": "nothing of this kind on this endpoint", "noneRole": "no element of this kind has this role here",
+      "on": "drawn as it is on {ep}", "pickEl": "pick the element to draw", "foldPlain": "Opens this group of controls; the others close."
     },
     "face": {
-      "noWords": "says nothing of its own",
-      "answer": "the answer, fields: {n}",
-      "request": "request body",
-      "reply": "answer",
-      "inside": "inside {name}",
-      "handler": "the handler",
-      "level": "level {i} · called by {name}",
-      "noRole": "no role known",
-      "noFn": "no function named",
-      "returns": "returns an answer",
-      "impl": "ways to run: {n}",
-      "answers": "answers {v}",
-      "accepts": "accepts {v}",
-      "stepOf": "step {i} of {n}",
-      "none": "—",
-      "pass": "pass",
-      "fail": "fail",
-      "mutation": "mutation",
-      "query": "query",
-      "setBy": "set by {name}",
-      "setAt": "set at {at}",
-      "server": "lives with the server",
-      "answer1": "goes with the answer",
-      "notKnown": "lifetime not known",
-      "raises": "raises {cls}",
-      "lifeChip": {
-        "with the answer": "this request",
-        "with the server process": "the server",
-        "unknown": "not known"
-      }
+      "noWords": "says nothing of its own", "answer": "the answer, fields: {n}", "request": "request body", "reply": "answer",
+      "inside": "inside {name}", "handler": "the handler", "level": "level {i} · called by {name}",
+      "noRole": "no role known", "noFn": "no function named", "returns": "returns an answer", "impl": "ways to run: {n}",
+      "answers": "answers {v}", "accepts": "accepts {v}", "stepOf": "step {i} of {n}", "none": "—", "pass": "pass", "fail": "fail",
+      "mutation": "mutation", "query": "query", "setBy": "set by {name}", "setAt": "set at {at}", "server": "lives with the server", "answer1": "goes with the answer",
+      "notKnown": "lifetime not known", "raises": "raises {cls}",
+      "lifeChip": { "with the answer": "this request", "with the server process": "the server", "unknown": "not known" }
     },
     "tip": {
-      "in": "in",
-      "do": "does",
-      "out": "out",
-      "end": {
-        "in": "{v}",
-        "inNone": "no condition of its own: {v}",
-        "do": "produced at {at}",
-        "doVia": "produced at {at}, by {v}",
-        "doNone": "the framework produces it",
-        "out": "answers {status} · {v}",
-        "decl": "the route declares this status",
-        "undecl": "the route does not declare this status",
-        "hdr": "sends the header {v}",
-        "tests": "tests that prove it: {n}",
-        "noTests": "no test proves it",
-        "ways": "ways through the code to it: {n}",
-        "skip": "it never happens here: the code skips this endpoint's path ({v})"
-      },
-      "table": {
-        "in": "{v} on this endpoint",
-        "inNone": "no function on this endpoint touches it by name",
-        "do": "{v}",
-        "out": "saved by a commit on the way to the answer",
-        "outNot": "nothing written to it here is saved",
-        "outRead": "only read here",
-        "race": "first requests sent at once with the same key can collide on its unique key and end in a 500",
-        "drift": "the migration and the model disagree on {v}",
-        "writers": "functions that write it across the app: {n}"
-      },
-      "schema": {
-        "in": "{v}",
-        "do": "fields: {n} · required: {k} · with a rule: {w}",
-        "c422": "ways to a 422 here: {n}",
-        "extra": "extra fields: {v}",
-        "cons": "endpoints that use it: {n}"
-      },
-      "fn": {
-        "in": "called by {v}",
-        "inHandler": "the route calls it",
-        "do": "{v}",
-        "ops": "{op} {tbl}",
-        "out": "returns {v}",
-        "raise": "raises {cls} at {at}{st}",
-        "raiseTo": ", which becomes {v}",
-        "commit": "ends a database transaction",
-        "lines": "lines: {n}"
-      },
-      "test": {
-        "in": "sends {v}",
-        "inNone": "sends no header it names",
-        "do": "requests in all: {n} · {v}",
-        "doService": "calls {v} directly, never the endpoint",
-        "out": "checks {v}",
-        "proves": "proves {v} here",
-        "provesNone": "proves no ending here"
-      }
+      "in": "in", "do": "does", "out": "out",
+      "end": { "in": "{v}", "inNone": "no condition of its own: {v}", "do": "produced at {at}", "doVia": "produced at {at}, by {v}", "doNone": "the framework produces it",
+               "out": "answers {status} · {v}", "decl": "the route declares this status", "undecl": "the route does not declare this status",
+               "hdr": "sends the header {v}", "tests": "tests that prove it: {n}", "noTests": "no test proves it", "ways": "ways through the code to it: {n}", "skip": "it never happens here: the code skips this endpoint's path ({v})" },
+      "table": { "in": "{v} on this endpoint", "inNone": "no function on this endpoint touches it by name", "do": "{v}", "out": "saved by a commit on the way to the answer",
+                 "outNot": "nothing written to it here is saved", "outRead": "only read here", "race": "first requests sent at once with the same key can collide on its unique key and end in a 500",
+                 "drift": "the migration and the model disagree on {v}", "writers": "functions that write it across the app: {n}" },
+      "schema": { "in": "{v}", "do": "fields: {n} · required: {k} · with a rule: {w}", "c422": "ways to a 422 here: {n}",
+                  "extra": "extra fields: {v}", "cons": "endpoints that use it: {n}" },
+      "fn": { "in": "called by {v}", "inHandler": "the route calls it", "do": "{v}", "ops": "{op} {tbl}", "out": "returns {v}", "raise": "raises {cls} at {at}{st}",
+              "raiseTo": ", which becomes {v}", "commit": "ends a database transaction", "lines": "lines: {n}" },
+      "test": { "in": "sends {v}", "inNone": "sends no header it names", "do": "requests in all: {n} · {v}", "doService": "calls {v} directly, never the endpoint",
+                "out": "checks {v}", "proves": "proves {v} here", "provesNone": "proves no ending here" },
+      "gate": { "in": "checks {v}", "do": "runs in {name}", "doNone": "runs in the framework, before the handler", "at": "at {at}", "after": "only after {v}",
+                "out": "then {v}", "outNone": "its effect is not an ending", "branch": "returns the answer {v}", "switch": "picks one of {v}", "tests": "tests that prove it: {n}" },
+      "hook": { "in": "used by {v}", "inNone": "no screen named", "do": "sends {v}", "refresh": "on success it refreshes {v}", "out": "endings the screen answers in a branch of its own: {n}",
+                "outNone": "the screen answers no ending in a branch of its own" },
+      "inf": { "in": "set by {name} at {at}", "from": "taken from the {k} {v}", "inNone": "set when the app starts", "do": "places that read it: {n} · {v}", "out": "{v}" }
     },
     "list": {
-      "fields": "fields",
-      "more": "{n} more fields, from the model",
-      "ops": "on this endpoint",
-      "saved": "saved",
-      "notSaved": "not saved",
-      "raises": "raises",
-      "calls": "calls",
-      "tables": "tables",
-      "does": "what it does",
-      "paths": "the ways to it",
-      "way": "way {i}",
-      "answer": "the answer",
-      "reactions": "what the screen does",
-      "noBranch": "no branch of its own",
-      "refresh": "refreshes",
-      "screens": "screens",
-      "reads": "read at",
-      "after": "waits for",
-      "tests": "proved by",
-      "impls": "runs one of",
-      "req": "requests, in order",
-      "here": "this endpoint"
+      "fields": "fields", "more": "{n} more fields, from the model", "ops": "on this endpoint", "saved": "saved", "notSaved": "not saved",
+      "raises": "raises", "calls": "calls", "tables": "tables", "does": "what it does", "paths": "the ways to it", "way": "way {i}", "answer": "the answer",
+      "reactions": "what the screen does", "noBranch": "no branch of its own", "refresh": "refreshes", "screens": "screens", "reads": "read at",
+      "after": "waits for", "tests": "proved by", "impls": "runs one of", "req": "requests, in order", "here": "this endpoint"
     },
     "chain": {
-      "title": "what the test runs through, in order",
-      "request": "the request",
-      "checks": "checks it passes",
-      "branch": "the branch it takes",
-      "fns": "functions it runs",
-      "tables": "tables it touches",
-      "saved": "saved",
-      "notSaved": "not saved",
-      "inf": "in-flight values it meets",
-      "ending": "the ending",
-      "which": "way {i} of {n}",
-      "raise": "the error it expects",
-      "service": "It calls {v} directly; the catch that turns this into an answer does not run in this test."
+      "title": "what the test runs through, in order", "request": "the request", "checks": "checks it passes", "branch": "the branch it takes",
+      "fns": "functions it runs", "tables": "tables it touches", "saved": "saved", "notSaved": "not saved", "inf": "in-flight values it meets",
+      "ending": "the ending", "which": "way {i} of {n}", "raise": "the error it expects", "service": "It calls {v} directly; the catch that turns this into an answer does not run in this test."
     },
     "notKnown": {
       "title": "not known from the test",
@@ -2280,10 +1921,6 @@
       "step": "what one step hands the next",
       "loop": "checks written inside a loop"
     },
-    "copy": {
-      "where": "examples",
-      "on": "on {ep}",
-      "all": "every endpoint"
-    }
+    "copy": { "where": "examples", "on": "on {ep}", "all": "every endpoint" }
   }
 }

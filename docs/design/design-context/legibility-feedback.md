@@ -122,9 +122,10 @@ deferred + trigger).
   arranging tests
 - **could not tell:** what a test does, what it touches (structures, functions, models, gates, in-flight state) and what it
   proves.
-- **fix:** a test BLOCK, the way the lab's table block was found — designed on the examples bench (L-23), then iterated.
+- **fix:** built: the TEST column of the examples bench (`sec-ex`) — a strip of its requests, and a click that opens the ordered
+  chain (request → checks passed → branch → functions → tables, saved or not → ending) with what the test does not tell.
 - **tag:** `context-without-meaning`
-- **status:** logged
+- **status:** option — his to pick (D-071)
 
 ### L-09
 - **words:** "For this one we have many columns with items that have no icon. And I would like to know why. For example, at
@@ -164,9 +165,10 @@ deferred + trigger).
   similar since they validate things on different levels."
 - **where:** BY MOMENT · Gates and decisions (the whole row)
 - **could not tell:** at which level a gate decides — the chips carry no subcategory.
-- **fix:** a proposal of G&D roles read from the feed's own categories, shown as an option.
+- **fix:** built: the GATE OR DECISION column's role filter on the examples bench — nine roles from the feed's own groups, each
+  block naming the function it runs in (glyph + role), its condition and its effect.
 - **tag:** `kind-without-subcategory`
-- **status:** logged (question)
+- **status:** option — his to pick (D-071)
 
 ### L-12
 - **words:** "Data effects the same thing for gates and decisions. We are doing things on tables basically. That's what we
@@ -191,9 +193,10 @@ deferred + trigger).
   And in blocks."
 - **where:** BY MOMENT · Functions
 - **could not tell:** what a function does — a chip is its name and role only.
-- **fix:** a function BLOCK, designed on the examples bench (L-23), then used in the row.
+- **fix:** built: the FUNCTION column of the examples bench on the lab's function look — a strip of the tables it touches; a
+  click lists its raises (and what each becomes here), tables, calls and what it does. Its use in BY MOMENT waits on EX-5.
 - **tag:** `name-only-chip`
-- **status:** logged
+- **status:** option — his to pick (D-071)
 
 ### L-14
 - **words:** "there is some functions that do not have the function icon or their role. For example, in the column for
@@ -327,7 +330,7 @@ deferred + trigger).
 - **where:** a new section between ONE ENDPOINT and BY MOMENT
 - **could not tell:** how a table, a schema, a test, a function or an ending should look — there is no place to decide one
   element's look on its own.
-- **fix:** an EXAMPLES section: one column per element kind across the page, each with a title, an element selector and a
-  role filter, the element drawn, and below it its controls (show · order by drag · size · colour) and a copy button.
+- **fix:** built: section EXAMPLES (`sec-ex`) between ONE ENDPOINT and BY MOMENT — eight columns in his order, each a title,
+  a scope switch, role chips and a select, the block, then parts (drag · not drawn) · size · colour · back to the default · copy.
 - **tag:** `no-bench-for-one-element`
-- **status:** logged
+- **status:** built (D-071)

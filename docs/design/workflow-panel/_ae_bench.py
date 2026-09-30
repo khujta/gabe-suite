@@ -30,7 +30,7 @@ HERE = UNI.HERE
 LAB_HTML, LAB_PANELS, LAB_CSS = HERE / "endpoint-lab.html", HERE / "_lab-ep-panels.js", HERE / "_lab-ep.css"
 PROBE_EPLAB = HERE / "probe-eplab.mjs"
 BENCH_JS, BENCH_CSS = HERE / "_ae-bench.js", HERE / "_ae-bench.css"
-KINDS = ("end", "table", "schema", "fn", "test")          # his order (L-23), the columns left to right
+KINDS = ("end", "table", "schema", "fn", "test", "gate", "hook", "inf")          # his order (L-23), the columns left to right
 LAB_KINDS = {"table": "DATACFG", "schema": "SCHCFG", "fn": "FNCFG"}
 GATE_ROLES = ("limiter", "scheme", "login", "rule", "own", "down", "branch", "catch", "switch")   # EX-4: the feed's own groups
 TEST_ROLES = ("act", "check", "arrange", "service", "helper")
@@ -415,6 +415,93 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
             if tt.get("case") and tt["case"] not in TC:
                 die(f"{ep} · path {pid}: its test {tt['case']} is not a case of the feed")
 
+    # GATES AND DECISIONS — the feed's own groups, each with the function it runs in and its effect (EX-4 · L-09 · L-10 · L-11)
+    walk_by_name = {f.get("name"): "fn:" + f["id"].replace("#", "::") for _lv, f, _v in walk if f.get("id")}
+    hk = "fn:" + handler if handler else None
+    xs = {x["id"]: x for x in exits}
+    def gate(i, role, cond, fnk, at, eff, after=None, extra=None):
+        # a gate is one place in THIS endpoint's way (a field rule's page key is shared by endpoints whose rules differ): scoped here,
+        # its page key kept for the light
+        key, i = (i if not i.startswith(ep + "|") else None), (i if i.startswith(ep + "|") else ep + "|" + i)
+        if i in cat:
+            die(f"{ep} · {i}: two gates of this endpoint share one place")
+        cat[i] = {"k": "gate", "n": cond, "key": key}
+        x = xs.get(eff) if eff else None
+        ex["gate"].append([i, role, {"fn": I(fnk), "at": I(at), "eff": eff, "st": x.get("status") if x else None,
+                                     "after": [I(a) for a in after or []], "tests": [c[0] for c in tests_of(x)] if x else [], **(extra or {})}])
+    for l in (F.get("rate") or {}).get("limits") or []:
+        nm = str(l.get("limiter") or l.get("class") or "?").lstrip("_")
+        args = {a.get("param"): a.get("value") for a in l.get("args") or []}
+        gate("limiter:" + nm, "limiter", nm, None, l.get("at"), l.get("exit"),
+             extra={"lim": [args.get("limit"), args.get("window_seconds"), l.get("key")], "place": l.get("via")})
+    au = F.get("auth") or {}
+    for s0 in au.get("schemes") or []:
+        gate(ep + "|gate:" + str(s0.get("exit")), "scheme", f"{s0.get('scheme')} · {s0.get('header') or s0.get('carrier')}", None, s0.get("at"), s0.get("exit"),
+             extra={"place": f"{s0.get('scheme')} {s0.get('name')}"})
+    gfn = "fn:" + au["gates"][0]["fn"] if au.get("gates") else None
+    for x in exits:
+        if x.get("phase") == "dependency":
+            gate(ep + "|gate:" + x["id"], "login", str(x.get("via") or x.get("detail")), gfn, x.get("at"), x["id"])
+    for x in exits:
+        for c in x.get("cases") or [] if x["kind"] == "validation" else []:
+            gate("rule:" + c["id"], "rule", f"{c.get('loc')} · {c.get('type')}" + (f" {c['rule']}" if c.get("rule") else ""), None, c.get("at"), x["id"],
+                 extra={"place": str(c.get("schema") or "").replace("schema:", "") or None})
+    for g in F.get("preconditions") or []:
+        m = re.match(r"^call (.+?) @", str(g.get("via") or ""))
+        fk = hk if not g.get("depth") else ((walk_by_name.get(m.group(1)) or walk_by_name.get(m.group(1).split(".")[-1])) if m else None)
+        gate("guard:" + g["id"], "own" if not g.get("depth") else "down", str(g.get("pred")), fk, g.get("at"), g.get("exit"), g.get("after"),
+             extra={"st0": g.get("status"), "call": m.group(1) if m else None})
+    for b in F.get("branches") or []:
+        gate("fork:" + b["id"], "branch", str(b.get("pred") or b.get("token")), "fn:" + b["fn"] if b.get("fn") else None, b.get("site"), None, b.get("after"),
+             extra={"ret": b.get("return"), "call": b.get("call")})
+    for c in (F.get("failure") or {}).get("catches") or []:
+        ty = " · ".join(c.get("types") or [])
+        eff = next((x["id"] for x in exits if str(x.get("via") or "") in ["except " + t for t in c.get("types") or []]), None)
+        gate("catch:" + c["id"], "catch", "except " + ty, "fn:" + c["fn"] if c.get("fn") else None, c.get("at"), eff,
+             extra={"answers": c.get("answers") or [], "outcome": c.get("outcome")})
+    for w in F.get("switches") or []:
+        words = w.get("port") or w.get("expr") or w.get("kind")
+        gate("switch:" + w["id"], "switch", f"{w.get('kind')} · {words}", "fn:" + w["fn"] if w.get("fn") else None, w.get("anchor"), None,
+             extra={"impl": [b.get("impl") for b in w.get("branches") or [] if b.get("impl")], "refs": w.get("refs") or [], "place": w.get("via")})
+    got = collections.Counter(e[1] for e in ex["gate"])
+    want = {"own": sum(1 for g in F.get("preconditions") or [] if not g.get("depth")), "down": sum(1 for g in F.get("preconditions") or [] if g.get("depth")),
+            "branch": len(F.get("branches") or []), "catch": len((F.get("failure") or {}).get("catches") or []), "switch": len(F.get("switches") or []),
+            "limiter": len((F.get("rate") or {}).get("limits") or []), "scheme": len(au.get("schemes") or [])}
+    bad = {k: (got[k], n) for k, n in want.items() if got[k] != n}
+    if bad:
+        die(f"{ep}: the gate roles and the feed's own groups differ {bad}")
+
+    # CLIENT HOOKS — the pieces that fetch this endpoint, and what the screen does on each ending (L-15 · L-16)
+    FE = (F.get("frontend") or {}) if not arm_off(fj, ("frontend", None)) else {}
+    hook = FE.get("hook") or {} if FE.get("present") else {}
+    rd = (FE.get("readers") or [{}])[0] if FE.get("present") and FE.get("readers") else {}
+    for fb in L["widening"].get("fetched_by") or []:
+        i = fb.get("id")
+        if not i:
+            continue
+        hc = hook if hook.get("piece") == i else {}
+        cl = (hc.get("calls") or [{}])[0]
+        if i not in cat:
+            cat[i] = {"k": "hook", "n": fb.get("name"), "key": i, "file": i.split("#")[0].replace("fe:", ""), "at": hc.get("at"), "hrole": fb.get("hrole"),
+                      "fkind": cl.get("kind") or fb.get("kind")}
+        ex["hook"].append([i, fb.get("hrole") or "none", {
+            "send": [[f0.get("method"), f0.get("path"), _fname(f0.get("wrapper") or f0.get("callee") or "")] for f0 in cl.get("fetch") or []],
+            "refresh": [[" ".join(map(str, v.get("key") or [])), v.get("when")] for v in cl.get("invalidates") or []],
+            "screens": [s.get("name") for s in L["widening"].get("screens") or []],
+            "react": [[z.get("exit"), z.get("status"), 1 if z.get("own_branch") else 0, X["dw"].get(z.get("site")) if z.get("site") and z.get("site") != "rest" else None,
+                       _short(z.get("at")) if z.get("at") else None] for z in rd.get("routes") or []] if hc else [],
+            "reader": rd.get("fn") if hc else None}])
+
+    # IN-FLIGHT VALUES — what is alive while the request runs (L-17)
+    for x in inf_rows:
+        i = _inf_key(x)
+        if i not in cat:
+            fr = x.get("from") or {}
+            cat[i] = {"k": "inf", "n": x.get("name"), "key": i, "ik": x.get("kind"), "dies": x.get("dies") or "unknown", "set": _short(x.get("set_at")),
+                      "by": str(x.get("set_by") or x.get("dependency") or "").split("::")[-1].replace("middleware:", ""), "in": x.get("set_in"),
+                      "from": [fr.get("kind"), fr.get("name")] if fr else None, "carrier": x.get("carrier"), "expr": x.get("expr")}
+        # where it is read is THIS endpoint's (a dependency value is read by each handler at its own lines)
+        ex["inf"].append([i, x.get("kind") or "unknown", {"reads": [[I(_short(ra.get("at"))), I(_fname(ra.get("fn") or "")), ra.get("in")] for ra in x.get("read_at") or []]}])
     ex["paths"] = PATHS
     for k in KINDS:
         tally["n:" + k] += len(ex[k])
@@ -429,6 +516,15 @@ MINE = {   # my picks (dashed on the page): each kind's parts in three lines of 
     "test": {"parts": ["icon", "cid", "state", "proves", "role", "name", "file", "sends", "asserts"],
              "rows": [{"l": ["icon", "cid", "proves"], "r": ["state"]}, {"l": ["name"], "r": []}, {"l": ["role", "sends"], "r": ["asserts"]}],
              "size": {"icon": 13, "cid": 13, "state": 11, "proves": 11, "role": 11, "name": 12, "file": 12, "sends": 11, "asserts": 12}, "iconCol": "model"},
+    "gate": {"parts": ["icon", "role", "cond", "fn", "effect", "via", "count"],
+             "rows": [{"l": ["icon", "cond"], "r": ["role"]}, {"l": ["fn"], "r": ["effect"]}, {"l": ["via"], "r": ["count"]}],
+             "size": {"icon": 13, "role": 11, "cond": 13, "fn": 12, "effect": 11, "via": 12, "count": 11}, "iconCol": "model"},
+    "hook": {"parts": ["icon", "role", "name", "fkind", "sends", "file", "count"],
+             "rows": [{"l": ["icon", "name"], "r": ["role"]}, {"l": ["sends"], "r": ["count"]}, {"l": ["file"], "r": ["fkind"]}],
+             "size": {"icon": 13, "role": 11, "name": 13, "fkind": 12, "sends": 12, "file": 12, "count": 11}, "iconCol": "model"},
+    "inf": {"parts": ["icon", "life", "name", "ikind", "set", "count"],
+            "rows": [{"l": ["icon", "name"], "r": ["life"]}, {"l": ["ikind"], "r": ["count"]}, {"l": ["set"], "r": []}],
+            "size": {"icon": 13, "life": 11, "name": 13, "ikind": 12, "set": 12, "count": 11}, "iconCol": "model"},
 }
 MODES = {"ent": ["word", "icon", "both"], "count": ["words", "badge"], "model": ["word", "icon", "both"], "via": ["word", "icon", "both"],
          "file": ["word", "icon", "both"]}

@@ -106,6 +106,34 @@
           q[7].forEach(function (x) { var m = x.match(/\['(\w+)'\]/g); if (m) a.push(m[m.length - 1].slice(2, -2)); }); });
         return a.length ? xMeta(null, a.join(" · "), z, "word", "exasr") : null; }
       return null; },
+    gate: function (p, c, it, L, z) { var o = it.o, md = L.mode || {};
+      if (p === "icon") { var s = el("span", "bki"); s.appendChild(xSvg(XW.icons.gate, z, xGlyphCol("gate", c, it, L))); return s; }
+      if (p === "role") return xChip(xRoleName("gate", it.role), EX.col.opc.gate, z);
+      if (p === "cond") { var b = xB(c.n, z); b.classList.add("excond"); return b; }
+      if (p === "fn") return o.fn == null && o.place ? xMeta(null, o.place, z, "word") : xFnRef(xT(o.fn), z);
+      if (p === "effect") { if (o.st != null) return xStatusChip(o.st, z); if (o.st0 != null) return xStatusChip(o.st0, z);
+        if (it.role === "branch") return xMeta("target", XW.face.returns, z, "word"); if (it.role === "switch" && o.impl && o.impl.length) return xMeta(null, fill(XW.face.impl, { n: o.impl.length }), z, "word");
+        if (o.answers && o.answers.length) return xStatusChip(o.answers.join("|"), z); return null; }
+      if (p === "via") return o.at != null ? xMeta("file", xShort(xT(o.at)), z, md.via) : null;
+      if (p === "count") return xCount(o.tests.length, z, md.count, fill(XW.tip.gate.tests, { n: o.tests.length }));
+      return null; },
+    hook: function (p, c, it, L, z) { var o = it.o, md = L.mode || {};
+      if (p === "icon") { var s = el("span", "bki"); s.appendChild(xStation(c.key, z, xGlyphCol("hook", c, it, L)) || xSvg("hook", z, xGlyphCol("hook", c, it, L))); return s; }
+      if (p === "role") return xChip(xRoleName("hook", it.role), EX.col.hrole[it.role] || "var(--muted)", z);
+      if (p === "name") return xB(c.n, z);
+      if (p === "fkind") return c.fkind ? xMeta(null, XW.face[c.fkind] || c.fkind, z, "word") : null;
+      if (p === "sends") return o.send.length ? xMeta("up", o.send.map(function (s2) { return s2[0] + " " + s2[1]; }).join(" · "), z, "both") : null;
+      if (p === "file") return xMeta("file", xShort(c.file), z, md.file || "word");
+      if (p === "count") { var n = o.react.filter(function (x) { return x[2]; }).length; return o.react.length ? xCount(n, z, md.count, fill(XW.tip.hook.out, { n: n })) : null; }
+      return null; },
+    inf: function (p, c, it, L, z) { var md = L.mode || {};
+      if (p === "icon") { var s = el("span", "bki"); s.appendChild(xSvg(XICO.inf(c), z, xGlyphCol("inf", c, it, L))); return s; }
+      if (p === "life") return xChip(XW.face.lifeChip[c.dies] || XW.face.lifeChip.unknown, EN.life[c.dies] || "var(--muted)", z);
+      if (p === "name") return xB(c.n, z);
+      if (p === "ikind") return xMeta(null, xRoleName("inf", c.ik), z, "word");
+      if (p === "set") return c.by || c.set ? xMeta("link", [c.by, c.set].filter(Boolean).join(" · "), z, "both") : null;
+      if (p === "count") return xCount(it.o.reads.length, z, md.count, it.o.reads.length + " " + XW.list.reads);
+      return null; }
   };
 
   /* ── the strip of marks: one per field (a table, a schema — the lab's field marks, lifted), per table touched (a function), per
@@ -128,6 +156,9 @@
           (q[0] === "gate" && q[2] === 0 ? "expass" : "") + (q[0] === "exit" ? " exhere" : "")); }); }
     else if (k === "test") { if (c.calls.length) c.calls.forEach(function (q, i) { m(q[2] === "act" ? E.opc.call : q[2] === "arrange-checked" ? E.opc.gate : E.opc.pure, "endpoint", q[0] ? q[0].charAt(0) : "?", o.here.indexOf(i) >= 0 ? "exhere" : ""); });
       else c.raises.forEach(function () { m(E.kind["function"], "function", "ƒ", "exhere"); }); }
+    else if (k === "gate") { o.after.forEach(function () { m(E.opc.pure, "shield", "·", "expass"); }); m(E.opc.gate, "shield", "!", "exhere"); }
+    else if (k === "hook") o.react.forEach(function (x) { m(xStatusCol(x[1]), "target", String(x[1]).charAt(0), x[2] ? "" : "exnob"); });
+    else if (k === "inf") it.o.reads.forEach(function (x) { m(EN.life[c.dies] || "var(--muted)", x[2] === "middleware" ? "shield" : "function", "r"); });
     return s.childNodes.length ? s : null; }
 
   /* ── the list a click opens: every field, the ways through the code, the ordered chain a test runs through ── */
@@ -151,6 +182,13 @@
     else if (k === "end") { var R = BYID[c.ep]; c.paths.forEach(function (pid, i) { xHead(b, c.paths.length > 1 ? fill(L.way, { i: i + 1 }) : L.paths); xChainRows(b, R.ex.paths[pid]); });
       xHead(b, L.answer); xRow(b, [c.media || XW.face.none, c.hd.length ? el("span", "exs", c.hd.map(function (h) { return h[0]; }).join(" · ")) : null]); }
     else if (k === "test") xTestChain(b, c, it);
+    else if (k === "gate") { if (o.after.length) { xHead(b, L.after); o.after.forEach(function (a) { xRow(b, [el("span", "exk", "✓"), xT(a)]); }); }
+      if (o.impl && o.impl.length) { xHead(b, L.impls); o.impl.forEach(function (a) { xRow(b, [el("span", "exk", "⇄"), a]); }); }
+      if (o.tests.length) { xHead(b, L.tests); xRow(b, [o.tests.join(" · ")]); } }
+    else if (k === "hook") { if (o.react.length) { xHead(b, L.reactions); o.react.forEach(function (x) { xRow(b, [xStatusChip(x[1], 12), x[2] ? (x[3] || XW.face.none) : el("span", "exs", L.noBranch), x[4] ? el("span", "exs", x[4]) : null]); }); }
+      if (o.refresh.length) { xHead(b, L.refresh); o.refresh.forEach(function (x) { xRow(b, ["[" + x[0] + "]", el("span", "exs", x[1])]); }); }
+      if (o.screens.length) { xHead(b, L.screens); xRow(b, [o.screens.join(" · ")]); } }
+    else if (k === "inf") { xHead(b, L.reads); it.o.reads.forEach(function (x) { xRow(b, [el("span", "exk", "·"), xT(x[1]), el("span", "exs", xT(x[0]))]); }); }
     return b; }
   /* EX-3 (L-08): what a test runs through here, in order — its requests, then per way to the ending it proves: the checks it passes,
      the branch it takes, the functions it runs, the tables it touches (saved or not), the in-flight values it meets, the ending */
@@ -200,6 +238,16 @@
       var sts = {}; o.ends.forEach(function (e) { var ec = EX.cat[it.ep + "|" + e[0]]; if (ec) sts[ec.st] = 1; });
       ln(2, Object.keys(sts).length ? fill(K.proves, { v: Object.keys(sts).join(" · ") }) : K.provesNone);
       o.here.forEach(function (i) { var q = c.calls[i]; if (q[6].length || q[7].length) ln(2, fill(K.out, { v: q[6].join(" · ") + (q[7].length ? " · " + q[7].join(" · ") : "") })); }); }
+    else if (k === "gate") { ln(0, fill(K.in, { v: c.n })); ln(1, o.fn != null ? fill(K.do, { name: xFnName(xT(o.fn)) }) : o.place ? fill(K.do, { name: o.place }) : K.doNone); if (o.at != null) ln(1, fill(K.at, { at: xT(o.at) }));
+      if (o.after.length) ln(1, fill(K.after, { v: o.after.map(xT).join(" · ") }));
+      ln(2, o.st != null || o.st0 != null ? fill(K.out, { v: (o.st != null ? o.st : o.st0) + (o.eff && EX.cat[it.ep + "|" + o.eff] ? " · " + (EX.cat[it.ep + "|" + o.eff].say || "") : "") })
+        : it.role === "branch" ? fill(K.branch, { v: o.ret || "" }) : it.role === "switch" && o.impl && o.impl.length ? fill(K.switch, { v: o.impl.join(" · ") }) : K.outNone);
+      if (o.tests.length) ln(2, fill(K.tests, { n: o.tests.length })); }
+    else if (k === "hook") { ln(0, o.screens.length ? fill(K.in, { v: o.screens.join(" · ") }) : K.inNone); o.send.forEach(function (s) { ln(1, fill(K.do, { v: s[0] + " " + s[1] })); });
+      o.refresh.forEach(function (x) { ln(1, fill(K.refresh, { v: "[" + x[0] + "]" })); }); var n = o.react.filter(function (x) { return x[2]; }).length; ln(2, n ? fill(K.out, { n: n }) : K.outNone); }
+    else if (k === "inf") { ln(0, c.by || c.set ? fill(K.in, { name: c.by || "?", at: c.set || "?" }) : K.inNone); if (c.from) ln(0, fill(K.from, { k: c.from[0], v: c.from[1] }));
+      ln(1, fill(K.do, { n: it.o.reads.length, v: it.o.reads.map(function (x) { return xT(x[1]); }).filter(function (x, i, a) { return a.indexOf(x) === i; }).join(" · ") }));
+      ln(2, fill(K.out, { v: c.dies === "with the answer" ? XW.face.answer1 : c.dies === "with the server process" ? XW.face.server : XW.face.notKnown })); }
     var h = head; [T.in, T.do, T.out].forEach(function (lab, i) { if (lines[i].length) h += "<span class=ln><i class=exio>" + esc(lab) + "</i> " + esc(lines[i].join(" · ")) + "</span>"; });
     return h; }
 
