@@ -59,6 +59,7 @@ import _ae_io as IO  # noqa: E402  (D-067 — one hover per BY MOMENT item: its 
 import _ae_els as ELS  # noqa: E402  (D-069 — every BY MOMENT element says what it is: its host, its effect, its role, its object)
 import _ae_rel as REL  # noqa: E402  (D-070 — the relations across the moments: data connectors, in-flight lifelines)
 import _ae_bench as BENCH  # noqa: E402  (D-071 — the examples bench, his L-23)
+import _ae_truth as TRUTH  # noqa: E402  (round-1 review F1a — readings corrected once, before any block reads the facts)
 
 
 def die(msg: str) -> None:
@@ -825,7 +826,9 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             xg = {"rz": list(rz[0])} if len(rz) == 1 else {}
             if cps - own_c:                                      # the paths it rides only by the call: the hover says so on those alone
                 xg["cq"] = [nm(VIA_CALL.match(str(g.get("via"))).group(1)), cps - own_c]; tally["f1:up"] += 1
-            e = add("gate", w, [rk[c][0]] + rk[c][1], g.get("pred") or "", ["status", g.get("status")] + (["raise"] if str(g.get("via") or "").startswith("except ") else []),
+            # review N3-25: a refusal raised inside an except refuses because the except took its error — that is its condition, not the if around it
+            gtx = str(g.get("via")) if str(g.get("via") or "").startswith("except ") else (g.get("pred") or "")
+            e = add("gate", w, [rk[c][0]] + rk[c][1], gtx, ["status", g.get("status")] + (["raise"] if str(g.get("via") or "").startswith("except ") else []),
                     pp if (pp or onr or site_paths.get(via_q(g))) else (None if t["x"] is None else set()), (r["d"]["guards"]["items"][c][2] or ""), "g:" + g["id"], x=xg or None)
             if len(rz) == 1:
                 e["m"] = [("rw", g["id"])]
@@ -960,7 +963,9 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                 continue
             senders.add(pid)
             # D-069 (client P5): the send chain in tap order — the screen (0), the hooks on the way (1), the hook that sends it (2)
-            add("client", ("fix", "send"), [pid], pid.split("#")[-1], ["kind2", c.get("kind")], None, _short(c.get("at")), "h:" + pid + str(c.get("at")))["o"] = 2
+            sm = sorted({str(ft.get("method")) for ft in c.get("fetch") or [] if ft.get("method")})   # review F32: a hook that sends it says so, by its method
+            add("client", ("fix", "send"), [pid], pid.split("#")[-1], ["kind2", c.get("kind")], None, _short(c.get("at")), "h:" + pid + str(c.get("at")),
+                x={"sm": " · ".join(sm)} if sm and c.get("kind") == "mutation" else None)["o"] = 2
             for wd, lst in (("seed", c.get("seeds") or []), ("refresh", c.get("invalidates") or [])):
                 for o in lst:
                     wn = o.get("when")
@@ -1034,9 +1039,11 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     for rd in rdrs:
         rest = sorted({ro.get("exit") for ro in rd.get("routes") or [] if ro.get("site") == "rest" and ro.get("exit") in XS}, key=str)
         pz = str(rd.get("piece") or "")
+        # review N3-20: the body's parse endings reach the same function and no branch of it compares them either — the rest is whole
+        fw0 = sorted({x0["id"] for x0 in F["exits"] if x0["kind"] == "framework"} - {ro.get("exit") for ro in rd.get("routes") or []}, key=str)
         if rest and ends_at(set(rest)):
-            add("client", ("fix", "after"), [], "", ["rest"], ends_at(set(rest)), None, "t:" + pz,
-                x={"rx": rest, "rs": [XS[x0].get("status") for x0 in rest], "pc": pcs.get(pz) or [pz, str(rd.get("fn") or pz.split("#")[-1]), _short(pz.split("#")[0][3:]), {"via": [], "err": [], "scr": None}],
+            add("client", ("fix", "after"), [], "", ["rest"], ends_at(set(rest) | set(fw0)), None, "t:" + pz,
+                x={"rx": rest, "rs": [XS[x0].get("status") for x0 in rest + fw0], **({"fw": fw0} if fw0 else {}), "pc": pcs.get(pz) or [pz, str(rd.get("fn") or pz.split("#")[-1]), _short(pz.split("#")[0][3:]), {"via": [], "err": [], "scr": None}],
                    "xk": [pz] if pz else []})
             tally["c1:rest"] += 1
     for o0 in orch.values():                                     # D-069 (client P5): a hook on the way from the screen to the send
@@ -1063,15 +1070,19 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             if c.get("endpoint") == E and c.get("role") == "act":
                 xs = {q.get("exit") for q in c.get("refs") or [] if q.get("exit") in XS}
                 a_ = c.get("asserts") or {}                      # D-056 (10): what the case asserts — the status, and the detail or code
+                # round-1 review F03 · CR-03: a call whose status fits several endings FITS them (am = how many); it proves none
+                am = max([int(m.group(1)) for q in c.get("refs") or [] for m in [re.match(r"ambiguous of (\d+)", str(q.get("conf") or ""))] if m] or [0])
                 add("proof", ("xs", sorted(xs)), ["case:" + cid], cid, proves(xs), ends_at(xs), ptxt(c.get("line"), xs), "p:" + cid + ":" + str(c.get("line")),
-                    x={"as": [a_.get("status") or [], a_.get("detail") or [], a_.get("code") or [], len(a_.get("attrs") or [])]})
+                    x={"as": [a_.get("status") or [], a_.get("detail") or [], a_.get("code") or [], len(a_.get("attrs") or [])], **({"am": am} if am else {})})
     sr = collections.defaultdict(set)
     for x in F["exits"]:
         for t in x.get("tests") or []:
             if t.get("role") == "service-raises":
                 sr[(t.get("case"), t.get("line"))].add(x["id"])
     for (cid, ln), xs in sorted(sr.items(), key=lambda kv: (str(kv[0][0]), kv[0][1] or 0)):
-        add("proof", ("xs", sorted(xs)), ["case:" + str(cid)], str(cid), proves(xs), ends_at(xs), ptxt(ln, xs), "p:" + str(cid) + ":" + str(ln) + ":raises")
+        # round-1 review N3-01: the function the test calls (only one this endpoint runs is joined here, _ae_truth.own_raise_tests)
+        sv = next((str(z.get("call")) for z in (fj.get("test_cases") or {}).get(cid, {}).get("raises") or [] if z.get("line") == ln and z.get("call")), "?")
+        add("proof", ("xs", sorted(xs)), ["case:" + str(cid)], str(cid), proves(xs), ends_at(xs), ptxt(ln, xs), "p:" + str(cid) + ":" + str(ln) + ":raises", x={"sv": sv})
     # JOURNEYS (D-065, his ruling 2026-09-28 "build A and B") — the station's own journey list for this endpoint (the card's Journeys
     # row, det.test_journeys, so the page and the card name the same ones). A journey the station names as one real case (its jReal)
     # whose recorded calls (forms.json test_cases, IN ORDER) reach this endpoint AND others is the outer time around this request.
@@ -1586,6 +1597,21 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     if raced != r500:
         die(f"{lab}: the races marked {sorted(raced)} are not the ones the race-500 alarm names {sorted(r500)}")
     tally["race"] += len(raced)
+    # review N3-18: a race the effects arm records on a write itself (steps[].race, nothing catches it) — the login's first add of a
+    # user breaks its unique key at the flush when two first requests meet — joined the same way, on the flush it breaks at, to the
+    # uncaught ending. A race a claim above already marks is not marked twice
+    for s0 in sids:
+        rq = (steps.get(s0) or {}).get("race") or {}
+        if rq.get("state") != "uncaught" or rq.get("at") in raced or unc_x is None:
+            continue
+        cols0 = list((rq.get("keys") or [[]])[0])
+        tb0 = steps[s0].get("table")
+        hit = [e for e in dgrp.values() if not e["x"].get("rc") and any((steps.get(q[2:]) or {}).get("at") == rq.get("at") and (steps.get(q[2:]) or {}).get("fn") == steps[s0].get("fn")
+                                                                       and (steps.get(q[2:]) or {}).get("op") in ("flush", "commit") for q in e["rec"])]
+        for e in hit:
+            e["x"]["rc"] = [tb0, tb0, cols0, unc_x]; e["x"]["rs"] = 1      # no constraint name: the table stands for it
+            e.setdefault("m", []).append(("race", rq.get("at")))
+        tally["raceStep"] += bool(hit)
     dun = {}
     for (pid, j), cand in miss.items():
         s = occ[pid][j][0]; tally["src:none"] += 1; n_occ += 1
@@ -1683,11 +1709,17 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         for k in e["keys"]:
             if k.startswith("fn:"):
                 dstep[k[3:]].append(e)
+    def dep_root(f):                                             # the dependency a walk function runs inside: its walk ancestor with no parent
+        while BH["par"].get(f):
+            f = BH["par"][f]
+        return f
     for f, dp, dep in [w0 for w0 in BH["walk"]] + [(f, None, False) for f in BH["extra"]]:
         if f in fn_ids:
             continue
         fn_ids.add(f)
-        xx = {"dp": dp} if dp else None
+        # review CR-05 · N3-05: a function a dependency runs is run by FastAPI before the handler, n calls inside that dependency — never
+        # "n calls below the handler", which does not call it
+        xx = ({"dd": [nm(dep_root(f)), dp - 1]} if dep else {"dp": dp}) if dp else None
         qs = [q for q in sites(f)[0] if q in allq]
         if qs:
             by_si = collections.defaultdict(list)
@@ -1930,6 +1962,26 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         els.extend(subs)
         tally["hollow"] += len(subs); tally["hollowCases"] += 1
     els[:] = [e for e in els if e is not None]
+    # round-1 review F03 · CR-03 · N3-17: a test's chips that FIT endings (its status fits several) and stand in one cell fold into
+    # ONE chip — every call of the case there, every ending it fits there; its face says "fits" and how many of how many
+    fold = collections.OrderedDict()
+    for i0, e in enumerate(els):
+        if e["f"] == "proof" and e["x"].get("am") and e["w"][0] == "xs" and not e.get("jy"):
+            fold.setdefault((e["keys"][0], e.get("si")), []).append(i0)
+    for (_k, si0), ix in fold.items():
+        grp = [els[i0] for i0 in ix]
+        e0 = grp[0]
+        xs0 = sorted({x0 for e in grp for x0 in e["w"][1]}, key=lambda x0: (x_si.get(x0, 0), str(XS[x0].get("status")), x0))
+        lns = sorted({int(e["id"].split(":")[2]) for e in grp}, key=int)
+        n = dict(e0, w=("xs", xs0), chip=proves(set(xs0)), paths=set().union(*[set(e["paths"] or ()) for e in grp]), pw=set().union(*[e["pw"] for e in grp]),
+                 id="p:" + e0["id"].split(":")[1] + ":" + ",".join(str(q) for q in lns), rec=list(dict.fromkeys(q for e in grp for q in e["rec"])),
+                 x=dict(e0["x"], am=max(e["x"]["am"] for e in grp), hn=len(xs0), **({"asm": {str(int(e["id"].split(":")[2])): e["x"].get("as") for e in grp}} if len(lns) > 1 else {})))
+        n["x"].pop("ho", None)
+        for i0 in ix:
+            els[i0] = None
+        els[ix[0]] = n
+        tally["fold:chips"] += len(grp) - 1; tally["fold:cells"] += 1
+    els[:] = [e for e in els if e is not None]
     # D-069 (his L-09 … L-18): what each element IS — a gate's host, what it does when it holds and where it decides; a rare piece's
     # rarity and the elements it names; what a function decides and touches (proven the code map's deciders and data functions)
     ELS.gates(els, ELC, tally)
@@ -1948,6 +2000,12 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     IOC = IO.Ctx(E=E, F=F, fj=fj, fep=fep, XS=XS, steps=steps, H=H, hf=hf, chains=chains, EXIT=EXIT, dset=dset, par=r["_beh"]["par"],
                  pieces=L["feedwide"]["pieces"]["rows"])
     IOC.req = req_name if shape_body else None
+    # round-1 review: what the hovers read beside the element — a client branch's function (F18), each drawn function's callers by
+    # the station's call edges and its depth (N3-24), its docstring's first sentence and return type (F20)
+    IOC.site_fn = {e["id"][2:]: e["x"]["pc"][1] for e in els if e["f"] == "client" and str(e.get("id") or "").startswith("s:") and (e.get("x") or {}).get("pc")}
+    IOC.radj, IOC.fninfo, IOC.lvbeh = X["radj"], X["fninfo"], X.get("lvbeh") or {}
+    IOC.drawn = {k[3:] for e in els if e["f"] == "fn" for k in e["keys"][:2] if k.startswith("fn:")}
+    IOC.depth_of = {k[3:]: e["x"]["dp"] for e in els if e["f"] == "fn" and (e.get("x") or {}).get("dp") for k in e["keys"][:2] if k.startswith("fn:")}
     for e in els:
         if e["w"][0] == "nm":                                    # D-064 (2): no moment by nature — the last column, never the band
             nmv.append([e["f"], "piece", e["keys"], e["text"], e.get("x") or None]); rn[e["f"]].update(e["rec"])
@@ -2071,7 +2129,18 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     # Proof's no-moment cell (the band no longer holds them), one chip per case, as the code map names them. PROOF: exactly the code
     # map's list, each once
     for cid, how in r["d"].get("arranged") or []:
-        nmv.append(["proof", "arr", ["case:" + cid], cid, {"h": how}]); rn["proof"].add("p:" + cid + ":arranged")
+        # review F12: its name and the request it sets up for (the first call after its last arranging call here, to another endpoint);
+        # review N3-15: a case that also ACTS on this endpoint tests it, and sets up besides
+        cs0 = (TCS.get(cid) or {}).get("calls") or []
+        arr_i = [i for i, c0 in enumerate(cs0) if c0.get("endpoint") == E and c0.get("role") != "act"]
+        nx = next(([c0.get("method"), c0["endpoint"].split(" ", 1)[1] if c0.get("endpoint") in FEP else c0.get("path")]
+                   for c0 in cs0[(max(arr_i) + 1 if arr_i else 0):] if c0.get("endpoint") != E), None)
+        ax = {"h": how, "nm": BENCH._case_name((TCS.get(cid) or {}).get("name"), cid)}
+        if any(c0.get("endpoint") == E and c0.get("role") == "act" for c0 in cs0):
+            ax["t"] = 1; tally["arrActs"] += 1
+        if nx:
+            ax["nx"] = nx
+        nmv.append(["proof", "arr", ["case:" + cid], cid, ax]); rn["proof"].add("p:" + cid + ":arranged")
         tally["arrCol"] += 1
     arr_k = [x[3] for x in nmv if x[1] == "arr"]
     if arr_k != [c0 for c0, _h in r["d"].get("arranged") or []] or len(set(arr_k)) != len(arr_k):
@@ -2932,6 +3001,27 @@ def reply_fields(F: dict, lab_resp: dict) -> tuple:
     return ("unknown", name) if name else ("none", None)
 
 
+def first_sentence(doc) -> str | None:
+    """a docstring's first sentence, whole (its first paragraph up to the first full stop that ends a sentence); none for a blank or
+    a dash"""
+    d = " ".join(str(doc or "").split("\n\n")[0].split())
+    if not d or d in ("\u2014", "-"):
+        return None
+    m = re.search(r"(?<!\be\.g)(?<!\bi\.e)\.(\s|$)", d)
+    return d[:m.start() + 1] if m else d
+
+
+def sure_t(t: dict) -> bool:
+    """a test joined to an ending that proves it on its own (not one whose status fits several — "ambiguous of N")"""
+    return not str(t.get("conf") or "").startswith("ambiguous")
+
+
+def beyond_t(t: dict) -> bool:
+    """review N3-03: a test's call that asserts more than the status — the body's attributes, the detail or the code"""
+    a = t.get("asserts") or {}
+    return bool(a.get("attrs") or a.get("detail") or a.get("code"))
+
+
 def arranged_of(t: dict) -> list:
     """D-056 (2): the cases that arrange through this endpoint, each once, in the feed's order (arranged_by, then helper_arranged),
     with how: "a" its own call · "h" through a helper · "ah" both."""
@@ -3056,13 +3146,17 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
         unknown("response", Z["response"]["unknown"].replace("{model}", rval))
 
     tst = F.get("tests") or {}
-    acts = tst.get("act") or 0
-    put("acts", acts, acts, Z["acts"]["zero"])
-    past = sum(1 for x in exits for t in (x.get("tests") or []) if "+" in str(t.get("conf") or ""))
+    acts = tst.get("act") or 0                                  # the calls that act on it (review N3-16: the column counts TESTS, these beside)
+    E0 = "endpoint:" + ident["label"]
+    acting = sorted(cid for cid, tc in (fj.get("test_cases") or {}).items() if any(c.get("endpoint") == E0 and c.get("role") == "act" for c in tc.get("calls") or []))
+    put("acts", len(acting), len(acting), Z["acts"]["zero"], acting)
+    # BEYOND (review N3-03): a proof — a test that proves an ending on its own — whose call also asserts on the answer's body, its
+    # detail or its code; a test whose status only fits several endings proves none, so it is never beyond
+    past = sum(1 for x in exits for t in (x.get("tests") or []) if sure_t(t) and beyond_t(t))
     put("asserted", past, past, Z["asserted"]["zero"])
     # PROVEN: an ending a test proves ON ITS OWN. A test whose status fits several endings ("ambiguous of N") proves none
     # of them: it is counted apart, as the third number, and drawn in the hover only
-    sure = lambda t: not str(t.get("conf") or "").startswith("ambiguous")
+    sure = sure_t
     tested = sum(1 for x in exits if any(sure(t) for t in (x.get("tests") or [])))
     amb = sum(1 for x in exits if x.get("tests") and not any(sure(t) for t in x["tests"]))
     put("proof", [tested, len(exits), amb], round(tested / len(exits), 4) if exits else 0, Z["proof"]["zero"])
@@ -3192,7 +3286,8 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
         # D-056 (1): [how many behind, how deep, the walk's names by level, the card's other callees (keyspace adds them), the card's
         # names no single function holds (counted, keyspace)] — the walk is the lab's over the station's call edges
         "behind": [L["functions"]["behind"].get("fns"), L["functions"]["behind"].get("depth"), [[q["name"] for q in lv] for lv in L["functions"].get("walk") or []], [], 0],
-        "proof": {k2: L["feedwide"]["proof"].get(k2) for k2 in ("tested", "produced", "rank", "rank_to", "of")},
+        "proof": {**{k2: L["feedwide"]["proof"].get(k2) for k2 in ("tested", "produced", "rank", "rank_to", "of")},
+                  "sts": [x0.get("status") for x0 in fep.get("produced") or []]},      # review N3-04: the endings it counts, by status
         "inflight": cap([[r.get("kind"), r.get("name"), r.get("dies")] for r in (inf.get("rows") or [])]),
         # D-056 (9): every piece that fetches it and every FILE the station's bridge edge ends at, by name; every screen above them
         "hook": [x[1] for x in hooks] or None,
@@ -3209,6 +3304,8 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
         "pieces": cap([[r["words"], r["n"], r["of"], r["word"]] for r in pc["rows"] if r["word"] in ("rare", "only here")]),
         "lacks": [[r["words"], r["n"], r["of"]] for r in pc["missing_norms"]],
     }
+    if len(det["proof"]["sts"]) != (det["proof"].get("produced") or 0):
+        die(f"{ident['label']}: the proof rank counts {det['proof'].get('produced')} produced endings, the feed lists {len(det['proof']['sts'])} — its label would be false")
     method, path = ident["method"], ident["path"]
     return {"id": ident["label"], "m": method, "p": path, "ent": ep.get("entity") or ident.get("entity"),
             "seg": path.strip("/").split("/")[0] or "/", "file": ident.get("file"), "line": ep.get("line"),
@@ -3218,6 +3315,7 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
             # D-056 (11): the handler's outline and docstring [async, lines, returns, the def text, the docstring] · (12) a streamed answer
             "sig": [(ident.get("sig") or {}).get("async"), (ident.get("sig") or {}).get("lines"), (ident.get("sig") or {}).get("returns"), ident.get("gsig"), ident.get("doc") or None],
             "stream": 1 if (L.get("security") or {}).get("stream") else 0,
+            "actc": acts,                                                 # review N3-16: the act calls the tests column's tests make
             "_hook": hooks, "_files": files, "_al": ALS,                  # D-057: the alarms' own records, parallel to d.alarms
             # D-043: what the code map's chips need beside the detail lists, parallel to their items — kept OUT of `d`, so the words
             # the gaps are read against (every string `d` holds) do not move: each path's kind of ending, and each piece's family and
@@ -3293,9 +3391,12 @@ def key_index(fj: dict, am: dict, feeds: dict) -> dict:
                 acts[c["endpoint"]].add(cid); act_calls[c["endpoint"]] += 1
     # review F1 (D-064 (1)): each function's length, so a function the forms feed records the def line of has its body's last line
     fnlines = {k: v["lines"] for k, v in (am.get("function_insight") or {}).items() if isinstance(v, dict) and isinstance(v.get("lines"), int)}
+    # round-1 review F20 · CR-30: what a function does in its author's words — its docstring's first sentence — and the type it returns
+    fninfo = {k: (first_sentence(v.get("doc")), v.get("returns") if v.get("returns") not in (None, "", "None", "\u2014") else None)
+              for k, v in (am.get("function_insight") or {}).items() if isinstance(v, dict)}
     return {"m2t": m2t, "node_t": node_t, "schemas": schemas, "short": short, "settings": settings, "nAlias": len(m2t), "nAliasC4": n_c4,
             "c4tables": set(node_t.values()), "WRITE": WRITE_OPS,
-            "acts": acts, "actCalls": act_calls, "fnlines": fnlines,
+            "acts": acts, "actCalls": act_calls, "fnlines": fnlines, "fninfo": fninfo,
             "flags": (set(am.get("flags") or {}) | flags) - settings, "unkeyed": set(), "names": set()}
 
 
@@ -3363,15 +3464,17 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
     # the tests column counts the calls that ACT on this endpoint (D-042): it holds the cases that make them, and its count is
     # proven to be theirs
     if v.get("acts") != "absent":
-        if X["actCalls"].get("endpoint:" + r["id"], 0) != r["k"]["acts"]:
-            die(f"{r['id']}: the tests column draws {r['k']['acts']} act calls, the feed's cases make {X['actCalls'].get('endpoint:' + r['id'], 0)}")
+        if len(X["acts"].get("endpoint:" + r["id"]) or ()) != r["k"]["acts"] or X["actCalls"].get("endpoint:" + r["id"], 0) != r["actc"]:
+            die(f"{r['id']}: the tests column draws {r['k']['acts']} tests making {r['actc']} act calls, the feed's cases are {len(X['acts'].get('endpoint:' + r['id']) or ())} making {X['actCalls'].get('endpoint:' + r['id'], 0)}")
         to("acts", *["case:" + c for c in sorted(X["acts"].get("endpoint:" + r["id"]) or [])])
     exits = F["exits"]
     for x in exits:
         to("e_" + x["kind"], stat(x.get("status"))); to("all", stat(x.get("status")))
         for t in x.get("tests") or []:
+            if not sure_t(t):                            # review F03: a test that only FITS endings proves none — not counted in proven
+                continue
             to("proof", "case:" + t["case"] if t.get("case") else None)
-            if "+" in str(t.get("conf") or ""):
+            if beyond_t(t):                              # review N3-03: a proof that checks the body, the detail or the code
                 to("asserted", "case:" + t["case"] if t.get("case") else None)
     au = F.get("auth") or {}
     to("auth", *[fkey(g.get("fn")) for g in au.get("gates") or []])
@@ -3507,7 +3610,9 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
     bk = ["fn:" + f for f in wids] + ["fn:" + f for _n, f in extra]
     if len(set(bk)) != len(bk):
         die(f"{r['id']}: a function behind the handler is named twice in the behind pair")
-    to("behind", *bk)
+    # review N3-05 · CR-05: the pinned row's behind COUNTS the station's — the handler's own calls; a function a dependency runs is not
+    # behind it, so no chip says "counted in: behind" for one (the code map's pair still names the lab's whole walk, as it draws it)
+    to("behind", *(["fn:" + f for f, _i, dep in wlist if not dep] + ["fn:" + f for _n, f in extra]))
     dk["behind"] = bk if v.get("behind") != "absent" else []
     r["_beh"] = {"walk": wlist, "extra": [f for _n, f in extra], "noname": noname, "par": wpar}
     r["ck"] = {c: sorted(ks) for c, ks in sorted(ck.items()) if ks}
@@ -3802,6 +3907,16 @@ def build(argv: list) -> tuple:
     smj = json.dumps(sm, sort_keys=True)
     if any(json.dumps(L["sectionmap"], sort_keys=True) != smj for L in facts):
         die("the ruled tree differs between two endpoints' facts")
+    # round-1 review (lane F1a): three readings corrected ONCE, before any block reads the facts (_ae_truth) — a service-side test
+    # proves an ending here only when the function it calls runs here; a step with no table that is not a save is no database write;
+    # a raise joined to no ending here takes the ending of the first except of its class up its callers
+    LV = json.loads((UNI.EX / "levels.json").read_text(encoding="utf-8"))
+    ADJ, MEMO, MOT = fn_adj(LV), {}, collections.Counter()
+    TRUTH.drop_tableless(fj, facts, MOT)
+    for L in facts:
+        H0 = (fj["endpoints"]["endpoint:" + L["identity"]["label"]].get("handler") or "")
+        TRUTH.own_raise_tests(L, fj, reach_of(ADJ, H0, MEMO), MOT)
+        TRUTH.class_joins(L, fj, MOT)
     spec, feeds = UNI.station_spec(), UNI.station_feeds()
     # D-056 (9): who fetches each endpoint, as the station draws it — its bridge wires, each ending at the piece or FILE that fetched
     nid_, links_ = UNI._station_links(feeds, spec)
@@ -3824,11 +3939,13 @@ def build(argv: list) -> tuple:
         keyspace(r, L, fj["endpoints"]["endpoint:" + r["id"]], X, CL, spec["_look"]["lift"]["jReal"][0])
         r["ro"] = roles_by_key(L, r)                                   # the roles the code map's chips wear (D-043)
     # ── BY MOMENT (his ask 2026-09-26): every timed block's elements on one spine per endpoint, placed only by recorded facts ──
-    LV = json.loads((UNI.EX / "levels.json").read_text(encoding="utf-8"))
-    ADJ, MEMO, MOT = fn_adj(LV), {}, collections.Counter()
     # D-057 (d): each function the station draws, the names its behind list holds (levels.json fn_nodes behind.names)
     X["lvbeh"] = {n["id"].replace("#", "::"): set((n.get("behind") or {}).get("names") or []) for n in LV.get("fn_nodes") or [] if (n.get("behind") or {}).get("names")}
     X["lvcut"] = {n["id"].replace("#", "::"): (n.get("behind") or {}).get("names_more") for n in LV.get("fn_nodes") or [] if (n.get("behind") or {}).get("names_more")}
+    X["radj"] = collections.defaultdict(set)                           # round-1 review N3-24: each function's callers, by the station's call edges
+    for s_, ts_ in ADJ.items():
+        for t_ in ts_:
+            X["radj"][t_].add(s_)
     # D-057 (b): what each client branch does, in the lab's own words (its doesWords, run over the site's does[] rows)
     X["dw"] = does_lift([s for L in facts for s in L["forms"]["frontend"].get("reason_sites") or []])
     X["jreal"] = spec["_look"]["lift"]["jReal"][0]                     # D-065: the station's own test for a journey that is one real case

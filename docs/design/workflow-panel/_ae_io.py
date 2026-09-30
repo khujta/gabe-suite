@@ -17,8 +17,11 @@ from __future__ import annotations
 import json
 import re
 
+import _ae_truth as TRUTH
+
 TOKEN = re.compile(r"\{([a-z]\w*)\}", re.I)
 CAP = 3                                                          # a list inside one line: its first few, then how many more
+OPS_SAID = {"read", "add", "update", "delete", "merge", "execute"}   # review CR-30: the ops a function's hover says as a sentence
 
 
 def _short(at) -> str:
@@ -27,6 +30,20 @@ def _short(at) -> str:
 
 def _nm(q) -> str:
     return str(q or "").split("::")[-1]
+
+
+def _short2(at) -> str:
+    """apps/web/src/lib/query/client.ts:23 → query/client.ts:23 (two parts: a file name two folders share, told apart)"""
+    return "/".join(str(at or "").split("/")[-2:])
+
+
+def _file(at) -> str:
+    return str(at or "").rsplit(":", 1)[0]
+
+
+def _ln(at):
+    t = str(at or "").rsplit(":", 1)
+    return int(t[1]) if len(t) == 2 and t[1].isdigit() else None
 
 
 def _says(x: dict) -> str:
@@ -67,7 +84,7 @@ class Ctx:
                 if ro.get("site") == "rest":
                     self.rest_in.setdefault(ro.get("exit"), []).append(str(rd.get("fn") or _nm(rd.get("piece"))))
                 else:
-                    self.read_by.setdefault(ro.get("exit"), []).append(_short((self.sites.get(ro.get("site")) or {}).get("at")) or str(ro.get("site")))
+                    self.read_by.setdefault(ro.get("exit"), []).append(ro.get("site"))
         # the paths that take a fork → the endings they end at
         self.fork_ends = {}
         for pid, ch in chains.items():
@@ -84,6 +101,27 @@ class Ctx:
         self.req = None                                          # D-069: the request body's schema (set by by_moment, where it is read)
         mdl = ((fep.get("declared") or {}).get("response_model") or {}).get("name")
         self.ok = sorted({(x.get("status"), mdl) for x in F.get("exits") or [] if x.get("kind") == "success" and mdl}, key=str)
+        # round-1 review F04 · CR-09: a raise the feed joins to no ending here meets the first except of its class up its callers
+        self.cats = [c for c in (fep.get("failure") or {}).get("catches") or [] if c.get("outcome") == "translate"]
+        self.parent = TRUTH.parent_of(self.inside, self.par, self.fns)
+        self.site_fn = {}                                        # a client branch's id → the function it sits in (set by by_moment)
+        self.radj, self.drawn, self.depth_of, self.fninfo, self.lvbeh = {}, set(), {}, {}, {}   # set by by_moment: callers by the station's edges, the
+                                                                 # functions drawn, their depth, doc + return, each one's station behind list
+
+    def near(self, fid, name):
+        """the drawn functions (not the handler) whose station behind list names this one, less those another of them is behind"""
+        n = _nm(fid) if fid else str(name or "")
+        c = [g for g in self.drawn if g != self.H and g != fid and n in (self.lvbeh.get(g) or ())]
+        return [g for g in c if not any(h != g and _nm(h) in (self.lvbeh.get(g) or ()) for h in c)]
+
+    def caught(self, fid, cls):
+        """(the except, the ending it makes) for a raise of `cls` in `fid` — the first except of its class up its callers"""
+        c = TRUTH.catch_up(fid, cls, self.parent, self.cats) if fid and cls else None
+        return (c, TRUTH.exit_of_catch(c, self.XS)) if c else (None, None)
+
+    def causes(self, xid):
+        """F05 · F06: the raises that become this ending, each [function, condition, where]"""
+        return TRUTH.causes(xid, self.inside, self.par, self.fns, self.cats, self.XS)
 
     def st(self, xid):
         x = self.XS.get(xid) or {}
@@ -104,7 +142,7 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
     """one element → {h: [its name, its kind word key], b, c, g: [[word key, {token: value}] …]} (see the module head)"""
     f, idn = e["f"], str(e.get("id") or "")
     b, c, g = [], [], []
-    k = None
+    k, title, asw = None, None, []                               # title: a name in words (review CR-37, CR-38) · asw: conditions as written (CR-15)
     name = str(e.get("text") or "")
     X = xx or {}
     # ── ENDINGS ──
@@ -137,7 +175,14 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             if m:
                 b.append(_L("inCall", fn=_nm(m.group(1)), at=_short(m.group(2))))
             elif via.startswith("except "):
-                b.append(_L("raisedAs", cls=via[7:]))
+                cz = C.causes(idn)                               # review F05 · F06: who raises it, and when — every cause, not one
+                for fn0, pr0, at0, _by, m0 in cz:                   # the if a raise sits in is where it stands, not always why (it may sit in an except)
+                    ln = _L("causeIf", fn=_nm(fn0), v=_plain(pr0), at=_short(at0)) if pr0 else _L("cause", fn=_nm(fn0), at=_short(at0))
+                    b.append(ln)
+                    if m0:
+                        b.append(_L("causeMsg", v=m0))
+                if not cz:
+                    b.append(_L("raisedAs", cls=via[7:]))
             if x.get("pred"):
                 c.append(_L("chk", v=x["pred"], at=_short(fr.get("site") or x.get("at"))))
             elif via.startswith("except "):
@@ -147,8 +192,8 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
         g.append(C.ans(idn))
         if x.get("kind") != "uncaught" and x.get("status") not in (None, ""):
             g.append(_L("x.declared" if x.get("status") in C.dset else "x.undeclared"))
-        for h in X.get("hd") or []:
-            g.append(_L("x.headers", v=h[0] + ": " + str(h[1])))
+        for h in X.get("hd") or []:                              # review CR-36: a value worked out as it answers is said so, not elided
+            g.append(_L("hdrRun", v=h[0]) if str(h[1]) in ("\u2026", "...", "") else _L("x.headers", v=h[0] + ": " + str(h[1])))
         if X.get("st"):
             g.append(_L("x.stream"))
         ts = sorted({str(t.get("case")) for t in x.get("tests") or [] if t.get("case") and not str(t.get("conf") or "").startswith("ambiguous")})
@@ -161,8 +206,9 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             g.append(_L("noTest"))
         if C.fe_on and x.get("kind") != "success":
             rb, rs = C.read_by.get(idn), sorted(set(C.rest_in.get(idn) or []))
-            if rb:
-                g.append(_L("screenReads", v=_cap(rb)))
+            if rb:                                               # review F18: the function that reads it, and where
+                g.append(_L("screenReads", v=_cap(list(dict.fromkeys(
+                    (C.site_fn.get(q) + " (" + _short((C.sites.get(q) or {}).get("at")) + ")") if C.site_fn.get(q) else (_short((C.sites.get(q) or {}).get("at")) or str(q)) for q in rb)))))
             if rs:
                 g.append(_L("screenRest", v=_cap(rs)))
             if not rb and not rs:
@@ -178,25 +224,39 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             m = re.match(r"^call (.+) @ (.+)$", str(q.get("via") or ""))
             if m:
                 b.append(_L("inCall", fn=_nm(m.group(1)), at=_short(m.group(2))))
-            if q.get("after"):
-                b.append(_L("after", v=" · ".join(q["after"])))
-            if q.get("pred"):
+            if q.get("after"):                                   # review CR-15: a negation said the other way round
+                b.append(_L("after", v=" · ".join(_plain(a) for a in q["after"])))
+                asw += [a for a in q["after"] if _plain(a) != a]
+            if str(q.get("via") or "").startswith("except "):   # review N3-25: raised inside an except — that except is what refuses
+                if q.get("pred"):
+                    b.append(_L("inIf", v=q["pred"]))
+                c.append(_L("chkExcept", cls=str(q["via"])[7:], at=_short(q.get("at"))))
+            elif q.get("pred"):
                 c.append(_L("chk", v=q["pred"], at=_short(q.get("at"))))
+            cj = C.caught(X["gh"][0][3:] if X.get("gh") and str(X["gh"][0]).startswith("fn:") else None, (X.get("rz") or [None])[0]) if not (q.get("exit") in C.XS) else (None, None)
             if q.get("exit") and q["exit"] in C.XS:
                 g.append(C.ans(q["exit"], "ends"))
+            elif cj[1]:                                          # review F04 · F06: its raise becomes the ending of the except that catches it
+                g.append(C.ans(cj[1]["id"], "ends"))
             elif q.get("status") is not None:
                 g.append(_L("endsUnknown", st=q["status"]))
             if X.get("rz"):
                 g.append(_L("x.raises", cls=X["rz"][0], msg=X["rz"][1]) if X["rz"][1] is not None else _L("x.raisesBuilt", cls=X["rz"][0]))
+            if cj[0]:
+                g.append(_L("caughtBy", cls=X["rz"][0], fn=_nm(cj[0].get("fn")), at=_short(cj[0].get("at"))))
         elif p == "b":                                           # a deciding branch
             q = C.fbr.get(v) or {}
             k = "fork"
             if q.get("call"):
                 b.append(_L("inCall", fn=q["call"], at=_short(q.get("site"))))
+            if q.get("after"):                                   # review CR-15: what must already hold, said the way it holds
+                b.append(_L("after", v=" · ".join(_plain(a0) for a0 in q["after"])))
+                asw += [a0 for a0 in q["after"] if _plain(a0) != a0]
             if q.get("pred"):
                 c.append(_L("if", v=q["pred"]))
-            elif q.get("token") == "fall-through":
+            elif q.get("token") == "fall-through":               # review CR-37: the fall-through is named "otherwise", never by its host
                 c.append(_L("fall"))
+                title = _L("forkElse")
             rt = C.rets.get(q.get("return")) or {}
             if rt.get("value"):
                 g.append(_L("retVal", fn=_nm(rt.get("fn")), v=rt["value"], at=_short(rt.get("at"))))
@@ -208,9 +268,11 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             k = "catch"
             types = q.get("types") or []
             name = "except " + " · ".join(types) if types else name
+            x1 = TRUTH.exit_of_catch(q, C.XS) if q.get("outcome") == "translate" else None
+            cz1 = C.causes(x1["id"]) if x1 else []               # review F04 · F06: every raise it takes here, the feed's joins and by class
             for cls in types:                                    # where it is raised: the raises this endpoint's endings translate
                 at = sorted({_short(z.get("at")) for rec in C.fns.values() for z in rec.get("raises") or [] if z.get("cls") == cls
-                             and any(t.get("exit") in C.XS for t in z.get("translated_by") or [])})
+                             and any(t.get("exit") in C.XS for t in z.get("translated_by") or [])} | {_short(q0[2]) for q0 in cz1})
                 b.append(_L("raisedAt", cls=cls, at=_cap(at)) if at else _L("raisedAs", cls=cls))
             c.append(_L("xcatch2", cls=" · ".join(types) or "?", at=_short(q.get("at"))))
             out = str(q.get("outcome") or "")
@@ -220,8 +282,10 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
                     g.append(C.ans(xs[0]["id"]) if len(xs) == 1 else _L("ansBare", st=st))
             elif out:
                 g.append(_L("outcome." + out))
-            for cm in q.get("commits") or []:
-                g.append(_L("commitsAt", at=_short(cm.get("at") if isinstance(cm, dict) else (C.steps.get(cm) or {}).get("at") or cm)))
+            for cm in q.get("commits") or []:                    # review F07 · N3-09: only a commit the except's own body runs (the
+                sr = cm if isinstance(cm, dict) else (C.steps.get(cm) or {})   # feed lists the try's commits; one the raise skipped saves nothing here)
+                if sr.get("fn") == q.get("fn") and _file(sr.get("at")) == _file(q.get("at")) and (_ln(sr.get("at")) or 0) >= (_ln(q.get("at")) or 0):
+                    g.append(_L("commitsAt", at=_short(sr.get("at") or cm)))
         elif p == "l":                                           # a rate limiter
             lm = C.lim_by_name.get(v) or {}
             k = "limiter"
@@ -230,7 +294,7 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             if lm.get("exit") in C.XS:
                 g.append(C.ans(lm["exit"], "ends"))
                 for h, hv in sorted(((C.resp.get(lm["exit"]) or {}).get("headers") or {}).items()):
-                    g.append(_L("x.headers", v=h + ": " + str(hv)))
+                    g.append(_L("hdrRun", v=h) if str(hv) in ("\u2026", "...", "") else _L("x.headers", v=h + ": " + str(hv)))   # review CR-36
         elif p == "a":                                           # the login check
             k = "login"
             for a in X.get("au") or []:
@@ -240,8 +304,9 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             for s in au.get("schemes") or []:
                 if s.get("exit") in C.XS:
                     g.append(C.ans(s["exit"], "ends"))
-            for x0 in C.F.get("exits") or []:
-                if x0.get("phase") == "dependency" and x0.get("kind") == "refusal":
+            ct = {t for c0 in (C.fep.get("failure") or {}).get("catches") or [] for t in c0.get("types") or []}
+            for x0 in C.F.get("exits") or []:                    # review N3-08: a dependency refusal an except makes is that except's
+                if x0.get("phase") == "dependency" and x0.get("kind") == "refusal" and not (str(x0.get("via") or "").startswith("except ") and str(x0["via"])[7:] in ct):
                     g.append(C.ans(x0["id"], "ends"))
             for pv in au.get("provisions") or []:
                 g.append(_L("prov", op=pv.get("op"), tbl=pv.get("table"), at=_short(pv.get("at"))))
@@ -256,8 +321,8 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
         for key in dict.fromkeys((r0.get("op"), r0.get("model") or r0.get("table"), _short(r0.get("at"))) for r0 in recs):
             c.append(_L("op", op=key[0], m=key[1], at=key[2]) if key[1] else _L("opw", op=key[0], at=key[2]))
         if X.get("rc"):
-            g.append(_L("x.race", cons=X["rc"][0]))
-            g.append(_L("x.racePlain", cols=", ".join(X["rc"][2]), tbl=X["rc"][1], st=X["rc"][3]))
+            g.append(_L("x.raceStep", cols=", ".join(X["rc"][2]), tbl=X["rc"][1]) if X.get("rs") else _L("x.race", cons=X["rc"][0]))
+            g.append(_L("x.raceStepPlain" if X.get("rs") else "x.racePlain", cols=", ".join(X["rc"][2]), tbl=X["rc"][1], st=X["rc"][3]))   # review N3-18
     # ── FUNCTIONS ──
     elif f == "fn":
         fid = next((q[3:] for q in e.get("keys") or [] if str(q).startswith("fn:")), None)
@@ -269,18 +334,37 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             k = "built"
             c.append(_L("builds", v=name))
         par = C.par.get(fid)                                     # the function that calls it, in the walk from the handler
+        # review N3-24 · F19: a function the walk does not hang under a caller — its callers among this endpoint's functions, by the
+        # station's call edges, and the line it is called at there where the feeds hold it
+        lvc = sorted(g for g in C.radj.get(fid, ()) if g in C.drawn and g != fid) if not par and fid and fid != C.H else []
         if fid == C.H:
             if C.dep_vals:
                 b.append(_L("gets", v=_cap(C.dep_vals)))
         elif par and par != C.H:
             b.append(_L("calledBy", v=_nm(par)))
+            if e.get("_q") is not None and not X.get("dd"):
+                b.append(_L("underCall", at=_short(C.hf) + ":" + str(e["_q"])))
+        elif lvc and lvc != [C.H]:
+            _p, st0 = C.parent(fid) if len(lvc) == 1 else (None, None)
+            b.append(_L("calledByAt", v=_nm(lvc[0]), at=_short(st0)) if st0 else _L("calledBy", v=_cap([_nm(g) for g in lvc])))
             if e.get("_q") is not None:
                 b.append(_L("underCall", at=_short(C.hf) + ":" + str(e["_q"])))
-        elif e.get("_q") is not None:
-            b.append(_L("calledAt", at=_short(C.hf) + ":" + str(e["_q"])))
-        elif e.get("_jc"):
-            b.append(_L("calledBy", v=_cap(sorted(_nm(q) for q in e["_jc"]))))
-        if X.get("dp"):
+            dps = {C.depth_of.get(g) for g in lvc}
+            if len(dps) == 1 and None not in dps and not X.get("dp"):
+                b.append(_L("depth", n=dps.pop() + 1))
+        else:
+            # review N3-24 · F19: a function the station's own list of what a function reaches puts behind a drawn one — the nearest such
+            # (none of the others behind it) — runs under it; the handler's call it runs in is said as that, never as the line calling it
+            near = sorted(e.get("_jc") or C.near(fid, name))
+            if near:
+                b.append(_L("underFn", v=_cap([_nm(g) for g in near])))
+            if e.get("_q") is not None:
+                b.append(_L("calledAt", at=_short(C.hf) + ":" + str(e["_q"])) if X.get("dp") == 1 and not near else _L("underCall", at=_short(C.hf) + ":" + str(e["_q"])))
+        if X.get("dd"):                                          # review CR-05: run by FastAPI before the handler, inside its dependency
+            b.append(_L("depRun", fn=X["dd"][0]) if X["dd"][1] else _L("depRoot"))
+            if X["dd"][1]:
+                b.append(_L("depIn1", fn=X["dd"][0]) if X["dd"][1] == 1 else _L("depIn", n=X["dd"][1], fn=X["dd"][0]))
+        elif X.get("dp"):
             b.append(_L("depth", n=X["dp"]) if X["dp"] != 1 else _L("depth1"))
         if X.get("cp"):
             b.append(_L("x.callPaths", via=X["cp"]))
@@ -288,6 +372,9 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
         if X.get("cn"):
             b.append(_L("x.cutNear", v=X["cn"]))
             b.append(_L("x.cutNearPlain", v=X["cn"]))
+        doc, ret = (C.fninfo.get(fid) or (None, None)) if fid else (None, None)
+        if doc and fid != C.H:                                   # review F20 · CR-30: what it does, in its author's words (its docstring's first sentence)
+            c.append(_L("doc", v=doc))
         at = rec.get("at") or ins.get("at")
         if at:
             c.append(_L("defAt", at=_short(at)))
@@ -295,14 +382,25 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
         for s in C.steps.values():
             if s.get("fn") == fid and s.get("table"):
                 ops.setdefault(s.get("op"), []).append(s["table"])
-        for op, ts in ops.items():
-            c.append(_L("opTables", op=op, v=_cap(sorted(set(ts)))))
+        for op in sorted(ops, key=lambda o: (o != "read", str(o))):   # review CR-30: a sentence per op, the reads first
+            ts = sorted(set(ops[op]))
+            v0 = " and ".join(ts) if len(ts) <= CAP else _cap(ts)
+            c.append(_L("op_" + op, v=v0) if op in OPS_SAID else _L("opTables", op=op, v=v0))
+        if ret and fid != C.H:
+            g.append(_L("gives", v=ret))
         for z in ins.get("refusals") or rec.get("refusals") or []:
             g.append(_L("refuses", st=z.get("status"), at=_short(z.get("at"))))
         for z in rec.get("raises") or []:
             tb = [t for t in z.get("translated_by") or [] if t.get("exit") in C.XS]
+            cj = C.caught(fid, z.get("cls")) if not tb else (None, None)
             if tb:
                 g.append(_L("rzTo", cls=z.get("cls"), at=_short(z.get("at")), st=" · ".join(sorted({str(t.get("status")) for t in tb}))))
+            elif cj[1]:                                          # review F04 · CR-09: the except of its class up its callers answers it
+                g.append(_L("rzCaught", cls=z.get("cls"), at=_short(z.get("at")), fn=_nm(cj[0].get("fn")), cat=_short(cj[0].get("at")), st=cj[1].get("status"), v=_says(cj[1]) or "?"))
+                if z.get("pred"):
+                    g.append(_L("rzWhen", v=_plain(z["pred"])))
+                if z.get("msg"):
+                    g.append(_L("causeMsg", v=z["msg"]))
             else:
                 g.append(_L("rzLoose", cls=z.get("cls"), at=_short(z.get("at"))))
         for cm in rec.get("commits") or ins.get("commits") or []:
@@ -367,8 +465,10 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             if hx.get("via"):                                    # … and in which context: the code that hands it the error
                 b.append(_L("handedAt", v=", ".join(hx["via"]) + (" (" + ", ".join(str(q) for q in hx.get("err") or []) + ")" if hx.get("err") else "")))
             rd = X.get("rd") or []
-            if len(rd) > 2 and rd[2] is not None:
-                c.append(_L("x.reads", what=rd[0], op=rd[1], v=rd[2]))
+            if len(rd) > 2 and rd[2] is not None:                # review F18 · CR-38: titled by what it reads, in which function; its line here
+                c.append(_L("readsAt", what=rd[0], op=rd[1], v=rd[2], at=_short(s.get("at"))) if s.get("at") else _L("x.reads", what=rd[0], op=rd[1], v=rd[2]))
+                if pc[1] or s.get("piece"):
+                    title = _L("rsTitle", v=rd[2], fn=pc[1] or str(s["piece"]).split("#")[-1])
             if X.get("dw"):
                 g.append(_L("x.does", v=X["dw"]))
             if X.get("al"):
@@ -379,6 +479,8 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             name = str(pc[1] or "")
             b.append(_L("inFn", fn=name or "?"))
             c.append(_L("restEnds", v=_cap([f"{C.st(x0)} {_says(C.XS.get(x0) or {})}".strip() for x0 in X.get("rx") or []])))
+            if X.get("fw"):                                      # review N3-20: the body's parse endings, which no branch compares either
+                c.append(_L("restFw", v=" · ".join(f"{C.st(x0)} {_says(C.XS.get(x0) or {})}".strip() for x0 in X["fw"])))
             g.append(_L("restDoes"))
         elif p == "y:":                                          # D-069 (client P5): a hook on the way from the screen to the send
             k = "orch"
@@ -432,7 +534,15 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
                 pol = next((q.get("policy") or {} for q in ((C.fj.get("frontend") or {}).get("client") or {}).get("clients") or []), {})
                 rt = ((pol.get("mutations") or {}).get("retry") or {})
                 if any(q.get("kind") == "mutation" for q in calls) and rt.get("state") == "defined" and rt.get("value") is False:
-                    c.append(_L("noRetry", at=_short(next((q.get("at") for q in ((C.fj.get("frontend") or {}).get("client") or {}).get("clients") or []), "")) or "?"))
+                    c.append(_L("noRetry", at=_short2(next((q.get("at") for q in ((C.fj.get("frontend") or {}).get("client") or {}).get("clients") or []), "")) or "?"))
+                tr = ((C.fj.get("frontend") or {}).get("client") or {}).get("transport") or {}
+                for q in calls:                                  # review N3-21: the wrapper that sends it has its own branch on a 401
+                    for ft in q.get("fetch") or []:
+                        wf = str(ft.get("wrapper") or "").split("#")[0].replace("fe:", "", 1)
+                        for br in (tr.get(wf) or {}).get("branches") or []:
+                            if br.get("fn") == ft.get("callee") and br.get("status") is not None and not br.get("when"):
+                                c.append(_L("wrapBranch", fn=br["fn"], st=br["status"], at=_short2(br.get("at"))))
+                                break
                 for st, mdl in C.ok:
                     g.append(_L("okTo", st=st, v=mdl))
                 rf = sorted({str(rd.get("fn") or "") for rd in (((C.fj.get("frontend") or {}).get("reasons") or {}).get("readers") or {}).get(C.E) or []} - {""})
@@ -467,13 +577,27 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
                 b.append(_L("setting", v=sname, env=sv.get("env") or "?", d=sv.get("default") or "?"))
             if w.get("expr"):
                 c.append(_L("expr", v=w["expr"]))
-            if w.get("port"):
-                c.append(_L("bind", port=w["port"], at=_short(w.get("anchor") or w.get("site"))))
-            for br in w.get("branches") or []:
+            if w.get("port"):                                    # review N3-10: where the verifier is used (the feed's site), who picks it
+                c.append(_L("bind", port=w["port"], at=_short(w.get("site") or w.get("anchor"))))
+                if w.get("factories"):
+                    c.append(_L("pickedBy", v=", ".join(_nm(q) for q in w["factories"])))
+            prev = None
+            for br in w.get("branches") or []:                   # review CR-15 · F22: each arm, the last one "otherwise" when it is the first's negation
                 if br.get("impl") or br.get("pred"):
-                    c.append(_L("arm", v=br.get("pred") or "?", impl=br.get("impl") or br.get("value") or "?"))
+                    pr = br.get("pred") or "?"
+                    if prev and pr == "not (" + prev + ")":
+                        c.append(_L("armElse", impl=br.get("impl") or br.get("value") or "?")); asw.append(pr)
+                    else:
+                        c.append(_L("arm", v=_plain(pr), impl=br.get("impl") or br.get("value") or "?"))
+                        if _plain(pr) != pr:
+                            asw.append(pr)
+                    prev = prev or pr
             xs = sorted({str(C.st(x0)) for x0 in (w.get("refs") or []) + (w.get("proves") or []) if C.st(x0) is not None})
-            if xs:
+            if xs and w.get("changes_exit") is False:            # review N3-10 · F22: what each arm does to the request
+                g.append(_L("eitherCan", v=" · ".join(xs)))
+            elif xs and w.get("kind") == "flag" and w.get("expr"):
+                g.append(_L("flagOn", v=w["expr"], st=" · ".join(xs)))
+            elif xs:
                 g.append(_L("decides", v=" · ".join(xs)))
         else:
             k = "piece"
@@ -493,8 +617,8 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             k = "mw"
             m = C.mw.get(name) or {}
             od = m.get("order") or {}
-            if od.get("runs") and od.get("of"):
-                b.append(_L("order", n=od["runs"], of=od["of"]))
+            if od.get("runs") is not None and od.get("of"):     # review N3-11: the feed counts from 0; the first to run is 1 of 3
+                b.append(_L("order", n=od["runs"] + 1, of=od["of"]))
             if m.get("method"):
                 c.append(_L("mwAt", fn=_nm(m["method"]), at=_short(m.get("registered_at"))))
             xs = sorted({str(x0.get("status")) for x0 in m.get("exits") or [] if x0.get("id") in C.XS})
@@ -510,32 +634,66 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             b.append(_L("tname", v=tc["name"], at=_short(tc.get("file")) + ":" + str(tc.get("line"))))
         raises = idn.endswith(":raises")
         if raises:
-            c.append(_L("svc"))
+            c.append(_L("svcFn", fn=X.get("sv") or "?"))
         else:
-            ln = parts[2] if len(parts) > 2 else None
-            call = next((q for q in tc.get("calls") or [] if str(q.get("line")) == str(ln) and q.get("role") == "act"), None)
-            if call:
-                b.append(_L("sends", v=", ".join(call["sends"])) if call.get("sends") else _L("sendsNone"))
+            # one call, or (folded, review F03) every call of the case in this cell — each with what it sends and asserts
+            lns = str(parts[2]).split(",") if len(parts) > 2 else []
+            sends = []
+            for ln in lns:
+                call = next((q for q in tc.get("calls") or [] if str(q.get("line")) == ln and q.get("role") == "act"), None)
+                if not call:
+                    continue
+                # review N3-02 · CR-02: `sends` null is headers a fixture sets, whose names the test does not spell; [] is none at all
+                sl = _L("sends", v=", ".join(call["sends"])) if call.get("sends") else _L("sendsNone") if call.get("sends") == [] else _L("sendsFix")
+                if sl not in sends:
+                    sends.append(sl)
                 c.append(_L("tcall", m=call.get("method"), p=call.get("path"), ln=call.get("line")))
-            if X.get("as"):
-                a = X["as"]
-                c.append(_L("x.asserts", v=" · ".join(str(q) for q in a[0])) if a[0] else _L("x.assertsNone"))
-                if a[1]:
-                    c.append(_L("x.assertsDetail", v=" · ".join(str(q) for q in a[1])))
-                if a[2]:
-                    c.append(_L("x.assertsCode", v=" · ".join(str(q) for q in a[2])))
-                if a[3]:
-                    c.append(_L("x.assertsAttrs", n=a[3]))
+                a = (X.get("asm") or {}).get(ln) or X.get("as")
+                if a:
+                    c.append(_L("x.asserts", v=" · ".join(str(q) for q in a[0])) if a[0] else _L("x.assertsNone"))
+                    if a[1]:
+                        c.append(_L("x.assertsDetail", v=" · ".join(str(q) for q in a[1])))
+                    if a[2]:
+                        c.append(_L("x.assertsCode", v=" · ".join(str(q) for q in a[2])))
+                    if a[3]:
+                        c.append(_L("x.assertsAttrs", n=a[3]))
+            b += sends
         w = e.get("w") or ()
         xs = list(w[1]) if w and w[0] == "xs" else []
-        for x0 in xs:                                            # the ending it proves, by where it is produced (two may share words)
+        fit = "fits" if X.get("am") else "proves"               # review F03: a status that fits several endings proves none of them
+        for x0 in xs:                                            # the ending it proves (or fits), by where it is produced (two may share words)
             at = _short((C.frec.get(x0) or {}).get("site") or (C.XS.get(x0) or {}).get("at"))
-            g.append(C.ans(x0, "provesAt", at=at) if at else C.ans(x0, "proves"))
-        if X.get("ho"):
+            g.append(C.ans(x0, fit + "At", at=at) if at else C.ans(x0, fit))
+        if X.get("am"):
+            g.append(_L("fitsOf", n=X["am"], h=X.get("hn") or len(xs)))
+        elif X.get("ho"):
             g.append(_L("x.hollow", n=X["ho"]))
         if tc.get("state"):
             g.append(_L("state", v=tc["state"]))
-    return {"h": [name, k or f], "b": b, "c": c, "g": g}
+    if asw:                                                      # review CR-15: the code, as written, the hover's last line
+        g.append(_L("asWritten", v=" · ".join(dict.fromkeys(asw))))
+    return {"h": [name, k or f] + ([title] if title else []), "b": b, "c": c, "g": g}
+
+
+NEG = re.compile(r"^not \((.*)\)$")
+FLIP = (((" is not ", " is "), (" != ", " == "), (" not in ", " in ")), ((" is ", " is not "), (" == ", " != "), (" in ", " not in ")))
+
+
+def _plain(p):
+    """review CR-15: `not (A is not None)` → `A is None`, `not (A is None)` → `A is not None` — ONE comparison, no and/or/if, said the
+    way it holds; anything else stays as written"""
+    m = NEG.match(str(p or "").strip())
+    if not m:
+        return p
+    q = m.group(1)
+    if q.count("(") != q.count(")") or re.search(r"\b(and|or|if)\b", q):
+        return p
+    for grp in FLIP:
+        for a, b0 in grp:
+            if a in q:
+                rest = q.replace(a, "\0", 1)
+                return q.replace(a, b0, 1) if q.count(a) == 1 and not re.search(r" is | == | != | in |\bnot\b", rest) else p
+    return p
 
 
 def _lim_before(C: Ctx, lm: dict, xid) -> list:
@@ -560,7 +718,11 @@ def _lim_checks(lm: dict) -> list:
     arg = {a.get("param"): a for a in lm.get("args") or []}
     if "limit" in arg and "window_seconds" in arg:
         w = arg["window_seconds"].get("value")
-        out.append(_L("x.limit", n=arg["limit"].get("value"), w=int(w) if isinstance(w, float) and w.is_integer() else w, k=lm.get("key")))
+        k0 = str(lm.get("key") or "")                            # review CR-36: the key in words — per caller IP, its own count for this limit
+        m0 = re.fullmatch(r"f?['\"]\{ip\}(?::(\w+))?['\"]", k0)
+        w0 = int(w) if isinstance(w, float) and w.is_integer() else w
+        out.append(_L("limIp", n=arg["limit"].get("value"), w=w0, v=m0.group(1)) if m0 and m0.group(1) else _L("limIp1", n=arg["limit"].get("value"), w=w0) if m0
+                   else _L("x.limit", n=arg["limit"].get("value"), w=w0, k=lm.get("key")))
     if arg.get("limit", {}).get("setting"):
         out.append(_L("limSet", v=arg["limit"]["setting"], env=arg["limit"].get("env") or "?"))
     return out
@@ -610,6 +772,8 @@ def words_check(W: dict, rows: list) -> list:
             if not io:
                 continue
             hk = io["h"][1]
+            if len(io["h"]) > 2:                                 # a title in words (review CR-37, CR-38): checked like a line
+                io = dict(io, b=list(io["b"]) + [io["h"][2]])
             if not (hk.startswith("end:") and hk[4:] in W["kinds"]) and not (hk in IO["k"] and (IO["k"][hk].get("name") or hk in W["el"]["kinds"])):
                 bad.append(("kind", hk))
             for part in ("b", "c", "g"):

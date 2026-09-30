@@ -23,6 +23,8 @@ from __future__ import annotations
 import collections
 import re
 
+import _ae_truth as TRUTH
+
 VIA_CALL = re.compile(r"^call (.+) @ (.+):(\d+)$")
 LIFE = {"with the answer": "req", "with the server process": "srv"}
 OUT_VERB = {"translate": "translates", "pass-through": "passes", "swallow": "swallows"}
@@ -68,6 +70,11 @@ class Ctx:
             for z in (f.get("raises") or []) + (f.get("refusals") or []):
                 if z.get("at") and f.get("fn"):
                     self.at2fn[z["at"]].add(f["fn"])
+        # round-1 review F04 · F06: a check whose raise the feed joins to no ending takes the ending of the first except of its class
+        self.cats_tr = [c for c in (fep.get("failure") or {}).get("catches") or [] if c.get("outcome") == "translate"]
+        self.parent = TRUTH.parent_of({f.get("fn"): f for f in (F.get("inside") or {}).get("functions") or [] if f.get("fn")}, (r.get("_beh") or {}).get("par") or {}, self.fns)
+        # review N3-08: the exceptions an except of this endpoint takes — a dependency's refusal it makes is that catch's, not the login's
+        self.caught_types = {t for c in (fep.get("failure") or {}).get("catches") or [] for t in c.get("types") or []}
         self.fork_ends = collections.defaultdict(set)
         for pid, ch in chains.items():
             for s in ch:
@@ -118,13 +125,18 @@ def gates(els: list, C: Ctx, tally: collections.Counter) -> None:
             h = next(iter(hs), None) or (C.H if str(g.get("at") or "").startswith(C.fep.get("file") or "\0") else None)
             host, name = fkey(h), _nm(h)
             xid = g.get("exit")
+            if xid not in C.XS and x.get("rz") and h:            # review F04 · F06: the except of its class up the callers answers it
+                c0 = TRUTH.catch_up(h, x["rz"][0], C.parent, C.cats_tr)
+                x0 = TRUTH.exit_of_catch(c0, C.XS) if c0 else None
+                xid = x0["id"] if x0 else xid
             eff = [C.end(xid)] if xid in C.XS else ([[g.get("status"), None, None, "status:" + str(g["status"])]] if g.get("status") is not None else [])
             x.update(gk="g", gl=C.level(h), gv="refuses", gc=g.get("status"))
         elif p == "a":                                           # the login check: it IS its function
             host, name = fkey(v), _nm(v)
             au = C.F.get("auth") or {}
             xs = [s.get("exit") for s in au.get("schemes") or [] if s.get("exit") in C.XS]
-            xs += [q["id"] for q in C.F.get("exits") or [] if q.get("phase") == "dependency" and q.get("kind") == "refusal"]
+            xs += [q["id"] for q in C.F.get("exits") or [] if q.get("phase") == "dependency" and q.get("kind") == "refusal"
+                   and not (str(q.get("via") or "").startswith("except ") and str(q["via"])[7:] in C.caught_types)]   # review N3-08: a catch's chip carries it
             eff = [C.end(q) for q in dict.fromkeys(xs)]
             x.update(gk="a", gl="login", gv="refuses")
         elif p == "l":                                           # a rate limiter: the middleware it runs in

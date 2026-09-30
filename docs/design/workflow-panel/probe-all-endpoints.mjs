@@ -50,6 +50,20 @@ const LEAVE = { middleware: 'EDGE', security: 'GATE', dependency: 'GATE', 'body-
 const FATES = ['saved', 'maybe', 'rolled', 'unsaved', 'after', 'none'];
 const STEPS = FJ.steps || {}, SCHEMAS = FJ.schemas || {}, PROC = (FJ.inflight || {}).process || {};
 const sureConf = (t) => !String(t.conf || '').startsWith('ambiguous');
+/* CHANGED 2026-09-30 (round-1 review, lane F1a): a service-side test proves an ending here only when the function it calls runs on this
+   endpoint's way — the handler, a function the forms feed reaches from it, one the station's edges reach (calls · binds · depends) */
+const SAVE = new Set(['commit', 'flush', 'rollback', 'savepoint', 'begin_nested']);
+const LVP = JSON.parse(fs.readFileSync(path.join(REPO, 'templates/center/shell/example/codebase-graph-station/levels.json'), 'utf8'));
+const ADJP = {}; (LVP.fn_edges || []).forEach((e) => { if (['calls', 'binds', 'depends'].includes(e.rel) && e.s && e.t) (ADJP[e.s.replace('#', '::')] = ADJP[e.s.replace('#', '::')] || []).push(e.t.replace('#', '::')); });
+const nmOf = (q) => String(q || '').split('::').pop();
+function onWay(key) { const ep = FJ.endpoints[key], H = ep.handler || '', seen = new Set(), st = [H];
+  while (st.length) (ADJP[st.pop()] || []).forEach((y) => { if (!seen.has(y)) { seen.add(y); st.push(y); } });
+  const names = new Set([nmOf(H), ...[...seen].map(nmOf)]);
+  Object.entries(FJ.functions || {}).forEach(([f, r]) => { if ((r.reached_by || []).some((rb) => rb.root === key)) names.add(nmOf(f)); });
+  return names; }
+const svcHere = (key, t, names) => { const tails = new Set([...names].filter((n) => n.includes('.')).map((n) => n.split('.').pop()));
+  return (((FJ.test_cases || {})[t.case] || {}).raises || []).filter((z) => z.line === t.line).some((z) => [z.call, z.root].some((q) => { q = String(q || '');
+    return names.has(q) || (q.includes('.') && tails.has(q.split('.').pop())); })); };
 /* the feed's own endings of one endpoint: its produced rows, its framework rows, its returns that carry a status */
 function feedExits(ep) {
   const d = new Map();
@@ -68,8 +82,9 @@ function feedBody(ep) {
 /* one path's fate, from the feed's buckets: the endpoint's own writes before the answer, then its writes after it */
 function feedFate(p) {
   const e = p.effects || {}, bk = (sid) => ['committed', 'maybe_committed', 'rolled_back', 'uncommitted'].find((b) => (e[b] || []).includes(sid));
-  const own = (e.steps || []).filter((s) => !s.dependency && WR.has((STEPS[s.step] || {}).op)).map((s) => bk(s.step));
-  const after = (e.after_response || []).filter((s) => !s.dependency && WR.has((STEPS[s.step] || {}).op));
+  /* CHANGED 2026-09-30 (review N3-06): a write needs a table — a step with none is no database write */
+  const own = (e.steps || []).filter((s) => !s.dependency && WR.has((STEPS[s.step] || {}).op) && (STEPS[s.step] || {}).table).map((s) => bk(s.step));
+  const after = (e.after_response || []).filter((s) => !s.dependency && WR.has((STEPS[s.step] || {}).op) && (STEPS[s.step] || {}).table);
   return own.includes('committed') ? 'saved' : own.includes('maybe_committed') ? 'maybe' : own.includes('rolled_back') ? 'rolled' : own.includes('uncommitted') ? 'unsaved' : after.length ? 'after' : 'none';
 }
 function fromFeed(key, W) {                        /* column id → the drawn key, for every column the forms feed decides */
@@ -85,14 +100,18 @@ function fromFeed(key, W) {                        /* column id → the drawn ke
   e.request = feedBody(ep);
   const named = Object.entries(ep.responses || {}).filter(([k, r]) => k.startsWith('r:') && r.fields != null);
   if (named.length) e.response = new Set(named.flatMap(([, r]) => r.fields)).size;
-  e.acts = (ep.tests || {}).act || 0;
-  e.asserted = X.reduce((n, { x }) => n + (x.tests || []).filter((t) => String(t.conf || '').includes('+')).length, 0);
-  const sure = X.filter(({ x }) => (x.tests || []).some(sureConf)).length;
+  /* CHANGED 2026-09-30 (review N3-16): the tests column counts TESTS (the cases that act on it), not their calls */
+  e.acts = Object.values(FJ.test_cases || {}).filter((t) => (t.calls || []).some((q) => q.endpoint === key && q.role === 'act')).length;
+  /* CHANGED 2026-09-30 (review N3-03): beyond = a proof (a sure join) whose call asserts the body's attributes, the detail or the code */
+  const callOf = (t) => (((FJ.test_cases || {})[t.case] || {}).calls || []).find((q) => q.line === t.line && q.endpoint === key) || {};
+  const names = onWay(key), keep = (t) => t.conf !== 'service raises' || svcHere(key, t, names);
+  e.asserted = X.reduce((n, { x }) => n + (x.tests || []).filter((t) => keep(t) && sureConf(t) && (((a) => (a.attrs || []).length || (a.detail || []).length || (a.code || []).length)(callOf(t).asserts || {}))).length, 0);
+  const sure = X.filter(({ x }) => (x.tests || []).some((t) => keep(t) && sureConf(t))).length;
   e.proof = X.length ? Math.round(10000 * sure / X.length) / 10000 : 0; e.proofText = sure + '/' + X.length;
   e.branches = (ep.branches || []).length; e.catches = ((ep.failure || {}).catches || []).length; e.switches = (ep.switches || []).length;
   const fate = Object.fromEntries(FATES.map((f) => [f, 0])), fns = new Set(), own = new Set(), dep = new Set();
   (ep.paths || []).forEach((p) => { fate[feedFate(p)]++;
-    ((p.effects || {}).steps || []).forEach((s) => { const r = STEPS[s.step] || {}; if (!s.dependency && r.fn) fns.add(r.fn);
+    ((p.effects || {}).steps || []).forEach((s) => { const r = STEPS[s.step] || {}; if (!s.dependency && r.fn && (r.table || SAVE.has(r.op))) fns.add(r.fn);
       if (WR.has(r.op) && r.table) (s.dependency ? dep : own).add(r.table); });
     ((p.effects || {}).after_response || []).forEach((s) => { const r = STEPS[s.step] || {}; if (!s.dependency && WR.has(r.op) && r.table) own.add(r.table); }); });
   e.fate = fate.saved; e.fateParts = fate; e.datafns = fns.size;
@@ -123,8 +142,11 @@ const b = await chromium.launch({ executablePath: CHROME, args: ['--use-angle=sw
 const ctx = await b.newContext({ viewport: { width: 1920, height: 1080 } });
 const p = await ctx.newPage(), errs = [];
 p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
-const open = async (file) => { await p.goto('file://' + file); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });
-  await p.evaluate(() => { try { for (const k of Object.keys(localStorage)) if (/^gabe:allep/.test(k)) localStorage.removeItem(k); } catch (e) {} });
+/* CHANGED 2026-09-30 (round-1 review CR-31): with the map on (the default) a Data effects cell folds to its count; the sections that read
+   the Data effects chips open on the chips look — open(file, 'default') opens on the page's own defaults */
+const open = async (file, look) => { await p.goto('file://' + file); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });
+  await p.evaluate((dflt) => { try { for (const k of Object.keys(localStorage)) if (/^gabe:allep/.test(k)) localStorage.removeItem(k);
+    if (!dflt) localStorage.setItem('gabe:allep:moments:v2', JSON.stringify({ dfx: 'chips' })); } catch (e) {} }, look === 'default');
   await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); };
 const pick = async (rail, v) => { await p.click(`.opt[data-rail="${rail}"][data-v="${v}"]`); await p.waitForTimeout(40); };
 const drawn = () => p.evaluate(() => [...document.querySelectorAll('#board tr.row[data-ep], #board .card[data-ep]')].map((e) => e.getAttribute('data-ep')));
@@ -409,8 +431,9 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   // CHANGED 2026-09-30 (D-069): the rows' own looks (the gates, the effect, gate icons, gate roles, function marks, standard or specialist) — twenty-two
   // CHANGED 2026-09-30 (D-070): Data effects' look and the in-flight values' look add theirs after the rows' own — twenty-four
   // CHANGED 2026-09-30 (D-071, merged): the examples bench's lines come after BY MOMENT's — twenty-four plus one per kind of example
-  ok(el0.length === 1 && set0.length === 24 + D.ex.kinds.length && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-(1 + set0.length))) === JSON.stringify([el0[0]].concat(set0))
-     && set0.slice(24).every((l) => l.startsWith(W8.ex.copy.where + ' · ')),
+  // CHANGED 2026-09-30 (round-1 review S4-29): Data effects' write colour adds its line — twenty-five
+  ok(el0.length === 1 && set0.length === 25 + D.ex.kinds.length && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-(1 + set0.length))) === JSON.stringify([el0[0]].concat(set0))
+     && set0.slice(25).every((l) => l.startsWith(W8.ex.copy.where + ' · ')),
     'the copy text adds the endpoint shown, then the code map\'s, BY MOMENT\'s and the examples\' settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -1010,6 +1033,7 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
   const EPK = 'endpoint:' + EP, TC = FJ.test_cases || {};
   const callsOn = (cid, role) => ((TC[cid] || {}).calls || []).filter((c) => c.endpoint === EPK && c.role === role).length;
   const actCalls = Object.keys(TC).reduce((n, cid) => n + callsOn(cid, 'act'), 0);
+  const actTests = Object.keys(TC).filter((cid) => callsOn(cid, 'act') > 0).length;   /* CHANGED 2026-09-30 (review N3-16): the column counts tests */
   const invRate = (label) => { const row = fs.readFileSync(path.join(REPO, 'docs/design/design-context/inventory-endpoint.md'), 'utf8').split('\n')
     .find((l) => l.toLowerCase().startsWith('| ' + label.toLowerCase() + ' |')); return row ? Number((row.split('|')[4].match(/\d/) || [])[0]) : null; };
   const whyOf = () => p.evaluate(() => { const s = document.getElementById('el-cm'); return { here: s.getAttribute('data-here'), text: s.textContent,
@@ -1025,10 +1049,10 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
     const ln = await p.$('#el-cm .elref[data-ref="c:acts"]'); if (ln) { await ln.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(60);
       const bx = await ln.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(80); h1 = await whyOf(); await p.mouse.move(5, 5); } }
   const R1 = ROW[EP].k.acts;
-  ok(!!K1 && R1 === actCalls && e1 && e1.here === 'false' && !e1.named.includes('case:' + K1) && e1.why.some(([w, refs]) => w === 'cnt' && refs.includes('c:acts'))
+  ok(!!K1 && R1 === actTests && ROW[EP].actc === actCalls && e1 && e1.here === 'false' && !e1.named.includes('case:' + K1) && e1.why.some(([w, refs]) => w === 'cnt' && refs.includes('c:acts'))
     && h1 && h1.elref.length === 1 && h1.elref[0][0] === 'c:acts' && h1.elref[0][1] === 'hover',
-    'a case that acts on ' + EP + ' (the feed\'s act calls, ' + actCalls + ', are the tests column\'s count): the code map says "counted, not named" with a link to the tests field, and pointing at the link lights exactly that field',
-    { K1, drawn: R1, feed: actCalls, why: e1 && e1.why, lit: h1 && h1.elref });
+    'a case that acts on ' + EP + ' (the feed\'s ' + actTests + ' acting tests, making ' + actCalls + ' calls, are the tests column\'s count): the code map says "counted, not named" with a link to the tests field, and pointing at the link lights exactly that field',
+    { K1, drawn: R1, feed: actTests, calls: actCalls, why: e1 && e1.why, lit: h1 && h1.elref });
   // (2) a callee of Code behind that touches no data — CHANGED 2026-09-26 (D-056 (1)): the code map's behind pair now names every
   // function behind the handler, so the callee is NAMED there (it said "low priority, counted, not named" before)
   const fns2 = new Set([...(ROW[EP].u.datafns || []), ...(ROW[EP].u.deciders || [])].map((q) => q.split('::').pop()));
@@ -1335,6 +1359,10 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   const m6 = await readM();
   ok(m6.lay === 'cols' && m6.cell === 'chips' && JSON.stringify(m6.rows) === JSON.stringify(m0.rows) && m6.chips === m0.chips, 'BY MOMENT · his default squares bring back the grid as it was', [m6.lay, m6.cell]);
   /* (f) a chip lit in the matrix lights everywhere; the station's glyph on every chip whose element it draws */
+  /* CHANGED 2026-09-30 (review CR-31): with the map on (the default) a Data effects cell folds to its count — the chips look draws the chip clicked */
+  await p.evaluate(() => { const A = window.__allep; A.mo.looks.dfx = 'chips'; localStorage.setItem(A.mo.key, JSON.stringify(A.mo.looks)); });
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E14); await p.waitForTimeout(150);
+  await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' }));
   const K14 = 'table:users', sel14 = '#mogrid td[data-mom="gate"][data-f="data"] .mc[data-key="' + K14 + '"]';
   await p.$eval(sel14, (e) => e.scrollIntoView({ block: 'center' })); await p.waitForTimeout(60); await p.click(sel14); await p.waitForTimeout(120);
   const l14 = await p.evaluate((K) => ({ el: window.__allep.state.el, chip: !document.getElementById('elchip').hidden, here: document.getElementById('el-mo').getAttribute('data-here'),
@@ -1716,14 +1744,16 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   const C237 = Object.values(FJ.test_cases.C237.calls).find((c) => c.endpoint === EK), xs237 = C237.refs.map((q) => q.exit);
   const momOf = (xid) => R.mo.sp[R.mo.ex.find((x) => x[0] === xid)[3]][0], pc = [];
   for (const m of [...new Set(R.mo.sp.map((x) => x[0]))]) for (const c of await cell(m, 'proof')) if (c.keys.includes('case:C237')) pc.push([m, c.st[0][0], c.hol, c.dash]);
-  const want237 = xs237.map((xid) => [momOf(xid), String((FE.produced.concat(FE.framework_exits)).find((x) => x.id === xid).status)]).sort().map((x) => x.join(' '));
-  ok(JSON.stringify(pc.map((x) => x[0] + ' ' + x[1]).sort()) === JSON.stringify(want237) && pc.every((x) => x[2] && x[3] === 'dashed') && !(await p.$$eval('#moband .mbr[data-why="spans"] .mc', (cs) => cs.map((c) => c.textContent))).some((t) => t.includes('C237')),
-    'D-056 (6) · ' + E + ' · C237 asserts a status four endings share: it rides each (' + want237.join(' · ') + '), hollow and dashed, and no longer stands in the band', pc);
+  /* CHANGED 2026-09-30 (round-1 review F03 · CR-03): the chips a test's fits make in one cell fold into one — one chip per moment its endings stand at */
+  const want237 = [...new Set(xs237.map((xid) => momOf(xid)))].sort();
+  ok(JSON.stringify(pc.map((x) => x[0]).sort()) === JSON.stringify(want237) && pc.every((x) => x[2] && x[3] === 'dashed') && !(await p.$$eval('#moband .mbr[data-why="spans"] .mc', (cs) => cs.map((c) => c.textContent))).some((t) => t.includes('C237')),
+    'D-056 (6) · ' + E + ' · C237 asserts a status four endings share: it rides each moment they stand at (' + want237.join(' · ') + '), one chip per moment, hollow and dashed, and no longer stands in the band', pc);
   /* (7) the headers per ending */
   const hdrs = Object.entries(FE.responses).filter(([, r0]) => r0.headers).map(([xid, r0]) => [xid, r0.status, Object.entries(r0.headers).map(([h, v]) => h + ': ' + v).join(' · ')]);
   const cmH = await p.$eval('#ocol-cm .pair[data-k="d:response"] .hdl', (e) => e.innerText.replace(/\s+/g, ' ').trim()).catch(() => '');
   const t429 = await tipAt('#mogrid td[data-mom="edge"][data-f="end"] .mc .vc-status'), t401 = await tipAt('#mogrid td[data-mom="gate"][data-f="end"] .mc .vc-status');
-  ok(hdrs.length === 3 && hdrs.every(([, st, h]) => cmH.includes(st + ' ' + h)) && t429 && t429.includes(fillW(MX.headers, { v: 'Retry-After: …' })) && t401 && t401.includes('WWW-Authenticate: Bearer'),
+  /* CHANGED 2026-09-30 (round-1 review CR-36): an elided value is said as a header whose value is worked out as it answers */
+  ok(hdrs.length === 3 && hdrs.every(([, st, h]) => cmH.includes(st + ' ' + h)) && t429 && t429.includes(fillW(D.words.mo.io.l.hdrRun, { v: 'Retry-After' })) && t401 && t401.includes('WWW-Authenticate: Bearer'),
     'D-056 (7) · ' + E + ' · Retry-After on both 429s and WWW-Authenticate on the 401 ride their chips\' hovers and the code map\'s reply pair', { cmH, t429: (t429 || '').slice(0, 120) });
   /* (8) the schemas inside the reply */
   const S8 = FJ.schemas, nest = (top) => { const seen = new Set(), out = [], todo = [top]; while (todo.length) { const n = todo.shift(); if (seen.has(n)) continue; seen.add(n); if (n !== top) out.push(n);
@@ -1756,7 +1786,8 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   const lim = FE.rate.limits.find((l) => l.limiter === '_sensitive'), av = (l, q) => l.args.find((a) => a.param === q).value;
   const tL = await tipAt('#mogrid .mc[data-keys="limiter:sensitive"] .mt'), tA = await tipAt('#mogrid td[data-mom="gate"][data-f="gate"] .mc[data-key^="fn:"] .mt'), tC = await tipAt('#mogrid .mc[data-f="proof"][data-keys="case:C267"] .mt');
   const sch = FE.auth.schemes[0], c267 = FJ.test_cases.C267.calls.find((c) => c.endpoint === EK && c.role === 'act');
-  ok(tL && tL.includes(fillW(MX.limit, { n: av(lim, 'limit'), w: av(lim, 'window_seconds'), k: lim.key })) && tA && tA.includes(fillW(MX.auth, { scheme: sch.scheme, header: sch.header, carrier: sch.carrier }))
+  /* CHANGED 2026-09-30 (round-1 review CR-36): the limiter's key in words — per caller IP, apart for its limit */
+  ok(tL && tL.includes(fillW(D.words.mo.io.l.limIp, { n: av(lim, 'limit'), w: av(lim, 'window_seconds'), v: 'sensitive' })) && tA && tA.includes(fillW(MX.auth, { scheme: sch.scheme, header: sch.header, carrier: sch.carrier }))
      && tC && tC.includes(fillW(MX.asserts, { v: c267.asserts.status.join(' · ') })),
     'D-056 (10) · ' + E + ' · the limiter\'s hover says ' + av(lim, 'limit') + ' per ' + av(lim, 'window_seconds') + ' s keyed ' + lim.key + '; the login check\'s, ' + sch.scheme + ' reads the ' + sch.header + ' ' + sch.carrier + '; C267\'s, what it asserts', { tL: (tL || '').slice(0, 140), tA: (tA || '').slice(0, 140), tC: (tC || '').slice(0, 140) });
   /* (11) the handler pair's hover */
@@ -2401,13 +2432,15 @@ ok(!errs.length, 'no page error after the D-065 checks', errs);
   const lims = FE.rate.limits.map((l) => ({ nm: l.limiter.replace(/^_/, ''), at: l.at.split('/').pop(), lim: l.args.find((a) => a.param === 'limit').value, w: l.args.find((a) => a.param === 'window_seconds').value, key: l.key }));
   const t429 = []; for (const c of await p.$$('#mogrid td[data-mom="edge"][data-f="end"] .mc')) { await c.scrollIntoViewIfNeeded(); const bx = await c.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
     t429.push(await p.$eval('#tip', (e) => e.textContent)); await p.mouse.move(5, 5); }
-  ok(t429.length === 2 && t429[0] !== t429[1] && lims.every((l) => t429.filter((t) => t.startsWith('429 · ' + l.nm) && t.includes(l.at) && t.includes(fillW(XW.limit, { n: l.lim, w: l.w, k: l.key }))).length === 1)
+  // CHANGED 2026-09-30 (round-1 review CR-36): the key in words
+  ok(t429.length === 2 && t429[0] !== t429[1] && lims.every((l) => t429.filter((t) => t.startsWith('429 · ' + l.nm) && t.includes(l.at) && t.includes(fillW(IO.l.limIp, { n: l.lim, w: l.w, v: l.nm }))).length === 1)
      && t429.every((t) => t.includes(IO.parts.b) && t.includes(IO.parts.c) && t.includes(IO.parts.g)),
     'D-067 (L-03) · ' + E + ' · the two 429s at the edge read apart: ' + lims.map((l) => l.nm + ' at ' + l.at + ', ' + l.lim + ' per ' + l.w + ' s').join(' · ') + ', each in before · checks · gives', t429.map((t) => t.slice(0, 90)));
   /* (3) the C237 chips, one per ending it fits, each names the ending it proves (the build stops on two that read the same) */
   const t237 = []; for (const c of await p.$$('#mogrid .mc[data-f="proof"][data-keys="case:C237"]')) { await c.scrollIntoViewIfNeeded(); const bx = await c.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
     t237.push(await p.$eval('#tip', (e) => e.textContent)); await p.mouse.move(5, 5); }
-  ok(t237.length === 4 && new Set(t237).size === 4, 'D-067 (L-03) · C237\'s ' + t237.length + ' chips, one per ending its status fits, each hover names the ending it proves', t237.map((t) => t.slice(-90)));
+  /* CHANGED 2026-09-30 (round-1 review F03): one chip per cell, each hover naming the endings it FITS there */
+  ok(t237.length === 3 && new Set(t237).size === 3 && t237.every((t) => t.includes(fillW(IO.l.fitsOf, { n: 4, h: '' }).split(',')[0])), 'D-067 (L-03) · C237\'s ' + t237.length + ' chips, one per cell its status fits endings in, each hover names the endings it fits there', t237.map((t) => t.slice(-90)));
   /* (4) no page-facing line in an item's hover (D-017), nor a kind's definition */
   const tEnd = await tipAt('#mogrid td[data-mom="body"][data-f="end"] .mc'), prov = Object.values(D.words.enc.from).concat([D.words.station.glyph, D.words.station.card, D.words.kinds.framework.plain]);
   ok(tEnd && !prov.some((w) => tEnd.text.includes(w)), 'D-067 (P4) · the framework ending\'s hover says no "as … draws it", no station words and not what "framework" means', (tEnd || {}).text);
@@ -2642,9 +2675,9 @@ ok(!errs.length, 'no page error after the D-069 checks', errs);
       rules: w ? [...w.querySelectorAll('.mdxru')].map((x) => [x.getAttribute('data-op'), (x.querySelector('.mdxrf') || {}).getAttribute('data-key')]) : [],
       bands: w ? [...w.querySelectorAll('.mdxb')].map((b) => +b.getAttribute('data-si')) : [] }; }, sc);
   ok(MW.opt.dfx.pick === 'one' && a.under && a.links === dx.l.length && a.links > 10 && a.strokes.every((x) => x === 'r|' + OP.r.col || x === 'w|' + OP.w.col)
-     && JSON.stringify(a.sc) === JSON.stringify(['r', 'w']) && JSON.stringify(a.race) === JSON.stringify(['500']) && JSON.stringify(a.bands) === JSON.stringify(dx.b)
+     && JSON.stringify(a.sc) === JSON.stringify(['r', 'w']) && JSON.stringify(a.race) === JSON.stringify(['500', '500']) && JSON.stringify(a.bands) === JSON.stringify(dx.b)
      && a.rules.some((q) => q[0] === 'commit' && q[1] === 'fn:apps/api/api/cooking.py::post_start_session') && a.rules.some((q) => q[0] === 'commit' && q[1] === 'fn:apps/api/auth/context.py::build_auth_context'),
-    'D-070 (a) · ' + E + ': the map (my pick) opens under Data effects — ' + a.links + ' links, green reads, orange writes; start_session → cooking_sessions reads then writes, the race\'s 500 on it; a commit rule names post_start_session and build_auth_context', a);
+    'D-070 (a) · ' + E + ': the map (my pick) opens under Data effects — ' + a.links + ' links, green reads, orange writes; start_session → cooking_sessions reads then writes, the race\'s 500 on it and on the login\'s first add of a user (review N3-18); a commit rule names post_start_session and build_auth_context', a);
   const b = await p.evaluate(() => { const T = document.querySelector('#mogrid'), fold = T.querySelector('.milf[data-fold]');
     const dotsOf = (k) => [...T.querySelectorAll('td.milc .mil[data-k="' + k + '"] .mild')].map((d) => [d.closest('td').getAttribute('data-mom'), [...d.querySelectorAll('.vc-status')].map((x) => x.textContent).join(','), !!d.querySelector('.milcl[data-key="table:cooking_sessions"]')]);
     const kOf = (n) => { const c = [...T.querySelectorAll('td.milc .mil > .mc[data-key]')].find((x) => x.getAttribute('data-key').includes('|' + n + '|')); return c ? c.closest('.mil').getAttribute('data-k') : null; };
@@ -2755,6 +2788,46 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(ly[0] === 'wrap' && ly[1] === 'true', 'D-071 · the column layouts are options, one row across the page my pick (dashed)', ly);
   await p.click('#exbar .opt[data-xopt="lay"][data-v="row"]'); await p.waitForTimeout(60);
   ok(!errs.length, 'D-071 · no page error on the examples bench', errs); }
+
+/* 30 · ROUND-1 REVIEW, lane F1a (2026-09-30) — the page said things the code does not do; each fix, smoke-checked on the page data and once on screen */
+{ const PS = ROW['POST /cooking/sessions'], GR = ROW['GET /recipes'], MK = D.mo.keys;
+  const els = (r, f) => r.mo.el.filter((x) => x[0] === f), io = (x) => (x[7] || {}).io || { h: [], b: [], c: [], g: [] }, has = (x, part, k) => io(x)[part].some((l) => l[0] === k);
+  const at404 = els(PS, 'proof').filter((x) => x[4] && x[4][0] === 'status' && x[4][1] === 404).map((x) => x[3]);
+  ok(JSON.stringify(at404) === JSON.stringify(['C221']), 'F1a · N3-01 · POST /cooking/sessions: the 404 is proven from the service side by C221 alone — the tests that raise the same error in other functions are not joined here', at404);
+  const c237 = els(PS, 'proof').filter((x) => x[3] === 'C237');
+  ok(c237.length && c237.every((x) => has(x, 'b', 'sendsFix') && (x[7] || {}).am === 4) && c237.every((x) => !has(x, 'b', 'sendsNone')), 'F1a · N3-02 · F03 · C237 sends the headers a fixture sets (never "no headers") and FITS its endings, 4 of them', c237.map((x) => (x[7] || {}).hn));
+  const cells = {}; els(GR, 'proof').filter((x) => (x[7] || {}).am).forEach((x) => { const k = x[3] + '@' + x[1]; cells[k] = (cells[k] || 0) + 1; });
+  ok(Object.values(cells).length && Object.values(cells).every((n) => n === 1), 'F1a · F03 · N3-17 · GET /recipes: a test that fits several endings stands once in each cell, however many endings it fits there', cells);
+  const fn = (r, n) => els(r, 'fn').find((x) => x[3] === n);
+  ok(has(fn(PS, 'assert_recipe_allergen_safe'), 'g', 'rzCaught') && has(fn(PS, '_get_firebase_app'), 'g', 'rzCaught') && PS.v.deciders === 4,
+    'F1a · F04 · N3-26 · a raise names the except of its class that answers it (assert_recipe_allergen_safe → 403, _get_firebase_app → 401); deciders 4', PS.v.deciders);
+  const e404 = els(PS, 'end').find((x) => x[4] && x[4][2] === 404), e403 = els(PS, 'end').find((x) => x[4] && x[4][2] === 403);
+  ok(io(e404).b.filter((l) => l[0] === 'causeIf').length === 2 && io(e403).b.some((l) => l[0] === 'causeIf' && l[1].fn === 'assert_recipe_allergen_safe'), 'F1a · F05 · F06 · the 404 names both its causes; the 403 names its raiser and its condition', [io(e404).b, io(e403).b]);
+  const login = els(PS, 'gate').find((x) => (x[7] || {}).gk === 'a'), cInv = els(PS, 'gate').find((x) => io(x).h[0] === 'except InvalidTokenError');
+  ok(login && login[7].ef[1].length === 1 && cInv && !has(cInv, 'g', 'commitsAt'), 'F1a · N3-08 · F07 · the login check ends once (401 Not authenticated; the catch carries invalid token); the catch commits nothing', login && login[7].ef);
+  const idem = els(PS, 'stage').find((x) => x[3] === 'IdempotencyMiddleware'), cors = els(PS, 'stage').find((x) => x[3] === 'CORSMiddleware');
+  ok(io(idem).b.some((l) => l[0] === 'order' && l[1].n === 3) && io(cors).b.some((l) => l[0] === 'order' && l[1].n === 1), 'F1a · N3-11 · the middleware run 1 of 3 (CORS) … 3 of 3 (Idempotency)');
+  const tv = els(PS, 'std').find((x) => x[3] === 'TokenVerifier');
+  ok(has(tv, 'g', 'eitherCan') && has(tv, 'c', 'armElse') && io(tv).c.some((l) => l[0] === 'bind' && l[1].at === 'context.py:77'), 'F1a · N3-10 · F22 · CR-15 · TokenVerifier: either choice can end at 401, its second arm "otherwise", used at context.py:77', io(tv).c);
+  const fall = els(PS, 'gate').find((x) => (x[7] || {}).fall);
+  ok(fall && io(fall).h[2] && io(fall).h[2][0] === 'forkElse', 'F1a · CR-37 · the fall-through branch is titled "otherwise"');
+  ok(els(PS, 'data').filter((x) => (x[7] || {}).rc).length === 2 && els(PS, 'data').some((x) => (x[7] || {}).rs), 'F1a · N3-18 · the login\'s first add of a user carries its race to the 500, beside the key claim\'s');
+  const fc = fn(PS, '_firebase_credential');
+  ok(fc && fc[7].dd && !fc[7].dp && !(PS.ck.behind || []).some((k) => MK[k] === 'fn:apps/api/auth/verifier.py::_firebase_credential' || k === 'fn:apps/api/auth/verifier.py::_firebase_credential'),
+    'F1a · CR-05 · N3-05 · a function the dependency runs is run by FastAPI before the handler, inside get_auth_context — and is not counted behind the handler', fc && fc[7]);
+  ok(GR.v.datafns === 13 && GR.v.fate.unsaved === 0 && GR.v.asserted === 17 && GR.v.acts === 32 && GR.actc === 44, 'F1a · N3-06 · N3-03 · N3-16 · GET /recipes: data fns 13, nothing left unsaved, beyond 17, tests 32 (44 calls)', [GR.v.datafns, GR.v.fate, GR.v.asserted, GR.v.acts, GR.actc]);
+  const rs = els(PS, 'client').filter((x) => (x[4] || [])[0] === 'rsn'), hook = els(PS, 'client').find((x) => x[3] === 'useStartCooking'), rest = els(PS, 'client').find((x) => (x[4] || [])[0] === 'rest');
+  ok(rs.length && rs.every((x) => io(x).h[2] && io(x).h[2][0] === 'rsTitle') && (hook[7] || {}).sm === 'POST' && (rest[7] || {}).fw && rest[7].fw.length === 2,
+    'F1a · CR-38 · F32 · N3-20 · a reason site is titled by what it reads; the sending hook says "sends POST"; the rest line holds the body\'s parse endings too');
+  const arr = GR.mo.nm.filter((x) => x[1] === 'arr'), c859 = arr.find((x) => x[3] === 'C859');
+  ok(arr.every((x) => x[4].nm) && c859 && c859[4].t === 1, 'F1a · F12 · N3-15 · an arranging case leads with its name; C859, which also tests GET /recipes, says so', arr.map((x) => [x[3], x[4].t || 0]));
+  ok(D.words.mo.opt.dxc && D.words.mo.opt.dxc.pick === 'page' && D.words.mo.opt.dxc.opts.his && !D.words.mo.opt.dxc.ruled, 'F1a · S4-29 · the write colour is an option — the page\'s colours my pick (dashed), his words\' colours beside');
+  await open(PAGE, 'default'); await p.evaluate(() => window.__allep.pick('POST /cooking/sessions')); await p.waitForTimeout(200);
+  const sc = await p.evaluate(() => ({ cnt: document.querySelectorAll('#mogrid td[data-f="data"] .mdxcnt').length, mc: document.querySelectorAll('#mogrid td[data-f="data"] .mc').length,
+    fits: [...document.querySelectorAll('#mogrid td[data-f="proof"] .mc .mpv')].map((x) => x.textContent), b0: document.querySelectorAll('#mogrid .mdxb0 > .mdxru').length }));
+  ok(sc.cnt > 0 && !sc.mc && sc.fits.includes(D.words.mo.fits) && sc.fits.includes(D.words.mo.svcFace) && sc.b0 >= 1,
+    'F1a · CR-31 · F03 · on screen: with the map on the Data effects cells say how many; the faces say "fits" and "from the service side"; an empty band draws its rule inside', sc);
+  ok(!errs.length, 'F1a · no page error', errs); }
 
 await b.close();
 console.log((fail ? 'FAIL ✗' : 'PASS ✓') + ` probe-all-endpoints · ${pass} passed · ${fail} failed · ${FEED.length} endpoints · sample ${SAMPLE.length} · page ${path.basename(PAGE)}`);
