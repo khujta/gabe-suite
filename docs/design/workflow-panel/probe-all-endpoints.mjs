@@ -403,7 +403,8 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   // CHANGED 2026-09-28 (D-065): BY MOMENT's journeys look adds its line after BY MOMENT's two looks — nine lines now
   // CHANGED 2026-09-30 (D-067): BY MOMENT's legend place and its hovers' form add theirs after the journeys' — eleven lines now
   // CHANGED 2026-09-30 (D-068): its header, saving's stage, the metadata's place, a head's click and fit add theirs after those — sixteen
-  ok(el0.length === 1 && set0.length === 16 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-17)) === JSON.stringify([el0[0]].concat(set0)),
+  // CHANGED 2026-09-30 (D-069): the rows' own looks (the gates, the effect, gate icons, gate roles, function marks, standard or specialist) — twenty-two
+  ok(el0.length === 1 && set0.length === 22 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-23)) === JSON.stringify([el0[0]].concat(set0)),
     'the copy text adds the endpoint shown, then the code map\'s and BY MOMENT\'s settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -815,6 +816,10 @@ const INVENTORY = path.join(REPO, 'docs/design/design-context/inventory-endpoint
   const want9 = Object.fromEntries(SMB.map((b) => { const pt = PAN[b.join.surface_key];
     return [b.key, pt ? { inner: iconOf(pt.icon), col: pt.col, pick: false } : { inner: LABM[b.key].inner, col: LABM[b.key].col, pick: true }]; }));
   want9._shared = { inner: iconOf(MK.shared.icon), col: null, pick: true };
+  /* CHANGED 2026-09-30 (D-069, his L-17/L-18): In-flight state and Standard or specialist wear a mark of their own — my pick, dashed (the
+     hourglass, the puzzle; In-flight in its row's hue), the page's own glyph in place of the lab's no-page mark */
+  const innerOf = (t) => String(t || '').slice(String(t || '').indexOf('>') + 1, String(t || '').lastIndexOf('</svg>'));
+  Object.entries(MK.own || {}).forEach(([f, ic]) => { const bk = D.mo.fam[f]; want9[bk] = { inner: innerOf(D.icons[ic]), col: f === 'inf' ? 'var(--if)' : want9[bk].col, pick: true }; });
   ok(SMB.filter((b) => !PAN[b.join.surface_key]).every((b) => LABM[b.key] && LABM[b.key].inner && LABM[b.key].col), 'the lab draws a mark for every block no part answers', LABM);
   const readMarks = (sel) => p.evaluate(({ sel, want }) => { const rgb = (c) => { const q = document.createElement('i'); q.style.color = c; document.body.appendChild(q); const v = getComputedStyle(q).color; q.remove(); return v; };
     return [...document.querySelectorAll(sel)].map((h) => { const bm = h.querySelector('.bm'), sv = bm && bm.querySelector('svg'), k = h.getAttribute('data-block');
@@ -894,7 +899,7 @@ ok(!errs.length, 'no page error after the D-036 checks', errs);
     const plain = [], tw = document.createTreeWalker(cm, NodeFilter.SHOW_TEXT); let t;
     while ((t = tw.nextNode())) { const x = t.textContent.trim(); if (!x || x === W.panel.none || t.parentElement.closest('.vc, .pk, .cbh, th, td.says, .pw, .ab, .ainfo, .elsay, h3')) continue;
       const m = rx.exec(x) || st.exec(x); if (m) plain.push([(t.parentElement.closest('.pair') || {}).getAttribute && t.parentElement.closest('.pair').getAttribute('data-k'), m[0], x.slice(0, 50)]); }
-    return { n: chips.length, bare, plain, missing: Object.keys(F).filter((f) => !F[f].station && !fams.has(f)) }; });   /* a station family (D-052) is drawn only where an element wears it */
+    return { n: chips.length, bare, plain, missing: Object.keys(F).filter((f) => !F[f].station && !F[f].mo && !fams.has(f)) }; });   /* a station family (D-052) is drawn only where an element wears it · CHANGED 2026-09-30 (D-069): a gate's kind, role and effect are BY MOMENT's alone (`mo`) */
   ok(enc.n > 100 && !enc.bare.length && !enc.missing.length && !enc.plain.length,
     'D-043 · ' + EP + ' · every verb and catalog value in the code-map column is a chip carrying a colour or an icon and its words, every family is drawn, and no catalog word is left as plain text', { chips: enc.n, bare: enc.bare.slice(0, 4), missing: enc.missing, plain: enc.plain.slice(0, 4) });
   /* D-052 · on POST /setup/complete every code-map mention of an element the station draws as a node carries that kind's glyph in
@@ -1271,7 +1276,9 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   const byB = {}; Object.entries(D.mo.fam).forEach(([f, b0]) => { byB[b0] = f; }); const ov = D.blocks.find((b0) => byB[b0.key] === 'over');
   /* CHANGED 2026-09-30 (D-068, his L-07): the Overview is no row — nothing of it acts at a moment; its facts stand in the endpoint
      metadata, one card per block that has any; the band holds no line of it */
-  const wantHeads = D.orders[D.words.rail.bord.pick].filter((k) => !D.mo.untimed.includes(byB[k])).map((k) => D.blocks.find((b0) => b0.key === k).name);
+  /* CHANGED 2026-09-30 (D-069, his L-18): Standard or specialist split into the gates (my pick) or merged into them is no row of its own */
+  const stdRow = await p.evaluate(() => window.__allep.mo.looks.std === 'keep');
+  const wantHeads = D.orders[D.words.rail.bord.pick].filter((k) => !D.mo.untimed.includes(byB[k]) && (stdRow || byB[k] !== 'std')).map((k) => D.blocks.find((b0) => b0.key === k).name);
   const wantCards = new Set(ROW[E14].mo.nm.map((x) => x[0]).concat(Object.keys(D.mo.meta).map((b0) => byB[b0]))).size;
   const cmEnds = await p.$$eval('#ocol-cm .pair[data-k="d:exits"] table.etab tr.erow .vc-status', (cs) => cs.map((c) => c.textContent));
   const failRow = m0.rows.findIndex((r) => r[0] === 'fail'), grp = ROW[E14].xd.exits.map((x, i) => [x, ROW[E14].d.exits.items[i]]).filter(([x]) => typeof x[0] === 'number').map(([, e]) => String(e[2]));
@@ -1865,10 +1872,12 @@ ok(!errs.length, 'no page error after the D-056 checks', errs);
     const w0 = (await cell('work', 'fn')).map((x) => x.name); onCodes.push([i, wantD.map(([n]) => w0.includes(n)), w0.includes('assert_recipe_allergen_safe')]); }
   await p.click('#mobar .mopath[data-path="all"]'); await p.waitForTimeout(100);
   const bandD = await p.$$eval('#moband .mbb[data-f="fn"] .mbr', (rs) => rs.map((r) => r.getAttribute('data-why')));
-  ok(gotD.every(([n, here, hasKey, glyph, via, tipOk, sameCodes], j) => here && via.length === 1 && tipOk && sameCodes && (wantD[j][1] ? hasKey : !hasKey && !glyph)) && !bandD.length
+  /* CHANGED 2026-09-30 (D-069, P-L14a, his L-14: "if they are functions, they should be given a function icon"): a function known by
+     name only keeps no key, and now wears the function glyph */
+  ok(gotD.every(([n, here, hasKey, glyph, via, tipOk, sameCodes], j) => here && via.length === 1 && tipOk && sameCodes && (wantD[j][1] ? hasKey : !hasKey && glyph)) && !bandD.length
      && onCodes.every(([, ws, par]) => ws.every((w) => w === par)) && onCodes.some(([, , par]) => par)
      && JSON.stringify(deepD) === JSON.stringify([['_stages', 3, true], ['_label', 4, true], ['_hold_hours', 4, true]]),
-    'D-057 (d) · D-062 (2) · ' + E + ': ' + gotD.map((x) => x[0] + ' under ' + x[4].join(',') + ' on codes ' + (x[7] || []).map((i) => R.mo.ex[i][1]).join(' ')).join(' · ') + ' — exactly its caller\'s, picked code by code — with no "on every path that calls" (the caller says none), no key and no glyph; ' + deepD.map((x) => x[0] + ' ↓' + x[1]).join(' · ') + ' stand there by their call edges (D-060 (3)); the band holds no function', { gotD, onCodes, deepD, bandD });
+    'D-057 (d) · D-062 (2) · ' + E + ': ' + gotD.map((x) => x[0] + ' under ' + x[4].join(',') + ' on codes ' + (x[7] || []).map((i) => R.mo.ex[i][1]).join(' ')).join(' · ') + ' — exactly its caller\'s, picked code by code — with no "on every path that calls" (the caller says none), no key, the function glyph; ' + deepD.map((x) => x[0] + ' ↓' + x[1]).join(' · ') + ' stand there by their call edges (D-060 (3)); the band holds no function', { gotD, onCodes, deepD, bandD });
   /* D-064 (1) (his ruling 2026-09-28): assert_recipe_allergen_safe — and the two chips joined under it by name — stand only on the paths
      that reach it. Recomputed HERE from the feed: its reached_by route (the call inside start_session, on the handler call it rides),
      the paths that route names, less those whose chain meets a fork that returns or fires a check inside start_session between its
@@ -2494,7 +2503,9 @@ ok(!errs.length, 'no page error after the D-067 checks', errs);
   const rh = await p.evaluate(() => [...document.querySelectorAll('#mogrid tbody th[data-block]')].map((h) => [h.getAttribute('data-f'), [...h.querySelectorAll('.msc')].map((b) => [b.getAttribute('data-mcol'), b.querySelector('.msh').textContent, b.querySelector('.msv').textContent]), !!h.querySelector('.mro')]));
   const pinVal = async (cid) => p.$eval('#pin tbody [data-col="' + cid + '"]', (e) => e.textContent.trim()).catch(() => null);
   const fnRow = rh.find((x) => x[0] === 'fn'), wantFn = D.mo.cols.fn.map((cid) => [cid, D.words.cols[cid].head, String(R.k[cid])]);
-  ok(rh.every((x) => x[2] && JSON.stringify(x[1].map((b) => b[0])) === JSON.stringify(D.mo.cols[x[0]])) && JSON.stringify(fnRow[1]) === JSON.stringify(wantFn) && wantFn.some(([c]) => c === 'deciders') && wantFn.some(([c]) => c === 'datafns')
+  /* CHANGED 2026-09-30 (D-069, his L-18): with Standard or specialist split into the gates (my pick) or merged, its columns stand on the gates' row */
+  const stdKeep = await p.evaluate(() => window.__allep.mo.looks.std === 'keep'), colsOf = (f) => D.mo.cols[f].concat(f === 'gate' && !stdKeep ? D.mo.cols.std || [] : []);
+  ok(rh.every((x) => x[2] && JSON.stringify(x[1].map((b) => b[0])) === JSON.stringify(colsOf(x[0]))) && JSON.stringify(fnRow[1]) === JSON.stringify(wantFn) && wantFn.some(([c]) => c === 'deciders') && wantFn.some(([c]) => c === 'datafns')
      && (await pinVal('deciders')) === String(R.k.deciders),
     'D-068 (L-20) · every row\'s head carries its options slot and its columns of the pinned row, in the pinned row\'s words — Functions: ' + fnRow[1].map((b) => b[1] + ' ' + b[2]).join(' · '), rh.map((x) => [x[0], x[1].map((b) => b[1] + ' ' + b[2]).join(' · ')]));
   await clk('#mogrid tbody th[data-f="fn"] .msc[data-mcol="deciders"]');
@@ -2540,6 +2551,66 @@ ok(!errs.length, 'no page error after the D-067 checks', errs);
   ok(back.moms === band.heads && back.rows === rh.length && !back.strip && !out2, 'D-068 · show all, fit off and the width given back: the table as it opens, and the copy text no longer names the columns', { back, out2 });
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-068 checks', errs);
+
+/* 23 · D-069 (his note "API Hover Legend Consolidation", L-09 … L-18): every element says what it is — smoke checks (D-037, light):
+   (a) every gate stands under the function or middleware it runs in, the rate limits under RateLimitMiddleware with the station's
+       middleware glyph; a check's effect is its ending's status, with its stage lit; its label says where it decides;
+   (b) every function chip wears the function glyph (a name-only one too); a function's marks: what it decides and touches;
+   (c) the refresh names the hooks that fetch again and their GET; the client's branches stand under describeStartCookingError, an
+       "any other status" line last; the send cell reads in tap order;
+   (d) an in-flight value's face is its plain kind and its lifetime (request · server), the machine word gone; the row wears its own
+       mark; Standard or specialist split into the gates (my pick): no row of its own, its rare pieces a label on what they name;
+   (e) the options: one chain per gate puts the host in the chip; keeping the row brings Standard or specialist back */
+{ const E = 'POST /cooking/sessions', MW = D.words.mo, C1 = MW.x.c1;
+  const clk = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await p.click(sel); await p.waitForTimeout(130); };
+  const setLook = async (st) => { await p.evaluate((st) => { const A = window.__allep; Object.assign(A.mo.looks, st); localStorage.setItem(A.mo.key, JSON.stringify(A.mo.looks)); }, st);
+    await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });   /* the looks are read at load (open() would clear them) */
+    await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E + '"] td.id'); await p.waitForTimeout(200); };
+  await setLook({ gdl: 'head', gef: 'end', gic: 'each', grl: 'where', fnm: 'on', std: 'split' });
+  const g = await p.evaluate(() => { const T = document.querySelector('#mogrid'), gates = [...T.querySelectorAll('td[data-f="gate"] .mc')];
+    return { n: gates.length, orphan: gates.filter((c) => !c.closest('.mgb') && !/^fn:/.test(c.getAttribute('data-keys') || '')).map((c) => c.getAttribute('data-keys')),
+      rl: [...T.querySelectorAll('td[data-mom="edge"][data-f="gate"] .mgb > .mgh [data-key]')].map((h) => [h.getAttribute('data-key'), (h.querySelector('.skg') || { getAttribute: () => null }).getAttribute('data-sk')]),
+      key: (() => { const c = gates.find((x) => /^guard:/.test(x.getAttribute('data-keys') || '') && x.querySelector('.mt').textContent === 'key is None'); return c ? [[...c.querySelectorAll('.vc-status')].map((v) => v.textContent),
+        (c.querySelector('.mef .spine i.on') ? [...c.querySelectorAll('.mef .spine i')].indexOf(c.querySelector('.mef .spine i.on')) : -1), (c.querySelector('.vc-gdl') || {}).textContent] : null; })() }; });
+  ok(g.n > 10 && !g.orphan.length && g.rl.length === 1 && g.rl[0][0] === 'middleware:RateLimitMiddleware' && g.rl[0][1] === 'middleware'
+     && g.key && g.key[0].join() === '400' && g.key[1] === D.orders.stageRows.filter((q) => D.orders.kinds[q] !== 'screen').indexOf('HANDLER') && g.key[2] === D.words.enc.fam.gdl.vals.own.name,
+    'D-069 (a) · ' + E + ': every one of its ' + g.n + ' gates stands under the function it runs in (the login check is its own); the rate limits under RateLimitMiddleware, the station\'s middleware glyph; "key is None" → 400, HANDLER lit, "' + D.words.enc.fam.gdl.vals.own.name + '"', g);
+  const f = await p.evaluate(() => { const cs = [...document.querySelectorAll('#mogrid td[data-f="fn"] .mc')];
+    const one = (n) => cs.find((c) => ((c.querySelector('.mt') || {}).textContent || '') === n);
+    return { bare: cs.filter((c) => !c.querySelector('.skg')).map((c) => c.textContent.slice(0, 40)), n: cs.length,
+      snap: (one('load_resolution_snapshot') || { querySelector: () => null }).querySelector('.sksub') ? one('load_resolution_snapshot').querySelector('.sksub').textContent : null,
+      handler: one('post_start_session') ? [...one('post_start_session').querySelectorAll('.mfm .vc-status')].map((v) => v.textContent) : null,
+      rw: (() => { const v = document.querySelector('#mogrid td[data-f="data"] .vc.jdrw'); return v ? getComputedStyle(v).backgroundColor : null; })() }; });
+  ok(f.n > 20 && !f.bare.length && f.snap === 'accessor' && JSON.stringify(f.handler) === JSON.stringify(['400', '403', '404', '409']) && f.rw && !/rgba\(0, 0, 0, 0\)|transparent/.test(f.rw),
+    'D-069 (b) · every one of the ' + f.n + ' function chips wears the function glyph; load_resolution_snapshot is an accessor (its own reads); post_start_session shows the statuses it decides; the R and W letters wear their colour', f);
+  const c = await p.evaluate(() => { const T = document.querySelector('#mogrid');
+    const rf = [...T.querySelectorAll('td[data-mom="after"][data-f="client"] .mc .mrf [data-key]')].map((k) => k.getAttribute('data-key'));
+    const blk = T.querySelector('td[data-mom="after"][data-f="client"] .mgb'), send = [...T.querySelectorAll('td[data-mom="send"][data-f="client"] .mcs > .mc')].map((x) => (x.getAttribute('data-keys') || '').split('#').pop());
+    return { rf, head: blk ? blk.querySelector('.mgh').textContent : null, lines: blk ? [...blk.querySelectorAll(':scope > .mc')].map((x) => x.textContent.replace(/\s+/g, ' ').trim()) : [], send }; });
+  ok(c.rf.some((k) => /#useActiveCooking$/.test(k)) && c.rf.includes('endpoint:GET /cooking/active') && c.rf.includes('endpoint:GET /cooking/reminders/due')
+     && c.head && c.head.includes('describeStartCookingError') && c.lines.length === 4 && c.lines.every((l, i) => i === 3 ? l.startsWith(C1.any) : l.startsWith(C1.reads))
+     && JSON.stringify(c.send) === JSON.stringify(['RecipeBrowseContainer', 'useCookingLoopActions', 'useStartCooking']),
+    'D-069 (c) · the refresh names useActiveCooking → GET /cooking/active and useRemindersDue → GET /cooking/reminders/due; the branches stand under describeStartCookingError, each read by its verb, "' + C1.any + '" last; the send chain reads screen → hook on the way → the hook that sends', c);
+  const i = await p.evaluate(() => { const cs = [...document.querySelectorAll('#mogrid td[data-f="inf"] .mc')];
+    return { life: cs.map((x) => x.getAttribute('data-life')), machine: cs.filter((x) => /dependency-value|setting-once|built-once/.test(x.textContent)).length,
+      mark: (() => { const bm = document.querySelector('#mogrid tbody th[data-f="inf"] .bm'); return bm ? [bm.getAttribute('data-icon'), bm.getAttribute('data-pick')] : null; })(),
+      rows: [...document.querySelectorAll('#mogrid tbody tr[data-f]')].map((r) => r.getAttribute('data-f')), ra: [...document.querySelectorAll('#mogrid .mc .mra[data-key]')].map((x) => x.getAttribute('data-key')) }; });
+  const rr = ROW[E];
+  ok(i.life.filter((l) => l === 'srv').length === rr.k.inf_server && i.life.filter((l) => l === 'req').length === rr.k.inf_answer && !i.machine && i.mark && i.mark[0] === 'pg:hourglass' && i.mark[1] === 'true'
+     && !i.rows.includes('std') && ['piece:repeat:key', 'piece:status:403', 'piece:repeat:idiom:get-or-create'].every((k) => i.ra.includes(k)),
+    'D-069 (d) · the in-flight values wear their lifetime (' + rr.k.inf_answer + ' request · ' + rr.k.inf_server + ' server), no machine word; the row\'s hourglass, my pick (dashed); Standard or specialist split into the rows: no row, its 3 rare pieces a label on what they name', i);
+  await setLook({ gdl: 'chain', std: 'keep' });
+  const o = await p.evaluate(() => ({ host: [...document.querySelectorAll('#mogrid td[data-f="gate"] .mc')].filter((x) => x.querySelector('.mgh0[data-key]')).length,
+    groups: document.querySelectorAll('#mogrid td[data-f="gate"] .mgb').length, rows: [...document.querySelectorAll('#mogrid tbody tr[data-f]')].map((r) => r.getAttribute('data-f')),
+    lanes: [...document.querySelectorAll('#mogrid td[data-f="std"] .mlane')].map((x) => x.textContent) }));
+  ok(o.host > 10 && !o.groups && o.rows.includes('std') && o.lanes.includes(C1.set) && o.lanes.includes(C1.rareHere),
+    'D-069 (e) · "' + MW.opt.gdl.opts.chain.name + '" puts the function in each gate chip; "' + MW.opt.std.opts.keep.name + '" brings the row back, in its lanes', o);
+  const qt = await (async () => { const h = await p.$('#mogrid tbody th[data-f="std"] .mbn'); if (!h) return ''; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const bx = await h.boundingBox();
+    await p.mouse.move(bx.x + 4, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; })();
+  ok(qt.includes(MW.rowq.std), 'D-069 (e) · the row\'s head says the question it answers', qt.slice(0, 160));
+  await setLook({ gdl: MW.opt.gdl.pick, gef: MW.opt.gef.pick, gic: MW.opt.gic.pick, grl: MW.opt.grl.pick, fnm: MW.opt.fnm.pick, std: MW.opt.std.pick });
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the D-069 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));

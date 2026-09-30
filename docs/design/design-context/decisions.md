@@ -938,3 +938,69 @@ road · moment; saving — under EFFECTS (my pick) · under HANDLER with an empt
 first words) · before it; a head's click — names whole (my pick) · every item on one line; fit — narrow the rest to strips of counts (my
 pick) · wrap into bands. His to pick by seeing. The forks and the stage proof are display-side generation (D-063's lighter regime);
 the rest is page-only: D-037's light checks.
+
+## D-069 — Every element says what it is: a gate names its function, its condition and what happens; a function always wears its glyph; the client says what it fetches and which function reads the answer; in-flight values and Standard or specialist get their own look
+Date: 2026-09-30 · Input: his note "API Hover Legend Consolidation", legibility-feedback.md L-09, L-10, L-11, L-12 (the R/W colour
+only), L-14, L-15, L-16, L-17, L-18; the gates, functions-data, client, inflight-specialist and lost-columns investigations.
+Decision, his: "if we have different gates and decisions, we should show the function method. Of the place where they are being
+called … ideally a function with a function role. It's okay if the functions gets repeated" (L-09) · "we will most likely mutate that
+to have a chain of functions. With the actual gates and decisions, like the flag or the condition that they are evaluating. And then
+… the effect of that … we should encode that with some color" (L-10) · "can we also put some roles in the gates and decisions
+themselves? I'm not sure about this" (L-11) · "Those two, if they are functions, they should be given a function, icon, and a role.
+And I would like to know why we haven't done that" (L-14) · "the hook is kind of the frontend function … it's a fetcher. But what is
+fetching and from where?" (L-15) · "Why do they trigger? In which context? A function I gave what is happening there" (L-16) ·
+"I would like to give it an appropriate icon to that row … surface what we are affecting" (L-17) · "let's give it an icon also … I'm
+not sure what what are we representing here … maybe can be merged with gates and decisions … tell me about that" (L-18).
+Consequence (his asks, built; how each is drawn is my reading): (1) every gate and switch names the function it runs in — the
+function whose raise or refusal the feed records at a check's line, a fork's and a catch's own function, the middleware a rate limit
+runs in (RateLimitMiddleware, the station's middleware node, glyph, no role: the station draws no function node for its dispatch) —
+as a station element with its glyph and role (D-052); the build STOPS when a gate runs in no function the feed names or a check is
+recorded in two (704 gates and switches: 523 in a function, 181 in a middleware). (2) Each gate is a chain: its host, its condition
+(a catch's "except …"; a fork's last arm "otherwise"), then what happens — the ending's status (a click lights it) or "returns" ·
+"passes the error on" · "goes on" · "decides" · "can end at" (the TokenVerifier binding: either choice ends the same). (3) A function
+always wears the function glyph, a name the feeds join to no function too; its role where a source knows it — the station's, the
+lab's walk, then the station's own rule on the feed's own facts (accessor when the forms feed records a read or write in its body;
+gate by `_a3_graft._is_gate_name`, read, never retyped; caller and pure never said here); with no role it wears glyph and name, and
+its hover says what it does (where it is defined, the tables it touches, the in-flight value it reads: get_idempotency_key "reads
+idempotency_key, set by IdempotencyMiddleware (idempotency.py:25)"). Why some have no role, answered for him here, not on the page
+(D-017): the code map reads ten folders of apps/api; reference/, middleware/, i18n/, net/, streaming/ and config.py are not among
+them, so the station draws no node for their functions. A class the handler builds (36: ActiveCookingResponse, RecipeDemand …) wears
+its schema's or model's glyph, its function key second; the name index reads the forms feed's call rows (equipment_codes gains its
+key). (4) BY MOMENT's R and W letters wear the code map's colours (read green, write orange). (5) The refresh chip names its trigger
+("useStartCooking · on success · refresh ["cooking"]") and, one line each, the hooks whose saved answers it throws away and the GET each
+sends again (useActiveCooking → GET /cooking/active, useRemindersDue → GET /cooking/reminders/due, from each query's own
+invalidated_by); its hover names each reply, the tables it reads, and the tables this request wrote that it reads. (6) The client's
+branches stand under the function they sit in (describeStartCookingError, the function glyph, no role: the station draws no node for
+it), with the way the error comes (from useCookingLoopActions, error handed over at lines 303, 386, in RecipeBrowseContainer — the
+feed's origins, each hop resolved to the frontend piece the c4 graph spans over its line); each line leads with its verb ("reads 409
+×2 → “cooking.error.start_concurrent_cap”"), the reason-collapsed alarm where the feed flags it; an "any other status" line holds the
+endings no branch compares (its does is not recorded — a feed gap, D-023); the hover title no longer ends in the feed's word "none".
+The send cell reads in tap order: RecipeBrowseContainer → useCookingLoopActions (orchestrator, "sends it at 293, 382") →
+useStartCooking; useStartCooking's hover says what it sends, that a failed send is not tried again, and where an error goes. (7) An
+in-flight value's face is its kind's glyph in the row's one hue, its name, its type, its kind in plain words at its end ("from a
+dependency", "setting at start", "built at start", "on the request"; a lock's kind is "held") and its lifetime in the pinned row's
+words (request · server); a value the server keeps is filled, one that goes with the answer outlined, an unknown one dashed. (8) Each
+row's head hover says the question the row answers (Gates and decisions, In-flight state, Standard or specialist). His L-18 question,
+answered: the row asks "is this endpoint built like the others, and what is unusual about it?" — its switches are set by the server's
+settings (79 of 80 endpoints carry the same binding and flag), its pieces are counted against the 80 endpoints (norm ≥ 9 in 10, rare
+≤ 1 in 10); only the switches decide something along the way, so the merge is built as options. A rare piece says how rare it is
+("6 of 80"). Every number above is the feed's; the build line says them (D-069 ·).
+Options built (D-025.2), my picks dashed, each in its row's options slot (D-068): the gates — function a head, its gates under it (my
+pick, B) · one chain per gate (A) · function · condition · effect side by side (C); the effect — the ending's colour with its stage lit
+on a small spine (my pick, e1) · a band in a colour per stage (e2, a stage palette of mine); gate icons — an icon per kind (my pick, the
+page's own glyphs: a gauge, a shield, a split, a reply, a sliders mark for a switch; their legend line says "my proposal: the station
+draws no node for this") · one gate icon (a diamond) · none; gate roles — where it decides (my pick, R2: app-wide · at login · in a
+dependency · in the handler · inside a call) · what it does (R1: refuses · translates · routes · passes on · swallows) · what a check
+guards (R3: bad input · not found · conflict …) · none; function marks (lost-columns P2) — what it decides and touches: the statuses its
+own code decides, R/W per table, the login check's own tables hollow (my pick) · name and role only; standard or specialist — split into
+the gates (my pick, M1: a switch beside what it switches, "set by settings"; a rare piece a label on the item it names, "rare · 6 of 80",
+a click lights the piece; its pieces and lacks stay in the endpoint metadata) · merged into the gates as they are (M2) · kept as its
+row, in lanes "set by settings" and "rare here" (M3). The row marks: In-flight state an hourglass in its hue, Standard or specialist a
+puzzle — my picks, dashed; timer and activity were the other candidates for In-flight, a star and a fingerprint for Standard or
+specialist; the lab's section map keeps its no-page mark until he rules (D-036). My proposal for the review page: the pinned row's
+"screen" head counts the hook that sends the request, not a screen — rename it "sends it" (lost-columns P3); his word stays until he
+rules. Not built here: the data-effects connector diagram and the in-flight lifelines (C2), the bench (L-23). Feed gaps left as they
+are (D-023, generation work): start_session's raise at services/cooking.py:129 is not joined to its 404 (its effect reads "not
+recorded"), assert_recipe_allergen_safe's raise is not joined to this endpoint, the fall-through branch records no does, the via hops
+carry no function names, and the code map does not read apps/api/middleware/ or reference/. Display-side generation (D-063's lighter
+regime) and page-only: D-037's light checks.

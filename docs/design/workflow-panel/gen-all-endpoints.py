@@ -56,6 +56,7 @@ DEF_FORMS = Path("~/.cache/gabe-map-baselines/lab-input/forms.json")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _ae_universe as UNI  # noqa: E402  (D-036 — the one-endpoint section: the universe card, the block marks, the gaps)
 import _ae_io as IO  # noqa: E402  (D-067 — one hover per BY MOMENT item: its facts before · checks · gives, and the twins check)
+import _ae_els as ELS  # noqa: E402  (D-069 — every BY MOMENT element says what it is: its host, its effect, its role, its object)
 
 
 def die(msg: str) -> None:
@@ -557,6 +558,11 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     EFP = {p["id"]: p.get("effects") or {} for p in paths}
     if sorted(LABP) != sorted(PIDS):
         die(f"{lab}: the lab's paths and the feed's differ: {sorted(set(LABP) ^ set(PIDS))[:3]}")
+    # D-069 (his L-09 … L-18): what each element IS — the function a gate runs in, what it does when it holds, the reads a refresh
+    # fetches again, the function a client branch sits in — read by _ae_els from the feed's own fields
+    ELC = ELS.Ctx(lab=lab, E=E, F=F, fj=fj, fep=fep, H=H, deps=deps, XS=XS, chains={p["id"]: p.get("chain") or [] for p in paths},
+                  EXIT={p["id"]: p["exit"]["id"] for p in paths}, r=r, X=X, die=die,
+                  stage_of=lambda x: "ANSWER" if x.get("kind") == "success" else "UNCAUGHT" if x.get("kind") == "uncaught" else PHASE_STAGE.get(x.get("phase"), "HANDLER"))
     # D-057 (a): the raises functions{} records, by the line they stand at — a check that IS one of them says what it raises
     rz_at = collections.defaultdict(set)
     for rec in fns.values():
@@ -951,44 +957,99 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             if c.get("endpoint") != E:
                 continue
             senders.add(pid)
-            add("client", ("fix", "send"), [pid], pid.split("#")[-1], ["kind2", c.get("kind")], None, _short(c.get("at")), "h:" + pid + str(c.get("at")))
+            # D-069 (client P5): the send chain in tap order — the screen (0), the hooks on the way (1), the hook that sends it (2)
+            add("client", ("fix", "send"), [pid], pid.split("#")[-1], ["kind2", c.get("kind")], None, _short(c.get("at")), "h:" + pid + str(c.get("at")))["o"] = 2
             for wd, lst in (("seed", c.get("seeds") or []), ("refresh", c.get("invalidates") or [])):
                 for o in lst:
                     wn = o.get("when")
                     pp = ends_at({x["id"] for x in F["exits"] if x["kind"] == "success"}) if wn == "onSuccess" else \
                         ends_at({x["id"] for x in F["exits"] if x["kind"] != "success"}) if wn == "onError" else None
+                    # D-069 (his L-15: "what is fetching and from where?"): a refresh names the hooks whose saved answers it throws away —
+                    # each fetches again — and the GET each sends
+                    rf = ELS.refetches(pid, o, ELC) if wd == "refresh" else []
                     add("client", ("fix", "after"), [pid], wd + " " + json.dumps(o.get("key"), ensure_ascii=False), ["cache", wd], pp,
-                        f"{wn} · {_short(o.get('at'))}", "o:" + pid + str(o.get("at")) + wd + json.dumps(o.get("key")))
+                        f"{wn} · {_short(o.get('at'))}", "o:" + pid + str(o.get("at")) + wd + json.dumps(o.get("key")),
+                        x={"rf": rf, "xk": [q[0] for q in rf] + [q[3] for q in rf if q[3]]} if rf else None)
+                    tally["c1:refetch"] += len(rf)
     for fb in L["widening"].get("fetched_by") or []:
         if fb.get("id") not in senders:
-            add("client", ("fix", "send"), [fb.get("id")], fb.get("name") or str(fb.get("id")).split("#")[-1], None, None, None, "h:" + str(fb.get("id")))
+            add("client", ("fix", "send"), [fb.get("id")], fb.get("name") or str(fb.get("id")).split("#")[-1], None, None, None, "h:" + str(fb.get("id")))["o"] = 2
     # D-056 (9): a FILE that fetches it (the station's bridge edge ends at the file, not at a hook or component inside it)
     for fid, fnm in r["_files"]:
         if fid not in senders:
-            add("client", ("fix", "send"), [fid], fnm, None, None, None, "h:" + fid, x={"fl": 1})
+            add("client", ("fix", "send"), [fid], fnm, None, None, None, "h:" + fid, x={"fl": 1})["o"] = 3
     for sc in L["widening"].get("screens") or []:
         add("client", ("fix", "send"), [sc.get("id")], sc.get("name") or str(sc.get("id")).split("#")[-1], None, None, None, "v:" + str(sc.get("id")))
     routed = collections.defaultdict(set)
-    for rd in ((fe.get("reasons") or {}).get("readers") or {}).get(E) or []:
+    rdrs = ((fe.get("reasons") or {}).get("readers") or {}).get(E) or []
+    for rd in rdrs:
         for ro in rd.get("routes") or []:
             routed[ro.get("site")].add(ro.get("exit"))
+    # D-069 (his L-16: "Why do they trigger? In which context? Which function"): each branch names the function it sits in, and the
+    # way the error travels to it — the feed's origins, each hop resolved to the frontend piece the c4 graph spans over its line
+    fsites = {s0["id"]: s0 for s0 in (fe.get("reasons") or {}).get("sites") or []}
+    coll = {f0.get("site") for f0 in (fj.get("arm_findings") or {}).get("frontend") or [] if f0.get("id") == "reason-collapsed" and f0.get("endpoint") == E}
+    orch = {}                                                    # a hook on the way to the send: [its key, its name, send lines, error lines, screen]
+
+    def pc_of(piece, site_ids):
+        hops, err, scr = [], [], None
+        for sid in site_ids:
+            for og in (fsites.get(sid) or {}).get("origins") or []:
+                if E not in (og.get("endpoints") or []):
+                    continue
+                via = og.get("via") or []
+                sp_ = ELS.fe_piece_at(X, via[-1]) if len(via) > 1 else None
+                scr = scr or (sp_ and sp_[3])
+                for j0, at0 in enumerate(via[1:-1], 1):
+                    pz = ELS.fe_piece_at(X, at0)
+                    if not pz or pz[2] in senders or pz[2] == piece:
+                        continue
+                    o0 = orch.setdefault(pz[2], [pz[2], pz[3], set(), set(), None])
+                    (o0[2] if j0 == len(via) - 2 else o0[3]).add(_line(at0))
+                    o0[4] = o0[4] or (sp_ and sp_[3])
+                    hops.append(pz[3]); err += [_line(at0)] if j0 < len(via) - 2 else []
+        return {"via": list(dict.fromkeys(hops)), "err": sorted(set(q for q in err if q)), "scr": scr}
+    by_piece = collections.defaultdict(list)
+    for s2 in F["frontend"].get("reason_sites") or []:
+        by_piece[str((fsites.get(s2["id"]) or {}).get("piece") or s2.get("piece") or "")].append(s2["id"])
+    pcs = {pz: [pz, pz.split("#")[-1], _short(pz.split("#")[0][3:]), pc_of(pz, ids)] for pz, ids in by_piece.items() if pz}
     # D-057 (b): a reason chip says on its face what it compares (the status, or the code it reads) and in its hover what the branch
     # does — the lab's own words for the site's does[] rows (window.doesWords, lifted by the build) — in place of the map's word "read"
     for s2 in F["frontend"].get("reason_sites") or []:
         dw = (X.get("dw") or {}).get(s2["id"])
         if dw is None:
             die(f"{lab}: reason site {s2['id']} has no words for what it does — the lab's doesWords was not run on it")
+        pz = str((fsites.get(s2["id"]) or {}).get("piece") or s2.get("piece") or "")
+        lit = next((d0.get("literal") for d0 in (fsites.get(s2["id"]) or {}).get("does") or [] if d0.get("literal")), None)
         e = add("client", ("fix", "after"), ["reason:" + s2["id"]], f"{_short(s2.get('at'))}", ["rsn", s2.get("reads"), s2.get("op"), s2.get("value")],
                 ends_at(routed.get(s2["id"]) or set()) or None, None, "s:" + s2["id"],
-                x={"dw": dw, "br": s2.get("branch"), "rd": [s2.get("reads"), s2.get("op"), s2.get("value")]})
+                x={"dw": dw, "br": s2.get("branch"), "rd": [s2.get("reads"), s2.get("op"), s2.get("value")], "lit": lit,
+                   "rx": sorted(routed.get(s2["id"]) or [], key=str), "al": 1 if s2["id"] in coll else 0,
+                   "rs": [(XS.get(x0) or {}).get("status") for x0 in sorted(routed.get(s2["id"]) or [], key=str)],
+                   **({"pc": pcs[pz], "xk": [pz]} if pz in pcs else {})})
         e["m"] = [("rsite", s2["id"])] if s2.get("reads") == "status" and s2.get("value") is not None else []
+    # D-069 (client P3 (a)): the endings no branch of a client function compares, one line under its branches — "any other status"
+    for rd in rdrs:
+        rest = sorted({ro.get("exit") for ro in rd.get("routes") or [] if ro.get("site") == "rest" and ro.get("exit") in XS}, key=str)
+        pz = str(rd.get("piece") or "")
+        if rest and ends_at(set(rest)):
+            add("client", ("fix", "after"), [], "", ["rest"], ends_at(set(rest)), None, "t:" + pz,
+                x={"rx": rest, "rs": [XS[x0].get("status") for x0 in rest], "pc": pcs.get(pz) or [pz, str(rd.get("fn") or pz.split("#")[-1]), _short(pz.split("#")[0][3:]), {"via": [], "err": [], "scr": None}],
+                   "xk": [pz] if pz else []})
+            tally["c1:rest"] += 1
+    for o0 in orch.values():                                     # D-069 (client P5): a hook on the way from the screen to the send
+        add("client", ("fix", "send"), [o0[0]], o0[1], None, None, None, "y:" + o0[0],
+            x={"ox": {"send": sorted(q for q in o0[2] if q), "err": sorted(q for q in o0[3] if q), "scr": o0[4], "to": sorted(q.split("#")[-1] for q in senders)}})["o"] = 1
+        tally["c1:orch"] += 1
     # IN-FLIGHT STATE — each value where it is SET: at server start, by a middleware, by a dependency, on a handler line
     ikey = lambda x: x.get("ref") or "|".join(str(x.get(q)) for q in ("kind", "name", "set_at"))
     for x in (F.get("inflight") or {}).get("rows") or []:
         si_ = x.get("set_in")
         w = (("fix", "start") if si_ == "init" else ("fix", "edge") if si_ == "middleware" else ("fix", "gate") if si_ == "dependency"
              else ("h", _line(x.get("set_at"))) if si_ == "handler" and inh(x.get("set_at")) else ("un", "firstcall"))
-        add("inf", w, ["inflight:" + ikey(x)], x.get("name") or "", ["ifk", x.get("kind")], "moment", x.get("dies"), "i:" + ikey(x))
+        # D-069 (his L-17): the value's type and its lifetime ride the chip — the lifetime is the pinned row's request · server
+        add("inf", w, ["inflight:" + ikey(x)], x.get("name") or "", ["ifk", x.get("kind")], "moment", x.get("dies"), "i:" + ikey(x),
+            x={"lt": ELS.LIFE.get(x.get("dies"), "unk"), **({"ty": x.get("type") or x.get("class")} if x.get("type") or x.get("class") else {})})
     # PROOF — a test call rides the ending it proves ("proves", never "runs at"); one that fits endings at several moments has none.
     # Its chip: the status its endings share, else each of theirs; its hover names the endings
     def proves(xs):
@@ -1867,11 +1928,24 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         els.extend(subs)
         tally["hollow"] += len(subs); tally["hollowCases"] += 1
     els[:] = [e for e in els if e is not None]
+    # D-069 (his L-09 … L-18): what each element IS — a gate's host, what it does when it holds and where it decides; a rare piece's
+    # rarity and the elements it names; what a function decides and touches (proven the code map's deciders and data functions)
+    ELS.gates(els, ELC, tally)
+    ELS.rarity(els, ELC, L["feedwide"]["pieces"]["rows"], WRITE_OPS, tally)
+    ELS.fn_marks(els, ELC, tally)
+    # D-069 (P-L14d): a class the handler builds is no function — it wears its schema's or its model's key first (the station's node
+    # for it), its function key second; one the station draws no node for stays as it was
+    for e in els:
+        n0 = nm(e["keys"][0][3:]) if e["f"] == "fn" and e["keys"] and e["keys"][0].startswith("fn:") else ""
+        k0 = ("schema:" + n0) if n0 in X["schemas"] else ("table:" + X["m2t"][n0]) if X["m2t"].get(n0) in X["c4tables"] else None
+        if k0 and "." not in n0:
+            e["keys"] = [k0] + e["keys"]; tally["c1:class"] += 1
     el, un, nmv, gone_fn = [], [], [], []
     rp, ru, rn = collections.defaultdict(set), collections.defaultdict(set), collections.defaultdict(set)
     # D-067: each placed item's ONE hover, its own facts in the order the code meets them (_ae_io.io_of — the builder)
     IOC = IO.Ctx(E=E, F=F, fj=fj, fep=fep, XS=XS, steps=steps, H=H, hf=hf, chains=chains, EXIT=EXIT, dset=dset, par=r["_beh"]["par"],
                  pieces=L["feedwide"]["pieces"]["rows"])
+    IOC.req = req_name if shape_body else None
     for e in els:
         if e["w"][0] == "nm":                                    # D-064 (2): no moment by nature — the last column, never the band
             nmv.append([e["f"], "piece", e["keys"], e["text"], e.get("x") or None]); rn[e["f"]].update(e["rec"])
@@ -3164,9 +3238,15 @@ def key_index(fj: dict, am: dict, feeds: dict) -> dict:
     fq |= {el["file"] + "::" + f for el in (am.get("element_census") or {}).get("elements") or [] for f in el.get("fns") or []}
     fq |= set(fj.get("functions") or {}) | set(fj.get("dependencies") or {}) | {s["fn"] for s in (fj.get("steps") or {}).values() if s.get("fn")}
     fq |= {i.replace("#", "::") for i in feeds["lvfns"]}
+    # D-069 (P-L14e): the forms feed's own call rows name functions too — a chain's call, a collapsed call, a read of an in-flight value
+    for ep0 in (fj.get("endpoints") or {}).values():
+        fq |= {s0["fn"] for p0 in ep0.get("paths") or [] for s0 in p0.get("chain") or [] if s0.get("fn")}
+        fq |= {s0["fn"] for s0 in ep0.get("collapsed") or [] if s0.get("fn")}
+        fq |= {q0["fn"] for x0 in ep0.get("inflight") or [] for q0 in x0.get("read_at") or [] if q0.get("fn")}
+    fq |= {q0["fn"] for x0 in ((fj.get("inflight") or {}).get("process") or {}).values() for q0 in x0.get("read_at") or [] if q0.get("fn")}
     short = collections.defaultdict(set)
     for q in fq:
-        if "::" in q:
+        if isinstance(q, str) and "::" in q:
             short[q.split("::", 1)[1]].add(q)
     settings = {k.split(":", 1)[1] for k in (fj.get("settings") or {}) if k.startswith("setting:")}
     # the cases whose calls ACT on each endpoint (D-042): the tests column counts those calls, so it counts these cases
@@ -3178,6 +3258,7 @@ def key_index(fj: dict, am: dict, feeds: dict) -> dict:
     # review F1 (D-064 (1)): each function's length, so a function the forms feed records the def line of has its body's last line
     fnlines = {k: v["lines"] for k, v in (am.get("function_insight") or {}).items() if isinstance(v, dict) and isinstance(v.get("lines"), int)}
     return {"m2t": m2t, "node_t": node_t, "schemas": schemas, "short": short, "settings": settings, "nAlias": len(m2t), "nAliasC4": n_c4,
+            "c4tables": set(node_t.values()), "WRITE": WRITE_OPS,
             "acts": acts, "actCalls": act_calls, "fnlines": fnlines,
             "flags": (set(am.get("flags") or {}) | flags) - settings, "unkeyed": set(), "names": set()}
 
@@ -3281,7 +3362,8 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
     for w in sws:
         lab("switch:" + w["id"], f"{w.get('kind')} · " + (w.get("port") or ", ".join(sorted(w.get("settings") or [])) or str(w.get("expr") or fsw.get(w.get("id"), {}).get("pred") or "")))
     for s in rs:
-        lab("reason:" + s["id"], f"{s.get('at')} · {s.get('branch')}")
+        # D-069 (his L-16): a branch is named by the function it sits in and its line — the feed's raw branch word ("none") is not a name
+        lab("reason:" + s["id"], (str(s.get("piece") or "").split("#")[-1] + " · " if s.get("piece") else "") + _short(s.get("at")))
     for x in inf:
         lab("inflight:" + ikey(x), f"{x.get('kind')} · {x.get('name')}")
     for m in u.get("cases422") or []:
@@ -3486,7 +3568,8 @@ def enc_lift(W: dict) -> tuple:
     if not jd:
         die("the lab's stylesheet no longer has its .jdrw rule — the channel chip's look")
     # the lab's chip reads --font-mono, a token the page's column does not set: it is the page's own monospace stack there
-    css = "#ocol-cm{ --font-mono: var(--af-stack); }\n" + "\n".join("#ocol-cm .jdrw{ " + b + " }" for b in jd)
+    # D-069 (P-L12a, his L-12): BY MOMENT's R and W letters wear the same channel chip (read green, write orange) the code map does
+    css = "#ocol-cm, #mogrid, #moband, #mometa{ --font-mono: var(--af-stack); }\n" + "\n".join("#ocol-cm .jdrw, #mogrid .jdrw, #moband .jdrw{ " + b + " }" for b in jd)
     # a finding's own words, and the 422 rule types grouped by the Field keyword or the model rule that makes each — the forms
     # registries' tables, read; which keyword belongs to which group is the words file's (my proposal), a keyword none names stops
     FR, SH = _registry(GENS / "_a3_forms.py"), _registry(GENS / "_a3_forms_short.py")
@@ -3509,10 +3592,50 @@ def enc_lift(W: dict) -> tuple:
 
 def mo_keys(r: dict) -> set:
     """every key BY MOMENT draws for one row (placed or not) — they wear the station's marks too (D-052)"""
-    return {k for x in r["mo"]["el"] for k in x[2]} | {k for x in r["mo"]["un"] for k in x[1]} | {k for x in r["mo"]["nm"] for k in x[2]}
+    return {k for x in r["mo"]["el"] for k in x[2]} | {k for x in r["mo"]["un"] for k in x[1]} | {k for x in r["mo"]["nm"] for k in x[2]} \
+        | {k for x in r["mo"]["el"] for k in (x[7] or {}).get("xk") or [] if k}             # D-069: the keys an element draws inside it
 
 
-def station_marks(W: dict, rows: list, feeds: dict) -> tuple:
+# D-069: the page's own glyphs (lucide, ISC), for the looks the station has no glyph for — my proposal, drawn dashed where they mark a
+# block (the hourglass, the puzzle) and named "my proposal" in the row's legend where they mark a gate or an in-flight kind
+PAGE_SVG = ('<svg class="ico " viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+            'stroke-linejoin="round">{}</svg>')
+PAGE_GLYPH = {
+    "pg:hourglass": '<path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/>'
+                    '<path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>',
+    "pg:puzzle": '<path d="M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 '
+                 '2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 '
+                 '1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 0-.474-1.68l1.683-1.682'
+                 'a2.414 2.414 0 0 1 3.414 0z"/>',
+    "pg:tag": '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/>'
+              '<circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
+    "pg:radio": '<path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/>'
+                '<path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/>',
+    "pg:list-end": '<path d="M16 12H3"/><path d="M16 6H3"/><path d="M10 18H3"/><path d="M21 6v10a2 2 0 0 1-2 2h-5"/><path d="m16 16-2 2 2 2"/>',
+    "pg:hand": '<path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/>'
+               '<path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>',
+    "pg:memory-stick": '<path d="M6 19v-3"/><path d="M10 19v-3"/><path d="M14 19v-3"/><path d="M18 19v-3"/><path d="M8 11V9"/><path d="M16 11V9"/><path d="M12 11V9"/>'
+                       '<path d="M2 15h20"/><path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1.1a2 2 0 0 0 0 3.837V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5.1a2 2 0 0 0 0-3.837Z"/>',
+    "pg:gauge": '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+    "pg:shield-check": '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0'
+                       'C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+    "pg:split": '<path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/>',
+    "pg:reply": '<polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>',
+    "pg:diamond": '<path d="M2.7 10.3a2.41 2.41 0 0 0 0 3.41l7.59 7.59a2.41 2.41 0 0 0 3.41 0l7.59-7.59a2.41 2.41 0 0 0 0-3.41l-7.59-7.59a2.41 2.41 0 0 0-3.41 0Z"/>',
+}
+RDER = collections.Counter()                                  # D-069: the roles the station's own rule gives here, counted for the build line
+
+
+def graft_gate_rule():
+    """the station's gate-by-name rule, read from the station's generator (_a3_graft._is_gate_name) — never retyped here"""
+    sys.path.insert(0, str(GENS))
+    try:
+        return _registry(GENS / "_a3_graft.py")._is_gate_name
+    finally:
+        sys.path.remove(str(GENS))
+
+
+def station_marks(W: dict, rows: list, feeds: dict, fj: dict) -> tuple:
     """D-052: (D.sk, its CSS). The station's glyph, kind colour and badge colours are lifted by _ae_universe.station_kinds; which
     station kind each page key kind is drawn as is the words file's ONE table (station.map, my proposal where not the same),
     checked here: every key kind has a row with its reason, every `to` is a kind the station's tables draw, and every badge family
@@ -3534,7 +3657,21 @@ def station_marks(W: dict, rows: list, feeds: dict) -> tuple:
             if roles.get(k, v) != v:
                 die(f"{k}: two rows read two roles for it")
             roles[k] = v
-    keys, tally = UNI.sk_keys({k for r in rows for k in all_keys(r) | mo_keys(r)}, SK, SM, feeds, roles)
+    # D-069 (P-L14b, his L-14: "they should be given a function icon and a role … I would like to know why"): a role wherever a source
+    # knows it — the station's (its node), the lab's walk (roles_by_key), then the station's OWN rule on two positive facts: accessor
+    # when the forms feed records a read or write in the function's own body, gate by the station's name rule (_a3_graft._is_gate_name,
+    # read from the generator, never retyped). Caller and pure need the whole call graph: never said here
+    allk = {k for r in rows for k in all_keys(r) | mo_keys(r)}
+    own_ops = {s0["fn"] for s0 in (fj.get("steps") or {}).values() if s0.get("fn") and s0.get("table")}
+    is_gate = graft_gate_rule()
+    for k in sorted(allk):
+        if k.startswith("fn:") and k not in roles:
+            q = k[3:]
+            if q in own_ops:
+                roles[k] = "accessor"; RDER["accessor"] += 1
+            elif is_gate(q.split("::")[-1]):
+                roles[k] = "gate"; RDER["gate"] += 1
+    keys, tally = UNI.sk_keys(allk, SK, SM, feeds, roles)
     ents = {v[2] for v in keys.values() if len(v) > 2} | {r["ent"] for r in rows if r.get("ent")}   # the table's entity groups too
     # entities the station's map colours alike (its ENT = the c4 colours): said beside the entity glyphs, never re-coloured here
     same = collections.defaultdict(list)
@@ -3642,6 +3779,11 @@ def build(argv: list) -> tuple:
         r["uni"] = UNI.universe(L, spec, feeds, W["universe"])
     # ── the identity key space (D-041): every element the two columns draw carries one key, the table's rows index them ──
     X, CL = key_index(fj, json.loads(archmap.read_text(encoding="utf-8")), feeds), {}
+    # D-069 (his L-16): each frontend piece's lines, as the c4 graph spans them — a hop of a branch's origin is the piece it stands in
+    X["fespan"] = collections.defaultdict(list)
+    for p0 in (feeds["graph"].get("fe") or {}).get("pieces") or []:
+        if p0.get("span") and p0.get("file") and p0.get("kind") != "fe-type":
+            X["fespan"][p0["file"]].append((p0["span"][0], p0["span"][1], p0["id"], p0.get("name"), p0.get("kind")))
     for L, r in zip(facts, rows):
         keyspace(r, L, fj["endpoints"]["endpoint:" + r["id"]], X, CL, spec["_look"]["lift"]["jReal"][0])
         r["ro"] = roles_by_key(L, r)                                   # the roles the code map's chips wear (D-043)
@@ -3674,7 +3816,7 @@ def build(argv: list) -> tuple:
     for r in rows:
         for k0, x in r["cv"].items():                                    # per field: endpoints where it is b · p · c · e · x
             cv_left.setdefault(k0, [0, 0, 0, 0, 0])["bpcex".index(x[0])] += 1
-    kinds = {k.split(":", 1)[0] for r in rows for k in all_keys(r)}
+    kinds = {k.split(":", 1)[0] for r in rows for k in all_keys(r) | mo_keys(r)}         # D-069: an element draws keys inside it too
     # every kind a key has wears a word; on the whole feed every word names a kind a key has (a fixture of a few endpoints holds fewer)
     if kinds - set(W["el"]["kinds"]) or (not only and set(W["el"]["kinds"]) - kinds):
         die(f"key kinds and the words file's kind words differ: no word for {sorted(kinds - set(W['el']['kinds']))}, a word for none {sorted(set(W['el']['kinds']) - kinds)}")
@@ -3773,7 +3915,7 @@ def build(argv: list) -> tuple:
     icon_names |= {f["icon"] for f in spec["RISK"]["flags"].values()} | {c["icon"] for c in W["cols"].values()}
     icon_names |= {x["icon"] for grp in ("head", "details") for x in CM[grp].values()}
     enc, enc_css, enc_icons = enc_lift(W)                             # the code map's value chips (D-043)
-    sk, sk_css = station_marks(W, rows, feeds)                         # the station's glyph, colour and subcategory per element (D-052)
+    sk, sk_css = station_marks(W, rows, feeds, fj)                         # the station's glyph, colour and subcategory per element (D-052)
     enc_css += "\n" + sk_css
     for r in rows:
         r.pop("ro")                                                     # the roles now ride the station's marks (D.sk.keys)
@@ -3783,6 +3925,18 @@ def build(argv: list) -> tuple:
     lab = UNI.lab_marks()
     marks = UNI.marks(blocks, got["parts"], W, lab)
     got["icons"].update({m["icon"]: m["svg"] for m in lab.values()})
+    # D-069 (his L-17: "give it an appropriate icon to that row", L-18: "let's give it an icon also"): the page's own glyphs, and the
+    # rows whose mark is my pick — In-flight state and Standard or specialist, which have no page in the lab (D-022)
+    got["icons"].update({k: PAGE_SVG.format(v) for k, v in PAGE_GLYPH.items()})
+    for f0, ic in (W["marks"].get("own") or {}).items():
+        b0 = MO["fam"].get(f0) or die(f"marks.own names {f0!r}, which is no BY MOMENT row")
+        if marks[b0]["from"] == "part" or ic not in got["icons"]:
+            die(f"marks.own.{f0}: block {b0} has a part's mark, or its icon {ic!r} is not drawn")
+        marks[b0] = dict(marks[b0], icon=ic, col="var(--if)" if f0 == "inf" else marks[b0]["col"], **{"from": "own"})
+    for f0, x0 in W["enc"]["fam"].items():                           # every icon a family of mine names is drawn
+        lost = sorted({v0.get("icon") for v0 in (x0.get("vals") or {}).values() if isinstance(v0, dict) and v0.get("icon")} - set(got["icons"]))
+        if lost and f0 in ("ifk", "gdk"):
+            die(f"enc.fam.{f0}: icons nothing draws: {lost}")
     uni_css, ulook = UNI.ulook(spec, [r["uni"] for r in rows])          # the station's card look, lifted (D-040)
     uspec = [{"row": x, "icon": (spec.get(x) or {}).get("icon"), "title": (spec.get(x) or {}).get("title"), "name": UW["rows"][x]["name"], "attrs": UW["rows"][x]["attrs"]} for x, _ in UNI.ROWS]
     attrs = {a_id: {"label": a["label"], "plain": a["plain"], "r": a["r"], "home": a.get("home"), "shared": bool(a.get("shared")),
@@ -3962,6 +4116,12 @@ def build(argv: list) -> tuple:
                 + (f"\n        POST /cooking/sessions · the hide headers: the code map {cs['cvn'][0]} of {cs['cvn'][1]} · {cs['cvn'][1] - cs['cvn'][0] - cs['cvn'][2]} left · {cs['cvn'][2]} with nothing here"
                    f" · the universe {cs['ucn'][0]} of {cs['ucn'][1]} · {cs['ucn'][1] - cs['ucn'][0]} left · THE GAPS from the universe {cs['gcn']['uni'][0]} of {cs['gcn']['uni'][1]}"
                    f" · from the code map {cs['gcn']['cm'][0]} of {cs['gcn']['cm'][1]}" if cs else ""))
+    # D-069: what each element says it is — the gates' hosts, the roles the station's own rule gives, the client's reads and branches
+    summary += (f"\nD-069 · gates and switches with a host {sum(v for k, v in MOT.items() if k.startswith('c1:host:'))} ("
+                + " · ".join(f"{k[8:]} {v}" for k, v in sorted(MOT.items()) if k.startswith("c1:host:")) + f"), with an effect {MOT['c1:eff']}"
+                f" · roles by the station's own rule: accessor {RDER['accessor']} · gate {RDER['gate']} · classes drawn as their schema or model {MOT['c1:class']}"
+                f" · functions marked with what they decide and touch {MOT['c1:fnMarks']} · rare pieces {MOT['c1:rare']} ({MOT['c1:rareTg']} naming a drawn item)"
+                f" · reads a refresh fetches again {MOT['c1:refetch']} · 'any other status' lines {MOT['c1:rest']} · hooks on the way to a send {MOT['c1:orch']}")
     return html, summary, out, check
 
 

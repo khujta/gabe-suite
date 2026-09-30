@@ -141,9 +141,10 @@ deferred + trigger).
 - **read as:** "the forks that decide something" · "ideally a function, with a function role"
 - **where:** BY MOMENT · Gates and decisions · at the edge · `sensitive` and `global` — and the other G&D cells
 - **could not tell:** what kind of thing a gate chip is (it wears no glyph) and which function it lives in.
-- **fix:** every gate or decision names the function it runs in, with the function's glyph and role (repeats are fine).
+- **fix:** BUILT — every gate and switch names the function (or middleware) it runs in, a station element with its glyph and role
+  (`_ae_els.gates` · all-endpoints.tpl.html `gdHost`/`moCell`); a gate wears the page's own icon per kind (my pick, dashed).
 - **tag:** `element-without-identity`
-- **status:** logged
+- **status:** built (D-069); the gate icons — option, his to pick (D-069)
 
 ### L-10
 - **words:** "Then we have some in the column checks. We have some return codes like 409, 400, then in the next column
@@ -157,10 +158,10 @@ deferred + trigger).
 - **read as:** "a chain of functions"
 - **where:** BY MOMENT · Gates and decisions · checks (409, 400) · subscription_tier_for +2 (404, 409)
 - **could not tell:** which function evaluates a condition and what its result does — an ending, a validation, a branch.
-- **fix:** G&D as chains — function → condition (the flag or expression) → effect (ending · validation · branch), the effect
-  coloured by the stage or branch it leads to. A representation: built as options, decided by seeing.
+- **fix:** BUILT — each gate is function → condition → what happens (the ending's status with its stage lit, or "returns" · "passes
+  the error on" · "goes on"); three looks and two effect colours in the Gates row's options slot (`gdChip`, `gdEff`).
 - **tag:** `condition-without-actor-or-effect`
-- **status:** logged
+- **status:** option — his to pick (D-069)
 
 ### L-11
 - **words:** "by the way, in gates and decisions, in gates and decisions, we might have, okay, we will have the functions
@@ -169,9 +170,10 @@ deferred + trigger).
   similar since they validate things on different levels."
 - **where:** BY MOMENT · Gates and decisions (the whole row)
 - **could not tell:** at which level a gate decides — the chips carry no subcategory.
-- **fix:** a proposal of G&D roles read from the feed's own categories, shown as an option.
+- **fix:** BUILT — a label at each gate's end from the feed's own categories: where it decides (my pick) · what it does · what a check
+  guards · none, in the Gates row's options slot (`gdRole`, words enc.fam.gdl/gdv/gdc).
 - **tag:** `kind-without-subcategory`
-- **status:** logged (question)
+- **status:** option — his to pick (D-069)
 
 ### L-12
 - **words:** "Data effects the same thing for gates and decisions. We are doing things on tables basically. That's what we
@@ -185,10 +187,10 @@ deferred + trigger).
 - **where:** BY MOMENT · Data effects
 - **could not tell:** which function does which operation on which table — the row lists tables with R/W beside a few
   functions, never the link between them.
-- **fix:** functions on the left, tables on the right, connectors coloured by operation (the page's existing read/write
-  encoding reused). A representation: built as options.
+- **fix:** BUILT (the R/W colour only) — BY MOMENT's R and W letters wear the code map's read-green / write-orange chip; the functions →
+  tables connector view is batch C2's.
 - **tag:** `relation-flattened-into-a-list`
-- **status:** logged
+- **status:** built (D-069) — the R/W colour; the connector view is batch C2's
 
 ### L-13
 - **words:** "in functions again, we will have to do kind of the same thing that we did on the endpoint lab for the tables for
@@ -208,9 +210,10 @@ deferred + trigger).
 - **read as:** `ResolutionSnapshot.violations_for` · `derive_restrictions` · `get_idempotency_key`
 - **where:** BY MOMENT · Functions · subscription_tier_for +2 and checks
 - **could not tell:** whether those names are functions at all.
-- **fix:** a function always wears the function glyph; its role where the map knows it; the why answered on the page.
+- **fix:** BUILT — a function always wears the function glyph; its role from the station, the lab's walk, else the station's own rule on
+  the feed (accessor · gate); no role: glyph and name, the hover says what it does; the why is answered in D-069, not on the page.
 - **tag:** `element-without-identity`
-- **status:** logged
+- **status:** built (D-069)
 
 ### L-15
 - **words:** "on client, we have the hook— okay. Can we somehow associate that hook with some schema or table? I don't know. I'm
@@ -218,9 +221,10 @@ deferred + trigger).
   and from where?"
 - **where:** BY MOMENT · Client · after the answer · the hook `refresh ["cooking"]`, role fetcher
 - **could not tell:** what the fetcher fetches (which endpoint, which schema, which tables) and from where.
-- **fix:** the hook names its fetch — the endpoint it calls, the schema that answers, the tables behind — and its file.
+- **fix:** BUILT — the refresh names its trigger and, one line each, the hooks that fetch again and the GET each sends; its hover names
+  each reply and the tables behind it (`_ae_els.refetches`, `refetchChip`).
 - **tag:** `role-without-its-object`
-- **status:** logged
+- **status:** built (D-069)
 
 ### L-16
 - **words:** "And the same thing in the— after the answer column for client, we have some ending for 403 and 404. Why do they
@@ -228,9 +232,10 @@ deferred + trigger).
 - **read as:** "Which function, and what is happening there?"
 - **where:** BY MOMENT · Client · after the answer · `cookingSessionModel.ts:381 403` · `:384 404` · `:389 409`
 - **could not tell:** why the client branch fires, in which function, and what it does — the chip shows a file and a line.
-- **fix:** the branch names the function it sits in, the endings of this endpoint that reach it, and what it does.
+- **fix:** BUILT — the branches stand under their function (describeStartCookingError) with the way the error comes, each line
+  "reads 409 ×2 → “…”", an "any other status" line last; the send cell reads in tap order (`moCell`, `_ae_io` client lines).
 - **tag:** `location-without-actor`
-- **status:** logged
+- **status:** built (D-069)
 
 ### L-17
 - **words:** "In flight state is something very important and I would like to give it an appropriate icon to that row." — and:
@@ -241,9 +246,10 @@ deferred + trigger).
 - **read as:** "in-flight state"
 - **where:** BY MOMENT · In-flight state (`dependency-value session`, `dependency-value ctx`)
 - **could not tell:** what an in-flight item is and what it affects; the row has no icon.
-- **fix:** a row icon; each item with its kind's glyph and colour and what it affects; possibilities shown as options.
+- **fix:** BUILT — the row wears an hourglass (my pick, dashed); each value its kind's glyph in the row's hue, its type, its kind in
+  plain words and its lifetime (request · server), filled when the server keeps it; its head's hover says what the row asks.
 - **tag:** `role-without-its-object`
-- **status:** logged
+- **status:** built (D-069); what each value affects across the moments (the lifelines) is batch C2's
 
 ### L-18
 - **words:** "Then standard of specialists, let's give it an icon also. We have here flags, binding, and different things um.
@@ -254,9 +260,10 @@ deferred + trigger).
 - **where:** BY MOMENT · Standard or specialist (`binding TokenVerifier`, `reads a repeat key`, `claims its key with
   get-or-create`, `can answer 403`)
 - **could not tell:** what the row represents.
-- **fix:** a row icon; the row explained on the page; merging it into Gates and decisions evaluated and shown as an option.
+- **fix:** BUILT — a puzzle mark (my pick, dashed); the row's question on its head's hover, answered in D-069; split into the gates (my
+  pick) · merged · kept as its row, in the options slot; a switch shows the endings it can change, a piece how rare it is.
 - **tag:** `concept-never-explained`
-- **status:** logged (question)
+- **status:** question — answered on the review page (D-069); split · merge · keep — option, his to pick (D-069)
 
 ### L-19
 - **words:** "I think that we are about to consolidate the sections so we might have endings proof case and decisions data and

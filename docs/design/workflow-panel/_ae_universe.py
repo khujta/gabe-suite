@@ -1404,8 +1404,8 @@ def sk_keys(keys: set, SK: dict, M: dict, feeds: dict, roles: dict) -> tuple:
     station's own feeds hold its node — the c4 graph's l2 nodes (endpoint · schema · flag · a model by its table · an unclaimed
     file), its frontend pieces, the levels map's functions; a mapping is never a promise the station keeps. A setting the station
     names as a flag's alias (the flag node's det.aliases) IS that flag. The subcategory is read from the same feeds; only a value
-    __BADGE_COL colours is a label. A function the station holds no node for wears no glyph, but keeps its role as a label (None
-    kind): D-043's role chip, read the station's way from the lab's facts (`roles`)."""
+    __BADGE_COL colours is a label. A function always wears the function glyph (D-069, P-L14a: the kind is certain even where the
+    station holds no node for it) and its role where a source knows it (`roles`: the lab's facts, then the station's own rule)."""
     G, LV = feeds["graph"], json.loads((EX / "levels.json").read_text(encoding="utf-8"))
     nodes = {p["id"]: p for e in (G.get("l2") or {}).values() for p in e.get("nodes") or []}
     t2m = {p["table"]: p for p in nodes.values() if p.get("kind") == "model" and p.get("table")}
@@ -1446,10 +1446,12 @@ def sk_keys(keys: set, SK: dict, M: dict, feeds: dict, roles: dict) -> tuple:
                 m = meth.match(n.get("label") or ident)
                 subs = sub("method", m.group(1) if m else None) + (sub("delivery", SK["stream"]) if n.get("stream") else [])
         elif to == "function":
-            if ident in fnr:
-                subs = sub("role", fnr[ident])
-            else:                                                        # no node: no glyph, the role label stays (D-043)
-                to, subs = None, sub("role", roles.get(K))
+            # D-069 (P-L14a, his L-14: "if they are functions, they should be given a function icon"): a function wears the function
+            # glyph whether or not the station draws its node — the kind is certain; its role where a source knows it (the station's,
+            # else the lab's walk, else the station's own rule on the feed's facts: gen-all-endpoints.station_marks)
+            subs = sub("role", fnr[ident]) if ident in fnr else sub("role", roles.get(K))
+        elif to == "middleware":                                        # D-069 (L-09): a middleware the station draws as a node
+            to = to if K in nodes else None
         elif to == "model":
             to = "model" if kind != "table" or ident in t2m else None
         elif to in ("schema", "flag"):

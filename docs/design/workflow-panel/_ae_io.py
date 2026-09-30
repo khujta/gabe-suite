@@ -81,6 +81,9 @@ class Ctx:
                     self.cases[c["id"]] = (c, x)
         self.dep_vals = [x.get("param") or x.get("name") for x in (F.get("inflight") or {}).get("rows") or [] if x.get("set_in") == "dependency"]
         self.inside = {f.get("fn"): f for f in (F.get("inside") or {}).get("functions") or []}
+        self.req = None                                          # D-069: the request body's schema (set by by_moment, where it is read)
+        mdl = ((fep.get("declared") or {}).get("response_model") or {}).get("name")
+        self.ok = sorted({(x.get("status"), mdl) for x in F.get("exits") or [] if x.get("kind") == "success" and mdl}, key=str)
 
     def st(self, xid):
         x = self.XS.get(xid) or {}
@@ -167,6 +170,8 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
     # ── GATES AND DECISIONS ──
     elif f == "gate":
         p, _s, v = idn.partition(":")
+        if X.get("gh") and p != "a":                             # D-069 (his L-09): the function (or middleware) it runs in, first
+            b.append(_L("hostIn", fn=X["gh"][1]))
         if p == "g":                                             # the endpoint's own check
             q = C.fpre.get(v) or {}
             k = "guard"
@@ -259,6 +264,10 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
         rec = C.fns.get(fid) or {}
         ins = C.inside.get(fid) or {}
         k = "handler" if fid == C.H else "fn"
+        k0 = str((e.get("keys") or [""])[0])
+        if k0.startswith(("schema:", "table:")):                  # D-069 (P-L14d): a class the handler builds, not a function
+            k = "built"
+            c.append(_L("builds", v=name))
         par = C.par.get(fid)                                     # the function that calls it, in the walk from the handler
         if fid == C.H:
             if C.dep_vals:
@@ -300,6 +309,12 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             g.append(_L("commitsAt", at=_short(cm.get("at") if isinstance(cm, dict) else (C.steps.get(cm) or {}).get("at") or cm)))
         for q in X.get("ru") or []:
             g.append(_L("x.uncaught", cls=q[0], at=q[1]))
+        for x0 in C.inf.values():                                # D-069 (P-L14c): an in-flight value its own body reads
+            for q in x0.get("read_at") or []:
+                if q.get("fn") == fid and (x0.get("set_by") or x0.get("set_at")):
+                    sb = str(x0.get("set_by") or "")
+                    b.append(_L("readsInf", v=x0.get("name") or "?", fn=_nm(sb.split(":", 1)[-1] if sb.startswith("middleware:") else sb) or "?", at=_short(x0.get("set_at"))))
+                    break
     # ── STRUCTURES ──
     elif f == "shape":
         S = C.fj.get("schemas") or {}
@@ -343,13 +358,37 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
         if p == "s:":
             s = C.sites.get(idn[2:]) or {}
             k = "reason"
-            if s.get("piece"):
-                b.append(_L("inFn", fn=str(s["piece"]).split("#")[-1]))
+            pc = X.get("pc") or [None, None, None, {}]
+            if s.get("piece") or pc[1]:
+                b.append(_L("inFn", fn=pc[1] or str(s["piece"]).split("#")[-1]))
+            if X.get("rx"):                                      # D-069 (his L-16: "why do they trigger?"): the endings that reach it
+                b.append(_L("reachedBy", v=_cap([f"{C.st(x0)} {_says(C.XS.get(x0) or {})}".strip() for x0 in X["rx"]])))
+            hx = pc[3] or {}
+            if hx.get("via"):                                    # … and in which context: the code that hands it the error
+                b.append(_L("handedAt", v=", ".join(hx["via"]) + (" (" + ", ".join(str(q) for q in hx.get("err") or []) + ")" if hx.get("err") else "")))
             rd = X.get("rd") or []
             if len(rd) > 2 and rd[2] is not None:
                 c.append(_L("x.reads", what=rd[0], op=rd[1], v=rd[2]))
             if X.get("dw"):
                 g.append(_L("x.does", v=X["dw"]))
+            if X.get("al"):
+                g.append(_L("collapsed", n=len(X.get("rx") or [])))
+        elif p == "t:":                                          # D-069 (client P3): what no branch of the function compares
+            k = "rest"
+            pc = X.get("pc") or [None, None]
+            name = str(pc[1] or "")
+            b.append(_L("inFn", fn=name or "?"))
+            c.append(_L("restEnds", v=_cap([f"{C.st(x0)} {_says(C.XS.get(x0) or {})}".strip() for x0 in X.get("rx") or []])))
+            g.append(_L("restDoes"))
+        elif p == "y:":                                          # D-069 (client P5): a hook on the way from the screen to the send
+            k = "orch"
+            ox = X.get("ox") or {}
+            if ox.get("scr"):
+                b.append(_L("usedBy", v=ox["scr"]))
+            if ox.get("send"):
+                c.append(_L("callsAt", fn=", ".join(ox.get("to") or []) or "?", v=", ".join(str(q) for q in ox["send"])))
+            if ox.get("err"):
+                g.append(_L("errAt", v=", ".join(str(q) for q in ox["err"])))
         elif p == "o:":
             k = "cache"
             h = str(e.get("hint") or "")
@@ -358,6 +397,13 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
                 b.append(_L("onWhen", v=wn))
             c.append(_L("cacheAt", at=at or "?"))
             g.append(_L("refreshKey" if (ch[1:2] == ["refresh"]) else "seedKey", v=name.split(" ", 1)[-1]))
+            for q in X.get("rf") or []:                          # D-069 (his L-15: "what is fetching and from where?")
+                m0, _s, p0 = str(q[4] or "").partition(" ")
+                g.append(_L("refetch", hook=q[1], m=m0 or "?", p=p0 or "?"))
+                if q[5]:
+                    g.append(_L("refetchReply", hook=q[1], v=q[5], tbl=_cap(q[6])) if q[6] else _L("refetchReplyBare", hook=q[1], v=q[5]))
+                if q[7]:
+                    g.append(_L("refetchWrote", v=" · ".join(q[7]), hook=q[1]))
             name = name.split(" ", 1)[0]
         elif p == "v:":
             k = "screen"
@@ -369,6 +415,8 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
             pid = (e.get("keys") or [None])[0]
             pc = ((C.fj.get("frontend") or {}).get("pieces") or {}).get(pid) or {}
             calls = [q for q in pc.get("calls") or [] if q.get("endpoint") == C.E]
+            if calls and C.req:                                  # D-069 (client P5): what it sends, what comes back, where an error goes
+                b.append(_L("sendsBody", v=C.req))
             for q in calls:
                 if q.get("callee"):
                     c.append(_L("through", v=q["callee"], at=_short(q.get("at"))))
@@ -380,6 +428,16 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
                     g.append(_L("seed", when=o.get("when") or "?", v=json.dumps(o.get("key"), ensure_ascii=False)))
             if not calls:
                 c.append(_L("fetches"))
+            else:
+                pol = next((q.get("policy") or {} for q in ((C.fj.get("frontend") or {}).get("client") or {}).get("clients") or []), {})
+                rt = ((pol.get("mutations") or {}).get("retry") or {})
+                if any(q.get("kind") == "mutation" for q in calls) and rt.get("state") == "defined" and rt.get("value") is False:
+                    c.append(_L("noRetry", at=_short(next((q.get("at") for q in ((C.fj.get("frontend") or {}).get("client") or {}).get("clients") or []), "")) or "?"))
+                for st, mdl in C.ok:
+                    g.append(_L("okTo", st=st, v=mdl))
+                rf = sorted({str(rd.get("fn") or "") for rd in (((C.fj.get("frontend") or {}).get("reasons") or {}).get("readers") or {}).get(C.E) or []} - {""})
+                if rf:
+                    g.append(_L("errTo", v=_cap(rf)))
     # ── IN-FLIGHT STATE ──
     elif f == "inf":
         ik = idn[2:]
@@ -387,6 +445,8 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
         k = "inflight"
         if x.get("set_by") or x.get("set_at"):
             b.append(_L("setBy", fn=_nm(str(x.get("set_by") or "?").split(":", 1)[-1] if str(x.get("set_by") or "").startswith("middleware:") else x.get("set_by")), at=_short(x.get("set_at"))))
+        if X.get("ty"):
+            c.append(_L("holdsA", v=X["ty"]))
         ra = [_short(q.get("at")) for q in x.get("read_at") or []]
         if ra:
             c.append(_L("readAt1", v=ra[0]) if len(ra) == 1 else _L("readAt", n=len(ra), v=_cap(ra)))
@@ -399,6 +459,8 @@ def io_of(e: dict, xx: dict, C: Ctx) -> dict:
         if idn.startswith("w:"):
             w = dict(C.sw.get(idn[2:]) or {}, **(C.fsw.get(idn[2:]) or {}))   # the feed's own record: its settings with env and default
             k = "switch"
+            if X.get("gh"):                                      # D-069: the function (or middleware) it switches in
+                b.append(_L("hostIn", fn=X["gh"][1]))
             ss = w.get("settings") or {}
             for sname in sorted(ss):
                 sv = ss[sname] if isinstance(ss, dict) and isinstance(ss[sname], dict) else {}

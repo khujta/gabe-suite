@@ -2,6 +2,7 @@
   "_about": "Authored words for all-endpoints.html — the only strings on the page that are not facts. gen-all-endpoints.py refuses to build when a line here types a number (a {token} the generator or the page fills instead) or says a word D-018 took out. Tokens the generator fills are listed in its `tok`; the ones the page fills while it runs are listed in _runtime.",
   "_runtime": [
     "env",
+    "hook",
     "fn",
     "impl",
     "lim",
@@ -937,6 +938,116 @@
           "min": { "name": "narrow the rest", "plain": "The fit button narrows the columns that do not fit, the ones with fewest items first, to a strip where each cell says how many items it holds; click a strip to widen it. A widened column keeps its width." },
           "bands": { "name": "wrap into bands", "plain": "The fit button wraps the table into bands of moments that fit the box, one under the other: time runs left to right, then down." }
         }
+      },
+      "gdl": {
+        "_about": "D-069, his L-10 (\"we will most likely mutate that to have a chain of functions with the actual gates and decisions … and then the effect of that\"): how a gate's chain function → condition → effect is drawn. All three are my proposal (D-025.2); the function as a head with its gates under it is my pick, dashed.",
+        "label": "the gates",
+        "pick": "head",
+        "opts": {
+          "chain": {
+            "name": "one chain per gate",
+            "plain": "Each gate is one chip: the function it runs in, then its condition, then what happens. The function repeats on each of its gates."
+          },
+          "head": {
+            "name": "function, gates under it",
+            "plain": "The function each gate runs in is a head, with its gates under it, one line each: condition, then what happens."
+          },
+          "cols": {
+            "name": "function · condition · effect",
+            "plain": "Each gate is a row of parts side by side, function, condition and what happens, so the effects line up."
+          }
+        }
+      },
+      "gef": {
+        "_about": "D-069, his L-10 (\"we should encode that with some color … for that branch or the stage\"): how a gate's effect is coloured. Both are my proposal; the ending's own colour with the stage lit is my pick, dashed.",
+        "label": "the effect",
+        "pick": "end",
+        "opts": {
+          "end": {
+            "name": "ending's colour, stage lit",
+            "plain": "The effect is the ending's status in its own colour, and a small spine of the stages with the one it leaves from lit."
+          },
+          "stage": {
+            "name": "a colour per stage",
+            "plain": "The effect is the ending's status on a band in the colour of the stage it leaves from."
+          }
+        }
+      },
+      "gic": {
+        "_about": "D-069, his L-09: the station draws no node for a gate, so a gate wears this page's own icon. An icon per kind is my pick, dashed.",
+        "label": "gate icons",
+        "pick": "each",
+        "opts": {
+          "each": {
+            "name": "an icon per kind",
+            "plain": "A rate limit, a check, a fork, a catch and a switch each wear an icon of their own."
+          },
+          "one": {
+            "name": "one gate icon",
+            "plain": "Every gate wears the same icon; the label at its end tells them apart."
+          },
+          "none": {
+            "name": "no icon",
+            "plain": "A gate wears no icon, as before."
+          }
+        }
+      },
+      "grl": {
+        "_about": "D-069, his L-11 (\"can we also put some roles in the gates and decisions themselves? … they validate things on different levels\"): the label at a gate's end. Where it decides is my pick, dashed.",
+        "label": "gate roles",
+        "pick": "where",
+        "opts": {
+          "where": {
+            "name": "where it decides",
+            "plain": "The label says where the gate decides: app-wide, at login, in a dependency, in the handler, or inside a call."
+          },
+          "what": {
+            "name": "what it does",
+            "plain": "The label says what the gate does: refuses, translates, routes, passes on or swallows."
+          },
+          "guards": {
+            "name": "what it guards",
+            "plain": "A check's label says what its refusal means: bad input, not found, conflict and so on; other gates wear none."
+          },
+          "off": {
+            "name": "no label",
+            "plain": "Gates wear no role label."
+          }
+        }
+      },
+      "fnm": {
+        "_about": "D-069 (lost-columns P2, his L-20 and L-12): a function chip shows what gets it counted in the pinned row. Showing them is my pick, dashed.",
+        "label": "function marks",
+        "pick": "on",
+        "opts": {
+          "on": {
+            "name": "what it decides and touches",
+            "plain": "A function shows the statuses its own code decides, and R or W for each table it reads or writes here; the login check's own tables are hollow."
+          },
+          "off": {
+            "name": "name and role only",
+            "plain": "A function shows its name and role only."
+          }
+        }
+      },
+      "std": {
+        "_about": "D-069, his L-18 (\"I'm not sure what we are representing here … maybe merged with gates and decisions … tell me about that\"): where Standard or specialist's items stand. All three are my proposal; splitting it is my pick, dashed. In each, the row's head says the question it answers.",
+        "label": "standard or specialist",
+        "pick": "split",
+        "opts": {
+          "split": {
+            "name": "split into the gates",
+            "plain": "A switch stands in Gates and decisions beside what it switches, marked set by settings; a rare piece becomes a label at the end of the item it names. The row leaves the table."
+          },
+          "merge": {
+            "name": "merge into the gates",
+            "plain": "Every item of the row stands in Gates and decisions as it is. The row leaves the table."
+          },
+          "keep": {
+            "name": "keep the row",
+            "plain": "The row stays, in lanes: what the server's settings switch, and what is rare here."
+          }
+        }
       }
     },
     "sets": { "table": "the table", "items": "the items", "cols": "the columns" },
@@ -1114,7 +1225,19 @@
         "rule": { "plain": "A rule FastAPI checks on the input; when it fails, the answer is a 422." },
         "case": { "plain": "A test that calls this endpoint, and the ending it proves." },
         "journey": { "name": "journey", "plain": "A test that calls this endpoint and others, one after another; its chip stands for its requests before this one, or after it." },
-        "jstep": { "name": "journey step", "plain": "One request a journey makes to another endpoint, in its place in the walk." }
+        "jstep": { "name": "journey step", "plain": "One request a journey makes to another endpoint, in its place in the walk." },
+        "built": {
+          "name": "a class it builds",
+          "plain": "A class the code builds here: a schema or a model, not a function."
+        },
+        "rest": {
+          "name": "any other status",
+          "plain": "The endings a client function has no branch for: none of its comparisons matches them."
+        },
+        "orch": {
+          "name": "hook on the way",
+          "plain": "Frontend code between the screen and the hook that sends the request: it calls that hook and takes its errors."
+        }
       },
       "outcome": {
         "swallow": "swallows the error: the code goes on",
@@ -1143,7 +1266,7 @@
         "ansBare": "answers {st}",
         "ends": "ends the request with {st}: {v}",
         "endsBare": "ends the request with {st}",
-        "endsUnknown": "raises a {st}; the ending it becomes is not known",
+        "endsUnknown": "raises a {st}; the ending it becomes is not recorded",
         "proves": "proves the {st}: {v}",
         "provesBare": "proves the {st}",
         "provesAt": "proves the {st} from {at}: {v}",
@@ -1221,7 +1344,27 @@
         "sendsNone": "sends no headers",
         "tcall": "calls {m} {p}, at line {ln}",
         "svc": "calls the code behind the endpoint directly, not the endpoint",
-        "state": "last run: {v}"
+        "state": "last run: {v}",
+        "hostIn": "runs in {fn}",
+        "refetch": "{hook} fetches again: {m} {p}",
+        "refetchReply": "{hook} gets back {v}, read from {tbl}",
+        "refetchReplyBare": "{hook} gets back {v}",
+        "refetchWrote": "this request wrote {v}, which {hook} reads",
+        "reachedBy": "reached by {v}",
+        "handedAt": "the error comes from {v}",
+        "collapsed": "the same text for {n} endings: a user cannot tell them apart",
+        "restEnds": "none of its branches compares these: {v}",
+        "restDoes": "what the code does then is not recorded",
+        "usedBy": "used by {v}",
+        "callsAt": "calls {fn} at lines {v}",
+        "errAt": "hands its error on at lines {v}",
+        "sendsBody": "sends {v}",
+        "noRetry": "a failed send is not tried again ({at})",
+        "okTo": "a success answers {st} with {v}",
+        "errTo": "an error goes to {v}",
+        "holdsA": "its value: {v}",
+        "builds": "builds {v}",
+        "readsInf": "reads {v}, set by {fn} ({at})"
       }
     },
     "leg": {
@@ -1277,9 +1420,33 @@
       "reads": "reads the {what}: {op} {v}",
       "does": "what it does: {v}",
       "cause": "escapes from {cls}, raised at {at}",
-      "uncaught": "raises {cls} at {at}, and nothing catches it"
+      "uncaught": "raises {cls} at {at}, and nothing catches it",
+      "c1": {
+        "_about": "D-069: the words on the faces of the items batch C1 built (his L-09 … L-18).",
+        "reads": "reads",
+        "rareOf": "{n} of {of}",
+        "rare": "rare · {n} of {of}",
+        "set": "set by settings",
+        "any": "any other status",
+        "onSucc": "on success",
+        "onErr": "on error",
+        "via": "from {v}",
+        "err": "error handed over at lines {v}",
+        "sendsAt": "sends it at {v}",
+        "times": "×{n}",
+        "collapsed": "the same text for {n} endings",
+        "rareHere": "rare here",
+        "fall": "otherwise",
+        "unk": "unknown"
+      }
     },
-    "noCode": "No refusal this app sends carries a code of its own ({nCoded} of its {nRefusals}): a client tells one refusal from another by the status and the words alone."
+    "noCode": "No refusal this app sends carries a code of its own ({nCoded} of its {nRefusals}): a client tells one refusal from another by the status and the words alone.",
+    "rowq": {
+      "_about": "D-069 (his L-17, L-18): the question a row answers, in plain words, on its head's hover.",
+      "gate": "Where can the request be stopped or sent another way: in which function, on what condition, and what happens then?",
+      "inf": "What does the request carry while it runs, and how long does each value live: until the answer is sent, or as long as the server runs?",
+      "std": "Is this endpoint built like the others, and what is unusual about it? A switch is set by the server's settings and changes a way the request can go; a rare piece is something few other endpoints have."
+    }
   },
   "carry": {
     "_about": "D-055: his ask 2026-09-26, a switch in the code map that dims or hides every field BY MOMENT already carries, to see what else is there. Its three looks and the default (show all) are my proposal (D-025.2): the default is my pick, dashed. What counts as carried is read by gen-all-endpoints.py (carried) and proven there.",
@@ -1656,7 +1823,7 @@
         "5": { "name": "a server error status", "plain": "The server failed; nothing the caller changes fixes it." } } },
       "fate": { "name": "fate of the writes", "col": "table" },
       "piece": { "name": "how common the piece is", "col": "table" },
-      "ifk": { "name": "kind of in-flight value", "ico": "lab" },
+      "ifk": {"name": "kind of in-flight value", "ico": "mine", "_about": "D-069, his L-17 (\"give it an appropriate icon … a better representation with some icon coloring\"): each kind its own glyph and a plain label at the chip's end, replacing the feed's machine word; one hue for the row, the lifetime by the chip's fill. My proposal (D-025.2), not the lab's catalogue.", "vals": {"state": {"icon": "pg:tag", "name": "on the request", "plain": "Kept on the request itself, for code later in the same request to read."}, "contextvar": {"icon": "pg:radio", "name": "in context", "plain": "A context value the code reads without it being passed along."}, "dependency-value": {"icon": "link", "name": "from a dependency", "plain": "Handed to the handler by one of its dependencies."}, "background": {"icon": "pg:list-end", "name": "after the answer", "plain": "Queued to run once the answer has been sent."}, "lock": {"icon": "pg:hand", "name": "held", "plain": "Held by this request so no other request can take it at the same time."}, "cache": {"icon": "layers", "name": "cached", "plain": "An answer kept from an earlier request and reused."}, "built-once": {"icon": "pg:memory-stick", "name": "built at start", "plain": "Built once when the server starts; every request uses the same one."}, "setting-once": {"icon": "role", "name": "setting at start", "plain": "A setting read once when the server starts; every request uses that value."}}},
       "life": { "name": "how long it lives", "col": "lab", "vals": {
         "with the answer": { "plain": "It is gone when the reply is sent: each request has its own." },
         "with the server process": { "plain": "It stays while the server runs: every request shares it." },
@@ -1682,7 +1849,7 @@
         "reads": { "icon": "show", "plain": "The branch reads the reason the endpoint gives." },
         "passed": { "icon": "suffix", "plain": "The branch hands the error to code that reads it." },
         "value": { "icon": "sub", "plain": "The branch only picks a value." },
-        "none": { "icon": "skip", "plain": "The branch uses neither the reason nor the error." },
+        "none": { "icon": "skip", "plain": "It decides by the status alone; the words the server sent are not read." },
         "unread": { "icon": "opacity", "plain": "What the branch does is not read: its condition is too long." },
         "_other": { "icon": "info", "plain": "What the branch does with the reason." } } },
       "does": { "name": "what the map read of the branch", "ico": "mine", "vals": {
@@ -1697,7 +1864,198 @@
         "model": { "icon": "polygon", "name": "a rule of the whole shape: a field required, a field not allowed, a value from a list", "table": "MODEL_ERRORS" },
         "validator": { "icon": "function", "name": "a rule the app's own validator raises", "table": "RAISE_ERRORS" },
         "other": { "icon": "info", "name": "a rule of another kind" } } },
-      "limit": { "name": "rate limiter", "ico": "mine", "icon": "middleware", "plain": "It lets this many requests through per window, then refuses." }
+      "limit": { "name": "rate limiter", "ico": "mine", "icon": "middleware", "plain": "It lets this many requests through per window, then refuses." },
+      "gdk": {
+        "mo": true,
+        "name": "kind of gate",
+        "ico": "mine",
+        "_about": "D-069, his L-09 (\"many columns with items that have no icon … I would like to know why\"): the station draws no node for a gate, so it keeps this page's own look; each kind its icon (my pick) or one gate icon for all (mo.opt.gic).",
+        "vals": {
+          "l": {
+            "icon": "pg:gauge",
+            "name": "rate limit",
+            "plain": "It counts a caller's requests over a window and refuses the one past the limit. My proposal: the station draws no node for this."
+          },
+          "g": {
+            "icon": "pg:shield-check",
+            "name": "check",
+            "plain": "A condition in the code; when it holds, the request ends. My proposal: the station draws no node for this."
+          },
+          "a": {
+            "icon": "key",
+            "name": "login check",
+            "plain": "The dependency that reads the caller's credential and decides who the caller is."
+          },
+          "b": {
+            "icon": "pg:split",
+            "name": "fork",
+            "plain": "A branch whose arms send the request different ways. My proposal: the station draws no node for this."
+          },
+          "c": {
+            "icon": "pg:reply",
+            "name": "catch",
+            "plain": "An except: an error raised below is caught here and turned into an answer, or let through. My proposal: the station draws no node for this."
+          },
+          "w": {
+            "icon": "config",
+            "name": "switch",
+            "plain": "A setting or a plugged-in part, set by the server's settings, that changes a way the request can go. My proposal: the station draws no node for this."
+          },
+          "one": {
+            "icon": "pg:diamond",
+            "name": "gate",
+            "plain": "A place where the code decides: a limit, a check, a fork or a catch. My proposal: the station draws no node for this."
+          }
+        }
+      },
+      "gdl": {
+        "mo": true,
+        "name": "where it decides",
+        "ico": "mine",
+        "_about": "D-069, his L-11 (\"since they validate things on different levels\"): R2, read from the gate's host — the app's middleware, the login dependency, another dependency, the handler's own code, or a function it calls. My proposal.",
+        "vals": {
+          "app": {
+            "name": "app-wide",
+            "plain": "In the app's middleware, before any endpoint's own code runs."
+          },
+          "login": {
+            "name": "at login",
+            "plain": "In the login check, while FastAPI works out who the caller is."
+          },
+          "dep": {
+            "name": "in a dependency",
+            "plain": "In one of the endpoint's dependencies, before the handler runs."
+          },
+          "own": {
+            "name": "in the handler",
+            "plain": "In the endpoint's own function."
+          },
+          "call": {
+            "name": "inside a call",
+            "plain": "In a function the handler calls."
+          }
+        }
+      },
+      "gdv": {
+        "mo": true,
+        "name": "what it does",
+        "ico": "mine",
+        "_about": "D-069, his L-11: R1, read from the gate's kind and a catch's outcome. My proposal.",
+        "vals": {
+          "refuses": {
+            "name": "refuses",
+            "plain": "When its condition holds, the request ends with a refusal."
+          },
+          "translates": {
+            "name": "translates",
+            "plain": "It turns an error raised below into an answer."
+          },
+          "routes": {
+            "name": "routes",
+            "plain": "It picks which answer the request gets."
+          },
+          "passes": {
+            "name": "passes on",
+            "plain": "It catches an error and raises it again, to an outer catch."
+          },
+          "swallows": {
+            "name": "swallows",
+            "plain": "It catches an error and the code goes on as if nothing happened."
+          }
+        }
+      },
+      "gdc": {
+        "mo": true,
+        "name": "what it guards",
+        "ico": "mine",
+        "_about": "D-069, his L-11: R3, a check's refusal by what its status means (checks only). My proposal.",
+        "vals": {
+          "400": {
+            "name": "bad input",
+            "plain": "The request is missing something or says something the code will not take."
+          },
+          "401": {
+            "name": "not signed in",
+            "plain": "The caller is not known."
+          },
+          "402": {
+            "name": "payment needed",
+            "plain": "The caller's plan does not cover this."
+          },
+          "403": {
+            "name": "forbidden",
+            "plain": "The caller is known but may not do this."
+          },
+          "404": {
+            "name": "not found",
+            "plain": "What the request names does not exist, or is not the caller's."
+          },
+          "409": {
+            "name": "conflict",
+            "plain": "The request clashes with what the server already holds."
+          },
+          "413": {
+            "name": "too large",
+            "plain": "The request is bigger than the code allows."
+          },
+          "415": {
+            "name": "wrong type",
+            "plain": "The request's content is of a type the code does not take."
+          },
+          "422": {
+            "name": "invalid",
+            "plain": "A value breaks a rule the code checks."
+          },
+          "429": {
+            "name": "too many",
+            "plain": "The caller has asked too often."
+          },
+          "502": {
+            "name": "upstream failed",
+            "plain": "A service the code calls answered badly."
+          },
+          "503": {
+            "name": "unavailable",
+            "plain": "Something the code needs is not available now."
+          },
+          "_other": {
+            "name": "refusal",
+            "plain": "The request ends with this status."
+          }
+        }
+      },
+      "gef": {
+        "mo": true,
+        "name": "what happens",
+        "ico": "mine",
+        "_about": "D-069, his L-10 (\"the result of that is an ending or maybe something else … maybe a branching\"): the word between a gate's condition and its effect. My proposal.",
+        "vals": {
+          "ends": {
+            "name": "ends",
+            "plain": "When the condition holds, the request ends with this answer."
+          },
+          "ret": {
+            "name": "returns",
+            "plain": "The function returns here, and the request goes on to this answer."
+          },
+          "pass": {
+            "name": "passes the error on",
+            "plain": "The error is raised again, to a catch further out or to the uncaught error."
+          },
+          "goes": {
+            "name": "goes on",
+            "plain": "The error is swallowed and the code goes on."
+          },
+          "dec": {
+            "name": "decides",
+            "plain": "Its setting decides whether these endings can happen."
+          },
+          "can": {
+            "name": "can end at",
+            "plain": "Whichever part is plugged in, the request can end the same way."
+          }
+        }
+      }
     }
   },
   "universe": {
@@ -1882,7 +2240,12 @@
     "part": "the {v} part's icon and colour, from the lab",
     "pick": "my pick: the Shared group has no part in the lab",
     "key": "dashed icon: my pick",
-    "lab": "the lab's section map marks it this way ({v}) — my pick there too, not ruled"
+    "lab": "the lab's section map marks it this way ({v}) — my pick there too, not ruled",
+    "own": {
+      "inf": "pg:hourglass",
+      "std": "pg:puzzle"
+    },
+    "ownWords": "my pick: this block has no page in the lab yet"
   },
   "pinRow": "The endpoint picked in the table, pinned at the top with the column names. Click it to go to its section below.",
   "el": {
@@ -1920,7 +2283,8 @@
       "inflight": "in-flight value",
       "finding": "finding",
       "limiter": "rate limiter",
-      "piece": "piece"
+      "piece": "piece",
+      "middleware": "middleware"
     },
     "why": {
       "_about": "D-042: when the code map does not NAME a lit element, the code-map column's top line says why. The reasons are my reading of his ask, read by _ae_universe.cm_reasons from each row's keys and from `table` below — never typed per element. `table` is MY PROPOSAL: for each kind of element and the universe rows that draw it, the card's attributes it belongs to (ids of the ruled tree, checked against inventory-endpoint.md; an unknown id stops the build) and the code-map fields it can sit in (c:<column> · h:<head pair> · d:<detail pair>). A field the data shows holding it that the table does not list also stops the build. `about: map` marks a kind whose presence is a fact about the map (D-017).",
@@ -1986,14 +2350,14 @@
     "mineTip": "My proposal: {why}",
     "alias": "The Gabe Universe names this setting as one of the flag's aliases, so it is that flag and wears the flag's glyph.",
     "card": "This is the node's look. The universe column copies the station's card, whose chips and entity faces use the card's own colours, so the same element can look different there: the station differs from itself.",
-    "nonode": "The Gabe Universe draws no node for this function, so it wears no glyph; its role is read from the endpoint's facts the way the station reads a role.",
+    "nonode": "The Gabe Universe draws no node for this function; it wears the function glyph all the same, and its role where one is known.",
     "same": "The station's map gives these entities one colour: {v}.",
     "mine": "my proposal",
     "count": "{n} of {of} named here are nodes there",
     "not": "Not drawn by the Gabe Universe as a node, so each keeps this page's own look: {v}.",
     "map": {
       "endpoint": { "to": "endpoint", "why": "The same: the station's endpoint node, its method and its delivery as labels." },
-      "fn": { "to": "function", "why": "The station's function node, where its function layer holds the function, its role read from that layer. A function it holds no node for wears no glyph; its role stays as a label." },
+      "fn": { "to": "function", "why": "The station's function node, where its function layer holds the function, its role read from that layer. A function it holds no node for still wears the function glyph (D-069: it is a function all the same); its role where one is known." },
       "schema": { "to": "schema", "why": "The station's schema node, where its map holds the schema. A schema named only inside a signature is no node, so it wears no glyph." },
       "flag": { "to": "flag", "why": "The station's feature flag node, where its map holds the flag." },
       "table": { "to": "model", "mine": true, "why": "A table and its model class are one element here (D-041); the station draws the model, where its map holds one for the table." },
@@ -2012,7 +2376,11 @@
       "rule": { "to": null, "why": "A validation rule sits on a field of a schema, not as a node." },
       "inflight": { "to": null, "why": "A value alive during a request is not a node." },
       "finding": { "to": null, "why": "A finding is a fact about the endpoint, not a node." },
-      "piece": { "to": null, "why": "A piece is how common a shape is across the endpoints, not a node." }
+      "piece": { "to": null, "why": "A piece is how common a shape is across the endpoints, not a node." },
+      "middleware": {
+        "to": "middleware",
+        "why": "The station's middleware node: code every request passes through before it reaches an endpoint, where the station's map holds it."
+      }
     }
   }
 }
