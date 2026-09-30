@@ -404,7 +404,8 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   // CHANGED 2026-09-30 (D-067): BY MOMENT's legend place and its hovers' form add theirs after the journeys' — eleven lines now
   // CHANGED 2026-09-30 (D-068): its header, saving's stage, the metadata's place, a head's click and fit add theirs after those — sixteen
   // CHANGED 2026-09-30 (D-069): the rows' own looks (the gates, the effect, gate icons, gate roles, function marks, standard or specialist) — twenty-two
-  ok(el0.length === 1 && set0.length === 22 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-23)) === JSON.stringify([el0[0]].concat(set0)),
+  // CHANGED 2026-09-30 (D-070): Data effects' look and the in-flight values' look add theirs after the rows' own — twenty-four
+  ok(el0.length === 1 && set0.length === 24 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-25)) === JSON.stringify([el0[0]].concat(set0)),
     'the copy text adds the endpoint shown, then the code map\'s and BY MOMENT\'s settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -1261,7 +1262,8 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
     rows: [...t.querySelectorAll('th.mom')].map((h) => [h.getAttribute('data-mom'), h.getAttribute('data-lines')]),
     /* CHANGED 2026-09-26 (D-057): the Endings head holds an info line behind the toggle — a head's name is its text less that line */
     /* CHANGED 2026-09-30 (D-068): a row's head holds its name, its options slot and its columns of the pinned row — its name is .mbn */
-    heads: [...t.querySelectorAll('th[data-block]')].map((h) => (h.querySelector('.mbn') || h).textContent.trim()), bodyRows: t.querySelectorAll('tbody tr').length,
+    /* CHANGED 2026-09-30 (D-070): Data effects' map opens full width under its row (my pick) — a row of the table, not a block's */
+    heads: [...t.querySelectorAll('th[data-block]')].map((h) => (h.querySelector('.mbn') || h).textContent.trim()), bodyRows: t.querySelectorAll('tbody tr:not(.mdxr)').length,
     ends: [...t.querySelectorAll('td[data-f="end"]')].map((td) => [...td.querySelectorAll('.vc-status')].map((c) => c.textContent)),
     chips: t.querySelectorAll('.mc').length, counts: t.querySelectorAll('.mcount').length,
     /* CHANGED 2026-09-30 (D-068): the no-moment column left the table — the endpoint metadata's title and its cards; the table's last row */
@@ -2566,7 +2568,8 @@ ok(!errs.length, 'no page error after the D-068 checks', errs);
   const setLook = async (st) => { await p.evaluate((st) => { const A = window.__allep; Object.assign(A.mo.looks, st); localStorage.setItem(A.mo.key, JSON.stringify(A.mo.looks)); }, st);
     await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });   /* the looks are read at load (open() would clear them) */
     await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E + '"] td.id'); await p.waitForTimeout(200); };
-  await setLook({ gdl: 'head', gef: 'end', gic: 'each', grl: 'where', fnm: 'on', std: 'split' });
+  /* CHANGED 2026-09-30 (D-070): (d) reads the in-flight chips' own face — the chips look (a lifeline each is the default now) */
+  await setLook({ gdl: 'head', gef: 'end', gic: 'each', grl: 'where', fnm: 'on', std: 'split', ifl: 'chips' });
   const g = await p.evaluate(() => { const T = document.querySelector('#mogrid'), gates = [...T.querySelectorAll('td[data-f="gate"] .mc')];
     return { n: gates.length, orphan: gates.filter((c) => !c.closest('.mgb') && !/^fn:/.test(c.getAttribute('data-keys') || '')).map((c) => c.getAttribute('data-keys')),
       rl: [...T.querySelectorAll('td[data-mom="edge"][data-f="gate"] .mgb > .mgh [data-key]')].map((h) => [h.getAttribute('data-key'), (h.querySelector('.skg') || { getAttribute: () => null }).getAttribute('data-sk')]),
@@ -2608,9 +2611,61 @@ ok(!errs.length, 'no page error after the D-068 checks', errs);
   const qt = await (async () => { const h = await p.$('#mogrid tbody th[data-f="std"] .mbn'); if (!h) return ''; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const bx = await h.boundingBox();
     await p.mouse.move(bx.x + 4, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; })();
   ok(qt.includes(MW.rowq.std), 'D-069 (e) · the row\'s head says the question it answers', qt.slice(0, 160));
-  await setLook({ gdl: MW.opt.gdl.pick, gef: MW.opt.gef.pick, gic: MW.opt.gic.pick, grl: MW.opt.grl.pick, fnm: MW.opt.fnm.pick, std: MW.opt.std.pick });
+  await setLook({ gdl: MW.opt.gdl.pick, gef: MW.opt.gef.pick, gic: MW.opt.gic.pick, grl: MW.opt.grl.pick, fnm: MW.opt.fnm.pick, std: MW.opt.std.pick, ifl: MW.opt.ifl.pick });
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-069 checks', errs);
+
+/* 24 · D-070 (his note "API Hover Legend Consolidation", L-12 · L-17): the relations across the moments — smoke checks (D-037, light):
+   (a) Data effects' map, my pick, opens under its row: a link per function → table the generator records, green reads and orange
+       writes, start_session → cooking_sessions a read then a write with the race's 500 on it, the commits naming who commits;
+   (b) the in-flight lanes, my pick: the seven rate-limit values fold into "rate limiter · 7", which opens; ctx is read at the checks and
+       can end the request with 409; the Idempotency-Key is read there with its 400 and claims cooking_sessions in the work;
+   (c) a picked path: the 409 at the checks leaves before the key is read (no 400 dot) and before the work (its links dim);
+   (d) the other looks: echoes where a value is read; a small map in each cell that holds data effects */
+{ const E = 'POST /cooking/sessions', R = ROW[E], MW = D.words.mo, C2 = MW.x.c2, MK = D.mo.keys, OP = D.enc.op;
+  const setLook = async (st) => { await p.evaluate((st) => { const A = window.__allep; Object.assign(A.mo.looks, st); localStorage.setItem(A.mo.key, JSON.stringify(A.mo.looks)); }, st);
+    await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });
+    await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E + '"] td.id'); await p.waitForTimeout(250); };
+  await setLook({ dfx: MW.opt.dfx.pick, ifl: MW.opt.ifl.pick, lay: MW.opt.lay.pick, cell: MW.opt.cell.pick });
+  const dx = R.mo.dx, sc = dx.l.findIndex((q) => MK[dx.f[q[0]]] === 'fn:apps/api/services/cooking.py::start_session' && MK[dx.t[q[1]]] === 'table:cooking_sessions');
+  const a = await p.evaluate((sc) => { const tr = document.querySelector('#mogrid tbody tr[data-f="data"]'), nx = tr && tr.nextElementSibling;
+    const w = nx && nx.querySelector('.mdx'), gs = w ? [...w.querySelectorAll('svg.mdxs g.mdxk[data-j]')] : [];
+    const g0 = gs.find((g) => w._dx.L[+g.getAttribute('data-j')].li === sc);
+    return { under: !!(nx && nx.classList.contains('mdxr')), links: gs.length, strokes: gs.flatMap((g) => [...g.querySelectorAll('.mdxst')].map((x) => x.getAttribute('data-op') + '|' + x.getAttribute('stroke'))),
+      sc: g0 ? [...g0.querySelectorAll('.mdxst')].map((x) => x.getAttribute('data-op')) : null, race: w ? [...w.querySelectorAll('.mdxrc .vc-status')].map((x) => x.textContent) : [],
+      rules: w ? [...w.querySelectorAll('.mdxru')].map((x) => [x.getAttribute('data-op'), (x.querySelector('.mdxrf') || {}).getAttribute('data-key')]) : [],
+      bands: w ? [...w.querySelectorAll('.mdxb')].map((b) => +b.getAttribute('data-si')) : [] }; }, sc);
+  ok(MW.opt.dfx.pick === 'one' && a.under && a.links === dx.l.length && a.links > 10 && a.strokes.every((x) => x === 'r|' + OP.r.col || x === 'w|' + OP.w.col)
+     && JSON.stringify(a.sc) === JSON.stringify(['r', 'w']) && JSON.stringify(a.race) === JSON.stringify(['500']) && JSON.stringify(a.bands) === JSON.stringify(dx.b)
+     && a.rules.some((q) => q[0] === 'commit' && q[1] === 'fn:apps/api/api/cooking.py::post_start_session') && a.rules.some((q) => q[0] === 'commit' && q[1] === 'fn:apps/api/auth/context.py::build_auth_context'),
+    'D-070 (a) · ' + E + ': the map (my pick) opens under Data effects — ' + a.links + ' links, green reads, orange writes; start_session → cooking_sessions reads then writes, the race\'s 500 on it; a commit rule names post_start_session and build_auth_context', a);
+  const b = await p.evaluate(() => { const T = document.querySelector('#mogrid'), fold = T.querySelector('.milf[data-fold]');
+    const dotsOf = (k) => [...T.querySelectorAll('td.milc .mil[data-k="' + k + '"] .mild')].map((d) => [d.closest('td').getAttribute('data-mom'), [...d.querySelectorAll('.vc-status')].map((x) => x.textContent).join(','), !!d.querySelector('.milcl[data-key="table:cooking_sessions"]')]);
+    const kOf = (n) => { const c = [...T.querySelectorAll('td.milc .mil > .mc[data-key]')].find((x) => x.getAttribute('data-key').includes('|' + n + '|')); return c ? c.closest('.mil').getAttribute('data-k') : null; };
+    return { fold: fold ? [fold.textContent.replace(/\s+/g, ' ').trim(), fold.getAttribute('data-keys').split('\n').length] : null, ctx: dotsOf(kOf('ctx')), key: dotsOf(kOf('idempotency_key')),
+      caps: [...T.querySelectorAll('td.milc .milx-cap')].map((x) => x.closest('td').getAttribute('data-mom')), keep: T.querySelectorAll('td.milc .milx-keep').length }; });
+  ok(MW.opt.ifl.pick === 'lane' && b.fold && b.fold[0].includes(C2.il.lim) && b.fold[1] === 7 && JSON.stringify(b.ctx[0]) === JSON.stringify(['checks', '409', false])
+     && JSON.stringify(b.key[0]) === JSON.stringify(['checks', '400', false]) && b.key.some((d) => d[0] === 'work' && d[2]) && b.caps.length === 3 && b.caps.every((m) => m === 'answer') && b.keep === 1,
+    'D-070 (b) · the lanes (my pick): "' + (b.fold || [''])[0] + '" folds ' + (b.fold || [0, 0])[1] + ' values the server keeps (an arrow past the end); ctx is read at the checks → 409; the key → 400, then claims cooking_sessions in the work; the request values end at the answer', b);
+  await p.$eval('#mogrid .milf[data-fold]', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#mogrid .milf[data-fold]'); await p.waitForTimeout(150);
+  const o = await p.evaluate(() => ({ head: !!document.querySelector('#mogrid .milh[data-fold]'), lanes: document.querySelectorAll('#mogrid td.milc[data-mom="start"] .mil > .mc[data-key^="inflight:"]').length }));
+  ok(o.head && o.lanes === 7, 'D-070 (b) · the fold opens: its header, then its ' + o.lanes + ' values a lane each', o);
+  const i409 = R.mo.ex.findIndex((x) => x[1] === 409 && x[3] === R.mo.sp.findIndex((q) => q[0] === 'checks'));
+  await p.$eval('#mobar .mopath[data-path="' + i409 + '"]', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#mobar .mopath[data-path="' + i409 + '"]'); await p.waitForTimeout(200);
+  const c = await p.evaluate(() => { const T = document.querySelector('#mogrid'), w = T.querySelector('tr.mdxr .mdx');
+    const workSi = [...w.querySelectorAll('.mdxb')].find((b) => b.querySelector('.mdxbl') && b.getAttribute('data-si') === String(window.__allep.data.rows.find((r) => r.id === 'POST /cooking/sessions').mo.sp.findIndex((q) => q[0] === 'work')));
+    return { st400: [...T.querySelectorAll('td.milc .mild .vc-status')].map((x) => x.textContent), workOff: workSi ? [...workSi.querySelectorAll('.mdxn')].every((n) => n.classList.contains('off')) : null,
+      depOn: [...w.querySelectorAll('svg.mdxs g.mdxk:not(.off)')].length }; });
+  ok(i409 >= 0 && !c.st400.includes('400') && c.st400.includes('409') && c.workOff === true && c.depOn > 0,
+    'D-070 (c) · on the path to the 409 at the checks: no read of the key (it leaves at cooking.py:125, the key is read at :126); the work\'s functions and tables dim, the dependencies\' links stay', c);
+  await setLook({ dfx: 'cell', ifl: 'echo' });
+  const d = await p.evaluate(() => ({ echo: [...document.querySelectorAll('#mogrid td[data-f="inf"] .mc.mie')].map((x) => x.closest('td').getAttribute('data-mom') + ':' + [...x.querySelectorAll('.vc-status')].map((v) => v.textContent).join(',')),
+    mini: [...document.querySelectorAll('#mogrid td[data-f="data"] .mdx.mdxm')].map((x) => x.closest('td').getAttribute('data-mom')), under: document.querySelectorAll('#mogrid tr.mdxr').length }));
+  ok(d.echo.includes('checks:400') && d.echo.includes('checks:409') && d.mini.length === dx.b.length && !d.under,
+    'D-070 (d) · "' + MW.opt.ifl.opts.echo.name + '": an echo where each value is read (' + d.echo.length + '); "' + MW.opt.dfx.opts.cell.name + '": a small map in each of the ' + d.mini.length + ' cells, none under the row', d);
+  await setLook({ dfx: MW.opt.dfx.pick, ifl: MW.opt.ifl.pick });
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the D-070 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));

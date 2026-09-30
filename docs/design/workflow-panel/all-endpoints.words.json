@@ -1048,6 +1048,44 @@
             "plain": "The row stays, in lanes: what the server's settings switch, and what is rare here."
           }
         }
+      },
+      "dfx": {
+        "_about": "D-070, his L-12 (\"put functions … in blocks … on the left, and in the right the tables, and have sort of a mind map … where the connectors will describe the kind of operation … we are affecting these tables, but how? With what function?\"): how Data effects shows which function does what to which table. The chips are what stood there; the two maps are my proposal; one map for the endpoint, opening under the row, is my pick, dashed. The colours are the page's own read and write colours.",
+        "label": "data effects",
+        "pick": "one",
+        "opts": {
+          "chips": {
+            "name": "chips",
+            "plain": "One chip per read or write at its moment: the table and R or W; the function in its hover."
+          },
+          "cell": {
+            "name": "a small map per moment",
+            "plain": "Inside each moment's cell: its functions on the left, its tables on the right, a line from each function to each table it touches — green reads, orange writes."
+          },
+          "one": {
+            "name": "one map for the endpoint",
+            "plain": "Under the row, full width: the functions on the left in the order they first touch data, the tables on the right in the order they are first touched, the moments as bands from top to bottom. A green line reads, an orange line writes; a function that reads a table and then writes it gets both, in that order. A tick is a flush; a rule across is a commit and names who commits. A picked path dims what it does not run."
+          }
+        }
+      },
+      "ifl": {
+        "_about": "D-070, his L-17 (\"visualize or surface what we are affecting … dig deeper … possibilities\"): how In-flight state shows what each value affects. The chips are what stood there; lifelines and echoes are my proposal; a lifeline each is my pick, dashed.",
+        "label": "in-flight values",
+        "pick": "lane",
+        "opts": {
+          "chips": {
+            "name": "chips where set",
+            "plain": "One chip per value, at the moment it is set."
+          },
+          "lane": {
+            "name": "a lifeline each",
+            "plain": "One lane per value across the moments: its chip where it is set, a line while it lives, a dot where it is read with what that read can decide, a cross at the answer — or an arrow on past it when the server keeps it. Values set together and read alike fold into one lane that opens."
+          },
+          "echo": {
+            "name": "echoes where read",
+            "plain": "The chip stays where the value is set; a small echo stands at each moment that reads it, with what that read can decide."
+          }
+        }
       }
     },
     "sets": { "table": "the table", "items": "the items", "cols": "the columns" },
@@ -1438,11 +1476,77 @@
         "rareHere": "rare here",
         "fall": "otherwise",
         "unk": "unknown"
+      },
+      "c2": {
+        "_about": "D-070: the words of the relations batch C2 drew across the moments (his L-12, L-17) — the data map and the in-flight lifelines. What the code does, never how the page knows it (D-017).",
+        "dx": {
+          "head": "which function reads or writes which table",
+          "fns": "functions, in the order they first touch data",
+          "tbls": "tables, in the order they are first touched",
+          "r": "reads",
+          "w": "writes",
+          "link": "{fn} → {tbl}",
+          "op": "{op} at {at} · {mom}",
+          "fate": "on this path: {v}",
+          "off": "not on this path",
+          "race": "a second request with the same key breaks {cons} ({cols}) at {at} and ends in {st}",
+          "tick": "{op} at {at} · {mom}",
+          "ticks": {
+            "flush": "Sends the writes made so far to the database, inside the transaction; nothing is saved until a commit.",
+            "savepoint": "Opens a savepoint: a part of the transaction that can be undone on its own.",
+            "add": "Adds a new row.",
+            "delete": "Deletes a row.",
+            "_other": "A step on the database session."
+          },
+          "rule": "{op} · {fn} · {at}",
+          "rules": {
+            "commit": "Saves every write this request made before it: a path that passes it keeps them.",
+            "rollback": "Throws away every write this request made since the last save."
+          },
+          "fnTip": "touches {n} tables here",
+          "fnTip1": "touches {n} table here",
+          "tblTip": "touched by {n} functions here",
+          "tblTip1": "touched by {n} function here",
+          "none": "No function reads or writes a table on this path."
+        },
+        "il": {
+          "lim": "rate limiter",
+          "fold": "{v} · {n}",
+          "open": "show the {n} values, a lane each",
+          "close": "fold them back into one lane",
+          "members": "{n} values: {v}",
+          "read": "read at {at}",
+          "handed": "handed to {v}",
+          "decides": "can end the request with {v}",
+          "claim": "claims its key in {tbl}",
+          "claimF": "claims",
+          "saves": "the commit reads it",
+          "end": "gone once the answer is sent",
+          "keep": "kept by the server for the next request",
+          "unk": "how long it lives is not known",
+          "also": "also read at {v}",
+          "set": "set at {mom}",
+          "echo": "reads {v}"
+        },
+        "lg": {
+          "dot": "a dot on the line: the value is read there; what that read can decide stands beside it",
+          "cap": "a cross: the value is gone once the answer is sent",
+          "keep": "an arrow past the end: the server keeps the value for the next request",
+          "fold": "values set together and read alike, in one lane — open it to see each",
+          "echo": "an echo: the value is read at this moment",
+          "r": "a green line: the function reads the table",
+          "w": "an orange line: the function writes the table",
+          "rw": "a green line and an orange one, in that order: the function reads the table, then writes it",
+          "tick": "a tick on a function's line: a step with no table of its own — a flush sends the writes to the database, unsaved until a commit",
+          "rule": "a rule across: a commit — every write above it on the path is saved",
+          "race": "the race: a second request with the same key breaks the unique key here"
+        }
       }
     },
     "noCode": "No refusal this app sends carries a code of its own ({nCoded} of its {nRefusals}): a client tells one refusal from another by the status and the words alone.",
     "rowq": {
       "_about": "D-069 (his L-17, L-18): the question a row answers, in plain words, on its head's hover.",
+      "data": "Which function reads or writes which table, when, and is the write saved?",
       "gate": "Where can the request be stopped or sent another way: in which function, on what condition, and what happens then?",
       "inf": "What does the request carry while it runs, and how long does each value live: until the answer is sent, or as long as the server runs?",
       "std": "Is this endpoint built like the others, and what is unusual about it? A switch is set by the server's settings and changes a way the request can go; a rare piece is something few other endpoints have."

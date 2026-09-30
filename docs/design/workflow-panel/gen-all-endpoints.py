@@ -57,6 +57,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _ae_universe as UNI  # noqa: E402  (D-036 — the one-endpoint section: the universe card, the block marks, the gaps)
 import _ae_io as IO  # noqa: E402  (D-067 — one hover per BY MOMENT item: its facts before · checks · gives, and the twins check)
 import _ae_els as ELS  # noqa: E402  (D-069 — every BY MOMENT element says what it is: its host, its effect, its role, its object)
+import _ae_rel as REL  # noqa: E402  (D-070 — the relations across the moments: data connectors, in-flight lifelines)
 
 
 def die(msg: str) -> None:
@@ -1940,7 +1941,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         k0 = ("schema:" + n0) if n0 in X["schemas"] else ("table:" + X["m2t"][n0]) if X["m2t"].get(n0) in X["c4tables"] else None
         if k0 and "." not in n0:
             e["keys"] = [k0] + e["keys"]; tally["c1:class"] += 1
-    el, un, nmv, gone_fn = [], [], [], []
+    el, un, nmv, gone_fn, inf_src = [], [], [], [], {}
     rp, ru, rn = collections.defaultdict(set), collections.defaultdict(set), collections.defaultdict(set)
     # D-067: each placed item's ONE hover, its own facts in the order the code meets them (_ae_io.io_of — the builder)
     IOC = IO.Ctx(E=E, F=F, fj=fj, fep=fep, XS=XS, steps=steps, H=H, hf=hf, chains=chains, EXIT=EXIT, dset=dset, par=r["_beh"]["par"],
@@ -2012,6 +2013,8 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             xx["rc"] = xx["rc"][:3] + [XS[xx["rc"][3]].get("status")]
         xx["io"] = IO.io_of(e, xx, IOC)
         el.append([e["f"], si, e["keys"], e["text"], e["chip"], mask, e["hint"], xx, e["o"]]); rp[e["f"]].update(e["rec"])
+        if e["f"] == "inf":                                      # D-070: its feed row, for its lifeline
+            inf_src[id(el[-1])] = e
         PX.update(e.get("m") or [])
         if e["f"] == "data":
             PX.update(("step", q[2:]) for q in e["rec"] if q.startswith("s:"))
@@ -2131,6 +2134,29 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     for i, x in enumerate(ex):                                    # D-055: what a path code's hover says — the ending's own words, its limiter
         x += [says(XS[x[0]]) or None, lim.get(x[0]) or None, picks[i], fork.get(picks[i])]   # D-057: the path, the forks that tell it apart
     pas = [sorted(seen[pid]) for pid in picks]
+    # ── D-070 (his L-12: "we are affecting these tables, but how? With what function?" · L-17: "surface what we are affecting"): the
+    # relations across the moments — each function's reads and writes as connectors to its tables, each in-flight value's lifeline —
+    # read from what is placed above and PROVEN in _ae_rel (a read before its value is set, an ending decided before its read, a
+    # connector the row does not place: the build stops) ──
+    def hsi_one(q):                                              # a handler line's moment, or None where it falls in no one run
+        c = hclass(q)
+        if c == "answer":
+            return SI["answer"]
+        hit = [i for i, x in enumerate(seg) if x[0] == c and x[1] is not None and x[1] <= q <= x[2]]
+        return H0 + hit[0] if len(hit) == 1 else None
+
+    def hnext_one(q):                                            # a line between two runs of its class, no anchor between: the next run
+        c = hclass(q)
+        nx = sorted((x[1], i) for i, x in enumerate(seg) if x[0] == c and x[1] is not None and x[1] > q)
+        if not nx or any(q < a < nx[0][0] for a, _c in anchors):
+            return None
+        tally["c2:il:gap"] += 1
+        return H0 + nx[0][1]
+    own_ops = {_line(steps[s]["at"]): steps[s]["op"] for s in sids if steps.get(s, {}).get("fn") == H and inh(steps[s].get("at")) and steps[s].get("op") in REL.RULE_OPS}
+    dx = REL.data_links(el, pas, live, lab, die, tally)
+    il = REL.lifelines(el, inf_src, REL.Ctx(lab=lab, die=die, rows={"i:" + ikey(x): x for x in (F.get("inflight") or {}).get("rows") or []}, SI=SI, x_si=x_si,
+                                            XS=XS, EXIT=EXIT, picks=picks, live=live, pas=pas, hsi=hsi_one, hnext=hnext_one, inh=inh, direct=direct, own_ops=own_ops,
+                                            fep=fep, F=F), tally)
     # ── D-068 · the stage each ending's moment stands in is the stage it leaves from (the code map's stages column, read per ending) ──
     for xid, si_ in x_si.items():
         if isinstance(si_, int):
@@ -2220,7 +2246,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     # the elements each block holds, counted — a journey is counted apart (review J7): its chips and its name are no element of Proof
     ne = lambda xs: len([q for q in xs if not str(q).startswith("j:")])
     return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "fk": fks, "n": {f: [ne(rp[f]), ne(ru[f]), ne(rn[f])] for f, _a in MO_FAM if ne(rp[f]) or ne(ru[f]) or ne(rn[f])},
-            "nm": nmv, "_P": PM | PX, "_Pw": PW, "_K": KM}
+            "nm": nmv, "_P": PM | PX, "_Pw": PW, "_K": KM, **({"dx": dx} if dx else {}), **({"il": il} if il else {})}
 
 
 MO_ORDER = [f for f, _a in MO_FAM]
@@ -2797,6 +2823,15 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
             x[1] = [KT.setdefault(k, len(KT)) for k in x[1]]
         for x in r["mo"]["nm"]:
             x[2] = [KT.setdefault(k, len(KT)) for k in x[2]]
+        dx, il = r["mo"].get("dx"), r["mo"].get("il")                 # D-070: the connectors' nodes and a claim's keys, as indices too
+        if dx:
+            dx["f"] = [KT.setdefault(k, len(KT)) for k in dx["f"]]; dx["t"] = [KT.setdefault(k, len(KT)) for k in dx["t"]]
+            for c0 in dx["c"]:
+                c0[0] = KT.setdefault(c0[0], len(KT))
+        for L in (il or {}).get("l") or []:
+            for d in L[4]:
+                if d[4]:
+                    d[4][0], d[4][1] = KT.setdefault(d[4][0], len(KT)), KT.setdefault(d[4][1], len(KT))
     # how each step occurrence (a step on one path) was placed — once per path it is on, so the sum is the occurrences, not the steps
     src = {k: tally.get("src:" + k, 0) for k in MO_SRC}
     if sum(src.values()) != tally["occ"]:
@@ -4122,6 +4157,11 @@ def build(argv: list) -> tuple:
                 f" · roles by the station's own rule: accessor {RDER['accessor']} · gate {RDER['gate']} · classes drawn as their schema or model {MOT['c1:class']}"
                 f" · functions marked with what they decide and touch {MOT['c1:fnMarks']} · rare pieces {MOT['c1:rare']} ({MOT['c1:rareTg']} naming a drawn item)"
                 f" · reads a refresh fetches again {MOT['c1:refetch']} · 'any other status' lines {MOT['c1:rest']} · hooks on the way to a send {MOT['c1:orch']}")
+    # D-070: the relations across the moments — the data connectors and the in-flight lifelines, each join proven in _ae_rel
+    summary += (f"\nD-070 · data connectors {MOT['c2:links']} function → table links ({MOT['c2:ops']} reads and writes, {MOT['c2:rw']} links that read and write)"
+                f" · ticks {MOT['c2:tick']} · commit and rollback rules {MOT['c2:rule']} · races on a link {MOT['c2:race']}"
+                f" · in-flight lanes {MOT['c2:il:lanes']} ({MOT['c2:il:folds']} folds holding {MOT['c2:il:folded']}) · read dots {MOT['c2:il:dots']}"
+                f" · endings a read decides {MOT['c2:il:decides']} · claims {MOT['c2:il:claim']} · reads at no moment {MOT['c2:il:unplaced']} (a line between two runs read into the next {MOT['c2:il:gap']}) · dot-paths left because the path leaves before the read {MOT['c2:il:leftBefore']} · dots on no path of their value {MOT['c2:il:dotOff']} · endings no path reaches, left off {MOT['c2:il:noPathEnd']}")
     return html, summary, out, check
 
 

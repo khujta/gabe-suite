@@ -468,6 +468,68 @@
   .mc .mifg { display: inline-flex; } .mc .mifg svg { width: 13px; height: 13px; display: block; }
   .mc .mfm { display: inline-flex; flex-wrap: wrap; gap: 0 3px; align-items: center; }
   .mc .mfm .mtb { color: var(--ink-soft); font-size: var(--fs-min); }
+  /* ── D-070 · THE RELATIONS ACROSS THE MOMENTS (his L-12, L-17): Data effects as one map under its row — the functions left, the
+     tables right, the moments as bands top to bottom, a line from a function to each table it touches in the page's read green or
+     write orange, a tick a table-less step, a rule a commit naming who commits — or a small map in each cell; each in-flight value a
+     lane across the moments — its chip where set, a line while it lives, a dot where read, a cross at the answer, an arrow when the
+     server keeps it — or an echo where read ── */
+  table.motab td.mdxtd { padding: 6px 8px 10px; background: var(--raised); }
+  .mdx { position: relative; box-sizing: border-box; }
+  td.mdxtd > .mdx, .mdxw > .mdx { position: sticky; left: 0; }
+  .mdxw { padding: 6px 8px 10px; background: var(--raised); border-top: 1px solid var(--rule); font-size: var(--fs-min); }
+  .mdxh { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; font-size: var(--fs-min); color: var(--muted); margin-bottom: 2px; }
+  .mdxh b { color: var(--ink-soft); font-weight: 650; } .mdxh span:last-child { text-align: right; }
+  .mdxb { position: relative; border-top: 1px solid var(--rule-soft); padding: 16px 0 6px; }
+  .mdxbl { position: absolute; top: 2px; left: 0; font-size: var(--fs-min); color: var(--muted); border-left: 3px solid var(--stc, var(--rule)); padding-left: 4px; line-height: 12px; }
+  .mdxg { display: grid; grid-template-columns: minmax(0, max-content) minmax(72px, 1fr) minmax(0, max-content); align-items: start; }
+  .mdxm .mdxg { grid-template-columns: minmax(0, 1fr) minmax(28px, .3fr) minmax(0, 1fr); }
+  .mdxm .mdxb { border-top: 0; padding: 0 0 3px; }
+  .mdxcl, .mdxcr { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+  .mdxn { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 3px; border: 1px solid var(--rule); border-radius: 5px; padding: 0 5px; background: var(--card); color: var(--ink);
+          line-height: 18px; max-width: 100%; box-sizing: border-box; overflow-wrap: anywhere; position: relative; z-index: 1; cursor: pointer; }
+  .mdxn.off, .mdxru.off .mdxrl, .mdxrc.off { opacity: .35; }
+  svg.mdxs { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+  svg.mdxs .mdxst { fill: none; stroke-width: 2; }
+  svg.mdxs .mdxst.off, svg.mdxs .mdxk.off .mdxtk { opacity: .14; }
+  svg.mdxs .mdxtk { stroke: var(--ink); stroke-width: 2; fill: none; }
+  svg.mdxs .mdxhit { fill: none; stroke: transparent; stroke-width: 10; pointer-events: stroke; }
+  .mdxru { position: relative; display: flex; justify-content: center; height: 0; margin: 14px 0 12px; border-top: 2px solid var(--ink-soft); z-index: 1; }
+  .mdxru[data-op="rollback"] { border-top-style: dashed; }
+  .mdxrl { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 4px; transform: translateY(-55%); background: var(--raised); padding: 0 6px; font-size: var(--fs-min); line-height: 18px; }
+  .mdxm .mdxrl { background: var(--card); }
+  .mdxro { font-weight: 650; } .mdxrf { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 3px; cursor: pointer; }
+  .mdxrc { position: absolute; z-index: 2; transform: translate(-50%, -50%); display: inline-flex; gap: 3px; align-items: center; background: var(--card); border: 1px solid var(--alert);
+           border-radius: 8px; padding: 0 4px; font-size: var(--fs-min); line-height: 16px; color: var(--alert); font-weight: 650; }
+  table.motab td.milc { padding-left: 0; padding-right: 0; }
+  .mils.h { display: flex; flex-direction: column; gap: 3px; }
+  .mils.h > .mil { display: flex; align-items: flex-start; min-height: 20px; }
+  .milg { flex: 0 0 8px; height: 2px; margin-top: 9px; background: var(--if); }
+  .milg.f { flex: 1 1 auto; min-width: 6px; }
+  .milg.u { background: repeating-linear-gradient(90deg, var(--if) 0 4px, transparent 4px 7px); }
+  .mil > .mc { flex: 0 1 auto; margin-left: 4px; }
+  .mild { display: inline-flex; flex-wrap: nowrap; align-items: flex-start; gap: 0 3px; flex: 0 1 auto; min-width: 0; line-height: 18px; margin-top: 1px; }
+  .mild > .milo { margin-top: 4px; } .mild > .milcl { flex-wrap: wrap; min-width: 0; overflow-wrap: anywhere; }
+  .milo { display: inline-block; flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--if); box-shadow: 0 0 0 2px var(--card); }
+  .milx { flex: none; color: var(--if); font-weight: 700; line-height: 20px; padding: 0 4px 0 1px; }
+  .milcl { display: inline-flex; gap: 0 3px; align-items: center; color: var(--ink-soft); font-size: var(--fs-min); cursor: pointer; }
+  .mc.milf { cursor: pointer; } .milfa { color: var(--muted); }
+  .milh { font: inherit; font-size: var(--fs-min); background: transparent; border: 1px dashed var(--if); border-radius: 5px; color: var(--ink-soft); cursor: pointer; padding: 0 5px; margin-left: 4px; line-height: 18px; }
+  .mc.mie { border-style: dotted; border-color: var(--if); }
+  .mc.mie .milo { width: 7px; height: 7px; }
+  table.motab[data-lay="rows"] td.milc { height: 1px; padding: 0; }   /* moments as rows: a lane is a rail, its line runs down */
+  .mils.v { display: flex; height: 100%; min-height: 22px; position: relative; }
+  .milr { display: flex; flex: none; padding-left: 3px; }
+  .milk { position: relative; width: 11px; flex: none; --y: 11px; }
+  .milk.kin::before, .milk.kout::after { content: ""; position: absolute; left: 4px; width: 2px; background: var(--if); }
+  .milk.kin::before { top: 0; height: var(--y); } .milk.kout::after { top: var(--y); bottom: 0; }
+  .milk.ku::before, .milk.ku::after { background: repeating-linear-gradient(180deg, var(--if) 0 4px, transparent 4px 7px); }
+  .milk > i { position: absolute; left: 1px; top: calc(var(--y) - 4px); width: 8px; height: 8px; border-radius: 50%; background: var(--if); }
+  .milk > i.milq { border-radius: 2px; }
+  .milb { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 2px 4px 2px 2px; }
+  .milv { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 2px 4px; }
+  .milv > .mc { max-width: 100%; }
+  #mogrid .milcl > .mq { white-space: nowrap !important; overflow-wrap: normal !important; }
+  .lgsv { display: inline-block; vertical-align: middle; }
   .mc .mfm .hol0 { opacity: .6; } .mc .mfm .hol0 .vc { background: transparent !important; outline: 1px dashed var(--muted); }
   .mc .mrf { display: flex; flex-direction: column; gap: 1px; flex: 1 1 100%; padding-left: 8px; }
   .mc .mrf > span { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 3px; }
@@ -1729,6 +1791,14 @@
                 /* D-069: Standard or specialist split into the gates · merged into them · kept as its row */
                 std: { split: '<rect x="3" y="4" width="18" height="6" rx="1.5"/><path d="M6 14h4M6 18h4M13 14h8M13 18h8"/>', merge: '<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M7 10h10M7 14h10"/>',
                        keep: '<rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/>' },
+                /* D-070: Data effects as chips · a small map per moment · one map for the endpoint under the row */
+                dfx: { chips: '<rect x="3" y="6" width="8" height="5" rx="2"/><rect x="13" y="6" width="8" height="5" rx="2"/><rect x="3" y="13" width="11" height="5" rx="2"/>',
+                       cell: '<rect x="2" y="4" width="9" height="16" rx="1.5"/><rect x="13" y="4" width="9" height="16" rx="1.5"/><path d="M4 9l5 5M15 9l5 5"/>',
+                       one: '<rect x="2" y="4" width="6" height="4" rx="1"/><rect x="2" y="15" width="6" height="4" rx="1"/><rect x="16" y="9" width="6" height="4" rx="1"/><path d="M8 6c4 0 4 5 8 5M8 17c4 0 4-6 8-6"/>' },
+                /* D-070: in-flight values as chips where set · a lifeline each · echoes where read */
+                ifl: { chips: '<rect x="3" y="9" width="8" height="6" rx="2"/><path d="M14 12h7" stroke-dasharray="2 2"/>',
+                       lane: '<rect x="2" y="9" width="6" height="6" rx="2"/><path d="M8 12h11"/><circle cx="13" cy="12" r="1.8" fill="currentColor"/><path d="M19 9l3 3-3 3"/>',
+                       echo: '<rect x="2" y="9" width="6" height="6" rx="2"/><rect x="11" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/>' },
                 fit: { min: '<path d="M4 5v14M7.5 5v14"/><rect x="11" y="5" width="10" height="14" rx="1.2"/>', bands: '<rect x="3" y="4" width="18" height="6" rx="1.2"/><rect x="3" y="14" width="11" height="6" rx="1.2"/>' } };
   /* D-068 (his L-21: "click the columns … give a little more width … hide other columns … a button that will force accommodation by
      minimizing or moving the other columns"): the columns' own state, apart from the looks — a widened column and a hidden moment of
@@ -1858,6 +1928,7 @@
     return f === "status" ? "status:" + v.charAt(0) + ":" + (m.getAttribute("data-decl") || "") : (m.classList.contains("sksub") ? "sub:" : "") + f + ":" + v; }
   function legLine(key, m) { var p = key.split(":");
     if (p[0] === "sk") return (SK.kinds[p[1]] || {}).t || p[1];
+    if (key.indexOf("lg:") === 0) return C2.lg[key.slice(3)] || key;                    /* D-070: a lane's or the map's mark */
     if (key === "mdp") return MW.x.depthPlain; if (key === "mrc") return LG.race; if (key === "mnest") return LG.nest; if (key === "hol") return MW.x.hollowPlain;
     if (p[0] === "status") { var sv = EF.status.vals[p[1]] || {};
       return (sv.name || "") + " \u2014 " + (sv.plain || "") + (p[2] === "1" ? " " + LG.filled + ": " + MW.x.declaredPlain : p[2] === "0" ? " " + LG.hollow + ": " + MW.x.undeclaredPlain : ""); }
@@ -1869,6 +1940,7 @@
       var put = function (key, m) { if (!key || seen[key]) return; seen[key] = 1; if (!M[key]) { M[key] = { n: 0, el: m }; mo.push(key); } M[key].n++; };
       [].forEach.call(c.querySelectorAll("[data-vc], .skg, .mdp, .mrc, .mnest"), function (m) { if (m !== face && !(face && face.contains(m))) put(legKey(m), m); });
       if (c.classList.contains("hol")) put("hol", null); });
+    document.querySelectorAll('#mogrid td[data-f="' + f + '"] [data-lg], #mogrid .mdxw[data-f="' + f + '"] [data-lg]').forEach(function (m) { var k = "lg:" + m.getAttribute("data-lg"); if (!M[k]) { M[k] = { n: 0, el: m }; mo.push(k); } M[k].n++; });   /* D-070 */
     return { kinds: ko.map(function (k) { return [k, K[k]]; }), marks: mo.map(function (k) { return [k, M[k]]; }) }; }
   function legKindPlain(k) { return k.indexOf("end:") === 0 ? (W.kinds[k.slice(4)] || {}).plain : (IOW.k[k] || {}).plain; }
   function legHtml(f) { var d = legData(f), n = function (x) { return "<span class=lgn>" + esc(fill(LG.n, { n: x })) + "</span>"; };
@@ -1876,7 +1948,7 @@
     return (d.kinds.length ? "<span class=lgh>" + esc(LG.kinds) + "</span>" + d.kinds.map(function (x) { var fc = x[1].face, said = fc && fc.textContent.trim() === ioKind(x[0]);   /* a kind label says its own name */
         return "<span class=lg>" + (fc ? "<span class=lgc>" + legClone(fc) + "</span>" : "") + (said ? "" : "<b>" + esc(ioKind(x[0])) + "</b> ") + "\u2014 " + esc(legKindPlain(x[0]) || "") + " " + n(x[1].n) + "</span>"; }).join("") : "")
       + (d.marks.length ? "<span class=lgh>" + esc(LG.marks) + "</span>" + d.marks.map(function (x) { var m = x[1].el;
-        return "<span class=lg>" + (m ? "<span class=lgc>" + legClone(m) + "</span>" : x[0] === "hol" ? "<span class=lgc><span class=\"mc hol lgs\"></span></span>" : "") + esc(legLine(x[0], m)) + " " + n(x[1].n) + "</span>"; }).join("") : ""); }
+        return "<span class=lg>" + (m && x[0].indexOf("lg:") === 0 ? lgSample(x[0].slice(3), m) : m ? "<span class=lgc>" + legClone(m) + "</span>" : x[0] === "hol" ? "<span class=lgc><span class=\"mc hol lgs\"></span></span>" : "") + esc(legLine(x[0], m)) + " " + n(x[1].n) + "</span>"; }).join("") : ""); }
   /* B2 · the legend above the table (an option): one line per row, always in view */
   function moLegStrip(fams) { var L0 = $("moleg"); if (!L0) return; L0.hidden = MS.leg !== "strip"; if (L0.hidden) { L0.textContent = ""; return; }
     L0.innerHTML = "<h3>" + esc(LG.head) + "</h3>" + fams.map(function (f) { var b = BLK[MO.fam[f]]; return "<div class=mlr data-f=\"" + f + "\"><span class=mln>" + esc(b.name) + "</span><span class=mle>" + legHtml(f) + "</span></div>"; }).join(""); }
@@ -1916,7 +1988,7 @@
      happens when it holds, where it decides; the reads a refresh fetches again; the function a client branch sits in; an in-flight
      value's lifetime; how rare a piece is); the page draws it in the look its row's options pick (mo.opt gdl · gef · gic · grl · fnm ·
      std — my picks dashed, D-025.2). Nothing here is a fact ══ */
-  var C1 = MW.x.c1, ROWOPT = { gate: ["gdl", "gef", "gic", "grl", "std"], fn: ["fnm"], std: ["std"] };
+  var C1 = MW.x.c1, C2 = MW.x.c2, ROWOPT = { gate: ["gdl", "gef", "gic", "grl", "std"], fn: ["fnm"], std: ["std"], data: ["dfx"], inf: ["ifl"] };   /* D-070: the data map and the lifelines, their rows' own looks */
   /* the function (or the middleware) a gate runs in — a station element, so skAll draws its glyph and its role (D-052); a click lights it */
   function gdHost(gh) { var h = kd(el("span", "mgh0"), [gh[0]]); moTxt(h, gh[1]); return h; }
   /* a gate's own kind: the station draws no node for it, so it wears this page's icon (my proposal, its legend line says so) */
@@ -2044,6 +2116,165 @@
     return moTail(c, X); }
   /* D-069: what every chip may end with — a rare piece that names it, when Standard or specialist is split into the rows (its pick) */
   function moTail(c, X) { if (X.ra && MS.std === "split") X.ra.forEach(function (q) { c.appendChild(kd(el("span", "mra", fill(C1.rare, { n: q[0], of: q[1] })), [q[3]])); }); return c; }   /* a click lights the piece */
+  /* ══ D-070 · THE RELATIONS ACROSS THE MOMENTS (his L-12: "put functions … on the left, and in the right the tables, and have sort of
+     a mind map … where the connectors will describe the kind of operation … we are affecting these tables, but how? With what
+     function?"; his L-17: "visualize or surface what we are affecting … dig deeper … possibilities"). r.mo.dx is Data effects' chips as
+     connectors: the functions in the order they first touch data, the tables in the order they are first touched, each function →
+     table its reads and writes in time order, a table-less step a tick on the function's line, a commit a rule naming who commits, the
+     race on the link it breaks — read and PROVEN by the generator (it draws exactly the row's chips, each at a moment its paths pass).
+     r.mo.il is each in-flight value's lane: where it is set, the moments that read it and what each read can decide, when it dies;
+     values set together and read alike fold into one lane that opens. How each is drawn is mo.opt.dfx / mo.opt.ifl, my picks dashed:
+     one map for the endpoint under the row (colours: the page's read green, write orange) · a lifeline each ══ */
+  var SVGNS = "http://www.w3.org/2000/svg", MIL = { ep: null, open: {} }, ILN = [];
+  function svgEl(t) { return document.createElementNS(SVGNS, t); }
+  function onMask(mask) { return mask == null || MPATH.i == null || ((mask >>> MPATH.i) & 1) === 1; }
+  function kName(K) { return K.slice(K.indexOf(":") + 1).split("::").pop(); }
+  /* a map over the moments `sis`: every band of the endpoint (its map, under the row) or one moment (a cell's own map) */
+  function dxView(r, M, sis, mini) { var X = M.dx; if (!X) return null; var want = {}; sis.forEach(function (s) { want[s] = 1; });
+    var L = [], K = [], R = X.c.filter(function (q) { return want[q[2]]; });
+    X.l.forEach(function (q, li) { var ops = q[2].filter(function (o) { return want[o[1]]; }); if (ops.length) L.push({ li: li, f: q[0], t: q[1], ops: ops, rc: q[3] }); });
+    X.k.forEach(function (q) { if (want[q[3]]) K.push({ q: q }); });
+    if (!L.length && !K.length && !R.length) return null;
+    var fB = {}, tB = {}, low = function (o, k, s) { if (o[k] == null || s < o[k]) o[k] = s; };      /* a node stands in the band of its first step */
+    L.forEach(function (q) { q.ops.forEach(function (o) { low(fB, q.f, o[1]); low(tB, q.t, o[1]); }); });
+    K.forEach(function (o) { low(fB, o.q[0], o.q[3]); });
+    var bands = sis.filter(function (s) { return L.some(function (q) { return q.ops.some(function (o) { return o[1] === s; }); }) || K.some(function (o) { return o.q[3] === s; }) || R.some(function (q) { return q[2] === s; }); });
+    var w = el("div", "mdx" + (mini ? " mdxm" : "")); w._dx = { L: L, K: K };
+    if (!mini) { var hd = el("div", "mdxh"); hd.appendChild(el("span", null, C2.dx.fns)); hd.appendChild(el("b", null, C2.dx.head)); hd.appendChild(el("span", null, C2.dx.tbls)); w.appendChild(hd); }
+    bands.forEach(function (si) { var b = el("div", "mdxb"), g = el("div", "mdxg"), lf = el("div", "mdxcl"), rt = el("div", "mdxcr"); b.setAttribute("data-si", String(si));
+      if (!mini) { var bl = el("div", "mdxbl", moName(r, M.sp[si])), st = moStage(M.sp[si][0]); if (st) bl.style.setProperty("--stc", "var(--st-" + st + ")"); b.appendChild(bl); }
+      X.f.forEach(function (ki, fi) { if (fB[fi] === si) lf.appendChild(dxNode(ki, "f", fi)); });
+      X.t.forEach(function (ki, ti) { if (tB[ti] === si) rt.appendChild(dxNode(ki, "t", ti)); });
+      g.appendChild(lf); g.appendChild(el("div", "mdxcm")); g.appendChild(rt); b.appendChild(g);
+      R.forEach(function (q) { if (q[2] === si) b.appendChild(dxRule(q)); }); w.appendChild(b); });
+    w.querySelectorAll(".mdxg .mdxn").forEach(function (n) { var s = n.getAttribute("data-side"), i = +n.getAttribute("data-i");   /* a node none of whose steps runs on the path: dimmed */
+      if (!L.some(function (q) { return q[s] === i && q.ops.some(function (o) { return onMask(o[3]); }); }) && !(s === "f" && K.some(function (o) { return o.q[0] === i && onMask(o.q[5]); }))) n.classList.add("off"); });
+    var sv = svgEl("svg"); sv.setAttribute("class", "mdxs"); sv.setAttribute("aria-hidden", "true"); w.appendChild(sv);
+    return w; }
+  function dxNode(ki, side, i) { var K = MO.keys[ki], n = kd(el("span", "mdxn"), [K]); n.setAttribute("data-side", side); n.setAttribute("data-i", String(i)); n.setAttribute("data-tip", "modxn");
+    return moTxt(n, kName(K)); }
+  function dxRule(q) { var c = el("div", "mdxru"), lb = el("span", "mdxrl"), K = MO.keys[q[0]], fn = kd(el("span", "mdxrf"), [K]); c._q = q; c.setAttribute("data-op", q[1]);
+    c.setAttribute("data-tip", "modxc"); c.setAttribute("data-lg", "rule"); lb.appendChild(el("span", "mdxro", q[1])); lb.appendChild(moTxt(fn, kName(K))); lb.appendChild(el("span", "mq", q[3]));
+    c.appendChild(lb); if (!onMask(q[4])) c.classList.add("off"); return c; }
+  /* the endpoint's map, opening full width under the Data effects row (moments as columns) or under the table (moments as rows) */
+  function dxRow(r, M, span) { var v = M.dx ? dxView(r, M, M.dx.b, false) : null; if (!v) return null; var tr = el("tr", "mdxr"), c = el("td", "mdxtd"); c.colSpan = span;
+    c.setAttribute("data-f", "data"); c.setAttribute("data-dx", "all"); c.appendChild(v); tr.appendChild(c); return tr; }
+  /* the connectors, drawn once the page has laid the nodes out: a curve from a function's right edge to a table's left edge, a stroke
+     per run of one operation in time order (a read then a write: green above, orange below), a tick across the function's last write
+     before a table-less step (on its own line when it wrote none), the race's badge at the middle of the link it breaks */
+  function dxDraw(root) { root.querySelectorAll(".mdx").forEach(function (w) { var Z = w._dx, sv = w.querySelector(":scope > svg.mdxs"); if (!Z || !sv) return;
+    if (!w.classList.contains("mdxm")) w.style.width = Math.max(320, Math.min(1100, $("mogrid").clientWidth - 20)) + "px";   /* the width a curve can still be followed across */
+    sv.textContent = ""; w.querySelectorAll(":scope > .mdxrc").forEach(function (x) { x.remove(); });
+    var wb = w.getBoundingClientRect(); if (!wb.width) return;
+    sv.setAttribute("width", String(Math.ceil(wb.width))); sv.setAttribute("height", String(Math.ceil(wb.height)));
+    var at = function (side, i) { var n = w.querySelector('.mdxg .mdxn[data-side="' + side + '"][data-i="' + i + '"]'); if (!n) return null; var b = n.getBoundingClientRect();
+      return side === "f" ? [b.right - wb.left + 1, b.top + b.height / 2 - wb.top] : [b.left - wb.left - 1, b.top + b.height / 2 - wb.top]; };
+    var curve = function (p, s, dy) { var dx = Math.max(14, (s[0] - p[0]) * 0.45); return [[p[0], p[1] + dy], [p[0] + dx, p[1] + dy], [s[0] - dx, s[1] + dy], [s[0], s[1] + dy]]; };
+    var bz = function (c, t) { var u = 1 - t; return [0, 1].map(function (k) { return u * u * u * c[0][k] + 3 * u * u * t * c[1][k] + 3 * u * t * t * c[2][k] + t * t * t * c[3][k]; }); };
+    var ds = function (c) { return "M" + c[0].join(" ") + "C" + c[1].join(" ") + " " + c[2].join(" ") + " " + c[3].join(" "); }, mid = {}, nt = {};
+    Z.L.forEach(function (q, j) { var p = at("f", q.f), s = at("t", q.t); if (!p || !s) return;
+      var runs = []; q.ops.forEach(function (o) { var u = runs[runs.length - 1]; if (u && u.k === o[0]) u.ops.push(o); else runs.push({ k: o[0], ops: [o] }); });
+      var on = q.ops.some(function (o) { return onMask(o[3]); }), g = svgEl("g"), base = curve(p, s, 0), hit = svgEl("path");
+      g.setAttribute("class", "mdxk" + (on ? "" : " off")); g.setAttribute("data-tip", "modxl"); g.setAttribute("data-j", String(j)); g.setAttribute("data-lg", runs.length > 1 ? "rw" : runs[0].k);
+      hit.setAttribute("d", ds(base)); hit.setAttribute("class", "mdxhit"); g.appendChild(hit);
+      runs.forEach(function (u, i) { var pa = svgEl("path"); pa.setAttribute("d", ds(curve(p, s, (i - (runs.length - 1) / 2) * 3.4))); pa.setAttribute("stroke", (EN.op[u.k] || {}).col || "currentColor");
+        pa.setAttribute("data-op", u.k); pa.setAttribute("class", "mdxst" + (u.ops.some(function (o) { return onMask(o[3]); }) ? "" : " off")); g.appendChild(pa); });
+      sv.appendChild(g); mid[q.li] = { c: base, n: 0 };
+      if (q.rc) { var m = bz(base, 0.5), bd = el("span", "mdxrc" + (on ? "" : " off")), rs = cStatus(q.rc[2]); kd(rs, ["status:" + q.rc[2]]); rs.removeAttribute("data-tip");
+        bd.appendChild(el("span", null, MW.x.raceShort)); bd.appendChild(rs); bd.style.left = m[0] + "px"; bd.style.top = m[1] + "px";
+        bd.setAttribute("data-tip", "modxl"); bd.setAttribute("data-j", String(j)); bd.setAttribute("data-lg", "race"); w.appendChild(bd); } });
+    Z.K.forEach(function (o, i) { var q = o.q, m0 = mid[q[1]], g = svgEl("g"), ln = svgEl("path"), hit = svgEl("path"), d;
+      if (m0) { var t = Math.min(0.9, 0.7 + 0.1 * m0.n++), P = bz(m0.c, t), Q = bz(m0.c, t + 0.02), ax = Q[0] - P[0], ay = Q[1] - P[1], l0 = Math.hypot(ax, ay) || 1, nx = -ay / l0 * 6, ny = ax / l0 * 6;
+        d = "M" + (P[0] + nx) + " " + (P[1] + ny) + "L" + (P[0] - nx) + " " + (P[1] - ny); }
+      else { var p = at("f", q[0]); if (!p) return; var x0 = p[0] + 5 + 5 * (nt[q[0]] = (nt[q[0]] || 0) + 1) - 5; d = "M" + x0 + " " + (p[1] - 6) + "L" + x0 + " " + (p[1] + 6); }
+      ln.setAttribute("d", d); ln.setAttribute("class", "mdxtk"); hit.setAttribute("d", d); hit.setAttribute("class", "mdxhit");
+      g.setAttribute("class", "mdxk" + (onMask(q[5]) ? "" : " off")); g.setAttribute("data-tip", "modxk"); g.setAttribute("data-k", String(i)); g.setAttribute("data-lg", "tick");
+      g.appendChild(hit); g.appendChild(ln); sv.appendChild(g); }); }); }
+  /* the in-flight lanes shown on this endpoint, on this path: a closed fold is ONE lane over its members; an open one its header, then
+     its members, a lane each */
+  function ilLanes(r, M) { var I = M.il; if (!I) return []; if (MIL.ep !== r.id) { MIL.ep = r.id; MIL.open = {}; }
+    var of = {}, out = [], seen = {}; I.f.forEach(function (F0, fi) { F0[2].forEach(function (j) { of[j] = fi; }); });
+    I.l.forEach(function (L, j) { var fi = of[j]; if (fi == null) { out.push(ilOne(M, [L], null, null)); return; } if (seen[fi]) return; seen[fi] = 1;
+      var F0 = I.f[fi], ms = F0[2].map(function (k) { return I.l[k]; });
+      if (MIL.open[fi]) { var h = ilOne(M, ms, fi, F0); h.head = 1; out.push(h); ms.forEach(function (m) { out.push(ilOne(M, [m], fi, null)); }); }
+      else out.push(ilOne(M, ms, fi, F0)); });
+    return out.filter(function (x) { return x.on; }); }
+  /* one lane over its values (one, or a fold's): their reads merged per moment — the lines read, the endings each can decide, the
+     functions the value is handed to, the claim it makes, the handler's own commit that reads it */
+  function ilOne(M, ms, fi, F0) { var by = {}, dots = [], keys = [];
+    ms.forEach(function (m) { keys = keys.concat(moK(M.el[m[0]][2])); m[4].forEach(function (d) { var x = by[d[0]];
+      if (!x) { x = by[d[0]] = { si: d[0], at: [], dec: [], fn: [], cl: null, own: null, mask: d[6] }; dots.push(x); } else x.mask = x.mask == null || d[6] == null ? null : (x.mask | d[6]);
+      d[1].forEach(function (a) { if (x.at.indexOf(a) < 0) x.at.push(a); }); d[2].forEach(function (q) { if (!x.dec.some(function (y) { return y[1] === q[1]; })) x.dec.push(q); });
+      d[3].forEach(function (f) { if (x.fn.indexOf(f) < 0) x.fn.push(f); }); x.cl = x.cl || d[4]; x.own = x.own || d[5]; }); });
+    dots.sort(function (a, b) { return a.si - b.si; });
+    return { ms: ms, fi: fi, F: F0, s0: ms[0][1], lt: ms[0][2], end: ms[0][3], dots: dots, keys: keys, un: [].concat.apply([], ms.map(function (m) { return m[5]; })),
+      on: ms.some(function (m) { return onPath(M.el[m[0]]); }) }; }
+  function ilName(M, ln) { return ln.F ? fill(C2.il.fold, { v: ln.F[0] === "lim" ? C2.il.lim : ln.F[1], n: ln.ms.length }) : M.el[ln.ms[0][0]][3]; }
+  /* where its line ends: a value that goes with the answer at the answer — on a picked path, at the moment that path's answer leaves;
+     one the server keeps runs on past the last moment shown; an unknown one stops at the last moment it is seen */
+  function ilEnd(M, ln) { if (ln.lt === "srv") return null; if (ln.lt === "req" && MPATH.i != null) return Math.max(M.ex[MPATH.i][3], ln.s0); return ln.end; }
+  function ilSeg(fillIt, ln) { return el("span", "milg" + (fillIt ? " f" : "") + (ln.lt === "unk" ? " u" : "")); }
+  /* ONE cell of the In-flight row as lanes: a slot per lane, in the same order in every cell, so a lane reads across the row */
+  function ilSpan(M, ln, VIS) { var first = null, last = null, end = ilEnd(M, ln);
+    VIS.forEach(function (v) { if (first == null && v >= ln.s0) first = v; if (end == null || v <= end) last = v; });
+    return { f0: first, l0: last, end: end }; }
+  function ilCell(M, si, VIS, vert) { if (vert) return ilCellV(M, si, VIS); var box = el("div", "mils h");
+    var first = function (s) { for (var i = 0; i < VIS.length; i++) if (VIS[i] >= s) return VIS[i]; return null; }, last = function (s) { var o = null; VIS.forEach(function (v) { if (v <= s) o = v; }); return o; };
+    ILN.forEach(function (ln, k) { var s = el("div", "mil"); s.setAttribute("data-k", String(k)); box.appendChild(s);
+      var f0 = first(ln.s0); if (ln.head) { if (si === f0) s.appendChild(ilFoldBtn(M, ln)); return; }
+      var end = ilEnd(M, ln), l0 = end == null ? VIS[VIS.length - 1] : last(end); if (f0 == null || l0 == null || si < f0 || si > l0) return;
+      var setHere = si === f0, dots = ln.dots.filter(function (d) { return d.si === si && onMask(d.mask); });
+      if (!setHere) s.appendChild(ilSeg(0, ln)); else s.appendChild(ln.F ? ilFoldChip(M, ln) : moChip(M.el[ln.ms[0][0]]));
+      dots.forEach(function (d) { s.appendChild(ilSeg(0, ln)); s.appendChild(ilDot(M, ln, d, false)); });
+      if (end != null && si === l0) { s.appendChild(ilSeg(0, ln)); s.appendChild(ilCap(ln, ln.lt === "unk" ? "unk" : "cap")); }
+      else { s.appendChild(ilSeg(1, ln)); if (end == null && si === VIS[VIS.length - 1]) s.appendChild(ilCap(ln, "keep")); } });
+    return box; }
+  /* moments as rows: each lane a rail at the left of the cell, its line running down from the moment it is set to the one it dies at;
+     what happens at this moment (the chip where set, a read, the end) stands right of the rails, a line per lane, its mark on the rail */
+  function ilCellV(M, si, VIS) { var box = el("div", "mils v"), rails = el("div", "milr"), body = el("div", "milb"); box.appendChild(rails); box.appendChild(body);
+    ILN.forEach(function (ln, k) { var rl = el("div", "milk"), S0 = ilSpan(M, ln, VIS); rails.appendChild(rl);
+      if (ln.head) { if (si === S0.f0) { var hb = el("div", "milv"); hb.setAttribute("data-k", String(k)); hb.appendChild(ilFoldBtn(M, ln)); body.appendChild(hb); } return; }
+      if (S0.f0 == null || S0.l0 == null || si < S0.f0 || si > S0.l0) return;
+      var setHere = si === S0.f0, ends = S0.end != null && si === S0.l0, keeps = S0.end == null && si === VIS[VIS.length - 1], items = [];
+      if (!setHere) rl.classList.add("kin"); if (!ends) rl.classList.add("kout"); if (ln.lt === "unk") rl.classList.add("ku");
+      if (setHere) items.push(ln.F ? ilFoldChip(M, ln) : moChip(M.el[ln.ms[0][0]]));
+      ln.dots.forEach(function (d) { if (d.si === si && onMask(d.mask)) items.push(ilDot(M, ln, d, false)); });
+      if (ends) items.push(ilCap(ln, ln.lt === "unk" ? "unk" : "cap")); else if (keeps) items.push(ilCap(ln, "keep"));
+      if (!items.length) return;
+      var row = el("div", "milv"); row.setAttribute("data-k", String(k)); items.forEach(function (x) { row.appendChild(x); }); body.appendChild(row);
+      rl.setAttribute("data-k", String(k)); rl.classList.add("kev"); rl.appendChild(el("i", setHere ? "milq" : null)); });
+    return box; }
+  function ilFoldChip(M, ln) { var e0 = M.el[ln.ms[0][0]], ik = (EF.ifk.vals || {})[(e0[4] || [])[1]] || {}, c = el("span", "mc milf");
+    kd(c, ln.keys, false); c.setAttribute("data-f", "inf"); c.setAttribute("data-tip", "moilf"); c.setAttribute("data-fold", String(ln.fi)); c.setAttribute("data-life", ln.lt);
+    c.setAttribute("data-lg", "fold"); c.setAttribute("role", "button"); c.setAttribute("tabindex", "0"); c.setAttribute("aria-expanded", "false"); c._ln = ln;
+    c.appendChild(el("span", "milfa", "▸")); if (ik.icon) c.appendChild(vIco(el("span", "mifg"), ik.icon)); c.appendChild(moTxt(el("span", "mt"), ilName(M, ln)));
+    var lt = vc("life", e0[6] || "unknown", ln.lt === "req" ? W.cols.inf_answer.head : ln.lt === "srv" ? W.cols.inf_server.head : C1.unk, "mlt"); lt.setAttribute("data-life", ln.lt);
+    lt.textContent = lt.getAttribute("aria-label"); c.appendChild(lt); return c; }
+  function ilFoldBtn(M, ln) { var b = el("button", "milh"); b.type = "button"; b.setAttribute("data-fold", String(ln.fi)); b.setAttribute("aria-expanded", "true"); b.setAttribute("data-tip", "moilf"); b._ln = ln;
+    b.appendChild(el("span", "milfa", "▾")); b.appendChild(el("span", null, ilName(M, ln))); return b; }
+  /* a read: a dot on the line (an echo, in its option), the endings that read can decide as their status, the claim it makes, the commit */
+  function ilDot(M, ln, d, echo) { var s = el("span", echo ? "mc mie" : "mild"); kd(s, ln.keys, echo && ln.ms.length === 1); s.setAttribute("data-tip", "moild"); s.setAttribute("data-lg", echo ? "echo" : "dot");
+    if (echo) s.setAttribute("data-f", "inf"); s._ln = ln; s._d = d; s.appendChild(el("i", "milo"));
+    if (echo) s.appendChild(moTxt(el("span", "mt"), fill(C2.il.echo, { v: ilName(M, ln) })));
+    d.dec.forEach(function (q) { var c = cStatus(q[0]); kd(c, ["status:" + q[0]]); c.removeAttribute("data-tip"); s.appendChild(c); });
+    if (d.cl) { var t = kd(el("span", "milcl"), [MO.keys[d.cl[0]]]); t.appendChild(el("span", "mq", C2.il.claimF)); t.appendChild(moTxt(el("span", null), kName(MO.keys[d.cl[0]]))); s.appendChild(t); }
+    if (d.own) s.appendChild(el("span", "mq", d.own)); return s; }
+  function ilCap(ln, k) { var c = el("span", "milx milx-" + k, k === "cap" ? "✕" : k === "keep" ? "➤" : "?"); c.setAttribute("data-tip", "moilc"); c.setAttribute("data-cap", k);
+    if (k !== "unk") c.setAttribute("data-lg", k); c._ln = ln; return c; }
+  /* B · echoes: a small chip at each moment that reads a value, beside the chips set there */
+  function ilEchoes(M, si) { var out = []; ILN.forEach(function (ln) { if (ln.head) return; ln.dots.forEach(function (d) { if (d.si === si && onMask(d.mask)) out.push(ilDot(M, ln, d, true)); }); }); return out; }
+  /* the lanes read across a row: slot k is as tall in every cell as the tallest slot k of the row (moments as columns) */
+  function ilEq(root) { root.querySelectorAll(".mils.v").forEach(function (b) { b.querySelectorAll(".milk.kev[data-k]").forEach(function (rl) {
+      var row = b.querySelector('.milb > .milv[data-k="' + rl.getAttribute("data-k") + '"]'); if (row) rl.style.setProperty("--y", (row.offsetTop + 10) + "px"); }); });
+    root.querySelectorAll("table.motab").forEach(function (t) { var bs = t.querySelectorAll("td.milc > .mils.h"), hs = {}; if (!bs.length) return;
+    bs.forEach(function (b) { [].forEach.call(b.children, function (s) { s.style.minHeight = ""; }); });
+    bs.forEach(function (b) { [].forEach.call(b.children, function (s) { var k = s.getAttribute("data-k"); hs[k] = Math.max(hs[k] || 0, s.getBoundingClientRect().height); }); });
+    bs.forEach(function (b) { [].forEach.call(b.children, function (s) { s.style.minHeight = Math.ceil(hs[s.getAttribute("data-k")]) + "px"; }); }); }); }
+  /* the legend's sample for a mark drawn as a line (the map's reads, writes, ticks, rules): drawn small, in its own colours */
+  function lgSample(k, m) { if (m && m.namespaceURI !== SVGNS && k !== "rule") return "<span class=lgc>" + legClone(m) + "</span>";
+    var ln = function (col, y) { return '<path d="M1 ' + y + 'H29" stroke="' + col + '" stroke-width="2" fill="none"/>'; }, R0 = (EN.op.r || {}).col, W0 = (EN.op.w || {}).col;
+    var s = k === "r" ? ln(R0, 6) : k === "w" ? ln(W0, 6) : k === "rw" ? ln(R0, 4) + ln(W0, 8) : k === "tick" ? ln(W0, 6) + '<path d="M20 1V11" stroke="currentColor" stroke-width="2"/>' : ln("currentColor", 6);
+    return "<span class=lgc><svg class=lgsv width=30 height=12 viewBox=\"0 0 30 12\" aria-hidden=true>" + s + "</svg></span>"; }
   /* D-064 (2) · a fact of the endpoint no moment holds, in the endpoint metadata (D-068): its words the words file's mo.nm.k, its values the
      row record's (read and proven by the generator, no_moment); a keyed one wears the station's mark (D-052), the returned type of the
      outline on its own name. Its hover (monm) says what it is and the block it belongs to */
@@ -2169,9 +2400,14 @@
     var t = el("table", "motab"), th = el("thead"), tb = el("tbody"), cg = el("colgroup"), dcs = [], need = [], lead = [];
     t.setAttribute("data-lay", MS.lay); t.setAttribute("data-cell", MS.cell); t.setAttribute("data-path", MPATH.i == null ? "all" : String(MPATH.i)); t.setAttribute("data-hdr", MS.hdr); t.setAttribute("data-save", MS.save);
     function td(si, f, j) { var c = el("td"), es = cellOf[si + "|" + f] || []; c._ci = j; c.setAttribute("data-f", f); c.setAttribute("data-mom", M.sp[si][0]);
+      var few = MS.cell === "counts" || isMini(rowsLook ? f : si);
+      if (f === "inf" && MS.ifl === "lane" && ILN.length && !few) { c.className = "milc"; c.appendChild(ilCell(M, si, rowsOn, rowsLook)); return c; }   /* D-070: a lifeline each (my pick) */
+      if (f === "data" && MS.dfx === "cell" && es.length && !few) { var dv = dxView(r, M, [si], true); if (dv) { c.className = "mdxc"; c.appendChild(dv); return c; } }   /* D-070: a small map per moment */
+      var ech = f === "inf" && MS.ifl === "echo" && !few ? ilEchoes(M, si) : [];               /* D-070: echoes where it is read */
+      if (!es.length && ech.length) { var eb = el("div", "mcs"); ech.forEach(function (x) { eb.appendChild(x); }); c.appendChild(eb); return c; }
       if (!es.length) { c.className = "mo0"; var em = el("span", "moempty"); em.setAttribute("aria-label", MW.empty); c.appendChild(em); return c; }   /* D-067 (P5): the empty mark says it, no native tooltip */
       if (MS.cell === "counts" || isMini(rowsLook ? f : si)) { var n = el("span", "mcount", String(es.length)); kd(n, [].concat.apply([], es.map(function (e) { return moK(e[2]); })), false); c.appendChild(n); return c; }
-      c.appendChild(moCell(es, f, M.sp[si][0])); return c; }                   /* D-069: grouped where the row's look asks */
+      var mcl = moCell(es, f, M.sp[si][0]); ech.forEach(function (x) { mcl.appendChild(x); }); c.appendChild(mcl); return c; }   /* D-069: grouped where the row's look asks */
     if (!rowsLook) {
       var trb = el("tr", "mostgr"), trr = H2 ? el("tr", "moroadr") : null, hr = el("tr", "momr"), corner = el("th", "mocorner", W.sec.mo);
       corner.rowSpan = H2 ? 3 : 2; trb.appendChild(corner); lead.push(corner); cg.appendChild(el("col", "mhc"));
@@ -2180,7 +2416,8 @@
       dc.forEach(function (si, j) { dcs.push(cg.appendChild(el("col"))); need.push(isMini(si) ? 3 : moNeed(r, M.sp[si]));
         hr.appendChild(moHead(r, M.sp[si], "th", si, { fk: H2 ? null : fkSeg(FK, dc, j), wc: wcol(si), wide: isWide(si), mini: isMini(si) })); });
       th.appendChild(trb); if (trr) th.appendChild(trr); th.appendChild(hr);
-      fams.forEach(function (f) { var tr = el("tr"); tr.setAttribute("data-f", f); tr.appendChild(blockHead(f, "th", r)); dc.forEach(function (si, j) { tr.appendChild(td(si, f, j)); }); tb.appendChild(tr); });
+      fams.forEach(function (f) { var tr = el("tr"); tr.setAttribute("data-f", f); tr.appendChild(blockHead(f, "th", r)); dc.forEach(function (si, j) { tr.appendChild(td(si, f, j)); }); tb.appendChild(tr);
+        if (f === "data" && MS.dfx === "one" && dc[0] === rowsOn[0]) { var dr = dxRow(r, M, dc.length + 1); if (dr) tb.appendChild(dr); } });   /* D-070: the endpoint's map, under its row */
     } else {
       var hr2 = el("tr"), c0 = el("th", "mocorner", MW.stg.head); hr2.appendChild(c0); lead.push(c0); cg.appendChild(el("col", "mstc"));
       if (H2) { var c1 = el("th", "mocorner", MW.stg.road.head); hr2.appendChild(c1); lead.push(c1); cg.appendChild(el("col", "mroc")); }
@@ -2196,7 +2433,7 @@
     }
     t.appendChild(cg); t.appendChild(th); t.appendChild(tb); G.appendChild(t);
     skAll(t);                                                   /* D-052 marks before the widths: the floors measure the labels too */
-    oneTip(t, ".mc, .nmc");                                     /* D-067 (P1): one hover per item */
+    oneTip(t, ".mc, .nmc, .mdxn, .mdxru, .mild");               /* D-067 (P1): one hover per item · D-070: a map's node, a rule, a read */
     return { t: t, dcs: dcs, need: need, lead: lead, dc: dc, rows: rowsLook, wcol: wcol, mini: mini }; }
   /* how wide a widened column needs to be: its widest item, every name whole (W-a: a name breaks only after its _ . / or at a space) or
      every item on one line (W-b), plus the cell's own padding — measured by the page's own layout, the table set to that look a moment */
@@ -2213,8 +2450,9 @@
     var cm0 = el("span", null, "0000000000"); cm0.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;font-weight:650"; T.lead[0].appendChild(cm0);
     var chPx = cm0.getBoundingClientRect().width / 10; cm0.remove();
     var cw = T.dc.map(function (d, j) { return wide[j] ? moContentW(t, j) : 0; }), fl = dcs.map(function () { return 0; });
-    t.querySelectorAll("tbody td").forEach(function (c) { if (c._ci == null) return; c.querySelectorAll(".mc .vc").forEach(function (v) { var ins = v.closest(".mgb") ? 20 : 0;   /* D-069: a chip under a head sits in by its group's inset */
-      fl[c._ci] = Math.max(fl[c._ci], v.getBoundingClientRect().width + ins, v.scrollWidth + ins); }); });
+    t.querySelectorAll("tbody td").forEach(function (c) { if (c._ci == null) return; c.querySelectorAll(".mc .vc").forEach(function (v) { var rl = v.closest(".mils.v"), ins = v.closest(".mgb") ? 20 : rl ? rl.querySelector(".milr").getBoundingClientRect().width + 8 : 0;   /* D-070: a lane chip sits right of the rails */   /* D-069: a chip under a head sits in by its group's inset */
+      fl[c._ci] = Math.max(fl[c._ci], v.getBoundingClientRect().width + ins, v.scrollWidth + ins); });
+      if (c.querySelector(".mdxm")) fl[c._ci] = Math.max(fl[c._ci], 22 * em); });   /* D-070: a small map's two columns of names */
     var flo = dcs.map(function (c, j) { return mini[j] ? Math.ceil(MINI * em) : Math.max(fl[j] > 0 ? Math.ceil(fl[j] + (rowsLook ? 12 : 8) + 18) : 0, 6.5 * em, !rowsLook && chPx > 0 ? Math.ceil(T.need[j] * chPx) + 8 : 0); });   /* its badge + the cell's padding + the chip's 12 + a label's 4px + 2 · the column floor · its head on two lines */
     var fix = dcs.map(function (c, j) { return mini[j] ? flo[j] : wide[j] ? Math.max(flo[j], cw[j]) : null; });
     var leadW = sum(T.lead.map(function (h) { return h.getBoundingClientRect().width; })), room = G.clientWidth - leadW - 2, free = fix.map(function (w) { return w == null; }), avail = Math.max(0, room - sum(fix));
@@ -2274,12 +2512,16 @@
     var rowsOn = (MPATH.i == null ? M.sp.map(function (x, i) { return i; }) : M.pass[MPATH.i]).filter(function (si) { var x = M.sp[si];
       return MO.fixed.indexOf(x[0]) >= 0 ? MC.hidF.indexOf(x[0]) < 0 : hidH.indexOf(String(si)) < 0; });
     var cell = {}; M.el.forEach(function (e) { if (!onPath(e)) return; var fm0 = moFam(e); if (!fm0) return; var k = e[1] + "|" + fm0; (cell[k] = cell[k] || []).push(e); });   /* D-069: a family's row (mo.opt.std) */
+    ILN = MS.ifl === "chips" ? [] : ilLanes(r, M);                                     /* D-070: the in-flight lanes, folds applied */
     var G = $("mogrid"); G.textContent = ""; var dcAll = MS.lay === "rows" ? fams : rowsOn;
     var T0 = moSize(G, moTable(G, r, M, fams, rowsOn, dcAll, {}, cell));
     if (MC.fit && G.scrollWidth > G.clientWidth + 2) {             /* D-068: fit, the way its option says */
       if (MS.fit === "bands") { var bands = moBands(T0); G.textContent = ""; bands.forEach(function (bd) { moSize(G, moTable(G, r, M, fams, rowsOn, bd, {}, cell)); }); }
       else { var mini = moMini(T0, cell, fams, rowsOn, M); G.textContent = ""; moSize(G, moTable(G, r, M, fams, rowsOn, dcAll, mini, cell)); } }
+    if (MS.lay === "rows" && MS.dfx === "one" && fams.indexOf("data") >= 0 && M.dx) { var dv0 = dxView(r, M, M.dx.b, false);   /* D-070: moments as rows — the map under the table */
+      if (dv0) { var dw = el("div", "mdxw"); dw.setAttribute("data-f", "data"); dw.appendChild(dv0); G.appendChild(dw); skAll(dw); oneTip(dw, ".mdxn, .mdxru"); } }   /* D-052 marks, one hover each */
     G.setAttribute("data-fit", MC.fit ? MS.fit : "off");
+    ilEq(G); dxDraw(G);                                        /* D-070: the lanes read across, then the map's connectors over the laid-out nodes */
     var sc = $("moscroll"); sc.hidden = !(G.scrollWidth > G.clientWidth + 2);
     /* the band: each block's elements that should have a moment and the map cannot place here, by reason, counted — what has no moment
        by nature stands in the endpoint metadata (D-068) */
@@ -2581,6 +2823,38 @@
     if (kind === "mojs") { var js0 = t._js; return "<b>" + esc(js0[1][0] + " " + js0[1][1]) + "</b> \u00b7 " + esc(fill(W.mo.jy.stepOf, { i: js0[1][7], cid: js0[0].c }))
       + "<span class=ln>" + esc(jyLine(js0[1], 0)) + "</span>"; }                                         /* D-067: what a journey is, in the row's legend */
     if (kind === "mowhy") { var mw = W.mo.why[t.getAttribute("data-why")]; return "<b>" + esc(mw.name) + "</b> · " + esc(W.mo.band.title) + "<span class=pl>" + esc(mw.plain) + "</span>"; }
+    /* D-070 · the data map's node, link, tick and rule; an in-flight lane's read, end and fold — each its own facts */
+    if (kind === "modxn") { var w0 = t.closest(".mdx"), Z0 = w0 && w0._dx, s0 = t.getAttribute("data-side"), i0 = +t.getAttribute("data-i"), r0 = BYID[S.open], K0 = keysOf(t)[0]; if (!Z0 || !r0) return null;
+      var ls0 = Z0.L.filter(function (q) { return q[s0] === i0; }), X0d = r0.mo.dx;
+      return "<b>" + esc(kName(K0)) + "</b> \u00b7 " + esc(elKind(K0)) + "<span class=ln>" + esc(fill(C2.dx[(s0 === "f" ? "fnTip" : "tblTip") + (ls0.length === 1 ? "1" : "")], { n: ls0.length })) + "</span>"
+        + ls0.map(function (q) { var o0 = MO.keys[s0 === "f" ? X0d.t[q.t] : X0d.f[q.f]]; return "<span class=ln>" + esc(kName(o0) + ": " + q.ops.map(function (o) { return fill(C2.dx.op, { op: C2.dx[o[0]], at: o[2], mom: moName(r0, r0.mo.sp[o[1]]) }); }).join(" \u00b7 ")) + "</span>"; }).join("")
+        + (s0 === "f" ? Z0.K.filter(function (o) { return o.q[0] === i0; }).map(function (o) { return "<span class=ln>" + esc(fill(C2.dx.tick, { op: o.q[2], at: o.q[4], mom: moName(r0, r0.mo.sp[o.q[3]]) })) + "</span>"; }).join("") : ""); }
+    if (kind === "modxl") { var Z1 = t.closest(".mdx")._dx, q1 = Z1.L[+t.getAttribute("data-j")], r1 = BYID[S.open], X1 = r1.mo.dx;
+      return "<b>" + esc(fill(C2.dx.link, { fn: kName(MO.keys[X1.f[q1.f]]), tbl: kName(MO.keys[X1.t[q1.t]]) })) + "</b>"
+        + q1.ops.map(function (o) { var fa = MPATH.i != null && o[4] ? o[4][String(MPATH.i)] : null; return "<span class=ln>" + esc(fill(C2.dx.op, { op: C2.dx[o[0]], at: o[2], mom: moName(r1, r1.mo.sp[o[1]]) }))
+          + (fa ? " \u00b7 " + esc(fill(C2.dx.fate, { v: fa.map(function (f) { return (W.fates[f] || {}).name || f; }).join(", ") })) : "") + (onMask(o[3]) ? "" : " \u00b7 " + esc(C2.dx.off)) + "</span>"; }).join("")
+        + (q1.rc ? "<span class=ln>" + esc(fill(C2.dx.race, { cons: q1.rc[0], cols: q1.rc[1].join(", "), at: q1.rc[3], st: q1.rc[2] })) + "</span>" : ""); }
+    if (kind === "modxk") { var q2 = t.closest(".mdx")._dx.K[+t.getAttribute("data-k")].q, r2 = BYID[S.open];
+      return "<b>" + esc(q2[2] + " \u00b7 " + kName(MO.keys[r2.mo.dx.f[q2[0]]])) + "</b><span class=ln>" + esc(fill(C2.dx.tick, { op: q2[2], at: q2[4], mom: moName(r2, r2.mo.sp[q2[3]]) })) + "</span>"
+        + "<span class=pl>" + esc(C2.dx.ticks[q2[2]] || C2.dx.ticks._other) + "</span>" + (onMask(q2[5]) ? "" : "<span class=ln>" + esc(C2.dx.off) + "</span>"); }
+    if (kind === "modxc") { var q3 = t._q, r3 = BYID[S.open];
+      return "<b>" + esc(fill(C2.dx.rule, { op: q3[1], fn: kName(MO.keys[q3[0]]), at: q3[3] })) + "</b><span class=ln>" + esc(moName(r3, r3.mo.sp[q3[2]])) + "</span>"
+        + "<span class=pl>" + esc(C2.dx.rules[q3[1]] || "") + "</span>" + (onMask(q3[4]) ? "" : "<span class=ln>" + esc(C2.dx.off) + "</span>"); }
+    if (kind === "moild") { var ln4 = t._ln, d4 = t._d, r4 = BYID[S.open], M4 = r4.mo;
+      return "<b>" + esc(ilName(M4, ln4)) + "</b> \u00b7 " + esc(moName(r4, M4.sp[d4.si]))
+        + d4.at.map(function (a) { return "<span class=ln>" + esc(fill(C2.il.read, { at: a })) + "</span>"; }).join("")
+        + (d4.fn.length ? "<span class=ln>" + esc(fill(C2.il.handed, { v: d4.fn.join(", ") })) + "</span>" : "")
+        + (d4.dec.length ? "<span class=ln>" + esc(fill(C2.il.decides, { v: d4.dec.map(function (q) { var x4 = M4.ex.filter(function (y) { return y[0] === q[1]; })[0]; return q[0] + (x4 && x4[6] ? " " + x4[6] : ""); }).join(" \u00b7 ") })) + "</span>" : "")
+        + (d4.cl ? "<span class=ln>" + esc(fill(C2.il.claim, { tbl: kName(MO.keys[d4.cl[0]]) }) + " (" + [d4.cl[3], kName(MO.keys[d4.cl[1]]), d4.cl[2]].filter(Boolean).join(" \u00b7 ") + ")") + "</span>" : "")
+        + (d4.own ? "<span class=ln>" + esc(C2.il.saves) + "</span>" : ""); }
+    if (kind === "moilc") { var ln5 = t._ln, k5 = t.getAttribute("data-cap"), r5 = BYID[S.open];
+      return "<b>" + esc(ilName(r5.mo, ln5)) + "</b><span class=ln>" + esc(k5 === "cap" ? C2.il.end : k5 === "keep" ? C2.il.keep : C2.il.unk) + "</span>"
+        + (ln5.un.length ? "<span class=ln>" + esc(fill(C2.il.also, { v: ln5.un.join(", ") })) + "</span>" : ""); }
+    if (kind === "moilf") { var ln6 = t._ln, r6 = BYID[S.open], M6 = r6.mo, op6 = t.getAttribute("aria-expanded") === "true";
+      return "<b>" + esc(ilName(M6, ln6)) + "</b><span class=ln>" + esc(fill(C2.il.members, { n: ln6.ms.length, v: ln6.ms.map(function (m) { return M6.el[m[0]][3]; }).join(", ") })) + "</span>"
+        + "<span class=ln>" + esc(fill(C2.il.set, { mom: moName(r6, M6.sp[ln6.s0]) }) + " \u00b7 " + (ln6.lt === "srv" ? C2.il.keep : ln6.lt === "req" ? C2.il.end : C2.il.unk)) + "</span>"
+        + (ln6.un.length ? "<span class=ln>" + esc(fill(C2.il.also, { v: ln6.un.join(", ") })) + "</span>" : "")
+        + "<span class=pl>" + esc(fill(op6 ? C2.il.close : C2.il.open, { n: ln6.ms.length })) + "</span>"; }
     if (kind === "mochip") { var X0 = t._x || {}; if (X0.io) return ioHtml(ioParts(X0, t));             /* D-067: the item's one hover · D-068: what counts it */
       var mks = keysOf(t); return "<b>" + esc(mks.length ? elName(mks[0]) : t.textContent.trim()) + "</b>" + (mks.length ? " \u00b7 " + esc(elKind(mks[0])) : ""); }   /* a chip the band names: its reason is its line */
     /* D-067 (P4, D-017): a glyph says what kind of element it marks — where the page took its look from is not a fact of the code */
@@ -2638,7 +2912,7 @@
   function cmLines() { var C = W.copy.lines; return [optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),
     optLine(C.uni, W.carry, PV.uni), optLine(C.gaps, W.carry, PV.gaps),                   /* D-058: the two panels' own switches */
     optLine(C.mo, W.mo.opt.lay, MS.lay), optLine(C.mo, W.mo.opt.cell, MS.cell), optLine(C.mo, W.mo.opt.jy, MS.jy),   /* D-065: the journeys' look */
-    optLine(C.mo, W.mo.opt.leg, MS.leg), optLine(C.mo, W.mo.opt.ipo, MS.ipo)].concat(["hdr", "save", "meta", "wid", "fit", "gdl", "gef", "gic", "grl", "fnm", "std"].map(function (g) { return optLine(C.mo, W.mo.opt[g], MS[g]); })); }   /* D-069: the rows' own looks */   /* D-067: the legend's place, the hovers' form · D-068: the header, saving's stage, the metadata's place, widening, fit */
+    optLine(C.mo, W.mo.opt.leg, MS.leg), optLine(C.mo, W.mo.opt.ipo, MS.ipo)].concat(["hdr", "save", "meta", "wid", "fit", "gdl", "gef", "gic", "grl", "fnm", "std", "dfx", "ifl"].map(function (g) { return optLine(C.mo, W.mo.opt[g], MS[g]); })); }   /* D-069: the rows' own looks */   /* D-067: the legend's place, the hovers' form · D-068: the header, saving's stage, the metadata's place, widening, fit */
   /* the code map's own copy (his ask 2026-09-26): the page, the endpoint, every option of the code map, then room for his words */
   function cmText(r) { var C = W.copy.lines; return [C.page + ": all-endpoints · " + T.app + " @ " + T.head, C.open + ": " + r.id,
     optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),
@@ -2691,6 +2965,7 @@
     if ((q = t.closest("[data-unhide]"))) { var u = q.getAttribute("data-unhide");
       if (u === "*") { MC.hidF = []; MC.hidH = []; MC.hidR = []; } else { var lst = { f: "hidF", h: "hidH", r: "hidR" }[u.charAt(0)], v0 = u.slice(2); MC[lst] = MC[lst].filter(function (x) { return x !== v0; }); }
       mcSave(); moRedraw(); return; }
+    if ((q = t.closest("[data-fold]"))) { var fo = +q.getAttribute("data-fold"); MIL.open[fo] = !MIL.open[fo]; moRedraw('#mogrid [data-fold="' + fo + '"]'); return; }   /* D-070: a fold opens, a lane each */
     if ((q = t.closest(".mro"))) { var f0 = q.getAttribute("data-rowopt"); MROW.f = MROW.f === f0 ? null : f0; moRedraw('#mogrid .mro[data-rowopt="' + f0 + '"]'); return; }
     if ((q = t.closest("[data-hiderow]"))) { var f1 = q.getAttribute("data-hiderow"); if (MC.hidR.indexOf(f1) < 0) MC.hidR.push(f1); MROW.f = null; mcSave(); moRedraw(); return; }
     if ((q = t.closest(".msc"))) { var cid = q.getAttribute("data-mcol"); MCOL.ep = r.id; MCOL.col = MCOL.col === cid ? null : cid; applyMoCol(); return; }
@@ -2698,6 +2973,7 @@
     if ((q = t.closest("[data-wcol]")) && !t.closest("button, [data-key], .mfk")) moWiden(q.getAttribute("data-wcol")); });
   $("sec-mo").addEventListener("keydown", function (e) { var q = e.target;
     if ((e.key === "Enter" || e.key === " ") && q.matches && q.matches("[data-wcol]")) { e.preventDefault(); moWiden(q.getAttribute("data-wcol")); return; }
+    if ((e.key === "Enter" || e.key === " ") && q.matches && q.matches(".milf[data-fold]")) { e.preventDefault(); q.click(); return; }
     if (e.key === "Escape" && MROW.f) { var f0 = MROW.f; MROW.f = null; moRedraw('#mogrid .mro[data-rowopt="' + f0 + '"]'); } });
   /* the toggle beside each title (D-038): closed by default, remembered per viewer (a convenience — the page draws the same without it) */
   var IKEY = "gabe:allep:info:v1", INFO = { board: false, one: false, mo: false };

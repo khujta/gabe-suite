@@ -187,10 +187,10 @@ deferred + trigger).
 - **where:** BY MOMENT · Data effects
 - **could not tell:** which function does which operation on which table — the row lists tables with R/W beside a few
   functions, never the link between them.
-- **fix:** BUILT (the R/W colour only) — BY MOMENT's R and W letters wear the code map's read-green / write-orange chip; the functions →
-  tables connector view is batch C2's.
+- **fix:** BUILT — Data effects' options slot: one map for the endpoint under the row (my pick): functions left, tables right, the moments
+  as bands, green reads, orange writes, a tick a flush, a rule a commit naming who commits, the race on its link · a small map per cell · chips.
 - **tag:** `relation-flattened-into-a-list`
-- **status:** built (D-069) — the R/W colour; the connector view is batch C2's
+- **status:** option — his to pick (D-070); the R/W colour built (D-069)
 
 ### L-13
 - **words:** "in functions again, we will have to do kind of the same thing that we did on the endpoint lab for the tables for
@@ -246,10 +246,10 @@ deferred + trigger).
 - **read as:** "in-flight state"
 - **where:** BY MOMENT · In-flight state (`dependency-value session`, `dependency-value ctx`)
 - **could not tell:** what an in-flight item is and what it affects; the row has no icon.
-- **fix:** BUILT — the row wears an hourglass (my pick, dashed); each value its kind's glyph in the row's hue, its type, its kind in
-  plain words and its lifetime (request · server), filled when the server keeps it; its head's hover says what the row asks.
+- **fix:** BUILT — the icon and look (D-069); In-flight's options slot: a lifeline each (my pick) — set · read, with the ending each read
+  can decide · a cross at the answer or an arrow past it; alike values fold ("rate limiter · 7") · echoes where read · chips.
 - **tag:** `role-without-its-object`
-- **status:** built (D-069); what each value affects across the moments (the lifelines) is batch C2's
+- **status:** built (D-069) — the icon and look; the lifelines — option, his to pick (D-070)
 
 ### L-18
 - **words:** "Then standard of specialists, let's give it an icon also. We have here flags, binding, and different things um.

@@ -1004,3 +1004,38 @@ are (D-023, generation work): start_session's raise at services/cooking.py:129 i
 recorded"), assert_recipe_allergen_safe's raise is not joined to this endpoint, the fall-through branch records no does, the via hops
 carry no function names, and the code map does not read apps/api/middleware/ or reference/. Display-side generation (D-063's lighter
 regime) and page-only: D-037's light checks.
+
+## D-070 — What is affected, drawn across the moments: Data effects as a map of functions and tables; each in-flight value as a lifeline
+Date: 2026-09-30 · Input: his note "API Hover Legend Consolidation", legibility-feedback.md L-12 and L-17; the functions-data (P-L12b)
+and inflight-specialist (P3) investigations.
+Decision, his: "put functions on the— in a block. In different blocks the functions on the left. And in the right the tables. And have
+sort of a mind map that gives you the relationship between the functions and the tables. Where the connectors will describe the kind
+of operation … In data effects we want to say, okay, we are affecting these tables, but how? With what function?" (L-12) · "inflight
+state is basically some sort of temporary flag that we store or something like that, right, that will affect something. So the idea
+here is visualize or surface what we are affecting. Um, So I would like to dig deeper on that to see possibilities on what we could
+represent on that inflight state." (L-17)
+Consequence (his asks, built; how each is drawn is my reading): (1) Data effects as connectors (his L-12): the generator turns the row's
+placed chips into one record per endpoint (`_ae_rel.data_links`) — the functions in the order they first touch data, the tables in the
+order they are first touched, each function → table its reads and writes in time order, a step with no table of its own (a flush, a
+savepoint) a tick on the function's last write before it, a commit or rollback a rule naming who commits, the race on the link it breaks
+— and PROVES it draws exactly the row's chips, each once, each at a moment one of its paths passes (feed-wide: 744 links, 1,000 reads
+and writes, 138 links that read and then write, 179 ticks, 136 rules, 2 races). His colours, read as "write red, read green": the page's
+own read green and write orange (red is the station's accessor label beside the function; amber its gate label); a function that reads
+a table and then writes it gets both lines, green above orange, in that order. The path picker dims what a path does not run. (2) Each
+in-flight value's lifeline (his L-17): the moment it is set, every moment that reads it (a middleware's read at the edge, a
+dependency's in the dependencies, the handler's on its line or on the call its read hangs under — a line between two runs goes on into
+the next), what each read can decide (an ending checked or produced at that very line, a rate limit checked there, the Idempotency-Key's
+400 and its get-or-create claim on cooking_sessions), and when it dies — with the answer (on a picked path, where that path's answer
+leaves) or kept by the server past it. PROVEN in the generator: a value is never read before it is set; an ending a read decides leaves
+at or after the read, on one of its paths; a path that leaves inside a moment before a read there is not on that read (the 409 at the
+checks leaves at cooking.py:125, before the key is read at :126 — 60 such dot-paths feed-wide); the claim is the placed write of the
+claimed table. Values set together by one owner, read at the same moments and dying alike fold into one lane that opens (the seven
+rate-limit values: "rate limiter · 7"; 80 folds, 446 values; 696 lanes, 701 read dots). 49 of the lanes' reads stand at no moment the
+page can name; each is said on its lane's end ("also read at …").
+Options built (D-025.2), my picks dashed, each in its row's options slot (D-068): Data effects — chips (as before) · a small map per
+moment, inside each cell · one map for the endpoint, full width under the Data effects row (my pick, P-L12b's B; with moments as rows
+it stands under the table); In-flight values — chips where set (as before) · a lifeline each (my pick, P3's A; with moments as rows,
+each lane a rail down the cell) · echoes where read (P3's B). The Data effects row's head now says its question ("Which function reads or
+writes which table, when, and is the write saved?"); the row legend names the new marks (a read's dot, the cross at the answer, the
+arrow past it, the fold, the map's lines, ticks, rules and race). His to pick by seeing. Display-side generation (D-063's lighter
+regime) and page-only: D-037's light checks.
