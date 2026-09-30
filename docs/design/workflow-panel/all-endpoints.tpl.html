@@ -523,6 +523,24 @@
   .tip .elref { color: inherit; font-size: inherit; }
   .tip .glk { display: block; margin-top: 3px; }
   .tip .glk .elref:first-child { margin-left: 0; }
+  /* D-067: an item's one hover in its parts — before · checks · gives, each a labelled group of lines (or one sentence) */
+  .tip .io { display: block; margin-top: 5px; }
+  .tip .io > i { display: block; font-style: normal; text-transform: uppercase; letter-spacing: .06em; font-size: .86em; opacity: .7; }
+  .tip .io > span { display: block; padding-left: .8em; }
+  .tip .iosent { margin-top: 4px; }
+  /* D-067: the row's legend — each kind and label drawn as it is (on a card patch, so its colours read on the dark hover) */
+  .tip .lgh, .moleg .lgh { display: block; margin-top: 6px; font-size: .86em; text-transform: uppercase; letter-spacing: .06em; opacity: .7; }
+  .tip .lg { display: block; margin-top: 3px; }
+  .lgc { display: inline-flex; align-items: center; gap: 3px; background: var(--card); color: var(--ink); border-radius: 4px; padding: 1px 4px; margin-right: 5px; vertical-align: middle; }
+  .lgc .skg { margin-right: 0; cursor: default; } .lgc .vc { cursor: default; }
+  .lgc .mc.lgs { display: inline-block; width: 22px; height: 12px; padding: 0; }
+  .lgn { opacity: .75; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .vc.sksub img.skd { width: 14px; height: 14px; display: block; flex: none; }
+  .moleg { margin: 6px 0 8px; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--card); font-size: var(--fs-min); }
+  .moleg h3 { margin: 0 0 4px; font-size: var(--fs-min); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .moleg .mlr { display: grid; grid-template-columns: 9em 1fr; gap: 8px; padding: 4px 0; border-top: 1px solid var(--rule); }
+  .moleg .mln { font-weight: 650; } .moleg .mle .lgh { margin-top: 0; } .moleg .mle .lg { display: inline; margin-right: 12px; }
+  .moleg .lgc { border: 1px solid var(--rule); }
   .tip .elref:hover, .tip .elref:focus-visible { outline-color: currentColor; }
 </style>
 
@@ -570,6 +588,7 @@
     <div class="mobar" id="mobar"></div>
     <div class="elsay" id="el-mo" hidden aria-live="polite"></div>
     <p class="moscroll" id="moscroll" hidden></p>
+    <div class="moleg" id="moleg" hidden></div>
     <div class="mogrid" id="mogrid"></div>
     <div class="moband" id="moband"></div>
   </section>
@@ -835,6 +854,7 @@
   /* the path breaks only after a slash, so the whole path stays readable beside its glyph and its labels (no ellipsis) */
   function pathEl(p) { var s = el("span", "pth"); String(p).split("/").forEach(function (x, i, a) { s.appendChild(document.createTextNode(x + (i < a.length - 1 ? "/" : ""))); if (i < a.length - 1) s.appendChild(document.createElement("wbr")); }); return s; }
   function idCell(r) { var d = el("div", "idc"); d.appendChild(pathEl(r.p)); skEp(d, r); d.setAttribute("aria-label", r.id);
+    d.querySelectorAll("[data-tip]").forEach(function (n) { n.removeAttribute("data-tip"); });   /* D-067 (P5): one hover per item — its glyph and method label hover as the row */
     d.setAttribute("data-tip", "id"); d.setAttribute("data-ep", r.id); return d; }
 
   function renderTable(L, GS, lit) {
@@ -1488,6 +1508,7 @@
         ps.appendChild(pr); });
       bx.appendChild(ps); C.appendChild(bx); });
     skAll(C);                                                 /* D-052: every element the code map names, drawn the station's way */
+    cmItems(C);                                               /* D-067 (P5): each item its own one hover */
     applyCarry(C, r);                                         /* D-055: what BY MOMENT carries, dimmed or hidden as the switch says */
     /* MIDDLE · the gaps, my reading, in the direction chosen at its top (D-040) */
     var G = $("ocol-gaps"); G.textContent = ""; G.setAttribute("data-ep", r.id); G.setAttribute("data-dir", GD); G.setAttribute("data-carry", PV.gaps); var gh = colH(O.gaps.title, "skip"); var mine = el("span", "mine", O.gaps.mine); mine.setAttribute("data-tip", "mine"); gh.appendChild(mine); G.appendChild(gh);
@@ -1551,13 +1572,17 @@
      ending's path: the moments it passes (r.mo.pass) and the elements on it. What has no moment is in the band below, with its
      reason. The two looks' defaults are his (D-055: moments as columns, cells as chips), remembered per viewer; a look remembered before
      his ruling must not override it, so the old key is dropped. ══ */
-  var MW = W.mo, MO = D.mo, MKEY = "gabe:allep:moments:v2", MS = { lay: MW.opt.lay.pick, cell: MW.opt.cell.pick, jy: MW.opt.jy.pick }, MPATH = { ep: null, i: null };   /* D-065: jy, the journeys' look */
+  var MW = W.mo, MO = D.mo, MKEY = "gabe:allep:moments:v2", MS = { lay: MW.opt.lay.pick, cell: MW.opt.cell.pick, jy: MW.opt.jy.pick, leg: MW.opt.leg.pick, ipo: MW.opt.ipo.pick }, MPATH = { ep: null, i: null };   /* D-067: leg, the legend's place (his) · ipo, the hovers' form (my pick) */   /* D-065: jy, the journeys' look */
   try { window.localStorage.removeItem("gabe:allep:moments:v1"); } catch (e) {}
   try { var mv = JSON.parse(window.localStorage.getItem(MKEY) || "null"); if (mv) Object.keys(MS).forEach(function (g) { if (mv[g] && MW.opt[g].opts[mv[g]]) MS[g] = mv[g]; }); } catch (e) {}
   /* their squares: a list of bars (rows) · the same bars standing (columns) · a cell of chips · a cell with a number */
   var MICON = { lay: { rows: '<rect x="3" y="3" width="6" height="18" rx="1.2"/><path d="M12 6h9M12 12h9M12 18h9"/>', cols: '<rect x="3" y="3" width="18" height="6" rx="1.2"/><path d="M6 12v9M12 12v9M18 12v9"/>' },
                 cell: { chips: '<rect x="3" y="6" width="8" height="5" rx="2"/><rect x="13" y="6" width="8" height="5" rx="2"/><rect x="3" y="13" width="11" height="5" rx="2"/>', counts: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5l2-1.5v8M10 16h4"/>' },
                 /* D-065: a journey as one chip (a stack behind it: its requests) · every request a chip of its own, in a row */
+                /* D-067: the legend on the row's name (a pointer over a row head) · a legend strip above the table */
+                leg: { hover: '<path d="M4 7h7"/><path d="M4 12h5"/><path d="M4 17h7"/><rect x="13" y="8" width="8" height="8" rx="1.5"/><path d="M13 12h-2"/>', strip: '<rect x="3" y="3" width="18" height="5" rx="1.2"/><path d="M3 12h18M3 16h18M3 20h18"/>' },
+                /* D-067: an item's hover as labelled lines · as one sentence */
+                ipo: { lines: '<path d="M4 6h3M4 12h3M4 18h3"/><path d="M10 6h10M10 12h10M10 18h10"/>', sent: '<path d="M3 12h13"/><path d="M13 8l4 4-4 4"/><path d="M20 7v10"/>' },
                 jy: { one: '<rect x="3" y="9" width="14" height="7" rx="2"/><path d="M6 6h13a2 2 0 0 1 2 2v5"/>', each: '<rect x="2" y="9" width="5" height="6" rx="1.5"/><rect x="9.5" y="9" width="5" height="6" rx="1.5"/><rect x="17" y="9" width="5" height="6" rx="1.5"/>' } };
   var MSTAGE = { edge: "EDGE", body: "INPUT", gate: "GATE", fields: "INPUT", checks: "HANDLER", work: "HANDLER", fail: "HANDLER", save: "HANDLER", answer: "ANSWER", uncaught: "UNCAUGHT" };
   /* D-064 (2): every block is a row, the Overview's too — nothing of it acts at a moment, its facts stand in the no-moment column */
@@ -1605,40 +1630,86 @@
     return Math.max(FL, (g + f[0].length <= 14 ? g + f[0].length : Math.max(g, f[0].length)) + 2); }
   /* a name's break points: after each _ . / (a <wbr>, so the text a probe or a copy reads is unchanged) */
   function moTxt(s, t) { t.split(/(?<=[_./])/).forEach(function (p, i) { if (i) s.appendChild(document.createElement("wbr")); s.appendChild(document.createTextNode(p)); }); return s; }
-  /* D-056: an element's extras (e[7]) — a function's depth, a write's fate on the picked path, a race, an ending's declared mark,
-     headers and stream badge, a limiter's numbers, the login check's scheme, what a test asserts, a hollow test, a nested schema, a
-     file that sends it. Drawn inside the chip where they are a fact of the element; the rest ride its hover (c._x) */
-  /* D-056: the hover lines an element's extras add (their words the words file's mo.x) */
-  function moExtra(X, t) { var XW = W.mo.x, h = "", ln = function (s) { h += "<span class=ln>" + esc(s) + "</span>"; }, pl = function (s) { h += "<span class=pl>" + esc(s) + "</span>"; };
-    if (X.dp) { ln(fill(XW.depth, { n: X.dp })); pl(XW.depthPlain); }
-    if (X.cp) { ln(fill(XW.callPaths, { via: X.cp })); pl(fill(XW.callPathsPlain, { via: X.cp })); }   /* F3: on the call's paths, an upper bound */
-    if (X.cn) { ln(fill(XW.cutNear, { v: X.cn })); pl(fill(XW.cutNearPlain, { v: X.cn })); }   /* review F3: a caller whose list is cut */
-    if (X.cq && (MPATH.i == null || X.cq[1].indexOf(MPATH.i) >= 0)) { ln(fill(XW.callCheck, { via: X.cq[0] })); pl(fill(XW.callCheckPlain, { via: X.cq[0] })); }   /* review F1: a check inside a call, on the paths it rides only by that call */
-    /* review F1 (D-064 (1)): a function whose call line the map does not record, on the paths that leave the function it hangs under
-       partway — each named, on the picked path, or counted over all paths */
+  /* ══ D-067 · ONE HOVER PER ITEM (his rulings on L-01 … L-04 and L-22: "the idea is that the hover … contains the different
+     information because they are different items"; "input, process and output"). An item's hover is its OWN facts, in three parts in
+     the order the code meets them — before (what must hold, what brings the code here) · checks (what it checks or does, and where) ·
+     gives (what comes out, and what that does). The generator writes the lines (e[7].io, _ae_io.io_of — words mo.io.l, or mo.x for a
+     line the page already had); the page adds only what hangs on the picked path (a check it may skip, a caller it may leave partway,
+     the write's fate). What a KIND means is not here: it stands once, in the row's legend. ioParts is THE builder: a new element kind
+     adds its lines in the generator, never a branch here ══ */
+  var IOW = MW.io;
+  function ioKind(k) { return k.indexOf("end:") === 0 ? ((W.kinds[k.slice(4)] || {}).name || k.slice(4)) : ((IOW.k[k] || {}).name || W.el.kinds[k] || k); }
+  function ioLine(q) { var k = q[0], t = k.indexOf("x.") === 0 ? MW.x[k.slice(2)] : k.indexOf("outcome.") === 0 ? IOW.outcome[k.slice(8)] : IOW.l[k]; return fill(t, q[1] || {}); }
+  function ioParts(X) { var io = X.io, XW = MW.x, P = { head: io.h[0] + " \u00b7 " + ioKind(io.h[1]), b: io.b.map(ioLine), c: io.c.map(ioLine), g: io.g.map(ioLine) };
+    /* review F1: a check inside a call, on the paths it rides only by that call; a caller left partway (D-064 (1)) — on the path picked */
+    if (X.cq && (MPATH.i == null || X.cq[1].indexOf(MPATH.i) >= 0)) { P.b.push(fill(XW.callCheck, { via: X.cq[0] })); P.b.push(fill(XW.callCheckPlain, { via: X.cq[0] })); }
     if (X.lq) X.lq.forEach(function (q) { if (MPATH.i != null && q[1].indexOf(MPATH.i) < 0) return;
-      ln(MPATH.i == null ? fill(XW.leftInAll, { via: q[0], n: q[1].length }) : fill(XW.leftIn, { via: q[0] })); pl(fill(XW.leftInPlain, { via: q[0] })); });
-    if (X.fa && MPATH.i != null && X.fa[MPATH.i]) { ln(fill(XW.fate, { v: X.fa[MPATH.i].map(function (f) { return W.fates[f].name; }).join(" · ") })); pl(XW.fatePlain); }
-    if (X.rc) { ln(fill(XW.race, { cons: X.rc[0] })); pl(fill(XW.racePlain, { cols: X.rc[2].join(", "), tbl: X.rc[1], st: X.rc[3] })); }
-    /* D-057: (a) a check says the error it raises, with the words the code gives it · (e) the uncaught 500 says what escapes to it, and
-       the function it is raised in says nothing catches it · (b) a client branch says what it reads and what it does */
-    if (X.rz) ln(X.rz[1] != null ? fill(XW.raises, { cls: X.rz[0], msg: X.rz[1] }) : fill(XW.raisesBuilt, { cls: X.rz[0] }));
-    if (X.cz) X.cz.forEach(function (q) { ln(fill(XW.cause, { cls: q[0], at: q[1] })); });
-    if (X.ru) X.ru.forEach(function (q) { ln(fill(XW.uncaught, { cls: q[0], at: q[1] })); });
-    if (X.rd && X.rd[2] != null) ln(fill(XW.reads, { what: X.rd[0], op: X.rd[1], v: X.rd[2] }));
-    if (X.dw) ln(fill(XW.does, { v: X.dw }));
-    if (X.br && EF.branch.vals[X.br] && EF.branch.vals[X.br].plain) pl(EF.branch.vals[X.br].plain);
-    if (X.hd) ln(fill(XW.headers, { v: X.hd.map(function (q) { return q[0] + ": " + q[1]; }).join(" · ") }));
-    var dc = t.querySelector(".vc-status[data-decl]"); if (dc && t.getAttribute("data-f") === "end") { ln(dc.getAttribute("data-decl") === "1" ? XW.declared : XW.undeclared); pl(dc.getAttribute("data-decl") === "1" ? XW.declaredPlain : XW.undeclaredPlain); }
-    if (X.st) ln(XW.stream);
-    if (X.lm) ln(fill(XW.limit, { n: X.lm[0], w: X.lm[1], k: X.lm[2] }));
-    if (X.au) X.au.forEach(function (a) { ln(fill(XW.auth, { scheme: a[0], header: a[2], carrier: a[1] })); });
-    if (X.as) { ln((X.as[0].length ? fill(XW.asserts, { v: X.as[0].join(" · ") }) : XW.assertsNone) + (X.as[1].length ? " " + fill(XW.assertsDetail, { v: X.as[1].join(" · ") }) : "")
-      + (X.as[2].length ? " " + fill(XW.assertsCode, { v: X.as[2].join(" · ") }) : "") + (X.as[3] ? " " + fill(XW.assertsAttrs, { n: X.as[3] }) : "")); }
-    if (X.ho) { ln(fill(XW.hollow, { n: X.ho })); pl(XW.hollowPlain); }
-    if (X.in) ln(fill(XW.inside, { v: X.in }));
-    if (X.fl) ln(XW.file);
-    return h; }
+      P.b.push(MPATH.i == null ? fill(XW.leftInAll, { via: q[0], n: q[1].length }) : fill(XW.leftIn, { via: q[0] })); P.b.push(fill(XW.leftInPlain, { via: q[0] })); });
+    if (X.fa && MPATH.i != null && X.fa[MPATH.i]) P.g.push(fill(XW.fate, { v: X.fa[MPATH.i].map(function (f) { return W.fates[f].name; }).join(" \u00b7 ") }));   /* D-056 (4) */
+    return P; }
+  /* the two forms (MS.ipo): labelled lines, top to bottom (my pick, dashed) · one sentence, the parts joined by arrows. `bold` the index
+     of a line to set in bold (a journey's own request) as [part, i] */
+  function ioHtml(P, bold) { var h = "<b>" + esc(P.head) + "</b>", ps = ["b", "c", "g"].filter(function (p) { return P[p].length; });
+    if (MS.ipo === "sent") return h + (ps.length ? "<span class=\"ln iosent\">" + ps.map(function (p) { return P[p].map(esc).join("; "); }).join(esc(IOW.arrow)) + "</span>" : "");
+    return h + ps.map(function (p) { return "<span class=io data-part=\"" + p + "\"><i>" + esc(IOW.parts[p]) + "</i>" + P[p].map(function (l, i) { var b0 = bold && bold[0] === p && bold[1] === i;
+      return "<span>" + (b0 ? "<b>" + esc(l) + "</b>" : esc(l)) + "</span>"; }).join("") + "</span>"; }).join(""); }
+  /* D-067 (P5): an item of the code map — a list item, a keyed name, a row of the endings table — is ONE hover: its name, its kind and
+     the words of the labels drawn inside it; hovering a name no longer falls through to the field's own words. An item with a hover of
+     its own (a file that sends it, a helper that arranges) keeps it; the field's name keeps the field's */
+  var CM_OWN = { hookfile: 1, arrh: 1, shared: 1, bhn: 1, hdrs: 1 };
+  function cmItems(C) { var items = [].slice.call(C.querySelectorAll(".pair [data-ci], .pair .pv[data-keys], .pair [data-key]")).filter(function (n) { return !n.closest(".eopts, .cvx, .cvn"); });
+    items.forEach(function (n) { if (!CM_OWN[n.getAttribute("data-tip")]) n.setAttribute("data-tip", "cmitem"); });
+    items.forEach(function (n) { n.querySelectorAll("[data-tip]").forEach(function (x) { if (items.indexOf(x) < 0 && !CM_OWN[x.getAttribute("data-tip")] && !x.matches(".opt, button")) x.removeAttribute("data-tip"); }); }); }
+  function cmItemTip(t) { var ks = keysOf(t), own = [].filter.call(t.childNodes, function (x) { return x.nodeType === 3; }).map(function (x) { return x.nodeValue; }).join("").replace(/\s+/g, " ").trim(),
+      nm = ks.length ? elName(ks[0]) : own || t.textContent.replace(/\s+/g, " ").trim(), labs = [];
+    [].forEach.call(t.querySelectorAll("[data-vc]"), function (v) { if (!v.closest("[data-tip=\"cmitem\"]") || v.closest("[data-tip=\"cmitem\"]") === t) labs.push(v.getAttribute("aria-label") + (v.getAttribute("data-hd") ? " \u00b7 " + fill(MW.x.headers, { v: v.getAttribute("data-hd") }) : "")); });
+    var tw = document.createTreeWalker(t, NodeFilter.SHOW_TEXT), tn, bits = [];                 /* its words, less what its labels draw */
+    while ((tn = tw.nextNode())) if (!tn.parentNode.closest("[data-vc], .skg")) bits.push(tn.nodeValue);
+    var all = bits.join("").replace(/\s+/g, " ").replace(/^[\s\u00b7:,]+|[\s\u00b7:,]+$/g, "").trim();
+    return "<b>" + esc(nm) + "</b>" + (ks.length ? " \u00b7 " + esc(elKind(ks[0])) : "") + (labs.length ? "<span class=ln>" + esc(labs.join(" \u00b7 ")) + "</span>" : "")
+      + (all && all !== nm ? "<span class=ln>" + esc(all) + "</span>" : ""); }
+  /* ══ D-067 · THE ROW'S LEGEND (his L-01, L-04: "in the row endings, at the beginning … when we hover on top of the [row name] we can
+     show the different labels"). Read off the row AS DRAWN, on the picked path: each kind of item it holds, drawn by the mark its chips
+     lead with (the glyph, an ending's kind label), and each other label its chips wear (a status by its class and whether it is filled,
+     a role, a fate, a hollow frame …) — each cloned as it is drawn, with what it means, and how many chips here wear it. What a kind or a
+     label means lives HERE, once, not on every chip's hover. MS.leg places it: on the row's name (his, ruled) or above the table ══ */
+  var LG = MW.leg;
+  function legClone(n) { var c = n.cloneNode(true), cs = n.querySelectorAll("canvas");
+    [c].concat([].slice.call(c.querySelectorAll("*"))).forEach(function (x) { ["data-tip", "data-key", "data-keys", "id", "title"].forEach(function (a) { x.removeAttribute(a); }); });
+    c.querySelectorAll("canvas").forEach(function (cv, i) { var im = document.createElement("img"); try { im.src = cs[i].toDataURL(); } catch (e) {} im.className = cv.className; im.setAttribute("aria-hidden", "true"); cv.parentNode.replaceChild(im, cv); });
+    return c.outerHTML; }
+  function legFace(c) { return c.querySelector(":scope > .skg") || (c.getAttribute("data-f") === "end" ? c.querySelector(":scope > .vc-kind") : null); }
+  function legKey(m) { if (m.classList.contains("skg")) return "sk:" + m.getAttribute("data-sk") + ":" + (m.getAttribute("data-ent") || "");
+    if (m.classList.contains("mdp")) return "mdp"; if (m.classList.contains("mrc")) return "mrc"; if (m.classList.contains("mnest")) return "mnest";
+    var f = m.getAttribute("data-vc"), v = m.getAttribute("data-vv") || ""; if (!f) return null;
+    return f === "status" ? "status:" + v.charAt(0) + ":" + (m.getAttribute("data-decl") || "") : (m.classList.contains("sksub") ? "sub:" : "") + f + ":" + v; }
+  function legLine(key, m) { var p = key.split(":");
+    if (p[0] === "sk") return (SK.kinds[p[1]] || {}).t || p[1];
+    if (key === "mdp") return MW.x.depthPlain; if (key === "mrc") return LG.race; if (key === "mnest") return LG.nest; if (key === "hol") return MW.x.hollowPlain;
+    if (p[0] === "status") { var sv = EF.status.vals[p[1]] || {};
+      return (sv.name || "") + " \u2014 " + (sv.plain || "") + (p[2] === "1" ? " " + LG.filled + ": " + MW.x.declaredPlain : p[2] === "0" ? " " + LG.hollow + ": " + MW.x.undeclaredPlain : ""); }
+    var f = m.getAttribute("data-vc"), v = m.getAttribute("data-vv"), pl = vcPlain(f, v), nm = (EF[f] || {}).name || f;
+    return nm + " \u2014 " + (pl || ((((EF[f] || {}).vals || {})[v] || {}).name) || v); }
+  function legData(f) { var K = {}, M = {}, ko = [], mo = [];
+    document.querySelectorAll('#mogrid td[data-f="' + f + '"]:not([data-nm]) .mc').forEach(function (c) { var ik = c.getAttribute("data-ik"), face = legFace(c), seen = {};
+      if (ik) { if (!K[ik]) { K[ik] = { n: 0, face: face }; ko.push(ik); } K[ik].n++; if (!K[ik].face && face) K[ik].face = face; }
+      var put = function (key, m) { if (!key || seen[key]) return; seen[key] = 1; if (!M[key]) { M[key] = { n: 0, el: m }; mo.push(key); } M[key].n++; };
+      [].forEach.call(c.querySelectorAll("[data-vc], .skg, .mdp, .mrc, .mnest"), function (m) { if (m !== face && !(face && face.contains(m))) put(legKey(m), m); });
+      if (c.classList.contains("hol")) put("hol", null); });
+    return { kinds: ko.map(function (k) { return [k, K[k]]; }), marks: mo.map(function (k) { return [k, M[k]]; }) }; }
+  function legKindPlain(k) { return k.indexOf("end:") === 0 ? (W.kinds[k.slice(4)] || {}).plain : (IOW.k[k] || {}).plain; }
+  function legHtml(f) { var d = legData(f), n = function (x) { return "<span class=lgn>" + esc(fill(LG.n, { n: x })) + "</span>"; };
+    if (!d.kinds.length && !d.marks.length) return "<span class=pl>" + esc(LG.none) + "</span>";
+    return (d.kinds.length ? "<span class=lgh>" + esc(LG.kinds) + "</span>" + d.kinds.map(function (x) { var fc = x[1].face, said = fc && fc.textContent.trim() === ioKind(x[0]);   /* a kind label says its own name */
+        return "<span class=lg>" + (fc ? "<span class=lgc>" + legClone(fc) + "</span>" : "") + (said ? "" : "<b>" + esc(ioKind(x[0])) + "</b> ") + "\u2014 " + esc(legKindPlain(x[0]) || "") + " " + n(x[1].n) + "</span>"; }).join("") : "")
+      + (d.marks.length ? "<span class=lgh>" + esc(LG.marks) + "</span>" + d.marks.map(function (x) { var m = x[1].el;
+        return "<span class=lg>" + (m ? "<span class=lgc>" + legClone(m) + "</span>" : x[0] === "hol" ? "<span class=lgc><span class=\"mc hol lgs\"></span></span>" : "") + esc(legLine(x[0], m)) + " " + n(x[1].n) + "</span>"; }).join("") : ""); }
+  /* B2 · the legend above the table (an option): one line per row, always in view */
+  function moLegStrip(fams) { var L0 = $("moleg"); if (!L0) return; L0.hidden = MS.leg !== "strip"; if (L0.hidden) { L0.textContent = ""; return; }
+    L0.innerHTML = "<h3>" + esc(LG.head) + "</h3>" + fams.map(function (f) { var b = BLK[MO.fam[f]]; return "<div class=mlr data-f=\"" + f + "\"><span class=mln>" + esc(b.name) + "</span><span class=mle>" + legHtml(f) + "</span></div>"; }).join(""); }
+  /* P1 (D-044's precedent): one hover per item — the kind label, the status square, the station glyph and the role label inside a chip
+     stay drawn (D-052) and keep what they are (data-vc, data-sk, a key a click lights), but hover as the chip */
+  function oneTip(root, sel) { root.querySelectorAll(sel).forEach(function (c) { c.querySelectorAll("[data-tip]").forEach(function (n) { n.removeAttribute("data-tip"); }); }); }
   /* D-065 · a journey's other requests at an outer moment, around ONE call it makes here (review J1: each call here has its own pair of
      chips). e[7].jy: its id, case, side, test name; st, its outer requests on this side as [method, path, role, statuses asserted,
      endpoint key, here?, line, place in the walk]; sq, the walk on this side — those requests and the calls here on this side, this one
@@ -1651,31 +1722,31 @@
   function jyAsserts(s) { return s[3].length ? fill(MW.x.asserts, { v: s[3].join(" \u00b7 ") }) : MW.x.assertsNone; }
   function jyLine(s, h) { var JW = MW.jy; return fill(h === 1 ? JW.here : h === 2 ? JW.hereAgain : JW.step, { i: s[7], m: s[0], p: s[1], role: JW.role[s[2]] || s[2] }) + " \u00b7 " + jyAsserts(s)
     + (s[4] ? "" : " \u00b7 " + JW.noEp); }
-  function jyTip(J) { var JW = MW.jy, ln = function (t, b) { return "<span class=ln>" + (b ? "<b>" + esc(t) + "</b>" : esc(t)) + "</span>"; };
-    var me = J.sq.filter(function (s) { return s[8] === 1; })[0], asked = me ? me[3] : [];
+  /* D-067: a journey's hover in the three parts — before: the test and its requests before this one · checks: this request, what it
+     asserts · gives: its requests after this one, and where it stays when a path is picked */
+  function jyTip(J) { var JW = MW.jy, me = J.sq.filter(function (s) { return s[8] === 1; })[0], asked = me ? me[3] : [], mi = me ? me[7] : 0;
     var go = J.jv.length ? fill(JW.on, { v: J.jv.join(" \u00b7 ") }) : fill(JW.leave[J.j], { v: asked.join(" \u00b7 "), n: J.jn });
-    return "<b>" + esc(fill(JW.head, { cid: J.c })) + "</b>" + (J.nm ? ln(J.nm) : "") + ln(J.s === "b" ? JW.sideB : JW.sideA)
-      + J.sq.map(function (s) { return ln(jyLine(s, s[8]), !!s[8]); }).join("")
-      + "<span class=pl>" + esc(go) + "</span>" + (J.pm ? "<span class=pl>" + esc(JW.onEach) + "</span>" : "")
-      + "<span class=pl>" + esc(JW.plain) + "</span>"; }
+    var P = { head: fill(JW.head, { cid: J.c }), b: (J.nm ? [J.nm] : []).concat(J.sq.filter(function (s) { return s[7] < mi; }).map(function (s) { return jyLine(s, s[8]); })),
+      c: me ? [jyLine(me, 1)] : [], g: J.sq.filter(function (s) { return s[7] > mi; }).map(function (s) { return jyLine(s, s[8]); }).concat([go], J.pm ? [JW.onEach] : []) };
+    return ioHtml(P, me ? ["c", 0] : null); }
   function jyEl(e) { var J = e[7].jy, JW = MW.jy, kk = J.nh > 1 ? " " + fill(JW.ofStep, { k: J.k }) : "";   /* a journey calling here more than once: which call */
-    if (MS.jy !== "each") { var c = el("span", "mc mjy"); c.setAttribute("data-f", "proof"); c.setAttribute("data-tip", "mojy"); c.setAttribute("data-jy", J.id); c.setAttribute("data-side", J.s); c.setAttribute("data-k", String(J.k)); c._jy = J;
+    if (MS.jy !== "each") { var c = el("span", "mc mjy"); c.setAttribute("data-f", "proof"); c.setAttribute("data-tip", "mojy"); c.setAttribute("data-ik", "journey"); c.setAttribute("data-jy", J.id); c.setAttribute("data-side", J.s); c.setAttribute("data-k", String(J.k)); c._jy = J;
       kd(c, moK(e[2])); c.appendChild(moTxt(el("span", "mt"), J.c));
       c.appendChild(el("span", "mq", fill(J.s === "b" ? (J.st.length === 1 ? JW.before1 : JW.before) : (J.st.length === 1 ? JW.after1 : JW.after), { n: J.st.length }) + kk)); return c; }
     var g = el("span", "mjg"), lb = el("span", "mc mjl"); g.setAttribute("data-f", "proof"); g.setAttribute("data-jy", J.id); g.setAttribute("data-side", J.s); g.setAttribute("data-k", String(J.k));
-    lb.setAttribute("data-tip", "mojy"); lb._jy = J; kd(lb, ["case:" + J.c]); lb.appendChild(moTxt(el("span", "mt"), J.c)); if (kk) lb.appendChild(el("span", "mq", fill(JW.around, { k: J.k }))); g.appendChild(lb);
-    J.st.forEach(function (s) { g.appendChild(el("span", "mjn", String(s[7]))); var sc = el("span", "mc mjs"); sc.setAttribute("data-f", "proof"); sc.setAttribute("data-tip", "mojs"); sc.setAttribute("data-i", String(s[7])); sc._js = [J, s];
+    lb.setAttribute("data-tip", "mojy"); lb.setAttribute("data-ik", "journey"); lb._jy = J; kd(lb, ["case:" + J.c]); lb.appendChild(moTxt(el("span", "mt"), J.c)); if (kk) lb.appendChild(el("span", "mq", fill(JW.around, { k: J.k }))); g.appendChild(lb);
+    J.st.forEach(function (s) { g.appendChild(el("span", "mjn", String(s[7]))); var sc = el("span", "mc mjs"); sc.setAttribute("data-f", "proof"); sc.setAttribute("data-tip", "mojs"); sc.setAttribute("data-ik", "jstep"); sc.setAttribute("data-i", String(s[7])); sc._js = [J, s];
       if (s[4]) kd(sc, [s[4]]); else sc.appendChild(el("span", "mq", s[0]));
       sc.appendChild(moTxt(el("span", "mt"), s[1])); g.appendChild(sc); });
     return g; }
   function moChip(e) { if ((e[4] || [])[0] === "jy") return jyEl(e);
     var f = e[0], ch = e[4] || [], c = el("span", "mc"), X = e[7] || {}; c.setAttribute("data-f", f); c.setAttribute("data-tip", "mochip"); c._x = X;
+    if (X.io) c.setAttribute("data-ik", X.io.h[1]);                                  /* D-067: its kind, for the row's legend */
     if (e[6] != null) c.setAttribute("data-hint", String(e[6])); var ks = moK(e[2]); if (ks.length) kd(c, ks);
     var txt = function (t, cls) { if (t) c.appendChild(moTxt(el("span", cls || "mt"), String(t))); };
     if (X.ho) { c.classList.add("hol"); c.setAttribute("data-ho", String(X.ho)); }
     if (X.in) c.appendChild(el("span", "mnest", "\u21b3"));
-    if (ch[0] === "end") { c.appendChild(cKind(ch[1])); var sc0 = c.appendChild(declMark(cStatus(ch[2]), ch[3], X.hd)); if (X.st && SK.badge.delivery) c.appendChild(skSub("delivery", "stream"));
-      if (X.cz) sc0.setAttribute("data-cz", X.cz.map(function (q) { return fill(MW.x.cause, { cls: q[0], at: q[1] }); }).join("\n")); }   /* D-057 (e): the status chip is what a pointer meets */
+    if (ch[0] === "end") { c.appendChild(cKind(ch[1])); c.appendChild(declMark(cStatus(ch[2]), ch[3], X.hd)); if (X.st && SK.badge.delivery) c.appendChild(skSub("delivery", "stream")); }   /* D-067: its causes ride the chip's one hover */
     else if (f === "proof") { txt(e[3]); c.appendChild(el("span", "mpv", MW.proves)); if (ch[0] === "status") c.appendChild(cStatus(ch[1]));
       else if (ch[0] === "statuses") ch[1].forEach(function (st) { c.appendChild(cStatus(st)); }); }
     else if (ch[0] === "status") { c.appendChild(cStatus(ch[1])); txt(e[3]); if (ch[2] === "raise") c.setAttribute("data-hint", (e[6] != null ? e[6] + " · " : "") + MW.atRaise); }
@@ -1718,7 +1789,7 @@
     else if (k === "piece") c.appendChild(pieceWords(x[3], X.fk));
     else if (k === "lack") { txt(K.text, "mq"); c.appendChild(pieceWords(x[3], X.fk)); txt(X.n + "/" + X.of, "mq"); }
     return c; }
-  function moOpts(bar) { ["lay", "cell", "jy"].forEach(function (g) { var R = MW.opt[g], grp = el("div", "mgrp"), o = el("div", "opts"); grp.appendChild(el("span", "rl", R.label));
+  function moOpts(bar) { ["lay", "cell", "jy", "leg", "ipo"].forEach(function (g) { var R = MW.opt[g], grp = el("div", "mgrp"), o = el("div", "opts"); grp.appendChild(el("span", "rl", R.label));
     o.setAttribute("role", "radiogroup"); o.setAttribute("aria-label", R.label);
     Object.keys(R.opts).forEach(function (v) { var bt = el("button", "opt"); bt.type = "button"; bt.setAttribute("role", "radio"); bt.setAttribute("data-mopt", g); bt.setAttribute("data-v", v);
       bt.setAttribute("aria-checked", MS[g] === v ? "true" : "false"); bt.setAttribute("aria-label", R.opts[v].name); bt.setAttribute("data-tip", "mopt");
@@ -1758,7 +1829,7 @@
     var rowsOn = MPATH.i == null ? M.sp.map(function (x, i) { return i; }) : M.pass[MPATH.i];
     var cell = {}; M.el.forEach(function (e) { if (!onPath(e)) return; var k = e[1] + "|" + e[0]; (cell[k] = cell[k] || []).push(e); });
     function td(si, f) { var t = el("td"), es = cell[si + "|" + f] || []; t.setAttribute("data-f", f); t.setAttribute("data-mom", M.sp[si][0]);
-      if (!es.length) { t.className = "mo0"; var em = el("span", "moempty"); em.setAttribute("aria-label", MW.empty); em.setAttribute("title", MW.empty); t.appendChild(em); return t; }
+      if (!es.length) { t.className = "mo0"; var em = el("span", "moempty"); em.setAttribute("aria-label", MW.empty); t.appendChild(em); return t; }   /* D-067 (P5): the empty mark says it, no native tooltip */
       if (MS.cell === "counts") { var n = el("span", "mcount", String(es.length)); kd(n, [].concat.apply([], es.map(function (e) { return moK(e[2]); })), false); t.appendChild(n); return t; }
       var w = el("div", "mcs"); es.forEach(function (e) { w.appendChild(moChip(e)); }); t.appendChild(w); return t; }
     /* D-064 (2) · the last column (a last row when the moments are rows): each block's facts no moment holds — the path row never hides
@@ -1767,7 +1838,7 @@
     function nmHead(tag) { var h = el(tag, "monmh"); h.setAttribute("data-tip", "nmhead"); h.setAttribute("data-mom", "nm"); h.setAttribute("aria-label", MW.nm.name);
       var l1 = el("span", "mh1 wrap"); l1.appendChild(el("span", "mn", MW.nm.name)); h.appendChild(l1); return h; }
     function tdNm(f) { var t = el("td", "monm"), xs = nmBy[f] || []; t.setAttribute("data-f", f); t.setAttribute("data-nm", "true");
-      if (!xs.length) { t.classList.add("mo0"); var em = el("span", "moempty"); em.setAttribute("aria-label", MW.nm.empty); em.setAttribute("title", MW.nm.empty); t.appendChild(em); return t; }
+      if (!xs.length) { t.classList.add("mo0"); var em = el("span", "moempty"); em.setAttribute("aria-label", MW.nm.empty); t.appendChild(em); return t; }
       if (MS.cell === "counts") { var n = el("span", "mcount", String(xs.length)); kd(n, [].concat.apply([], xs.map(function (x) { return moK(x[2]); })), false); t.appendChild(n); return t; }
       var w = el("div", "mcs"); xs.forEach(function (x) { w.appendChild(nmChip(x)); }); t.appendChild(w); return t; }
     function blockHead(f, tag) { var b = MO.fam[f], th = el(tag); th.setAttribute("data-block", b); th.setAttribute("data-f", f); th.setAttribute("data-tip", "block"); th.appendChild(markEl(b)); th.appendChild(document.createTextNode(BLK[b].name));
@@ -1787,6 +1858,7 @@
       fams.forEach(function (f) { var tr = el("tr"); tr.setAttribute("data-f", f); tr.appendChild(blockHead(f, "th")); rowsOn.forEach(function (si) { tr.appendChild(td(si, f)); }); tr.appendChild(tdNm(f)); tb.appendChild(tr); }); }
     th.appendChild(hr); t.appendChild(th); t.appendChild(tb); G.appendChild(t);
     skAll(G);                                                   /* D-052 marks before the widths: moFloor measures the labels too */
+    oneTip(G, ".mc, .nmc");                                     /* D-067 (P1): one hover per item */
     /* moments as columns: each column's share of the box follows what its head needs (D-055), so the heads' two lines fit where the box
        allows; the box is shared out, never overrun, above the columns' floor */
     if (MS.lay !== "rows") { var h0 = hr.firstChild, cm0 = el("span", null, "0000000000"); cm0.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;font-weight:650"; h0.appendChild(cm0);
@@ -1819,6 +1891,8 @@
       row.appendChild(box); B.appendChild(row); });
     if (!any) B.appendChild(el("p", "mball", MW.band.all));
     skAll(B);                                                  /* D-052: every element named here, drawn the station's way (the grid's, above) */
+    oneTip(B, ".mc");                                          /* D-067 (P1): one hover per item */
+    moLegStrip(fams);                                          /* D-067 (P2): the legend above the table, when that is its place */
   }
   /* pointing at a gap lights where it is: in (a) the code-map pairs that carry its attribute, in (b) the universe row it is in */
   document.addEventListener("mouseover", function (e) { var g = e.target.closest && e.target.closest("#ocol-gaps .gap[data-attr], #ocol-gaps [data-row]");
@@ -1967,7 +2041,11 @@
       var mk = R.pick !== ov ? "" : R.ruled ? " · " + esc(W.ruledMark) : " · " + esc(W.pickMark);
       return "<b>" + esc(optName(rr, ov)) + "</b>" + mk + "<span class=pl>" + esc(fill(R.opts[ov].plain, ck)) + "</span>"; }
     if (kind === "pickkey") return esc(W.pickKeyPlain);
-    if (kind === "head") return "<b>" + esc(c.head) + "</b> · " + esc(c.name) + "<span class=pl>" + esc(W.sortHint) + "</span>";
+    /* D-067 (P4): a column's label, what it means and its rating live on its head, once — not on each of its cells; a spine column's
+       head says what each stage is, a dots column's what its places are */
+    if (kind === "head") return "<b>" + esc(c.head) + "</b> · " + esc(c.name) + "<span class=pl>" + esc(c.label) + " — " + esc(c.plain) + " · " + esc(fill(W.rating, { rating: c.r, top: T.rTop })) + (c.alarm ? " · " + esc(W.alarmRating) : "") + "</span>"
+      + (c.kind === "spine" ? SPINE.map(function (x) { return "<span class=ln>" + esc(x) + " — " + esc(W.stages[x] || "") + "</span>"; }).join("") : "")
+      + (c.kind === "dots" ? "<span class=pl>" + esc(W.families) + "</span>" : "") + "<span class=pl>" + esc(W.sortHint) + "</span>";
     if (kind === "sortreset") return esc(W.sortReset);
     if (kind === "pinrow") return esc(W.pinRow);
     if (kind === "lablink") return esc(W.panel.lab);
@@ -2000,6 +2078,7 @@
     if (kind === "gap") { var ga = t.getAttribute("data-attr"), at = D.attrs[ga], px = r && t.hasAttribute("data-part") ? r.partly.filter(function (x) { return x[0] === ga; })[0] : null;
       if (px) return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.partly) + "<span class=ln>" + esc(fill(W.one.gaps.partlyTip, { names: px[3].join(", "), n: px[1], of: px[2] })) + "</span>" + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>" + gcvHtml(t, r);
       return "<b>" + esc(at.label) + "</b> · " + esc(W.one.gaps.shows) + gwHtml(t, r) + "<span class=pl>" + esc(at.plain) + "</span>" + gcvHtml(t, r); }
+    if (kind === "cmitem") return cmItemTip(t);                                                   /* D-067 (P5) */
     if (kind === "copycmd") return esc(W.panel.copy);
     if (kind === "hookfile") return "<b>" + esc(t.textContent.trim()) + "</b><span class=pl>" + esc(W.panel.hookFile) + "</span>";   /* D-056 (9) */
     if (kind === "bhn") return "<b>" + esc(t.textContent.trim()) + "</b><span class=pl>" + esc(W.panel.behindNonamePlain) + "</span>";   /* D-056 (1) */
@@ -2032,22 +2111,19 @@
         + "<span class=pl>" + esc(nk === "risk" && NK.ids[nx.id] ? NK.ids[nx.id].plain : NK.plain) + "</span>" + "<span class=pl>" + esc(nk === "jy" ? NK.col : W.mo.nm.plain) + "</span>"; }   /* review F4: each flag its own words; review J7: a journey's requests have moments */
     if (kind === "mojy") return jyTip(t._jy);                                                    /* D-065: a journey, its requests in order */
     if (kind === "mojs") { var js0 = t._js; return "<b>" + esc(js0[1][0] + " " + js0[1][1]) + "</b> \u00b7 " + esc(fill(W.mo.jy.stepOf, { i: js0[1][7], cid: js0[0].c }))
-      + "<span class=ln>" + esc(jyLine(js0[1], 0)) + "</span><span class=pl>" + esc(W.mo.jy.plain) + "</span>"; }
+      + "<span class=ln>" + esc(jyLine(js0[1], 0)) + "</span>"; }                                         /* D-067: what a journey is, in the row's legend */
     if (kind === "mowhy") { var mw = W.mo.why[t.getAttribute("data-why")]; return "<b>" + esc(mw.name) + "</b> · " + esc(W.mo.band.title) + "<span class=pl>" + esc(mw.plain) + "</span>"; }
-    if (kind === "mochip") { var mf = t.getAttribute("data-f"), mb = BLK[D.mo.fam[mf]], mks = keysOf(t), mh = t.getAttribute("data-hint");
-      return "<b>" + esc(fill(W.mo.tip, { name: mks.length ? elName(mks[0]) : t.textContent.trim(), block: mb.name })) + "</b>" + (mh ? "<span class=ln>" + esc(mh) + "</span>" : "")
-        + mks.slice(1).map(function (k) { return "<span class=ln>" + esc(elKind(k) + " · " + elName(k)) + "</span>"; }).join("") + moExtra(t._x || {}, t) + "<span class=pl>" + esc(mb.plain) + "</span>"; }
-    if (kind === "sk") { var sk0 = t.getAttribute("data-sk"), sx = SK.kinds[sk0] || {}, pk0 = t.getAttribute("data-pk"), sm = pk0 && W.station.map[pk0];
-      var own = sm && pk0 === "setting" && sk0 === "flag" ? W.station.alias : sm && sm.mine ? fill(W.station.mineTip, { why: sm.why }) : null;   /* where the pairing is not the station's own, say whose it is */
-      return "<b>" + esc(sx.t) + "</b> · " + esc(sk0 === "entity" ? W.station.drawnEnt : W.station.drawn) + "<span class=pl>" + esc(W.station.glyph) + "</span>" + (own ? "<span class=pl>" + esc(own) + "</span>" : "") + "<span class=pl>" + esc(W.station.card) + "</span>"; }
+    if (kind === "mochip") { var X0 = t._x || {}; if (X0.io) return ioHtml(ioParts(X0));                /* D-067: the item's one hover */
+      var mks = keysOf(t); return "<b>" + esc(mks.length ? elName(mks[0]) : t.textContent.trim()) + "</b>" + (mks.length ? " \u00b7 " + esc(elKind(mks[0])) : ""); }   /* a chip the band names: its reason is its line */
+    /* D-067 (P4, D-017): a glyph says what kind of element it marks — where the page took its look from is not a fact of the code */
+    if (kind === "sk") { var sk0 = t.getAttribute("data-sk"), sx = SK.kinds[sk0] || {}, en0 = t.getAttribute("data-ent"); return "<b>" + esc(sx.t) + "</b>" + (sk0 === "entity" && en0 ? " \u00b7 " + esc(en0) : ""); }
     /* D-043: a value chip — its words, its family, what it means, and where its look is read (an element's hover: a little richer) */
     if (kind === "vc") { var vf = t.getAttribute("data-vc"), vv = t.getAttribute("data-vv"), ve = EF[vf], vp = vcPlain(vf, vv), vd = t.getAttribute("data-decl"), vh = t.getAttribute("data-hd");
       return "<b>" + esc(t.getAttribute("aria-label")) + "</b> · " + esc(ve.name) + (vh ? "<span class=ln>" + esc(fill(W.mo.x.headers, { v: vh })) + "</span>" : "")
-        + (t.getAttribute("data-cz") ? t.getAttribute("data-cz").split("\n").map(function (q) { return "<span class=ln>" + esc(q) + "</span>"; }).join("") : "")   /* D-057 (e) */
         + (vd != null ? "<span class=pl>" + esc(vd === "1" ? W.mo.x.declaredPlain : W.mo.x.undeclaredPlain) + "</span>" : "")
-        + (vp ? "<span class=pl>" + esc(vp) + "</span>" : "") + "<span class=pl>" + esc(lookWords(ve)) + "</span>"
-        + (t.getAttribute("data-nonode") === "true" ? "<span class=pl>" + esc(W.station.nonode) + "</span>" : ""); }
-    if (kind === "block") { var key = t.getAttribute("data-block"), b = key === "_shared" ? W.sharedBlock : BLK[key]; return "<b>" + esc(b.name) + "</b><span class=pl>" + esc(fill(b.plain)) + "</span><span class=pl>" + esc(markWords(key)) + "</span>"; }
+        + (vp ? "<span class=pl>" + esc(vp) + "</span>" : ""); }                                 /* D-067 (P4, D-017): where its look was read is not the code's */
+    if (kind === "block") { var key = t.getAttribute("data-block"), b = key === "_shared" ? W.sharedBlock : BLK[key], lf = t.closest("#mogrid") && MS.leg === "hover" ? t.getAttribute("data-f") : null;
+      return "<b>" + esc(b.name) + "</b><span class=pl>" + esc(fill(b.plain)) + "</span>" + (lf ? legHtml(lf) : ""); }   /* D-067 (P2 B1, his placement): the row's legend · (P4) no icon provenance */
     if (kind === "bin") { var bn = BINS[c.id].filter(function (x) { return x.key === t.getAttribute("data-bin"); })[0];
       return "<b>" + esc(c.head) + "</b> · " + esc(fill(W.strip, { n: bn.n, of: N, what: bn.what })) + "<span class=pl>" + esc(W.stripHint) + "</span>"; }
     if (kind === "agg") return "<b>" + esc(c.head) + "</b> · " + esc(c.name) + "<span class=pl>" + esc(W.group[{ union: "union", count: "has", ratio: "ratio" }[c.agg] || "sum"]) + "</span>";
@@ -2055,8 +2131,7 @@
     if (kind === "cell" && r) {
       var h = "<b>" + esc(c.head) + "</b> · " + esc(c.name) + "<span class=ln>" + esc(r.m + " " + r.p) + "</span><span class=ln>" + esc(cellWords(c, r)) + "</span>";
       if (c.kind === "spine") { var sub = t.closest("[data-stage]") || null; }
-      h += "<span class=pl>" + esc(c.label) + " — " + esc(c.plain) + " · " + esc(fill(W.rating, { rating: c.r, top: T.rTop })) + (c.alarm ? " · " + esc(W.alarmRating) : "") + "</span>";
-      return h; }
+      return h; }                                                                              /* D-067 (P4): the column's words are on its head */
     return null;
   }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (ch) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]; }); }
@@ -2071,8 +2146,8 @@
     clearTimeout(TIPH); TIPH = null;
     if (!t) { tipOff(); return; }
     if (t.getAttribute("data-tip") === "cell" && e.target.closest(".spine i")) { var si = e.target.closest(".spine i"), c = COL[t.getAttribute("data-col")];
-      tip.innerHTML = "<b>" + esc(si.getAttribute("data-stage")) + "</b> · " + esc(fill(W.stageCell, { stage: si.getAttribute("data-stage"), n: si.getAttribute("data-n") })) + "<span class=pl>" + esc(W.stages[si.getAttribute("data-stage")] || "") + "</span>"; }
-    else if (t.getAttribute("data-tip") === "cell" && e.target.closest(".dots i")) { tip.innerHTML = "<b>" + esc(e.target.closest(".dots i").getAttribute("data-f")) + "</b><span class=pl>" + esc(W.families) + "</span>"; }
+      tip.innerHTML = "<b>" + esc(si.getAttribute("data-stage")) + "</b> · " + esc(fill(W.stageCell, { stage: si.getAttribute("data-stage"), n: si.getAttribute("data-n") })); }   /* D-067 (P4): what a stage is, on the column's head */
+    else if (t.getAttribute("data-tip") === "cell" && e.target.closest(".dots i")) { var dt = e.target.closest(".dots i"); tip.innerHTML = "<b>" + esc(dt.getAttribute("data-f")) + "</b> · " + esc(dt.classList.contains("on") ? W.dotOn : W.dotOff); }
     else { var h = tipFor(t); if (!h) { tipOff(); return; } tip.innerHTML = h; }
     var live = !!tip.querySelector(".elref[data-gref]"), gp = live ? 0 : 6;
     var bx = t.getBoundingClientRect(), tw = tip.offsetWidth, thh = tip.offsetHeight;
@@ -2093,7 +2168,8 @@
   function optLine(where, R, v) { return where + " · " + R.label + ": " + R.opts[v].name + " (" + (v === R.pick ? (R.ruled ? W.ruledMark : W.copy.pick) : W.copy.his) + ")"; }
   function cmLines() { var C = W.copy.lines; return [optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),
     optLine(C.uni, W.carry, PV.uni), optLine(C.gaps, W.carry, PV.gaps),                   /* D-058: the two panels' own switches */
-    optLine(C.mo, W.mo.opt.lay, MS.lay), optLine(C.mo, W.mo.opt.cell, MS.cell), optLine(C.mo, W.mo.opt.jy, MS.jy)]; }   /* D-065: the journeys' look */
+    optLine(C.mo, W.mo.opt.lay, MS.lay), optLine(C.mo, W.mo.opt.cell, MS.cell), optLine(C.mo, W.mo.opt.jy, MS.jy),   /* D-065: the journeys' look */
+    optLine(C.mo, W.mo.opt.leg, MS.leg), optLine(C.mo, W.mo.opt.ipo, MS.ipo)]; }   /* D-067: the legend's place, the hovers' form */
   /* the code map's own copy (his ask 2026-09-26): the page, the endpoint, every option of the code map, then room for his words */
   function cmText(r) { var C = W.copy.lines; return [C.page + ": all-endpoints · " + T.app + " @ " + T.head, C.open + ": " + r.id,
     optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),

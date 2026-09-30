@@ -55,6 +55,7 @@ EPSLUG_JS = HERE / "_ep-slug.js"                                               #
 DEF_FORMS = Path("~/.cache/gabe-map-baselines/lab-input/forms.json")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _ae_universe as UNI  # noqa: E402  (D-036 — the one-endpoint section: the universe card, the block marks, the gaps)
+import _ae_io as IO  # noqa: E402  (D-067 — one hover per BY MOMENT item: its facts before · checks · gives, and the twins check)
 
 
 def die(msg: str) -> None:
@@ -1858,6 +1859,9 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     els[:] = [e for e in els if e is not None]
     el, un, nmv, gone_fn = [], [], [], []
     rp, ru, rn = collections.defaultdict(set), collections.defaultdict(set), collections.defaultdict(set)
+    # D-067: each placed item's ONE hover, its own facts in the order the code meets them (_ae_io.io_of — the builder)
+    IOC = IO.Ctx(E=E, F=F, fj=fj, fep=fep, XS=XS, steps=steps, H=H, hf=hf, chains=chains, EXIT=EXIT, dset=dset, par=r["_beh"]["par"],
+                 pieces=L["feedwide"]["pieces"]["rows"])
     for e in els:
         if e["w"][0] == "nm":                                    # D-064 (2): no moment by nature — the last column, never the band
             nmv.append([e["f"], "piece", e["keys"], e["text"], e.get("x") or None]); rn[e["f"]].update(e["rec"])
@@ -1922,7 +1926,8 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                 del xx["lq"]
         if "rc" in xx:                                           # D-056 (5): the ending the race escapes to — its status
             xx["rc"] = xx["rc"][:3] + [XS[xx["rc"][3]].get("status")]
-        el.append([e["f"], si, e["keys"], e["text"], e["chip"], mask, e["hint"], xx or None, e["o"]]); rp[e["f"]].update(e["rec"])
+        xx["io"] = IO.io_of(e, xx, IOC)
+        el.append([e["f"], si, e["keys"], e["text"], e["chip"], mask, e["hint"], xx, e["o"]]); rp[e["f"]].update(e["rec"])
         PX.update(e.get("m") or [])
         if e["f"] == "data":
             PX.update(("step", q[2:]) for q in e["rec"] if q.startswith("s:"))
@@ -1998,6 +2003,11 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         die(f"{lab}: {n_occ} step occurrences placed or counted, the paths list {sum(len(v) for v in occ.values())}")
     tally["occ"] += n_occ
     el.sort(key=lambda x: (x[1], MO_ORDER.index(x[0]), x[8]))           # stable: within one family, the order the records were read
+    # D-067 (L-03, his "I don't see the difference between one and the other"): two items of one block at one moment whose hovers
+    # would read the same stop the build — each must carry what makes it itself (a limit's scope and numbers, the status a test proves)
+    tw = IO.twins(lab, el)
+    if tw:
+        die(f"{lab}: items whose hovers read the same at one moment (D-067): {tw[:3]}")
     for x in el:
         x.pop()                                                      # [family, moment, keys, words, chip, endings, hint, extras (D-056)]
     # the path picker: each path under the moment its ending leaves at, in time order; two endings of one status at one moment are told
@@ -2600,6 +2610,9 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
     bad = sorted({d0[1] for r in rows for x in r["mo"]["ex"] for d0 in x[9] or [] if d0[0] == "split" and d0[1] not in MW["path"]["split"]})
     if bad:
         die(f"BY MOMENT: paths told apart by what FastAPI checks ({bad}) that mo.path.split has no words for")
+    bad = IO.words_check(W, rows)                                  # D-067: every hover line has words, and shows every value it is given
+    if bad:
+        die(f"BY MOMENT: hover lines whose words are missing or do not use what they are given (mo.io): {sorted(set(map(str, bad)))[:4]}")
     KT = {}
     for r in rows:
         for x in r["mo"]["el"]:

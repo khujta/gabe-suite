@@ -870,3 +870,35 @@ it (D-025.5); a representation he asks for is built as options with the agent's 
 worked, the tags are grouped into patterns — count, example items, why it was clear to the model and not to him — each with a
 proposal for how the suite could catch or prevent it, shown on a generated page (D-025.8). Carrying a pattern into the suite is
 a meta change: drafted, and nothing lands before his "land it".
+
+## D-067 — One hover per item, in before · checks · gives; what a kind means moves to the row's legend
+Date: 2026-09-30 · Input: his note "API Hover Legend Consolidation", legibility-feedback.md L-01, L-02, L-03, L-04, L-22; the hovers
+investigation (P1–P5).
+Decision, his: "something that repeats always with the same text, that is not something that we should put as a hover. Instead, it
+should be something con— consolidated section, like a legend for a table" (L-01) · "we should consolidate in just one hover this whole
+icon … the hover … between items contains the different information because they are different items" (L-02) · "both 4, 29 say. The
+same, exactly the same … So I don't see the difference between one and the other" (L-03) · "in the row endings, at the beginning we can
+have when we hover in top of the ending, we can show the different labels that we manage show" (L-04, the legend's place) · "whatever
+dynamic information we have that should give in enough static context to be understandable … the input process and output like okay
+initial conditions what are we checking then how are we checking that and then what are we producing" (L-22).
+Consequence: (1) BY MOMENT: every chip is ONE hover — the kind label, the status square, the station glyph and the role label inside it
+stay drawn (D-052) but no longer hover apart (D-044's precedent); the empty cells lose their native "nothing here" tooltip. (2) An
+item's hover is its OWN facts in three parts in the order the code meets them — before (what must hold, what brings the code here) ·
+checks (what it checks or does, and where) · gives (what comes out, and what that does) — for every kind BY MOMENT draws: ending,
+own guard, deciding branch, catch, rate limiter, login check, table op, save step, function, handler, body, body field, reply, schema,
+hook, file, screen, cache write, reason site, in-flight value, switch, piece, middleware, 422 rule, test case, journey. The generator
+writes the lines from the feed (`_ae_io.io_of`, the one builder later kinds extend; words mo.io); a part the feed holds nothing for is
+left out, never guessed. (3) The two 429s (his L-03) now lead with what makes each itself: the sensitive limit (7 routes, 23 endpoints,
+checked at rate_limit.py:117, 20 per 60 seconds) and the global one (every request but /healthz, 79 endpoints, :121, 120 per 60 s); the
+build now STOPS when two items of one block at one moment would read the same, naming them (on its first run it stopped on GET /recipes:
+C316, C574 and C811 each fit several 400s at one moment whose words are the same — a proof now names where the ending it proves is
+produced; C237's four chips on POST /cooking/sessions each name the status and the ending they prove). (4) The row's legend: pointing at a row's name
+shows the kinds of item it holds and the labels its chips wear, each cloned as drawn, with what it means and how many are here — his
+placement, the default, marked ruled (D-067). (5) Page-wide (D-017): no hover says where the page took its colour or icon ("as the table
+draws it", "as the Gabe Universe draws it", the station's card); a table column's label, meaning and rating sit on its head only, with
+each stage's meaning on a stage column's head and the findings' order on the dots column's head — a cell, a stage pip, a finding dot says
+only its own. (6) THE ENDPOINTS' id cell is one hover; each item of ONE ENDPOINT's code map (a list item, a keyed name, a row of the
+endings table) is one hover of its own, so pointing at a name no longer shows the field's words.
+Options built (D-025.2): the legend's place — on the row's name (his, ruled, the default) · above the table, one line per row (the
+external legend he named as the other option); the hovers' form — labelled lines, top to bottom (the agent's pick, dashed) · one
+sentence, the parts joined by arrows. His to pick by seeing. Page-only: D-037's light checks.

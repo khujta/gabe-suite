@@ -26,9 +26,10 @@ deferred + trigger).
 - **where:** BY MOMENT · Endings · "at the edge" · the `refusal` label on each 429 ending
 - **could not tell:** anything about THIS ending — the label's hover is the kind's definition (identical on every refusal)
   plus how the page chose its colour and icon, a fact about the page, not the code.
-- **fix:** the kind definitions leave the item hovers and become a legend (see L-04 for where).
+- **fix:** BUILT — BY MOMENT chips are one hover each; a kind's definition (and how the page drew it, D-017) left every item hover
+  and stands once in the row's legend (`_ae_io.py` · all-endpoints.tpl.html `legHtml`/`oneTip`).
 - **tag:** `static-text-repeated-in-hovers`
-- **status:** logged
+- **status:** built (D-067)
 
 ### L-02
 - **words:** "the final is the container that contains both the label and the 4, 29 square. That says 4, 29 endings. Rate
@@ -38,9 +39,10 @@ deferred + trigger).
   items."
 - **where:** BY MOMENT · Endings · at the edge · one ending chip = three hover targets (label · code square · container)
 - **could not tell:** which of three partial cards describes the item; each tells a third of it.
-- **fix:** ONE hover per item, on the whole chip, carrying that item's own facts.
+- **fix:** BUILT — the label, the status square, the glyph and the role label inside a chip no longer hover apart (`oneTip`); the
+  chip's one hover carries the item's own facts in before · checks · gives (`ioParts` over the generator's `e[7].io`).
 - **tag:** `one-item-three-hovers`
-- **status:** logged
+- **status:** built (D-067)
 
 ### L-03
 - **words:** "Then if I hover in the 4, 29, I can see a client error status. Not declare, status. Sense, retry after. And
@@ -50,9 +52,10 @@ deferred + trigger).
 - **read as:** "not declared · status · sends Retry-After"
 - **where:** BY MOMENT · Endings · at the edge · the two 429 endings
 - **could not tell:** what makes the two 429s two endings — the hovers never name what differs between them.
-- **fix:** each ending's hover leads with what makes it itself (who produces it, on what condition, with what numbers).
+- **fix:** BUILT — each 429 leads with its own limit: sensitive (7 routes, 23 endpoints, rate_limit.py:117, 20 per 60 s) · global
+  (all but /healthz, 79 endpoints, :121, 120 per 60 s); the generator stops on two items at one moment whose hovers read the same.
 - **tag:** `twin-items-indistinguishable`
-- **status:** logged
+- **status:** built (D-067)
 
 ### L-04
 - **words:** "We have framework, error 4, 22. Again, the same structure, framework can be— when we hover in top of framework,
@@ -64,10 +67,10 @@ deferred + trigger).
 - **read as:** "an ending the framework produces while it reads the body" · "the different labels that we show"
 - **where:** BY MOMENT · Endings · reads the body · the framework 422 — and every ending in the row
 - **could not tell:** same as L-01 and L-02, on every ending of the row.
-- **fix:** the legend sits at the row's head: hovering "Endings" shows the kinds the row uses (his placement); an external
-  legend is the other option. One hover per ending.
+- **fix:** BUILT — pointing at a row's name ("Endings") shows its legend: the kinds and labels it draws, cloned, with what each means
+  and how many are here (his placement, ruled); the legend above the table, one line per row, is the other option (mo.opt.leg).
 - **tag:** `static-text-repeated-in-hovers`
-- **status:** logged
+- **status:** built (D-067); the external legend — option, his to pick (D-067)
 
 ### L-05
 - **words:** "by moment is kind of confusing, because some moments show with this progressive bar, like at the edge, then
@@ -303,10 +306,11 @@ deferred + trigger).
   an endpoint a functions a table or schema for what is being used and what is the effect of on that"
 - **where:** every hover of the page
 - **could not tell:** the item — hovers describe its KIND and leave out what this one checks, how, and what it produces.
-- **fix:** a hover rule: the item's own facts in input → process → output order, with only the static context needed to read
-  them.
+- **fix:** BUILT — every BY MOMENT item's hover is before · checks · gives from the feed (`_ae_io.io_of`, the one builder later kinds
+  extend); labelled lines (my pick, dashed) or one sentence (mo.opt.ipo); a column's words sit on its head only. The code map's
+  items are one hover each (their name, kind and labels), not yet in the three parts.
 - **tag:** `hover-describes-the-kind-not-the-item`
-- **status:** logged
+- **status:** built (D-067); the hover's form — option, his to pick (D-067)
 
 ### L-23
 - **words:** "You know what no let's put the section before the buy moment between buy moment and the one endpoint section I want

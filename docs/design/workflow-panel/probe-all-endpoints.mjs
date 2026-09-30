@@ -401,7 +401,8 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   ok(sl.length === 1 && a0.blk.indexOf(sl[0]) === colsAt + 1, 'the copy text puts the Shared treatment\'s line right under the columns line', a0.blk);
   const set0 = a0.blk.filter(isSet);
   // CHANGED 2026-09-28 (D-065): BY MOMENT's journeys look adds its line after BY MOMENT's two looks — nine lines now
-  ok(el0.length === 1 && set0.length === 9 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-10)) === JSON.stringify([el0[0]].concat(set0)),
+  // CHANGED 2026-09-30 (D-067): BY MOMENT's legend place and its hovers' form add theirs after the journeys' — eleven lines now
+  ok(el0.length === 1 && set0.length === 11 && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-12)) === JSON.stringify([el0[0]].concat(set0)),
     'the copy text adds the endpoint shown, then the code map\'s and BY MOMENT\'s settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -1308,7 +1309,8 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E14); await p.waitForTimeout(100);
   const m5 = await readM();
   // CHANGED 2026-09-28 (D-065): the journeys' squares are read apart (section 19)
-  ok(m5.lay === 'rows' && m5.cell === 'counts' && m5.squares.filter(([g, , on]) => on === 'true' && g !== 'jy').map(([g, v]) => g + ':' + v).sort().join(' ') === 'cell:counts lay:rows', 'BY MOMENT · both looks are remembered for this viewer', [m5.lay, m5.cell]);
+  /* CHANGED 2026-09-30 (D-067): the legend's place and the hovers' form are pressed squares of their own, read in section 21 */
+  ok(m5.lay === 'rows' && m5.cell === 'counts' && m5.squares.filter(([g, , on]) => on === 'true' && (g === 'lay' || g === 'cell')).map(([g, v]) => g + ':' + v).sort().join(' ') === 'cell:counts lay:rows', 'BY MOMENT · both looks are remembered for this viewer', [m5.lay, m5.cell]);
   await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' }));
   await p.click('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(60); await p.click('#mobar .opt[data-mopt="cell"][data-v="chips"]'); await p.waitForTimeout(80);
   const m6 = await readM();
@@ -2257,7 +2259,12 @@ ok(!errs.length, 'no page error after the D-058 checks', errs);
     const line = (i) => { const c = J.cs[i], h = i === K.k ? 1 : c.endpoint === EK ? 2 : 0;
       return fillW(h === 1 ? JW.here : h === 2 ? JW.hereAgain : JW.step, { i: i + 1, m: c.method, p: epPath(c), role: role(c) }) + ' · ' + asserts(c) + (known(c) ? '' : ' · ' + JW.noEp); };
     const jv = sortS(K.joined.map((x) => G.EN.st[x])), go = jv.length ? fillW(JW.on, { v: jv.join(' · ') }) : fillW(JW.leave[K.how], { v: K.st.join(' · '), n: K.cand.length });
-    return [fillW(JW.head, { cid: J.cid })].concat(J.name ? [J.name] : [], [side === 'b' ? JW.sideB : JW.sideA], rng.map(line), [go], K.on.length > K.joined.length ? [JW.onEach] : [], [JW.plain]); };
+    /* CHANGED 2026-09-30 (D-067, his L-22 "input, process and output"): the hover in its three parts — before: the test's name and its
+       requests before this call · checks: this call · gives: its requests after it, where it goes when a path is picked, each path to its
+       ending when several reach it. The side line and the plain left the item's hover (what a journey is stands in the Proof row's legend) */
+    const IP = MW.io.parts, bef = (J.name ? [J.name] : []).concat(rng.filter((i) => i < K.k).map(line)),
+      giv = rng.filter((i) => i > K.k).map(line).concat([go], K.on.length > K.joined.length ? [JW.onEach] : []);
+    return [fillW(JW.head, { cid: J.cid })].concat(bef.length ? [IP.b + bef.join('')] : [], [IP.c + line(K.k)], [IP.g + giv.join('')]); };
   const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
   const tipLines = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
     const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
@@ -2351,6 +2358,62 @@ ok(!errs.length, 'no page error after the D-058 checks', errs);
     'D-065 · review J3 · ' + ES + ' · C2137 wears its case key on its ' + f3.jy + ' journey chips and its own call sits in the band: the Tests row\'s C2137 stays bright; ' + wantC + ' of ' + f3.items.length + ' carried, the other chips\' keys', f3);
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-065 checks', errs);
+
+/* 21 · D-067 (his note "API Hover Legend Consolidation", L-01 … L-04 · L-22): ONE hover per item, its own facts in three parts; the
+   kinds and labels in the row's legend (on the row's name, his placement; above the table, the option); no page-facing line in a hover;
+   a column's words on its head only; the code map's items and the table's id cell one hover each; no native tooltip on an empty cell */
+{ const E = 'POST /cooking/sessions', R = ROW[E], FE = FJ.endpoints['endpoint:' + E], MW = D.words.mo, IO = MW.io, XW = MW.x;
+  const fillW = (s0, x) => String(s0).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
+  const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
+    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
+    const t = await p.$eval('#tip', (e) => ({ text: e.textContent, html: e.innerHTML })); await p.mouse.move(5, 5); return t; };
+  await open(PAGE); await openEp(E);
+  /* (1) one hover per item */
+  const nest = await p.evaluate(() => [document.querySelectorAll('#mogrid .mc [data-tip], #mogrid .nmc [data-tip], #moband .mc [data-tip]').length, document.querySelectorAll('#mogrid .mc').length,
+    document.querySelectorAll('#mogrid td [title], #mogrid td[title]').length, document.querySelectorAll('#board .idc [data-tip]').length]);
+  ok(nest[0] === 0 && nest[1] > 100 && nest[2] === 0 && nest[3] === 0, 'D-067 (P1 · P5) · ' + E + ' · no hover inside any of the ' + nest[1] + ' BY MOMENT chips, no native tooltip on a cell, none inside the table\'s id cells', nest);
+  /* (2) the two 429s read apart: each names its limit, the line it is checked at, its scope and its numbers (read from forms.json) */
+  const lims = FE.rate.limits.map((l) => ({ nm: l.limiter.replace(/^_/, ''), at: l.at.split('/').pop(), lim: l.args.find((a) => a.param === 'limit').value, w: l.args.find((a) => a.param === 'window_seconds').value, key: l.key }));
+  const t429 = []; for (const c of await p.$$('#mogrid td[data-mom="edge"][data-f="end"] .mc')) { await c.scrollIntoViewIfNeeded(); const bx = await c.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
+    t429.push(await p.$eval('#tip', (e) => e.textContent)); await p.mouse.move(5, 5); }
+  ok(t429.length === 2 && t429[0] !== t429[1] && lims.every((l) => t429.filter((t) => t.startsWith('429 · ' + l.nm) && t.includes(l.at) && t.includes(fillW(XW.limit, { n: l.lim, w: l.w, k: l.key }))).length === 1)
+     && t429.every((t) => t.includes(IO.parts.b) && t.includes(IO.parts.c) && t.includes(IO.parts.g)),
+    'D-067 (L-03) · ' + E + ' · the two 429s at the edge read apart: ' + lims.map((l) => l.nm + ' at ' + l.at + ', ' + l.lim + ' per ' + l.w + ' s').join(' · ') + ', each in before · checks · gives', t429.map((t) => t.slice(0, 90)));
+  /* (3) the C237 chips, one per ending it fits, each names the ending it proves (the build stops on two that read the same) */
+  const t237 = []; for (const c of await p.$$('#mogrid .mc[data-f="proof"][data-keys="case:C237"]')) { await c.scrollIntoViewIfNeeded(); const bx = await c.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
+    t237.push(await p.$eval('#tip', (e) => e.textContent)); await p.mouse.move(5, 5); }
+  ok(t237.length === 4 && new Set(t237).size === 4, 'D-067 (L-03) · C237\'s ' + t237.length + ' chips, one per ending its status fits, each hover names the ending it proves', t237.map((t) => t.slice(-90)));
+  /* (4) no page-facing line in an item's hover (D-017), nor a kind's definition */
+  const tEnd = await tipAt('#mogrid td[data-mom="body"][data-f="end"] .mc'), prov = Object.values(D.words.enc.from).concat([D.words.station.glyph, D.words.station.card, D.words.kinds.framework.plain]);
+  ok(tEnd && !prov.some((w) => tEnd.text.includes(w)), 'D-067 (P4) · the framework ending\'s hover says no "as … draws it", no station words and not what "framework" means', (tEnd || {}).text);
+  /* (5) the row's legend on the row's name (his placement, ruled): the kinds and labels drawn, each cloned, with how many */
+  const tLeg = await tipAt('#mogrid th[data-f="end"]'), nKinds = new Set(R.mo.el.filter((e) => e[0] === 'end').map((e) => e[4][1])).size;
+  ok(MW.opt.leg.ruled === 'D-067' && MW.opt.leg.pick === 'hover' && tLeg && tLeg.text.includes(MW.leg.kinds) && tLeg.text.includes(MW.leg.marks) && (tLeg.html.match(/class="lg"/g) || []).length >= nKinds
+     && ['refusal', 'framework'].every((k) => tLeg.text.includes(D.words.kinds[k].plain)),
+    'D-067 (P2 B1) · the Endings row\'s name carries its legend: the ' + nKinds + ' kinds of ending, each with what it means, and the status labels', (tLeg || {}).text.slice(0, 160));
+  /* (6) the options: the legend above the table, and the hovers as one sentence */
+  const sq = await p.$$eval('#mobar .opt[data-mopt="leg"], #mobar .opt[data-mopt="ipo"]', (os) => os.map((o) => [o.getAttribute('data-mopt'), o.getAttribute('data-v'), o.getAttribute('aria-checked'), o.getAttribute('data-ruled'), o.getAttribute('data-pick')]));
+  await p.click('#mobar .opt[data-mopt="leg"][data-v="strip"]'); await p.waitForTimeout(150);
+  const strip = await p.evaluate(() => { const L = document.getElementById('moleg'); return [L.hidden, L.querySelectorAll('.mlr').length, document.querySelectorAll('#mogrid tbody tr[data-f]').length]; });
+  const tLeg2 = await tipAt('#mogrid th[data-f="end"]');
+  await p.click('#mobar .opt[data-mopt="leg"][data-v="hover"]'); await p.click('#mobar .opt[data-mopt="ipo"][data-v="sent"]'); await p.waitForTimeout(150);
+  const tSent = await tipAt('#mogrid td[data-mom="edge"][data-f="end"] .mc');
+  await p.click('#mobar .opt[data-mopt="ipo"][data-v="lines"]'); await p.waitForTimeout(100);
+  ok(sq.length === 4 && sq.some(([g, v, on, ruled]) => g === 'leg' && v === 'hover' && on === 'true' && ruled === 'true') && sq.some(([g, v, on, , pk]) => g === 'ipo' && v === 'lines' && on === 'true' && pk === 'true')
+     && !strip[0] && strip[1] === strip[2] && tLeg2 && !tLeg2.text.includes(MW.leg.kinds) && tSent && tSent.html.includes('iosent') && !tSent.html.includes('class="io"') && tSent.text.includes(IO.arrow.trim()),
+    'D-067 (P2 B2 · P3b) · the legend above the table shows one line per row and leaves the row\'s name its own words; the hovers as one sentence read before → checks → gives', { sq, strip });
+  /* (7) a column's words on its head, never on each cell */
+  const c0 = D.cols.find((c) => c.kind === 'spine'), tCell = await tipAt('#board tr.row [data-col="' + c0.id + '"]'), tHead = await tipAt('#board thead th[data-tip="head"][data-col="' + c0.id + '"]');
+  const st0 = D.orders.stageRows.filter((x) => D.orders.kinds[x] !== 'screen')[0];
+  ok(tCell && tHead && !tCell.text.includes(c0.plain) && tHead.text.includes(c0.plain) && tHead.text.includes(st0 + ' — ' + D.words.stages[st0]),
+    'D-067 (P4) · the ' + c0.id + ' column says what it is on its head (with each stage), and its cells say only their own', { cell: (tCell || {}).text, head: (tHead || {}).text.slice(0, 120) });
+  /* (8) a code-map item hovers as itself, not as its field */
+  const tIt = await tipAt('#ocol-cm .pair[data-k="d:tables"] li'), fld = D.attrs[(await p.$eval('#ocol-cm .pair[data-k="d:tables"]', (e) => e.getAttribute('data-attr'))).split(' ')[0]].plain;
+  ok(tIt && !tIt.text.includes(fld) && (await p.$$eval('#ocol-cm .pair [data-tip="cmitem"] :is([data-tip="vc"], [data-tip="sk"], [data-tip="cell"])', (n) => n.length)) === 0,
+    'D-067 (P5) · a table named in the code map hovers as that table, the field\'s own words stay on the field\'s name; nothing inside an item hovers apart', (tIt || {}).text);
+  await p.evaluate(() => window.scrollTo(0, 0)); }
+ok(!errs.length, 'no page error after the D-067 checks', errs);
 
 /* 7 · an arm the feed lacks reads "absent", never 0 — on a fixture built from a scratch copy of the feed */
 { const copy = JSON.parse(JSON.stringify(FJ));
