@@ -30,7 +30,7 @@ HERE = UNI.HERE
 LAB_HTML, LAB_PANELS, LAB_CSS = HERE / "endpoint-lab.html", HERE / "_lab-ep-panels.js", HERE / "_lab-ep.css"
 PROBE_EPLAB = HERE / "probe-eplab.mjs"
 BENCH_JS, BENCH_CSS = HERE / "_ae-bench.js", HERE / "_ae-bench.css"
-KINDS = ("end", "table", "schema", "fn")          # his order (L-23), the columns left to right
+KINDS = ("end", "table", "schema", "fn", "test")          # his order (L-23), the columns left to right
 LAB_KINDS = {"table": "DATACFG", "schema": "SCHCFG", "fn": "FNCFG"}
 GATE_ROLES = ("limiter", "scheme", "login", "rule", "own", "down", "branch", "catch", "switch")   # EX-4: the feed's own groups
 TEST_ROLES = ("act", "check", "arrange", "service", "helper")
@@ -365,6 +365,56 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
         ex["fn"].append([i, f.get("role") or "none", {"lv": lv, "via": via, "h": 1 if lv == 0 else 0, "ops": [[o.get("rw"), o.get("table")] for o in f.get("ops") or []],
                                                      "calls": [I(g.get("name")) for l2, g, v2 in walk if v2 == f.get("name") and l2 == lv + 1], "does": [I(d) for d in doesw.get(q, [])], "rz": raises_here(q)}])
 
+    # TESTS — every case the lab's roster names on this endpoint, linked to what its requests here pass and touch (L-08, EX-3)
+    TC = fj.get("test_cases") or {}
+    roster = (L["tests"].get("roster") or []) if not arm_off(fj, KIND_ARM["test"]) else []
+    jy = {j["cid"]: j.get("entities") or [] for j in L["tests"].get("journeys") or []}
+    status_ends = collections.defaultdict(list)
+    for x in exits:
+        status_ends[x.get("status")].append(x["id"])
+    listed = {t["cid"] for t in roster}
+    roster = roster + [{"cid": c, "role": "helper-arranged", **{q: (TC.get(c) or {}).get(q) for q in ("name", "file", "line", "state", "corpus")}}
+                       for c in ((F.get("endpoint") or {}).get("tests") or {}).get("helper_arranged") or [] if c not in listed and c in TC and roster]
+    for t in roster:
+        cid, tc = t["cid"], TC.get(t["cid"]) or {}
+        i = "case:" + cid
+        if i not in cat:
+            cat[i] = {"k": "test", "n": _case_name(t.get("name"), cid), "cid": cid, "key": i, "file": t.get("file"), "line": t.get("line"), "corpus": t.get("corpus"),
+                      "state": t.get("state"), "calls": [[c.get("method"), (c.get("endpoint") or "").replace("endpoint:", "") or f"{c.get('method')} {c.get('path')}", c.get("role"), c.get("line"), c.get("helper"),
+                                                          c.get("sends") or [], (c.get("asserts") or {}).get("status") or [], (c.get("asserts") or {}).get("attrs") or []]
+                                                         for c in tc.get("calls") or []],
+                      "raises": [[z.get("call"), z.get("raises"), z.get("line")] for z in tc.get("raises") or []], "ents": jy.get(cid, [])}
+        here = [k for k, c in enumerate(tc.get("calls") or []) if c.get("endpoint") == "endpoint:" + ep]
+        roles = {(tc["calls"][k].get("role")) for k in here}
+        role = "helper" if t.get("role") == "helper-arranged" else "act" if "act" in roles else "check" if "arrange-checked" in roles else "arrange" if "arrange" in roles else \
+            {"service-raises": "service", "helper-arranged": "helper"}.get(t.get("role"), "arrange" if t.get("role") == "arranged" else "act")
+        ends, how = [], []
+        for k in here:
+            c = tc["calls"][k]
+            if c.get("refs"):
+                for z in c["refs"]:
+                    if z.get("exit") not in [e0["id"] for e0 in exits]:
+                        die(f"{ep} · {cid}: proves {z.get('exit')}, which this endpoint does not have")
+                    ends.append(z["exit"]); how.append("refs" if not str(z.get("conf") or "").startswith("ambiguous") else "amb")
+            else:
+                for s in (c.get("asserts") or {}).get("status") or []:
+                    for xid in status_ends.get(s, []):
+                        ends.append(xid); how.append("status")
+        if not here:
+            for z in t.get("proves") or []:
+                ends.append(z.get("exit")); how.append("service")
+        seen_e, E2 = set(), []
+        for x0, h0 in zip(ends, how):
+            if x0 not in seen_e:
+                seen_e.add(x0); E2.append([x0, h0])
+        paths = [pid for x0, _h in E2 for pid in by_exit.get(x0, [])]
+        tally["testLinks"] += len(E2)
+        ex["test"].append([i, role, {"here": here, "ends": E2, "paths": paths}])
+    for pid, p in PATHS.items():
+        for tt in next((pp.get("tests") or [] for pp in F.get("paths") or [] if pp["id"] == pid), []):
+            if tt.get("case") and tt["case"] not in TC:
+                die(f"{ep} · path {pid}: its test {tt['case']} is not a case of the feed")
+
     ex["paths"] = PATHS
     for k in KINDS:
         tally["n:" + k] += len(ex[k])
@@ -376,6 +426,9 @@ MINE = {   # my picks (dashed on the page): each kind's parts in three lines of 
     "end": {"parts": ["icon", "status", "name", "stage", "count", "via"],
             "rows": [{"l": ["icon", "status"], "r": ["stage"]}, {"l": ["name"], "r": ["count"]}, {"l": ["via"], "r": []}],
             "size": {"icon": 13, "status": 11, "name": 13, "stage": 11, "count": 11, "via": 12}, "iconCol": "model"},
+    "test": {"parts": ["icon", "cid", "state", "proves", "role", "name", "file", "sends", "asserts"],
+             "rows": [{"l": ["icon", "cid", "proves"], "r": ["state"]}, {"l": ["name"], "r": []}, {"l": ["role", "sends"], "r": ["asserts"]}],
+             "size": {"icon": 13, "cid": 13, "state": 11, "proves": 11, "role": 11, "name": 12, "file": 12, "sends": 11, "asserts": 12}, "iconCol": "model"},
 }
 MODES = {"ent": ["word", "icon", "both"], "count": ["words", "badge"], "model": ["word", "icon", "both"], "via": ["word", "icon", "both"],
          "file": ["word", "icon", "both"]}

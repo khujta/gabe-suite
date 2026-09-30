@@ -1784,10 +1784,15 @@
       "fn": {
         "name": "function",
         "plain": "The handler, or a function it calls on the way."
+      },
+      "test": {
+        "name": "test",
+        "plain": "A test that sends this request, or calls the code behind it."
       }
     },
     "icons": {
       "end": "target",
+      "test": "test",
       "file": "file",
       "link": "link",
       "up": "up",
@@ -1892,6 +1897,28 @@
         "none": {
           "name": "no role known"
         }
+      },
+      "test": {
+        "act": {
+          "name": "tests it",
+          "plain": "It sends this request to test it; what it checks on the answer is what it proves."
+        },
+        "check": {
+          "name": "sets up and checks",
+          "plain": "It sends this request to set something up, and checks the status it gets."
+        },
+        "arrange": {
+          "name": "sets up",
+          "plain": "It sends this request only to set something up for a later request."
+        },
+        "service": {
+          "name": "from the service side",
+          "plain": "It never sends this request: it calls the code behind it and checks what that code raises."
+        },
+        "helper": {
+          "name": "through a helper",
+          "plain": "A helper it calls sends this request to set something up."
+        }
       }
     },
     "parts": {
@@ -1983,6 +2010,44 @@
           "name": "where",
           "plain": "The file and line that produce it."
         }
+      },
+      "test": {
+        "icon": {
+          "name": "glyph",
+          "plain": "The test glyph."
+        },
+        "cid": {
+          "name": "case",
+          "plain": "The test's case id."
+        },
+        "state": {
+          "name": "result",
+          "plain": "Whether it passed in the last run."
+        },
+        "proves": {
+          "name": "endings",
+          "plain": "The statuses of the endings it proves here."
+        },
+        "role": {
+          "name": "role here",
+          "plain": "What the test does with this endpoint."
+        },
+        "name": {
+          "name": "name",
+          "plain": "The test's name, without its prefix and its case id."
+        },
+        "file": {
+          "name": "file",
+          "plain": "The test's file and line."
+        },
+        "sends": {
+          "name": "headers",
+          "plain": "The headers its requests here send."
+        },
+        "asserts": {
+          "name": "checks",
+          "plain": "What it checks on the answer here: the status, and the answer's fields it reads."
+        }
       }
     },
     "cp": {
@@ -2018,13 +2083,25 @@
         "stage": "stage",
         "count": "count",
         "via": "where"
+      },
+      "test": {
+        "icon": "glyph",
+        "cid": "case",
+        "state": "result",
+        "proves": "endings",
+        "role": "chip",
+        "name": "name",
+        "file": "file",
+        "sends": "headers",
+        "asserts": "checks"
       }
     },
     "chipWord": {
       "end": "status",
       "table": "channel",
       "schema": "direction",
-      "fn": "role"
+      "fn": "role",
+      "test": "role"
     },
     "ctl": {
       "parts": "parts",
@@ -2145,6 +2222,15 @@
         "raiseTo": ", which becomes {v}",
         "commit": "ends a database transaction",
         "lines": "lines: {n}"
+      },
+      "test": {
+        "in": "sends {v}",
+        "inNone": "sends no header it names",
+        "do": "requests in all: {n} · {v}",
+        "doService": "calls {v} directly, never the endpoint",
+        "out": "checks {v}",
+        "proves": "proves {v} here",
+        "provesNone": "proves no ending here"
       }
     },
     "list": {
@@ -2170,6 +2256,29 @@
       "impls": "runs one of",
       "req": "requests, in order",
       "here": "this endpoint"
+    },
+    "chain": {
+      "title": "what the test runs through, in order",
+      "request": "the request",
+      "checks": "checks it passes",
+      "branch": "the branch it takes",
+      "fns": "functions it runs",
+      "tables": "tables it touches",
+      "saved": "saved",
+      "notSaved": "not saved",
+      "inf": "in-flight values it meets",
+      "ending": "the ending",
+      "which": "way {i} of {n}",
+      "raise": "the error it expects",
+      "service": "It calls {v} directly; the catch that turns this into an answer does not run in this test."
+    },
+    "notKnown": {
+      "title": "not known from the test",
+      "body": "the body it sends",
+      "fixture": "header values a fixture sets",
+      "which": "which of the {n} ways to {status} it takes",
+      "step": "what one step hands the next",
+      "loop": "checks written inside a loop"
     },
     "copy": {
       "where": "examples",

@@ -91,6 +91,21 @@
       if (p === "count") return xCount(c.paths.length, z, md.count, fill(XW.tip.end.ways, { n: c.paths.length }));
       if (p === "via") return c.at ? xMeta("file", xShort(c.at), z, md.via) : null;
       return null; },
+    test: function (p, c, it, L, z) { var md = L.mode || {}, o = it.o, here = o.here.map(function (i) { return c.calls[i]; });
+      if (p === "icon") { var s = el("span", "bki"); s.appendChild(xSvg("test", z, xGlyphCol("test", c, it, L))); return s; }
+      if (p === "cid") return xB(c.cid, z);
+      if (p === "state") return xChip(c.state === "pass" ? XW.face.pass : XW.face.fail, c.state === "pass" ? EX.col.opc.read : "var(--alert)", z);
+      if (p === "proves") { if (!o.ends.length) return null; var w = el("span", "bkm exends"), sts = {}; o.ends.forEach(function (e) { var ec = EX.cat[it.ep + "|" + e[0]]; if (ec) sts[ec.st] = 1; });
+        Object.keys(sts).forEach(function (st) { w.appendChild(xStatusChip(st, z)); }); return w; }
+      if (p === "role") return xChip(xRoleName("test", it.role), xChanCol("test", c, it), z);
+      if (p === "name") { var n = el("span", "bkm exname", c.n); n.style.fontSize = z + "px"; return n; }
+      if (p === "file") return xMeta("file", xShort(c.file) + ":" + c.line, z, md.file || "word");
+      if (p === "sends") { var hs = {}; here.forEach(function (q) { q[5].forEach(function (h) { hs[h] = 1; }); }); var ks = Object.keys(hs); if (!ks.length) return null;
+        var w2 = el("span", "bkm exhdr"); w2.style.fontSize = z + "px"; ks.forEach(function (h) { w2.appendChild(el("span", "exh", h)); }); return w2; }
+      if (p === "asserts") { var a = []; here.forEach(function (q) { if (q[6].length) a.push(q[6].length > 1 ? fill(XW.face.accepts, { v: q[6].join(" · ") }) : String(q[6][0]));
+          q[7].forEach(function (x) { var m = x.match(/\['(\w+)'\]/g); if (m) a.push(m[m.length - 1].slice(2, -2)); }); });
+        return a.length ? xMeta(null, a.join(" · "), z, "word", "exasr") : null; }
+      return null; },
   };
 
   /* ── the strip of marks: one per field (a table, a schema — the lab's field marks, lifted), per table touched (a function), per
@@ -111,6 +126,8 @@
         m(q[0] === "gate" ? (q[2] ? xStatusCol(c.st) : E.opc.gate) : q[0] === "call" ? E.kind["function"] : q[0] === "branch" ? E.opc.call : q[0] === "switch" ? E.opc.pure : xStatusCol(c.st),
           q[0] === "gate" ? "shield" : q[0] === "call" ? "function" : q[0] === "branch" ? "merge" : q[0] === "switch" ? "role" : "target", q[0] === "call" ? "ƒ" : q[0].charAt(0).toUpperCase(),
           (q[0] === "gate" && q[2] === 0 ? "expass" : "") + (q[0] === "exit" ? " exhere" : "")); }); }
+    else if (k === "test") { if (c.calls.length) c.calls.forEach(function (q, i) { m(q[2] === "act" ? E.opc.call : q[2] === "arrange-checked" ? E.opc.gate : E.opc.pure, "endpoint", q[0] ? q[0].charAt(0) : "?", o.here.indexOf(i) >= 0 ? "exhere" : ""); });
+      else c.raises.forEach(function () { m(E.kind["function"], "function", "ƒ", "exhere"); }); }
     return s.childNodes.length ? s : null; }
 
   /* ── the list a click opens: every field, the ways through the code, the ordered chain a test runs through ── */
@@ -133,7 +150,31 @@
       if (o.does.length) { xHead(b, L.does); xRow(b, [o.does.map(xT).join(" · ")]); } }
     else if (k === "end") { var R = BYID[c.ep]; c.paths.forEach(function (pid, i) { xHead(b, c.paths.length > 1 ? fill(L.way, { i: i + 1 }) : L.paths); xChainRows(b, R.ex.paths[pid]); });
       xHead(b, L.answer); xRow(b, [c.media || XW.face.none, c.hd.length ? el("span", "exs", c.hd.map(function (h) { return h[0]; }).join(" · ")) : null]); }
+    else if (k === "test") xTestChain(b, c, it);
     return b; }
+  /* EX-3 (L-08): what a test runs through here, in order — its requests, then per way to the ending it proves: the checks it passes,
+     the branch it takes, the functions it runs, the tables it touches (saved or not), the in-flight values it meets, the ending */
+  function xTestChain(b, c, it) { var o = it.o, CH = XW.chain, R = BYID[it.ep], NK = XW.notKnown;
+    xHead(b, XW.list.req); c.calls.forEach(function (q, i) { xRow(b, [el("span", "exk", String(i + 1)), q[1], el("span", "exs", xRoleName("test", q[2] === "act" ? "act" : q[2] === "arrange-checked" ? "check" : "arrange")),
+      q[6].length ? xStatusChip(q[6].join("|"), 12) : null], o.here.indexOf(i) >= 0 ? "exhit" : ""); });
+    if (!c.calls.length && c.raises.length) { xHead(b, CH.raise); c.raises.forEach(function (z) { xRow(b, [el("span", "exk", "!"), z[0] + " → " + z[1]]); });
+      xRow(b, [fill(CH.service, { v: c.raises.map(function (z) { return z[0]; }).join(" · ") })], "exnote"); }
+    xHead(b, CH.title);
+    o.paths.forEach(function (pid, i) { var P = R.ex.paths[pid]; if (!P) return; if (o.paths.length > 1) xHead(b, fill(CH.which, { i: i + 1, n: o.paths.length }) + " · " + P.st);
+      var gates = P.ch.filter(function (q) { return q[0] === "gate" && !q[2]; }), br = P.ch.filter(function (q) { return q[0] === "branch" && q[2]; });
+      if (!c.calls.length) { xRow(b, [el("span", "exk", "✕"), P.ch.filter(function (q) { return q[0] === "gate" && q[2]; }).map(function (q) { return xT(q[1]); }).join(" · ") || String(P.st)]); return; }
+      var q0 = c.calls[o.here[0]] || []; xRow(b, [el("span", "exk", "1"), CH.request, q0[1] ? el("span", "exs", q0[1]) : null, q0[5] && q0[5].length ? el("span", "exs", q0[5].join(" · ")) : null], "exsec"); xRow(b, [el("span", "exk", "2"), CH.checks + " · " + gates.length], "exsec");
+      gates.forEach(function (q) { xRow(b, [el("span", "exk", "✓"), xT(q[1]), q[5] != null ? el("span", "exs", xT(q[5])) : null], "exin"); });
+      if (br.length) { xRow(b, [el("span", "exk", "→"), CH.branch], "exsec"); br.forEach(function (q) { xRow(b, [el("span", "exk", "→"), xT(q[1])], "exin"); }); }
+      xRow(b, [el("span", "exk", "ƒ"), CH.fns + " · " + P.fn.length], "exsec"); xRow(b, [P.fn.map(function (i) { return xFnName(xT(i)); }).join(" · ")], "exin");
+      xRow(b, [el("span", "exk", "▤"), CH.tables + " · " + P.tb.length], "exsec"); var tb = el("div", "exin"); xTables(tb, P); b.appendChild(tb);
+      if (P.inf.length && R.ex.inf) { xRow(b, [el("span", "exk", "~"), CH.inf + " · " + P.inf.length], "exsec"); var inf = ((R.ex.inf || [])); xRow(b, [P.inf.map(function (j) { var e = inf[j]; return e ? EX.cat[e[0]].n : ""; }).join(" · ")], "exin"); }
+      xRow(b, [el("span", "exk", "■"), CH.ending, xStatusChip(P.st, 12)], "exsec"); });
+    var nk = [NK.body]; if (!o.here.some(function (i) { return c.calls[i][5].length; }) && c.calls.length) nk.push(NK.fixture);
+    o.ends.forEach(function (e) { var ec = EX.cat[it.ep + "|" + e[0]]; if (ec && ec.paths.length > 1) nk.push(fill(NK.which, { n: ec.paths.length, status: ec.st })); });
+    if (c.calls.length > 1) nk.push(NK.step); nk.push(NK.loop);
+    xHead(b, NK.title); nk.forEach(function (t) { xRow(b, [el("span", "exk", "?"), t], "exnk"); }); }
+
   /* ── ONE hover per block (L-02 · L-22): what goes in, what it does, what comes out — this element's own facts ── */
   function xTipBlock(k, it) { var c = EX.cat[it.id], o = it.o, T = XW.tip, K = T[k], lines = [[], [], []], ln = function (i, s) { if (s) lines[i].push(s); };
     var head = "<b>" + esc(k === "test" ? c.cid + " · " + c.n : k === "gate" ? c.n : k === "end" ? c.st + " · " + (c.kd === "success" ? fill(XW.face.answer, { n: c.fields }) : (c.say || c.code || XW.face.noWords)) : c.n) + "</b> · " + esc(XW.kinds[k].name) + " · " + esc(xRoleName(k, it.role));
@@ -153,6 +194,12 @@
     else if (k === "fn") { ln(0, o.h ? K.inHandler : fill(K.in, { v: o.via })); ln(1, o.does.length ? fill(K.do, { v: o.does.map(xT).join(" · ") }) : null);
       o.ops.forEach(function (q) { ln(1, fill(K.ops, { op: xRoleName("table", q[0]), tbl: q[1] })); }); if (c.commits) ln(1, K.commit);
       if (c.ret) ln(2, fill(K.out, { v: c.ret })); c.raises.forEach(function (z, i) { var to = (o.rz || [])[i] || []; ln(2, fill(K.raise, { cls: z[0], at: z[1], st: to.length ? fill(K.raiseTo, { v: to.join(" · ") }) : "" })); }); }
+    else if (k === "test") { var hs = {}; o.here.forEach(function (i) { c.calls[i][5].forEach(function (h) { hs[h] = 1; }); });
+      ln(0, c.calls.length ? (Object.keys(hs).length ? fill(K.in, { v: Object.keys(hs).join(" · ") }) : K.inNone) : null);
+      ln(1, c.calls.length ? fill(K.do, { n: c.calls.length, v: xRoleName("test", it.role) }) : fill(K.doService, { v: c.raises.map(function (z) { return z[0]; }).join(" · ") }));
+      var sts = {}; o.ends.forEach(function (e) { var ec = EX.cat[it.ep + "|" + e[0]]; if (ec) sts[ec.st] = 1; });
+      ln(2, Object.keys(sts).length ? fill(K.proves, { v: Object.keys(sts).join(" · ") }) : K.provesNone);
+      o.here.forEach(function (i) { var q = c.calls[i]; if (q[6].length || q[7].length) ln(2, fill(K.out, { v: q[6].join(" · ") + (q[7].length ? " · " + q[7].join(" · ") : "") })); }); }
     var h = head; [T.in, T.do, T.out].forEach(function (lab, i) { if (lines[i].length) h += "<span class=ln><i class=exio>" + esc(lab) + "</i> " + esc(lines[i].join(" · ")) + "</span>"; });
     return h; }
 
