@@ -5,6 +5,7 @@
 <!--__UNILOOK__-->
 <!-- the endpoint lab's channel chip (.jdrw) for the code map's value chips (D-043), lifted from _lab-ep.css by gen-all-endpoints.py -->
 <!--__ENCLOOK__-->
+<!--__BENCHLOOK__-->
 <style>
   /* ══ the page's own rules — the kit block above is pasted verbatim by gen-all-endpoints.py ══ */
   /* centred (his rule, 2026-09-17) and WIDE: the subject is a table of every endpoint, and every column saved is a row seen */
@@ -560,6 +561,14 @@
       <div class="ocol gaps" id="ocol-gaps"></div>
       <div class="ocol cm" id="ocol-cm"></div>
     </div>
+  </section>
+
+  <!-- D-071 · THE EXAMPLES BENCH (his L-23): one example of every kind of element, a column each in his order, its controls below it -->
+  <section class="sec" data-sec="6" id="sec-ex" data-info="closed">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="18" x="3" y="3" rx="1.5"></rect><rect width="7" height="11" x="14" y="3" rx="1.5"></rect><path d="M14 18h7M14 21h5"></path></svg><span id="t-ex">—</span></h2><button class="itog" type="button" id="itog-ex" data-sec="ex" aria-expanded="false" aria-controls="info-ex" data-tip="itog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg></button></div>
+    <div class="ainfo" id="info-ex"></div>
+    <div class="exbar" id="exbar"></div>
+    <div class="exgrid" id="exgrid"></div>
   </section>
 
   <!-- BY MOMENT (his ask 2026-09-26): the endpoint ONE ENDPOINT shows, its moments as rows and its timed blocks as columns -->
@@ -1436,6 +1445,7 @@
   function renderOne() {
     var r = BYID[S.open]; if (!r) return; var P = W.panel, O = W.one;
     renderMo();                                                /* BY MOMENT follows the same endpoint */
+    renderEx();                                                /* D-071: so does the examples bench */
     /* the face (D-038): which endpoint, and the two places to see it drawn — the lab and the Gabe Universe */
     var hd = $("onehead"); hd.textContent = ""; var h = el("h3"); h.appendChild(el("span", null, r.p)); skEp(h, r); h.setAttribute("aria-label", r.id); hd.appendChild(h);   /* D-052 */
     hd.appendChild(linkBtn("lablink", "endpoint-lab.html?ep=" + slugOf(r.id), LABICON, P.labShort, fill(P.open, { ep: r.id }), "lablink"));
@@ -1963,6 +1973,7 @@
   var tip = $("tip");
   function tipFor(t) {
     var kind = t.getAttribute("data-tip"), c = COL[t.getAttribute("data-col")], rowEl = t.closest("[data-ep]"), r = rowEl ? ROWS.filter(function (x) { return x.id === rowEl.getAttribute("data-ep"); })[0] : null;
+    if (kind && kind.slice(0, 2) === "ex") return exTip(t, kind);                     /* D-071: the examples bench's hovers */
     if (kind === "opt") { var rr = t.getAttribute("data-rail"), R = W.rail[rr], ov = t.getAttribute("data-v"), ck = { cards: D.layouts[ov] };
       var mk = R.pick !== ov ? "" : R.ruled ? " · " + esc(W.ruledMark) : " · " + esc(W.pickMark);
       return "<b>" + esc(optName(rr, ov)) + "</b>" + mk + "<span class=pl>" + esc(fill(R.opts[ov].plain, ck)) + "</span>"; }
@@ -2111,6 +2122,7 @@
     lines = lines.concat(cmLines());                          /* the code map's settings and BY MOMENT's, with whose pick each is */
     var rm = BYID[S.open]; if (rm) lines.push(C.mo + " · " + C.path + ": " + (MPATH.i == null || MPATH.ep !== rm.id ? W.mo.path.all : fill(W.mo.path.one, { status: rm.mo.ex[MPATH.i][1] })
       + " (" + rm.mo.ex[MPATH.i][0] + (rm.mo.ex[MPATH.i][9] ? " · " + rm.mo.ex[MPATH.i][8] : "") + ")"));   /* D-057 (c): the path, where its ending has several */
+    lines = lines.concat(exLines());                          /* D-071: each example's look, one line per kind */
     lines.push("", C.your, "");
     $("out").value = lines.join("\n");
   }
@@ -2125,11 +2137,11 @@
   $("eyebrow").textContent = fill(W.eyebrow); $("h1").textContent = fill(W.h1); $("lede").textContent = fill(W.lede); $("prop").textContent = fill(W.proposal);
   $("stamp").textContent = fill(W.stamp); $("keys").textContent = fill(W.keys);
   if (D.partial) { $("partial").hidden = false; $("partial").textContent = fill(W.partial); }
-  $("t-board").textContent = W.sec.board; $("t-one").textContent = W.sec.one; $("t-more").textContent = W.sec.more; $("t-copy").textContent = W.sec.copy; $("t-mo").textContent = W.sec.mo; $("moscroll").textContent = W.mo.scrolls;
+  $("t-board").textContent = W.sec.board; $("t-one").textContent = W.sec.one; $("t-more").textContent = W.sec.more; $("t-copy").textContent = W.sec.copy; $("t-mo").textContent = W.sec.mo; $("t-ex").textContent = W.ex.title; $("moscroll").textContent = W.mo.scrolls;
   /* the columns' shares are measured against the box (D-055): a new width draws BY MOMENT again */
   window.addEventListener("resize", function () { var G = $("mogrid"); if (G && G.firstChild) { renderMo(); applyEl(); } });
   /* the toggle beside each title (D-038): closed by default, remembered per viewer (a convenience — the page draws the same without it) */
-  var IKEY = "gabe:allep:info:v1", INFO = { board: false, one: false, mo: false };
+  var IKEY = "gabe:allep:info:v1", INFO = { board: false, one: false, mo: false, ex: false };
   try { var ir = window.localStorage.getItem(IKEY); if (ir) { var io = JSON.parse(ir); Object.keys(INFO).forEach(function (k) { INFO[k] = io[k] === true; }); } } catch (e) {}
   function applyInfo() { Object.keys(INFO).forEach(function (k) { var b = $("itog-" + k), sec = $("sec-" + k); sec.setAttribute("data-info", INFO[k] ? "open" : "closed");
     b.setAttribute("aria-expanded", INFO[k] ? "true" : "false"); b.setAttribute("aria-label", INFO[k] ? W.info.close : W.info.open); }); }
@@ -2180,6 +2192,7 @@
   (function () { var want = null; try { want = new URLSearchParams(window.location.search).get("ep"); } catch (e) {}
     if (!want) return; var hit = ROWS.filter(function (r) { return slugOf(r.id) === want; })[0];
     if (hit) S.open = hit.id; else { $("onenote").hidden = false; $("onenote").textContent = fill(W.one.notFound, { ep: window.EPSLUG.valid(want) ? want : "?" }); } })();
+/*__BENCHJS__*/
   render();
   window.__allep = { ready: true, key: KEY, rails: RAILS, icons: ICON, data: D, state: S, render: render, bins: BINS, layout: layout, groups: groups, cellWords: cellWords, aggOf: aggOf, pick: pick, slug: slugOf, groupOfAttr: groupOfAttr, rowKeys: rowKeys, elName: elName,
     mo: { key: MKEY, looks: MS, path: MPATH, fams: moFams, face: moFace }, carry: { key: CKEY, get: function () { return CV; } },

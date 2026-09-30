@@ -55,6 +55,7 @@ EPSLUG_JS = HERE / "_ep-slug.js"                                               #
 DEF_FORMS = Path("~/.cache/gabe-map-baselines/lab-input/forms.json")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _ae_universe as UNI  # noqa: E402  (D-036 — the one-endpoint section: the universe card, the block marks, the gaps)
+import _ae_bench as BENCH  # noqa: E402  (D-071 — the examples bench, his L-23)
 
 
 def die(msg: str) -> None:
@@ -3549,6 +3550,7 @@ def build(argv: list) -> tuple:
         r["mo"] = by_moment(L, fj, fj["endpoints"]["endpoint:" + r["id"]], r, X, ADJ, MEMO, MOT)
         no_moment(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], sm["attrs"], MOT, MOUNTS)   # D-064 (2): the last column
         carried(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], W)      # D-055: what BY MOMENT carries of the code map, proven
+    EXD, ex_css, ex_js, ex_line, ex_icons = BENCH.bench(facts, rows, fj, W, X, PHASE_STAGE, WRITE_OPS)   # D-071: the examples bench (L-23)
     # D-055: the switch's words, and per code-map field, across the feed, how many endpoints leave it bright (whole, or in part)
     CW = W["carry"]
     if CW.get("pick") not in (CW.get("opts") or {}) or "ruled" in CW:
@@ -3660,7 +3662,7 @@ def build(argv: list) -> tuple:
     enc_css += "\n" + sk_css
     for r in rows:
         r.pop("ro")                                                     # the roles now ride the station's marks (D.sk.keys)
-    icon_names |= enc_icons
+    icon_names |= enc_icons | ex_icons
     MO = mo_block(rows, W, A, blocks, MOT)                              # BY MOMENT: the blocks, the coverage, the keys once
     got = UNI.harvest(icon_names, colour_refs, HERE)                  # + every lab part's own icon
     lab = UNI.lab_marks()
@@ -3730,7 +3732,7 @@ def build(argv: list) -> tuple:
             "kinds5": list(KINDS5), "fates": list(FATES), "pieceWords": list(PIECE_WORDS), "words": W,
             "icons": got["icons"], "marks": marks, "uspec": uspec, "attrs": attrs, "attrOrder": order, "ulook": ulook,
             "ucard": {k: spec["_card"][k] for k in ("more", "comp", "okState")}, "elLabels": dict(sorted(CL.items())), "enc": enc, "sk": sk, "mo": MO,
-            "cvLeft": cv_left}
+            "cvLeft": cv_left, "ex": EXD}
 
     RUNTIME = set(W.get("_runtime") or [])
     left = set(TOKEN.findall(json.dumps({k2: v2 for k2, v2 in W.items() if not k2.startswith("_")}, ensure_ascii=False))) - {"{" + t + "}" for t in list(tok) + list(RUNTIME)}
@@ -3755,6 +3757,8 @@ def build(argv: list) -> tuple:
                       ("<!--__EPSLUG__-->", "<script>\n" + EPSLUG_JS.read_text(encoding="utf-8").replace("</", "<\\/") + "</script>"),
                       ("<!--__UNILOOK__-->", '<style id="unilook">\n' + uni_css.replace("</", "<\\/") + "\n</style>"),
                       ("<!--__ENCLOOK__-->", '<style id="enclook">\n' + enc_css.replace("</", "<\\/") + "\n</style>"),
+                      ("<!--__BENCHLOOK__-->", '<style id="benchlook">\n' + ex_css.replace("</", "<\\/") + "\n</style>"),
+                      ("/*__BENCHJS__*/", ex_js.replace("</", "<\\/")),
                       ("/*__DATA__*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c"))):
         if mark not in html:
             die("template marker missing: " + mark)
@@ -3845,6 +3849,7 @@ def build(argv: list) -> tuple:
                 + (f"\n        POST /cooking/sessions · the hide headers: the code map {cs['cvn'][0]} of {cs['cvn'][1]} · {cs['cvn'][1] - cs['cvn'][0] - cs['cvn'][2]} left · {cs['cvn'][2]} with nothing here"
                    f" · the universe {cs['ucn'][0]} of {cs['ucn'][1]} · {cs['ucn'][1] - cs['ucn'][0]} left · THE GAPS from the universe {cs['gcn']['uni'][0]} of {cs['gcn']['uni'][1]}"
                    f" · from the code map {cs['gcn']['cm'][0]} of {cs['gcn']['cm'][1]}" if cs else ""))
+    summary += "\n" + ex_line                                          # D-071
     return html, summary, out, check
 
 
