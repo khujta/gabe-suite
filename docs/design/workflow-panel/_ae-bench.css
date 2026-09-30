@@ -1,0 +1,83 @@
+/* ══ D-071 · THE EXAMPLES BENCH — the page's own rules around the lab's block (the block rules above are cut out of _lab-ep.css by
+   _ae_bench.py and scoped here: the lab's tokens are the page's) ══ */
+#sec-ex { --line: var(--rule); --chip-bg: var(--raised); --panel: var(--card); --font-mono: var(--af-stack); }
+.exbar { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: flex-start; margin: 0 0 10px; }
+/* the columns — A: one row across the page, sideways when narrower (my pick) · B: wrapped rows · C: two rows */
+.exgrid { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(218px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 8px; align-items: start; }
+.exgrid[data-lay="wrap"] { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.exgrid[data-lay="half"] { grid-auto-flow: row; grid-template-columns: repeat(4, minmax(218px, 1fr)); }
+.excol { display: flex; flex-direction: column; gap: 8px; min-width: 0; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 10px; }
+.exhd { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.exhd h3 { display: flex; align-items: center; gap: 6px; margin: 0; font-size: var(--fs-sm); letter-spacing: .08em; text-transform: uppercase; }
+.exwho { font-size: var(--fs-min); color: var(--muted); border: 1.5px solid var(--rule); border-radius: 999px; padding: 1px 8px; white-space: nowrap; cursor: help; }
+.exwho[data-whose="his"] { border-color: var(--accent); color: var(--accent); }
+.exwho[data-whose="mine"] { border-style: dashed; border-color: var(--ink-soft); }
+.exsel { display: flex; flex-direction: column; gap: 6px; }
+.opt.exo { width: auto; height: auto; padding: 3px 9px; font-size: var(--fs-min); }
+.exroles { display: flex; flex-wrap: wrap; gap: 4px; }
+.exrc { font: inherit; font-size: var(--fs-min); cursor: pointer; border: 1px solid var(--rule); background: var(--raised); color: var(--ink-soft); border-radius: 999px; padding: 1px 8px; }
+.exrc:hover { border-color: var(--accent); }
+.exrc[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--ground); }
+.expick { display: flex; gap: 4px; align-items: center; }
+.exselect { flex: 1; min-width: 0; font: inherit; font-size: var(--fs-min); padding: 3px 4px; border: 1px solid var(--rule); border-radius: 6px; background: var(--raised); color: var(--ink); }
+.exstep { padding: 2px 8px; }
+.exon, .exnone { margin: 0; font-size: var(--fs-min); color: var(--muted); }
+/* the block: the lab's, with the page's hover cursor; a strip mark that is this endpoint's request, a check passed, a branch not taken */
+#sec-ex .exw .bkhd { cursor: pointer; }
+/* a line's right side may shrink too, so a long part on it never rides over the left side in a column this narrow */
+#sec-ex .exw .bkcol { overflow: hidden; }
+#sec-ex .exw .bkcol.r { flex: 0 1 auto; max-width: 64%; }
+#sec-ex .exw .bkcol > * { min-width: 0; }
+#sec-ex .exw .bkcol > .bkrw, #sec-ex .exw .bkcol > .bki, #sec-ex .exw .bkcol > .bkn { flex: none; }
+#sec-ex .exw .bkhd .bkm.exname { opacity: 1; color: var(--ink-soft); }
+#sec-ex .exw .bkhd .bkm.exasr { opacity: 1; }
+#sec-ex .exw .bkhd .excond { font-weight: 600; }
+#sec-ex .exw .bkhd .exstg { opacity: 1; letter-spacing: .06em; }
+#sec-ex .exw .exends { display: inline-flex; gap: 3px; opacity: 1; }
+#sec-ex .exw .exhdr { display: inline-flex; flex-wrap: nowrap; gap: 3px; opacity: 1; overflow: hidden; }
+#sec-ex .exw .exh { border: 1px solid var(--rule); border-radius: 4px; padding: 0 4px; color: var(--ink-soft); }
+#sec-ex .exw .exfn { opacity: 1; color: var(--ink-soft); }
+#sec-ex .exw .exmini { margin-left: 3px; border-radius: 999px; padding: 0 5px; background: color-mix(in srgb, var(--rwc) 90%, transparent); }
+#sec-ex .exw .excdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--alert); flex: none; }
+#sec-ex .exw .bkn.god { box-shadow: 0 0 0 1.5px var(--alert); }
+#sec-ex .exw .sq.exhere { outline: 2px solid var(--ink); outline-offset: 1px; }
+#sec-ex .exw .sq.expass, #sec-ex .exw .sq.exnob, #sec-ex .exw .sq.exmore { opacity: .38; }
+/* the list a click opens */
+#sec-ex .exfl { max-height: 380px; overflow: auto; padding: 4px 9px 9px; font: 600 12px/1.45 var(--font-mono); cursor: default; }
+.exr { display: flex; align-items: center; gap: 6px; padding: 1px 0; flex-wrap: wrap; color: var(--ink); }
+.exr .exk { color: var(--muted); width: 14px; flex: none; text-align: center; }
+.exr .exs { color: var(--muted); font-weight: 500; }
+.exr.exhit { background: color-mix(in srgb, var(--accent) 10%, transparent); border-radius: 4px; }
+.exr.ex-gate.exhit .exk { color: var(--alert); }
+.exlh { margin: 8px 0 2px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.exr.exsec { margin-top: 4px; font-weight: 700; }
+.exin { padding-left: 18px; }
+.exr.exnk, .exr.exnote { color: var(--ink-soft); font-weight: 500; }
+/* the controls under the block */
+.exctl { display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed var(--rule); padding-top: 6px; }
+.exfolds { display: flex; flex-wrap: wrap; gap: 4px; }
+.exfold[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
+.expane { display: flex; flex-direction: column; gap: 6px; }
+.expane:empty { display: none; }
+.exhint { margin: 0; font-size: var(--fs-min); color: var(--muted); }
+.exctl .lnrow { display: flex; align-items: center; gap: 6px; }
+.exctl .dzl { flex: none; width: 58px; font-size: 12px; color: var(--muted); }
+.exctl .lnsides { flex: 1; display: flex; align-items: stretch; gap: 4px; min-width: 0; }
+.exctl .lnsides .exz { flex: 1 1 0; min-width: 0; }
+.exctl .lnmid { flex: none; width: 2px; align-self: stretch; background: repeating-linear-gradient(var(--rule) 0 3px, transparent 3px 6px); }
+.exz { display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; min-height: 30px; padding: 3px; border: 1px dashed var(--rule); border-radius: 7px; }
+.exz.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.exz.exoff { flex: 1; background: color-mix(in srgb, var(--muted) 7%, transparent); }
+.expc { display: inline-flex; align-items: center; gap: 4px; font: inherit; font-size: 12px; cursor: grab; border: 1px solid var(--rule); background: var(--raised); color: var(--ink-soft); border-radius: 6px; padding: 2px 6px; }
+.expc:hover { border-color: var(--accent); }
+.expc[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.expc.dragging { opacity: .35; }
+.exrg { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.exrg .rl { flex: none; width: 112px; color: var(--muted); font-size: 12px; }
+.exrg input[type="range"], .exrg select { flex: 1; min-width: 0; font: inherit; font-size: 12px; }
+.exv { width: 28px; text-align: right; font-variant-numeric: tabular-nums; }
+.excp { display: flex; align-items: flex-start; gap: 6px; flex-wrap: wrap; }
+.exline { flex: 1 1 100%; min-width: 0; font-size: 12px; line-height: 1.4; color: var(--ink-soft); word-break: break-word; background: var(--raised);
+          border: 1px solid var(--rule); border-radius: 6px; padding: 4px 6px; max-height: 5.8em; overflow: auto; }
+/* the block's one hover: in · does · out */
+.exio { font-style: normal; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-right: 4px; }

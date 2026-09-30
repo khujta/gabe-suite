@@ -1039,3 +1039,34 @@ each lane a rail down the cell) · echoes where read (P3's B). The Data effects 
 writes which table, when, and is the write saved?"); the row legend names the new marks (a read's dot, the cross at the answer, the
 arrow past it, the fold, the map's lines, ticks, rules and race). His to pick by seeing. Display-side generation (D-063's lighter
 regime) and page-only: D-037's light checks.
+
+## D-071 — The examples bench: one example of every kind of element, a column each, its controls below it
+Date: 2026-09-30 · Input: his note 'API Hover Legend Consolidation', legibility-feedback.md L-23 (with L-08, L-13, L-11).
+Decision, his: "I want a section where we put an example that we can change like let's say an example of a table an example
+of a schema example of uh a test example of how we represent a function and so on … let's do for endings too … it will be
+different columns one by other one by one throughout. The width of the page … each column will contain the title with the
+selector of the element that we are showing … and if they have roles also the role to look for filter for roles then the the
+representation itself of the element we already have defined that for the tables so we can pick it up … and after that we will
+put the controls … where we can drag and drop the different elements that we show inside uh show show them or not size color";
+for tests (L-08): "the data structures, the functions, the models … the gates and decisions … in-flight states … what is being
+tested"; for functions (L-13): "with a little bit more of detail. And in blocks".
+Consequence: a section EXAMPLES (`sec-ex`) stands between ONE ENDPOINT and BY MOMENT and follows the endpoint the table has open.
+His words decide: the section and its place; one column per kind in his order (ending · table · schema · function · test ·
+gate or decision · client hook · in-flight value), each a title, a selector with a role filter, the element drawn, and below
+it the controls — the parts dragged between the lines or out of the block, their size, the colours — and a copy button; the
+table's look is his DATA line (D-027), lifted from the lab and proven word for word by the build against probe-eplab.mjs.
+The agent's picks: every kind is drawn in the lab's block anatomy (title lines with a left and a right side → a strip of
+marks → a list a click opens → ONE hover in · does · out, L-22); the schema and the function boot on the lab's own looks (its
+SCHCFG and FNCFG, not ruled); the ending, test, gate, hook and in-flight parts, lines and sizes are mine (dashed). The test
+block (L-08) opens on the ordered chain its request runs through here — request → checks passed → branch → functions → tables
+(saved or not) → ending — and says what the test does not tell (the body, header values a fixture sets, which of n ways to a
+status it takes, what one step hands the next, checks inside a loop) as facts about the test. The gate column's role filter
+(L-11) reads nine roles from the feed's own groups (rate limiter · login scheme · login check · field rule · own check · check
+one call down · branch that picks the answer · catch that translates · switch), each block naming the function it runs in
+with its role (L-09) and its effect (L-10). Options built (D-025.2), my pick first: the columns — one row across the page
+(sideways when narrower) · wrapped rows · an upper and a lower row; the element lit elsewhere — the column follows it · stays;
+per column, which elements — this endpoint · every endpoint (an element not on the open endpoint is drawn as on the first
+endpoint that has it; the role filter then counts every role it has anywhere); hiding a part — dragged into "not drawn" (the
+lab's on/off picks are not repeated). A kind whose arm the feed lacks says absent. Not built: EX-5, the bench's looks drawn in
+BY MOMENT's chips (one hover per chip, L-02) — trigger: he rules a kind's look; that look then becomes the words file's default
+("ruled") and a BY MOMENT cell option "blocks from the bench" is built and decided by seeing. Page-only: D-037's light checks.
