@@ -1,0 +1,387 @@
+{
+  "_about": "D-066 — the patterns behind his human-reader feedback, round 1. AUTHORED: the grouping, the names, the reasons and the suite proposals (all DRAFT — nothing lands in the suite before his 'land it'). GENERATED elsewhere, never typed here: how many of his items and of the review's findings each pattern holds (from legibility-feedback.md tags and review-r1.raw.json 'pattern' fields through the two maps below), and the before / after numbers of each check (measures.*.json). A reviewer tag missing from reviewTagMap stops the page's build.",
+  "patterns": [
+    {
+      "id": "P1",
+      "name": "The hover describes the kind, not the item",
+      "line": "One item had several hovers, each told a third of it, and most said what every item of its kind is. Two different items read the same.",
+      "whyModel": "A model reads every hover at once, beside the data record that tells items apart. Repetition costs it nothing, and the fact that separates two twins sat in the record.",
+      "whyHuman": "A person sees one hover at a time and has to compare them from memory. A definition repeated on every item hides the one line that is about this item.",
+      "checks": [
+        "nested",
+        "repeatLine",
+        "twins",
+        "twinFaces",
+        "titles"
+      ],
+      "suite": [
+        {
+          "kind": "check",
+          "target": "skills/gabe-artifact (render gate) + a generic legibility audit script",
+          "what": "Report nested hover targets, a hover line repeated on many items (a legend candidate), and two items in one cell or list whose hovers or faces read the same.",
+          "size": "script"
+        },
+        {
+          "kind": "words",
+          "target": "skills/gabe-lens (plain) + skills/gabe-artifact reference",
+          "what": "A hover opens with what makes THIS item itself, in before · checks · gives order. What a kind means lives once, in a legend.",
+          "size": "reference"
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "name": "The page talks about itself",
+      "line": "Hovers said where the page took a colour or an icon, and what the map could not read. Nothing in them was about the code.",
+      "whyModel": "Where a fact came from matters to the model that built it; it is true and it is the model's own concern. The rule against it (D-017) was written down but nothing checked it.",
+      "whyHuman": "A person reads the page to learn the code. A sentence about the page is noise that sits where the answer should be.",
+      "checks": [
+        "pageTalk"
+      ],
+      "suite": [
+        {
+          "kind": "check",
+          "target": "the legibility audit script + each page generator's words sweep",
+          "what": "Stop words about the page or the map (as the table draws it, found by, the map does not, my proposal outside an option) in hovers and faces.",
+          "size": "script"
+        },
+        {
+          "kind": "reference",
+          "target": "skills/gabe-artifact reference (and later the execution contract)",
+          "what": "State D-017 for every generated page: what the code does is shown; how the map knows it is not.",
+          "size": "reference"
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "An element drawn without its identity",
+      "line": "Gates, functions and client branches were bare words: no icon, no kind, no role. A row had no icon of its own.",
+      "whyModel": "The model knows what a thing is from its key. The page drew an icon only where the Gabe Universe draws a node, a rule that made sense to the generator.",
+      "whyHuman": "A bare word is an unknown thing. He had to ask what each one was.",
+      "checks": [
+        "bare"
+      ],
+      "suite": [
+        {
+          "kind": "check",
+          "target": "the legibility audit script",
+          "what": "Every item in a row of elements wears an icon: the station's, or a page mark that the legend declares.",
+          "size": "script"
+        },
+        {
+          "kind": "reference",
+          "target": "skills/gabe-artifact reference + the station conventions",
+          "what": "A kind the station does not draw gets a page mark, never a plain word; one kind, one look, on every surface of a page.",
+          "size": "reference"
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "One end of a relation",
+      "line": "A condition without the function that checks it, a refresh without what it fetches, a branch shown as a file and a line, tables without the function that touches them.",
+      "whyModel": "The data record joined both ends: a data chip carried the table AND the function. The page drew one end; the model reads the keys, not the face.",
+      "whyHuman": "A person reads the face. Half a relation is a question: checked where? fetched from what? written by whom?",
+      "checks": [],
+      "suite": [
+        {
+          "kind": "check",
+          "target": "each page generator (a build check)",
+          "what": "An element whose record joins two things draws both ends, or its hover names the other end.",
+          "size": "generator"
+        },
+        {
+          "kind": "words",
+          "target": "skills/gabe-lens (plain)",
+          "what": "A role word needs its object: a fetcher OF what, a check IN which function, a branch ON which ending.",
+          "size": "reference"
+        }
+      ]
+    },
+    {
+      "id": "P5",
+      "name": "Structure hidden in a mark, or mixed into an axis",
+      "line": "A stage mark whose meaning was only in a hover, a column of timeless facts inside a timeline, names broken in the middle of a word, text cut off, counts with no noun.",
+      "whyModel": "The model reads the mapping and the widths as data. It never sees the pixels, the wrap or the line where a name breaks.",
+      "whyHuman": "A person sees the pixels. A mark without a key and a word cut in half both stop the reading.",
+      "checks": [
+        "midWord",
+        "cut",
+        "timeless"
+      ],
+      "suite": [
+        {
+          "kind": "check",
+          "target": "skills/gabe-artifact (render gate)",
+          "what": "No word broken between two letters (camel humps, _ . / allowed); no text clipped; a timeline's heads are all moments; a grid's heads stay in view while it scrolls.",
+          "size": "script"
+        },
+        {
+          "kind": "reference",
+          "target": "skills/gabe-artifact reference",
+          "what": "A mark carries a visible key; a number carries its noun; an axis holds one kind of thing.",
+          "size": "reference"
+        }
+      ]
+    },
+    {
+      "id": "P6",
+      "name": "One thing, several names (and one name, several things)",
+      "line": "deciders · deciding functions · nothing; screen · what sends it · the screen sends it; request as a kind and as a lifetime. Every member he missed was drawn — under another name.",
+      "whyModel": "The model holds all the vocabularies and the key that joins them, so three names for one thing still resolve.",
+      "whyHuman": "A person matches by words. A second name reads as a second thing; one word for two things reads as one.",
+      "checks": [],
+      "suite": [
+        {
+          "kind": "check",
+          "target": "the legibility audit script (words file) + each page generator",
+          "what": "One display word per concept across a page's views; two concepts never share a display word on one page.",
+          "size": "script"
+        },
+        {
+          "kind": "reference",
+          "target": "the Gabe register + skills/gabe-docs",
+          "what": "Extend 'one term per concept' from prose to the words a page shows.",
+          "size": "reference"
+        }
+      ]
+    },
+    {
+      "id": "P7",
+      "name": "The code's spelling instead of its meaning",
+      "line": "str(exc) as an answer, 'only when not (existing is not None)', a pydantic error type as a rule, a feed id or an i18n key on a face.",
+      "whyModel": "The model reads code as fluently as prose, so the expression IS the meaning to it.",
+      "whyHuman": "A person, even a programmer, has to decode each one — and str(exc) is not the message at all.",
+      "checks": [
+        "machineWords"
+      ],
+      "suite": [
+        {
+          "kind": "check",
+          "target": "the legibility audit script",
+          "what": "Faces and hovers never show a raw feed id, a library error id or a source expression as a value.",
+          "size": "script"
+        },
+        {
+          "kind": "words",
+          "target": "skills/gabe-lens (plain)",
+          "what": "The meaning first, in words; the code last, as written.",
+          "size": "reference"
+        }
+      ]
+    },
+    {
+      "id": "P8",
+      "name": "A word or a number that promises more than its rule",
+      "line": "'sends no headers' when the headers were not read; 'proves' on a test that only fits; a count whose rule is not the one its label says; a Python set's add drawn as a database write.",
+      "whyModel": "The model knows the rule it computed and reads the label as a handle for it.",
+      "whyHuman": "A person reads the label literally. When the rule is looser than the words, the page tells him something false.",
+      "checks": [],
+      "suite": [
+        {
+          "kind": "check",
+          "target": "each page generator (a build check)",
+          "what": "A count's label comes from the same definition that computes it; unknown is never drawn as none (the suite's state words: present · absent · not read).",
+          "size": "generator"
+        },
+        {
+          "kind": "reference",
+          "target": "skills/gabe-docs (execution contract, the state words)",
+          "what": "The forms state-word law (unknown · absent · beyond one level, never a bare 0 or []) extended to generated pages.",
+          "size": "reference"
+        }
+      ]
+    },
+    {
+      "id": "P9",
+      "name": "No bench to decide one element's look",
+      "line": "Every element was drawn at once in a dense table before any one element's look had been decided alone.",
+      "whyModel": "A model needs no look to understand an element, so the dense view came first.",
+      "whyHuman": "A person decides a look by seeing one element, its parts and its controls, before seeing eighty of them.",
+      "checks": [],
+      "suite": [
+        {
+          "kind": "method",
+          "target": "docs/design/design-context/method.md",
+          "what": "A bench step — one element per column, its parts and its controls — before a dense view of many.",
+          "size": "doc"
+        }
+      ]
+    },
+    {
+      "id": "P10",
+      "name": "A written rule with no check breaks on the next surface",
+      "line": "Choices made alone that were not options, options the copy text dropped, a typed number, lifted words that skipped the words sweep, text under the size floor, an unruled look drawn as ruled.",
+      "whyModel": "Every agent was told the rules. Rules that a check enforced held (typed numbers in the words file, twin hovers once the check existed); rules that lived only in words broke on the new surfaces.",
+      "whyHuman": "He cannot re-check every rule on every page. A rule he has to remember to check is the rule that breaks.",
+      "checks": [],
+      "suite": [
+        {
+          "kind": "check",
+          "target": "each page generator + the legibility audit",
+          "what": "Every standing rule of a generated page gets a check on a rail that already runs (the build, the probe, the commit gate): an option is in the copy text, a pick is marked, a lifted string goes through the words sweep, text keeps the floor.",
+          "size": "generator"
+        },
+        {
+          "kind": "reference",
+          "target": "skills/gabe-docs (execution contract)",
+          "what": "A page rule without a check is not a rule: when a rule is written, its check is named in the same change.",
+          "size": "reference"
+        }
+      ]
+    }
+  ],
+  "ledgerTagMap": {
+    "static-text-repeated-in-hovers": "P1",
+    "one-item-three-hovers": "P1",
+    "twin-items-indistinguishable": "P1",
+    "hover-describes-the-kind-not-the-item": "P1",
+    "element-without-identity": "P3",
+    "kind-without-subcategory": "P3",
+    "name-only-chip": "P3",
+    "condition-without-actor-or-effect": "P4",
+    "role-without-its-object": "P4",
+    "location-without-actor": "P4",
+    "relation-flattened-into-a-list": "P4",
+    "context-without-meaning": "P4",
+    "mark-without-its-meaning": "P5",
+    "timeless-facts-inside-a-timeline": "P5",
+    "cramped-columns": "P5",
+    "two-vocabularies-for-one-thing": "P6",
+    "lost-between-views": "P6",
+    "concept-never-explained": "P6",
+    "no-bench-for-one-element": "P9"
+  },
+  "alsoItems": {
+    "P2": [
+      "L-01"
+    ],
+    "P3": [
+      "L-17",
+      "L-18"
+    ]
+  },
+  "reviewTagMap": {
+    "static-text-repeated-in-hovers": "P1",
+    "twin-items-indistinguishable": "P1",
+    "one-item-three-hovers": "P1",
+    "nested hover returns on a new element": "P1",
+    "twins outside the twin check": "P1",
+    "hover-describes-the-kind-not-the-item": "P1",
+    "hover-says-only-the-kind": "P1",
+    "hover-copied-from-sibling": "P1",
+    "twin-faces": "P1",
+    "generic-verbs-for-the-item": "P1",
+    "map talk on new surfaces": "P2",
+    "map-talk-in-code-hover": "P2",
+    "map-limit-stated-as-code-fact": "P2",
+    "same kind, two looks": "P3",
+    "element-without-identity": "P3",
+    "name-only-chip": "P3",
+    "kind-name-and-mark-split": "P3",
+    "id-without-name": "P3",
+    "branch-named-by-its-host": "P3",
+    "effect-without-its-cause": "P4",
+    "one-ending-many-causes-shown-as-one": "P4",
+    "location-without-actor": "P4",
+    "condition-not-named": "P4",
+    "effect-verb-without-its-arms": "P4",
+    "verb-without-object": "P4",
+    "not-known-beside-the-answer": "P4",
+    "raise-inside-except-unread": "P4",
+    "label-without-subject": "P4",
+    "half-explained-label": "P4",
+    "location-as-title": "P4",
+    "cramped-columns": "P5",
+    "word-broken-mid-word": "P5",
+    "text-cut-with-ellipsis": "P5",
+    "foreign-heads-over-a-grid": "P5",
+    "one-column-two-times": "P5",
+    "mark-without-its-meaning": "P5",
+    "count-without-noun": "P5",
+    "numbers-without-units": "P5",
+    "bare-number-meaning-varies": "P5",
+    "rank-without-direction": "P5",
+    "one concept, two vocabularies": "P6",
+    "two-vocabularies-for-one-thing": "P6",
+    "one-word-two-meanings": "P6",
+    "one concept, many names": "P6",
+    "same-word-two-things": "P6",
+    "two-labels-one-word": "P6",
+    "one-moment-two-names": "P6",
+    "same-name-different-places": "P6",
+    "kind-and-lifetime-same-word": "P6",
+    "column-name-vs-member": "P6",
+    "role-word-contradicts-action": "P6",
+    "ambiguous-short-location": "P6",
+    "concept-never-explained": "P6",
+    "same-fact-drawn-twice": "P6",
+    "same-count-in-two-places": "P6",
+    "expression-instead-of-value": "P7",
+    "source-expression-as-message": "P7",
+    "key-shown-as-text": "P7",
+    "code-negation-as-condition": "P7",
+    "raw-code-as-condition": "P7",
+    "raw-code-in-a-fact": "P7",
+    "library-error-id-as-rule": "P7",
+    "machine-id-on-face": "P7",
+    "proof-joined-by-error-class": "P8",
+    "unread-value-stated-as-none": "P8",
+    "unread-read-as-empty": "P8",
+    "unknown-rendered-as-none": "P8",
+    "hedge-in-hover-claim-on-face": "P8",
+    "face-verb-stronger-than-the-fact": "P8",
+    "language-builtin-read-as-db-write": "P8",
+    "counted-in-disagrees-with-column-rule": "P8",
+    "membership-joined-by-status-code": "P8",
+    "passed-check-named-by-its-failure": "P8",
+    "effect-attached-to-wrong-branch": "P8",
+    "same-exception-other-function-join": "P8",
+    "count-rule-differs-from-its-label": "P8",
+    "denominator-from-a-different-set": "P8",
+    "member-set-differs-from-its-count": "P8",
+    "sample-read-as-the-count": "P8",
+    "one-example-stands-for-a-class": "P8",
+    "ambiguity-not-narrowed-by-request": "P8",
+    "basename-collision": "P6",
+    "call-site-of-the-root-not-the-caller": "P8",
+    "call-span-joined-by-first-line": "P8",
+    "calls-counted-as-tests": "P8",
+    "chain-drops-checks-inside-calls": "P8",
+    "choice made alone, not an option": "P10",
+    "copy line drops a choice": "P10",
+    "effect-attributed-to-wrong-condition": "P8",
+    "enclosing-if-shown-as-condition": "P8",
+    "field-meaning-inverted": "P8",
+    "floor overridden for look-sized text": "P10",
+    "host-and-line-disagree": "P8",
+    "join-available-on-the-page": "P4",
+    "legend says where the look came from": "P2",
+    "lifted definition contradicts the row": "P8",
+    "lifted words bypass the sweep": "P10",
+    "line-of-effect-shown-as-line-of-check": "P8",
+    "named element without its glyph": "P3",
+    "one concept, many phrasings": "P6",
+    "one word, two axes": "P6",
+    "one word, two meanings": "P6",
+    "one-element-two-roles": "P6",
+    "one-retry-layer-of-two": "P8",
+    "option not in copy text": "P10",
+    "overloaded mark": "P6",
+    "python-set-add-read-as-db-write": "P8",
+    "remainder-not-complete": "P8",
+    "role name asserts the common case": "P8",
+    "role-from-one-of-many-calls": "P8",
+    "second hover system": "P1",
+    "second-source-ignored": "P8",
+    "static text as repeated hover": "P1",
+    "station-flag-contradicts-feed": "P8",
+    "sweep-driven contortion": "P10",
+    "table word generalised to every kind": "P6",
+    "two-sections-two-verdicts": "P6",
+    "typed ordinal in code": "P10",
+    "unruled drawn as ruled": "P10",
+    "zero-based-index-shown-as-ordinal": "P8"
+  }
+}

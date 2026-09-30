@@ -1,6 +1,6 @@
 {
  "label": "after round 1 · 2ee6ab5",
- "page": "docs/design/workflow-panel/all-endpoints.html",
+ "page": "../../../../tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/after/r1.html",
  "ep": "post-cooking-sessions",
  "repeatAt": 5,
  "viewport": "1920x1200",
@@ -52,9 +52,16 @@
    "pageTalk": 1
   }
  },
+ "cut": {
+  "sec-ex": 5
+ },
+ "bench": {
+  "midWord": 0
+ },
  "mo": {
   "items": 190,
   "twins": 1,
+  "twinFaces": 5,
   "bare": 50,
   "bareByRow": {
    "proof": 19,
@@ -63,11 +70,52 @@
    "inf": 12,
    "stage": 2
   },
-  "midWord": 13,
-  "machineWords": 0,
+  "midWord": 11,
+  "machineWords": 1,
   "timeless": 0
  },
  "examples": {
+  "twinFaces": [
+   [
+    2,
+    "refusal429"
+   ],
+   [
+    2,
+    "refusal401"
+   ],
+   [
+    2,
+    "cooking_sessionsR"
+   ],
+   [
+    3,
+    "✕"
+   ]
+  ],
+  "cut": [
+   [
+    "sec-ex",
+    "Rate limit exceeded. Try again shortly."
+   ],
+   [
+    "sec-ex",
+    "start session response carries recipe title"
+   ],
+   [
+    "sec-ex",
+    "sensitive"
+   ],
+   [
+    "sec-ex",
+    "useStartCooking"
+   ],
+   [
+    "sec-ex",
+    "rate_limit_active"
+   ]
+  ],
+  "benchMidWord": [],
   "repeatText": [
    [
     15,
@@ -175,9 +223,11 @@
    "eTokenVerifi|er.",
    "etary_profil|e",
    "cooking_phot|os",
-   "essionCreate|Request"
+   "CookingSessi|onResponse ·"
   ],
-  "machineWords": [],
+  "machineWords": [
+   "reads409×2reason-collapsed→“cooking.error.start_concurrent_c"
+  ],
   "timeless": []
  }
 }

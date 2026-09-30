@@ -50,9 +50,14 @@
    "pageTalk": 192
   }
  },
+ "cut": {},
+ "bench": {
+  "midWord": 0
+ },
  "mo": {
   "items": 160,
   "twins": 9,
+  "twinFaces": 4,
   "bare": 63,
   "bareByRow": {
    "proof": 28,
@@ -64,11 +69,31 @@
    "stage": 3,
    "over": 6
   },
-  "midWord": 12,
-  "machineWords": 9,
+  "midWord": 9,
+  "machineWords": 14,
   "timeless": 2
  },
  "examples": {
+  "twinFaces": [
+   [
+    2,
+    "refusal429"
+   ],
+   [
+    2,
+    "refusal401"
+   ],
+   [
+    2,
+    "cooking_sessionsR"
+   ],
+   [
+    2,
+    "cooking_sessionsW"
+   ]
+  ],
+  "cut": [],
+  "benchMidWord": [],
   "repeatText": [
    [
     85,
@@ -187,11 +212,11 @@
   "midWord": [
    "TokenVerifie|r.",
    "essionRespon|se",
-   "essionCreate|Request",
    "CookingSessi|onResponse ·",
-   "CookingPhoto|Ref",
    "useStartCoo|king",
    "RecipeBrows|eContainer",
+   "cookingSess|ionModel.",
+   "cookingSess|ionModel.",
    "cookingSess|ionModel."
   ],
   "machineWords": [

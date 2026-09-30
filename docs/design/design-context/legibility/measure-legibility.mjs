@@ -11,6 +11,8 @@
      repeatText   targets whose WHOLE hover text is shown by >= R targets (a kind's definition used as an item's hover)
      repeatLine   targets whose hover holds a line (>= 24 chars) that >= R targets repeat (a static tail on every hover)
      twins        pairs of items in one BY MOMENT cell whose hovers read the same
+     twinFaces    pairs of items in one BY MOMENT cell whose FACES read the same (a reader must hover each)
+     cut          elements in BY MOMENT, the bench and ONE ENDPOINT that clip their own text (ellipsis / hidden overflow)
      pageTalk     hovers that talk about the page or the map, not the code (D-017)
      bare         BY MOMENT items that wear no glyph (no svg, no station mark) — an element without its identity
      midWord      words broken across two lines inside BY MOMENT items between two letters or digits
@@ -90,26 +92,49 @@ const M = await p.evaluate(({ R }) => {
       for (let i = 0; i < s.length; i++) {
         if (/\s/.test(s[i])) { prevTop = null; continue; }
         const rg = document.createRange(); rg.setStart(n, i); rg.setEnd(n, i + 1); const rc = rg.getClientRects()[0]; if (!rc) continue;
-        if (prevTop !== null && Math.abs(rc.top - prevTop) > 3 && /[A-Za-z0-9]/.test(s[i - 1]) && /[A-Za-z0-9]/.test(s[i])) { midWord++; if (exMid.length < 8) exMid.push(s.slice(Math.max(0, i - 12), i) + '|' + s.slice(i, i + 12)); }
+        if (prevTop !== null && Math.abs(rc.top - prevTop) > 3 && /[A-Za-z0-9]/.test(s[i - 1]) && /[A-Za-z0-9]/.test(s[i]) && !(/[a-z0-9]/.test(s[i - 1]) && /[A-Z]/.test(s[i]))) { midWord++; if (exMid.length < 8) exMid.push(s.slice(Math.max(0, i - 12), i) + '|' + s.slice(i, i + 12)); }
         prevTop = rc.top;
       }
     }
   });
-  const MACH = /(dependency-value|setting-once|built-once|contextvar|arrange-checked)| · none\b/;   /* no \b: a chip's parts join with no space */
+  const MACH = /(dependency-value|setting-once|built-once|contextvar|arrange-checked|race-500|reason-collapsed|reason-lost|shared-status|text-only|escape-500)| · none\b/;   /* no \b: a chip's parts join with no space */
   let mach = 0; const exMach = [];
   moItems.forEach((r) => { const t = (r.e.textContent || ''); if (MACH.test(t)) { mach++; if (exMach.length < 6) exMach.push(t.trim().slice(0, 60)); } });
   const heads = grid ? [...grid.querySelectorAll('th')] : [];
   const timeless = heads.filter((h) => /\bno moment\b|overview and risk/i.test(h.textContent || '')).map((h) => (h.textContent || '').trim().slice(0, 40));
+
+  /* twin FACES: two items in one BY MOMENT cell whose faces read the same (a reader must hover each to tell them apart) */
+  let nTwinF = 0; const exTwinF = [];
+  const cellsF = new Map();
+  moItems.forEach((r) => { const td = r.e.closest('td'); if (!td) return; const f = (r.e.textContent || '').replace(/\s+/g, ' ').trim(); if (!f) return;
+    const m = cellsF.get(td) || new Map(); cellsF.set(td, m); m.set(f, (m.get(f) || 0) + 1); });
+  cellsF.forEach((m) => m.forEach((n, f) => { if (n > 1) { nTwinF += n - 1; if (exTwinF.length < 6) exTwinF.push([n, f.slice(0, 80)]); } }));
+  /* CUT text: an element that clips its own text (ellipsis or hidden overflow) in BY MOMENT, the examples bench and ONE ENDPOINT */
+  const cut = {}, exCut = [];
+  ['sec-mo', 'sec-ex', 'sec-one'].forEach((id) => { const sec = document.getElementById(id); if (!sec) return;
+    sec.querySelectorAll('*').forEach((e) => { if (!e.childNodes.length || ![...e.childNodes].some((c) => c.nodeType === 3 && c.nodeValue.trim())) return;
+      const cs = getComputedStyle(e); if (cs.display === 'none' || !vis(e)) return;
+      const clips = (cs.textOverflow === 'ellipsis' || cs.overflow === 'hidden' || cs.overflowX === 'hidden') && e.scrollWidth > e.clientWidth + 1;
+      if (clips) { cut[id] = (cut[id] || 0) + 1; if (exCut.length < 8) exCut.push([id, (e.textContent || '').trim().slice(0, 50)]); } }); });
+  /* the examples bench: words broken between two letters there too */
+  let midEx = 0; const exMidEx = [];
+  const ex = document.getElementById('sec-ex');
+  if (ex) { const w = document.createTreeWalker(ex, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { const s = n.nodeValue; if (!s || s.trim().length < 4 || !vis(n.parentElement)) continue;
+    let prevTop = null; for (let i = 0; i < s.length; i++) { if (/\s/.test(s[i])) { prevTop = null; continue; }
+      const rg = document.createRange(); rg.setStart(n, i); rg.setEnd(n, i + 1); const rc = rg.getClientRects()[0]; if (!rc) continue;
+      if (prevTop !== null && Math.abs(rc.top - prevTop) > 3 && /[A-Za-z0-9]/.test(s[i - 1]) && /[A-Za-z0-9]/.test(s[i]) && !(/[a-z0-9]/.test(s[i - 1]) && /[A-Z]/.test(s[i]))) { midEx++; if (exMidEx.length < 6) exMidEx.push(s.slice(Math.max(0, i - 12), i) + '|' + s.slice(i, i + 12)); }
+      prevTop = rc.top; } } }
   const tot = (k) => Object.values(per).reduce((a, s) => a + (s[k] || 0), 0);
   return {
     totals: { targets: tot('targets'), items: tot('items'), nested: tot('nested'), titles: tot('titles'), repeatText: tot('repeatText'),
       repeatLine: tot('repeatLine'), pageTalk: tot('pageTalk') },
     perSection: per,
-    mo: { items: moItems.length, twins: nTwins, bare: Object.values(bare).reduce((a, b) => a + b, 0), bareByRow: bare, midWord, machineWords: mach, timeless: timeless.length },
-    examples: { repeatText: exText, repeatLine: exLine, pageTalk: exTalk, twins, bare: exBare, midWord: exMid, machineWords: exMach, timeless },
+    cut, bench: { midWord: midEx },
+    mo: { items: moItems.length, twins: nTwins, twinFaces: nTwinF, bare: Object.values(bare).reduce((a, b) => a + b, 0), bareByRow: bare, midWord, machineWords: mach, timeless: timeless.length },
+    examples: { twinFaces: exTwinF, cut: exCut, benchMidWord: exMidEx, repeatText: exText, repeatLine: exLine, pageTalk: exTalk, twins, bare: exBare, midWord: exMid, machineWords: exMach, timeless },
   };
 }, { R });
 await b.close();
 const out = { label: LABEL, page: path.relative(REPO, PAGE), ep: EP, repeatAt: R, viewport: '1920x1200', pageErrors: errs, ...M };
 if (OUT) { fs.mkdirSync(path.dirname(path.resolve(OUT)), { recursive: true }); fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n'); }
-console.log(JSON.stringify({ label: LABEL, totals: M.totals, mo: M.mo, pageErrors: errs.length }, null, 0));
+console.log(JSON.stringify({ label: LABEL, totals: M.totals, mo: M.mo, cut: M.cut, bench: M.bench, pageErrors: errs.length }, null, 0));
