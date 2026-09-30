@@ -166,13 +166,23 @@ def lift(types: set) -> dict:
 
 
 # ── 2 · THE ELEMENTS, per endpoint (r.ex) and feed-wide (D.ex.cat) ───────────────────────────────────────────────────────────
+SHORT_PARTS = 2   # a file is named by its last parts: the folder and the file (the page's xShort keeps as many)
+
+
 def _short(at) -> str:
-    """apps/api/services/cooking.py:140 → services/cooking.py:140 (the last two parts of the path)"""
-    return "/".join(str(at).split("/")[-2:]) if at else ""
+    """apps/api/services/cooking.py:140 → services/cooking.py:140 (the last SHORT_PARTS parts of the path)"""
+    return "/".join(str(at).split("/")[-SHORT_PARTS:]) if at else ""
 
 
 def _fname(q: str) -> str:
     return str(q).split("::")[-1].split("#")[-1]
+
+
+def fill(t: str, **d) -> str:
+    """a words entry with its {tokens} filled (the page's fill, for the few names the build must compare: the twins check)"""
+    for k, v in d.items():
+        t = t.replace("{" + k + "}", ("%g" % v) if isinstance(v, float) else str(v))
+    return t
 
 
 def _case_name(n: str, cid: str) -> str:
@@ -181,7 +191,70 @@ def _case_name(n: str, cid: str) -> str:
     return s.replace("_", " ").strip() or str(cid)
 
 
-def _paths(F: dict, fj: dict, handler: str, inf: list, write_ops: set, I) -> dict:
+def _file_line(at) -> tuple:
+    f, _s, n = str(at or "").rpartition(":")
+    return (f, int(n)) if n.isdigit() else (str(at or ""), -1)
+
+
+def _chk(c: dict, CX: dict, I) -> list:
+    """what a gate on a path CHECKS, as the page words it (CR-08 · CR-28): its kind and the facts its plain line needs — a limiter's
+    name and numbers, the header a login scheme reads, the check's host and its condition as written"""
+    ref, ph = c.get("ref"), c.get("phase")
+    if ref in CX["lim"]:
+        n, lim, win = CX["lim"][ref]
+        return ["lim", I(n), lim, win]
+    if ph == "middleware":
+        return ["mw", I(c.get("via") or c.get("sub"))]
+    if ph == "body-parse":
+        return ["parse", I((CX["xs"].get(ref) or {}).get("code") or "")]
+    if ph == "security":
+        return ["scheme", I(CX["hdr"].get(ref) or ""), I(c.get("via") or c.get("sub"))]
+    if ph == "dependency":
+        return ["login", I(CX["gname"]), I(c.get("via") or c.get("sub"))]
+    if ph == "validation":
+        return ["body", I(CX["body"])]
+    g = CX["pre_x"].get(ref)
+    if g:
+        return ["guard", I(CX["host"](g)), I(g.get("pred"))]
+    via = str(c.get("via") or "")
+    if via.startswith("except "):
+        return ["catch", I(via[len("except "):])]
+    return ["x"]
+
+
+def _passes(g: dict, P: dict, ch: list, CX: dict) -> bool:
+    """N3-13: does this way through the code pass a check that sits INSIDE a call (a precondition of depth ≥ 1)? Only when the way
+    makes that call, leaves by another ending, took no branch the check waits past, and did not leave inside the call before the
+    check's line (the call's own checks, in the order the called function runs them)"""
+    m = re.match(r"^call (.+?) @ (.+)$", str(g.get("via") or ""))
+    if not m or not any(c.get("kind") in ("call", "collapsed") and c.get("at") == m.group(2) for c in ch):
+        return False
+    ex = (P.get("exit") or {}).get("id") if isinstance(P.get("exit"), dict) else P.get("exit")
+    if g.get("exit") and g.get("exit") == ex:
+        return False
+    if any(c.get("kind") == "gate" and c.get("ref") and c.get("ref") == g.get("exit") for c in ch):
+        return False                                                        # the way already names it
+    taken = {str(c.get("label") or "") for c in ch if c.get("kind") == "branch" and c.get("hit")}
+    g_end = CX["pre_x"].get(ex)
+    stopped = {str(g_end.get("pred"))} if g_end else set()
+    for a in g.get("after") or []:
+        w = re.match(r"^not \((.*)\)$", str(a))
+        if w and (w.group(1) in taken or w.group(1) in stopped):
+            return False
+    gf, gl = _file_line(g.get("at"))
+    for c in ch:                                                            # a branch that returns before the check's line
+        if c.get("kind") == "branch" and c.get("hit") and str(c.get("label") or "") != "fall-through":
+            bf, bl = _file_line(c.get("at"))
+            if bf == gf and 0 <= bl < gl:
+                return False
+    if g_end and g_end is not g:
+        ef, el = _file_line(g_end.get("at"))
+        if ef == gf and 0 <= el < gl:
+            return False
+    return True
+
+
+def _paths(F: dict, fj: dict, handler: str, inf: list, write_ops: set, I, CX: dict) -> dict:
     """{path id: the path as the bench draws it} — its ordered chain, the functions on it, the tables it reads and writes and whether
     each write is saved, its switches and the in-flight values read along it."""
     steps, out = fj.get("steps") or {}, {}
@@ -192,18 +265,33 @@ def _paths(F: dict, fj: dict, handler: str, inf: list, write_ops: set, I) -> dic
                 fns.append(q)
         if p.get("phase") in ("handler",) and handler:
             fn_(handler)
-        for c in p.get("chain") or []:
+        raw = list(p.get("chain") or [])
+        # N3-13: the checks inside a call this way passes, each under the call it hangs from, in the order the called function runs them
+        for g in CX["pre"]:
+            if not g.get("depth") or not _passes(g, p, raw, CX):
+                continue
+            site = re.match(r"^call (.+?) @ (.+)$", str(g["via"])).group(2)
+            j = next(k for k, c in enumerate(raw) if c.get("kind") in ("call", "collapsed") and c.get("at") == site) + 1
+            gf, gl = _file_line(g.get("at"))
+            while j < len(raw) and _file_line(raw[j].get("at"))[0] == gf and 0 <= _file_line(raw[j].get("at"))[1] < gl:
+                j += 1
+            x = CX["xs"].get(g.get("exit")) or {}
+            raw.insert(j, {"kind": "gate", "hit": False, "at": g.get("at"), "ref": g.get("exit") or g.get("id"), "status": g.get("status"),
+                           "label": f"{g.get('status')} {x.get('detail') or ''}".strip(), "sub": g.get("pred"), "phase": "handler", "_g": g})
+            CX["tally"]["inCall"] += 1
+        for c in raw:
             t, lb, sub, at = c.get("kind"), c.get("label"), c.get("sub"), _short(c.get("at")) or None
             if t == "step":
                 ch.append(["step", I(lb), None, None, I(at), None])
             elif t == "switch":
                 ch.append(["switch", I(lb), None, I("switch:" + str(c.get("ref"))), I(at), I(sub)])
             elif t == "gate":
-                ch.append(["gate", I(lb), 1 if c.get("hit") else 0, I(c.get("ref")), I(at), I(sub)])
+                chk = ["guard", I(CX["host"](c["_g"])), I(c["_g"].get("pred"))] if c.get("_g") else _chk(c, CX, I)
+                ch.append(["gate", I(lb), 1 if c.get("hit") else 0, I(c.get("ref")), I(at), I(sub), c.get("status"), chk])
             elif t in ("call", "collapsed"):
                 ch.append(["call", I(lb), None, I("fn:" + c["fn"]) if c.get("fn") else None, I(at), None]); fn_(c.get("fn"))
             elif t == "branch":
-                ch.append(["branch", I(lb), 1 if c.get("hit") else 0, I("fork:" + str(c.get("ref"))), I(at), None])
+                ch.append(["branch", I(CX["fall"] if lb == "fall-through" else lb), 1 if c.get("hit") else 0, I("fork:" + str(c.get("ref"))), I(at), None])
             elif t == "exit":
                 ch.append(["exit", I(lb), None, I(c.get("ref")), None, I(sub)])
         E = p.get("effects") or {}
@@ -248,14 +336,47 @@ def _inf_key(x: dict) -> str:
     return "inflight:" + (x.get("ref") or "|".join(str(x.get(q)) for q in ("kind", "name", "set_at")))
 
 
-def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_ops: set, cat: dict, lk: dict, tally: collections.Counter, I) -> dict:
+def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_ops: set, cat: dict, lk: dict, tally: collections.Counter, I, W: dict) -> dict:
     """r.ex: {kind: [[id, role here, what depends on this endpoint]], "paths": {…}} — and every element's feed-wide record into cat."""
     F, ep = L["forms"], r["id"]
     fep = fj["endpoints"]["endpoint:" + ep]
     handler = (F.get("endpoint") or {}).get("handler") or (L["functions"].get("handler") or {}).get("id", "").replace("#", "::")
     inf_rows = [x for x in ((F.get("inflight") or {}).get("rows") or [])] if (F.get("inflight") or {}).get("state") == "present" and not arm_off(fj, KIND_ARM["inf"]) else []
-    PATHS = _paths(F, fj, handler, inf_rows, write_ops, I)
     exits = F.get("exits") or []
+    au = F.get("auth") or {}
+    auth_fns = {g.get("fn") for g in au.get("gates") or [] if g.get("fn")}
+    deps = set(fj.get("dependencies") or {})
+    FJF = fj.get("functions") or {}
+    at2fn = collections.defaultdict(set)                  # a check's host: the function whose raise or refusal sits at its line (as _ae_els)
+    for f0, rec in FJF.items():
+        for z in (rec.get("raises") or []) + (rec.get("refusals") or []):
+            if z.get("at"):
+                at2fn[z["at"]].add(f0)
+    for f0 in (F.get("inside") or {}).get("functions") or []:
+        for z in (f0.get("raises") or []) + (f0.get("refusals") or []):
+            if z.get("at") and f0.get("fn"):
+                at2fn[z["at"]].add(f0["fn"])
+
+    def host_of(g):
+        """the function a check sits in: the handler for its own checks; else the one function recording a raise or refusal at its
+        line; else the function the handler calls to reach it"""
+        if not g.get("depth"):
+            return handler
+        hs = at2fn.get(g.get("at")) or set()
+        if len(hs) == 1:
+            return next(iter(hs))
+        m = re.match(r"^call (.+?) @", str(g.get("via") or ""))
+        return m.group(1) if m else None
+    lim_x = {}
+    for l0 in (F.get("rate") or {}).get("limits") or []:
+        args = {a.get("param"): a.get("value") for a in l0.get("args") or []}
+        lim_x[l0.get("exit")] = [str(l0.get("limiter") or l0.get("class") or "?").lstrip("_"), args.get("limit"), args.get("window_seconds")]
+    CX = {"lim": lim_x, "xs": {x["id"]: x for x in exits}, "pre": F.get("preconditions") or [], "tally": tally, "fall": W["mo"]["x"]["c1"]["fall"],
+          "pre_x": {g["exit"]: g for g in F.get("preconditions") or [] if g.get("exit")},
+          "hdr": {s0.get("exit"): s0.get("header") or s0.get("carrier") for s0 in au.get("schemes") or []},
+          "gname": (au.get("gates") or [{}])[0].get("name") or _fname((au.get("gates") or [{}])[0].get("fn") or ""),
+          "body": (r["d"].get("request") or [None])[0] or "", "host": lambda g: _fname(host_of(g) or "")}
+    PATHS = _paths(F, fj, handler, inf_rows, write_ops, I, CX)
     decl = {x[2]: x[5] for x in r["xd"]["exits"]}
     tests_of = lambda x: [[t.get("case"), t.get("conf"), t.get("role")] for t in x.get("tests") or [] if t.get("case")]
     ex = {k: [] for k in KINDS}
@@ -270,7 +391,12 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
         cat[i] = {"k": "end", "n": str(x.get("status")), "ep": ep, "st": x.get("status"), "kd": x["kind"], "sg": phase_stage.get(x.get("phase"), "HANDLER") if x["kind"] != "success" else "ANSWER",
                   "say": x.get("detail"), "code": x.get("code"), "at": x.get("at") or rs.get("source"), "via": x.get("via"), "pred": x.get("pred"), "form": x.get("form"),
                   "decl": decl.get(x["id"]), "hd": sorted((rs.get("headers") or {}).items()), "media": rs.get("media"),
-                  "fields": len(rs.get("fields") or []), "model": rs.get("model"), "tests": [q[0] for q in tests_of(x)], "paths": by_exit.get(x["id"], [])}
+                  "fields": len(rs.get("fields") or []), "model": rs.get("model"), "tests": [q[0] for q in tests_of(x)], "paths": by_exit.get(x["id"], []),
+                  # CR-28 · F26: what its plain line needs — the phase it leaves at, a limiter's name and numbers, the check that stops it
+                  # (its host and its condition as written), the header a login scheme reads, the schema a 422 checks
+                  "ph": x.get("phase"), "lim": lim_x.get(x["id"]), "hdr": CX["hdr"].get(x["id"]),
+                  "guard": [CX["host"](CX["pre_x"][x["id"]]), CX["pre_x"][x["id"]].get("pred")] if x["id"] in CX["pre_x"] else None,
+                  "sch": next((str(c.get("schema") or "").replace("schema:", "") for c in x.get("cases") or [] if c.get("schema")), None) or CX["body"] or None}
         row = next((q for q in fep.get("produced") or [] if q.get("id") == x["id"]), {})
         if not cat[i]["paths"]:
             if row.get("applies") is not False:
@@ -316,7 +442,14 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
                       "uq": [[u.get("name"), u.get("cols")] for u in ((m.get("constraints") or {}).get("uniques") or [])],
                       "drift": [[d.get("column"), d.get("field")] for d in m.get("drift") or []],
                       "race": len(((m.get("m10") or {}).get("races")) or []), "writers": len(m.get("writers") or [])}
-        ex["table"].append([i, t["rw"], {"ops": ops.get(t["table"], [])}])
+        # S4-21: a race THIS endpoint's get-or-create runs on the table's unique key, joined to the ending it escapes to — the facts
+        # BY MOMENT's race sentence (mo.x.racePlain) is filled with
+        unc = next((x.get("status") for x in exits if x["kind"] == "uncaught"), None)
+        rc = next(([cl.get("constraint"), cl.get("table"), list(cl.get("unique") or []), unc] for cl in (F.get("repeat") or {}).get("claims") or []
+                   if cl.get("race") == "uncaught" and cl.get("table") == t["table"]), None)
+        if rc and unc is None:
+            die(f"{ep}: the race on {t['table']} escapes, and the endpoint has no uncaught ending to join it to")
+        ex["table"].append([i, t["rw"], {"ops": ops.get(t["table"], []), **({"rc": rc} if rc else {})}])
 
     # SCHEMAS — the request body, the answer, and the shapes nested in them
     S = fj.get("schemas") or {}
@@ -346,24 +479,72 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
         e[2]["c422"] = cases422.get(e[0], 0)
 
     # FUNCTIONS — the handler and the functions behind it, level by level (the lab's walk)
-    FJF = fj.get("functions") or {}
     # a raise is the function's (feed-wide); the ending it becomes is THIS endpoint's (the overlay)
     raises_of = lambda q: [[z.get("cls"), _short(z.get("at"))] for z in (FJF.get(q) or {}).get("raises") or []]
     raises_here = lambda q: [[t.get("status") for t in z.get("translated_by") or [] if t.get("endpoint") == "endpoint:" + ep] for z in (FJF.get(q) or {}).get("raises") or []]
-    doesw = {d["fn"]: d.get("does") or [] for d in (L["functions"].get("does") or {}).get("rows") or []}
     h = L["functions"].get("handler") or {}
     walk = [(0, h, None)] + [(i + 1, f, f.get("via")) for i, lv in enumerate(L["functions"].get("walk") or []) for f in lv]
-    for lv, f, via in walk:
-        if not f.get("id"):
-            continue
-        q = f["id"].replace("#", "::")
-        i = "fn:" + q
+    COMMITS = {s0.get("fn") for s0 in (fj.get("steps") or {}).values() if s0.get("op") == "commit"}
+    # N3-24: the members are BY MOMENT's own — the lab's walk (with its levels), then every other function BY MOMENT places or names:
+    # a call the handler's chain makes, a function whose own steps run, a name no single function carries
+    in_walk = {f["id"].replace("#", "::") for _lv, f, _v in walk if f.get("id")}
+    mo_fns = [x for x in (r.get("mo") or {}).get("el", []) + (r.get("mo") or {}).get("un", []) if x and x[0] == "fn"]
+    extra = list(dict.fromkeys((x[2][0][3:] if x[2] else None, None if x[2] else str(x[3])) for x in mo_fns))
+    extra = [(q, n) for q, n in extra if (q and q not in in_walk) or (not q and n)]
+    chain_at = {}                                             # a function the handler's chain calls: the line it calls it at
+    for p in F.get("paths") or []:
+        for c in p.get("chain") or []:
+            if c.get("kind") in ("call", "collapsed") and c.get("fn"):
+                chain_at.setdefault(c["fn"], c.get("at"))
+    fn_ops = collections.defaultdict(lambda: collections.OrderedDict())   # a function the walk does not hold: the tables its own steps touch here
+    for p in F.get("paths") or []:
+        for s in (p.get("effects") or {}).get("steps") or []:
+            st = {**((fj.get("steps") or {}).get(s.get("step")) or {}), **{q: s[q] for q in ("table", "op", "fn") if s.get(q)}}
+            if st.get("table") and st.get("fn") and (st.get("op") in write_ops or st.get("op") == "read"):
+                fn_ops[st["fn"]].setdefault(st["table"], set()).add("w" if st["op"] in write_ops else "r")
+    own_checks = collections.defaultdict(list)                 # CR-29: the checks a function's own code makes, each with its refusal
+    for g in F.get("preconditions") or []:
+        q = host_of(g)
+        if q:
+            x = CX["xs"].get(g.get("exit")) or {}
+            own_checks[q].append([g.get("status"), I(x.get("detail")), I(g.get("pred"))])
+    for lv, f, via in walk + [(None, {"id": q, "name": _fname(q) if q else n, "_x": 1}, None) for q, n in extra]:
+        q = f["id"].replace("#", "::") if f.get("id") else None
+        i = "fn:" + q if q else "fnname:" + f["name"]
         if i not in cat:
-            cat[i] = {"k": "fn", "n": f.get("name"), "key": i, "file": f.get("file"), "at": f.get("at"), "lines": f.get("lines"), "god": 1 if f.get("god") else 0,
-                      "async": f.get("async"), "ret": f.get("returns"), "role": f.get("role"), "commits": 1 if f.get("commits") else 0,
-                      "raises": raises_of(q), "doc": (f.get("insight") or {}).get("doc"), "ent": f.get("entity")}
-        ex["fn"].append([i, f.get("role") or "none", {"lv": lv, "via": via, "h": 1 if lv == 0 else 0, "ops": [[o.get("rw"), o.get("table")] for o in f.get("ops") or []],
-                                                     "calls": [I(g.get("name")) for l2, g, v2 in walk if v2 == f.get("name") and l2 == lv + 1], "does": [I(d) for d in doesw.get(q, [])], "rz": raises_here(q)}])
+            if q:
+                cat[i] = {"k": "fn", "n": f.get("name"), "key": i, "file": f.get("file") or q.split("::")[0], "at": f.get("at") or (FJF.get(q) or {}).get("at"),
+                          "lines": f.get("lines") if not f.get("_x") else X["fnlines"].get(q), "god": 1 if f.get("god") else 0,
+                          "async": f.get("async"), "ret": f.get("returns"), "role": f.get("role"),
+                          "commits": 1 if q in COMMITS else 0,               # N3-19: from the forms feed's steps (op commit), never the station's flag
+                          "raises": raises_of(q), "doc": (f.get("insight") or {}).get("doc"), "ent": f.get("entity")}
+            else:
+                cat[i] = {"k": "fn", "n": f["name"], "key": None, "nokey": 1, "raises": [], "commits": 0}
+        o = {"lv": lv, "via": via, "h": 1 if lv == 0 else 0, "ops": [[o0.get("rw"), o0.get("table")] for o0 in f.get("ops") or []],
+             "calls": [[I("fn:" + g["id"].replace("#", "::")), []] for l2, g, v2 in walk if lv is not None and v2 == f.get("name") and l2 == lv + 1 and g.get("id")],
+             "rz": raises_here(q) if q else [], "chk": own_checks.get(q, []) if q else []}
+        if f.get("_x") and q:                                  # not on the walk: who calls it, where the handler's chain says so
+            o["ops"] = [["".join(sorted(v, key="rw".index)), t0] for t0, v in fn_ops.get(q, {}).items()]
+            if q in chain_at:
+                o["by"] = [I(_fname(handler)), I(_short(chain_at[q]))]
+            else:
+                rb = next((b for b in (FJF.get(q) or {}).get("reached_by") or [] if b.get("root") == "endpoint:" + ep and b.get("via")), None)
+                if rb:
+                    o["by"] = [I(_fname(rb["via"])), I(_short(rb.get("site")))]
+        if lv == 0:                                            # the handler: each call its chain makes, with the refusals it can lead to
+            sts = collections.defaultdict(set)
+            for g in F.get("preconditions") or []:
+                m = re.match(r"^call (.+?) @ (.+)$", str(g.get("via") or ""))
+                if m and g.get("status") is not None:
+                    sts[m.group(2)].add(g["status"])
+            o["calls"] = []
+            for fq, at in chain_at.items():
+                for z in (FJF.get(fq) or {}).get("raises") or []:
+                    for t in z.get("translated_by") or []:
+                        if t.get("endpoint") == "endpoint:" + ep and t.get("status") is not None:
+                            sts[at].add(t["status"])
+                o["calls"].append([I("fn:" + fq), sorted(sts.get(at, set()), key=str)])
+        ex["fn"].append([i, f.get("role") or "none", o])
 
     # TESTS — every case the lab's roster names on this endpoint, linked to what its requests here pass and touch (L-08, EX-3)
     TC = fj.get("test_cases") or {}
@@ -409,7 +590,7 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
                 seen_e.add(x0); E2.append([x0, h0])
         paths = [pid for x0, _h in E2 for pid in by_exit.get(x0, [])]
         tally["testLinks"] += len(E2)
-        ex["test"].append([i, role, {"here": here, "ends": E2, "paths": paths}])
+        ex["test"].append([i, role, {"here": here, "ends": E2, "paths": paths}])     # N3-14: only a `refs` ending is proved; `amb` fits, `status` is checked
     for pid, p in PATHS.items():
         for tt in next((pp.get("tests") or [] for pp in F.get("paths") or [] if pp["id"] == pid), []):
             if tt.get("case") and tt["case"] not in TC:
@@ -418,51 +599,72 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
     # GATES AND DECISIONS — the feed's own groups, each with the function it runs in and its effect (EX-4 · L-09 · L-10 · L-11)
     walk_by_name = {f.get("name"): "fn:" + f["id"].replace("#", "::") for _lv, f, _v in walk if f.get("id")}
     hk = "fn:" + handler if handler else None
-    xs = {x["id"]: x for x in exits}
-    def gate(i, role, cond, fnk, at, eff, after=None, extra=None):
+    xs, gat = {x["id"]: x for x in exits}, {}
+    def gate(i, role, cond, fnk, at, eff, after=None, extra=None, raw=None, key=None):
         # a gate is one place in THIS endpoint's way (a field rule's page key is shared by endpoints whose rules differ): scoped here,
         # its page key kept for the light
-        key, i = (i if not i.startswith(ep + "|") else None), (i if i.startswith(ep + "|") else ep + "|" + i)
+        key, i = (key or (i if not i.startswith(ep + "|") else None)), (i if i.startswith(ep + "|") else ep + "|" + i)
         if i in cat:
             die(f"{ep} · {i}: two gates of this endpoint share one place")
-        cat[i] = {"k": "gate", "n": cond, "key": key}
+        cat[i] = {"k": "gate", "n": cond, "key": key, **({"raw": raw} if raw and raw != cond else {})}
+        gat[i] = _short(at) if at else None
         x = xs.get(eff) if eff else None
         ex["gate"].append([i, role, {"fn": I(fnk), "at": I(at), "eff": eff, "st": x.get("status") if x else None,
                                      "after": [I(a) for a in after or []], "tests": [c[0] for c in tests_of(x)] if x else [], **(extra or {})}])
+    EW = W["ex"]
+    def lvl(host):                                        # S4-02: where it decides — BY MOMENT's R2 (_ae_els.Ctx.level), read the same way
+        return "login" if host in auth_fns else "dep" if host in deps else "own" if host == handler else "call"
+    fnk_of = lambda q: ("fn:" + q) if q and "::" in q else (walk_by_name.get(q) or walk_by_name.get(str(q).split(".")[-1]) if q else None)
+    # a gate's face is a plain line (CR-28); its condition as the code writes it rides `raw`, said last in its hover
     for l in (F.get("rate") or {}).get("limits") or []:
         nm = str(l.get("limiter") or l.get("class") or "?").lstrip("_")
         args = {a.get("param"): a.get("value") for a in l.get("args") or []}
-        gate("limiter:" + nm, "limiter", nm, None, l.get("at"), l.get("exit"),
-             extra={"lim": [args.get("limit"), args.get("window_seconds"), l.get("key")], "place": l.get("via")})
-    au = F.get("auth") or {}
+        gate("limiter:" + nm, "limiter", fill(EW["face"]["lim"], name=nm, n=args.get("limit"), w=args.get("window_seconds")) if args.get("limit") is not None else nm,
+             None, l.get("at"), l.get("exit"), raw=(xs.get(l.get("exit")) or {}).get("pred"),
+             extra={"lim": [args.get("limit"), args.get("window_seconds"), l.get("key")], "place": l.get("via"), "gk": "l", "gl": "app", "gv": "refuses"})
     for s0 in au.get("schemes") or []:
-        gate(ep + "|gate:" + str(s0.get("exit")), "scheme", f"{s0.get('scheme')} · {s0.get('header') or s0.get('carrier')}", None, s0.get("at"), s0.get("exit"),
-             extra={"place": f"{s0.get('scheme')} {s0.get('name')}"})
-    gfn = "fn:" + au["gates"][0]["fn"] if au.get("gates") else None
-    for x in exits:
+        gate(ep + "|gate:" + str(s0.get("exit")), "scheme", fill(EW["face"]["scheme"], header=s0.get("header") or s0.get("carrier")), None, s0.get("at"), s0.get("exit"),
+             raw=f"{s0.get('scheme')} {s0.get('name')}", extra={"place": f"{s0.get('scheme')} {s0.get('name')}", "gk": "a", "gl": "login", "gv": "refuses"})
+    # N3-07: the login check IS its dependency function (as BY MOMENT draws it), its refusals all the endings of that phase — never
+    # one gate per ending, which named the catch inside it a second time
+    dep_x = [x["id"] for x in exits if x.get("phase") == "dependency" and x["kind"] == "refusal"]
+    for g0 in au.get("gates") or []:
+        if not dep_x:
+            continue
+        gate(ep + "|login:" + str(g0.get("fn")), "login", g0.get("name") or _fname(g0.get("fn")), "fn:" + str(g0.get("fn")), (FJF.get(g0.get("fn")) or {}).get("at"),
+             dep_x[0], key="fn:" + str(g0.get("fn")), extra={"effs": dep_x, "gk": "a", "gl": "login", "gv": "refuses"})
+    for x in exits if not au.get("gates") else []:
         if x.get("phase") == "dependency":
-            gate(ep + "|gate:" + x["id"], "login", str(x.get("via") or x.get("detail")), gfn, x.get("at"), x["id"])
+            gate(ep + "|gate:" + x["id"], "login", str(x.get("via") or x.get("detail")), None, x.get("at"), x["id"], extra={"gk": "a", "gl": "dep", "gv": "refuses"})
     for x in exits:
         for c in x.get("cases") or [] if x["kind"] == "validation" else []:
-            gate("rule:" + c["id"], "rule", f"{c.get('loc')} · {c.get('type')}" + (f" {c['rule']}" if c.get("rule") else ""), None, c.get("at"), x["id"],
-                 extra={"place": str(c.get("schema") or "").replace("schema:", "") or None})
+            loc = str(c.get("loc") or "")
+            fld = EW["face"]["theBody"] if loc == "body" else loc.split(".")[-1]
+            val = str(c.get("rule") or "").partition("=")[2]
+            gate("rule:" + c["id"], "rule", fill(EW["rule"].get(c.get("type")) or EW["rule"]["_other"], name=fld, v=val), None, c.get("at"), x["id"],
+                 raw=f"{loc} · {c.get('type')}" + (f" {c['rule']}" if c.get("rule") else ""),
+                 extra={"place": str(c.get("schema") or "").replace("schema:", "") or None, "rt": c.get("type")})
     for g in F.get("preconditions") or []:
         m = re.match(r"^call (.+?) @", str(g.get("via") or ""))
-        fk = hk if not g.get("depth") else ((walk_by_name.get(m.group(1)) or walk_by_name.get(m.group(1).split(".")[-1])) if m else None)
-        gate("guard:" + g["id"], "own" if not g.get("depth") else "down", str(g.get("pred")), fk, g.get("at"), g.get("exit"), g.get("after"),
-             extra={"st0": g.get("status"), "call": m.group(1) if m else None})
+        host = host_of(g)
+        gate("guard:" + g["id"], "own" if not g.get("depth") else "down", str(g.get("pred")), hk if not g.get("depth") else fnk_of(host), g.get("at"), g.get("exit"), g.get("after"),
+             extra={"st0": g.get("status"), "call": m.group(1) if m else None, "gk": "g", "gl": lvl(host), "gv": "refuses"})
     for b in F.get("branches") or []:
-        gate("fork:" + b["id"], "branch", str(b.get("pred") or b.get("token")), "fn:" + b["fn"] if b.get("fn") else None, b.get("site"), None, b.get("after"),
-             extra={"ret": b.get("return"), "call": b.get("call")})
+        gate("fork:" + b["id"], "branch", str(b.get("pred") or (W["mo"]["x"]["c1"]["fall"] if b.get("token") == "fall-through" else b.get("token"))),
+             "fn:" + b["fn"] if b.get("fn") else None, b.get("site"), None, b.get("after"),
+             extra={"ret": b.get("return"), "call": b.get("call"), "gk": "b", "gl": lvl(b.get("fn")), "gv": "routes"})
     for c in (F.get("failure") or {}).get("catches") or []:
         ty = " · ".join(c.get("types") or [])
         eff = next((x["id"] for x in exits if str(x.get("via") or "") in ["except " + t for t in c.get("types") or []]), None)
-        gate("catch:" + c["id"], "catch", "except " + ty, "fn:" + c["fn"] if c.get("fn") else None, c.get("at"), eff,
-             extra={"answers": c.get("answers") or [], "outcome": c.get("outcome")})
+        gate("catch:" + c["id"], "catch", fill(EW["face"]["catches"], v=ty), "fn:" + c["fn"] if c.get("fn") else None, c.get("at"), eff, raw="except " + ty,
+             extra={"answers": c.get("answers") or [], "outcome": c.get("outcome"), "gk": "c", "gl": lvl(c.get("fn")), "types": ty,
+                    "gv": {"translate": "translates", "pass-through": "passes", "swallow": "swallows"}.get(str(c.get("outcome") or ""), "translates")})
     for w in F.get("switches") or []:
         words = w.get("port") or w.get("expr") or w.get("kind")
-        gate("switch:" + w["id"], "switch", f"{w.get('kind')} · {words}", "fn:" + w["fn"] if w.get("fn") else None, w.get("anchor"), None,
-             extra={"impl": [b.get("impl") for b in w.get("branches") or [] if b.get("impl")], "refs": w.get("refs") or [], "place": w.get("via")})
+        face = EW["face"]["sw"].get(w.get("kind"))
+        gate("switch:" + w["id"], "switch", fill(face, v=words) if face else f"{w.get('kind')} · {words}", "fn:" + w["fn"] if w.get("fn") else None, w.get("anchor"), None,
+             raw=str(words), extra={"impl": [b.get("impl") for b in w.get("branches") or [] if b.get("impl")], "refs": w.get("refs") or [], "place": w.get("via"),
+                                    "gk": "w", "gl": {"middleware": "app", "dependency": "dep", "handler": "own"}.get(w.get("scope"), "call")})
     got = collections.Counter(e[1] for e in ex["gate"])
     want = {"own": sum(1 for g in F.get("preconditions") or [] if not g.get("depth")), "down": sum(1 for g in F.get("preconditions") or [] if g.get("depth")),
             "branch": len(F.get("branches") or []), "catch": len((F.get("failure") or {}).get("catches") or []), "switch": len(F.get("switches") or []),
@@ -490,7 +692,7 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
             "screens": [s.get("name") for s in L["widening"].get("screens") or []],
             "react": [[z.get("exit"), z.get("status"), 1 if z.get("own_branch") else 0, X["dw"].get(z.get("site")) if z.get("site") and z.get("site") != "rest" else None,
                        _short(z.get("at")) if z.get("at") else None] for z in rd.get("routes") or []] if hc else [],
-            "reader": rd.get("fn") if hc else None}])
+            "reader": rd.get("fn") if hc else None, "epk": "endpoint:" + ep}])            # S4-31: the endpoint it sends to, a station element
 
     # IN-FLIGHT VALUES — what is alive while the request runs (L-17)
     for x in inf_rows:
@@ -499,9 +701,35 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
             fr = x.get("from") or {}
             cat[i] = {"k": "inf", "n": x.get("name"), "key": i, "ik": x.get("kind"), "dies": x.get("dies") or "unknown", "set": _short(x.get("set_at")),
                       "by": str(x.get("set_by") or x.get("dependency") or "").split("::")[-1].replace("middleware:", ""), "in": x.get("set_in"),
-                      "from": [fr.get("kind"), fr.get("name")] if fr else None, "carrier": x.get("carrier"), "expr": x.get("expr")}
+                      "from": [fr.get("kind"), fr.get("name")] if fr else None, "carrier": x.get("carrier"), "expr": x.get("expr"),
+                      # S4-31: who sets it, as station elements to try in order — the function, then the middleware whose method it is
+                      "byk": [q for q in (("fn:" + str(x["set_by"])) if "::" in str(x.get("set_by") or "") else None,
+                                          x["set_by"] if str(x.get("set_by") or "").startswith("middleware:") else None,
+                                          ("middleware:" + str(x["set_by"]).split("::")[-1].split(".")[0]) if "::" in str(x.get("set_by") or "")
+                                          and ("middleware:" + str(x["set_by"]).split("::")[-1].split(".")[0]) in (fj.get("middleware") or {}) else None) if q]}
         # where it is read is THIS endpoint's (a dependency value is read by each handler at its own lines)
         ex["inf"].append([i, x.get("kind") or "unknown", {"reads": [[I(_short(ra.get("at"))), I(_fname(ra.get("fn") or "")), ra.get("in")] for ra in x.get("read_at") or []]}])
+    # CR-16 · F26: no two items of one column wear the same face — an ending carries its limit, a twin name its place; the build
+    # stops on a pair still alike
+    def face(k, e):
+        c = cat[e[0]]
+        if k == "end":
+            return (c["st"], (c.get("lim") or [None])[0], c.get("say") or c.get("code") or c["kd"])
+        return (c.get("cid") or c.get("n"),)
+    place = {"end": lambda e: _short(cat[e[0]].get("at")) or cat[e[0]].get("ph"), "gate": lambda e: gat.get(e[0]),
+             "fn": lambda e: _short(cat[e[0]].get("file")), "inf": lambda e: cat[e[0]].get("set") or cat[e[0]].get("by"),
+             "hook": lambda e: _short(cat[e[0]].get("file"))}
+    for k in KINDS:
+        seen = collections.Counter(face(k, e) for e in ex[k])
+        for e in ex[k]:
+            if seen[face(k, e)] > 1:
+                if k not in place or not place[k](e):
+                    die(f"{ep}: two {k} items wear the face {face(k, e)} and nothing tells them apart")
+                e[2]["tw"] = place[k](e)
+                tally["twins"] += 1
+        left = [f for f, n in collections.Counter(face(k, e) + (e[2].get("tw"),) for e in ex[k]).items() if n > 1]
+        if left:
+            die(f"{ep}: {k} items still alike after their places are added: {left[:2]}")
     ex["paths"] = PATHS
     for k in KINDS:
         tally["n:" + k] += len(ex[k])
@@ -509,32 +737,52 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
 
 
 # ── 3 · THE BENCH, for the page ─────────────────────────────────────────────────────────────────────────────────────────────
-MINE = {   # my picks (dashed on the page): each kind's parts in three lines of a left and a right side, their sizes
+FLOOR = 12   # the page's legibility floor: every text part of a block at or above it, but the table's (his DATA line, D-027)
+GLYPH_PARTS = {"icon", "commit"}   # parts that draw no text — a glyph, a dot — and may go below the floor
+MINE = {   # my picks (dashed on the page): each kind's parts in three lines of a left and a right side, their sizes (S4-24: text at 12)
     "end": {"parts": ["icon", "status", "name", "stage", "count", "via"],
             "rows": [{"l": ["icon", "status"], "r": ["stage"]}, {"l": ["name"], "r": ["count"]}, {"l": ["via"], "r": []}],
-            "size": {"icon": 13, "status": 11, "name": 13, "stage": 11, "count": 11, "via": 12}, "iconCol": "model"},
+            "size": {"icon": 13, "status": 12, "name": 13, "stage": 12, "count": 12, "via": 12}, "iconCol": "kind"},
     "test": {"parts": ["icon", "cid", "state", "proves", "role", "name", "file", "sends", "asserts"],
              "rows": [{"l": ["icon", "cid", "proves"], "r": ["state"]}, {"l": ["name"], "r": []}, {"l": ["role", "sends"], "r": ["asserts"]}],
-             "size": {"icon": 13, "cid": 13, "state": 11, "proves": 11, "role": 11, "name": 12, "file": 12, "sends": 11, "asserts": 12}, "iconCol": "model"},
-    "gate": {"parts": ["icon", "role", "cond", "fn", "effect", "via", "count"],
-             "rows": [{"l": ["icon", "cond"], "r": ["role"]}, {"l": ["fn"], "r": ["effect"]}, {"l": ["via"], "r": ["count"]}],
-             "size": {"icon": 13, "role": 11, "cond": 13, "fn": 12, "effect": 11, "via": 12, "count": 11}, "iconCol": "model"},
+             "size": {"icon": 13, "cid": 13, "state": 12, "proves": 12, "role": 12, "name": 12, "file": 12, "sends": 12, "asserts": 12}, "iconCol": "kind"},
+    "gate": {"parts": ["icon", "role", "cond", "fn", "level", "effect", "via", "count"],
+             "rows": [{"l": ["icon", "cond"], "r": ["role"]}, {"l": ["fn", "level"], "r": ["effect"]}, {"l": ["via"], "r": ["count"]}],
+             "size": {"icon": 13, "role": 12, "cond": 13, "fn": 12, "level": 12, "effect": 12, "via": 12, "count": 12}, "iconCol": "kind"},
     "hook": {"parts": ["icon", "role", "name", "fkind", "sends", "file", "count"],
              "rows": [{"l": ["icon", "name"], "r": ["role"]}, {"l": ["sends"], "r": ["count"]}, {"l": ["file"], "r": ["fkind"]}],
-             "size": {"icon": 13, "role": 11, "name": 13, "fkind": 12, "sends": 12, "file": 12, "count": 11}, "iconCol": "model"},
+             "size": {"icon": 13, "role": 12, "name": 13, "fkind": 12, "sends": 12, "file": 12, "count": 12}, "iconCol": "kind"},
     "inf": {"parts": ["icon", "life", "name", "ikind", "set", "count"],
             "rows": [{"l": ["icon", "name"], "r": ["life"]}, {"l": ["ikind"], "r": ["count"]}, {"l": ["set"], "r": []}],
-            "size": {"icon": 13, "life": 11, "name": 13, "ikind": 12, "set": 12, "count": 11}, "iconCol": "model"},
+            "size": {"icon": 13, "life": 12, "name": 13, "ikind": 12, "set": 12, "count": 12}, "iconCol": "kind"},
 }
 MODES = {"ent": ["word", "icon", "both"], "count": ["words", "badge"], "model": ["word", "icon", "both"], "via": ["word", "icon", "both"],
          "file": ["word", "icon", "both"]}
 
 
-def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict, write_ops: set) -> tuple:
-    """(D.ex, the bench's CSS, its JS, the build line). Adds r["ex"] to every row."""
+def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict, write_ops: set, sweep=None) -> tuple:
+    """(D.ex, the bench's CSS, its JS, the build line). Adds r["ex"] to every row. `sweep` is the page's words sweep: the words
+    lifted from the lab reach the page through it too (S4-22)."""
     types = {c[1] for L in facts for t in L["data"]["tables"] for c in t["cols"]}
     types |= {f.get("annotation") or "" for s in (fj.get("schemas") or {}).values() for f in s.get("fields") or []}
     lk = lift(types)
+    # S4-22: a number the lab types into a part's note is the god-function threshold the facts carry — made a {god} token (the build
+    # stops when the lab's number and the facts' threshold part), then every lifted word is swept like the words file
+    gods = {(L.get("context") or {}).get("risk", {}).get("god_lines") for L in facts}
+    if len(gods) != 1 or not isinstance(next(iter(gods)), int):
+        die(f"the facts do not agree on one god-function threshold: {sorted(map(str, gods))}")
+    god = next(iter(gods))
+    for k in lk["parts"]:
+        for p in lk["parts"][k]:
+            if re.search(r"\d", p.get("note") or ""):
+                if not re.search(rf"\b{god}\b", p["note"]):
+                    die(f"the lab's {k} part {p['key']!r} types a number that is not the god-function threshold ({god}): {p['note']!r}")
+                p["note"] = re.sub(rf"\b{god}\b", "{god}", p["note"])
+            # the file part's "last two folders" is the number of path parts a file is named by (SHORT_PARTS, the page's xShort too)
+            if p["key"] == "file" and re.search(r"\btwo\b", p.get("note") or "") and SHORT_PARTS == 2:
+                p["note"] = re.sub(r"\btwo\b", "{dirs}", p["note"])
+    if sweep:
+        sweep({"parts": lk["parts"], "icol": lk["icol"], "sq": [{q: x[q] for q in ("word", "plain")} for x in lk["sq"]]}, "ex.lifted")
     cat, tally, SL, SI = {}, collections.Counter(), [], {}
     def I(x):                                   # one table of the strings the paths, the gates and the functions repeat (page size)
         if x is None:
@@ -544,7 +792,7 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
             SI[x] = len(SL); SL.append(x)
         return SI[x]
     for L, r in zip(facts, rows):
-        r["ex"] = per_endpoint(L, fj, r, X, phase_stage, write_ops, cat, lk, tally, I)
+        r["ex"] = per_endpoint(L, fj, r, X, phase_stage, write_ops, cat, lk, tally, I, W)
     EW = W["ex"]
     if list(EW["kinds"]) != list(KINDS):
         die(f"ex.kinds names {list(EW['kinds'])}, the bench draws {list(KINDS)} in his order")
@@ -559,10 +807,16 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
             continue
         if list(EW["roles"][k]) != list(R):
             die(f"ex.roles.{k} names {list(EW['roles'][k])}, the bench reads {list(R)}")
+    # CR-27 · S4-17: an in-flight value's kind is named by BY MOMENT's own words (enc.fam.ifk); the bench names only a kind it has none for
+    named = {k: set(EW["roles"][k]) | (set(W["enc"]["fam"]["ifk"]["vals"]) if k == "inf" else set()) for k in KINDS if k != "end"}
+    if set(EW["roles"]["inf"]) & set(W["enc"]["fam"]["ifk"]["vals"]):
+        die(f"ex.roles.inf names a kind BY MOMENT already names (enc.fam.ifk): {sorted(set(EW['roles']['inf']) & set(W['enc']['fam']['ifk']['vals']))}")
     for k in [k for k in KINDS if k != "end"]:
-        stray = {e[1] for r in rows for e in r["ex"][k]} - set(EW["roles"][k])
+        stray = {e[1] for r in rows for e in r["ex"][k]} - named[k]
         if stray:
             die(f"{k}: roles the words do not name {sorted(stray)}")
+    if sorted(EW["icol"]) != sorted(["kind" if q == "model" else q for q in lk["icol"]]):
+        die(f"ex.icol names {sorted(EW['icol'])}, the lab's glyph colours {sorted(lk['icol'])} (its model colour called kind)")
     for g, O in EW["opt"].items():
         if O.get("pick") not in O["opts"]:
             die(f"ex.opt.{g}: its default {O.get('pick')!r} is not one of its options")
@@ -577,18 +831,24 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
             L0 = lk["look"][k]
             looks[k] = {**base, **{x: L0[x] for x in L0 if x not in ("show",)}, "form": L0.get("form", "block"),
                         "mode": {p: L0[p] for p in MODES if p in L0}, "on": {p: L0.get(p, 1) for p in ("icon", "rw", "name", "dir", "role") if p in L0}}
+            if k != "table":
+                # S4-24: the lab's own sizes are no ruling — a text part below the floor is raised to it (the table keeps his line)
+                looks[k]["size"] = {p: (max(v, FLOOR) if p not in GLYPH_PARTS else v) for p, v in looks[k]["size"].items()}
+                # S4-25: "model" is the table's word for its own colour; every other kind calls it its kind's colour
+                looks[k]["iconCol"] = "kind" if looks[k].get("iconCol") == "model" else looks[k].get("iconCol")
         else:
             M = MINE[k]
             looks[k] = {**base, "form": "block", "rows": M["rows"], "size": M["size"], "iconCol": M["iconCol"], "mode": {"count": "badge", "via": "both", "file": "word"},
                         "on": {}, "off": [p for p in M["parts"] if p not in [q for r0 in M["rows"] for q in r0["l"] + r0["r"]]]}
     icons = {p["ico"] for k in LAB_KINDS for p in lk["parts"][k]} | {x["sym"] for x in lk["sq"]} | set(EW["icons"].values())
     D = {"kinds": list(KINDS), "look": looks, "parts": lk["parts"], "icol": lk["icol"], "sq": lk["sq"], "col": lk["col"], "his": lk["his"],
-         "cat": dict(sorted(cat.items())), "modes": MODES, "str": SL,
+         "cat": dict(sorted(cat.items())), "modes": MODES, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
          "absent": {k: arm_off(fj, a) for k, a in KIND_ARM.items() if k in KINDS and arm_off(fj, a)}}
     css = _css() + "\n" + BENCH_CSS.read_text(encoding="utf-8")
     js = BENCH_JS.read_text(encoding="utf-8")
     line = ("L-23 · examples · " + " · ".join(f"{k} {tally['n:' + k]}" for k in KINDS) + f" (on {len(rows)} endpoints, {len(cat)} elements feed-wide)"
             + f" · endings the code skips here {tally['skipped']} · test links {tally['testLinks']} · tables whose column names the lab and the model spell differently {tally['tblMismatch']}"
             + (" (" + ", ".join(sorted(k[4:] for k in tally if k.startswith("tbl:"))) + ")" if tally["tblMismatch"] else "")
+            + f" · checks inside calls placed on the ways that pass them {tally['inCall']} · items told apart by their place {tally['twins']}"
             + f" · his DATA line: the table boots on it")
     return D, css, js, line, icons

@@ -3844,7 +3844,7 @@ def build(argv: list) -> tuple:
         r["mo"] = by_moment(L, fj, fj["endpoints"]["endpoint:" + r["id"]], r, X, ADJ, MEMO, MOT)
         no_moment(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], sm["attrs"], MOT, MOUNTS)   # D-064 (2) · D-068: the endpoint metadata
         carried(r, L, fj, fj["endpoints"]["endpoint:" + r["id"]], W)      # D-055: what BY MOMENT carries of the code map, proven
-    EXD, ex_css, ex_js, ex_line, ex_icons = BENCH.bench(facts, rows, fj, W, X, PHASE_STAGE, WRITE_OPS)   # D-071: the examples bench (L-23)
+    EXD, ex_css, ex_js, ex_line, ex_icons = BENCH.bench(facts, rows, fj, W, X, PHASE_STAGE, WRITE_OPS, sweep=sweep)   # D-071: the examples bench (L-23) · S4-22: its lifted words swept too
     # D-055: the switch's words, and per code-map field, across the feed, how many endpoints leave it bright (whole, or in part)
     CW = W["carry"]
     if CW.get("pick") not in (CW.get("opts") or {}) or "ruled" in CW:
