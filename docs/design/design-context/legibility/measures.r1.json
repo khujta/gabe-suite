@@ -1,0 +1,183 @@
+{
+ "label": "after round 1 · 2ee6ab5",
+ "page": "docs/design/workflow-panel/all-endpoints.html",
+ "ep": "post-cooking-sessions",
+ "repeatAt": 5,
+ "viewport": "1920x1200",
+ "pageErrors": [],
+ "totals": {
+  "targets": 4206,
+  "items": 3585,
+  "nested": 621,
+  "titles": 45,
+  "repeatText": 291,
+  "repeatLine": 3580,
+  "pageTalk": 30
+ },
+ "perSection": {
+  "other": {
+   "targets": 220,
+   "items": 47,
+   "nested": 173,
+   "repeatLine": 203
+  },
+  "sec-board": {
+   "targets": 3137,
+   "items": 2998,
+   "nested": 139,
+   "repeatLine": 2977,
+   "repeatText": 196
+  },
+  "sec-one": {
+   "targets": 353,
+   "items": 117,
+   "nested": 236,
+   "titles": 45,
+   "repeatLine": 133,
+   "pageTalk": 24
+  },
+  "sec-ex": {
+   "targets": 117,
+   "items": 117,
+   "repeatText": 61,
+   "repeatLine": 61,
+   "pageTalk": 5
+  },
+  "sec-mo": {
+   "targets": 379,
+   "items": 306,
+   "nested": 73,
+   "repeatLine": 206,
+   "repeatText": 34,
+   "pageTalk": 1
+  }
+ },
+ "mo": {
+  "items": 190,
+  "twins": 1,
+  "bare": 50,
+  "bareByRow": {
+   "proof": 19,
+   "data": 14,
+   "client": 3,
+   "inf": 12,
+   "stage": 2
+  },
+  "midWord": 13,
+  "machineWords": 0,
+  "timeless": 0
+ },
+ "examples": {
+  "repeatText": [
+   [
+    15,
+    "Hide this moment; the bar keeps it, to bring it back."
+   ],
+   [
+    8,
+    "this endpoint · my pick\nThe elements of the endpoint the table has open."
+   ],
+   [
+    8,
+    "every endpoint\nEvery element of this kind on any endpoint. One that is not on the open endpoint is drawn as it is on the first endpoint that has it."
+   ],
+   [
+    8,
+    "parts\nOpens this group of controls; the others close."
+   ],
+   [
+    8,
+    "size\nOpens this group of controls; the others close."
+   ],
+   [
+    8,
+    "colour\nOpens this group of controls; the others close."
+   ]
+  ],
+  "repeatLine": [
+   [
+    278,
+    "Click to light these rows, again to clear."
+   ],
+   [
+    93,
+    "fate · its paths, by what becomes of the endpoint's own writes; the number is the paths that save"
+   ],
+   [
+    93,
+    "pieces · its pieces by how common each is in the app; the number is the rare ones plus the ones only it has"
+   ],
+   [
+    93,
+    "lacks · pieces nearly every endpoint carries that it does not"
+   ],
+   [
+    93,
+    "proven · endings a test proves on its own, of all its endings; a test whose status fits several endings proves none of them"
+   ],
+   [
+    93,
+    "alarms · anomalies the form check found"
+   ]
+  ],
+  "pageTalk": [
+   "An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name; a",
+   "Which attributes a universe row shows is my proposal, not a ruling. More information, at the end of the page, lists it row by row.",
+   "STATUS open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's produced[], returns[] and framework_exits[] (the end",
+   "STATUS open — The station's card would draw it from forms.json, where the code map reads it: each ending's phase in produced[] and framework_exits[]; a success ",
+   "STATUS open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's preconditions[], each with the ending it guards. my "
+  ],
+  "twins": [
+   [
+    2,
+    "start_session → cooking_sessions"
+   ]
+  ],
+  "bare": [
+   [
+    "proof",
+    "C2502 steps before"
+   ],
+   [
+    "proof",
+    "C10872 steps before"
+   ],
+   [
+    "proof",
+    "C5551 step before"
+   ],
+   [
+    "proof",
+    "C237proves400"
+   ],
+   [
+    "proof",
+    "C237proves409"
+   ],
+   [
+    "proof",
+    "C237proves400"
+   ],
+   [
+    "proof",
+    "C221proves404"
+   ],
+   [
+    "proof",
+    "C225proves404"
+   ]
+  ],
+  "midWord": [
+   "lidTokenErro|r",
+   "onNotFoundEr|ror",
+   "enConflictEr|ror",
+   "entCookCapEr|ror",
+   "eTokenVerifi|er.",
+   "etary_profil|e",
+   "cooking_phot|os",
+   "essionCreate|Request"
+  ],
+  "machineWords": [],
+  "timeless": []
+ }
+}

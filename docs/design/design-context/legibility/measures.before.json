@@ -1,0 +1,210 @@
+{
+ "label": "before · 6170519",
+ "page": "../../../../tmp/claude-1000/-home-khujta-projects-gabe-lens/857a7423-daf2-4043-a071-0da1feabdae5/scratchpad/before/all-endpoints.html",
+ "ep": "post-cooking-sessions",
+ "repeatAt": 5,
+ "viewport": "1920x1200",
+ "pageErrors": [],
+ "totals": {
+  "targets": 4359,
+  "items": 3374,
+  "nested": 985,
+  "titles": 169,
+  "repeatText": 677,
+  "repeatLine": 4216,
+  "pageTalk": 648
+ },
+ "perSection": {
+  "other": {
+   "targets": 222,
+   "items": 47,
+   "nested": 175,
+   "repeatLine": 218,
+   "repeatText": 2,
+   "pageTalk": 2
+  },
+  "sec-board": {
+   "targets": 3298,
+   "items": 2998,
+   "nested": 300,
+   "repeatLine": 3229,
+   "repeatText": 358,
+   "pageTalk": 167
+  },
+  "sec-one": {
+   "targets": 437,
+   "items": 117,
+   "nested": 320,
+   "titles": 45,
+   "repeatText": 163,
+   "repeatLine": 390,
+   "pageTalk": 287
+  },
+  "sec-mo": {
+   "targets": 402,
+   "items": 212,
+   "nested": 190,
+   "titles": 124,
+   "repeatText": 154,
+   "repeatLine": 379,
+   "pageTalk": 192
+  }
+ },
+ "mo": {
+  "items": 160,
+  "twins": 9,
+  "bare": 63,
+  "bareByRow": {
+   "proof": 28,
+   "gate": 13,
+   "data": 1,
+   "fn": 6,
+   "client": 3,
+   "std": 3,
+   "stage": 3,
+   "over": 6
+  },
+  "midWord": 12,
+  "machineWords": 9,
+  "timeless": 2
+ },
+ "examples": {
+  "repeatText": [
+   [
+    85,
+    "API endpoint · as the Gabe Universe draws its node\nThe glyph and the colour this kind of element wears in the Gabe Universe.\nThis is the node's look. The univer"
+   ],
+   [
+    61,
+    "Function ƒ · as the Gabe Universe draws its node\nThe glyph and the colour this kind of element wears in the Gabe Universe.\nThis is the node's look. The universe"
+   ],
+   [
+    34,
+    "method POST · method\ncreates — writes a new row\ncolour: as the Gabe Universe draws it · chip: as the Gabe Universe draws it"
+   ],
+   [
+    34,
+    "Model · as the Gabe Universe draws its node\nThe glyph and the colour this kind of element wears in the Gabe Universe.\nMy proposal: A table and its model class a"
+   ],
+   [
+    29,
+    "method GET · method\nreads — returns data, no write\ncolour: as the Gabe Universe draws it · chip: as the Gabe Universe draws it"
+   ],
+   [
+    27,
+    "refusal · kind of ending\nAn ending where the app's own code says no.\ncolour: as the table draws it · icon: as the endpoint lab draws it"
+   ]
+  ],
+  "repeatLine": [
+   [
+    410,
+    "Kinds of ending — The families a request's ending can belong to — success, refusal, framework, validation, uncaught. · rated 3 of 3 in the card's inventory"
+   ],
+   [
+    278,
+    "Click to light these rows, again to clear."
+   ],
+   [
+    202,
+    "The glyph and the colour this kind of element wears in the Gabe Universe."
+   ],
+   [
+    202,
+    "This is the node's look. The universe column copies the station's card, whose chips and entity faces use the card's own colours, so the same element can look di"
+   ],
+   [
+    164,
+    "In-flight values — The values alive only while a request runs, and the ones the server keeps between requests. · rated 2 of 3 in the card's inventory"
+   ],
+   [
+    164,
+    "How common this piece is — The count of other endpoints that use the same piece, so the odd one out is visible. · rated 2 of 3 in the card's inventory"
+   ]
+  ],
+  "pageTalk": [
+   "API endpoint · as the Gabe Universe draws its node",
+   "colour: as the Gabe Universe draws it · chip: as the Gabe Universe draws it",
+   "My proposal: The station draws an entity as the boundary round its pieces; where it names one (its panel, a search hit) it draws the entity glyph in that entity",
+   "API endpoint · as the Gabe Universe draws its node",
+   "colour: as the Gabe Universe draws it · chip: as the Gabe Universe draws it"
+  ],
+  "twins": [
+   [
+    2,
+    "429 · Endings"
+   ],
+   [
+    2,
+    "C237 · Proof"
+   ],
+   [
+    2,
+    "a journey not ordered · Proof · no moment"
+   ],
+   [
+    2,
+    "SessionCreateRequest · Structures"
+   ],
+   [
+    6,
+    "alarm · Overview and risk · no moment"
+   ]
+  ],
+  "bare": [
+   [
+    "proof",
+    "C2502 steps before"
+   ],
+   [
+    "proof",
+    "C10872 steps before"
+   ],
+   [
+    "proof",
+    "C5551 step before"
+   ],
+   [
+    "proof",
+    "C237proves400"
+   ],
+   [
+    "proof",
+    "C237proves409"
+   ],
+   [
+    "proof",
+    "C237proves400"
+   ],
+   [
+    "proof",
+    "C221proves404"
+   ],
+   [
+    "proof",
+    "C225proves404"
+   ]
+  ],
+  "midWord": [
+   "TokenVerifie|r.",
+   "essionRespon|se",
+   "essionCreate|Request",
+   "CookingSessi|onResponse ·",
+   "CookingPhoto|Ref",
+   "useStartCoo|king",
+   "RecipeBrows|eContainer",
+   "cookingSess|ionModel."
+  ],
+  "machineWords": [
+   "setting-oncerate_limit_active",
+   "setting-oncetrusted_proxy_hops",
+   "built-once_sensitive",
+   "setting-oncerate_limit_sensitive_per_minute",
+   "setting-oncerate_limit_window_seconds",
+   "built-once_global"
+  ],
+  "timeless": [
+   "no moment",
+   "Overview and risk"
+  ]
+ }
+}
