@@ -51,6 +51,7 @@
   }
  },
  "cut": {},
+ "unfilled": 2,
  "bench": {
   "midWord": 0
  },
@@ -74,6 +75,16 @@
   "timeless": 2
  },
  "examples": {
+  "unfilled": [
+   [
+    "hover",
+    "20 per 60 seconds, keyed f'{ip}:sensitive'"
+   ],
+   [
+    "hover",
+    "120 per 60 seconds, keyed f'{ip}:global'"
+   ]
+  ],
   "twinFaces": [
    [
     2,

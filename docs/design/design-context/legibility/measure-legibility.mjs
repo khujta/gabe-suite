@@ -12,6 +12,7 @@
      repeatLine   targets whose hover holds a line (>= 24 chars) that >= R targets repeat (a static tail on every hover)
      twins        pairs of items in one BY MOMENT cell whose hovers read the same
      twinFaces    pairs of items in one BY MOMENT cell whose FACES read the same (a reader must hover each)
+     unfilled     a {token} the page never filled, or undefined / NaN, on a face or in a hover
      cut          elements in BY MOMENT, the bench and ONE ENDPOINT that clip their own text (ellipsis / hidden overflow)
      pageTalk     hovers that talk about the page or the map, not the code (D-017)
      bare         BY MOMENT items that wear no glyph (no svg, no station mark) — an element without its identity
@@ -124,17 +125,25 @@ const M = await p.evaluate(({ R }) => {
       const rg = document.createRange(); rg.setStart(n, i); rg.setEnd(n, i + 1); const rc = rg.getClientRects()[0]; if (!rc) continue;
       if (prevTop !== null && Math.abs(rc.top - prevTop) > 3 && /[A-Za-z0-9]/.test(s[i - 1]) && /[A-Za-z0-9]/.test(s[i]) && !(/[a-z0-9]/.test(s[i - 1]) && /[A-Z]/.test(s[i]))) { midEx++; if (exMidEx.length < 6) exMidEx.push(s.slice(Math.max(0, i - 12), i) + '|' + s.slice(i, i + 12)); }
       prevTop = rc.top; } } }
+
+  /* UNFILLED words: a template the page never filled ({token}), or undefined / NaN, on a face or in a hover */
+  const UNF = /\bundefined\b|\bNaN\b|(?<!\/)\{[a-z]\w*\}/;   /* a {x} right after a slash is a URL path parameter, not an unfilled word */
+  let unfilled = 0; const exUnf = [];
+  const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let tn; while ((tn = tw.nextNode())) { const pe = tn.parentElement; if (!pe || pe.closest('script,style,#tip') || !vis(pe)) continue;
+    if (UNF.test(tn.nodeValue) && UNF.test(pe.textContent || '')) { unfilled++; if (exUnf.length < 6) exUnf.push(['face', tn.nodeValue.trim().slice(0, 80)]); } }
+  rec.forEach((r) => { if (r.txt && UNF.test(r.txt)) { unfilled++; if (exUnf.length < 10) exUnf.push(['hover', r.txt.split('\n').find((l) => UNF.test(l)).slice(0, 100)]); } });
   const tot = (k) => Object.values(per).reduce((a, s) => a + (s[k] || 0), 0);
   return {
     totals: { targets: tot('targets'), items: tot('items'), nested: tot('nested'), titles: tot('titles'), repeatText: tot('repeatText'),
       repeatLine: tot('repeatLine'), pageTalk: tot('pageTalk') },
     perSection: per,
-    cut, bench: { midWord: midEx },
+    cut, unfilled, bench: { midWord: midEx },
     mo: { items: moItems.length, twins: nTwins, twinFaces: nTwinF, bare: Object.values(bare).reduce((a, b) => a + b, 0), bareByRow: bare, midWord, machineWords: mach, timeless: timeless.length },
-    examples: { twinFaces: exTwinF, cut: exCut, benchMidWord: exMidEx, repeatText: exText, repeatLine: exLine, pageTalk: exTalk, twins, bare: exBare, midWord: exMid, machineWords: exMach, timeless },
+    examples: { unfilled: exUnf, twinFaces: exTwinF, cut: exCut, benchMidWord: exMidEx, repeatText: exText, repeatLine: exLine, pageTalk: exTalk, twins, bare: exBare, midWord: exMid, machineWords: exMach, timeless },
   };
 }, { R });
 await b.close();
 const out = { label: LABEL, page: path.relative(REPO, PAGE), ep: EP, repeatAt: R, viewport: '1920x1200', pageErrors: errs, ...M };
 if (OUT) { fs.mkdirSync(path.dirname(path.resolve(OUT)), { recursive: true }); fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n'); }
-console.log(JSON.stringify({ label: LABEL, totals: M.totals, mo: M.mo, cut: M.cut, bench: M.bench, pageErrors: errs.length }, null, 0));
+console.log(JSON.stringify({ label: LABEL, totals: M.totals, mo: M.mo, cut: M.cut, unfilled: M.unfilled, bench: M.bench, pageErrors: errs.length }, null, 0));

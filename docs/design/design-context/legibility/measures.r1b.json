@@ -1,0 +1,195 @@
+{
+ "label": "after round 1b · 6d5e9c5",
+ "page": "docs/design/workflow-panel/all-endpoints.html",
+ "ep": "post-cooking-sessions",
+ "repeatAt": 5,
+ "viewport": "1920x1200",
+ "pageErrors": [],
+ "totals": {
+  "targets": 4121,
+  "items": 3540,
+  "nested": 581,
+  "titles": 0,
+  "repeatText": 237,
+  "repeatLine": 3495,
+  "pageTalk": 30
+ },
+ "perSection": {
+  "other": {
+   "targets": 223,
+   "items": 47,
+   "nested": 176,
+   "repeatLine": 206
+  },
+  "sec-board": {
+   "targets": 3140,
+   "items": 2998,
+   "nested": 142,
+   "repeatLine": 2980,
+   "repeatText": 196
+  },
+  "sec-one": {
+   "targets": 355,
+   "items": 148,
+   "nested": 207,
+   "repeatLine": 139,
+   "repeatText": 15,
+   "pageTalk": 24
+  },
+  "sec-ex": {
+   "targets": 62,
+   "items": 62,
+   "repeatText": 5,
+   "repeatLine": 5,
+   "pageTalk": 5
+  },
+  "sec-mo": {
+   "targets": 341,
+   "items": 285,
+   "nested": 56,
+   "repeatLine": 165,
+   "repeatText": 21,
+   "pageTalk": 1
+  }
+ },
+ "cut": {},
+ "unfilled": 0,
+ "bench": {
+  "midWord": 0
+ },
+ "mo": {
+  "items": 163,
+  "twins": 2,
+  "twinFaces": 3,
+  "bare": 34,
+  "bareByRow": {
+   "data": 19,
+   "client": 3,
+   "inf": 12
+  },
+  "midWord": 0,
+  "machineWords": 0,
+  "timeless": 0
+ },
+ "examples": {
+  "unfilled": [],
+  "twinFaces": [
+   [
+    2,
+    "race500"
+   ],
+   [
+    3,
+    "✕"
+   ]
+  ],
+  "cut": [],
+  "benchMidWord": [],
+  "repeatText": [
+   [
+    16,
+    "Hide this moment; the bar keeps it, to bring it back."
+   ],
+   [
+    7,
+    "endings · every way a request can end\nadded up over the group's endpoints: each one's own, so nothing is counted twice"
+   ],
+   [
+    7,
+    "tables · tables it reads or writes\ndistinct across the group's endpoints: a thing several of them share is counted once"
+   ],
+   [
+    7,
+    "checks · checks in its own code that refuse the request\ndistinct across the group's endpoints: a thing several of them share is counted once"
+   ],
+   [
+    7,
+    "login · the login scheme it asks for\nendpoints in the group that have one"
+   ],
+   [
+    7,
+    "ok · success endings\nadded up over the group's endpoints: each one's own, so nothing is counted twice"
+   ]
+  ],
+  "repeatLine": [
+   [
+    284,
+    "Click to light these rows, again to clear."
+   ],
+   [
+    93,
+    "fate · its paths, by what becomes of the endpoint's own writes; the number is the paths that save"
+   ],
+   [
+    93,
+    "pieces · its pieces by how common each is in the app; the number is the rare ones plus the ones only it has"
+   ],
+   [
+    93,
+    "lacks · pieces nearly every endpoint carries that it does not"
+   ],
+   [
+    93,
+    "proven · endings a test proves on its own, of all its endings; a test whose status fits several endings proves none of them"
+   ],
+   [
+    93,
+    "alarms · anomalies the form check found"
+   ]
+  ],
+  "pageTalk": [
+   "Which attributes a universe row shows is my proposal, not a ruling. More information, at the end of the page, lists it row by row.",
+   "STATUS open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's produced[], returns[] and framework_exits[] (the end",
+   "STATUS open — The station's card would draw it from forms.json, where the code map reads it: each ending's phase in produced[] and framework_exits[]; a success ",
+   "STATUS open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's preconditions[], each with the ending it guards. my ",
+   "STATUS open — The station's card would draw it from forms.json, where the code map reads it: each ending of the endpoint's produced[], returns[] and framework_e"
+  ],
+  "twins": [
+   [
+    2,
+    "resolve_or_create_user → users"
+   ],
+   [
+    2,
+    "start_session → cooking_sessions"
+   ]
+  ],
+  "bare": [
+   [
+    "data",
+    "7 · in the map below"
+   ],
+   [
+    "data",
+    "14 · in the map belowrare · claims its key with get-or-creat"
+   ],
+   [
+    "data",
+    "1 · in the map below"
+   ],
+   [
+    "data",
+    "2 · in the map below"
+   ],
+   [
+    "data",
+    ""
+   ],
+   [
+    "data",
+    ""
+   ],
+   [
+    "data",
+    ""
+   ],
+   [
+    "data",
+    ""
+   ]
+  ],
+  "midWord": [],
+  "machineWords": [],
+  "timeless": []
+ }
+}
