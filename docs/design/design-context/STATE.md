@@ -1,94 +1,84 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-065). Updated 2026-09-30 · D-038 … D-065 built, on `graft-adoption` — 38 commits ahead
-of origin, **committed locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
+`decisions.md` (every ruling, D-001 … D-071). Updated 2026-10-01 · on `graft-adoption`, 63 commits ahead of origin, **committed
+locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
 
-Loop 1 is the API endpoint card. Its first half (inventory, questions, blocks, prisms, leftovers) is done and ruled. The
-display half moved onto ONE page: `../workflow-panel/all-endpoints.html` — every gustify endpoint (frozen feed, gustify @
-`05007957`), and for the endpoint you pick, three views of it plus BY MOMENT, the request laid out in time.
+Loop 1 is the API endpoint card. Its display half lives on ONE page, `../workflow-panel/all-endpoints.html` (gustify @
+`05007957`, frozen feed). On 2026-09-30 he read that page as a HUMAN and dictated 23 items of feedback (D-066): much that was clear
+to the model was not clear to him. Round 1 fixed them AND named the patterns behind them, so they can be carried into the Gabe Suite.
 
-Since 2026-09-23 the page grew fast (D-038 … D-065), and generation work re-opened narrowly INSIDE the suite to make the page
-truthful: the reach fix and its follow-ups (D-059, D-060), the center's dates counted when a page opens (D-061, D-062), under
-two proof regimes (D-063). Nothing reached a twin: every build read a read-only copy (D-023 holds).
+**Now: he reviews round 1 on `legibility/legibility-review.html`** — a generated decision page: his calls (the looks added this
+round, my picks dashed, real-click pictures), his 23 items, his questions answered, the L-19 gap analysis, the ten patterns with
+draft suite proposals, what is still on the page, and one copy button. His pasted REVIEW text is the next input.
 
-**Next:** he brings his feedback on `all-endpoints.html` as a HUMAN reader. Much that was clear to the model was not clear to
-him. The work is twofold — fix what he flags, and name the PATTERNS behind each flag, so they can later be carried into the
-Gabe Suite (checks, rules, references) and the next page avoids them. His words are quoted in the handoff and belong in
-decisions.md as D-066 when the work starts.
+## Round 1 — what happened (D-066 … D-071)
 
-## The all-endpoints page, top to bottom (for a cold reader)
-
-Build: `cd docs/design/workflow-panel && python3 gen-all-endpoints.py --forms ~/.cache/gabe-map-baselines/lab-input/forms.json`
-then `--check`. Probe: `node docs/design/workflow-panel/probe-all-endpoints.mjs` (≈3 min, browser — run it alone, under a
-lock). Walk (his pictures, real clicks): `node docs/design/workflow-panel/walk-all-endpoints.mjs` → `shots/all-endpoints/`.
-
-| section | what it shows | rulings |
+| step | what | where |
 |---|---|---|
-| THE ENDPOINTS | one row per endpoint, the eleven blocks as column groups, his defaults; the picked row pinned on top | D-034, D-038, D-039 |
-| ONE ENDPOINT | three columns: the Gabe Universe card · THE GAPS (two directions, a reason and a status per gap) · the code map (by the eleven blocks; endings in time order with their checks) | D-036, D-040 … D-044, D-052, D-053 |
-| — switches | each panel: show all · dim · hide what BY MOMENT carries; "copy the settings" | D-054, D-055, D-058 |
-| BY MOMENT | moments as columns (his default) × the blocks as rows; a path row of codes; cells as chips; the handler's moments named by function + except; journeys at the outer moments; a last "no moment" column of metadata | D-054 … D-057, D-061, D-062, D-064, D-065 |
-| not placed | only what should have a moment but the feed cannot place, with the reason | D-064 |
-| the copy text | every setting, then "your words:" — how he hands a configuration back | D-034, D-054 |
+| log | his 23 items logged BEFORE any fix: words, where, could-not-tell, fix, pattern tag, status | `legibility-feedback.md` (L-01 … L-23) |
+| build | hovers + row legend (D-067) · stage band, metadata section, column controls, row-head columns (D-068) · element identity: gate hosts and chains, function icons, client blocks, in-flight and specialist looks (D-069) · data map + lifelines (D-070) · the EXAMPLES bench with test and function blocks (D-071) | `3343b42` … `2ee6ab5` |
+| review | one read-only review, four lenses: 136 findings; his items 9 answered · 13 partly · L-19 not built | `legibility/review-r1.raw.json` |
+| fix | round 1b: 117 fixed · 13 partly · 4 left (the feed lacks the fact) · 2 his to rule; then a small pass (7 items) | `89d99e0` … `efe3725`, `legibility/fix-1b.json` |
+| measure | a prototype of the pattern checks, before · round 1 · after the small pass, on POST /cooking/sessions | `legibility/measure-legibility.mjs`, `measures.*.json` |
+| walk | repaired for D-067 … D-071 + a D-066 section of 116 real-click steps (pictures 294 … 409) | `3835fed` |
+| page | the review + patterns page, then a two-lens content review of it, fixed | `1ccb861` … `fa7f250` |
+
+Checks at the end: `probe-all-endpoints` 739/0 · the review page's smoke probe 23/23 · both `--check` current · the walk exits 0.
+
+## The patterns (draft — nothing lands in the suite before his "land it")
+
+Ten, in `legibility/patterns.json`, each with why it was clear to a model and not to him, the checks that measure it, and suite
+proposals with cost and counter-argument: P1 the hover describes the kind, not the item · P2 the page talks about itself · P3 an
+element without its identity · P4 one end of a relation · P5 structure hidden in a mark or mixed into an axis · P6 one thing, several
+names · P7 the code's spelling instead of its meaning · P8 a word or number that promises more than its rule · P9 no bench for one
+element · P10 a written rule with no check breaks on the next surface. The six check proposals share one tool, the audit A1
+(`measure-legibility.mjs` moved into `skills/gabe-artifact/tools/`). Evidence that rules alone do not hold: the review found the
+same patterns on the surfaces the agents had just built, and two merged lanes broke a shared word key no build check could see.
 
 ## Rules in force
 
 | rule | where |
 |---|---|
-| No propagation to the twins; pages read the frozen feed; a twin is only ever read through a read-only copy | D-023 |
-| Display is decided by seeing built options; generation comes first | D-025.1 |
-| A choice made alone is an option with the agent's pick DASHED | D-025.2 |
-| Facts are generated, never typed (numbers as `{tokens}` in the words files) | D-025.3 |
+| No propagation to the twins; pages read the frozen feed (the review page also reads gustify's source read-only, git grep at `05007957`, to place two functions — a deviation he may overrule) | D-023 |
+| Display is decided by seeing built options; a choice made alone is an option with the agent's pick dashed | D-025.1, D-025.2 |
+| Facts are generated, never typed — numbers in words are `{tokens}`; numbers in commit messages are measured first | D-025.3 |
 | A click path comes from a real-click walk | D-025.4 |
 | A ruling goes into `decisions.md` in the same commit that acts on it | D-025.5 |
-| Analysis, not diagnosis | D-025.6 |
+| He reviews on a generated decision page | D-025.8 |
 | Design pages are checked lightly: true numbers in the generator, `--check`, the probe once, one walk | D-037 |
-| Generation code: FULL proof for what the map says · LIGHTER for how it is shown | D-059, D-063 |
-| Non-actionable text sits behind an ⓘ beside the section title | D-038 |
 | Facts about the code are shown; how the map knows them is hidden | D-017 |
+| One hover per item, in before · checks · gives; a kind's meaning lives in the row's legend | D-067 |
 | Every element named wears the station's glyph and colour, its subcategory as a label at the end | D-052 |
-| Hovers: very short on a control, richer on an element | D-009 |
-| Regions: COMMAND concepts · MIDDLE specifics · PORTRAIT detail | D-008 |
-| One stage spine for every endpoint; the moments are its inner grain | D-001, D-054 |
-| The kinds of ending are fixed slots, drawn even when empty | D-012 |
-| One kind at a time; the lab is the API endpoint kind only | D-029 |
-| Artifacts start finished, and are centred | D-004, D-005 |
 
-## Open for you — what to LOOK at
+## Open for you — on the review page
 
-1. **The wider BY MOMENT table** (D-064): the "no moment" column pushes 30 of 80 endpoints into a sideways scroll at 1920 px
-   (was 16). Keep it · a narrower column with details in hovers · a row under the table.
-2. **Rules the agents added and you have not ruled** (D-064, all shown as fact): a call inside an `except` stands only on the
-   paths that enter it · a path landing in the handler's `except` with no evidence of the source counts as leaving partway ·
-   an except-body call on the way to a 500 is labelled so.
-3. **Which line a handler shows**: the decorator line (`cooking.py:114`, as the code map shows) and "def at line 119" both
-   stand today.
-4. **Accepted without you** (D-062): a report that read "never" gets one NEW badge the first time it is counted.
-5. **Older opens from 2026-09-23, still standing**: the lab's simpler section map and its By-stage switch (D-035) · "the four
-   standpoints" (all nine blocks stand unless you meant four) · the lab's navigation picks · the all-endpoints page's own
-   picks (D-034) · which face M3 starts from · the command layout and its two conflicts · the five click obstacles of
-   2026-09-21 · the per-arm acceptance sheet (`../element-forms/goldens/acceptance.html`).
+1. **The looks added this round** (29 choices on the page): pick or keep each; my picks are dashed.
+2. **Four proposals**: rename his "screen" column to "sends it" · L-19 — a Security control over the rows (G1, my pick), a ninth
+   row (G2), or nothing new (G3) · open BY MOMENT fitted when it overflows · EX-5, the bench's looks into BY MOMENT's chips.
+3. **The ten patterns' suite proposals**: land it · not yet · change it, each. My pick is "land it" where the pattern is still open.
+4. **Older opens, still standing** (from the previous STATE): the agent-added rules of D-064, which handler line a handler shows,
+   the 2026-09-23 opens (D-035's section map, the four standpoints, the lab's picks, M3's first face, the command layout).
 
 ## Generation items open (suite code; each needs its regime, D-063)
 
-Router tags (`APIRouter(tags=…)`) are in no feed · a call inside another call's arguments is recorded after the call it runs
-before (`concurrent_cook_cap_for_tier` in `start_session(...)`) · relief-accept's error paths list every step of the
-handler · the web/e2e journeys need the tests arm to read the Playwright reports · a re-export two hops deep is not followed ·
-the universe card's Source shows the file's length, not the handler line · gustify's baseline waits for its twin to settle
-(it moved to `fd4573f8`); gastify's is another session's.
+Router tags · a call inside another call's arguments recorded after it · relief-accept's error paths · the web/e2e journeys (the
+tests arm reading Playwright reports) · a re-export two hops deep · the universe card's Source line. New from round 1 (all feed
+gaps the page now states as "not recorded"): a raise inside an `except` joined to its outer `if` · `start_session`'s raise at :129
+and `assert_recipe_allergen_safe`'s raise not joined to their endings · a fall-through branch's does[] · via-hop function names ·
+a step's condition text · a call's end line · three real writes whose model the feed did not resolve · gustify's code map not
+reading `middleware/`, `reference/`, `i18n/`, `net/`, `streaming/` (why ~87 functions have no role) · the CORS origins and the
+secrets a path reads (settings{} has them, unjoined).
 
 ## Next, in order
 
-1. **His human-reader feedback on all-endpoints.html** — each item fixed AND logged with the pattern behind it (the handoff
-   of 2026-09-30 carries the method); record his ask as D-066.
-2. **M3**: the channel budget for the first prism.
-3. **The gallery**: 3–5 variants of the card at true size, one fader each, judged by seeing. Then the tests, and promote.
+1. **His REVIEW text** for round 1 → act on each line (a ruling = a D-entry in the same commit); "my pick, not ruled" is never a ruling.
+2. **The patterns into the Gabe Suite** — only the proposals he marks "land it", as a draft first (iterate-before-implement).
+3. **M3** (the channel budget for the first prism), then **the gallery**.
+4. Generation items above, each under its D-063 regime.
 
-Later: carry the legibility patterns into the Gabe Suite (his ask; iterate-before-implement — a draft he approves with "land
-it") · the twins' code-vs-map COVERAGE AUDIT (D-059) — running in a parallel session, its files under
-`coverage/` are that session's · piece 9 (D-016) · 12b, the second round of in-flight detectors (D-019) · the robot for every
-kind (`workflow-panel/robot-brief.md`) · the "more information" toggle (D-017) · pages for the blocks with none yet (D-022) ·
-the parked WORLD region (D-031) · `pieces-digest.json` is stale against the cache.
+Later: the twins' code-vs-map COVERAGE AUDIT (a parallel session; its files under `coverage/` are that session's — never touch) ·
+piece 9 (D-016) · 12b (D-019) · the robot for every kind · the "more information" toggle (D-017) · pages for the blocks with none
+yet (D-022) · the parked WORLD region (D-031) · `pieces-digest.json` is stale against the cache.
