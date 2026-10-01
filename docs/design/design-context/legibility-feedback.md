@@ -350,3 +350,37 @@ deferred + trigger).
   a scope switch, role chips and a select, the block, then parts (drag · not drawn) · size · colour · back to the default · copy.
 - **tag:** `no-bench-for-one-element`
 - **status:** built (D-071)
+
+---
+
+Round 2 — source: his message of 2026-10-01 after reading `legibility/legibility-review.html` (the round-1 review page) as a human.
+
+### L-24
+- **words:** "I have been looking at the page. It's very dense. We can use more width to better accommodate the tables. There are some
+  rows that might benefit from this and end up in one row only. The status column, for example, in the first table on the What
+  Round 1B Left, is using two rows. It can change to just one."
+- **where:** the review page · every table · first seen on "What round 1b left", its first table's status column
+- **could not tell:** a row at a glance — short values (a status, a count) wrap onto a second line in a column narrower than they
+  need, while the page leaves width unused at the sides.
+- **fix:** the page uses more of the screen's width; a short-value column never wraps; one row reads as one line.
+- **tag:** `short-values-wrapped`
+- **status:** logged
+
+### L-25
+- **words:** "Can we also use more encoding using icons and summarize things?"
+- **where:** the review page · every section
+- **could not tell:** where a section stands without reading it all — states and kinds are written out as words, and nothing sums a
+  section up before its tables.
+- **fix:** states, kinds and patterns wear icons (with one legend); each section opens with what it sums up to.
+- **tag:** `words-where-a-mark-would-do`
+- **status:** logged
+
+### L-26
+- **words:** "At the beginning of each set of tables, I would like a summary that I can copy and paste and read out loud in a chat that
+  I have dedicated to reading out loud your messages."
+- **where:** the review page · the start of every section
+- **could not tell:** the page by ear — there was no text written to be read aloud: ids, file paths and symbols read badly when spoken.
+- **fix:** each section opens with a spoken summary (plain words, no ids, paths or symbols) and a copy button; one button copies all of
+  them in order.
+- **tag:** `no-spoken-channel`
+- **status:** logged
