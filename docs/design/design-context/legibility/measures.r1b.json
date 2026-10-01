@@ -1,17 +1,17 @@
 {
- "label": "after round 1b · 6d5e9c5",
+ "label": "after round 1b small pass · efe3725",
  "page": "docs/design/workflow-panel/all-endpoints.html",
  "ep": "post-cooking-sessions",
  "repeatAt": 5,
  "viewport": "1920x1200",
  "pageErrors": [],
  "totals": {
-  "targets": 4121,
-  "items": 3540,
+  "targets": 4119,
+  "items": 3538,
   "nested": 581,
   "titles": 0,
   "repeatText": 237,
-  "repeatLine": 3495,
+  "repeatLine": 2703,
   "pageTalk": 30
  },
  "perSection": {
@@ -19,20 +19,20 @@
    "targets": 223,
    "items": 47,
    "nested": 176,
-   "repeatLine": 206
+   "repeatLine": 178
   },
   "sec-board": {
    "targets": 3140,
    "items": 2998,
    "nested": 142,
-   "repeatLine": 2980,
+   "repeatLine": 2251,
    "repeatText": 196
   },
   "sec-one": {
    "targets": 355,
    "items": 148,
    "nested": 207,
-   "repeatLine": 139,
+   "repeatLine": 111,
    "repeatText": 15,
    "pageTalk": 24
   },
@@ -44,10 +44,10 @@
    "pageTalk": 5
   },
   "sec-mo": {
-   "targets": 341,
-   "items": 285,
+   "targets": 339,
+   "items": 283,
    "nested": 56,
-   "repeatLine": 165,
+   "repeatLine": 158,
    "repeatText": 21,
    "pageTalk": 1
   }
@@ -58,12 +58,12 @@
   "midWord": 0
  },
  "mo": {
-  "items": 163,
-  "twins": 2,
-  "twinFaces": 3,
-  "bare": 34,
+  "items": 161,
+  "twins": 0,
+  "twinFaces": 2,
+  "bare": 32,
   "bareByRow": {
-   "data": 19,
+   "data": 17,
    "client": 3,
    "inf": 12
   },
@@ -74,10 +74,6 @@
  "examples": {
   "unfilled": [],
   "twinFaces": [
-   [
-    2,
-    "race500"
-   ],
    [
     3,
     "✕"
@@ -117,24 +113,24 @@
     "Click to light these rows, again to clear."
    ],
    [
-    93,
-    "fate · its paths, by what becomes of the endpoint's own writes; the number is the paths that save"
+    84,
+    "added up over the group's endpoints: each one's own, so nothing is counted twice"
    ],
    [
-    93,
-    "pieces · its pieces by how common each is in the app; the number is the rare ones plus the ones only it has"
+    84,
+    "distinct across the group's endpoints: a thing several of them share is counted once"
    ],
    [
-    93,
-    "lacks · pieces nearly every endpoint carries that it does not"
+    81,
+    "0 — Zero, because it carries every piece that is the norm."
    ],
    [
-    93,
-    "proven · endings a test proves on its own, of all its endings; a test whose status fits several endings proves none of them"
+    74,
+    "0 — Zero, because no screen reads why it refused."
    ],
    [
-    93,
-    "alarms · anomalies the form check found"
+    66,
+    "Click to sort by this column, again to reverse."
    ]
   ],
   "pageTalk": [
@@ -144,16 +140,7 @@
    "STATUS open — The station's card would draw it from forms.json, where the code map reads it: the endpoint's preconditions[], each with the ending it guards. my ",
    "STATUS open — The station's card would draw it from forms.json, where the code map reads it: each ending of the endpoint's produced[], returns[] and framework_e"
   ],
-  "twins": [
-   [
-    2,
-    "resolve_or_create_user → users"
-   ],
-   [
-    2,
-    "start_session → cooking_sessions"
-   ]
-  ],
+  "twins": [],
   "bare": [
    [
     "data",
