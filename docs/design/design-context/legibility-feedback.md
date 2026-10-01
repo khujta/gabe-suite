@@ -281,7 +281,7 @@ deferred + trigger).
 - **could not tell:** that the page and the lab name one set of things two ways.
 - **fix:** a gap analysis between the two sets, on a generated page.
 - **tag:** `two-vocabularies-for-one-thing`
-- **status:** logged (analysis)
+- **status:** question — answered on the review page (the gap analysis, D-066)
 
 ### L-20
 - **words:** "in the top row the one that comes from the table where we have all the endpoints we have some sections that we

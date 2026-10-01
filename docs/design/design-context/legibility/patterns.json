@@ -1,5 +1,5 @@
 {
-  "_about": "D-066 — the patterns behind his human-reader feedback, round 1. AUTHORED: the grouping, the names, the reasons and the suite proposals (all DRAFT — nothing lands in the suite before his 'land it'). GENERATED elsewhere, never typed here: how many of his items and of the review's findings each pattern holds (from legibility-feedback.md tags and review-r1.raw.json 'pattern' fields through the two maps below), and the before / after numbers of each check (measures.*.json). A reviewer tag missing from reviewTagMap stops the page's build.",
+  "_about": "D-066 — the patterns behind his human-reader feedback, round 1. AUTHORED: the grouping, the names, the reasons and the suite proposals with what each costs and what speaks against it, and the audit (A1) the check proposals share (all DRAFT — nothing lands in the suite before his 'land it'). GENERATED elsewhere, never typed here: how many of his items and of the review's findings each pattern holds (from legibility-feedback.md tags and review-r1.raw.json 'pattern' fields through the two maps below), and the before / after numbers of each check (measures.*.json). A reviewer tag missing from reviewTagMap stops the page's build.",
   "patterns": [
     {
       "id": "P1",
@@ -17,15 +17,26 @@
       "suite": [
         {
           "kind": "check",
-          "target": "skills/gabe-artifact (render gate) + a generic legibility audit script",
+          "target": "the legibility audit (A1)",
           "what": "Report nested hover targets, a hover line repeated on many items (a legend candidate), and two items in one cell or list whose hovers or faces read the same.",
-          "size": "script"
+          "checks": [
+            "nested",
+            "repeatLine",
+            "twins",
+            "twinFaces"
+          ],
+          "partOf": "A1",
+          "lands": "three counts in the audit — hovers inside a hover, a line many hovers repeat, twins in one cell — each with a case that fires and a case that stays silent in its battery",
+          "gate": "It reports; it stops nothing.",
+          "against": "A line many hovers repeat is sometimes right, a legend line for instance, so each flag needs a look before a fix; on all-endpoints it starts with a long list."
         },
         {
           "kind": "words",
-          "target": "skills/gabe-lens (plain) + skills/gabe-artifact reference",
+          "target": "skills/gabe-lens (plain) + the gabe-artifact rules",
           "what": "A hover opens with what makes THIS item itself, in before · checks · gives order. What a kind means lives once, in a legend.",
-          "size": "reference"
+          "lands": "skills/gabe-lens/references/lens-spec.md (the plain mode) and skills/gabe-artifact/SKILL.md, one rule each",
+          "gate": "Words only: nothing runs.",
+          "against": "A rule in words alone; P10 says such a rule breaks on the next surface unless a check stands behind it (P1.1)."
         }
       ]
     },
@@ -41,15 +52,23 @@
       "suite": [
         {
           "kind": "check",
-          "target": "the legibility audit script + each page generator's words sweep",
+          "target": "the legibility audit (A1) + the words sweep of each page generator (gen-all-endpoints.py, gen-legibility-review.mjs)",
           "what": "Stop words about the page or the map (as the table draws it, found by, the map does not, my proposal outside an option) in hovers and faces.",
-          "size": "script"
+          "checks": [
+            "pageTalk"
+          ],
+          "partOf": "A1",
+          "lands": "a count of hovers about the page in the audit, and a stop-list in each generator's words sweep",
+          "gate": "The audit reports; the words sweep stops the build.",
+          "against": "Some panels are about the map on purpose (THE GAPS, R-07); the stop-list needs a way to mark them, or it stops a page you want."
         },
         {
           "kind": "reference",
-          "target": "skills/gabe-artifact reference (and later the execution contract)",
+          "target": "the gabe-artifact rules (and later the execution contract)",
           "what": "State D-017 for every generated page: what the code does is shown; how the map knows it is not.",
-          "size": "reference"
+          "lands": "skills/gabe-artifact/SKILL.md, one rule; later skills/gabe-docs/references/execution-contract.md",
+          "gate": "Words only: nothing runs.",
+          "against": "Alone it is a rule in words; it holds only with the check of P2.1 behind it."
         }
       ]
     },
@@ -65,15 +84,26 @@
       "suite": [
         {
           "kind": "check",
-          "target": "the legibility audit script",
-          "what": "Every item in a row of elements wears an icon: the station's, or a page mark that the legend declares.",
-          "size": "script"
+          "target": "the legibility audit (A1)",
+          "what": "Every item in a row of elements wears an icon: the station's, or a page mark that the legend declares. Gates follow what you rule for gate icons: if you rule no icon, gates are left out of the count.",
+          "checks": [
+            "bare"
+          ],
+          "partOf": "A1",
+          "waitsOn": [
+            "mo.gic"
+          ],
+          "lands": "a count of bare items in the audit, with its two battery cases",
+          "gate": "It reports; it stops nothing.",
+          "against": "An icon on every item can crowd a dense row; the count says where an icon is missing, not whether the row needs one."
         },
         {
           "kind": "reference",
-          "target": "skills/gabe-artifact reference + the station conventions",
+          "target": "the gabe-artifact rules + the station conventions",
           "what": "A kind the station does not draw gets a page mark, never a plain word; one kind, one look, on every surface of a page.",
-          "size": "reference"
+          "lands": "skills/gabe-artifact/SKILL.md, one rule",
+          "gate": "Words only: nothing runs.",
+          "against": "A page mark for every kind grows the legend; on a small page that is more to learn than the bare word."
         }
       ]
     },
@@ -87,15 +117,19 @@
       "suite": [
         {
           "kind": "check",
-          "target": "each page generator (a build check)",
+          "target": "each page generator, as a build check (gen-all-endpoints.py, gen-legibility-review.mjs)",
           "what": "An element whose record joins two things draws both ends, or its hover names the other end.",
-          "size": "generator"
+          "lands": "a check in the build of each generator, beside its words sweep",
+          "gate": "It stops the build.",
+          "against": "The generator must say which records join two things; a join it does not list stays unchecked."
         },
         {
           "kind": "words",
           "target": "skills/gabe-lens (plain)",
           "what": "A role word needs its object: a fetcher OF what, a check IN which function, a branch ON which ending.",
-          "size": "reference"
+          "lands": "skills/gabe-lens/references/lens-spec.md, one rule in the plain mode",
+          "gate": "Words only: nothing runs.",
+          "against": "Words only; no check stands behind it."
         }
       ]
     },
@@ -114,36 +148,53 @@
         {
           "kind": "check",
           "target": "skills/gabe-artifact (render gate)",
-          "what": "No word broken between two letters (camel humps, _ . / allowed); no text clipped; a timeline's heads are all moments; a grid's heads stay in view while it scrolls.",
-          "size": "script"
+          "what": "No word broken between two letters (camel humps, _ . / allowed); no text clipped, a closed selector's text included; a timeline's heads are all moments; a grid's heads do what you rule for the heads, scrolled.",
+          "checks": [
+            "midWord",
+            "cut",
+            "timeless"
+          ],
+          "waitsOn": [
+            "mo.stk"
+          ],
+          "lands": "skills/gabe-artifact/tools/verify-artifact-chrome.mjs grows by these checks, and tests/artifact-chrome by a case for each",
+          "gate": "It fails the render gate, which runs before a publish.",
+          "against": "A gate that fails on a cut word holds back a page you may want published as it is; today it would fail all-endpoints on its bench selectors (R-10)."
         },
         {
           "kind": "reference",
-          "target": "skills/gabe-artifact reference",
+          "target": "the gabe-artifact rules",
           "what": "A mark carries a visible key; a number carries its noun; an axis holds one kind of thing.",
-          "size": "reference"
+          "lands": "skills/gabe-artifact/SKILL.md, one rule",
+          "gate": "Words only: nothing runs.",
+          "against": "Words only; P5.1 is the check behind it."
         }
       ]
     },
     {
       "id": "P6",
       "name": "One thing, several names (and one name, several things)",
-      "line": "deciders · deciding functions · nothing; screen · what sends it · the screen sends it; request as a kind and as a lifetime. Every member he missed was drawn — under another name.",
+      "line": "The same thing went by several names: deciders, deciding functions, or no name at all; the screen, what sends it, the screen sends it. One word, request, stood for a kind and for a lifetime. Every member he missed was drawn, under another name.",
       "whyModel": "The model holds all the vocabularies and the key that joins them, so three names for one thing still resolve.",
       "whyHuman": "A person matches by words. A second name reads as a second thing; one word for two things reads as one.",
       "checks": [],
       "suite": [
         {
           "kind": "check",
-          "target": "the legibility audit script (words file) + each page generator",
+          "target": "the legibility audit (A1), reading each page's words file",
           "what": "One display word per concept across a page's views; two concepts never share a display word on one page.",
-          "size": "script"
+          "partOf": "A1",
+          "lands": "a count in the audit that reads a page's words file for one display word on two concepts, or two on one",
+          "gate": "It reports; it stops nothing.",
+          "against": "Telling two concepts apart from their words alone is a guess; it will flag words that only look alike, and each flag needs your look."
         },
         {
           "kind": "reference",
           "target": "the Gabe register + skills/gabe-docs",
           "what": "Extend 'one term per concept' from prose to the words a page shows.",
-          "size": "reference"
+          "lands": ".claude/output-styles/gabe.md and skills/gabe-docs/references/docs-spec.md, one line each",
+          "gate": "Words only: nothing runs.",
+          "against": "The register is a trial in this repo; a rule there reaches no other project yet."
         }
       ]
     },
@@ -159,15 +210,23 @@
       "suite": [
         {
           "kind": "check",
-          "target": "the legibility audit script",
+          "target": "the legibility audit (A1)",
           "what": "Faces and hovers never show a raw feed id, a library error id or a source expression as a value.",
-          "size": "script"
+          "checks": [
+            "machineWords"
+          ],
+          "partOf": "A1",
+          "lands": "a count of raw feed words on faces and hovers in the audit",
+          "gate": "It reports; it stops nothing.",
+          "against": "A raw word is sometimes the only name there is; the count needs a list of the names you want to keep."
         },
         {
           "kind": "words",
           "target": "skills/gabe-lens (plain)",
           "what": "The meaning first, in words; the code last, as written.",
-          "size": "reference"
+          "lands": "skills/gabe-lens/references/lens-spec.md, one rule",
+          "gate": "Words only: nothing runs.",
+          "against": "Words only; P7.1 is the check behind it."
         }
       ]
     },
@@ -181,15 +240,19 @@
       "suite": [
         {
           "kind": "check",
-          "target": "each page generator (a build check)",
-          "what": "A count's label comes from the same definition that computes it; unknown is never drawn as none (the suite's state words: present · absent · not read).",
-          "size": "generator"
+          "target": "each page generator, as a build check (gen-all-endpoints.py, gen-legibility-review.mjs)",
+          "what": "A count's label comes from the same definition that computes it; unknown is never drawn as none. The state words: unknown · absent · beyond one level, where a bare 0 or [] stood (the element-forms state-word sweep, docs/design/element-forms/review-a4.md, fix 6).",
+          "lands": "a check in the build of each generator",
+          "gate": "It stops the build.",
+          "against": "The check can hold a label to its rule only where the generator states both; a label typed into a template stays unchecked."
         },
         {
           "kind": "reference",
-          "target": "skills/gabe-docs (execution contract, the state words)",
-          "what": "The forms state-word law (unknown · absent · beyond one level, never a bare 0 or []) extended to generated pages.",
-          "size": "reference"
+          "target": "skills/gabe-docs (execution contract)",
+          "what": "The same state words — unknown · absent · beyond one level, where a bare 0 or [] stood (docs/design/element-forms/review-a4.md, fix 6) — carried from the forms feed to generated pages.",
+          "lands": "skills/gabe-docs/references/execution-contract.md, one clause",
+          "gate": "Words only: nothing runs.",
+          "against": "A clause in the execution contract reaches every skill at once, so its wording needs a review of its own."
         }
       ]
     },
@@ -203,9 +266,11 @@
       "suite": [
         {
           "kind": "method",
-          "target": "docs/design/design-context/method.md",
+          "target": "skills/gabe-mockup (the spike step) + docs/design/design-context/method.md",
           "what": "A bench step — one element per column, its parts and its controls — before a dense view of many.",
-          "size": "doc"
+          "lands": "skills/gabe-mockup/references/spike.md gains a bench step, and the method note here says it too",
+          "gate": "A step to follow: nothing runs.",
+          "against": "A bench costs a page of its own before the dense view; for an element whose look is already settled it is a detour."
         }
       ]
     },
@@ -219,15 +284,20 @@
       "suite": [
         {
           "kind": "check",
-          "target": "each page generator + the legibility audit",
+          "target": "each page generator (gen-all-endpoints.py, gen-legibility-review.mjs) + the legibility audit (A1)",
           "what": "Every standing rule of a generated page gets a check on a rail that already runs (the build, the probe, the commit gate): an option is in the copy text, a pick is marked, a lifted string goes through the words sweep, text keeps the floor.",
-          "size": "generator"
+          "partOf": "A1",
+          "lands": "checks in the build and the probe of each generator, and in the audit",
+          "gate": "The build checks stop the build; the audit reports.",
+          "against": "A check per rule grows each generator; a rule that is cheap to keep by eye may not be worth its check."
         },
         {
           "kind": "reference",
           "target": "skills/gabe-docs (execution contract)",
           "what": "A page rule without a check is not a rule: when a rule is written, its check is named in the same change.",
-          "size": "reference"
+          "lands": "skills/gabe-docs/references/execution-contract.md, one clause",
+          "gate": "Words only: nothing runs.",
+          "against": "The clause is itself a rule in words; it holds only if a review asks for the check."
         }
       ]
     }
@@ -383,5 +453,14 @@
     "typed ordinal in code": "P10",
     "unruled drawn as ruled": "P10",
     "zero-based-index-shown-as-ordinal": "P8"
+  },
+  "audit": {
+    "id": "A1",
+    "name": "The legibility audit: measure-legibility.mjs moved into the suite",
+    "what": "One script opens a generated page in a browser and counts each kind of defect this round found. Today it is a prototype in this folder, run by hand on all-endpoints. Landed, it takes any page, and the check proposals marked part of A1 become its counts.",
+    "lands": "skills/gabe-artifact/tools/legibility-audit.mjs, moved from docs/design/design-context/legibility/measure-legibility.mjs, and a new battery, tests/legibility-audit/run.sh, that proves each count can fire and stay silent",
+    "gate": "It reports; it stops nothing.",
+    "battery": "suite-doctor gains one more battery that opens a browser, so its run grows.",
+    "against": "It reads one page at one width; a defect that shows on another endpoint or at another width stays unseen. Its first run on all-endpoints is a long list of work, not a pass."
   }
 }

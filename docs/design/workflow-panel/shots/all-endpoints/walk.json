@@ -6704,7 +6704,7 @@
   {
    "n": 337,
    "file": "337-d066-gate-icons-one.png",
-   "item": "L-11",
+   "item": "L-09",
    "option": "gic",
    "value": "one",
    "size": [
@@ -6720,7 +6720,7 @@
   {
    "n": 338,
    "file": "338-d066-gate-icons-none.png",
-   "item": "L-11",
+   "item": "L-09",
    "option": "gic",
    "value": "none",
    "size": [
@@ -6736,7 +6736,7 @@
   {
    "n": 339,
    "file": "339-d066-gic-back-to-each.png",
-   "item": "L-11",
+   "item": "L-09",
    "option": "gic",
    "value": "each",
    "size": [

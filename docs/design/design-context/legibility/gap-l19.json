@@ -51,13 +51,13 @@
     ["the ordered chain per ending", "drawn only as BY MOMENT's axis"],
     ["events published", "drawn nowhere (would lose its home with Standard or specialist)"],
     ["tasks dispatched", "drawn nowhere (would lose its home with Standard or specialist)"],
-    ["outside services called", "lands in metadata — it is an effect that can fail and cost, so data and effects fits better"],
-    ["coverage per condition", "lands in metadata — the per-ending marks belong in proof"]
+    ["outside services called", "lands in the endpoint metadata — it is an effect that can fail and cost, so Data effects fits better"],
+    ["coverage per condition", "lands in the endpoint metadata — the per-ending marks belong in Proof"]
   ],
   "recommend": [
-    { "id": "G1", "pick": true, "name": "No ninth row: a Security lens over the rows", "what": "Home the security facts in Gates and decisions (the middleware and the two switches move there), and add one control that lights every security element across the rows — the login check, the 401 and 429 endings, the limiters, the users row the login adds, a function that reads a secret. It is lit by his ruled per-stage security lines (STAGE_EXPECT.security). Two facts are read from the feed's settings to fill the gaps: the secrets read on the path, and the CORS allowed origins." },
+    { "id": "G1", "pick": true, "name": "No ninth row: a Security control over the rows", "what": "Home the security facts in Gates and decisions (the middleware and the two switches move there), and add one control that lights every security element across the rows — the login check, the 401 and 429 endings, the limiters, the users row the login adds, a function that reads a secret. It lights what you ruled as security for each stage. Two facts are read from the feed's settings to fill the gaps: the secrets read on the path, and the CORS allowed origins.", "cost": "Its cost: one control to build; the three app-wide middleware and the two switches move into Gates and decisions, so that row grows by those five items on this endpoint; two facts are newly read from the feed's settings." },
     { "id": "G2", "pick": false, "name": "A ninth row, Security", "what": "A row of its own; it would repeat or tear out the 401 and 429 endings, the in-flight limiters and the users row from their own rows." },
-    { "id": "G3", "pick": false, "name": "Nothing new: everything into Gates and decisions", "what": "The ruled pairing as it stands, without a lens; the two missing facts stay missing." }
+    { "id": "G3", "pick": false, "name": "Nothing new: everything into Gates and decisions", "what": "The ruled pairing as it stands, without a Security control; the two missing facts stay missing." }
   ],
   "alsoFound": [
     "The lab's own Security part says 'none — a retry runs the work again' for this endpoint's idempotency, which is wrong: it looks for a table named idempotency_keys instead of reading the feed's repeat block.",

@@ -1048,7 +1048,7 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
   await press('open-the-gates-row-options', HEAD('gate') + ' .mro', ['L-09 L-10 L-11'], S.el([HEAD('gate') + ' .mbh', HEAD('gate') + ' .mrop']));
   const GOPT = [['gdl', 'chain', 'gates-look-a-one-chain-per-gate', 'L-09 L-10'], ['gdl', 'cols', 'gates-look-c-side-by-side', 'L-09 L-10'], ['gdl', 'head', null, 'L-09 L-10'],
     ['gef', 'stage', 'effect-e2-a-colour-per-stage', 'L-10'], ['gef', 'end', null, 'L-10'],
-    ['gic', 'one', 'gate-icons-one', 'L-11'], ['gic', 'none', 'gate-icons-none', 'L-11'], ['gic', 'each', null, 'L-11'],
+    ['gic', 'one', 'gate-icons-one', 'L-09'], ['gic', 'none', 'gate-icons-none', 'L-09'], ['gic', 'each', null, 'L-09'],
     ['grl', 'what', 'gate-roles-r1-what-it-does', 'L-11'], ['grl', 'guards', 'gate-roles-r3-what-it-guards', 'L-11'], ['grl', 'off', 'gate-roles-off', 'L-11'], ['grl', 'where', null, 'L-11']];
   for (const [g, v, nm, it] of GOPT) await press(nm || (g + '-back-to-' + v), rsq('gate', g, v), [it, g, v], nm ? S.row([ROW('gate')]) : S.el([rgrp('gate', g)]));
   /* L-18: Standard or specialist — M1 split into the gates (my pick), M2 merged into them, M3 kept as its row */
