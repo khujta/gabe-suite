@@ -1,6 +1,10 @@
 {
   "_about": "Authored words for all-endpoints.html — the only strings on the page that are not facts. gen-all-endpoints.py refuses to build when a line here types a number (a {token} the generator or the page fills instead) or says a word D-018 took out. Tokens the generator fills are listed in its `tok`; the ones the page fills while it runs are listed in _runtime.",
   "_runtime": [
+    "b",
+    "f",
+    "t",
+    "was",
     "cat",
     "h",
     "env",
@@ -339,13 +343,27 @@
     "name": "Shared",
     "plain": "Attributes needed by {nShare} or more of the card's blocks. The ruled tree homes them in none of those blocks, so they stand in a group of their own."
   },
+  "terms": {
+    "_about": "Review r1, lane F1b: ONE word per concept. gen-all-endpoints.py (terms, TERM_OF) writes these into every key a BY MOMENT surface reads — a gate kind's name in the row legend, on its icon, as an element's kind and as its column head; a value's lifetime on its chip, its hover, its lane's end and the legend — and stops the build when a surface says the concept another way. The examples bench reads these same keys.",
+    "gate": { "check": "check", "checks": "checks", "fork": "fork", "forks": "forks", "catch": "catch", "limit": "rate limit", "switch": "switch", "login": "login check" },
+    "life": {
+      "req": { "name": "until the answer", "plain": "It is gone once the answer is sent; each request has its own." },
+      "srv": { "name": "kept by the server", "plain": "The server keeps it between requests; every request shares it." },
+      "unk": { "name": "lifetime not shown", "plain": "The code does not show how long it lives." }
+    }
+  },
+  "blockPlain": {
+    "_about": "Review S4-03 · S4-28: a block's plain line where the lab's section words say it wrongly for this page, by the block's name.",
+    "In-flight state": "The values the request reads while it runs: its own, which last until the answer, and the ones kept by the server.",
+    "Stages and order": "The stages a request passes, and the order in which things run."
+  },
   "stages": {
     "EDGE": "the app band, before the endpoint is reached",
     "GATE": "the login check",
     "INPUT": "the input is read and checked against its shape",
     "HANDLER": "the endpoint's own code decides",
     "EFFECTS": "the writes left behind; no ending leaves from here",
-    "ANSWER": "the reply goes back; every success leaves here",
+    "ANSWER": "the answer goes back; every success leaves here",
     "UNCAUGHT": "anything nobody caught, the bay beside every stage"
   },
   "stageCell": "{stage}: {n} endings leave here",
@@ -435,7 +453,6 @@
       "icon": "table"
     },
     "guards": {
-      "head": "guards",
       "name": "checks in its own code that refuse the request",
       "zero": "its own code holds no check that refuses",
       "icon": "shield"
@@ -497,7 +514,6 @@
       "icon": "doc"
     },
     "branches": {
-      "head": "forks",
       "name": "branches in called code that change how it ends",
       "zero": "no called branch changes the ending",
       "icon": "path"
@@ -614,6 +630,8 @@
     },
     "lacks": {
       "head": "lacks",
+      "label": "What it lacks",
+      "plain": "The pieces nearly every endpoint carries that this one does not.",
       "name": "pieces nearly every endpoint carries that it does not",
       "zero": "it carries every piece that is the norm",
       "icon": "skip"
@@ -646,7 +664,7 @@
     "switches": "switches",
     "behind": "functions behind, and how deep",
     "proof": "the lab's proof rank",
-    "proofWords": "{n} of the endings its code produces named by a test · rank {v} of {of}",
+    "proofWords": "{n} of the endings its code produces named by a test · {v} of the app's {of} by that count (the first names the most)",
     "inflight": "in flight",
     "hook": "what sends it",
     "screens": "screens above them",
@@ -692,6 +710,9 @@
     "plainUnplaced": "A row that starts with a check inside a call holds a check whose ending the map does not name; it stands at the line where the handler makes that call.",
     "shared": "shared code",
     "sharedPlain": "Decided by code the endpoint shares with others, not by a check of its own.",
+    "rowShared": "decided in code it shares with others: {v}",
+    "rowChecks": "its own checks: {v}",
+    "rowTests": "tests that name it: {n}",
     "sharedSource": "In the framework's own code: {at}",
     "frameworks": {
       "fastapi": "FastAPI"
@@ -818,7 +839,8 @@
     "off": "{off} times a chain lists a call inside a catch its path never passes; that call is left off that path.",
     "offocc": "{offocc} times a path lists a step that no call of its own reaches while another path places it; it is left off that path.",
     "moms": {
-      "start": { "name": "before any request", "plain": "Values the server builds once, when it starts; every request then reads them. In Proof, the requests a test makes before this one." },
+      "start": { "name": "before any request", "plain": "Values the server builds once, when it starts; every request then reads them." },
+      "prior": { "name": "earlier in the test", "plain": "The requests a test makes before this one, in the order it makes them: they happen before this request is sent, never while the server starts." },
       "send": { "name": "the screen sends it", "plain": "The screen and the hook that send the request, before it reaches the server. Their order is the screen's structure, not time." },
       "edge": { "name": "at the edge", "plain": "The app's middleware, before the endpoint is reached." },
       "body": { "name": "reads the body", "plain": "FastAPI reads the request's body before any dependency runs." },
@@ -1080,6 +1102,24 @@
           "his": { "name": "his words' colours", "plain": "Write red, read green, both orange: the colours he named. Red is also the colour of the station's accessor label beside a function." }
         }
       },
+      "jyb": {
+        "_about": "Review CR-20: where a test's earlier requests stand — the review offered both places; my pick, dashed: a moment of their own.",
+        "label": "a test's earlier requests",
+        "pick": "prior",
+        "opts": {
+          "prior": { "name": "their own moment", "plain": "Earlier in the test: a moment of their own before this request is sent, apart from the server starting." },
+          "head": { "name": "in Proof's head", "plain": "In the Proof row's head, out of the moments: a test's earlier requests are no time of this request." }
+        }
+      },
+      "stk": {
+        "_about": "Review CR-07: what the heads do while BY MOMENT scrolls past the pinned row — the review offered heads that ride down or a folded pin; my pick, dashed: the heads ride down.",
+        "label": "the heads, scrolled",
+        "pick": "ride",
+        "opts": {
+          "ride": { "name": "ride under the pinned row", "plain": "The stage band and the moment heads ride down under the pinned row while the table scrolls past, so the pinned row's heads are never read as BY MOMENT's." },
+          "stay": { "name": "stay at the top", "plain": "The heads stay at the table's top; scrolled down, only the pinned row's heads are in view." }
+        }
+      },
       "ifl": {
         "_about": "D-070, his L-17 (\"visualize or surface what we are affecting … dig deeper … possibilities\"): how In-flight state shows what each value affects. The chips are what stood there; lifelines and echoes are my proposal; a lifeline each is my pick, dashed.",
         "label": "in-flight values",
@@ -1104,16 +1144,18 @@
     "stg": {
       "_about": "D-068, his L-05: the stage band over the moments. Which stage each moment stands in is gen-all-endpoints.py's (MO_STAGE, proven against each ending's stage); the words, the numbering and the bracket are my proposal.",
       "head": "stage",
-      "out": { "name": "outside the request", "plain": "Not a stage of the request: the server starting before any request, the screen that sends it, and what happens once the answer has left." },
+      "out": { "name": "outside the request", "plain": "Not a stage of the request: the server starting before any request, a test's earlier requests, the screen that sends it, and what happens once the answer has left." },
       "part": "{i} of {k}",
       "partPlain": "The request comes back to this stage later: this is part {i} of {k}, in time order.",
       "why": { "INPUT": "FastAPI reads the body before the dependencies run, and checks the fields after them." },
+      "cnt": "{n} endings",
+      "cnt1": "{n} ending",
       "n": "{n} endings leave from here",
       "n1": "one ending leaves from here",
       "n0": "no ending leaves from here",
       "eff": { "name": "EFFECTS", "plain": "In this look the handler's own save stays under HANDLER, so EFFECTS has no moment of its own: the writes land inside the handler's moments, and the Data effects row shows them." },
       "fork": {
-        "name": "one of {n}",
+        "name": "one of {n} ways",
         "one": "one way of {n}",
         "plain": "A request takes one of these {n} ways: an except of this try turns the error its call raised into an ending, or nothing is raised and the handler goes on.",
         "way": "way {i}: {v}",
@@ -1163,16 +1205,16 @@
       "hereAgain": "{i} · this endpoint, another call, with chips of its own · {role}",
       "noEp": "no endpoint of the app matches it",
       "stepOf": "step {i} of {cid}'s journey",
-      "on": "With a path picked, it stays on the paths ending {v}.",
-      "onEach": "On each path to that ending: which one this request takes is not recorded.",
+      "on": "its request here ends in {v}",
+      "onEach": "the test does not show which of the ways to that ending it takes",
       "leave": {
-        "none": "With a path picked, it leaves: this request asserts no status and proves no ending.",
-        "miss": "With a path picked, it leaves: this request asserts {v}, which no ending here has.",
-        "many": "With a path picked, it leaves: this request asserts {v}, a status {n} endings here share, and proves none of them.",
-        "act": "With a path picked, it leaves: this request acts and asserts {v}, and the test records no ending it proves."
+        "none": "this request asserts no status: the test does not show how it ends",
+        "miss": "this request asserts {v}, which no ending here answers",
+        "many": "this request asserts {v}, which {n} endings here answer: the test does not show which one it gets",
+        "act": "this request acts and asserts {v}; the test does not show which ending it gets"
       },
       "role": { "act": "acts", "arrange": "arranges", "arrange-checked": "arranges, checks the status" },
-      "plain": "A journey is a test that calls this endpoint and others, one after another. Each of its calls here stays where it is: the proof at its ending, or its line among the cases that arrange through it. Around each one its other requests stand: the earlier ones before any request, the later ones after the answer. With a path picked, a call here keeps its chips when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded.",
+      "plain": "A journey is a test that calls this endpoint and others, one after another. Each of its calls here stays where it is: the proof at its ending, or its line among the cases that arrange through it. Around each one its other requests stand: the earlier ones earlier in the test, the later ones after the answer. With a path picked, a call here keeps its chips when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded.",
       "feed": "Journeys: the Gabe Universe names {jyRows} across the page's endpoints, on {jyEps} of them, and counts {jyMore} more on {jyMoreEps} of them that it does not name. {jyOrd} walk across their endpoint and others and stand at the outer moments, around each of the {jyCalls} calls they make to it: with a path picked, {jyRefs} of those calls keep their chips by the ending the call proves, {jyStat} by the one ending of the status it asserts, and {jyNone} leave. The rest are named in the endpoint metadata, on Proof's card with the reason: {jyAgg} groups of web or end-to-end cases whose report is not read, {jyNoRec} tests with no record of their requests, {jyOne} that record one request, {jyNoHere} none of whose recorded requests calls their endpoint, and {jyOnly} whose every request calls it."
     },
     "band": {
@@ -1192,18 +1234,29 @@
       "k": {
         "ep": { "name": "method and path", "plain": "The verb and the URL a client calls." },
         "full": { "text": "served at {v}", "mount": "mounted at {v}", "name": "the path it is served at", "plain": "The path the app answers it on: its own path, with its router's mount before it." },
-        "seg": { "text": "first segment /{v}", "name": "the URL's first segment", "plain": "The first part of its path: the group of URLs it sits in.", "label": "the map labels its path {v}; the segment is read from the path it is served at" },
+        "seg": { "text": "first segment /{v}", "name": "the URL's first segment", "plain": "The first part of its path: the group of URLs it sits in.", "label": "its route is written as {v}; the app serves it at the longer path" },
         "ent": { "name": "entity", "plain": "The feature of the app that owns the endpoint." },
-        "cl": { "text": "cluster {v}", "name": "cluster", "plain": "The group of endpoints the Gabe Universe draws it in, inside its entity.", "label": "the Gabe Universe groups it by the path the map labels it with, {v}" },
-        "risk": { "name": "flag", "plain": "A warning the Gabe Universe draws on the endpoint.",
+        "cl": { "text": "cluster {v}", "name": "cluster", "plain": "The group of related endpoints it sits in, inside its entity.", "label": "its route is written as {v}" },
+        "risk": { "name": "flag", "plain": "A warning about the endpoint's code.",
           "ids": {
-            "untested": { "plain": "No test calls the endpoint: no case acts on it and none sets another test up through it." },
-            "conflict": { "plain": "A large surface: many functions stand behind the handler, or many pieces lead to it, so a change here reaches far." },
-            "god": { "plain": "Its handler is one of the app's oversized functions or classes." }
+            "untested": { "name": "no test calls it", "plain": "No test calls the endpoint: no case acts on it and none sets another test up through it." },
+            "conflict": { "name": "large surface", "plain": "Many functions stand behind the handler, or many pieces lead to it, so a change here reaches far." },
+            "god": { "name": "oversized handler", "plain": "Its handler is one of the app's oversized functions or classes." }
           } },
         "behind": { "text": "{n} behind · {d} calls deep", "text1": "{n} behind · {d} call deep", "name": "functions behind", "plain": "How many functions the handler's own calls reach, and how many calls below it the deepest one stands; the functions its dependencies run are not counted (the Functions row draws them at the moment the dependencies run)." },
-        "proof": { "name": "proof", "sts": "the endings it counts: {v}", "plain": "How many of the endings its code produces a test names (every ending but the answer and the body's parse errors; a test whose status fits several endings counts for each, and so does a test of the same error raised in another function), and where that puts the endpoint among the app's." },
-        "alarm": { "name": "alarm", "plain": "An anomaly the form check found; the facts it reads stand at their moments." },
+        "proof": { "name": "proof", "sts": "the endings it counts: {v}", "tied": "tied {v}", "plain": "How many of the endings its code produces a test names (every ending but the answer and the body's parse errors; a test whose status fits several endings counts for each, and so does a test of the same error raised in another function), and where that puts the endpoint among the app's." },
+        "alarm": { "name": "alarm", "plain": "Something in the code that looks wrong; each alarm's hover says what it found here.", "id": "named {v}",
+          "says": {
+            "_about": "review F11 · S4-09 · CR-21: what each alarm found on THIS endpoint, its values read from the alarm's own record (alarm_words in gen-all-endpoints.py); race-500 says the one race sentence, mo.x.race",
+            "textOnly": "{n} of its refusals send words only, and no code a client could tell them apart by",
+            "undeclared": "it answers {v}, and its route declares none of them",
+            "shared": "{n} different refusals answer {st}: {v}",
+            "collapsed": "{fn} shows the same message for {v}: a user cannot tell them apart",
+            "lost": "at {at} the {st} answers “{v}”, while the error it caught said “{was}”: the first reason is lost",
+            "escape": "{cls}, raised at {at}, is caught by no except: the request ends in {st}",
+            "refWrites": "{n} of its ways to a refusal still save a write",
+            "safeCommits": "it commits at {v}, though a {m} request should change nothing"
+          } },
         "file": { "text": "{file}:{line}", "def": "def at line {n}", "name": "the handler's file and line", "plain": "The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known." },
         "sig": { "name": "the handler's outline", "plain": "Async or not, how many lines it runs, the type it returns; its def in the hover." },
         "doc": { "name": "the handler's docstring", "plain": "The text the handler's author wrote at its top." },
@@ -1211,14 +1264,14 @@
         "chain": { "text": "{n} steps on its longest path", "name": "the longest path", "plain": "How many steps the longest path a request can take runs through." },
         "arr": { "text": "arranges", "textAct": "tests it; also sets up", "then": "then {m} {p}", "name": "arranges another test", "plain": "A case that calls this endpoint only to set another test up. A test has no time inside the request, and this one proves no ending here.",
           "plainAct": "A case that calls this endpoint to test it, and calls it again to set a later request up. Its testing calls stand in the Proof row, at the ending each proves, or among the calls that prove no ending." },
-        "jy": { "name": "a journey not ordered", "plain": "A journey the Gabe Universe names for this endpoint whose requests cannot be set in order around this one; the reason says why.",
-          "col": "Its requests happen at moments like any request's; it stands in the metadata only because they cannot be set in order around this one. The path row never hides it.",
+        "jy": { "name": "a journey not ordered", "plain": "A test that calls this endpoint among other requests; the test does not show when, among them, it calls this one.",
+          "col": "Its requests happen at moments like any request's; it stands here because the test does not show their order around this one.",
           "why": {
-            "agg": { "name": "report not read", "plain": "A group of cases from the {corpus} tests. Only the pytest report is read, so which requests they make, and in what order, is not known." },
-            "one": { "name": "no walk", "plain": "The test records {n} request(s), so there is no walk across endpoints to set around this one." },
-            "norec": { "name": "no record", "plain": "No record of this test's requests is read." },
-            "nohere": { "name": "no call here", "plain": "None of the test's recorded requests calls this endpoint; the Gabe Universe credits it here from its test ledger." },
-            "only": { "name": "only here", "plain": "Every request the test records calls this endpoint, so there is no other endpoint to walk to." }
+            "agg": { "name": "no requests listed", "plain": "A group of cases from the {corpus} tests; their report lists no requests." },
+            "one": { "name": "no walk", "plain": "The test makes {n} request(s), so there is nothing to set around this one." },
+            "norec": { "name": "no requests listed", "plain": "The test's requests are not written down." },
+            "nohere": { "name": "no call here", "plain": "None of the requests the test makes calls this endpoint." },
+            "only": { "name": "only here", "plain": "Every request the test makes calls this endpoint, so there is no other endpoint to walk to." }
           } },
         "piece": { "name": "a rare piece", "plain": "A piece few endpoints carry that names what the endpoint is (its method, its login, its limit), not something that acts." },
         "lack": { "text": "lacks", "name": "a norm it lacks", "plain": "A piece nearly every endpoint carries that this one does not." }
@@ -1257,8 +1310,9 @@
         "guard": { "plain": "A check the endpoint's own code makes; when it holds, the request ends." },
         "fork": { "plain": "A branch whose arms lead the request different ways." },
         "catch": { "plain": "An except: an error raised below is caught here and turned into an answer, or let through." },
-        "limiter": { "plain": "A speed limit: it counts a caller's requests over a window and refuses the one past the limit." },
-        "login": { "name": "login check", "plain": "The dependency that reads the caller's credential and decides who the caller is." },
+        "limiter": { "plain": "A rate limit: it counts a caller's requests over a window and refuses the one past the limit." },
+        "login": { "plain": "The dependency that reads the caller's credential and decides who the caller is." },
+        "clfn": { "name": "screen function", "plain": "A function of the screen's code that reads the answer and picks what the screen shows." },
         "table": { "plain": "A read or a write on a table." },
         "step": { "name": "save step", "plain": "A flush, a commit or a rollback: where the session's writes go to the database, or are undone." },
         "handler": { "name": "handler", "plain": "The endpoint's own function." },
@@ -1311,6 +1365,7 @@
         "fw": "FastAPI reads the body before any code of the endpoint runs ({src})",
         "code": "error code {v}",
         "val": "FastAPI checks the input against {n} rules",
+        "valBody": "FastAPI checks the input against {n} rules: {k} on its fields, and the body being there",
         "unc": "nothing catches it",
         "ret": "the handler returns, at {at}",
         "inCall": "inside {fn}, called at {at}",
@@ -1390,6 +1445,8 @@
         "fields": "{n} fields: {v}",
         "extra": "extra fields: {v}",
         "val422": "a 422 on any of its {n} rules; else the handler gets the body",
+        "val422Body": "a 422 on any of its {n} field rules, or when the body is missing; else the handler gets the body",
+        "val422oneBody": "a 422 when its field rule fails, or when the body is missing; else the handler gets the body",
         "val422one": "a 422 when its rule fails; else the handler gets the body",
         "fieldOf": "a field of {v}",
         "ann": "type {v}",
@@ -1410,7 +1467,7 @@
         "setBy": "set by {fn}, at {at}",
         "readAt": "read at {n} places: {v}",
         "readAt1": "read at {v}",
-        "lasts": "lasts {v}",
+        "lasts": "how long it lives: {v}",
         "sharedBy": "shared by {n} endpoints",
         "setting": "the setting {v} (env {env}, default {d})",
         "expr": "tests {v}",
@@ -1429,6 +1486,15 @@
         "order": "runs {n} of {of}",
         "mwAt": "{fn}, registered at {at}",
         "mwEnds": "can end the request with {v}",
+        "mwLib": "a library's middleware, registered at {at}",
+        "mwSkipPath": "lets these paths through without its check: {v}",
+        "mwSkip": "does nothing when {v}",
+        "mwHdr": "reads the {v} header",
+        "mwSets": "keeps {v} on the request ({at}), for {fn}",
+        "mwNone": "it ends no request here",
+        "clCmp": "in {at}, compares the answer's {what} with {v}",
+        "scrUses": "calls {v}, on its way to this request",
+        "scrIn": "written in {at}",
         "tname": "{v}, at {at}",
         "sends": "sends {v}",
         "sendsNone": "sends no headers",
@@ -1445,7 +1511,7 @@
         "handedAt": "the error comes from {v}",
         "collapsed": "the same text for {n} endings: a user cannot tell them apart",
         "restEnds": "none of its branches compares these: {v}",
-        "restDoes": "what the code does then is not recorded",
+        "restDoes": "no branch of {fn} handles them",
         "usedBy": "used by {v}",
         "callsAt": "calls {fn} at lines {v}",
         "errAt": "hands its error on at lines {v}",
@@ -1471,29 +1537,31 @@
       "filled": "filled",
       "hollow": "hollow",
       "none": "nothing drawn in this row on this path",
-      "race": "a race: a first call and its retry with the same key can both pass the check, and the later one breaks a unique key here",
-      "nest": "a schema inside another, drawn under it"
+      "race": "race: requests that carry the same values, sent close together, can each pass the check; the later one breaks a unique key here",
+      "nest": "a schema inside another, drawn under it",
+      "_f1b": "review r1, lane F1b: a status stands for itself (F13 · CR-11): each drawn status with its own count, its class said once; a label with no meaning line gets one (CR-35); the gate kinds wear their icon on their kind line (F14)",
+      "each": "×{n}",
+      "sk": { "model": "the class a table is read or written through", "hook": "a frontend hook", "endpoint": "an endpoint of the app", "function": "a function", "component": "a frontend component", "schema": "a schema the body is read into or built from", "middleware": "code that runs on every request before the endpoint", "entity": "a feature of the app", "screen": "a screen", "route": "a route of the screen", "store": "a frontend store", "module": "a frontend module", "view": "a frontend view", "type": "a type", "flag": "a setting that turns something on or off", "provider": "an outside service" },
+      "hol0": "hollow: a table the login check reads or writes, not this endpoint's own code",
+      "answers": "answers: the statuses the function's own code refuses with",
+      "twin": "a word on a chip's face after its name: what tells it from a chip beside it that reads the same"
     },
     "x": {
       "_about": "D-056: what each element's hover adds, read off the feed (the operator's twelve adds, his ruling \"agree with your recommendations\").",
       "depth": "depth {n}",
       "depthPlain": "How many calls below the handler it is reached.",
-      "callPaths": "on every path that calls {via}",
-      "callPathsPlain": "It runs inside {via}, and a path may leave {via} before it runs, so a path picked here may not reach it.",
-      "cutNear": "may also run under {v}",
-      "cutNearPlain": "{v} calls more functions than are listed; if this is one of them, it also runs where {v} runs, on its paths.",
-      "callCheck": "checked inside {via}; a path picked here may skip it",
-      "callCheckPlain": "It stands on the paths that call {via}, less those that leave {via} before it; a path may still skip it or leave before it, so a path picked here may not reach it.",
-      "leftIn": "this path leaves {via} partway, maybe before calling it",
-      "leftInAll": "on {n} of its paths, {via} is left partway, maybe before calling it",
-      "leftInPlain": "It is called somewhere inside {via}. A path that leaves {via} partway, at a check that fires or on an error, may leave before that call, so it may never run on that path.",
+      "callPaths": "it runs inside {via}, when {via} gets that far",
+      "leftIn": "on this path {via} ends partway, maybe before it calls this",
+      "leftInAll": "{via} can end partway, before it calls this: a check that fires, or an error",
       "fate": "on this path: {v}",
       "fatePlain": "With one path picked, a write wears what the path does with it.",
-      "race": "a race on {cons}",
+      "_race": "review S4-21: ONE race sentence, its values filled from the race's own facts — here, on the data map's link, on the race-500 alarm; the examples bench reads it too. raceStep: a race whose unique key has no name of its own (its table stands for it)",
+      "race": "requests that carry the same {cols}, sent close together, can each pass the check; the later one breaks {cons} at {at} and ends in {st}",
+      "raceStep": "requests that carry the same {cols}, sent close together, can each pass the check; the later one breaks the unique key of {tbl} at {at} and ends in {st}",
       "raceShort": "race",
-      "racePlain": "A first call and its retry with the same key both pass the check before this step; the later one breaks the unique key ({cols}) of {tbl} here, nothing catches it, and it ends in the uncaught {st}.",
-      "raceStep": "a race on the unique key ({cols}) of {tbl}",
-      "raceStepPlain": "Requests that run at the same time can each add a row with the same unique key ({cols}) to {tbl}; the later one breaks it here, nothing catches it, and it ends in the uncaught {st}.",
+      "saysExc": "the text of the {cls} it caught",
+      "saysPyd": "a list of what is wrong, per field",
+      "tagLine": "line {n}",
       "headers": "sends {v}",
       "declared": "declared",
       "undeclared": "not declared",
@@ -1513,7 +1581,7 @@
       "file": "a file, not a hook or component inside it",
       "_d057": "D-057 (his ruling \"build 1 and 2\"): a check says the error it raises and its words (a); a client branch what it reads and what it does (b); an error nothing catches its cause, on the 500 and on the function it is raised in (e)",
       "raises": "raises {cls}: “{msg}”",
-      "raisesBuilt": "raises {cls}; its words are no fixed text: built as it raises, or none given",
+      "raisesBuilt": "raises {cls}, with no fixed message",
       "reads": "reads the {what}: {op} {v}",
       "does": "what it does: {v}",
       "cause": "escapes from {cls}, raised at {at}",
@@ -1522,8 +1590,10 @@
         "_about": "D-069: the words on the faces of the items batch C1 built (his L-09 … L-18).",
         "reads": "reads",
         "rareOf": "{n} of {of}",
-        "rare": "rare · {n} of {of}",
+        "rare": "rare · {v} · {n} of {of}",
         "set": "set by settings",
+        "norm": "{w} · {n} of {of}",
+        "answers": "answers",
         "any": "any other status",
         "onSucc": "on success",
         "onErr": "on error",
@@ -1549,7 +1619,6 @@
           "op": "{op} at {at} · {mom}",
           "fate": "on this path: {v}",
           "off": "not on this path",
-          "race": "a second request with the same key breaks {cons} ({cols}) at {at} and ends in {st}",
           "tick": "{op} at {at} · {mom}",
           "ticks": {
             "flush": "Sends the writes made so far to the database, inside the transaction; nothing is saved until a commit.",
@@ -1570,8 +1639,7 @@
           "none": "No function reads or writes a table on this path."
         },
         "il": {
-          "lim": "rate limiter",
-          "fold": "{v} · {n}",
+          "fold": "{v} · {n} values",
           "open": "show the {n} values, a lane each",
           "close": "fold them back into one lane",
           "members": "{n} values: {v}",
@@ -1581,34 +1649,41 @@
           "claim": "claims its key in {tbl}",
           "claimF": "claims",
           "saves": "the commit reads it",
-          "end": "gone once the answer is sent",
-          "keep": "kept by the server for the next request",
-          "unk": "how long it lives is not known",
           "also": "also read at {v}",
-          "set": "set at {mom}",
+          "set": "set at the moment “{mom}”",
           "echo": "reads {v}"
         },
         "lg": {
           "dot": "a dot on the line: the value is read there; what that read can decide stands beside it",
-          "cap": "a cross: the value is gone once the answer is sent",
-          "keep": "an arrow past the end: the server keeps the value for the next request",
+          "cap": "a cross where its line ends: {v}",
+          "keep": "an arrow past the last moment: {v}",
+          "unk": "a question mark where its line stops: {v}",
+          "test": "the test mark: this page's own — the Gabe Universe draws no node for a test",
           "fold": "values set together and read alike, in one lane — open it to see each",
           "echo": "an echo: the value is read at this moment",
           "r": "a green line: the function reads the table",
           "w": "an orange line: the function writes the table",
           "rw": "a green line and an orange one, in that order: the function reads the table, then writes it",
           "tick": "a tick on a function's line: a step with no table of its own — a flush sends the writes to the database, unsaved until a commit",
-          "rule": "a rule across: a commit — every write above it on the path is saved",
-          "race": "the race: a second request with the same key breaks the unique key here"
+          "rule": "a rule across: a commit — every write above it on the path is saved"
         }
       }
     },
     "noCode": "No refusal this app sends carries a code of its own ({nCoded} of its {nRefusals}): a client tells one refusal from another by the status and the words alone.",
+    "rule": {
+      "_about": "Review CR-33: a 422 rule's face says the rule ({f} the field, {v} its value); the error type FastAPI sends stays in its hover.",
+      "missing": "{f} required", "greater_than_equal": "{f} ≥ {v}", "less_than_equal": "{f} ≤ {v}", "greater_than": "{f} > {v}", "less_than": "{f} < {v}",
+      "string_too_short": "{f}: at least {v} characters", "string_too_long": "{f}: at most {v} characters", "too_short": "{f}: at least {v} items",
+      "too_long": "{f}: at most {v} items", "extra_forbidden": "{f}: no fields beyond its own", "literal_error": "{f}: one of its allowed values",
+      "string_pattern_mismatch": "{f} matches {v}", "value_error": "{f}: passes its validator", "_other": "{f}: {t}",
+      "body": "the body", "in": "{f} in the {v}"
+    },
     "rowq": {
       "_about": "D-069 (his L-17, L-18): the question a row answers, in plain words, on its head's hover.",
       "data": "Which function reads or writes which table, when, and is the write saved?",
       "gate": "Where can the request be stopped or sent another way: in which function, on what condition, and what happens then?",
-      "inf": "What does the request carry while it runs, and how long does each value live: until the answer is sent, or as long as the server runs?",
+      "inf": "What does the request carry while it runs, and how long does each value live: until the answer, or kept by the server?",
+      "stdIn": "also here — {b}:",
       "std": "Is this endpoint built like the others, and what is unusual about it? A switch is set by the server's settings and changes a way the request can go; a rare piece is something few other endpoints have."
     }
   },
@@ -1635,7 +1710,7 @@
       "uni": {
         "opts": {
           "all": "Every row of the universe card, as it is.",
-          "dim": "An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name; a journey BY MOMENT draws, at the outer moments or by name in its endpoint metadata. A row whose items it draws, every one, fades with its title. Pointing at one brings it back.",
+          "dim": "An item BY MOMENT already draws fades; a row whose items it draws, every one, fades with its title. Pointing at one brings it back.",
           "hide": "An item BY MOMENT draws leaves the card; a row whose items it draws, every one, leaves with its title; a row it draws in part says how many of its items are there."
         },
         "plain": "Carried, on the universe card: an item BY MOMENT draws at a moment, on any path, or in its endpoint metadata, found by the key the code map's switch reads, or, for a function Code behind names without a key, by its name (when that name is one function there); a table an access or a connection reads or writes, by a chip of that same op (a read never carries a write); the endpoint is BY MOMENT's heading. A count or a line (the usage, the fields a payload ferries, a file's cases, the layer, the fan-in) stays unless the card names every member it counts and BY MOMENT draws each one; the cluster, the signature, the docstring, a flag and the count behind are carried by BY MOMENT's endpoint metadata, which draws them. A journey is carried when BY MOMENT draws it: its other requests at the outer moments of Proof, or, when they cannot be set in order, its name in the endpoint metadata; the journeys the Gabe Universe counts without naming them (the +N of that row's count) never are, so that row is carried in part at most. What BY MOMENT holds only in its band, not placed, is not carried.",
@@ -1666,7 +1741,10 @@
       "plain": "The card the station draws for this endpoint as it opens (the {uniTier} tier, functions hidden), row by row, in the station's order and in its own look: its groups, badges, chips, kind icons and colours, lifted from the station.",
       "silent": "The station draws no row here for: {rows}.",
       "deeper": "On a deeper tier ({uniDeeper}) the station also draws functions, and its card for an endpoint changes: Connections gains the handler, and Code behind can be walked. The left column keeps the card the station opens on.",
-      "twisty": "In the Gabe Universe this arrow opens the piece's own connections."
+      "twisty": "In the Gabe Universe this arrow opens the piece's own connections.",
+      "face": "an entity the journey's requests reach",
+      "faceHome": "the entity this endpoint belongs to",
+      "legend": "what this column draws"
     },
     "gaps": {
       "title": "the gaps",
@@ -1988,10 +2066,7 @@
       "fate": { "name": "fate of the writes", "col": "table" },
       "piece": { "name": "how common the piece is", "col": "table" },
       "ifk": {"name": "kind of in-flight value", "ico": "mine", "_about": "D-069, his L-17 (\"give it an appropriate icon … a better representation with some icon coloring\"): each kind its own glyph and a plain label at the chip's end, replacing the feed's machine word; one hue for the row, the lifetime by the chip's fill. My proposal (D-025.2), not the lab's catalogue.", "vals": {"state": {"icon": "pg:tag", "name": "on the request", "plain": "Kept on the request itself, for code later in the same request to read."}, "contextvar": {"icon": "pg:radio", "name": "in context", "plain": "A context value the code reads without it being passed along."}, "dependency-value": {"icon": "link", "name": "from a dependency", "plain": "Handed to the handler by one of its dependencies."}, "background": {"icon": "pg:list-end", "name": "after the answer", "plain": "Queued to run once the answer has been sent."}, "lock": {"icon": "pg:hand", "name": "held", "plain": "Held by this request so no other request can take it at the same time."}, "cache": {"icon": "layers", "name": "cached", "plain": "An answer kept from an earlier request and reused."}, "built-once": {"icon": "pg:memory-stick", "name": "built at start", "plain": "Built once when the server starts; every request uses the same one."}, "setting-once": {"icon": "role", "name": "setting at start", "plain": "A setting read once when the server starts; every request uses that value."}}},
-      "life": { "name": "how long it lives", "col": "lab", "vals": {
-        "with the answer": { "plain": "It is gone when the reply is sent: each request has its own." },
-        "with the server process": { "plain": "It stays while the server runs: every request shares it." },
-        "unknown": { "plain": "How long it lives is not read." } } },
+      "life": { "name": "how long it lives", "col": "lab" },
       "dir": { "name": "which way the shape travels", "col": "lab", "ico": "lab", "txt": "lab" },
       "role": { "name": "function role", "col": "station", "txt": "station" },
       "hrole": { "name": "hook role", "col": "station", "txt": "station" },
@@ -2006,9 +2081,11 @@
         "value": { "icon": "tint", "plain": "A setting's value decides the way." },
         "flag": { "icon": "flag", "plain": "A flag turns a way on or off." } } },
       "alarm": { "name": "alarm", "col": "table", "ico": "mine", "vals": {
-        "text-only": { "icon": "doc" }, "undeclared": { "icon": "file" }, "shared-status": { "icon": "both" }, "reason-lost": { "icon": "prompt" },
-        "reason-collapsed": { "icon": "prefix" }, "escape-500": { "icon": "nav" }, "race-500": { "icon": "swords" }, "refusal-writes": { "icon": "store" },
-        "safe-method-commits": { "icon": "wrap" }, "_other": { "icon": "alert" } } },
+        "text-only": { "icon": "doc", "name": "message is text only" }, "undeclared": { "icon": "file", "name": "status not declared" },
+        "shared-status": { "icon": "both", "name": "refusals share a status" }, "reason-lost": { "icon": "prompt", "name": "reason lost" },
+        "reason-collapsed": { "icon": "prefix", "name": "reasons share one message" }, "escape-500": { "icon": "nav", "name": "an error escapes to 500" },
+        "race-500": { "icon": "swords", "name": "a repeat can end in 500" }, "refusal-writes": { "icon": "store", "name": "a refusal still writes" },
+        "safe-method-commits": { "icon": "wrap", "name": "a read that commits" }, "_other": { "icon": "alert" } } },
       "branch": { "name": "what the branch does with the reason", "ico": "mine", "vals": {
         "reads": { "icon": "show", "plain": "The branch reads the reason the endpoint gives." },
         "passed": { "icon": "suffix", "plain": "The branch hands the error to code that reads it." },
@@ -2028,7 +2105,7 @@
         "model": { "icon": "polygon", "name": "a rule of the whole shape: a field required, a field not allowed, a value from a list", "table": "MODEL_ERRORS" },
         "validator": { "icon": "function", "name": "a rule the app's own validator raises", "table": "RAISE_ERRORS" },
         "other": { "icon": "info", "name": "a rule of another kind" } } },
-      "limit": { "name": "rate limiter", "ico": "mine", "icon": "middleware", "plain": "It lets this many requests through per window, then refuses." },
+      "limit": { "ico": "mine", "icon": "middleware", "plain": "It lets this many requests through per window, then refuses." },
       "gdk": {
         "mo": true,
         "name": "kind of gate",
@@ -2037,38 +2114,32 @@
         "vals": {
           "l": {
             "icon": "pg:gauge",
-            "name": "rate limit",
-            "plain": "It counts a caller's requests over a window and refuses the one past the limit. My proposal: the station draws no node for this."
+            "plain": "It counts a caller's requests over a window and refuses the one past the limit."
           },
           "g": {
             "icon": "pg:shield-check",
-            "name": "check",
-            "plain": "A condition in the code; when it holds, the request ends. My proposal: the station draws no node for this."
+            "plain": "A condition in the code; when it holds, the request ends."
           },
           "a": {
             "icon": "key",
-            "name": "login check",
             "plain": "The dependency that reads the caller's credential and decides who the caller is."
           },
           "b": {
             "icon": "pg:split",
-            "name": "fork",
-            "plain": "A branch whose arms send the request different ways. My proposal: the station draws no node for this."
+            "plain": "A branch whose arms send the request different ways."
           },
           "c": {
             "icon": "pg:reply",
-            "name": "catch",
-            "plain": "An except: an error raised below is caught here and turned into an answer, or let through. My proposal: the station draws no node for this."
+            "plain": "An except: an error raised below is caught here and turned into an answer, or let through."
           },
           "w": {
             "icon": "config",
-            "name": "switch",
-            "plain": "A setting or a plugged-in part, set by the server's settings, that changes a way the request can go. My proposal: the station draws no node for this."
+            "plain": "A setting or a plugged-in part, set by the server's settings, that changes a way the request can go."
           },
           "one": {
             "icon": "pg:diamond",
             "name": "gate",
-            "plain": "A place where the code decides: a limit, a check, a fork or a catch. My proposal: the station draws no node for this."
+            "plain": "A place where the code decides: a limit, a check, a fork or a catch."
           }
         }
       },
@@ -2438,15 +2509,10 @@
       "entity": "entity",
       "endpoint": "endpoint",
       "fe": "frontend piece",
-      "guard": "own guard",
-      "fork": "deciding branch",
-      "catch": "catch",
-      "switch": "switch",
       "reason": "reason site",
       "rule": "422 rule",
       "inflight": "in-flight value",
       "finding": "finding",
-      "limiter": "rate limiter",
       "piece": "piece",
       "middleware": "middleware"
     },

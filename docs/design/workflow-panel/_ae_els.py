@@ -31,7 +31,7 @@ OUT_VERB = {"translate": "translates", "pass-through": "passes", "swallow": "swa
 
 
 def _short(at) -> str:
-    return str(at or "").rsplit("/", 1)[-1]
+    return TRUTH.short(at)
 
 
 def _nm(q) -> str:

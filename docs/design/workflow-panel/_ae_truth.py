@@ -197,3 +197,80 @@ def causes(xid: str, ins: dict, par: dict, fns: dict, cats: list, XS: dict) -> l
             if x and x.get("id") == xid:
                 seen.add((f, z.get("at"))); out.append((f, z.get("pred"), z.get("at"), "class", z.get("msg")))
     return out
+
+
+# ── round-1 review, lane F1b: how the code's own words and places read to a human ──────────────────────────────────────────────
+# said(x)     an ending's words as the caller gets them (CR-10 · F16): an f-string's literal words with each value it fills in as "…";
+#             `str(exc)` — the text of the error the except caught, named by its class (the feeds hold no __init__ message); FastAPI's
+#             "pydantic error type" — a list of what is wrong, per field. The words are the words file's (SAY, set once by the generator)
+# short(at)   file:line by its file name, or folder/file:line when two files this endpoint touches share that name (N3-12 · F17)
+SAY = {"exc": "{cls}", "pyd": "pydantic error type"}
+TERMS: dict = {}                                                   # the words file's `terms` (one word per concept), set by the generator
+AMB: set = set()
+_FILES = __import__("re").compile(r"[\w.\-]+(?:/[\w.\-]+)+\.(?:py|ts|tsx|js|jsx)\b")
+
+
+def set_amb(*blobs) -> set:
+    """the file names two different files this endpoint's records mention share — read off the records' own text"""
+    import json as _json
+    dirs: dict = {}
+    for b in blobs:
+        for m in _FILES.findall(_json.dumps(b, default=str)):
+            dirs.setdefault(m.rsplit("/", 1)[-1], set()).add(m)
+    AMB.clear()
+    AMB.update(k for k, v in dirs.items() if len({"/".join(q.split("/")[-2:]) for q in v}) > 1)
+    return set(AMB)
+
+
+def short(at) -> str:
+    s = str(at or "")
+    base = s.rsplit("/", 1)[-1]
+    return "/".join(s.split("/")[-2:]) if base.split(":", 1)[0] in AMB else base
+
+
+def fstr(s: str):
+    """f"Invalid code '{c}'. Valid: {', '.join(v)}" → Invalid code '…'. Valid: … — the literal words, each value as "…" (None when
+    `s` is no f-string)"""
+    import re as _re
+    m = _re.match(r"^[fF][rR]?(['\"])(.*)\1$", s, _re.S)
+    if not m:
+        return None
+    body, out, i, n = m.group(2), [], 0, len(m.group(2))
+    while i < n:
+        ch = body[i]
+        if body.startswith("{{", i) or body.startswith("}}", i):
+            out.append(ch); i += 2
+            continue
+        if ch != "{":
+            out.append(ch); i += 1
+            continue
+        depth, i, q = 1, i + 1, None                             # a value: to its matching brace, past the strings inside it
+        while i < n and depth:
+            c = body[i]
+            if q:
+                q = None if c == q else q
+            elif c in "'\"":
+                q = c
+            elif c == "{":
+                depth += 1
+            elif c == "}":
+                depth -= 1
+            i += 1
+        out.append("…")
+    return "".join(out)
+
+
+def said(x: dict) -> str:
+    d = x.get("detail")
+    if isinstance(d, dict):
+        d = d.get("detail")
+    w = str(d or x.get("code") or x.get("via") or x.get("reason") or "")
+    if w == "pydantic error type":
+        return SAY["pyd"]
+    if not d:
+        return w
+    d = str(d)
+    via = str(x.get("via") or "")
+    if __import__("re").fullmatch(r"str\(\w+\)", d) and via.startswith("except "):
+        return SAY["exc"].replace("{cls}", via[7:])
+    return fstr(d) or d

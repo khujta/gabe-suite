@@ -25,13 +25,15 @@ from __future__ import annotations
 import collections
 import re
 
+import _ae_truth as TRUTH
+
 VIA_CALL = re.compile(r"^call (.+) @ (.+):(\d+)$")
 RULE_OPS = ("commit", "rollback")                                  # a step that ends the waiting writes: a rule across the band
 LIFE = {"with the answer": "req", "with the server process": "srv"}
 
 
 def _short(at) -> str:
-    return str(at or "").rsplit("/", 1)[-1]
+    return TRUTH.short(at)
 
 
 def _line(at):
@@ -96,7 +98,7 @@ def data_links(el: list, pas: list, live: set, lab: str, die, tally: collections
             pair = (fi[fk], ti.get("table:" + str(tbl)))
             if pair not in li:
                 die(f"{lab}: D-070 — the race on {cons} breaks at {hint}, and {fk} draws no link to {tbl}")
-            links[li[pair]][3] = [cons, uniq, st, hint]
+            links[li[pair]][3] = [cons, uniq, st, hint, 1 if xx.get("rs") else 0]   # review S4-21: rs — no constraint name, its table stands for it
             tally["c2:race"] += 1
     drawn = sum(len(q[2]) for q in links) + len(ticks) + len(rules)
     if drawn != n_data:                                            # PROOF: the connectors draw exactly the row's chips, each once

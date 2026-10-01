@@ -132,6 +132,41 @@ def sweep(o, at: str = "") -> None:
             sweep(v, f"{at}.{k}")
 
 
+# ── 1b · review r1 (lane F1b): ONE WORD PER CONCEPT. The words file's `terms` names each concept once — a gate kind (check · fork ·
+# catch · rate limit · switch · login check), a value's lifetime (until the answer · kept by the server) — and the keys the page's
+# surfaces read (a gate kind in the row legend, on its icon, as an element's kind and as its column head; the rate limit's lane) are
+# written from it here, so no surface can say the concept another way. The examples bench reads `terms` itself.
+TERM_OF = ((("mo", "io", "k", "guard", "name"), ("gate", "check")), (("mo", "io", "k", "fork", "name"), ("gate", "fork")),
+           (("mo", "io", "k", "catch", "name"), ("gate", "catch")), (("mo", "io", "k", "limiter", "name"), ("gate", "limit")),
+           (("mo", "io", "k", "switch", "name"), ("gate", "switch")), (("mo", "io", "k", "login", "name"), ("gate", "login")),
+           (("enc", "fam", "gdk", "vals", "g", "name"), ("gate", "check")), (("enc", "fam", "gdk", "vals", "b", "name"), ("gate", "fork")),
+           (("enc", "fam", "gdk", "vals", "c", "name"), ("gate", "catch")), (("enc", "fam", "gdk", "vals", "l", "name"), ("gate", "limit")),
+           (("enc", "fam", "gdk", "vals", "w", "name"), ("gate", "switch")), (("enc", "fam", "gdk", "vals", "a", "name"), ("gate", "login")),
+           (("el", "kinds", "guard"), ("gate", "check")), (("el", "kinds", "fork"), ("gate", "fork")), (("el", "kinds", "catch"), ("gate", "catch")),
+           (("el", "kinds", "limiter"), ("gate", "limit")), (("el", "kinds", "switch"), ("gate", "switch")),
+           (("cols", "guards", "head"), ("gate", "checks")), (("cols", "branches", "head"), ("gate", "forks")),
+           (("mo", "x", "c2", "il", "lim"), ("gate", "limit")), (("enc", "fam", "limit", "name"), ("gate", "limit")))
+
+
+def terms(W: dict) -> None:
+    T = W.get("terms") or die("words: no `terms` — one word per concept (review r1, lane F1b)")
+    for lt in ("req", "srv", "unk"):
+        if not all(isinstance((T.get("life") or {}).get(lt, {}).get(q), str) for q in ("name", "plain")):
+            die(f"words: terms.life.{lt} needs a name and a plain line")
+    for dst, src in TERM_OF:
+        v = T
+        for k0 in src:
+            v = v.get(k0) if isinstance(v, dict) else None
+        if not isinstance(v, str):
+            die(f"words: terms.{'.'.join(src)} is not a word")
+        o = W
+        for k0 in dst[:-1]:
+            o = o.setdefault(k0, {})
+        if o.get(dst[-1]) not in (None, v):
+            die(f"words: {'.'.join(dst)} says {o[dst[-1]]!r} — say it once, in terms.{'.'.join(src)}")
+        o[dst[-1]] = v
+
+
 # ── 2 · the columns ───────────────────────────────────────────────────────────────────────────────────────────────
 # A column is an attribute of the ruled inventory (its id is the sectionmap's), drawn with one renderer. Its BLOCK is not
 # typed here: an attribute homed in a block sits under it, and a shared one (homed nowhere) sits in the shared group or
@@ -222,7 +257,11 @@ def _file(at) -> str:
     return re.sub(r":\d+(?:-\d+)?$", "", str(at or ""))
 
 
-def _short(at) -> str:
+def _short(at) -> str:                                              # review N3-12: folder/file when two files here share the name
+    return TRUTH.short(at)
+
+
+def _base(at) -> str:
     """apps/api/api/recipe_creation.py:258 → recipe_creation.py:258"""
     return str(at or "").rsplit("/", 1)[-1]
 
@@ -468,7 +507,7 @@ def time_order(F: dict, fep: dict, fj: dict, ident: dict, EW: dict) -> dict:
 # its paths passes (a step placed by the calls the endpoint's OTHER paths make — this path's chain names none — only never after the
 # path has left, counted apart); a path's placed steps keep the order the path records them in; and each block's records, placed
 # or not, are exactly the records the code map counts for it (its members, read from the lab's facts).
-MO_PRE = ("start", "send", "edge", "body", "gate", "fields")
+MO_PRE = ("start", "prior", "send", "edge", "body", "gate", "fields")   # review CR-20: "prior", a test's requests before this one — its own time
 MO_POST = ("answer", "after", "uncaught")
 MO_RANK = {"checks": 0, "work": 1, "fail": 2, "save": 3}
 # which element family fills which block: an attribute HOMED in the block names it (the ruled tree's home is read, never a block id)
@@ -484,7 +523,7 @@ MO_FAM = (("end", "kinds-of-ending"), ("gate", "deciding-branches"), ("data", "o
 MO_STAGE = {"edge": "EDGE", "body": "INPUT", "gate": "GATE", "fields": "INPUT", "checks": "HANDLER", "work": "HANDLER", "fail": "HANDLER",
             "save": "EFFECTS", "answer": "ANSWER", "uncaught": "UNCAUGHT"}
 MO_STAGE_ALT = {"save": "HANDLER"}
-MO_OUT = ("start", "send", "after")
+MO_OUT = ("start", "prior", "send", "after")
 MO_WHY = ("nolink", "twomom", "notable", "firstcall", "spans", "member", "noend", "nosite", "pathsonly", "fnnone", "swmoves", "nopath", "noname", "in500")
 MO_SRC = ("own", "chain", "reached", "edges", "wide", "order", "gate", "after", "none")
 CALL_REL = {"calls", "binds"}                                    # the station's call edges a function is reached through
@@ -510,8 +549,8 @@ def reach_of(adj: dict, f: str, memo: dict) -> set:
 
 
 def says(x: dict) -> str:
-    """an ending's own words, whole (the code map's column cuts them; a hover never does)"""
-    return str(x.get("detail") or x.get("code") or x.get("via") or x.get("reason") or "")
+    """an ending's own words, whole (the code map's column cuts them; a hover never does) — as the caller gets them (review CR-10)"""
+    return TRUTH.said(x)
 
 
 def declared_set(fep: dict) -> set:
@@ -528,6 +567,107 @@ def decl_of(x: dict, dset: set):
     return 1 if x.get("status") in dset else 0
 
 
+# ── review CR-16: TWIN FACES. Two items of one row at one moment whose faces read the same (seven "refusal 400", two "429", a function
+# called twice) make a reader hover each one. Each such item gets, on its face, the one fact its hover already says that tells it
+# from its twins — read off its own hover lines, in their order: the first token its line holds that differs from every twin's (a
+# limit's name, the first words its message or its condition differs by, the place it stands). A face still twinned stops the build.
+W_TAG = {"line": "{n}"}                                           # its words: mo.x.tagLine, set at load
+_TOKW = re.compile(r"[A-Za-z_][\w.]*|\d+")
+
+
+def _face(x: list) -> str:
+    f, text, chip, X = x[0], x[3], x[4], x[7] or {}
+    if f == "end":
+        return json.dumps([f, (chip or [])[:3]])
+    if f == "gate":
+        return json.dumps([f, X.get("gk"), "except " + str(x[6]) if X.get("gk") == "c" else "fall" if X.get("fall") else text,
+                           [q[0] for q in ((X.get("ef") or [None, []])[1] or [])]])
+    if f == "fn":
+        return json.dumps([f, text, X.get("fd"), X.get("ft")])
+    if f == "proof":
+        return json.dumps([f, text, chip, X.get("am"), X.get("sv")], default=str)
+    if f == "client":
+        return json.dumps([f, text, chip, (X.get("ox") or {}).get("send"), X.get("sm")], default=str)
+    return json.dumps([f, text, chip], default=str)
+
+
+def _words_apart(vals: list):
+    """the first words each value differs from all the others by — None when some value holds no such word"""
+    tk = [_TOKW.findall(str(v)) for v in vals]
+    n = max(len(t) for t in tk)
+    g = next((i for i in range(n) if len({(t[i] if i < len(t) else None) for t in tk}) > 1), None)
+    if g is None:
+        return None
+    out = []
+    for i, t in enumerate(tk):
+        j = next((j for j in range(g, len(t)) if all(j >= len(o) or o[j] != t[j] for k, o in enumerate(tk) if k != i)), None)
+        if j is None or j - g > 2:
+            return None
+        out.append(" ".join(t[g:j + 1]))
+    return out if len(set(out)) == len(out) else None
+
+
+def face_twins(lab: str, el: list, WT: dict, tally: collections.Counter) -> None:
+    grp = collections.defaultdict(list)
+    for x in el:
+        if (x[7] or {}).get("io") and not (x[4] and x[4][0] == "jy"):
+            grp[(x[0], x[1], _face(x))].append(x)
+    for key, xs in grp.items():
+        if len(xs) < 2:
+            continue
+        seqs = []
+        for x in xs:
+            io, sq = x[7]["io"], [("h", str(x[7]["io"]["h"][0]))]
+            for part in "bcg":
+                for ln in io[part]:
+                    sq += [(part + ":" + ln[0] + ":" + k0, str(v0)) for k0, v0 in sorted((ln[1] if len(ln) > 1 else {}).items())]
+            seqs.append(sq)
+        tags = None
+        labs = [l0 for l0, _v in seqs[0]]                                # the answer's words first, then other words, then a place
+        isat = lambda l0, v0: l0.endswith((":at", ":ln")) or re.fullmatch(r".+:\d+", v0 or "")
+        labs = [l0 for l0 in labs if l0 == "h" or ":ans" in l0 or ":ends" in l0] + [l0 for l0 in labs if not (l0 == "h" or ":ans" in l0 or ":ends" in l0)]
+        labs = [l0 for l0 in labs if not isat(l0, dict(seqs[0]).get(l0))] + [l0 for l0 in labs if isat(l0, dict(seqs[0]).get(l0))]
+        for lab0 in labs:
+            vals = [next((v for l0, v in sq if l0 == lab0), None) for sq in seqs]
+            if None in vals or len(set(vals)) != len(vals):
+                continue
+            if lab0.endswith((":at", ":ln")) or re.fullmatch(r".+:\d+", vals[0]):
+                tags = [WT["line"].replace("{n}", v) if lab0.endswith(":ln") else v for v in vals]
+            elif lab0 != "h" and all(len(v) <= 24 for v in vals):
+                tags = vals                                              # short words: the whole of each
+            else:
+                tags = _words_apart(vals)
+            if tags:
+                break
+        if not tags:
+            die(f"{lab}: review CR-16 — {len(xs)} items of {key[0]} at one moment read the same on their faces, and nothing their hovers say tells them apart: {key[2][:90]}")
+        for x, t in zip(xs, tags):
+            x[7]["tw"] = t
+        tally["cr16:twinFaces"] += len(xs)
+
+
+def host_ios(els: list, el: list, IOC, tally: collections.Counter) -> dict:
+    """review F09 · S4-07 · F33: the function or middleware a gate runs in heads its gates — ONE hover, its before · checks · gives:
+    the Functions row's own for a function it draws, else built the same way; a middleware's by the middleware's own record; a
+    client function its branches sit in, by the branches it holds"""
+    out = {}
+    fn_io = {x[2][0]: x[7]["io"] for x in el if x[0] == "fn" and x[2] and (x[7] or {}).get("io")}
+    for e in els:
+        X = e.get("x") or {}
+        gh = X.get("gh")
+        if gh and gh[0] not in out:
+            if gh[0].startswith("middleware:"):
+                out[gh[0]] = IO.io_of({"f": "stage", "id": "m:" + gh[1], "text": gh[1]}, {}, IOC)
+            else:
+                out[gh[0]] = fn_io.get(gh[0]) or IO.io_of({"f": "fn", "id": "h:" + gh[0], "keys": [gh[0]], "text": gh[1]}, {}, IOC)
+        pc = X.get("pc")
+        if pc and pc[0] not in out and e["f"] == "client":
+            sites = [q for q in els if q["f"] == "client" and (q.get("x") or {}).get("pc", [None])[0] == pc[0] and str(q.get("id") or "").startswith("s:")]
+            out[pc[0]] = IO.io_of({"f": "client", "id": "pc:" + pc[0], "text": pc[1]}, {"pc": pc, "cmp": [q["x"].get("rd") for q in sites]}, IOC)
+    tally["f09:hosts"] += len(out)
+    return out
+
+
 def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: dict, tally: collections.Counter) -> dict:
     """{sp: the spine [[moment, group, first line, last line]], el: placed [[family, spine index, keys, text, chip, endings | None, hint]],
     un: no moment [[family, keys, text, why]], ex: the picker's codes, one per PATH (D-057), in the endings' time order [[ending id, status,
@@ -535,6 +675,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     pass: per code the spine indices its path passes, n: {family: [records placed, records with none]}} — see the section head."""
     TO, F, ident = r["_to"], L["forms"], L["identity"]
     lab = ident["label"]; E = "endpoint:" + lab
+    TRUTH.AMB.clear(); TRUTH.AMB.update(r["_amb"])                # review N3-12: this endpoint's shared file names
     hf, H = ident.get("file") or "", fep.get("handler") or ""
     steps, fns = fj.get("steps") or {}, fj.get("functions") or {}
     deps = set(fj.get("dependencies") or {})
@@ -1046,6 +1187,11 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                 x={"rx": rest, "rs": [XS[x0].get("status") for x0 in rest + fw0], **({"fw": fw0} if fw0 else {}), "pc": pcs.get(pz) or [pz, str(rd.get("fn") or pz.split("#")[-1]), _short(pz.split("#")[0][3:]), {"via": [], "err": [], "scr": None}],
                    "xk": [pz] if pz else []})
             tally["c1:rest"] += 1
+    for e0 in els:                                               # review F33: a screen says which hooks on the way it calls
+        if e0["f"] == "client" and str(e0.get("id") or "").startswith("v:"):
+            us = sorted({o0[1] for o0 in orch.values() if o0[4] == e0["text"] and o0[0] not in e0["keys"]})
+            if us:
+                e0["x"]["uses"] = us
     for o0 in orch.values():                                     # D-069 (client P5): a hook on the way from the screen to the send
         add("client", ("fix", "send"), [o0[0]], o0[1], None, None, None, "y:" + o0[0],
             x={"ox": {"send": sorted(q for q in o0[2] if q), "err": sorted(q for q in o0[3] if q), "scr": o0[4], "to": sorted(q.split("#")[-1] for q in senders)}})["o"] = 1
@@ -1168,7 +1314,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
                 if any(b0 <= a0 for a0, b0 in zip(pl, pl[1:])) or pl != (list(range(1, k + 2)) if side == "b" else list(range(k + 1, len(calls) + 1))) \
                         or [s[6] for s in seq] != [calls[q - 1].get("line") for q in pl] or sum(1 for s in seq if s[8] == 1) != 1:
                     die(f"{lab}: D-065 — {cid}'s walk {side} its step {k + 1} is not its recorded calls, each once, in strictly increasing order: {pl}")
-                e = add("proof", ("fix", "start" if side == "b" else "after"), ["case:" + cid] + list(dict.fromkeys(s[4] for s in sts if s[4])), cid,
+                e = add("proof", ("fix", "prior" if side == "b" else "after"), ["case:" + cid] + list(dict.fromkeys(s[4] for s in sts if s[4])), cid,
                         ["jy", side, len(sts)], set(jp), None, "j:" + jid + ":" + side + str(k + 1),
                         x={"jy": {"id": jid, "c": cid, "s": side, "nm": tc.get("name"), "st": sts, "sq": seq, "k": k + 1, "nh": len(here), "j": how, "jv": jv,
                               "jn": len(cand), "pm": 1 if len(jp) > len(xs) else 0, "of": len(calls)}})
@@ -1181,7 +1327,8 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             if s.get("kind") == "step" and s.get("phase") == "middleware" and (s.get("label") or s.get("call")) not in mw:
                 mw.append(s.get("label") or s.get("call"))
     for m in mw:
-        add("stage", ("fix", "edge"), [], str(m), None, {p for p in PIDS if any(s.get("kind") == "step" and (s.get("label") or s.get("call")) == m for s in chains[p])}, None, "m:" + str(m))
+        add("stage", ("fix", "edge"), [], str(m), None, {p for p in PIDS if any(s.get("kind") == "step" and (s.get("label") or s.get("call")) == m for s in chains[p])}, None, "m:" + str(m),
+            x={"xk": ["middleware:" + str(m)]} if "middleware:" + str(m) in (fj.get("middleware") or {}) else None)   # review S4-15: the station's middleware glyph
     for x in F["exits"]:
         for c in x.get("cases") or []:
             if isinstance(c, dict):                              # a dependency's own parameter is checked while that dependency is solved
@@ -1192,14 +1339,17 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     # STANDARD OR SPECIALIST — a switch where its chain has it; a rare piece where the thing it names acts; an identity has no moment.
     # A norm the endpoint LACKS is an absence, not a piece: it has no moment and is not drawn here (the code map says it)
     fsw = {w.get("id"): w for w in fep.get("switches") or []}
+    prow = {q.get("key"): q for q in L["feedwide"]["pieces"]["rows"]}
     for w in F.get("switches") or []:
         ph = next((s.get("phase") for p in paths for s in chains[p["id"]] if s.get("kind") == "switch" and s.get("ref") == w["id"]), None)
         fw = fsw.get(w["id"]) or {}
         anc = fw.get("anchor") if w.get("kind") == "value" else fw.get("at")
         wn = (("fix", "edge") if ph == "middleware" else ("fix", "gate") if ph == "dependency"
               else ("h", _line(anc)) if inh(anc) else ("next", w["id"]))
+        pk_ = prow.get("switch:" + str(w.get("kind")))                   # review F23: how common a switch of its kind is ("the norm · 79 of 80")
         add("std", wn, ["switch:" + w["id"]], w.get("port") or ", ".join(sorted(w.get("settings") or [])) or str(w.get("expr") or fw.get("pred") or ""),
-            ["switch", w.get("kind")], {p for p in PIDS if any(s.get("kind") == "switch" and s.get("ref") == w["id"] for s in chains[p])}, None, "w:" + w["id"])
+            ["switch", w.get("kind")], {p for p in PIDS if any(s.get("kind") == "switch" and s.get("ref") == w["id"] for s in chains[p])}, None, "w:" + w["id"],
+            x={"pn": [pk_.get("n"), pk_.get("of"), pk_.get("word")]} if pk_ else None)
     pc = L["feedwide"]["pieces"]
     resp = fep.get("responses") or {}
     for pr in pc["rows"]:
@@ -1316,7 +1466,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     # ── 4 · what each path passes, from the FEED alone: its chain's steps in spine order (PROOF), its exit, its own steps on the
     # handler's lines and in the dependencies, the reached_by records naming it; the handler's first moment when it gets there ──
     sw_next = collections.defaultdict(set)
-    passed = {p: {SI["start"], SI["send"], SI["after"]} for p in PIDS}
+    passed = {p: {SI["start"], SI["prior"], SI["send"], SI["after"]} for p in PIDS}
     unc = lambda pid: XS.get(EXIT[pid], {}).get("kind") == "uncaught"
     xe_of = lambda pid: x_si.get(EXIT[pid]) if isinstance(x_si.get(EXIT[pid]), int) else None
 
@@ -2011,7 +2161,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
             nmv.append([e["f"], "piece", e["keys"], e["text"], e.get("x") or None]); rn[e["f"]].update(e["rec"])
             continue
         if e.get("jy"):                                          # D-065: a journey's other requests, at an outer moment every path passes;
-            if e["si"] not in (SI["start"], SI["after"]) or any(e["si"] not in passed[p] for p in e["paths"]):   # on the paths its step here
+            if e["si"] not in (SI["prior"], SI["after"]) or any(e["si"] not in passed[p] for p in e["paths"]):   # on the paths its step here
                 die(f"{lab}: D-065 — the journey {e['jy']} stands at {e['si']}, not at an outer moment each of its paths passes")   # ends on
             ends = sorted({PI[p] for p in e["paths"] if p in PI})
             if len(ends) != len(e["paths"]):
@@ -2031,7 +2181,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         elif pp == "moment":
             pp = {p for p in PIDS if si in passed[p]}
         elif pp is None:
-            pp = {p for p in PIDS if si in passed[p]} if si not in (SI["start"], SI["send"], SI["after"]) else set(PIDS)
+            pp = {p for p in PIDS if si in passed[p]} if si not in (SI["start"], SI["prior"], SI["send"], SI["after"]) else set(PIDS)
         if e["f"] == "end":                                      # an ending: the paths that end at it, and those that pass its check AND its moment
             pp = {p for p in pp if si in passed[p]} | {p for p in PIDS if EXIT[p] == e["id"]}
         if not pp:
@@ -2165,6 +2315,8 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     tw = IO.twins(lab, el)
     if tw:
         die(f"{lab}: items whose hovers read the same at one moment (D-067): {tw[:3]}")
+    face_twins(lab, el, W_TAG, tally)                                  # review CR-16: twin FACES carry what tells them apart, or the build stops
+    hio = host_ios(els, el, IOC, tally)                                    # review F09 · S4-07: a gate's host head, ONE hover (its before · checks · gives)
     for x in el:
         x.pop()                                                      # [family, moment, keys, words, chip, endings, hint, extras (D-056)]
     # the path picker: each path under the moment its ending leaves at, in time order; two endings of one status at one moment are told
@@ -2315,7 +2467,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     KM.update(k for x in nmv if x[1] != "jy" for k in x[2])
     # the elements each block holds, counted — a journey is counted apart (review J7): its chips and its name are no element of Proof
     ne = lambda xs: len([q for q in xs if not str(q).startswith("j:")])
-    return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "fk": fks, "n": {f: [ne(rp[f]), ne(ru[f]), ne(rn[f])] for f, _a in MO_FAM if ne(rp[f]) or ne(ru[f]) or ne(rn[f])},
+    return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "fk": fks, "hio": hio, "n": {f: [ne(rp[f]), ne(ru[f]), ne(rn[f])] for f, _a in MO_FAM if ne(rp[f]) or ne(ru[f]) or ne(rn[f])},
             "nm": nmv, "_P": PM | PX, "_Pw": PW, "_K": KM, **({"dx": dx} if dx else {}), **({"il": il} if il else {})}
 
 
@@ -2355,6 +2507,45 @@ def nm_facts(nm: list) -> set:
         elif x[1] == "risk":
             out.add("risk:" + str((x[4] or {}).get("id")))
     return out
+
+
+def alarm_words(a: str, r: dict, L: dict, fep: dict, fj: dict) -> list:
+    """review F11 · S4-09 · CR-21: an alarm's hover says what it found on THIS endpoint — [the words key (mo.nm.k.alarm.says, or
+    "x.race": the one race sentence), its values], read from the alarm's own record (r._al, the feed's) and the endpoint's endings"""
+    f = next((q for q in r["_al"] if q.get("id") == a), None) or die(f"{r['id']}: the alarm {a} has no record of its own")
+    XS = {x["id"]: x for x in L["forms"]["exits"]}
+    st = lambda v: " \u00b7 ".join(str(q) for q in v)
+
+    def said_of(status, d):                                              # a detail the alarm names, as the ending that sends it says it
+        x = next((x for x in XS.values() if x.get("status") == status and str(x.get("detail")) == str(d)), None)
+        return TRUTH.said(x) if x else (TRUTH.fstr(str(d)) or str(d))
+    if a == "text-only":
+        return ["textOnly", {"n": f.get("n")}]
+    if a == "undeclared":
+        return ["undeclared", {"v": st(f.get("statuses") or [])}]
+    if a == "shared-status":
+        ds = f.get("details") or []
+        return ["shared", {"n": len(ds), "st": f.get("status"), "v": " \u00b7 ".join(said_of(f.get("status"), d) for d in ds)}]
+    if a == "reason-collapsed":
+        fz = next((q for q in (L["forms"].get("frontend") or {}).get("reason_sites") or [] if q.get("id") == f.get("site")), None)
+        fn = str(f.get("piece") or (fz or {}).get("piece") or "?").split("#")[-1]
+        return ["collapsed", {"fn": fn, "v": " \u00b7 ".join(f"{f.get('status')} {said_of(f.get('status'), d)}" for d in f.get("details") or [])}]
+    if a == "reason-lost":
+        return ["lost", {"at": _short(f.get("at")), "st": f.get("status"), "v": f.get("detail"), "was": f.get("was")}]
+    if a == "race-500":
+        cl = next((c for c in (fep.get("repeat") or {}).get("claims") or [] if c.get("race_at") == f.get("race_at")), None) or \
+            die(f"{r['id']}: the race-500 alarm at {f.get('race_at')} names no claim the endpoint holds")
+        unc = next((x for x in XS.values() if x["kind"] == "uncaught"), {})
+        return ["x.race", {"cons": cl.get("constraint") or f.get("table"), "cols": ", ".join(cl.get("unique") or []), "at": _short(f.get("race_at")), "st": unc.get("status")}]
+    if a == "escape-500":
+        unc = next((x for x in XS.values() if x["kind"] == "uncaught"), {})
+        return ["escape", {"cls": f.get("cls"), "at": _short(f.get("at")), "st": unc.get("status")}]
+    if a == "refusal-writes":
+        return ["refWrites", {"n": len(f.get("paths") or [])}]
+    if a == "safe-method-commits":
+        st0 = fj.get("steps") or {}
+        return ["safeCommits", {"m": r["m"], "v": st([_short((st0.get(c) or {}).get("at")) or c for c in f.get("commits") or []])}]
+    die(f"{r['id']}: the alarm {a} has no words of its own in alarm_words (review F11)")
 
 
 def no_moment(r: dict, L: dict, fj: dict, fep: dict, A: dict, tally: collections.Counter, mounts: list) -> None:
@@ -2413,8 +2604,8 @@ def no_moment(r: dict, L: dict, fj: dict, fep: dict, A: dict, tally: collections
     al = v["alarms"] if isinstance(v.get("alarms"), list) else []
     if len(al) != (r["k"].get("alarms") or 0):
         die(f"{lab}: D-064 — {len(al)} alarms drawn, the code map counts {r['k'].get('alarms')}")
-    for a in al:
-        put("alarm", [], a, None, [("finding", a)])
+    for a in al:                                                          # review F11 · S4-09: what each alarm found HERE, in its own words
+        put("alarm", [], a, {"id": a, "w": alarm_words(a, r, L, fep, fj)}, [("finding", a)])
     # THE HANDLER — its file and the line its route is declared at (the code map's pair), the line its def stands at, its outline, its
     # docstring. PROVEN: the file and line are the lab's own place for it; the def line is the forms feed's record of the handler
     df = _line((((fj.get("functions") or {}).get(fep.get("handler")) or {}).get("at")))
@@ -2447,6 +2638,10 @@ def no_moment(r: dict, L: dict, fj: dict, fep: dict, A: dict, tally: collections
     if len(d["lacks"]) != (r["k"].get("lacks") or 0):
         die(f"{lab}: D-064 — {len(d['lacks'])} norms drawn as lacking, the code map counts {r['k'].get('lacks')}")
     nm = sorted(mo["nm"] + out, key=lambda x: NM_KINDS.index(x[1]))       # stable: within one kind, the order read
+    # review S4-09: the twins check reaches the metadata cards too — two facts of one card whose hovers would read the same stop the build
+    sig_ = collections.Counter(json.dumps([x[0], x[1], x[2], x[3], x[4]], sort_keys=True, default=str) for x in nm)
+    if any(n > 1 for n in sig_.values()):
+        die(f"{lab}: review S4-09 — the endpoint metadata draws two facts that read the same: {[k[:90] for k, n in sig_.items() if n > 1][:2]}")
     tally["nm:facts"] += sum(1 for x in nm if x[1] != "jy"); tally["nm:rows"] += 1   # review J7: a journey named here is counted apart
     mo["nm"] = nm
     mo["_P"] |= P
@@ -3067,6 +3262,7 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
         die(f"{L['identity']['label']}: the facts carry no forms block ({F.get('state')}: {F.get('reason')})")
     ident = L["identity"]
     ep = F["endpoint"]
+    amb_ = TRUTH.set_amb({k0: v0 for k0, v0 in L.items() if k0 != "sectionmap"}, fep)   # review N3-12: the file names two files here share
     v, k, why, u = {}, {}, {}, {}
     Z = W["cols"]
 
@@ -3316,7 +3512,7 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
             "sig": [(ident.get("sig") or {}).get("async"), (ident.get("sig") or {}).get("lines"), (ident.get("sig") or {}).get("returns"), ident.get("gsig"), ident.get("doc") or None],
             "stream": 1 if (L.get("security") or {}).get("stream") else 0,
             "actc": acts,                                                 # review N3-16: the act calls the tests column's tests make
-            "_hook": hooks, "_files": files, "_al": ALS,                  # D-057: the alarms' own records, parallel to d.alarms
+            "_hook": hooks, "_files": files, "_al": ALS, "_amb": sorted(amb_),                  # D-057: the alarms' own records, parallel to d.alarms
             # D-043: what the code map's chips need beside the detail lists, parallel to their items — kept OUT of `d`, so the words
             # the gaps are read against (every string `d` holds) do not move: each path's kind of ending, and each piece's family and
             # value from its key (a status, a method or a switch kind in a piece's own sentence is drawn as its chip)
@@ -3405,6 +3601,7 @@ def keyspace(r: dict, L: dict, fep: dict, X: dict, CL: dict, jreal: str) -> None
     of its detail pairs (parallel to the items), `uni.rows[*].keys` (parallel to what each station row draws) and the
     signature's parts; and to CL the label of every key whose identity is not readable (a guard's condition, a switch …)."""
     F, d, u, v = L["forms"], r["d"], r["u"], r["v"]
+    TRUTH.AMB.clear(); TRUTH.AMB.update(r["_amb"])
     tkey = lambda name: (("table:" + X["m2t"][name]) if name in X["m2t"] and name not in X["schemas"] else ("schema:" + name)) if name else None
     stat = lambda s: None if s is None or s == "" else "status:" + str(s)
     fkey = lambda q: ("fn:" + q.replace("#", "::")) if q else None
@@ -3874,6 +4071,10 @@ def build(argv: list) -> tuple:
 
     W = json.loads(words_p.read_text(encoding="utf-8"))
     sweep(W)
+    TRUTH.SAY.update(exc=W["mo"]["x"]["saysExc"], pyd=W["mo"]["x"]["saysPyd"])   # review CR-10: an ending's words as the caller gets them
+    terms(W)                                                           # review r1 (F1b): one word per concept, read by every surface
+    W_TAG.update(line=W["mo"]["x"]["tagLine"])
+    TRUTH.TERMS.update(W["terms"])
     ids = [c[0] for c in COLS]
     if sorted(W["cols"]) != sorted(ids):
         die(f"the words file's columns and the generator's differ: only in words {sorted(set(W['cols']) - set(ids))}, only here {sorted(set(ids) - set(W['cols']))}")
@@ -3950,9 +4151,9 @@ def build(argv: list) -> tuple:
     X["dw"] = does_lift([s for L in facts for s in L["forms"]["frontend"].get("reason_sites") or []])
     X["jreal"] = spec["_look"]["lift"]["jReal"][0]                     # D-065: the station's own test for a journey that is one real case
     # D-057: the handler chip's hover names the file without its directory — only where no other handler file has that name
-    hb = collections.Counter(_short(f) for f in {r["file"] for r in rows if r.get("file")})
+    hb = collections.Counter(_base(f) for f in {r["file"] for r in rows if r.get("file")})
     for r in rows:
-        r["_fileOne"] = bool(r.get("file")) and hb[_short(r["file"])] == 1
+        r["_fileOne"] = bool(r.get("file")) and hb[_base(r["file"])] == 1
     # review F6: the mounts the app serves its routes under — each endpoint whose served path ends with its own path gives one; the
     # longest first, so a route whose own path the map mislabels ("/") is read from the path it is served at
     MOUNTS = sorted({ep0["full_path"][:len(ep0["full_path"]) - len(ep0["path"])] for ep0 in (fj.get("endpoints") or {}).values()
@@ -4023,7 +4224,11 @@ def build(argv: list) -> tuple:
     for k, x in W["codemap"]["details"].items():
         if x.get("in") and (x["in"] not in W["codemap"]["details"] or W["codemap"]["details"][x["in"]].get("in")):
             die(f"codemap.details.{k}: it is drawn inside {x['in']!r}, which is not a pair the code map draws")
-    blocks = [{"key": b["key"], "sig": b["sig"], "name": b["name"], "plain": b["plain"], "kind": b["join"]["kind"], "act": (b["join"].get("act") or {}).get("kind") or "none",
+    # review S4-03 · S4-28: a block's plain line the lab's section words say wrongly for this page — said here, by the block's name
+    BP = {k0: v0 for k0, v0 in W["blockPlain"].items() if not k0.startswith("_")}
+    if set(BP) - {b0["name"] for b0 in sm["blocks"]}:
+        die(f"words: blockPlain names blocks the ruled tree has not: {sorted(set(BP) - {b0['name'] for b0 in sm['blocks']})}")
+    blocks = [{"key": b["key"], "sig": b["sig"], "name": b["name"], "plain": BP.get(b["name"]) or b["plain"], "kind": b["join"]["kind"], "act": (b["join"].get("act") or {}).get("kind") or "none",
                "surface": b["join"].get("surface_key") or "none", "surfaceWords": b["join"].get("surface")} for b in sm["blocks"]]
     # every attribute id the words file ties to a universe row or a code-map pair is a row of the ruled tree AND of the inventory
     inv, CM, UW = UNI.inventory_ids(), W["codemap"], W["universe"]
@@ -4042,7 +4247,7 @@ def build(argv: list) -> tuple:
     # groups (one per catch per endpoint) · endpoints whose moments come in several runs · the longest endings table
     d53 = collections.Counter()
     for r in rows:
-        r.pop("_cd"); r.pop("_cv"); TO = r.pop("_to"); r.pop("_hook"); r.pop("_files"); r.pop("_beh"); r.pop("_al"); r.pop("_fileOne")
+        r.pop("_cd"); r.pop("_cv"); TO = r.pop("_to"); r.pop("_hook"); r.pop("_files"); r.pop("_beh"); r.pop("_al"); r.pop("_fileOne"); r.pop("_amb")
         d53["endings"] += sum(1 for t in TO["rows"] if t["x"]); d53["checks"] += sum(len(t["checks"]) for t in TO["rows"] if t["x"])
         d53["alone"] += sum(1 for t in TO["rows"] if not t["x"]); d53["groups"] += len(TO["moms"])
         d53["runs"] += any(n > 1 for n in TO["runs"].values()); d53["rows"] = max(d53["rows"], len(TO["rows"]))

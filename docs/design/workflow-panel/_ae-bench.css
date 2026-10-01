@@ -54,7 +54,7 @@
 .exin { padding-left: 18px; }
 .exr.exnk, .exr.exnote { color: var(--ink-soft); font-weight: 500; }
 /* the controls under the block */
-.exctl { display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed var(--rule); padding-top: 6px; }
+.exctl { display: flex; flex-direction: column; gap: 6px; border-top: 1px dotted var(--rule); padding-top: 6px; }   /* review S4-30: dashed is only my pick */
 .exfolds { display: flex; flex-wrap: wrap; gap: 4px; }
 .exfold[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
 .expane { display: flex; flex-direction: column; gap: 6px; }
@@ -65,7 +65,7 @@
 .exctl .lnsides { flex: 1; display: flex; align-items: stretch; gap: 4px; min-width: 0; }
 .exctl .lnsides .exz { flex: 1 1 0; min-width: 0; }
 .exctl .lnmid { flex: none; width: 2px; align-self: stretch; background: repeating-linear-gradient(var(--rule) 0 3px, transparent 3px 6px); }
-.exz { display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; min-height: 30px; padding: 3px; border: 1px dashed var(--rule); border-radius: 7px; }
+.exz { display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; min-height: 30px; padding: 3px; border: 1px dotted var(--rule); border-radius: 7px; background: color-mix(in srgb, var(--ink) 3%, transparent); }   /* review S4-30: a drop zone, dotted on a tint */
 .exz.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .exz.exoff { flex: 1; background: color-mix(in srgb, var(--muted) 7%, transparent); }
 .expc { display: inline-flex; align-items: center; gap: 4px; font: inherit; font-size: 12px; cursor: grab; border: 1px solid var(--rule); background: var(--raised); color: var(--ink-soft); border-radius: 6px; padding: 2px 6px; }
