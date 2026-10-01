@@ -109,6 +109,23 @@
   .prop .what { font-size: var(--fs-sm); color: var(--ink); margin: 0; }
   .landnote { font-size: 1em; color: var(--ink); margin: 0; border: 1.5px solid var(--accent); border-radius: 8px; padding: 8px 12px; }
 
+  /* the contents strip (L21, L11): every section one jump away, and a way back from each */
+  nav.toc { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; font-size: var(--fs-sm); }
+  nav.toc .lab { margin-right: 4px; }
+  nav.toc a, a.up, a.ref { color: var(--accent); text-decoration: none; }
+  nav.toc a:hover, a.up:hover, a.ref:hover { text-decoration: underline; }
+  a.up { font-size: var(--fs-min); letter-spacing: .04em; }
+  a.chip.ref { display: inline-block; }
+  [id^="item-"] { scroll-margin-top: 16px; }
+  .sub2 { font-size: var(--fs-sm); color: var(--muted); margin: 6px 0 0; letter-spacing: .06em; text-transform: uppercase; }
+  .costl { font-size: var(--fs-sm); color: var(--ink); margin: 0; }
+  .costl b, .against b, .because b { color: var(--muted); font-weight: 400; font-size: var(--fs-min); letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; }
+  .against, .because { font-size: var(--fs-sm); color: var(--ink-soft); margin: 0; }
+  .audit { border: 1.5px solid var(--accent); }
+  /* pictures at full size, each in its own scroller (L10) */
+  .full figure.pic a { overflow-x: auto; overflow-y: hidden; }
+  .full figure.pic img { max-width: none; width: auto; }
+  .full .looks { grid-template-columns: minmax(0, 1fr); }
   .out { font: inherit; letter-spacing: inherit; font-size: var(--fs-sm); line-height: 1.5; color: var(--ink); background: var(--raised); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; width: 100%; box-sizing: border-box; min-height: 18em; resize: vertical; white-space: pre; overflow: auto; }
   .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
   .said { font-size: var(--fs-sm); color: var(--accent); min-height: 1.4em; }
@@ -121,6 +138,7 @@
     <p class="lede" id="lede"></p>
     <p class="cap" id="source"></p>
     <div class="key"><span><button class="btn" data-mine="true" type="button" tabindex="-1" id="key-dashed"></button><span id="key-mine"></span></span><span><button class="btn" aria-pressed="true" type="button" tabindex="-1" id="key-filled"></button><span id="key-yours"></span></span><span id="count" class="state"></span></div>
+    <nav class="toc" id="toc" aria-label="contents"></nav>
   </header>
 
   <section class="sec" data-sec="1" id="sec-glance">
@@ -128,33 +146,33 @@
     <div class="body"></div><p class="take"></p>
   </section>
 
-  <section class="sec" data-sec="2" id="sec-calls">
-    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"></line><line x1="10" x2="3" y1="4" y2="4"></line><line x1="21" x2="12" y1="12" y2="12"></line><line x1="8" x2="3" y1="12" y2="12"></line><line x1="21" x2="16" y1="20" y2="20"></line><line x1="12" x2="3" y1="20" y2="20"></line><line x1="14" x2="14" y1="2" y2="6"></line><line x1="8" x2="8" y1="10" y2="14"></line><line x1="16" x2="16" y1="18" y2="22"></line></svg><span class="st"></span></h2><span class="n"></span></div>
+  <section class="sec" data-sec="2" id="sec-rem">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><span class="st"></span></h2><span class="n"></span></div>
     <div class="body"></div><p class="take"></p>
   </section>
 
-  <section class="sec" data-sec="3" id="sec-items">
-    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span class="st"></span></h2><span class="n"></span></div>
-    <div class="body"></div><p class="take"></p>
-  </section>
-
-  <section class="sec" data-sec="4" id="sec-qs">
-    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg><span class="st"></span></h2><span class="n"></span></div>
-    <div class="body"></div><p class="take"></p>
-  </section>
-
-  <section class="sec" data-sec="5" id="sec-gap">
-    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><path d="M11 18H8a2 2 0 0 1-2-2V9"></path></svg><span class="st"></span></h2><span class="n"></span></div>
-    <div class="body"></div><p class="take"></p>
-  </section>
-
-  <section class="sec" data-sec="6" id="sec-pat">
+  <section class="sec" data-sec="3" id="sec-pat">
     <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"></path><rect x="3" y="14" width="7" height="7" rx="1"></rect><circle cx="17.5" cy="17.5" r="3.5"></circle></svg><span class="st"></span></h2><span class="n"></span></div>
     <div class="body"></div><p class="take"></p>
   </section>
 
-  <section class="sec" data-sec="7" id="sec-rem">
-    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><span class="st"></span></h2><span class="n"></span></div>
+  <section class="sec" data-sec="4" id="sec-calls">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"></line><line x1="10" x2="3" y1="4" y2="4"></line><line x1="21" x2="12" y1="12" y2="12"></line><line x1="8" x2="3" y1="12" y2="12"></line><line x1="21" x2="16" y1="20" y2="20"></line><line x1="12" x2="3" y1="20" y2="20"></line><line x1="14" x2="14" y1="2" y2="6"></line><line x1="8" x2="8" y1="10" y2="14"></line><line x1="16" x2="16" y1="18" y2="22"></line></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body"></div><p class="take"></p>
+  </section>
+
+  <section class="sec" data-sec="5" id="sec-items">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body"></div><p class="take"></p>
+  </section>
+
+  <section class="sec" data-sec="6" id="sec-qs">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body"></div><p class="take"></p>
+  </section>
+
+  <section class="sec" data-sec="7" id="sec-gap">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><path d="M11 18H8a2 2 0 0 1-2-2V9"></path></svg><span class="st"></span></h2><span class="n"></span></div>
     <div class="body"></div><p class="take"></p>
   </section>
 
@@ -182,7 +200,11 @@
   function $(id) { return document.getElementById(id); }
   function rt(s, o) { return String(s).replace(/\{\{(\w+)\}\}/g, function (m, k) { return o[k] != null ? String(o[k]) : m; }); }   /* the page's own {{tokens}} */
   function chip(text, attr, val, cls) { var c = el("span", "chip" + (cls ? " " + cls : ""), text); if (attr) c.setAttribute(attr, val); return c; }
-  function sec(id, w) { var s = $(id); s.querySelector(".st").textContent = w.title; s.querySelector(".n").textContent = w.n; s.querySelector(".take").textContent = w.take; return s.querySelector(".body"); }
+  function sec(id, w) { var s = $(id); s.querySelector(".st").textContent = w.title; s.querySelector(".n").textContent = w.n; s.querySelector(".take").textContent = w.take;
+    var up = el("a", "up", U.toc.up); up.href = "#toc"; s.querySelector(".sec-head").appendChild(up); return s.querySelector(".body"); }
+  /* an id is never drawn alone (L11): it wears its name, and an item links to its card */
+  function refChip(id, name, cls, pre) { var t = (pre ? pre + " " : "") + id + (name ? " · " + name : ""); if (/^L-\d\d$/.test(id)) { var a = el("a", "chip ref" + (cls ? " " + cls : ""), t); a.href = "#item-" + id; return a; } return chip(t, null, null, cls); }
+  function itemChip(id) { return refChip(id, D.itemNames[id]); }
   function pic(p) { var f = el("figure", "pic"), a = el("a"), i = el("img"); a.href = D.shotBase + p.f; a.target = "_blank"; a.rel = "noopener";
     i.src = D.shotBase + p.f; i.loading = "lazy"; i.width = p.w; i.height = p.h; i.alt = p.cap; a.appendChild(i); f.appendChild(a); f.appendChild(el("figcaption", null, p.cap)); return f; }
   function pics(list, first) { var w = el("div"); if (!list.length) return w; var g = el("div", "pics"); list.slice(0, first).forEach(function (p) { g.appendChild(pic(p)); }); w.appendChild(g);
@@ -196,6 +218,8 @@
   $("eyebrow").textContent = U.page.eyebrow; $("title").textContent = U.page.h1; $("lede").textContent = U.page.lede; $("source").textContent = U.page.source;
   $("key-mine").textContent = U.page.keyMine; $("key-yours").textContent = U.page.keyYours; $("key-dashed").textContent = U.page.keyDashed; $("key-filled").textContent = U.page.keyFilled;
   $("out").setAttribute("aria-label", U.copy.aria);
+  (function () { var n = $("toc"); n.appendChild(el("span", "lab", U.toc.head)); ["sec-glance", "sec-rem", "sec-pat", "sec-calls", "sec-items", "sec-qs", "sec-gap", "sec-copy"].forEach(function (id) {
+      var k = id.slice(4), w = U.sec[k], a = el("a", null, w.title); a.href = "#" + id; n.appendChild(a); }); })();
 
   /* ── state: one value + one note per choice id; nothing is saved at boot ── */
   var CH = {}; D.choices.forEach(function (c) { CH[c.id] = c; });
@@ -227,21 +251,25 @@
     var cs = el("div", "chips"); ["fixed", "partly", "left", "his"].forEach(function (k) { cs.appendChild(chip(R[k] + " " + U.outcome[k], "data-o", k)); }); b.appendChild(cs); b.appendChild(el("p", "cap", W.findNote)); cols.appendChild(b);
     B.appendChild(cols);
     var m = el("div", "panel"); m.appendChild(el("h3", null, W.measHead)); m.appendChild(el("p", "cap", W.measNote));
-    var rows = G.checks.map(function (c) { var nm = el("span", null, c.name); nm.appendChild(el("span", "sub", c.plain)); return [nm].concat(c.vals.map(function (v) { return v == null ? W.noSection : v; })); });
+    var rows = G.checks.map(function (c) { var nm = el("span", null, c.name); nm.appendChild(el("span", "sub", c.plain)); if (c.blind) nm.appendChild(el("span", "sub", c.blind)); return [nm].concat(c.vals.map(function (v) { return v == null ? W.noSection : v; })); });
     var tw = table([W.colCheck].concat(G.labels), rows, [1, 2, 3]); m.appendChild(tw);
     G.checks.forEach(function (c, i) { var tr = tw.querySelectorAll("tr")[i + 1]; if (c.vals[0] != null && c.vals[2] != null && c.vals[2] < c.vals[0]) tr.children[3].classList.add("lower"); });
     B.appendChild(m); })();
 
   /* ── 2 · your calls ── */
   (function () { var W = U.sec.calls, C = U.calls, B = sec("sec-calls", W); B.appendChild(el("p", "cap", W.note)); B.appendChild(el("p", "cap", W.motionNote));
+    var pn = el("div", "acts"), tg = el("button", "btn", C.fullOn); tg.type = "button"; tg.setAttribute("aria-pressed", "false"); tg.id = "fullsize";
+    tg.addEventListener("click", function () { var on = !B.classList.contains("full"); B.classList.toggle("full", on); tg.textContent = on ? C.fullOff : C.fullOn; tg.setAttribute("aria-pressed", String(on)); });
+    pn.appendChild(el("span", "cap", W.picsNote)); pn.appendChild(tg); B.appendChild(pn);
     ["table", "row", "bench"].forEach(function (wh) { var list = D.calls.filter(function (c) { return c.where === wh; }); if (!list.length) return;
       var h = el("h3", null, C.where[wh]); B.appendChild(h); B.appendChild(el("p", "cap", C.whereNote[wh]));
-      list.forEach(function (c) { var ch = CH[c.id], card = el("div", "panel call"); card.setAttribute("data-call", c.id);
-        var hd = el("div", "hd"); hd.appendChild(el("h4", null, c.label)); var cs = el("div", "chips");
+      list.forEach(function (c, ci) { var ch = CH[c.id], card = el("div", "panel call"); card.setAttribute("data-call", c.id);
+        if (c.kind && !(list[ci - 1] || {}).kind) { B.appendChild(el("h4", "sub2", C.kindsHead)); B.appendChild(el("p", "cap", C.kindsNote)); }
+        var hd = el("div", "hd"); hd.appendChild(el("h4", null, c.label)); if (c.about) hd.appendChild(el("p", "cap", c.about)); var cs = el("div", "chips");
         c.rows.forEach(function (r) { cs.appendChild(chip(C.inRow + " " + r, null, null, "acc")); });
-        cs.appendChild(chip(C.from + " " + c.from)); if (c.answers.length) cs.appendChild(chip(C.answers + " " + c.answers.join(" "))); hd.appendChild(cs); card.appendChild(hd);
+        cs.appendChild(refChip(c.from, c.fromName, null, C.from)); c.answers.forEach(function (a) { cs.appendChild(refChip(a.id, a.name, null, C.answers)); }); hd.appendChild(cs); card.appendChild(hd);
         var looks = el("div", "looks"); c.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
-          if (o.shot) t.appendChild(pic(o.shot)); else t.appendChild(el("div", "noshot", C.noShot));
+          if (o.shot) t.appendChild(pic(o.shot)); else t.appendChild(el("div", "noshot", o.note || C.noShot));
           var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); looks.appendChild(t); });
         card.appendChild(looks);
         var sets = el("p", "sets"); sets.appendChild(el("b", null, C.sets)); sets.appendChild(document.createTextNode(c.motion)); card.appendChild(sets);
@@ -259,11 +287,12 @@
 
   /* ── 3 · your items ── */
   (function () { var W = U.sec.items, I = U.items, B = sec("sec-items", W); B.appendChild(el("p", "cap", W.note));
-    D.items.forEach(function (it) { var card = el("div", "panel item"); card.setAttribute("data-item", it.id);
-      var h = el("h3"); h.appendChild(el("span", null, it.id)); h.appendChild(chip(it.tag)); h.appendChild(chip(I.pattern + " " + it.pattern, null, null, "acc")); h.appendChild(chip(U.statusWord[it.kind])); card.appendChild(h);
+    D.items.forEach(function (it) { var card = el("div", "panel item"); card.setAttribute("data-item", it.id); card.id = "item-" + it.id;
+      var h = el("h3"); h.appendChild(el("span", null, it.id + " · " + it.name)); var pa = el("a", "chip ref acc", I.pattern + " " + it.pattern + (it.patternName ? " · " + it.patternName : "")); pa.href = "#pat-" + it.pattern; h.appendChild(pa); h.appendChild(chip(U.statusWord[it.kind])); card.appendChild(h);
       card.appendChild(el("p", "lab", I.his)); card.appendChild(el("blockquote", null, "“" + it.first + "”"));
       if (it.rest) { var d = el("details"); d.appendChild(el("summary", null, I.more)); d.appendChild(el("p", null, it.rest)); card.appendChild(d); }
       var kv = el("dl", "kv"); [[I.readAs, it.readAs], [I.where, it.where], [I.couldNot, it.couldNot], [I.fix, it.fix], [I.status, it.status]].forEach(function (r) { if (!r[1]) return; kv.appendChild(el("dt", null, r[0])); kv.appendChild(el("dd", null, r[1])); }); card.appendChild(kv);
+      if (it.fixRecord) { var rd = el("details"); rd.appendChild(el("summary", null, I.record)); rd.appendChild(el("p", null, it.fixRecord)); card.appendChild(rd); }
       card.appendChild(el("p", "lab", I.review)); var vc = el("div", "chips"); it.verdicts.forEach(function (v) { vc.appendChild(chip(U.lens[v.lens] + ": " + (U.verdict[v.verdict] || v.verdict), "data-v", v.verdict)); }); card.appendChild(vc);
       if (it.verdicts[0]) { var r0 = el("p", "cap"); r0.appendChild(el("b", null, I.remains + ": ")); r0.appendChild(document.createTextNode(it.verdicts[0].remains)); card.appendChild(r0); }
       if (it.verdicts.length > 1) { var od = el("details"); od.appendChild(el("summary", null, I.otherLenses)); it.verdicts.slice(1).forEach(function (v) { var p = el("p"); p.appendChild(el("b", null, U.lens[v.lens] + ": ")); p.appendChild(document.createTextNode(v.remains)); od.appendChild(p); }); card.appendChild(od); }
@@ -277,7 +306,7 @@
   /* ── 4 · your questions ── */
   (function () { var W = U.sec.qs, Q = U.qs, B = sec("sec-qs", W); B.appendChild(el("p", "cap", W.note));
     D.questions.forEach(function (q) { var card = el("div", "panel"); card.setAttribute("data-q", q.key);
-      card.appendChild(el("p", "lab", Q.his + " · " + q.items.join(" "))); card.appendChild(el("p", "q", "“" + q.q + "”")); if (q.about) card.appendChild(el("p", "cap", q.about));
+      card.appendChild(el("p", "lab", Q.his)); var qi = el("div", "chips"); q.items.forEach(function (i) { qi.appendChild(itemChip(i)); }); card.appendChild(qi); card.appendChild(el("p", "q", "“" + q.q + "”")); if (q.about) card.appendChild(el("p", "cap", q.about));
       var ol = el("ol", "ans"); q.lines.forEach(function (l) { ol.appendChild(el("li", null, l)); }); card.appendChild(ol);
       if (q.verdict) { card.appendChild(el("p", "lab", Q.verdict)); var cs = el("div", "chips"); cs.appendChild(chip(U.verdict[q.verdict.verdict] || q.verdict.verdict, "data-v", q.verdict.verdict)); card.appendChild(cs); card.appendChild(el("p", "cap", q.verdict.remains)); }
       if (q.findings.length) { card.appendChild(el("p", "lab", Q.findings)); var ul = el("ul", "fl"); q.findings.forEach(function (f) { var li = el("li"), cs = el("span", "chips"); cs.appendChild(chip(f.id)); cs.appendChild(chip(U.outcome[f.outcome], "data-o", f.outcome)); li.appendChild(cs); li.appendChild(el("span", null, f.what)); if (f.why) li.appendChild(el("span", "why", f.why)); ul.appendChild(li); }); card.appendChild(ul); }
@@ -292,6 +321,7 @@
     sp.appendChild(el("p", "lab", X.sections)); sp.appendChild(cs); sp.appendChild(el("p", "lab", X.pairing)); sp.appendChild(el("p", "cap", G.ruledPairing)); B.appendChild(sp);
     var pp = el("div", "panel"); pp.appendChild(el("h3", null, X.partsHead));
     pp.appendChild(table([X.colPart, X.colRows, X.colTo, X.colR3, X.colNone], G.parts.map(function (p) { var c = el("div", "chips"); p.to.forEach(function (t) { c.appendChild(chip(t[0] + " · " + t[1])); }); return [p.part, p.n, c, p.r3, p.none]; }), [1, 3, 4]));
+    pp.appendChild(el("p", "cap", X.scale));
     var d = el("details"); d.appendChild(el("summary", null, X.rowsShow)); d.appendChild(table([X.colPart, X.colAttr, X.colR3, X.colWhere], [].concat.apply([], G.parts.map(function (p) { return p.rows.map(function (r) { return [p.part, r[0], r[1], r[2] || X.noHome]; }); })), [2])); pp.appendChild(d); B.appendChild(pp);
     var sq = el("div", "panel"); sq.appendChild(el("h3", null, X.secHead)); sq.appendChild(table([X.colFact, X.colStatus, X.colWhere], G.security.map(function (r) { return [r[0], r[1], r[2] || X.noHome]; }))); B.appendChild(sq);
     var two = el("div", "grid2"), wi = el("div", "panel"), oq = el("div", "panel");
@@ -301,26 +331,40 @@
     var af = el("div", "panel"); af.appendChild(el("h3", null, X.alsoHead)); var ul = el("ul", "facts"); G.alsoFound.forEach(function (s) { ul.appendChild(el("li", null, s)); }); af.appendChild(ul); B.appendChild(af); })();
 
   /* ── 6 · the patterns ── */
+  function suiteCard(s, ch) { var pr = el("div", "prop"); pr.setAttribute("data-choice-card", s.cid); var X = U.pat, c2 = el("div", "chips");
+    c2.appendChild(chip(s.cid)); if (s.kind) c2.appendChild(chip(X.kind + " · " + s.kind)); if (s.partOf) c2.appendChild(chip(X.partOf + " " + s.partOf, null, null, "acc"));
+    (s.waits || []).forEach(function (w) { c2.appendChild(chip(X.waits + " " + w.label, null, null, "acc")); }); pr.appendChild(c2);
+    if (s.name) pr.appendChild(el("h4", null, s.name)); if (s.target) pr.appendChild(el("p", "cap", X.target + ": " + s.target)); pr.appendChild(el("p", "what", s.what));
+    var cl = el("p", "costl"); cl.appendChild(el("b", null, X.cost)); cl.appendChild(document.createTextNode(X.lands + " " + s.lands + ". " + s.gate + (s.battery ? " " + s.battery : "") + (s.lines ? " " + s.lines : "") + (s.flags ? " " + s.flags : ""))); pr.appendChild(cl);
+    var ag = el("p", "against"); ag.appendChild(el("b", null, X.against)); ag.appendChild(document.createTextNode(s.against)); pr.appendChild(ag);
+    optButtons(pr, pr, ch); return pr; }
   (function () { var W = U.sec.pat, X = U.pat, B = sec("sec-pat", W); B.appendChild(el("p", "landnote", W.landNote)); B.appendChild(el("p", "cap", W.note)); B.appendChild(el("p", "cap", W.pickRule));
-    D.patterns.forEach(function (p) { var card = el("div", "panel"); card.setAttribute("data-pattern", p.id);
+    var A = D.audit, ac = el("div", "panel audit"); ac.setAttribute("data-audit", A.id); ac.appendChild(el("h3", null, W.auditHead)); ac.appendChild(el("p", "cap", W.auditNote));
+    var parts = el("div", "chips"); A.parts.forEach(function (c) { parts.appendChild(chip(c)); }); ac.appendChild(parts);
+    ac.appendChild(suiteCard({ cid: A.id, name: A.name, what: A.what, lands: A.lands, gate: A.gate, battery: A.battery, lines: A.lines, against: A.against }, CH[A.id])); B.appendChild(ac);
+    D.patterns.forEach(function (p) { var card = el("div", "panel"); card.setAttribute("data-pattern", p.id); card.id = "pat-" + p.id;
       card.appendChild(el("h3", null, p.id + " · " + p.name)); card.appendChild(el("p", "cap", p.line));
-      var cs = el("div", "chips"); cs.appendChild(chip(p.items.length + " " + X.items, null, null, "acc")); p.items.forEach(function (i) { cs.appendChild(chip(i)); }); card.appendChild(cs);
+      var cs = el("div", "chips"); cs.appendChild(chip(p.items.length + " " + X.items, null, null, "acc")); p.items.forEach(function (i) { cs.appendChild(itemChip(i)); }); card.appendChild(cs);
       var fs = el("div", "chips"); fs.appendChild(chip(p.nFind + " " + X.findings, null, null, "acc")); ["fixed", "partly", "left", "his"].forEach(function (k) { if (p.out[k]) fs.appendChild(chip(p.out[k] + " " + U.outcome[k], "data-o", k)); });
-      if (p.nRem) fs.appendChild(chip(X.still + ": " + p.nOpen + " " + X.openOf + " " + p.nRem, "data-o", p.nOpen ? "open" : "closed")); card.appendChild(fs);
+      fs.appendChild(chip(X.still + ": " + p.stillThere, "data-o", p.stillThere ? "open" : "closed")); card.appendChild(fs);
       var w2 = el("div", "why2"), a = el("div"), b = el("div"); a.appendChild(el("p", "lab", X.model)); a.appendChild(el("p", null, p.whyModel)); b.appendChild(el("p", "lab", X.human)); b.appendChild(el("p", null, p.whyHuman)); w2.appendChild(a); w2.appendChild(b); card.appendChild(w2);
       card.appendChild(el("p", "lab", X.checks));
-      if (p.checks.length) { var tw = table([U.sec.glance.colCheck].concat(D.glance.labels), p.checks.map(function (c) { return [c.name].concat(c.vals.map(function (v) { return v == null ? U.sec.glance.noSection : v; })); }), [1, 2, 3]);
+      if (p.checks.length) { var tw = table([U.sec.glance.colCheck].concat(D.glance.labels), p.checks.map(function (c) { var nm = el("span", null, c.name); if (c.blind) nm.appendChild(el("span", "sub", c.blind)); return [nm].concat(c.vals.map(function (v) { return v == null ? U.sec.glance.noSection : v; })); }), [1, 2, 3]);
         p.checks.forEach(function (c, i) { if (c.vals[0] != null && c.vals[2] != null && c.vals[2] < c.vals[0]) tw.querySelectorAll("tr")[i + 1].children[3].classList.add("lower"); }); card.appendChild(tw); }
       else card.appendChild(el("p", "cap", X.noChecks));
-      card.appendChild(el("p", "lab", X.suite)); var su = el("div", "suite");
-      p.suite.forEach(function (s) { var ch = CH[s.cid], pr = el("div", "prop"); pr.setAttribute("data-choice-card", s.cid); var c2 = el("div", "chips"); c2.appendChild(chip(s.cid)); c2.appendChild(chip(X.kind + " · " + s.kind)); c2.appendChild(chip(X.size + " · " + s.size)); pr.appendChild(c2);
-        pr.appendChild(el("p", "cap", X.target + ": " + s.target)); pr.appendChild(el("p", "what", s.what)); optButtons(pr, pr, ch); su.appendChild(pr); });
-      card.appendChild(su); B.appendChild(card); }); })();
+      card.appendChild(el("p", "lab", X.suite)); var bc = el("p", "because"); bc.appendChild(el("b", null, X.because)); bc.appendChild(document.createTextNode(p.because)); card.appendChild(bc);
+      var su = el("div", "suite"); p.suite.forEach(function (s) { su.appendChild(suiteCard(s, CH[s.cid])); }); card.appendChild(su); B.appendChild(card); }); })();
 
-  /* ── 7 · still on the page ── */
+  /* ── 7 · what round 1b left: still open · fixed only partly or left · fixed by the small pass ── */
   (function () { var W = U.sec.rem, X = U.rem, B = sec("sec-rem", W); B.appendChild(el("p", "cap", W.note));
     D.remaining.forEach(function (g) { var card = el("div", "panel"); card.setAttribute("data-rem", g.id); card.appendChild(el("h3", null, g.id + " · " + g.name));
-      card.appendChild(table(["", U.items.where, X.what, X.source, X.status], g.rows.map(function (r) { return [r.id, r.where, r.what, r.source, chip(r.open ? X.open : r.status, "data-o", r.open ? "open" : "fixed")]; }), [], 0)); B.appendChild(card); }); })();
+      if (g.open.length) { card.appendChild(el("p", "lab", X.openHead));
+        card.appendChild(table(["", U.items.where, X.what, X.source, X.status], g.open.map(function (r) { var c = el("div", "chips"); c.appendChild(chip(X.open, "data-o", "open")); c.appendChild(chip(X.kind[r.kind])); return [r.id, r.where, r.what, r.source, c]; }), [], 0)); }
+      if (g.left.length) { card.appendChild(el("p", "lab", X.leftHead)); var ul = el("ul", "fl");
+        g.left.forEach(function (f) { var li = el("li"), cs = el("span", "chips"); cs.appendChild(chip(f.id)); cs.appendChild(chip(U.outcome[f.outcome], "data-o", f.outcome)); li.appendChild(cs); li.appendChild(el("span", null, f.what)); if (f.why) li.appendChild(el("span", "why", X.why + ": " + f.why)); ul.appendChild(li); }); card.appendChild(ul); }
+      if (g.fixed.length) { card.appendChild(el("p", "lab", X.fixedHead));
+        card.appendChild(table(["", U.items.where, X.whatWas, X.source, X.status], g.fixed.map(function (r) { return [r.id, r.where, r.what, r.source, chip(X.fixed, "data-o", "fixed")]; }), [], 0)); }
+      B.appendChild(card); }); })();
 
   /* ── 8 · copy ── */
   var CW = U.copy, out = $("out"); sec("sec-copy", U.sec.copy); $("copynote").textContent = U.sec.copy.note; $("copy").textContent = CW.button; $("reset").textContent = CW.reset;
@@ -328,7 +372,7 @@
   function paintOut() { var yours = 0, mine = 0, body = [];
     ["CALLS", "PROPOSALS", "PATTERNS"].forEach(function (g) { body.push(""); body.push(CW.groups[g]);
       D.choices.filter(function (c) { return c.group === g; }).forEach(function (c) { var e = eff(c), s = state.v[c.id] || {}, how, val;
-        if (e) { yours++; val = nameOf(c, e); how = e === c.mine ? CW.same : rt(CW.differs, { mine: nameOf(c, c.mine) }); } else { mine++; val = nameOf(c, c.mine); how = CW.minePick; }
+        if (e) { yours++; val = nameOf(c, e); how = c.ruled ? (e === c.ruled ? rt(CW.ruled, { by: c.ruledBy }) : rt(CW.changedRuled, { ruled: nameOf(c, c.ruled), by: c.ruledBy })) : e === c.mine ? CW.same : rt(CW.differs, { mine: nameOf(c, c.mine) }); } else { mine++; val = nameOf(c, c.mine); how = CW.minePick; }
         body.push(c.id + ": " + val + " (" + how + ")" + (s.n ? " · " + rt(CW.note, { note: s.n.replace(/\s+/g, " ").trim() }) : "")); }); });
     out.value = [rt(CW.head, { pageSha: D.pageSha }), rt(CW.counts, { yours: yours, mine: mine })].concat(body).join("\n");
     $("count").textContent = rt(U.page.count, { yours: yours, mine: mine }); }

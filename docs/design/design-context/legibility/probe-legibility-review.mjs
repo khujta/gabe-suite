@@ -1,6 +1,7 @@
 /* probe-legibility-review.mjs — a SMOKE probe of the legibility review page (D-037 light: build, --check, this probe once).
    It loads with no page error · every section draws · every picture file exists and decodes · the copy text carries every choice ·
-   no unfilled {token}, undefined or NaN · a click makes a look yours and the copy line says so · no text under 12px · no sideways scroll.
+   no unfilled {token}, undefined or NaN · a click makes a look yours and the copy line says so · pictures at full size scroll in their
+   own box · no he · him · his · no text under 12px · no sideways scroll.
 
      node docs/design/design-context/legibility/probe-legibility-review.mjs [--html <file>] [--shots <dir>]   # browser-gated; run it ALONE
        --shots <dir>   also save a picture of each section there (for looking, never committed) */
@@ -37,7 +38,7 @@ try {
   ok(n.looks === D.calls.reduce((a, c) => a + c.opts.length, 0), 'every value of every look is drawn with its plain line', String(n.looks));
   ok(n.items === D.items.length && n.qs === D.questions.length && n.pats === D.patterns.length && n.rem === D.remaining.length && n.gapRec === 1,
     'items, questions, patterns and remaining groups each draw one card', `${n.items} items · ${n.qs} questions · ${n.pats} patterns · ${n.rem} remaining · ${n.gapRec} gap choice`);
-  ok(n.props === D.patterns.reduce((a, x) => a + x.suite.length, 0), 'every draft suite proposal has its choice', String(n.props));
+  ok(n.props === D.patterns.reduce((a, x) => a + x.suite.length, 0) + 1 && !!(await p.$('#sec-pat [data-audit] [data-choice="' + D.audit.id + '"]')), 'every draft suite proposal has its choice, and the audit its own', String(n.props));
   /* untouched: each choice shows exactly one dashed pick, or its ruled value filled */
   { const wrong = await p.evaluate(() => window.LEG_DATA.choices.filter((c) => { const bs = [...document.querySelectorAll('[data-choice="' + CSS.escape(c.id) + '"]')];
       const dashed = bs.filter((x) => x.dataset.mine === 'true'), filled = bs.filter((x) => x.getAttribute('aria-pressed') === 'true');
@@ -70,6 +71,13 @@ try {
     ok(stored === 'throws' || (stored && stored.v && stored.v[c.id] && stored.v[c.id].v === other.v), 'the choice is kept under gabe:legibility:r1');
     await p.click('#reset'); const back = (await p.$eval('#out', (t) => t.value)).split('\n').find((l) => l.startsWith(c.id + ': '));
     ok(back.endsWith('(my pick, not ruled)'), 'clear gives every choice back to my pick', back); }
+  /* the pictures at full size stay inside their own scrollers (L10) */
+  { await p.click('#fullsize'); await p.waitForTimeout(200); const side = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    const wide = await p.evaluate(() => [...document.querySelectorAll('#sec-calls figure.pic img')].some((i) => i.getBoundingClientRect().width > i.closest('a').getBoundingClientRect().width + 1));
+    await p.click('#fullsize'); ok(side <= 1 && wide, 'pictures at full size scroll inside their own box, never the page', side + 'px'); }
+  /* the page speaks to you: no he · him · his in what it draws (L17) */
+  { const he = await p.evaluate(() => (document.querySelector('.artifact-page').innerText.match(/.{0,30}\b(he|him|his)\b.{0,20}/gi) || []));
+    ok(he.length === 0, 'no he · him · his on the page', he.slice(0, 2).join(' | ')); }
   /* no unfilled words */
   { const left = await p.evaluate(() => { const t = document.body.innerText; const m = t.match(/(?<![\/'"\w{])\{[a-z]\w*\}|\{\{\w+\}\}|\bundefined\b|\bNaN\b/g); return m || []; });
     ok(left.length === 0, 'no unfilled {token}, undefined or NaN on the page', left.slice(0, 4).join(' ')); }
