@@ -1,0 +1,66 @@
+{
+  "_about": "L-19 — the gap analysis he asked for: the lab's six parts against his new sections. Built from the read-only investigation of 2026-09-30 (the lab's own attribute tags in _lab-ep-panels.js, inventory-endpoint.md, prisms.md, brainmap-endpoint.json), values for POST /cooking/sessions. The page counts rows from this file; it types no count.",
+  "newSections": ["endings", "proof", "gates and decisions", "data and effects", "functions", "structures", "client", "in-flight state"],
+  "undecided": ["standard or specialist"],
+  "toMetadata": ["overview and risk"],
+  "asAxis": ["stages and order"],
+  "ruledPairing": "prisms.md, 2026-09-19: data → Data and effects · schemas → Structures · functions → Functions · tests → Proof · widening → Client · security → Gates and decisions ('a gate is one kind of fork').",
+  "parts": [
+    { "part": "data", "rows": [
+      ["tables touched", 3, "data and effects"], ["operation per table", 3, "data and effects"], ["fate of the writes", 3, "data and effects"],
+      ["provisions (a row the login adds)", 2, "data and effects"], ["how a table was found", 1, "hidden (about the map, D-017)"],
+      ["the moment a table is touched", 2, null], ["expected slots at this stage", 2, null],
+      ["race on a unique key", 3, "proof"], ["status code per ending", 2, "gates and decisions"], ["file:line", 1, "functions"] ] },
+    { "part": "schemas", "rows": [
+      ["request shape", 2, "structures"], ["response shape per ending", 2, "structures"], ["field rules of the request body", 2, "structures"], ["file:line", 1, "functions"] ] },
+    { "part": "functions", "rows": [
+      ["the handler", 3, "functions"], ["decision-point functions", 3, "functions"], ["roles per function", 3, "functions"], ["data-touching functions", 3, "functions"],
+      ["context-giving functions", 2, "functions"], ["signature", 2, "functions"], ["file:line", 1, "functions"],
+      ["the predicate per decision point", 3, "gates and decisions"], ["functions behind", 1, "metadata"] ] },
+    { "part": "tests", "rows": [
+      ["cases", 2, "proof"], ["case role", 2, "proof"], ["what the case asserts", 3, "proof"], ["coverage per condition", 3, "metadata"], ["workflow step", 1, "endings"] ] },
+    { "part": "widening", "rows": [
+      ["method + path", 3, "metadata"], ["who fetches it", 2, "client"], ["workflow step", 1, "endings"] ] },
+    { "part": "security", "rows": [
+      ["the checks met, in run order", 2, "gates and decisions"], ["app band (middleware on every request)", 1, "gates and decisions"],
+      ["auth scheme + gate", 2, "gates and decisions"], ["context-giving functions", 2, "gates and decisions"], ["declared status", 2, "endings"],
+      ["method + path", 3, "metadata"], ["switches", 2, null], ["idempotency claim", 2, null], ["delivery", 2, null], ["how common this piece is", 2, null] ] }
+  ],
+  "security": [
+    ["login scheme: a bearer token in the Authorization header", "carried", "gates and decisions"],
+    ["login check: get_auth_context refuses with 401", "carried", "gates and decisions + endings"],
+    ["the order the login helpers run", "partly lost", "functions"],
+    ["the login adds a users row the first time", "carried", "data and effects"],
+    ["app-wide middleware in run order: CORS, rate limit, repeat key", "orphaned (it sat in Stages and order)", "gates and decisions"],
+    ["rate limits per client IP, 429 with Retry-After", "carried", "gates and decisions + endings + in-flight state"],
+    ["switches that turn a check on (rate limiting on/off; which token checker runs)", "orphaned (it sat in Standard or specialist)", null],
+    ["repeat key: required, claimed with get-or-create, a race ends in 500", "carried", "gates and decisions + in-flight state + data and effects"],
+    ["who may do this: a household is required; another member's session reads as not found; allergens refuse", "carried", "gates and decisions"],
+    ["CORS: which websites may call the API (the allowed origins)", "missing from both", null],
+    ["secrets read on this path (the Firebase credentials)", "missing from both", null],
+    ["how the client IP is read for the limit", "carried", "in-flight state"],
+    ["status contract: what it declares", "carried", "endings"],
+    ["the commit", "carried", "data and effects"],
+    ["delivery: one answer or a stream", "carried", "endings"]
+  ],
+  "widening": [
+    ["the hook that fetches", "client"], ["the screen", "client"], ["routes → router → App above the screen", null],
+    ["the curated workflow step around it", "metadata"], ["usage and fan-in", "metadata"], ["the reply has other users", "structures"]
+  ],
+  "orphanedRated3": [
+    ["the ordered chain per ending", "drawn only as BY MOMENT's axis"],
+    ["events published", "drawn nowhere (would lose its home with Standard or specialist)"],
+    ["tasks dispatched", "drawn nowhere (would lose its home with Standard or specialist)"],
+    ["outside services called", "lands in metadata — it is an effect that can fail and cost, so data and effects fits better"],
+    ["coverage per condition", "lands in metadata — the per-ending marks belong in proof"]
+  ],
+  "recommend": [
+    { "id": "G1", "pick": true, "name": "No ninth row: a Security lens over the rows", "what": "Home the security facts in Gates and decisions (the middleware and the two switches move there), and add one control that lights every security element across the rows — the login check, the 401 and 429 endings, the limiters, the users row the login adds, a function that reads a secret. It is lit by his ruled per-stage security lines (STAGE_EXPECT.security). Two facts are read from the feed's settings to fill the gaps: the secrets read on the path, and the CORS allowed origins." },
+    { "id": "G2", "pick": false, "name": "A ninth row, Security", "what": "A row of its own; it would repeat or tear out the 401 and 429 endings, the in-flight limiters and the users row from their own rows." },
+    { "id": "G3", "pick": false, "name": "Nothing new: everything into Gates and decisions", "what": "The ruled pairing as it stands, without a lens; the two missing facts stay missing." }
+  ],
+  "alsoFound": [
+    "The lab's own Security part says 'none — a retry runs the work again' for this endpoint's idempotency, which is wrong: it looks for a table named idempotency_keys instead of reading the feed's repeat block.",
+    "The lab's Security part has numbers from POST /setup/complete typed into its sentences (the corpus proves five, 3 unique constraints, 11 writes …), false on every other endpoint."
+  ]
+}
