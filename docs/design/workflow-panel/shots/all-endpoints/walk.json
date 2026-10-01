@@ -515,7 +515,7 @@
       953,
       53,
       935,
-      6537
+      6593
      ]
     ],
     "universe": [
@@ -568,7 +568,7 @@
     "click": "show what this section is",
     "at": [
      221,
-     2
+     527
     ],
     "size": [
      26,
@@ -579,15 +579,27 @@
   ],
   [
    "one endpoint info shown",
-   []
+   [
+    "info-one: setup_complete · apps/api/api/setup.py:183 · authThe endpoint picked i",
+    "plain ainfo: The card the station draws for this endpoint as it opens (the Surface ",
+    "ucv-plain: Carried, on the universe card: an item BY MOMENT draws at a moment, on",
+    "gcv-plain: The switch reads whichever way the gaps are shown. From the code map: ",
+    "gap-st-plain: Pointing at a gap says why it exists, in D-042's words, and then its s",
+    "plain ainfo: Across the page's endpoints: 512 gaps solved elsewhere · 366 not solvi",
+    "plain ainfo: Attributes of the card the code map holds something for here, that no ",
+    "plain ainfo: What the code map knows about this endpoint, under the card's blocks.",
+    "cv-plain: Carried: an element BY MOMENT places at a moment, on any path, or a fa",
+    "enckey: Every action word and every value from a fixed set is a chip that carr",
+    "ainfo eplain: The endings in the order they happen, read off the paths' chains: on e"
+   ]
   ],
   [
    "step 52 · one-info-close",
    {
-    "click": "show what this section is",
+    "click": "hide what this section is",
     "at": [
      221,
-     2
+     527
     ],
     "size": [
      26,
@@ -621,7 +633,7 @@
    "hover a value chip",
    {
     "chip": "reads and writes",
-    "tip": "reads and writes · read or write, per table The endpoint reads this table and writes it. colour: as the endpoint lab draws it · chip: as the endpoint lab draws it"
+    "tip": "households · table reads and writes"
    }
   ],
   [
@@ -1107,7 +1119,7 @@
     "click": "open POST /setup/complete in the Gabe Universe",
     "at": [
      594,
-     435
+     283
     ],
     "size": [
      101,
@@ -1173,6 +1185,7 @@
      "The stage an ending leaves from",
      "Own guardsshown in part",
      "Kinds of ending",
+     "What the case asserts on this condition",
      "Case role on this endpoint",
      "The predicate per decision point",
      "Status code per ending",
@@ -1392,13 +1405,13 @@
   [
    "D-053 · a check lit",
    {
-    "chip": "lit: 403 · not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) (own guard) · 1 endpoints",
+    "chip": "lit: 403 · not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) (check) · 1 endpoints",
     "rowsLit": 1,
     "landsOn": [
      [
       null,
       null,
-      "guards11"
+      "checks11"
      ],
      [
       "x:81c0e80409",
@@ -1406,7 +1419,7 @@
       "not (RECIPE_CREATION_ENABLED or settings.recipe_creation_ena"
      ]
     ],
-    "cmSays": "403 · not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) (own guard) · 2 drawn here"
+    "cmSays": "403 · not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) (check) · 2 drawn here"
    }
   ],
   [
@@ -1414,7 +1427,7 @@
    {
     "click": "clear",
     "at": [
-     909,
+     880,
      401
     ],
     "size": [
@@ -1452,25 +1465,25 @@
      "validation INPUT 422 pydantic error type shared code FastAPI 3",
      "── checks",
      "refusal HANDLER 400 f\"Invalid allergen_safe code '{allergen_safe}'. Valid: {', '.join(sort allergen_safe is not None and allergen_safe not in allergen",
-     "refusal HANDLER 400 f\"Invalid diet code '{diet}'. Valid: {', '.join(sorted(preference_code diet is not None and diet not in preference_codes() · recip",
+     "refusal HANDLER 400 f\"Invalid diet code '{diet}'. Valid: {', '.join(sorted(preference_code diet is not None and diet not in preference_codes() · api/r",
      "refusal HANDLER 400 f\"Invalid technique code '{technique}'. Valid: {', '.join(sorted(curio technique is not None and technique not in curiosity_techni",
-     "refusal HANDLER 400 f\"Invalid mode '{mode}'. Valid: {', '.join(SCORING_MODES)}\" mode is not None and mode not in SCORING_MODES · recipes.py:363 8",
-     "refusal HANDLER 400 f\"Invalid exclude_equipment code '{raw_code}'. Valid: {', '.join(sorte exclude_equipment and norm not in valid_equipment · recipes",
-     "refusal HANDLER 400 f\"Invalid exclude_techniques code '{raw_code}'. Valid: {', '.join(sort exclude_techniques and norm not in valid_techniques · recip",
-     "refusal HANDLER 400 f\"Invalid taste axis '{axis}'. Valid: {', '.join(sorted(valid_axes))}\" taste and axis not in valid_axes · recipes.py:424 8",
-     "── after a call failed — caught at recipes.py:430 (except ValueError)",
-     "refusal HANDLER 400 f\"Invalid taste threshold '{raw_min}' for '{axis}' (expected an intege taste · recipes.py:431 9",
+     "refusal HANDLER 400 f\"Invalid mode '{mode}'. Valid: {', '.join(SCORING_MODES)}\" mode is not None and mode not in SCORING_MODES · api/recipes.py:363 8",
+     "refusal HANDLER 400 f\"Invalid exclude_equipment code '{raw_code}'. Valid: {', '.join(sorte exclude_equipment and norm not in valid_equipment · api/rec",
+     "refusal HANDLER 400 f\"Invalid exclude_techniques code '{raw_code}'. Valid: {', '.join(sort exclude_techniques and norm not in valid_techniques · api/r",
+     "refusal HANDLER 400 f\"Invalid taste axis '{axis}'. Valid: {', '.join(sorted(valid_axes))}\" taste and axis not in valid_axes · api/recipes.py:424 8",
+     "── after a call failed — caught at api/recipes.py:430 (except ValueError)",
+     "refusal HANDLER 400 f\"Invalid taste threshold '{raw_min}' for '{axis}' (expected an intege taste · api/recipes.py:431 9",
      "── checks",
-     "refusal HANDLER 400 f\"taste threshold for '{axis}' must be 1-5, got {minimum}.\" taste and not 1 <= minimum <= 5 · recipes.py:436 9",
-     "refusal HANDLER 400 f\"Invalid texture code '{raw_code}'. Valid: {', '.join(sorted(valid_te textures and norm not in valid_textures · recipes.py:453 8",
+     "refusal HANDLER 400 f\"taste threshold for '{axis}' must be 1-5, got {minimum}.\" taste and not 1 <= minimum <= 5 · api/recipes.py:436 9",
+     "refusal HANDLER 400 f\"Invalid texture code '{raw_code}'. Valid: {', '.join(sorted(valid_te textures and norm not in valid_textures · api/recipes.py:45",
      "refusal HANDLER 400 f\"Invalid temperature code '{temperature}'. Valid: {', '.join(sorted(t temperature is not None and temperature not in temperature_",
-     "refusal HANDLER 400 f\"Invalid texture code '{raw_code}'. Valid: {', '.join(sorted(valid_te exclude_textures and norm not in valid_textures · recipes.p",
+     "refusal HANDLER 400 f\"Invalid texture code '{raw_code}'. Valid: {', '.join(sorted(valid_te exclude_textures and norm not in valid_textures · api/recip",
      "refusal HANDLER 400 f\"Invalid temperature code '{exclude_temperature}'. Valid: {', '.join( exclude_temperature is not None and exclude_temperature not",
-     "refusal HANDLER 400 f\"Invalid taste axis '{axis}'. Valid: {', '.join(sorted(valid_cap_axes taste_max and axis not in valid_cap_axes · recipes.py:514 8",
-     "── after a call failed — caught at recipes.py:520 (except ValueError)",
-     "refusal HANDLER 400 f\"Invalid taste cap '{raw_max}' for '{axis}' (expected an integer 1-5) taste_max · recipes.py:521 9",
+     "refusal HANDLER 400 f\"Invalid taste axis '{axis}'. Valid: {', '.join(sorted(valid_cap_axes taste_max and axis not in valid_cap_axes · api/recipes.py:5",
+     "── after a call failed — caught at api/recipes.py:520 (except ValueError)",
+     "refusal HANDLER 400 f\"Invalid taste cap '{raw_max}' for '{axis}' (expected an integer 1-5) taste_max · api/recipes.py:521 9",
      "── checks",
-     "refusal HANDLER 400 f\"taste cap for '{axis}' must be 1-5, got {maximum}.\" taste_max and not 1 <= maximum <= 5 · recipes.py:526 9",
+     "refusal HANDLER 400 f\"taste cap for '{axis}' must be 1-5, got {maximum}.\" taste_max and not 1 <= maximum <= 5 · api/recipes.py:526 9",
      "success ANSWER 200 19",
      "uncaught UNCAUGHT 500 0"
     ]
@@ -1517,31 +1530,31 @@
   [
    "BY MOMENT · all paths",
    [
-    "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
-    "Endings refusal 429 refusal 429 framework 422 framework 400 refusal 401 refusal 401 validation 422 refusal 403 refusal 409 refusal 400 refusal 400 refusal 429 refusal 429",
-    "Proof C81 1 step before C79 proves 429 C79 proves 429 C73 proves 400 C74 proves 400 C72 proves 401 C72 proves 401 C83 proves 422 C971 proves 403 C72 proves 403 C73 proves",
-    "Gates and decisions sensitive global get_auth_context caller context.py:98 · translate 403 not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) 409 self.hous",
-    "Data effects users R users W flush resolve_or_create_user accessor commit build_auth_context caller memberships R households R locations R recipe_creation_requests R cano",
-    "Functions get_auth_context ↓1 caller build_auth_context ↓2 caller FirebaseTokenVerifier.verify ↓3 pure MockTokenVerifier.verify ↓3 pure load_household_context ↓3 accessor",
-    "Structures IN GustifyCreateRequest mode model_tier OUT GustifyCreationResponse · 7 ↳ CreationRequestResponse ↳ GeneratedCandidateOut ↳ GustifyUsage ↳ ResolvedIngredientOu",
-    "Client ",
-    "In-flight state setting-once rate_limit_active setting-once trusted_proxy_hops built-once _sensitive setting-once rate_limit_sensitive_per_minute setting-once rate_limit_",
-    "Standard or specialist flag environment, rate_limit_enabled binding TokenVerifier can answer 403 flag not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) re",
-    "Stages and order CORSMiddleware IdempotencyMiddleware body.mode missing body.mode string_too_long body.model_tier literal_error body missing 22 steps on its longest path",
-    "Overview and risk /recipe-creation/gustify POST served at /api/v1/recipe-creation/gustify first segment /recipe-creation recipe cluster recipe-creation conflict · large s"
+    "by moment outside the request EDGE2 endings INPUT1 of 22 endings GATE2 endings INPUT2 of 21 ending HANDLER11 endings EFFECTS ANSWER1 ending outside the request UNCAUGHT1 ",
+    "before any request × earlier in the test × the screen sends it × at the edge × reads the body × the dependencies × checks the fields × checks × the work generate_gustify_",
+    "Endings endings 20 ok 1 refused 15 body 2 shape 1 uncaught 1 refusal 429 sensitive refusal 429 global framework 422 framework 400 refusal 401 Not authenticated refusal 40",
+    "Proof tests 18 beyond 12 C81 1 request before C79 fits 429 2 of 5 C73 fits 400 1 of 3 C74 fits 400 1 of 3 C72 fits 401 2 of 3 C83 proves 422 C971 proves 403 C72 fits 403 ",
+    "Gates and decisions checks 11 login HTTPBearer forks 0 catches 7 rate global · sensitive switches 4 RateLimitMiddleware rate limit sensitive 20/60s → 429 app-wide rate li",
+    "Data effects tables 16 writes 3 fate 1 7 · in the map below 31 · in the map belowrare · claims its key with begin_nested · 4 of 80 1 · in the map below ",
+    "functions, in the order they first touch data which function reads or writes which table tables, in the order they are first touched the dependencies resolve_or_create_us",
+    "Functions deciders 3 data fns 14 get_auth_context caller build_auth_context caller FirebaseTokenVerifier.verify pure MockTokenVerifier.verify pure load_household_context ",
+    "Structures reply 7 fields 2 IN GustifyCreateRequest mode model_tier OUT GustifyCreationResponse · 7 ↳ CreationRequestResponse ↳ GeneratedCandidateOut ↳ GustifyUsage ↳ Res",
+    "Client screen 0 reads 0 ",
+    "In-flight state request 3 server 8 ▸ rate limit · 7 values kept by the server 429 sensitive 429 global idempotency_key on the request until the answer rare · reads a repe",
+    "Stages and order steps 22 rules 4 CORSMiddleware IdempotencyMiddleware mode required mode: at most 40 characters model_tier: one of its allowed values the body required "
    ]
   ],
   [
    "BY MOMENT · fits its box",
    {
     "box": 1854,
-    "table": 1994,
+    "table": 2004,
     "scrollsSideways": true
    }
   ],
   [
    "BY MOMENT · no moment",
-   "NOT PLACED Functions 1 not placed by name only _strip_port"
+   "NOT PLACED Functions 1 not placed no single function by this name _strip_port"
   ],
   [
    "step 109 · by-moment-info-open",
@@ -1561,7 +1574,7 @@
   [
    "BY MOMENT · its info",
    [
-    "One endpoint's time, left to right, with every block as a row (his default; the other look turns it). A column is a mome",
+    "One endpoint's time, left to right, with every block as a row (his default; the other look turns it). The top row names ",
     "The moments are D-053's, extended. Before the handler they are fixed: the server starting (before any request), the scre",
     "A handler moment that happens twice (checks, then a catch, then more checks) is drawn twice, in the order it happens, ne",
     "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs ",
@@ -1569,21 +1582,21 @@
     "The path: every path at once, or one path to its ending. Each path is a code, in the order its ending happens, a small g",
     "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it name",
     "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An end",
-    "The last column, no moment, holds per block the facts no moment of a request holds: what the endpoint is (its method and",
+    "The endpoint metadata, after the table (or before it, its option), holds per block the facts no moment of a request hold",
     "A test that walks across several endpoints, a journey, keeps each of its calls here where it is, and around each one has",
     "Across the 80 endpoints, what each block places:",
     "Endings: 727 with a moment, 1 the map cannot place, 0 with no moment by nature, of 728.",
     "Gates and decisions: 532 with a moment, 0 the map cannot place, 0 with no moment by nature, of 532.",
-    "Data effects: 1349 with a moment, 24 the map cannot place, 80 with no moment by nature, of 1453.",
-    "Functions: 1496 with a moment, 51 the map cannot place, 240 with no moment by nature, of 1787.",
+    "Data effects: 1345 with a moment, 24 the map cannot place, 80 with no moment by nature, of 1449.",
+    "Functions: 1495 with a moment, 45 the map cannot place, 240 with no moment by nature, of 1780.",
     "Structures: 339 with a moment, 0 the map cannot place, 0 with no moment by nature, of 339.",
-    "Client: 174 with a moment, 0 the map cannot place, 0 with no moment by nature, of 174.",
+    "Client: 185 with a moment, 0 the map cannot place, 0 with no moment by nature, of 185.",
     "In-flight state: 696 with a moment, 10 the map cannot place, 0 with no moment by nature, of 706.",
-    "Proof: 368 with a moment, 22 the map cannot place, 240 with no moment by nature, of 630.",
+    "Proof: 318 with a moment, 22 the map cannot place, 240 with no moment by nature, of 580.",
     "Stages and order: 442 with a moment, 0 the map cannot place, 80 with no moment by nature, of 522.",
     "Standard or specialist: 223 with a moment, 1 the map cannot place, 21 with no moment by nature, of 245.",
     "Overview and risk: 0 with a moment, 0 the map cannot place, 780 with no moment by nature, of 780.",
-    "Data effects, how each step was placed on each path it is on (4559 in all): 95 on the handler's own line, 455 inside a c",
+    "Data effects, how each step was placed on each path it is on (4544 in all): 88 on the handler's own line, 453 inside a c",
     "3 times a chain lists a call inside a catch its path never passes; that call is left off that path.",
     "2 times a path lists a step that no call of its own reaches while another path places it; it is left off that path.",
     "Journeys: the Gabe Universe names 106 across the page's endpoints, on 37 of them, and counts 57 more on 8 of them that i"
@@ -1608,15 +1621,16 @@
    "BY MOMENT · the heads (moments as columns, his default)",
    [
     "before any request",
+    "earlier in the test",
     "the screen sends it",
     "at the edge",
     "reads the body",
     "the dependencies",
     "checks the fields",
     "checks",
-    "generate_gustify_recipe +1",
+    "the work · generate_gustify_recipe +1",
     "generate_gustify_recipe · Exception",
-    "commit",
+    "saving · commit",
     "the answer",
     "after the answer",
     "escapes"
@@ -1627,7 +1641,7 @@
    {
     "click": "moments as rows",
     "at": [
-     1105,
+     1117,
      524
     ],
     "size": [
@@ -1647,15 +1661,16 @@
     },
     "heads": [
      "before any request",
+     "earlier in the test",
      "the screen sends it",
      "at the edge",
      "reads the body",
      "the dependencies",
      "checks the fields",
      "checks",
-     "generate_gustify_recipe +1",
+     "the work · generate_gustify_recipe +1",
      "generate_gustify_recipe · Exception",
-     "commit",
+     "saving · commit",
      "the answer",
      "after the answer",
      "escapes"
@@ -1667,7 +1682,7 @@
    {
     "click": "moments as columns",
     "at": [
-     1142,
+     1154,
      524
     ],
     "size": [
@@ -1682,7 +1697,7 @@
    {
     "click": "cells as counts",
     "at": [
-     1259,
+     1265,
      524
     ],
     "size": [
@@ -1695,18 +1710,18 @@
   [
    "BY MOMENT · cells as counts",
    [
-    "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
-    "Endings 2 2 2 1 3 8 1 1 ",
-    "Proof 1 2 2 2 1 4 10 11 2",
-    "Gates and decisions 2 2 3 5 9 ",
-    "Data effects 7 31 1 1",
-    "Functions 10 3 30 1 1 3",
-    "Structures 1 2 5 ",
-    "Client ",
-    "In-flight state 7 1 3 ",
-    "Standard or specialist 1 1 3 4 3 ",
-    "Stages and order 2 4 1",
-    "Overview and risk 12"
+    "by moment outside the request EDGE2 endings INPUT1 of 22 endings GATE2 endings INPUT2 of 21 ending HANDLER11 endings EFFECTS ANSWER1 ending outside the request UNCAUGHT1 ",
+    "before any request × earlier in the test × the screen sends it × at the edge × reads the body × the dependencies × checks the fields × checks × the work generate_gustify_",
+    "Endings endings 20 ok 1 refused 15 body 2 shape 1 uncaught 1 2 2 2 1 3 8 1 1",
+    "Proof tests 18 beyond 12 1 1 2 1 1 4 7 11 ",
+    "Gates and decisions checks 11 login HTTPBearer forks 0 catches 7 rate global · sensitive switches 4 3 3 4 6 9 ",
+    "Data effects tables 16 writes 3 fate 1 7 31 1 ",
+    "functions, in the order they first touch data which function reads or writes which table tables, in the order they are first touched the dependencies resolve_or_create_us",
+    "Functions deciders 3 data fns 14 10 3 30 1 1 ",
+    "Structures reply 7 fields 2 1 2 5 ",
+    "Client screen 0 reads 0 ",
+    "In-flight state request 3 server 8 7 1 3 ",
+    "Stages and order steps 22 rules 4 2 4 "
    ]
   ],
   [
@@ -1714,7 +1729,7 @@
    {
     "click": "cells as chips",
     "at": [
-     1222,
+     1228,
      524
     ],
     "size": [
@@ -1742,18 +1757,18 @@
   [
    "BY MOMENT · the path to the 402",
    [
-    "by moment before any request the screen sends it at the edge reads the body the dependencies checks the fields checks generate_gustify_recipe +1 generate_gustify_recipe E",
-    "Endings refusal 429 refusal 429 framework 422 framework 400 refusal 401 refusal 401 validation 422 refusal 403 refusal 409 refusal 400 refusal 400 refusal 429 refusal 429",
-    "Proof C81 1 step before C80 proves 402 C81 proves 402 C89 arranges C90 arranges",
-    "Gates and decisions sensitive global get_auth_context caller 403 not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) 409 self.household is None 400 key is N",
-    "Data effects users R users W saved flush resolve_or_create_user accessor commit build_auth_context caller memberships R households R locations R recipe_creation_requests ",
-    "Functions get_auth_context ↓1 caller build_auth_context ↓2 caller FirebaseTokenVerifier.verify ↓3 pure MockTokenVerifier.verify ↓3 pure load_household_context ↓3 accessor",
-    "Structures IN GustifyCreateRequest mode model_tier ",
-    "Client ",
-    "In-flight state setting-once rate_limit_active setting-once trusted_proxy_hops built-once _sensitive setting-once rate_limit_sensitive_per_minute setting-once rate_limit_",
-    "Standard or specialist flag environment, rate_limit_enabled binding TokenVerifier can answer 403 flag not (RECIPE_CREATION_ENABLED or settings.recipe_creation_enabled) re",
-    "Stages and order CORSMiddleware IdempotencyMiddleware body.mode missing body.mode string_too_long body.model_tier literal_error body missing 22 steps on its longest path",
-    "Overview and risk /recipe-creation/gustify POST served at /api/v1/recipe-creation/gustify first segment /recipe-creation recipe cluster recipe-creation conflict · large s"
+    "by moment outside the request EDGE INPUT1 of 2 GATE INPUT2 of 2 HANDLER1 ending outside the request",
+    "before any request × earlier in the test × the screen sends it × at the edge × reads the body × the dependencies × checks the fields × checks × the work generate_gustify_",
+    "Endings endings 20 ok 1 refused 15 body 2 shape 1 uncaught 1 refusal 429 sensitive refusal 429 global framework 422 framework 400 refusal 401 Not authenticated refusal 40",
+    "Proof tests 18 beyond 12 C81 1 request before C80 proves 402 C81 proves 402 ",
+    "Gates and decisions checks 11 login HTTPBearer forks 0 catches 7 rate global · sensitive switches 4 RateLimitMiddleware rate limit sensitive 20/60s → 429 app-wide rate li",
+    "Data effects tables 16 writes 3 fate 1 7 · in the map below 31 · in the map belowrare · claims its key with begin_nested · 4 of 80 ",
+    "functions, in the order they first touch data which function reads or writes which table tables, in the order they are first touched the dependencies resolve_or_create_us",
+    "Functions deciders 3 data fns 14 get_auth_context caller build_auth_context caller FirebaseTokenVerifier.verify pure MockTokenVerifier.verify pure load_household_context ",
+    "Structures reply 7 fields 2 IN GustifyCreateRequest mode model_tier ",
+    "Client screen 0 reads 0 ",
+    "In-flight state request 3 server 8 ▸ rate limit · 7 values kept by the server 429 sensitive 429 global idempotency_key on the request until the answer rare · reads a repe",
+    "Stages and order steps 22 rules 4 CORSMiddleware IdempotencyMiddleware mode required mode: at most 40 characters model_tier: one of its allowed values the body required "
    ]
   ],
   [
@@ -1774,16 +1789,16 @@
   [
    "step 121 · light-households-in-by-moment",
    {
-    "click": "householdsR",
+    "click": "households",
     "at": [
-     609,
+     1033,
      530
     ],
     "size": [
-     124,
+     102,
      20
     ],
-    "note": "the chip \"householdsR\" in the dependencies' column, Data effects"
+    "note": "the table \"households\" in the Data effects map, the dependencies' band"
    }
   ],
   [
@@ -1791,12 +1806,22 @@
    {
     "chip": "lit: households (table) · 79 endpoints",
     "rowsLit": 79,
-    "says": "households (table) · 1 drawn here",
+    "says": "households (table) · 3 drawn here",
     "inGrid": [
      [
       "gate",
       "data",
-      "householdsR"
+      "7 · in the map below"
+     ],
+     [
+      null,
+      "data",
+      "households"
+     ],
+     [
+      "gate",
+      "fn",
+      "Rhouseholds"
      ]
     ]
    }
@@ -1821,32 +1846,37 @@
    {
     "chip": "lit: households (table) · 79 endpoints",
     "rowsLit": 79,
-    "says": "households (table) · 5 drawn here",
+    "says": "households (table) · 6 drawn here",
     "inGrid": [
      [
       "gate",
       "data",
-      "householdsR"
+      "7 · in the map below"
      ],
      [
       "work",
       "data",
-      "householdsR"
+      "91 · in the map belowrare · claims its k"
+     ],
+     [
+      null,
+      "data",
+      "households"
      ],
      [
       "work",
-      "data",
-      "householdsR"
+      "fn",
+      "RWhouseholds"
      ],
      [
       "work",
-      "data",
-      "householdsW"
+      "fn",
+      "Rhouseholds"
      ],
      [
       "work",
-      "data",
-      "householdsW"
+      "fn",
+      "Whouseholds"
      ]
     ]
    }
@@ -1893,17 +1923,18 @@
    "D-055 · the heads",
    [
     "before any request",
+    "earlier in the test",
     "the screen sends it",
     "at the edge",
     "reads the body",
     "the dependencies",
     "checks the fields",
     "checks",
-    "subscription_tier_for +2",
+    "the work · subscription_tier_for +2",
     "start_session · SessionNotFoundError",
     "start_session · AllergenConflictError",
     "start_session · ConcurrentCookCapError",
-    "commit",
+    "saving · commit",
     "the answer",
     "after the answer",
     "escapes"
@@ -1927,18 +1958,18 @@
     "click": "the path to 404 · refusal · after a call failed — start_session raised",
     "at": [
      565,
-     537
+     482
     ],
     "size": [
      42,
      24
     ],
-    "note": "the code \"the path to 404 · refusal · after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) · Recipe not found\""
+    "note": "the code \"the path to 404 · refusal · after a call failed — start_session raised — caught at api/cooking.py:155 (except SessionNotFoundError) · Recipe not found\""
    }
   ],
   [
    "hover the chosen 404 code",
-   "404 · refusal ┆ moment: after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) ┆ says: Recipe not found ┆ the path in force now"
+   "404 · refusal ┆ moment: after a call failed — start_session raised — caught at api/cooking.py:155 (except SessionNotFoundError) ┆ says: Recipe not found ┆ the path in force now"
   ],
   [
    "step 134 · path-all-again",
@@ -1946,7 +1977,7 @@
     "click": "all paths",
     "at": [
      32,
-     536
+     481
     ],
     "size": [
      81,
@@ -1957,11 +1988,11 @@
   ],
   [
    "hover a failure head",
-   "after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) ┆ line 155 ┆ stage HANDLER — the endpoint's own code decides ┆ A call raised; this catch turned the error into these endings."
+   "after a call failed — start_session raised — caught at api/cooking.py:155 (except SessionNotFoundError) ┆ line 155 ┆ stage HANDLER — the endpoint's own code decides ┆ A call raised; this catch turned the error into these endings. ┆ Click: widen this column to what it holds; again: give the width back."
   ],
   [
    "hover the work head",
-   "the work ┆ lines 138 to 153 ┆ stage HANDLER — the endpoint's own code decides ┆ calls: subscription_tier_for · start_session · concurrent_cook_cap_for_tier ┆ The calls the handler makes after its checks, and what they read and write inside."
+   "the work ┆ lines 138 to 153 ┆ stage HANDLER — the endpoint's own code decides ┆ calls: subscription_tier_for · start_session · concurrent_cook_cap_for_tier ┆ The calls the handler makes after its checks, and what they read and write inside. ┆ Click: widen this column to what it holds; again: give the width back."
   ],
   [
    "D-055 · the code map, show all",
@@ -2105,7 +2136,7 @@
   ],
   [
    "hover the stream tables note",
-   "the tables ┆ attribute: Operation per table ┆ The kind of touch each table gets — read, add, update or delete. ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there. ┆ BY MOMENT's steps also touch 3 tables this field does not list: canonical_ingredients, ingredient_aliases, ingredient_restrictions. The code map is short of them."
+   "the tables ┆ attribute: Operation per table ┆ The kind of touch each table gets — read, add, update or delete. ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there, or in its endpoint metadata. ┆ BY MOMENT's steps also touch 3 tables this field does not list: canonical_ingredients, ingredient_aliases, ingredient_restrictions. The code map is short of them."
   ],
   [
    "step 146 · back-to-cooking-sessions",
@@ -2188,39 +2219,39 @@
   ],
   [
    "d056 hover the handler pair",
-   "handler ┆ async · 53 lines · returns CookingSessionResponse ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ no docstring ┆ attribute: The handler ┆ attribute: File:line ┆ attribute: Signature ┆ The function that faces the API and receives the request. ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there."
+   "handler ┆ async · 53 lines · returns CookingSessionResponse ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ no docstring ┆ attribute: The handler ┆ attribute: File:line ┆ attribute: Signature ┆ The function that faces the API and receives the request. ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there, or in its endpoint metadata."
   ],
   [
    "d056 hover a not-declared 409",
-   "409 · a client error status · not declared · status ┆ The endpoint does not declare this status; a client reading its contract does not expect it. ┆ The request is refused; the caller can change it and try again. ┆ colour: as the endpoint lab draws it"
+   "409 · refusal · HANDLER ┆ setup required ┆ not declared ┆ its own checks: self.household is None ┆ tests that name it: 1"
   ],
   [
    "d056 hover a function behind",
-   "seed_stage_schedule · Functions ┆ depth 2 ┆ How many calls below the handler it is reached. ┆ The code that runs, sorted by how much it decides."
+   "seed_stage_schedule · function ┆ BEFORE ┆ called by start_session ┆ under the handler's call at api/cooking.py:150 ┆ 2 calls below the handler ┆ CHECKS ┆ its docstring: On session start for a staged recipe: set current_stage=0 + schedule stage 1's reminder. ┆ updates cooking_sessions ┆ GIVES ┆ gives back CookingStageReminder | None ┆ counted in: data fns · behind"
   ],
   [
    "d056 hover the race",
-   "start_session · Data effects ┆ cooking.py:166 ┆ a race on uq_cooking_sessions_hh_key ┆ A first call and its retry with the same key both pass the check before this step; the later one breaks the unique key (household_id, idempotency_key) of cooking_sessions here, nothing catches it, and it ends in the uncaught 500. ┆ The rows the endpoint touches, the moment it touches them, and the fate of each change."
+   "start_session → cooking_sessions ┆ reads at services/cooking.py:119 · the work ┆ writes at services/cooking.py:165 · the work ┆ requests that carry the same household_id, idempotency_key, sent close together, can each pass the check; the later one breaks uq_cooking_sessions_hh_key at services/cooking.py:166 and ends in 500"
   ],
   [
    "d056 hover the first 429",
-   "429 · a client error status · not declared · status ┆ sends Retry-After: … ┆ The endpoint does not declare this status; a client reading its contract does not expect it. ┆ The request is refused; the caller can change it and try again. ┆ colour: as the endpoint lab draws it"
+   "429 · sensitive · refusal ┆ BEFORE ┆ on paths that start with one of 7 prefixes: /api/v1/cooking/sessions · /api/v1/pantry/items/batch · /api/v1/pantry/reset/apply · +4 ┆ 23 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its sensitive limit, and answers when the count is over, at rate_limit.py:117 ┆ 20 per 60 seconds, counted per caller IP, apart for the sensitive limit ┆ the limit is the setting rate_limit_sensitive_per_minute (env GUSTIFY_RATE_LIMIT_SENSITIVE_PER_MINUTE) ┆ GIVES ┆ answers 429: Rate limit exceeded. Try again shortly. ┆ not declared ┆ sends a Retry-After header, its value worked out as it answers ┆ no test proves it ┆ describeStartCookingError has no branch for it ┆ counted in: endings · refused"
   ],
   [
    "d056 hover the limiter",
-   "sensitive · Gates and decisions ┆ rate_limit.py:117 ┆ 20 per 60 seconds, keyed f'{ip}:sensitive' ┆ The checks that stop a request and the forks that decide its ending."
+   "sensitive · rate limit ┆ BEFORE ┆ runs in RateLimitMiddleware ┆ on paths that start with one of 7 prefixes: /api/v1/cooking/sessions · /api/v1/pantry/items/batch · /api/v1/pantry/reset/apply · +4 ┆ 23 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its sensitive limit, and answers when the count is over, at rate_limit.py:117 ┆ 20 per 60 seconds, counted per caller IP, apart for the sensitive limit ┆ the limit is the setting rate_limit_sensitive_per_minute (env GUSTIFY_RATE_LIMIT_SENSITIVE_PER_MINUTE) ┆ GIVES ┆ ends the request with 429: Rate limit exceeded. Try again shortly. ┆ sends a Retry-After header, its value worked out as it answers ┆ counted in: rate"
   ],
   [
    "d056 hover the login check",
-   "get_auth_context · Gates and decisions ┆ HTTPBearer ┆ HTTPBearer reads the Authorization header ┆ The checks that stop a request and the forks that decide its ending."
+   "get_auth_context · login check ┆ CHECKS ┆ HTTPBearer reads the Authorization header ┆ calls get_auth_context ┆ GIVES ┆ ends the request with 401: Not authenticated ┆ may add a users row, at ownership.py:49 ┆ counted in: login"
   ],
   [
    "d056 hover C237 hollow",
-   "C237 · Proof ┆ 378 · setup required · str(exc) · There was an error parsing the body · Idempotency-Key required for cooking session ┆ asserts status 400 · 409 ┆ fits 4 endings; this is one of them ┆ Its status fits endings at several moments, so it rides each of them, drawn hollow: it proves one of them, not which. ┆ The conditions a test proves, and the ones nothing reaches."
+   "C237 · test case ┆ BEFORE ┆ test_session_requires_idempotency_key_C237, at test_cooking.py:375 ┆ sends the headers a fixture sets; the test does not name them ┆ CHECKS ┆ calls POST /api/v1/cooking/sessions, at line 378 ┆ asserts status 400 · 409 ┆ GIVES ┆ fits the 400: There was an error parsing the body ┆ its status fits 4 endings, 1 of them here: it proves none of them, since the test does not show which one it gets ┆ last run: pass ┆ counted in: tests"
   ],
   [
    "d056 hover C267",
-   "C267 · Proof ┆ 367 ┆ asserts status 201 and asserts on the body (1) ┆ The conditions a test proves, and the ones nothing reaches."
+   "C267 · test case ┆ BEFORE ┆ test_start_session_response_carries_recipe_title_C267, at test_cooking_photos.py:361 ┆ sends Authorization, Idempotency-Key ┆ CHECKS ┆ calls POST /api/v1/cooking/sessions, at line 367 ┆ asserts status 201 ┆ and asserts on the body (1) ┆ GIVES ┆ proves the 201 from api/cooking.py:171 ┆ last run: pass ┆ counted in: tests · beyond · proven"
   ],
   [
    "step 160 · d056-path-to-the-201",
@@ -2228,7 +2259,7 @@
     "click": "the path to 201 · existing is not None · success · the answer",
     "at": [
      721,
-     537
+     482
     ],
     "size": [
      42,
@@ -2239,9 +2270,7 @@
   ],
   [
    "D-056 · the writes on the path to the 201",
-   [
-    "users W saved"
-   ]
+   []
   ],
   [
    "step 162 · d056-path-to-the-403",
@@ -2249,20 +2278,18 @@
     "click": "the path to 403 · refusal · after a call failed — start_session raised",
     "at": [
      617,
-     537
+     482
     ],
     "size": [
      42,
      24
     ],
-    "note": "the code \"the path to 403 · refusal · after a call failed — start_session raised — caught at cooking.py:159 (except AllergenConflictError) · Recipe contains your allergen restrictions\""
+    "note": "the code \"the path to 403 · refusal · after a call failed — start_session raised — caught at api/cooking.py:159 (except AllergenConflictError) · Recipe contains your allergen restrictions\""
    }
   ],
   [
    "D-056 · the writes on the path to the 403",
-   [
-    "users W saved"
-   ]
+   []
   ],
   [
    "step 164 · d056-all-paths-again",
@@ -2270,7 +2297,7 @@
     "click": "all paths",
     "at": [
      32,
-     536
+     481
     ],
     "size": [
      81,
@@ -2330,7 +2357,7 @@
   [
    "D-056 · the stream, its answer",
    [
-    "success 200 stream"
+    "success 200 stream rare · an answer with no body · 6 of 80"
    ]
   ],
   [
@@ -2361,7 +2388,7 @@
   ],
   [
    "review hover the handler signature and docstring",
-   "handler ┆ async · 53 lines · returns CookingSessionResponse ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ no docstring ┆ attribute: The handler ┆ attribute: File:line ┆ attribute: Signature ┆ The function that faces the API and receives the request. ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there."
+   "handler ┆ async · 53 lines · returns CookingSessionResponse ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ no docstring ┆ attribute: The handler ┆ attribute: File:line ┆ attribute: Signature ┆ The function that faces the API and receives the request. ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there, or in its endpoint metadata."
   ],
   [
    "step 172 · review-path-to-the-201",
@@ -2369,7 +2396,7 @@
     "click": "the path to 201 · existing is not None · success · the answer",
     "at": [
      721,
-     537
+     482
     ],
     "size": [
      42,
@@ -2380,9 +2407,7 @@
   ],
   [
    "review · the writes on the path to the 201, each with its fate",
-   [
-    "users W saved"
-   ]
+   []
   ],
   [
    "review · seed_stage_schedule on the replay 201 path",
@@ -2392,7 +2417,7 @@
    "picture · review-by-moment-path-to-the-201",
    {
     "pieces": 1,
-    "height": 3013
+    "height": 4261
    }
   ],
   [
@@ -2401,7 +2426,7 @@
     "click": "all paths",
     "at": [
      32,
-     536
+     481
     ],
     "size": [
      81,
@@ -2412,7 +2437,7 @@
   ],
   [
    "review hover the 401 declared or not with its header",
-   "401 · a client error status · not declared · status ┆ sends WWW-Authenticate: Bearer ┆ The endpoint does not declare this status; a client reading its contract does not expect it. ┆ The request is refused; the caller can change it and try again. ┆ colour: as the endpoint lab draws it"
+   "401 · refusal ┆ CHECKS ┆ HTTPBearer bearer_scheme gives it, at context.py:23 ┆ GIVES ┆ answers 401: Not authenticated ┆ not declared ┆ sends WWW-Authenticate: Bearer ┆ no test proves it ┆ describeStartCookingError has no branch for it ┆ counted in: endings · refused"
   ],
   [
    "review · the arranges pair",
@@ -2446,7 +2471,7 @@
   ],
   [
    "review hover CookingPhotoRef, inside CookingSessionResponse",
-   "CookingPhotoRef · Structures ┆ inside CookingSessionResponse ┆ The shapes of the body that comes in and the body that goes out."
+   "CookingPhotoRef · schema ┆ BEFORE ┆ inside CookingSessionResponse ┆ CHECKS ┆ 5 fields: id · slot · content_type · +2"
   ],
   [
    "step 179 · review-open-the-stream",
@@ -2466,14 +2491,14 @@
   [
    "review · the stream, its answer",
    [
-    "success 200 stream [delivery:stream]"
+    "success 200 stream rare · an answer with no body · 6 of 80 [delivery:stream]"
    ]
   ],
   [
    "picture · review-the-stream-answer",
    {
     "pieces": 1,
-    "height": 5284
+    "height": 4144
    }
   ],
   [
@@ -2537,7 +2562,7 @@
   ],
   [
    "d057 hover the alarms pair",
-   "alarms ┆ attribute: Findings ┆ The anomalies the form check found on the endpoint. ┆ shown by no universe row ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there."
+   "alarms ┆ attribute: Findings ┆ The anomalies the form check found on the endpoint. ┆ shown by no universe row ┆ BY MOMENT carries this field whole: each of its elements stands at a moment there, or in its endpoint metadata."
   ],
   [
    "D-057 · the path row",
@@ -2549,7 +2574,7 @@
   ],
   [
    "d057 hover a 201 code (13)",
-   "201 · past every fork, to the end · success ┆ the fork it takes: past every fork, to the end ┆ moment: the answer ┆ click to follow only this path"
+   "201 · otherwise: past every fork, to the end · success ┆ the fork it takes: otherwise: past every fork, to the end ┆ moment: the answer ┆ click to follow only this path"
   ],
   [
    "step 188 · d057-the-201-code-12",
@@ -2557,7 +2582,7 @@
     "click": "the path to 201 · existing is not None · success · the answer",
     "at": [
      721,
-     537
+     482
     ],
     "size": [
      42,
@@ -2568,41 +2593,34 @@
   ],
   [
    "D-057 · on this 201, the writes",
-   [
-    "gate users W saved"
-   ]
+   []
   ],
   [
    "D-057 · on this 201, the moments",
-   "before any request · the screen sends it · at the edge · reads the body · the dependencies · checks the fields · checks · subscription_tier_for +2 · commit · the answer · after the answer"
+   "before any request · earlier in the test · the screen sends it · at the edge · reads the body · the dependencies · checks the fields · checks · the work · subscription_tier_for +2 · saving · commit · the answer · after the answer"
   ],
   [
    "step 190 · d057-the-201-code-13",
    {
-    "click": "the path to 201 · past every fork, to the end · success · the answer",
+    "click": "the path to 201 · otherwise: past every fork, to the end · success · t",
     "at": [
      766,
-     537
+     482
     ],
     "size": [
      42,
      24
     ],
-    "note": "the code \"the path to 201 · past every fork, to the end · success · the answer\""
+    "note": "the code \"the path to 201 · otherwise: past every fork, to the end · success · the answer\""
    }
   ],
   [
    "D-057 · on this 201, the writes",
-   [
-    "gate users W saved",
-    "work cooking_sessions W saved",
-    "work cooking_sessions W saved",
-    "work cooking_stage_reminders W saved"
-   ]
+   []
   ],
   [
    "D-057 · on this 201, the moments",
-   "before any request · the screen sends it · at the edge · reads the body · the dependencies · checks the fields · checks · subscription_tier_for +2 · commit · the answer · after the answer"
+   "before any request · earlier in the test · the screen sends it · at the edge · reads the body · the dependencies · checks the fields · checks · the work · subscription_tier_for +2 · saving · commit · the answer · after the answer"
   ],
   [
    "step 192 · d057-all-paths-again",
@@ -2610,7 +2628,7 @@
     "click": "all paths",
     "at": [
      32,
-     536
+     481
     ],
     "size": [
      81,
@@ -2621,27 +2639,27 @@
   ],
   [
    "d057 hover the check that raises the lost reason",
-   "404 · existing is not None and existing.user_id != user_id · Gates and decisions ┆ start_session @ cooking.py:150 ┆ checked inside start_session; a path picked here may skip it ┆ It stands on the paths that call start_session, less those that leave start_session before it; a path may still skip it or leave before it, so a path picked here may not reach it. ┆ raises SessionNotFoundError: “Cooking session not found” ┆ The checks that stop a request and the forks that decide its ending."
+   "existing is not None and existing.user_id != user_id · check ┆ BEFORE ┆ runs in start_session ┆ inside start_session, called at api/cooking.py:150 ┆ CHECKS ┆ checks existing is not None and existing.user_id != user_id, at services/cooking.py:129 ┆ GIVES ┆ ends the request with 404: Recipe not found ┆ raises SessionNotFoundError: “Cooking session not found” ┆ except SessionNotFoundError in post_start_session catches it, at api/cooking.py:155 ┆ counted in: checks"
   ],
   [
    "d057 hover the 404 after the catch",
-   "refusal · kind of ending ┆ An ending where the app's own code says no. ┆ colour: as the table draws it · icon: as the endpoint lab draws it"
+   "HANDLER · the endpoint's own code decides ┆ 5 endings leave from here"
   ],
   [
    "d057 hover the client branch that reads 409",
-   "apps/web/src/features/cooking/cookingSessionModel.ts:389 · none · Client ┆ reads the status: === 409 ┆ what it does: hands back the text “cooking.error.start_concurrent_cap” ┆ The branch uses neither the reason nor the error. ┆ The screen's side of each ending."
+   "reads 409 · in describeStartCookingError · reason site ┆ BEFORE ┆ in describeStartCookingError ┆ reached by 409 setup required · 409 the text of the ConcurrentCookCapError it caught ┆ the error comes from useCookingLoopActions (303, 386) ┆ CHECKS ┆ reads the status: === 409, at cookingSessionModel.ts:389 ┆ GIVES ┆ what it does: hands back the text “cooking.error.start_concurrent_cap” ┆ the same text for 2 endings: a user cannot tell them apart ┆ counted in: reads"
   ],
   [
    "d057 hover _stages at the work",
-   "_stages · Functions ┆ depth 3 ┆ How many calls below the handler it is reached. ┆ The code that runs, sorted by how much it decides."
+   "_stages · function ┆ BEFORE ┆ called by seed_stage_schedule ┆ under the handler's call at api/cooking.py:150 ┆ 3 calls below the handler ┆ GIVES ┆ gives back list[dict[str, Any]] ┆ counted in: behind"
   ],
   [
    "d057 hover _label at the work",
-   "_label · Functions ┆ depth 4 ┆ How many calls below the handler it is reached. ┆ The code that runs, sorted by how much it decides."
+   "_label · function ┆ BEFORE ┆ called by _schedule_next ┆ under the handler's call at api/cooking.py:150 ┆ 4 calls below the handler ┆ GIVES ┆ gives back str ┆ counted in: behind"
   ],
   [
    "d057 hover derive_restrictions at the work",
-   "derive_restrictions · Functions ┆ on 1 of its paths, assert_recipe_allergen_safe is left partway, maybe before calling it ┆ It is called somewhere inside assert_recipe_allergen_safe. A path that leaves assert_recipe_allergen_safe partway, at a check that fires or on an error, may leave before that call, so it may never run on that path. ┆ The code that runs, sorted by how much it decides."
+   "derive_restrictions · function ┆ BEFORE ┆ runs under assert_recipe_allergen_safe ┆ under the handler's call at api/cooking.py:150 ┆ assert_recipe_allergen_safe can end partway, before it calls this: a check that fires, or an error"
   ],
   [
    "step 199 · d057-open-the-by-moment-info",
@@ -2694,11 +2712,11 @@
   ],
   [
    "d057 hover the 500",
-   "500 · a server error status · status ┆ escapes from ValueError, raised at cooking.py:442 ┆ The server failed; nothing the caller changes fixes it. ┆ colour: as the endpoint lab draws it"
+   "500 · uncaught ┆ BEFORE ┆ escapes from ValueError, raised at services/cooking.py:442 ┆ CHECKS ┆ nothing catches it ┆ GIVES ┆ answers 500 ┆ no test proves it ┆ no screen code reads it ┆ counted in: endings · uncaught"
   ],
   [
    "d057 hover set_session_timer",
-   "set_session_timer · Functions ┆ @ 368 ┆ depth 1 ┆ How many calls below the handler it is reached. ┆ raises ValueError at cooking.py:442, and nothing catches it ┆ The code that runs, sorted by how much it decides."
+   "set_session_timer · function ┆ BEFORE ┆ called at api/cooking.py:368 ┆ one call below the handler ┆ CHECKS ┆ its docstring: Start/replace or clear a session's per-step timer (H7, founder-locked 2026-07-08). ┆ defined at services/cooking.py:419 ┆ reads cooking_sessions and recipe_steps and recipes ┆ updates cooking_sessions ┆ GIVES ┆ gives back CookingSession ┆ raises ValueError at services/cooking.py:442; no except of that class stands on this endpoint's way ┆ raises SessionNotFoundError at services/cooking.py:458, answered 404 ┆ raises ValueError at services/cooking.py:442, and nothing catches it ┆ counted in: deciders · data fns · behind"
   ],
   [
    "step 205 · d057-open-setup-complete",
@@ -2717,7 +2735,7 @@
   ],
   [
    "d057 hover the setup client branch",
-   "apps/web/src/features/auth/SetupScreen.tsx:43 · none · Client ┆ reads the status: === 409 ┆ what it does: hands back what t(“auth.setup.error.in_progress”) gives ┆ The branch uses neither the reason nor the error. ┆ The screen's side of each ending."
+   "reads 409 · in setupErrorMessage · reason site ┆ BEFORE ┆ in setupErrorMessage ┆ reached by 409 consent required · 409 setup in progress ┆ the error comes from SetupScreen ┆ CHECKS ┆ reads the status: === 409, at SetupScreen.tsx:43 ┆ GIVES ┆ what it does: hands back what t(“auth.setup.error.in_progress”) gives ┆ the same text for 2 endings: a user cannot tell them apart ┆ counted in: reads"
   ],
   [
    "D-057 · POST /setup/complete, the path row",
@@ -2785,48 +2803,48 @@
   ],
   [
    "review hover the 201 code 13",
-   "201 · past every fork, to the end · success ┆ the fork it takes: past every fork, to the end ┆ moment: the answer ┆ click to follow only this path"
+   "201 · otherwise: past every fork, to the end · success ┆ the fork it takes: otherwise: past every fork, to the end ┆ moment: the answer ┆ click to follow only this path"
   ],
   [
    "review · the first-run 201 is the code whose hover says",
-   "past every fork, to the end"
+   "otherwise: past every fork, to the end"
   ],
   [
    "step 213 · review-pick-the-first-run-201",
    {
-    "click": "the path to 201 · past every fork, to the end · success · the answer",
+    "click": "the path to 201 · otherwise: past every fork, to the end · success · t",
     "at": [
      766,
-     537
+     482
     ],
     "size": [
      42,
      24
     ],
-    "note": "the code \"the path to 201 · past every fork, to the end · success · the answer\""
+    "note": "the code \"the path to 201 · otherwise: past every fork, to the end · success · the answer\""
    }
   ],
   [
    "review · on the first-run 201, the checks at the work",
    [
-    "404 existing is not None and existing.user_id != user_id",
-    "404 recipe is None",
-    "409 concurrent_cap is not None and active + 1 > concurrent_cap",
-    "existing is not None",
-    "start_session"
+    "check existing is not None and existing.user_id != user_id → 404 inside a call",
+    "check recipe is None → 404 inside a call",
+    "check concurrent_cap is not None and active + 1 > concurrent_cap → 409 inside a call",
+    "fork existing is not None returns 201 inside a call",
+    "fork otherwise returns 201 inside a call"
    ]
   ],
   [
    "review hover seed_stage_schedule on the first-run 201",
-   "seed_stage_schedule · Functions ┆ depth 2 ┆ How many calls below the handler it is reached. ┆ The code that runs, sorted by how much it decides."
+   "seed_stage_schedule · function ┆ BEFORE ┆ called by start_session ┆ under the handler's call at api/cooking.py:150 ┆ 2 calls below the handler ┆ CHECKS ┆ its docstring: On session start for a staged recipe: set current_stage=0 + schedule stage 1's reminder. ┆ updates cooking_sessions ┆ GIVES ┆ gives back CookingStageReminder | None ┆ counted in: data fns · behind"
   ],
   [
    "review hover the check that raises SessionNotFoundError",
-   "404 · recipe is None · Gates and decisions ┆ start_session @ cooking.py:150 ┆ raises SessionNotFoundError; its words are no fixed text: built as it raises, or none given ┆ The checks that stop a request and the forks that decide its ending."
+   "recipe is None · check ┆ BEFORE ┆ runs in start_session ┆ inside start_session, called at api/cooking.py:150 ┆ only when existing is None ┆ CHECKS ┆ checks recipe is None, at services/cooking.py:140 ┆ GIVES ┆ ends the request with 404: Recipe not found ┆ raises SessionNotFoundError, with no fixed message ┆ as written: not (existing is not None) ┆ counted in: checks"
   ],
   [
    "review hover the cap check",
-   "409 · concurrent_cap is not None and active + 1 > concurrent_cap · Gates and decisions ┆ start_session @ cooking.py:150 ┆ checked inside start_session; a path picked here may skip it ┆ It stands on the paths that call start_session, less those that leave start_session before it; a path may still skip it or leave before it, so a path picked here may not reach it. ┆ raises ConcurrentCookCapError; its words are no fixed text: built as it raises, or none given ┆ The checks that stop a request and the forks that decide its ending."
+   "concurrent_cap is not None and active + 1 > concurrent_cap · check ┆ BEFORE ┆ runs in start_session ┆ inside start_session, called at api/cooking.py:150 ┆ only when existing is None · recipe is not None ┆ CHECKS ┆ checks concurrent_cap is not None and active + 1 > concurrent_cap, at services/cooking.py:155 ┆ GIVES ┆ ends the request with 409: the text of the ConcurrentCookCapError it caught ┆ raises ConcurrentCookCapError, with no fixed message ┆ as written: not (existing is not None) · not (recipe is None) ┆ counted in: checks"
   ],
   [
    "step 218 · review-all-paths-again",
@@ -2834,7 +2852,7 @@
     "click": "all paths",
     "at": [
      32,
-     536
+     481
     ],
     "size": [
      81,
@@ -2845,11 +2863,11 @@
   ],
   [
    "review hover the client branch after the answer",
-   "apps/web/src/features/cooking/cookingSessionModel.ts:389 · none · Client ┆ reads the status: === 409 ┆ what it does: hands back the text “cooking.error.start_concurrent_cap” ┆ The branch uses neither the reason nor the error. ┆ The screen's side of each ending."
+   "reads 409 · in describeStartCookingError · reason site ┆ BEFORE ┆ in describeStartCookingError ┆ reached by 409 setup required · 409 the text of the ConcurrentCookCapError it caught ┆ the error comes from useCookingLoopActions (303, 386) ┆ CHECKS ┆ reads the status: === 409, at cookingSessionModel.ts:389 ┆ GIVES ┆ what it does: hands back the text “cooking.error.start_concurrent_cap” ┆ the same text for 2 endings: a user cannot tell them apart ┆ counted in: reads"
   ],
   [
    "review hover a function known by name only",
-   "ResolutionSnapshot.violations_for · Functions ┆ on 1 of its paths, assert_recipe_allergen_safe is left partway, maybe before calling it ┆ It is called somewhere inside assert_recipe_allergen_safe. A path that leaves assert_recipe_allergen_safe partway, at a check that fires or on an error, may leave before that call, so it may never run on that path. ┆ The code that runs, sorted by how much it decides."
+   "ResolutionSnapshot.violations_for · function ┆ BEFORE ┆ runs under assert_recipe_allergen_safe ┆ under the handler's call at api/cooking.py:150 ┆ assert_recipe_allergen_safe can end partway, before it calls this: a check that fires, or an error"
   ],
   [
    "step 221 · review-open-session-complete",
@@ -2868,7 +2886,7 @@
   ],
   [
    "review hover the 500 of complete",
-   "500 · a server error status · status ┆ escapes from ValueError, raised at cooking.py:582 ┆ The server failed; nothing the caller changes fixes it. ┆ colour: as the endpoint lab draws it"
+   "500 · uncaught ┆ BEFORE ┆ escapes from ValueError, raised at services/cooking.py:582 ┆ CHECKS ┆ nothing catches it ┆ GIVES ┆ answers 500 ┆ no test proves it ┆ no screen code reads it ┆ counted in: endings · uncaught"
   ],
   [
    "step 223 · d058-open-cooking-sessions",
@@ -2895,14 +2913,14 @@
     "gaps": [
      "all",
      "cm",
-     "22 of 22 carried by BY MOMENT · 0 left"
+     "22 of 23 carried by BY MOMENT · 1 left"
     ],
     "notes": []
    }
   ],
   [
    "d058 hover the universe dim square",
-   "dim what BY MOMENT carries ┆ An item BY MOMENT draws at a moment fades: a guard, a table, a chip, a case, found by its key, or a function Code behind names without one, found by its name; a journey BY MOMENT draws, at the outer moments or by name in its last column. A row whose items it draws, every one, fades with its title. Pointing at one brings it back."
+   "dim what BY MOMENT carries ┆ An item BY MOMENT already draws fades; a row whose items it draws, every one, fades with its title. Pointing at one brings it back."
   ],
   [
    "step 226 · d058-universe-dim",
@@ -2929,7 +2947,7 @@
     "gaps": [
      "all",
      "cm",
-     "22 of 22 carried by BY MOMENT · 0 left"
+     "22 of 23 carried by BY MOMENT · 1 left"
     ],
     "notes": []
    }
@@ -2963,7 +2981,7 @@
     "gaps": [
      "all",
      "cm",
-     "22 of 22 carried by BY MOMENT · 0 left"
+     "22 of 23 carried by BY MOMENT · 1 left"
     ],
     "notes": [
      "GUARDS +1 in BY MOMENT",
@@ -3096,14 +3114,15 @@
     "gaps": [
      "hide",
      "cm",
-     "22 of 22 carried by BY MOMENT · 0 left"
+     "22 of 23 carried by BY MOMENT · 1 left"
     ],
     "notes": [
      "GUARDS +1 in BY MOMENT",
      "PAYLOAD +1 in BY MOMENT",
      "TESTS +8 in BY MOMENT",
      "IDENTITY +1 in BY MOMENT",
-     "ABOVE +2 in BY MOMENT"
+     "ABOVE +2 in BY MOMENT",
+     "c7 +1 in BY MOMENT"
     ]
    }
   ],
@@ -3155,7 +3174,7 @@
     "gaps": [
      "all",
      "cm",
-     "22 of 22 carried by BY MOMENT · 0 left"
+     "22 of 23 carried by BY MOMENT · 1 left"
     ],
     "notes": []
    }
@@ -3185,7 +3204,7 @@
     "gaps": [
      "all",
      "cm",
-     "22 of 22 carried by BY MOMENT · 0 left"
+     "22 of 23 carried by BY MOMENT · 1 left"
     ],
     "notes": []
    }
@@ -3259,7 +3278,7 @@
     "gaps": [
      "all",
      "cm",
-     "22 of 22 carried by BY MOMENT · 0 left"
+     "22 of 23 carried by BY MOMENT · 1 left"
     ],
     "notes": [
      "GUARDS +1 in BY MOMENT",
@@ -3495,81 +3514,88 @@
    }
   ],
   [
-   "D-064 (2) · the no-moment column, cell by cell",
+   "D-064 (2) · the endpoint metadata, card by card (D-068: where the no-moment column went)",
    [
-    "proof: C1087 arranges | C250 arranges | C283 arranges | C284 arranges | C555 arranges | C675 arranges | C266 arranges through a helper | 11 case(s) e2e | 6 case(s) e2e",
-    "data: saved 1 no own write 14",
-    "fn: apps/api/api/cooking.py:114 def at line 119 | async · 53 lines · returns CookingSessionResponse | no docstring",
-    "stage: 22 steps on its longest path",
-    "over: /cooking/sessions POST | served at /api/v1/cooking/sessions | first segment /cooking | cooking | cluster cooking | conflict · large surface | 18 behind · 4 calls deep | 4/11 of its refusals named by a test, a test that fits several counted for each · rank 3–6 of 80 | race-500 | reason-collapsed | reason-lost | shared-status | text-only | undeclared"
+    "over: Overview and risk /cooking/sessions POST served at /api/v1/cooking/sessions first segment /cooking cooking cluster cooking large surface proven 2/14 endings a t",
+    "proof: Proof C1087 cook route unlocks surface on profile arranges C250 cook complete history pantry loop arranges C283 timer patch api round trip arranges C284 timer p",
+    "data: Data effects fate 1 saved 1 no own write 14",
+    "fn: Functions apps/api/api/cooking.py:114 def at line 119 async · 53 lines · returns CookingSessionResponse no docstring",
+    "std: Standard or specialist pieces 3 claims its key with get-or-create · reads a repeat key · can answer 403 lacks 0",
+    "stage: Stages and order steps 22"
    ]
   ],
   [
    "D-064 (2) · the band",
-   "NOT PLACED the map places every element that should have a moment"
+   "NOT PLACED every element that should have a moment has one"
   ],
   [
-   "D-064 (2) · the box scrolled to its end",
+   "D-064 (2) · the box, at its start",
    {
     "box": 1854,
-    "table": 2283,
-    "at": 429,
-    "note": true
+    "table": 2497,
+    "at": 14,
+    "metadataAfter": "mogrid"
    }
   ],
   [
-   "D-064 (2) · the no-moment cell of proof photographed",
+   "D-064 (2) · the metadata card of over photographed",
    {
-    "box": 429
+    "h": 533
    }
   ],
   [
-   "D-064 (2) · the no-moment cell of data photographed",
+   "D-064 (2) · the metadata card of proof photographed",
    {
-    "box": 429
+    "h": 411
    }
   ],
   [
-   "D-064 (2) · the no-moment cell of fn photographed",
+   "D-064 (2) · the metadata card of data photographed",
    {
-    "box": 429
+    "h": 92
    }
   ],
   [
-   "D-064 (2) · the no-moment cell of stage photographed",
+   "D-064 (2) · the metadata card of fn photographed",
    {
-    "box": 429
+    "h": 152
    }
   ],
   [
-   "D-064 (2) · the no-moment cell of over photographed",
+   "D-064 (2) · the metadata card of std photographed",
    {
-    "box": 429
+    "h": 134
    }
   ],
   [
-   "d064 hover the no-moment head",
-   "no moment ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
+   "D-064 (2) · the metadata card of stage photographed",
+   {
+    "h": 69
+   }
+  ],
+  [
+   "d064 hover the metadata title",
+   "endpoint metadata ┆ Facts with no moment: what the endpoint is and what sums it up, one card per block. Each is true of every path, so the path row never hides it; and, on Proof's card, the journeys whose requests cannot be set in order around this one, each with its reason."
   ],
   [
    "d064 hover the handler file and line",
-   "the handler's file and line · Functions · no moment ┆ apps/api/api/cooking.py ┆ The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
+   "the handler's file and line · Functions ┆ apps/api/api/cooking.py ┆ The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known."
   ],
   [
    "d064 hover the outline",
-   "the handler's outline · Functions · no moment ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ Async or not, how many lines it runs, the type it returns; its def in the hover. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
+   "the handler's outline · Functions ┆ async def post_start_session(request: Request, payload: SessionCreateRequest, ctx: Annotated[AuthContext, Depends(get_auth_context)], session: Annotated[AsyncSession, Depends(get_session)]) -> CookingSessionResponse ┆ Async or not, how many lines it runs, the type it returns; its def in the hover."
   ],
   [
    "d064 hover the cluster",
-   "cluster · Overview and risk · no moment ┆ The group of endpoints the Gabe Universe draws it in, inside its entity. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
+   "cluster · Overview and risk ┆ The group of related endpoints it sits in, inside its entity."
   ],
   [
-   "step 265 · d064-path-the-replay-201",
+   "step 266 · d064-path-the-replay-201",
    {
     "click": "the path to 201 · existing is not None · success · the answer",
     "at": [
      721,
-     537
+     482
     ],
     "size": [
      42,
@@ -3587,18 +3613,18 @@
    ]
   ],
   [
-   "step 266 · d064-path-the-404",
+   "step 267 · d064-path-the-404",
    {
     "click": "the path to 404 · refusal · after a call failed — start_session raised",
     "at": [
      565,
-     537
+     482
     ],
     "size": [
      42,
      24
     ],
-    "note": "the code \"the path to 404 · refusal · after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) · Recipe not found\""
+    "note": "the code \"the path to 404 · refusal · after a call failed — start_session raised — caught at api/cooking.py:155 (except SessionNotFoundError) · Recipe not found\""
    }
   ],
   [
@@ -3609,18 +3635,18 @@
    ]
   ],
   [
-   "step 267 · d064-path-the-first-run-201",
+   "step 268 · d064-path-the-first-run-201",
    {
-    "click": "the path to 201 · past every fork, to the end · success · the answer",
+    "click": "the path to 201 · otherwise: past every fork, to the end · success · t",
     "at": [
      766,
-     537
+     482
     ],
     "size": [
      42,
      24
     ],
-    "note": "the code \"the path to 201 · past every fork, to the end · success · the answer\""
+    "note": "the code \"the path to 201 · otherwise: past every fork, to the end · success · the answer\""
    }
   ],
   [
@@ -3642,12 +3668,12 @@
    ]
   ],
   [
-   "step 268 · d064-all-paths-again",
+   "step 269 · d064-all-paths-again",
    {
     "click": "all paths",
     "at": [
      32,
-     536
+     481
     ],
     "size": [
      81,
@@ -3661,7 +3687,7 @@
    "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here"
   ],
   [
-   "step 269 · d064-carry-hide",
+   "step 270 · d064-carry-hide",
    {
     "click": "hide what BY MOMENT carries",
     "at": [
@@ -3684,7 +3710,7 @@
    []
   ],
   [
-   "step 270 · d064-carry-show-all",
+   "step 271 · d064-carry-show-all",
    {
     "click": "show all",
     "at": [
@@ -3705,43 +3731,41 @@
   [
    "review of D-064 · BY MOMENT photographed from its top",
    {
-    "section": 3643,
-    "window": 3781,
+    "section": 4580,
+    "window": 4718,
     "box": {
      "box": 1854,
-     "table": 2283,
-     "at": 429
+     "table": 2497,
+     "at": 0
     },
-    "lastColumn": {
-     "left": 1720,
-     "right": 1887,
-     "inWindow": true
+    "metadata": {
+     "after": "mogrid",
+     "cards": [
+      "over",
+      "proof",
+      "data",
+      "fn",
+      "std",
+      "stage"
+     ]
     }
    }
   ],
   [
-   "review of D-064 · the box, wheeled",
-   {
-    "box": 1854,
-    "table": 2283,
-    "at": 429
-   }
-  ],
-  [
    "d064r hover the entity chip",
-   "entity · Overview and risk · no moment ┆ cooking ┆ The feature of the app that owns the endpoint. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
+   "entity · Overview and risk ┆ cooking ┆ The feature of the app that owns the endpoint."
   ],
   [
    "d064r hover the file and line",
-   "the handler's file and line · Functions · no moment ┆ apps/api/api/cooking.py ┆ The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known. ┆ What is true of the endpoint at no moment of a request: what it is and what sums it up, each fact true of every path; and, in Proof, the journeys whose requests cannot be set in order around this one, each with its reason. The path row never hides any of it."
+   "the handler's file and line · Functions ┆ apps/api/api/cooking.py ┆ The file the handler lives in, and the line its route is declared at: its decorator, which stands above the def. The line the def stands at is beside it when it is known."
   ],
   [
-   "step 274 · d064r-pick-the-replay-201",
+   "step 275 · d064r-pick-the-replay-201",
    {
     "click": "the path to 201 · existing is not None · success · the answer",
     "at": [
      721,
-     537
+     482
     ],
     "size": [
      42,
@@ -3762,12 +3786,12 @@
    }
   ],
   [
-   "step 276 · d064r-all-paths-again",
+   "step 277 · d064r-all-paths-again",
    {
     "click": "all paths",
     "at": [
      32,
-     536
+     481
     ],
     "size": [
      81,
@@ -3777,7 +3801,7 @@
    }
   ],
   [
-   "step 277 · d064r-code-map-hide",
+   "step 278 · d064r-code-map-hide",
    {
     "click": "hide what BY MOMENT carries",
     "at": [
@@ -3796,7 +3820,7 @@
    "53 of 56 fields carried by BY MOMENT · 0 left · 3 with nothing here"
   ],
   [
-   "step 279 · d064r-code-map-show-all",
+   "step 280 · d064r-code-map-show-all",
    {
     "click": "show all",
     "at": [
@@ -3824,8 +3848,8 @@
   [
    "D-065 · Proof at the outer moments, all paths",
    [
-    "start: C250 2 steps before | C1087 2 steps before | C555 1 step before",
-    "after: C250 4 steps after | C1087 2 steps after | C555 3 steps after"
+    "prior: C250 2 requests before | C1087 2 requests before | C555 1 request before",
+    "after: C250 4 requests after | C1087 2 requests after | C555 3 requests after"
    ]
   ],
   [
@@ -3838,11 +3862,11 @@
   [
    "D-065 · d065-proof-before-any-request · BY MOMENT photographed from its top",
    {
-    "section": 3643,
-    "window": 3781,
+    "section": 4580,
+    "window": 4718,
     "box": {
      "box": 1854,
-     "table": 2283,
+     "table": 2497,
      "at": 0
     }
    }
@@ -3850,30 +3874,30 @@
   [
    "D-065 · d065-proof-after-the-answer · BY MOMENT photographed from its top",
    {
-    "section": 3643,
-    "window": 3781,
+    "section": 4580,
+    "window": 4718,
     "box": {
      "box": 1854,
-     "table": 2283,
-     "at": 429
+     "table": 2497,
+     "at": 643
     }
    }
   ],
   [
    "d065 hover C250 before chip",
-   "C250 · a journey ┆ test_cook_complete_history_pantry_loop_C250 ┆ its requests up to this one, in order: ┆ 1 · POST /setup/complete · arranges, checks the status · asserts status 200 ┆ 2 · POST /recipe-creation/manual · arranges, checks the status · asserts status 201 ┆ 3 · this request · arranges, checks the status · asserts status 201 ┆ With a path picked, it stays on the paths ending 201. ┆ On each path to that ending: which one this request takes is not recorded. ┆ A journey is a test that calls this endpoint and others, one after another. Each of its calls here stays where it is: the proof at its ending, or its line among the cases that arrange through it. Around each one its other requests stand: the earlier ones before any request, the later ones after the answer. With a path picked, a call here keeps its chips when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded."
+   "C250 · a journey ┆ BEFORE ┆ test_cook_complete_history_pantry_loop_C250 ┆ 1 · POST /setup/complete · arranges, checks the status · asserts status 200 ┆ 2 · POST /recipe-creation/manual · arranges, checks the status · asserts status 201 ┆ CHECKS ┆ 3 · this request · arranges, checks the status · asserts status 201 ┆ GIVES ┆ its request here ends in 201 ┆ the test does not show which of the ways to that ending it takes"
   ],
   [
    "d065 hover C250 after chip",
-   "C250 · a journey ┆ test_cook_complete_history_pantry_loop_C250 ┆ its requests from this one on, in order: ┆ 3 · this request · arranges, checks the status · asserts status 201 ┆ 4 · POST /cooking/sessions/{session_id}/complete · acts · asserts status 200 ┆ 5 · GET /history/dishes · acts · asserts status 200 ┆ 6 · GET /pantry/overview · arranges, checks the status · asserts status 200 ┆ 7 · GET /profile/summary · acts · asserts status 200 ┆ With a path picked, it stays on the paths ending 201. ┆ On each path to that ending: which one this request takes is not recorded. ┆ A journey is a test that calls this endpoint and others, one after another. Each of its calls here stays where it is: the proof at its ending, or its line among the cases that arrange through it. Around each one its other requests stand: the earlier ones before any request, the later ones after the answer. With a path picked, a call here keeps its chips when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded."
+   "C250 · a journey ┆ BEFORE ┆ test_cook_complete_history_pantry_loop_C250 ┆ CHECKS ┆ 3 · this request · arranges, checks the status · asserts status 201 ┆ GIVES ┆ 4 · POST /cooking/sessions/{session_id}/complete · acts · asserts status 200 ┆ 5 · GET /history/dishes · acts · asserts status 200 ┆ 6 · GET /pantry/overview · arranges, checks the status · asserts status 200 ┆ 7 · GET /profile/summary · acts · asserts status 200 ┆ its request here ends in 201 ┆ the test does not show which of the ways to that ending it takes"
   ],
   [
-   "step 284 · d065-every-step-a-chip",
+   "step 285 · d065-every-step-a-chip",
    {
     "click": "every step a chip",
     "at": [
-     1147,
-     536
+     81,
+     591
     ],
     "size": [
      32,
@@ -3885,29 +3909,29 @@
   [
    "D-065 · Proof at the outer moments, every step a chip",
    [
-    "start: C250 1 /setup/complete POST 2 /recipe-creation/manual POST | C1087 1 /setup/complete POST 2 /recipe-creation/manual POST | C555 1 /setup/complete POST",
+    "prior: C250 1 /setup/complete POST 2 /recipe-creation/manual POST | C1087 1 /setup/complete POST 2 /recipe-creation/manual POST | C555 1 /setup/complete POST",
     "after: C250 4 /cooking/sessions/{session_id}/complete POST 5 /history/dishes GET 6 /pantry/overview GET 7 /profile/summary GET | C1087 4 /cooking/sessions/{session_id}/complete POST 5 /profile/summary GET | C555 3 /cooking/reminders/due GET 4 /cooking/sessions/{session_id}/advance-stage POST 5 /cooking/reminders/due GET"
    ]
   ],
   [
    "D-065 · d065-proof-every-step-a-chip-after · BY MOMENT photographed from its top",
    {
-    "section": 4441,
-    "window": 4579,
+    "section": 4902,
+    "window": 5040,
     "box": {
      "box": 1854,
-     "table": 2283,
-     "at": 285
+     "table": 2498,
+     "at": 644
     }
    }
   ],
   [
-   "step 286 · d065-back-to-a-chip-per-journey",
+   "step 287 · d065-back-to-a-chip-per-journey",
    {
     "click": "a chip per journey",
     "at": [
-     1110,
-     536
+     44,
+     591
     ],
     "size": [
      32,
@@ -3917,32 +3941,32 @@
    }
   ],
   [
-   "step 287 · d065-pick-the-404",
+   "step 288 · d065-pick-the-404",
    {
     "click": "the path to 404 · refusal · after a call failed — start_session raised",
     "at": [
      565,
-     537
+     482
     ],
     "size": [
      42,
      24
     ],
-    "note": "the code \"the path to 404 · refusal · after a call failed — start_session raised — caught at cooking.py:155 (except SessionNotFoundError) · Recipe not found\""
+    "note": "the code \"the path to 404 · refusal · after a call failed — start_session raised — caught at api/cooking.py:155 (except SessionNotFoundError) · Recipe not found\""
    }
   ],
   [
    "D-065 · Proof at the outer moments, the 404 picked",
    [
-    "start: ",
+    "prior: ",
     "after: "
    ]
   ],
   [
    "D-065 · d065-the-404-journeys-gone · BY MOMENT photographed from its top",
    {
-    "section": 2896,
-    "window": 3034,
+    "section": 3878,
+    "window": 4016,
     "box": {
      "box": 1854,
      "table": 1854,
@@ -3951,12 +3975,12 @@
    }
   ],
   [
-   "step 289 · d065-all-paths-again",
+   "step 290 · d065-all-paths-again",
    {
     "click": "all paths",
     "at": [
      32,
-     536
+     481
     ],
     "size": [
      81,
@@ -3966,7 +3990,7 @@
    }
   ],
   [
-   "step 290 · d065-open-delete-pantry-item",
+   "step 291 · d065-open-delete-pantry-item",
    {
     "click": "/pantry/items/{item_id}DELETE",
     "at": [
@@ -3987,7 +4011,7 @@
   [
    "D-065 · DELETE /pantry/items/{item_id} · Proof at the outer moments",
    [
-    "start: C705 3 steps before its step 4 | C705 3 steps before its step 5",
+    "prior: C705 3 requests before its request 4 | C705 3 requests before its request 5",
     "after: "
    ]
   ],
@@ -4001,18 +4025,2048 @@
   [
    "D-065 · d065-delete-pantry-item-c705-two-calls · BY MOMENT photographed from its top",
    {
-    "section": 2786,
-    "window": 2924,
+    "section": 3497,
+    "window": 3635,
     "box": {
      "box": 1854,
-     "table": 1869,
+     "table": 2068,
      "at": 0
     }
    }
   ],
   [
    "d065 hover C705 step 5 chip",
-   "C705 · a journey ┆ test_delete_item_cross_household_404_C705 ┆ its requests up to this one, in order: ┆ 1 · POST /setup/complete · arranges · asserts status 200 ┆ 2 · POST /pantry/items · arranges · asserts status 201 ┆ 3 · POST /setup/complete · arranges, checks the status · asserts status 200 ┆ 4 · this endpoint, another call, with chips of its own · acts · asserts status 404 ┆ 5 · this request · acts · asserts status 200 ┆ With a path picked, it stays on the paths ending 200. ┆ A journey is a test that calls this endpoint and others, one after another. Each of its calls here stays where it is: the proof at its ending, or its line among the cases that arrange through it. Around each one its other requests stand: the earlier ones before any request, the later ones after the answer. With a path picked, a call here keeps its chips when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded."
+   "C705 · a journey ┆ BEFORE ┆ test_delete_item_cross_household_404_C705 ┆ 1 · POST /setup/complete · arranges · asserts status 200 ┆ 2 · POST /pantry/items · arranges · asserts status 201 ┆ 3 · POST /setup/complete · arranges, checks the status · asserts status 200 ┆ 4 · this endpoint, another call, with chips of its own · acts · asserts status 404 ┆ CHECKS ┆ 5 · this request · acts · asserts status 200 ┆ GIVES ┆ its request here ends in 200"
+  ],
+  [
+   "D-066 · 294 · open-cooking-sessions",
+   {
+    "n": 294,
+    "file": "294-d066-open-cooking-sessions.png",
+    "item": "D-066",
+    "size": [
+     1872,
+     52
+    ],
+    "click": "/cooking/sessions POST",
+    "at": [
+     185,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · BY MOMENT is open on",
+   "POST /cooking/sessions"
+  ],
+  [
+   "D-066 · 295 · hover-an-ending-by-its-label",
+   {
+    "n": 295,
+    "file": "295-d066-hover-an-ending-by-its-label.png",
+    "item": "L-01 L-02 L-22",
+    "option": "ipo",
+    "value": "lines",
+    "size": [
+     520,
+     298
+    ],
+    "hover": "refusal",
+    "tip": "409 · refusal ┆ BEFORE ┆ inside AuthContext.require_household, called at api/cooking.py:125 ┆ CHECKS ┆ checks self.household is None, at context.py:55 ┆ GIVES ┆ answers 409: setup required ┆ not declared ┆ C237 asserts its status, which other endings share: it proves one of them, not which ┆ the screen code reads it: describeStartCookingError (cookingSessionModel.ts:389) ┆ counted in: endings · refused"
+   }
+  ],
+  [
+   "D-066 · 296 · hovers-as-one-sentence",
+   {
+    "n": 296,
+    "file": "296-d066-hovers-as-one-sentence.png",
+    "item": "L-22",
+    "option": "ipo",
+    "value": "sent",
+    "size": [
+     102,
+     72
+    ],
+    "click": "one sentence",
+    "at": [
+     319,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 297 · hover-the-ending-one-sentence",
+   {
+    "n": 297,
+    "file": "297-d066-hover-the-ending-one-sentence.png",
+    "item": "L-01 L-02 L-22",
+    "option": "ipo",
+    "value": "sent",
+    "size": [
+     520,
+     188
+    ],
+    "hover": "refusal",
+    "tip": "409 · refusal ┆ inside AuthContext.require_household, called at api/cooking.py:125 → checks self.household is None, at context.py:55 → answers 409: setup required; not declared; C237 asserts its status, which other endings share: it proves one of them, not which; the screen code reads it: describeStartCookingError (cookingSessionModel.ts:389) ┆ counted in: endings · refused"
+   }
+  ],
+  [
+   "D-066 · 298 · hovers-back-to-labelled-lines",
+   {
+    "n": 298,
+    "file": "298-d066-hovers-back-to-labelled-lines.png",
+    "item": "L-22",
+    "option": "ipo",
+    "value": "lines",
+    "size": [
+     102,
+     72
+    ],
+    "click": "labelled lines",
+    "at": [
+     282,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 299 · hover-the-first-429",
+   {
+    "n": 299,
+    "file": "299-d066-hover-the-first-429.png",
+    "item": "L-03",
+    "size": [
+     520,
+     460
+    ],
+    "hover": "refusal 429 sensitive",
+    "tip": "429 · sensitive · refusal ┆ BEFORE ┆ on paths that start with one of 7 prefixes: /api/v1/cooking/sessions · /api/v1/pantry/items/batch · /api/v1/pantry/reset/apply · +4 ┆ 23 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its sensitive limit, and answers when the count is over, at rate_limit.py:117 ┆ 20 per 60 seconds, counted per caller IP, apart for the sensitive limit ┆ the limit is the setting rate_limit_sensitive_per_minute (env GUSTIFY_RATE_LIMIT_SENSITIVE_PER_MINUTE) ┆ GIVES ┆ answers 429: Rate limit exceeded. Try again shortly. ┆ not declared ┆ sends a Retry-After header, its value worked out as it answers ┆ no test proves it ┆ describeStartCookingError has no branch for it ┆ counted in: endings · refused"
+   }
+  ],
+  [
+   "D-066 · 300 · hover-the-second-429",
+   {
+    "n": 300,
+    "file": "300-d066-hover-the-second-429.png",
+    "item": "L-03",
+    "size": [
+     520,
+     424
+    ],
+    "hover": "refusal 429 global",
+    "tip": "429 · global · refusal ┆ BEFORE ┆ on every request but /healthz ┆ 79 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its global limit, and answers when the count is over, at rate_limit.py:121 ┆ 120 per 60 seconds, counted per caller IP, apart for the global limit ┆ the limit is the setting rate_limit_per_minute (env GUSTIFY_RATE_LIMIT_PER_MINUTE) ┆ GIVES ┆ answers 429: Rate limit exceeded. Try again shortly. ┆ not declared ┆ sends a Retry-After header, its value worked out as it answers ┆ no test proves it ┆ describeStartCookingError has no branch for it ┆ counted in: endings · refused"
+   }
+  ],
+  [
+   "D-066 · 301 · hover-the-endings-row-name",
+   {
+    "n": 301,
+    "file": "301-d066-hover-the-endings-row-name.png",
+    "item": "L-04",
+    "option": "leg",
+    "value": "hover",
+    "size": [
+     520,
+     563
+    ],
+    "hover": "Endings",
+    "tip": "Endings ┆ The ways a request can end, and the expected one among them. ┆ KINDS ┆ refusal ┆ — An ending where the app's own code says no. 9 here ┆ framework ┆ — An ending the framework produces while it reads the body: after the app's edge, before any dependency or code of the endpoint runs. 2 here ┆ validation ┆ — The ending where the input, the body, the query, the path or a header, does not fit its declared shape. 1 here ┆ success ┆ — An ending the endpoint means to reach. 1 here ┆ uncaught ┆ — The ending nobody translated: the 500. 1 here ┆ LABELS ┆ 429 ┆ ×2  ┆ 422 ┆ ×2  ┆ 400 ┆ ×2  ┆ 401 ┆ ×2  ┆ 409 ┆ ×2  ┆ 404 ┆ ×1  ┆ 403 ┆ ×1 — a client error status — The request is refused; the caller can change it and try again. ┆ 201 ┆ ×1 — a success status — The request went right. ┆ 500 ┆ ×1 — a server error status — The server failed; nothing the caller changes fixes it. ┆ 4xx ┆ hollow: The endpoint does not declare this status; a client reading its contract does not expect it. 10 here ┆ sensitive ┆ a word on a chip's face after its name: what tells it from a chip beside it that reads the same 4 here ┆ 4xx ┆ filled: The endpoint declares this status: the decorator's success status, a declared refusal, or the 422 FastAPI declares for every endpoint it checks. 3 here"
+   }
+  ],
+  [
+   "D-066 · 302 · legend-above-the-table",
+   {
+    "n": 302,
+    "file": "302-d066-legend-above-the-table.png",
+    "item": "L-04",
+    "option": "leg",
+    "value": "strip",
+    "size": [
+     1872,
+     1475
+    ],
+    "click": "legend above the table",
+    "at": [
+     217,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 303 · legend-back-on-the-row-name",
+   {
+    "n": 303,
+    "file": "303-d066-legend-back-on-the-row-name.png",
+    "item": "L-04",
+    "option": "leg",
+    "value": "hover",
+    "size": [
+     102,
+     72
+    ],
+    "click": "legend on the row's name",
+    "at": [
+     180,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 304 · the-stage-band-and-the-fork",
+   {
+    "n": 304,
+    "file": "304-d066-the-stage-band-and-the-fork.png",
+    "item": "L-05",
+    "option": "hdr",
+    "value": "band",
+    "size": [
+     1864,
+     258
+    ]
+   }
+  ],
+  [
+   "D-066 · 305 · header-stages-roads-moments",
+   {
+    "n": 305,
+    "file": "305-d066-header-stages-roads-moments.png",
+    "item": "L-05",
+    "option": "hdr",
+    "value": "road",
+    "size": [
+     1864,
+     309
+    ],
+    "click": "stages, roads, moments",
+    "at": [
+     1163,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 306 · header-back-to-the-band",
+   {
+    "n": 306,
+    "file": "306-d066-header-back-to-the-band.png",
+    "item": "L-05",
+    "option": "hdr",
+    "value": "band",
+    "size": [
+     102,
+     72
+    ],
+    "click": "stages over moments",
+    "at": [
+     1126,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 307 · saving-under-handler",
+   {
+    "n": 307,
+    "file": "307-d066-saving-under-handler.png",
+    "item": "L-05",
+    "option": "save",
+    "value": "hand",
+    "size": [
+     1864,
+     309
+    ],
+    "click": "saving under HANDLER",
+    "at": [
+     1265,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 308 · saving-back-under-effects",
+   {
+    "n": 308,
+    "file": "308-d066-saving-back-under-effects.png",
+    "item": "L-05",
+    "option": "save",
+    "value": "eff",
+    "size": [
+     85,
+     72
+    ],
+    "click": "saving under EFFECTS",
+    "at": [
+     1228,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 309 · the-endpoint-metadata-after-the-table",
+   {
+    "n": 309,
+    "file": "309-d066-the-endpoint-metadata-after-the-table.png",
+    "item": "L-06 L-07",
+    "option": "meta",
+    "value": "after",
+    "size": [
+     1872,
+     834
+    ]
+   }
+  ],
+  [
+   "D-066 · 310 · metadata-before-the-table",
+   {
+    "n": 310,
+    "file": "310-d066-metadata-before-the-table.png",
+    "item": "L-06 L-07",
+    "option": "meta",
+    "value": "before",
+    "size": [
+     1872,
+     902
+    ],
+    "click": "metadata before the table",
+    "at": [
+     1350,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 311 · metadata-back-after-the-table",
+   {
+    "n": 311,
+    "file": "311-d066-metadata-back-after-the-table.png",
+    "item": "L-06 L-07",
+    "option": "meta",
+    "value": "after",
+    "size": [
+     120,
+     72
+    ],
+    "click": "metadata after the table",
+    "at": [
+     1313,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 312 · the-functions-row-head-columns",
+   {
+    "n": 312,
+    "file": "312-d066-the-functions-row-head-columns.png",
+    "item": "L-20",
+    "size": [
+     120,
+     95
+    ]
+   }
+  ],
+  [
+   "D-066 · 313 · light-the-deciders",
+   {
+    "n": 313,
+    "file": "313-d066-light-the-deciders.png",
+    "item": "L-20",
+    "size": [
+     1864,
+     1080
+    ],
+    "click": "deciders 4",
+    "at": [
+     79,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · deciders lit",
+   {
+    "chips": [
+     "AuthContext.require_householdgate",
+     "post_start_sessioncaller",
+     "start_sessionaccessor",
+     "post_start_sessioncaller",
+     "post_start_sessioncaller",
+     "post_start_sessioncaller",
+     "14 · in the map belowrare · claims its k",
+     "1 · in the map below",
+     "post_start_sessioncaller",
+     "start_sessionaccessor",
+     "assert_recipe_allergen_safegate",
+     "post_start_sessioncaller",
+     "post_start_session",
+     "AuthContext.require_household",
+     "start_session",
+     "assert_recipe_allergen_safe"
+    ],
+    "pin": true
+   }
+  ],
+  [
+   "D-066 · 314 · deciders-put-out",
+   {
+    "n": 314,
+    "file": "314-d066-deciders-put-out.png",
+    "item": "L-20",
+    "size": [
+     120,
+     54
+    ],
+    "click": "deciders 4",
+    "at": [
+     79,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 315 · widen-at-the-edge",
+   {
+    "n": 315,
+    "file": "315-d066-widen-at-the-edge.png",
+    "item": "L-21",
+    "option": "wid",
+    "value": "names",
+    "size": [
+     1864,
+     439
+    ],
+    "click": "at the edge",
+    "at": [
+     616,
+     202
+    ]
+   }
+  ],
+  [
+   "D-066 · 316 · widen-every-item-on-one-line",
+   {
+    "n": 316,
+    "file": "316-d066-widen-every-item-on-one-line.png",
+    "item": "L-21",
+    "option": "wid",
+    "value": "line",
+    "size": [
+     1864,
+     555
+    ],
+    "click": "every item on one line",
+    "at": [
+     439,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 317 · widen-back-to-names-whole",
+   {
+    "n": 317,
+    "file": "317-d066-widen-back-to-names-whole.png",
+    "item": "L-21",
+    "option": "wid",
+    "value": "names",
+    "size": [
+     137,
+     72
+    ],
+    "click": "names whole",
+    "at": [
+     402,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 318 · hide-before-any-request",
+   {
+    "n": 318,
+    "file": "318-d066-hide-before-any-request.png",
+    "item": "L-21",
+    "size": [
+     1864,
+     222
+    ],
+    "click": "hide before any request",
+    "at": [
+     303,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 319 · fit-to-the-box",
+   {
+    "n": 319,
+    "file": "319-d066-fit-to-the-box.png",
+    "item": "L-21",
+    "option": "fit",
+    "value": "min",
+    "size": [
+     1864,
+     464
+    ],
+    "click": "fit to the box",
+    "at": [
+     666,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · fit",
+   {
+    "box": 1854,
+    "table": 1854,
+    "strips": 6
+   }
+  ],
+  [
+   "D-066 · 320 · fit-wrap-into-bands",
+   {
+    "n": 320,
+    "file": "320-d066-fit-wrap-into-bands.png",
+    "item": "L-21",
+    "option": "fit",
+    "value": "bands",
+    "size": [
+     1864,
+     337
+    ],
+    "click": "wrap into bands",
+    "at": [
+     576,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · fit, wrapped into bands",
+   {
+    "tables": 2
+   }
+  ],
+  [
+   "D-066 · 321 · fit-the-second-band",
+   {
+    "n": 321,
+    "file": "321-d066-fit-the-second-band.png",
+    "item": "L-21",
+    "option": "fit",
+    "value": "bands",
+    "size": [
+     1864,
+     316
+    ],
+    "look": "the second band, further down"
+   }
+  ],
+  [
+   "D-066 · 322 · fit-back-to-narrow-the-rest",
+   {
+    "n": 322,
+    "file": "322-d066-fit-back-to-narrow-the-rest.png",
+    "item": "L-21",
+    "option": "fit",
+    "value": "min",
+    "size": [
+     222,
+     72
+    ],
+    "click": "narrow the rest",
+    "at": [
+     539,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 323 · fit-off",
+   {
+    "n": 323,
+    "file": "323-d066-fit-off.png",
+    "item": "L-21",
+    "size": [
+     222,
+     72
+    ],
+    "click": "fit to the box",
+    "at": [
+     666,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 324 · show-all-columns",
+   {
+    "n": 324,
+    "file": "324-d066-show-all-columns.png",
+    "item": "L-21",
+    "size": [
+     371,
+     95
+    ],
+    "click": "show all",
+    "at": [
+     947,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 325 · widen-given-back",
+   {
+    "n": 325,
+    "file": "325-d066-widen-given-back.png",
+    "item": "L-21",
+    "size": [
+     1864,
+     258
+    ],
+    "click": "at the edge",
+    "at": [
+     616,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 326 · heads-ride-when-scrolled",
+   {
+    "n": 326,
+    "file": "326-d066-heads-ride-when-scrolled.png",
+    "item": "L-21",
+    "option": "stk",
+    "value": "ride",
+    "size": [
+     1864,
+     640
+    ],
+    "scrolled": "by the wheel, to Functions"
+   }
+  ],
+  [
+   "D-066 · 327 · heads-stay-at-the-top",
+   {
+    "n": 327,
+    "file": "327-d066-heads-stay-at-the-top.png",
+    "item": "L-21",
+    "option": "stk",
+    "value": "stay",
+    "size": [
+     180,
+     72
+    ],
+    "click": "stay at the top",
+    "at": [
+     1470,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 328 · heads-stay-when-scrolled",
+   {
+    "n": 328,
+    "file": "328-d066-heads-stay-when-scrolled.png",
+    "item": "L-21",
+    "option": "stk",
+    "value": "stay",
+    "size": [
+     1864,
+     640
+    ],
+    "scrolled": "by the wheel, to Functions"
+   }
+  ],
+  [
+   "D-066 · 329 · heads-back-to-ride",
+   {
+    "n": 329,
+    "file": "329-d066-heads-back-to-ride.png",
+    "item": "L-21",
+    "option": "stk",
+    "value": "ride",
+    "size": [
+     180,
+     72
+    ],
+    "click": "ride under the pinned row",
+    "at": [
+     1433,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 330 · the-gates-row",
+   {
+    "n": 330,
+    "file": "330-d066-the-gates-row.png",
+    "item": "L-09 L-10 L-11",
+    "option": "gdl",
+    "value": "head",
+    "size": [
+     1864,
+     611
+    ]
+   }
+  ],
+  [
+   "D-066 · 331 · open-the-gates-row-options",
+   {
+    "n": 331,
+    "file": "331-d066-open-the-gates-row-options.png",
+    "item": "L-09 L-10 L-11",
+    "size": [
+     120,
+     521
+    ],
+    "click": "Gates and decisions: this row's options",
+    "at": [
+     133,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 332 · gates-look-a-one-chain-per-gate",
+   {
+    "n": 332,
+    "file": "332-d066-gates-look-a-one-chain-per-gate.png",
+    "item": "L-09 L-10",
+    "option": "gdl",
+    "value": "chain",
+    "size": [
+     1864,
+     846
+    ],
+    "click": "one chain per gate",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 333 · gates-look-c-side-by-side",
+   {
+    "n": 333,
+    "file": "333-d066-gates-look-c-side-by-side.png",
+    "item": "L-09 L-10",
+    "option": "gdl",
+    "value": "cols",
+    "size": [
+     1864,
+     846
+    ],
+    "click": "function · condition · effect",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 334 · gdl-back-to-head",
+   {
+    "n": 334,
+    "file": "334-d066-gdl-back-to-head.png",
+    "item": "L-09 L-10",
+    "option": "gdl",
+    "value": "head",
+    "size": [
+     110,
+     104
+    ],
+    "click": "function, gates under it",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 335 · effect-e2-a-colour-per-stage",
+   {
+    "n": 335,
+    "file": "335-d066-effect-e2-a-colour-per-stage.png",
+    "item": "L-10",
+    "option": "gef",
+    "value": "stage",
+    "size": [
+     1864,
+     846
+    ],
+    "click": "a colour per stage",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 336 · gef-back-to-end",
+   {
+    "n": 336,
+    "file": "336-d066-gef-back-to-end.png",
+    "item": "L-10",
+    "option": "gef",
+    "value": "end",
+    "size": [
+     102,
+     67
+    ],
+    "click": "ending's colour, stage lit",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 337 · gate-icons-one",
+   {
+    "n": 337,
+    "file": "337-d066-gate-icons-one.png",
+    "item": "L-11",
+    "option": "gic",
+    "value": "one",
+    "size": [
+     1864,
+     846
+    ],
+    "click": "one gate icon",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 338 · gate-icons-none",
+   {
+    "n": 338,
+    "file": "338-d066-gate-icons-none.png",
+    "item": "L-11",
+    "option": "gic",
+    "value": "none",
+    "size": [
+     1864,
+     846
+    ],
+    "click": "no icon",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 339 · gic-back-to-each",
+   {
+    "n": 339,
+    "file": "339-d066-gic-back-to-each.png",
+    "item": "L-11",
+    "option": "gic",
+    "value": "each",
+    "size": [
+     110,
+     104
+    ],
+    "click": "an icon per kind",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 340 · gate-roles-r1-what-it-does",
+   {
+    "n": 340,
+    "file": "340-d066-gate-roles-r1-what-it-does.png",
+    "item": "L-11",
+    "option": "grl",
+    "value": "what",
+    "size": [
+     1864,
+     846
+    ],
+    "click": "what it does",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 341 · gate-roles-r3-what-it-guards",
+   {
+    "n": 341,
+    "file": "341-d066-gate-roles-r3-what-it-guards.png",
+    "item": "L-11",
+    "option": "grl",
+    "value": "guards",
+    "size": [
+     1864,
+     846
+    ],
+    "click": "what it guards",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 342 · gate-roles-off",
+   {
+    "n": 342,
+    "file": "342-d066-gate-roles-off.png",
+    "item": "L-11",
+    "option": "grl",
+    "value": "off",
+    "size": [
+     1864,
+     846
+    ],
+    "click": "no label",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 343 · grl-back-to-where",
+   {
+    "n": 343,
+    "file": "343-d066-grl-back-to-where.png",
+    "item": "L-11",
+    "option": "grl",
+    "value": "where",
+    "size": [
+     110,
+     104
+    ],
+    "click": "where it decides",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 344 · standard-m1-split-into-the-gates",
+   {
+    "n": 344,
+    "file": "344-d066-standard-m1-split-into-the-gates.png",
+    "item": "L-18",
+    "option": "std",
+    "value": "split",
+    "size": [
+     1864,
+     846
+    ]
+   }
+  ],
+  [
+   "D-066 · 345 · standard-m2-merged-into-the-gates",
+   {
+    "n": 345,
+    "file": "345-d066-standard-m2-merged-into-the-gates.png",
+    "item": "L-18",
+    "option": "std",
+    "value": "merge",
+    "size": [
+     1864,
+     846
+    ],
+    "click": "merge into the gates",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 346 · standard-m3-kept-as-its-row",
+   {
+    "n": 346,
+    "file": "346-d066-standard-m3-kept-as-its-row.png",
+    "item": "L-18",
+    "option": "std",
+    "value": "keep",
+    "size": [
+     1864,
+     242
+    ],
+    "click": "keep the row",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 347 · standard-back-to-split",
+   {
+    "n": 347,
+    "file": "347-d066-standard-back-to-split.png",
+    "item": "L-18",
+    "option": "std",
+    "value": "split",
+    "size": [
+     110,
+     132
+    ],
+    "click": "split into the gates",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 348 · close-the-gates-row-options",
+   {
+    "n": 348,
+    "file": "348-d066-close-the-gates-row-options.png",
+    "item": "L-09 L-10 L-11 L-18",
+    "size": [
+     120,
+     84
+    ],
+    "click": "Gates and decisions: this row's options",
+    "at": [
+     133,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 349 · hover-the-gates-row-head",
+   {
+    "n": 349,
+    "file": "349-d066-hover-the-gates-row-head.png",
+    "item": "L-18",
+    "size": [
+     520,
+     1028
+    ],
+    "hover": "Gates and decisions",
+    "tip": "Gates and decisions ┆ Where can the request be stopped or sent another way: in which function, on what condition, and what happens then? ┆ also here — Standard or specialist: Is this endpoint built like the others, and what is unusual about it? A switch is set by the server's settings and changes a way the request can go; a rare piece is something few other endpoints have. ┆ The checks that stop a request and the forks that decide its ending. ┆ KINDS ┆ middleware — Code that runs on every request before the endpoint, in the order the app registers it. 1 here ┆ rate limit ┆ — A rate limit: it counts a caller's requests over a window and refuses the one past the limit. 2 here ┆ switch ┆ — A setting or a binding that changes what the request does. 2 here ┆ login check — The dependency that reads the caller's credential and decides who the caller is. 1 here ┆ catch ┆ — An except: an error raised below is caught here and turned into an answer, or let through. 4 here ┆ function — A function the request runs through. 3 here ┆ check ┆ — A check the endpoint's own code makes; when it holds, the request ends. 5 here ┆ handler — The endpoint's own function. 4 here ┆ fork ┆ — A branch whose arms lead the request different ways. 2 here ┆ LABELS ┆ 429 ┆ ×3  ┆ 401 ┆ ×3  ┆ 409 ┆ ×3  ┆ 400 ┆ ×1  ┆ 404 ┆ ×3  ┆ 403 ┆ ×1 — a client error status — The request is refused; the caller can change it and try again. ┆ 201 ┆ ×2 — a success status — The request went right. ┆ stage — the app band, before the endpoint is reached 3 here ┆ app-wide ┆ where it decides — In the app's middleware, before any endpoint's own code runs. 2 here ┆ stage — the login check 3 here ┆ at login ┆ where it decides — In the login check, while FastAPI works out who the caller is. 2 here ┆ caller ┆ function role — orchestrates — calls other functions, no store of its own 6 here ┆ gate ┆ function role — guards — auth / consent / idempotency before the work runs 1 here ┆ stage — the endpoint's own code decides 8 here ┆ inside a call ┆ where it decides — In a function the handler calls. 6 here ┆ in the handler ┆ where it decides — In the endpoint's own function. 4 here ┆ accessor ┆ function role — touches the store — reads/writes a DB table or a durable sink 1 here ┆ stage — the answer goes back; every success leaves here 2 here"
+   }
+  ],
+  [
+   "D-066 · 350 · hover-ratelimitmiddleware",
+   {
+    "n": 350,
+    "file": "350-d066-hover-ratelimitmiddleware.png",
+    "item": "L-09",
+    "size": [
+     520,
+     268
+    ],
+    "hover": "RateLimitMiddleware",
+    "tip": "RateLimitMiddleware · middleware ┆ BEFORE ┆ runs 2 of 3 ┆ CHECKS ┆ RateLimitMiddleware.dispatch, registered at main.py:127 ┆ does nothing when not (settings.rate_limit_enabled or settings.is_production) ┆ lets these paths through without its check: /healthz ┆ GIVES ┆ can end the request with 429 sensitive · 429 global"
+   }
+  ],
+  [
+   "D-066 · 351 · hover-the-sensitive-limit",
+   {
+    "n": 351,
+    "file": "351-d066-hover-the-sensitive-limit.png",
+    "item": "L-09 L-10",
+    "size": [
+     520,
+     493
+    ],
+    "hover": "rate limit sensitive 20/60s → 429 app-wide",
+    "tip": "sensitive · rate limit ┆ BEFORE ┆ runs in RateLimitMiddleware ┆ on paths that start with one of 7 prefixes: /api/v1/cooking/sessions · /api/v1/pantry/items/batch · /api/v1/pantry/reset/apply · +4 ┆ 23 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its sensitive limit, and answers when the count is over, at rate_limit.py:117 ┆ 20 per 60 seconds, counted per caller IP, apart for the sensitive limit ┆ the limit is the setting rate_limit_sensitive_per_minute (env GUSTIFY_RATE_LIMIT_SENSITIVE_PER_MINUTE) ┆ GIVES ┆ ends the request with 429: Rate limit exceeded. Try again shortly. ┆ sends a Retry-After header, its value worked out as it answers ┆ counted in: rate"
+   }
+  ],
+  [
+   "D-066 · 352 · data-effects-the-map",
+   {
+    "n": 352,
+    "file": "352-d066-data-effects-the-map.png",
+    "item": "L-12",
+    "option": "dfx",
+    "value": "one",
+    "size": [
+     1864,
+     762
+    ]
+   }
+  ],
+  [
+   "D-066 · 353 · open-the-data-row-options",
+   {
+    "n": 353,
+    "file": "353-d066-open-the-data-row-options.png",
+    "item": "L-12",
+    "size": [
+     120,
+     352
+    ],
+    "click": "Data effects: this row's options",
+    "at": [
+     133,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 354 · data-effects-a-map-per-moment",
+   {
+    "n": 354,
+    "file": "354-d066-data-effects-a-map-per-moment.png",
+    "item": "L-12",
+    "option": "dfx",
+    "value": "cell",
+    "size": [
+     1864,
+     649
+    ],
+    "click": "a small map per moment",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 355 · data-effects-as-chips",
+   {
+    "n": 355,
+    "file": "355-d066-data-effects-as-chips.png",
+    "item": "L-12",
+    "option": "dfx",
+    "value": "chips",
+    "size": [
+     1864,
+     767
+    ],
+    "click": "chips",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 356 · data-effects-back-to-the-map",
+   {
+    "n": 356,
+    "file": "356-d066-data-effects-back-to-the-map.png",
+    "item": "L-12",
+    "option": "dfx",
+    "value": "one",
+    "size": [
+     110,
+     118
+    ],
+    "click": "one map for the endpoint",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 357 · write-colour-his-words",
+   {
+    "n": 357,
+    "file": "357-d066-write-colour-his-words.png",
+    "item": "L-12",
+    "option": "dxc",
+    "value": "his",
+    "size": [
+     1864,
+     959
+    ],
+    "click": "his words' colours",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 358 · write-colour-back-to-the-page",
+   {
+    "n": 358,
+    "file": "358-d066-write-colour-back-to-the-page.png",
+    "item": "L-12",
+    "option": "dxc",
+    "value": "page",
+    "size": [
+     110,
+     81
+    ],
+    "click": "the page's colours",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 359 · close-the-data-row-options",
+   {
+    "n": 359,
+    "file": "359-d066-close-the-data-row-options.png",
+    "item": "L-12",
+    "size": [
+     120,
+     70
+    ],
+    "click": "Data effects: this row's options",
+    "at": [
+     133,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 360 · the-functions-row-with-marks",
+   {
+    "n": 360,
+    "file": "360-d066-the-functions-row-with-marks.png",
+    "item": "L-13 L-14",
+    "option": "fnm",
+    "value": "on",
+    "size": [
+     1864,
+     959
+    ]
+   }
+  ],
+  [
+   "D-066 · 361 · open-the-functions-row-options",
+   {
+    "n": 361,
+    "file": "361-d066-open-the-functions-row-options.png",
+    "item": "L-13",
+    "size": [
+     120,
+     210
+    ],
+    "click": "Functions: this row's options",
+    "at": [
+     133,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 362 · functions-marks-off",
+   {
+    "n": 362,
+    "file": "362-d066-functions-marks-off.png",
+    "item": "L-13",
+    "option": "fnm",
+    "value": "off",
+    "size": [
+     1864,
+     749
+    ],
+    "click": "name and role only",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 363 · functions-marks-back-on",
+   {
+    "n": 363,
+    "file": "363-d066-functions-marks-back-on.png",
+    "item": "L-13",
+    "option": "fnm",
+    "value": "on",
+    "size": [
+     110,
+     81
+    ],
+    "click": "what it decides and touches",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 364 · close-the-functions-row-options",
+   {
+    "n": 364,
+    "file": "364-d066-close-the-functions-row-options.png",
+    "item": "L-13",
+    "size": [
+     120,
+     54
+    ],
+    "click": "Functions: this row's options",
+    "at": [
+     133,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 365 · hover-resolutionsnapshot-violations-for",
+   {
+    "n": 365,
+    "file": "365-d066-hover-resolutionsnapshot-violations-for.png",
+    "item": "L-14",
+    "size": [
+     520,
+     201
+    ],
+    "hover": "ResolutionSnapshot.violations_for",
+    "tip": "ResolutionSnapshot.violations_for · function ┆ BEFORE ┆ runs under assert_recipe_allergen_safe ┆ under the handler's call at api/cooking.py:150 ┆ assert_recipe_allergen_safe can end partway, before it calls this: a check that fires, or an error"
+   }
+  ],
+  [
+   "D-066 · 366 · hover-the-refresh-chip",
+   {
+    "n": 366,
+    "file": "366-d066-hover-the-refresh-chip.png",
+    "item": "L-15",
+    "size": [
+     518,
+     514
+    ],
+    "hover": "useStartCooking fetcher on success · refresh [\"cooking\"] ↳ useActiveCooking fetcher → /cooking/active GET ↳ useRemindersDue fetcher → /cooki",
+    "tip": "refresh · cache write ┆ BEFORE ┆ only while onSuccess ┆ CHECKS ┆ at useCookingSessions.ts:99 ┆ GIVES ┆ refreshes the cached [\"cooking\"] ┆ useActiveCooking fetches again: GET /cooking/active ┆ useActiveCooking gets back ActiveCookingResponse, read from cooking_photos · cooking_sessions · cooking_step_progress · +1 ┆ this request wrote cooking_sessions, which useActiveCooking reads ┆ useRemindersDue fetches again: GET /cooking/reminders/due ┆ useRemindersDue gets back DueRemindersResponse, read from cooking_stage_reminders ┆ this request wrote cooking_stage_reminders, which useRemindersDue reads ┆ counted in: screen"
+   }
+  ],
+  [
+   "D-066 · 367 · hover-the-reads-403-line",
+   {
+    "n": 367,
+    "file": "367-d066-hover-the-reads-403-line.png",
+    "item": "L-16",
+    "size": [
+     498,
+     282
+    ],
+    "hover": "reads 403 → “cooking.error.start_allergen”",
+    "tip": "reads 403 · in describeStartCookingError · reason site ┆ BEFORE ┆ in describeStartCookingError ┆ reached by 403 Recipe contains your allergen restrictions ┆ the error comes from useCookingLoopActions (303, 386) ┆ CHECKS ┆ reads the status: === 403, at cookingSessionModel.ts:381 ┆ GIVES ┆ what it does: hands back the text “cooking.error.start_allergen” ┆ counted in: reads"
+   }
+  ],
+  [
+   "D-066 · 368 · in-flight-lifelines",
+   {
+    "n": 368,
+    "file": "368-d066-in-flight-lifelines.png",
+    "item": "L-17",
+    "option": "ifl",
+    "value": "lane",
+    "size": [
+     1864,
+     408
+    ]
+   }
+  ],
+  [
+   "D-066 · 369 · in-flight-lifelines-to-the-end",
+   {
+    "n": 369,
+    "file": "369-d066-in-flight-lifelines-to-the-end.png",
+    "item": "L-17",
+    "option": "ifl",
+    "value": "lane",
+    "size": [
+     1864,
+     408
+    ],
+    "wheeled": "the box to its end"
+   }
+  ],
+  [
+   "D-066 · 370 · open-the-rate-limiter-lane",
+   {
+    "n": 370,
+    "file": "370-d066-open-the-rate-limiter-lane.png",
+    "item": "L-17",
+    "size": [
+     1864,
+     951
+    ],
+    "click": "▸ rate limit · 7 values kept by the server",
+    "at": [
+     124,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 371 · fold-the-rate-limiter-lane",
+   {
+    "n": 371,
+    "file": "371-d066-fold-the-rate-limiter-lane.png",
+    "item": "L-17",
+    "size": [
+     179,
+     320
+    ],
+    "click": "▾rate limit · 7 values",
+    "at": [
+     234,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 372 · hover-a-read-dot",
+   {
+    "n": 372,
+    "file": "372-d066-hover-a-read-dot.png",
+    "item": "L-17",
+    "size": [
+     349,
+     129
+    ],
+    "hover": "409",
+    "tip": "ctx · checks ┆ read at api/cooking.py:125 ┆ handed to AuthContext.require_household ┆ can end the request with 409: setup required"
+   }
+  ],
+  [
+   "D-066 · 373 · open-the-in-flight-row-options",
+   {
+    "n": 373,
+    "file": "373-d066-open-the-in-flight-row-options.png",
+    "item": "L-17",
+    "size": [
+     120,
+     277
+    ],
+    "click": "In-flight state: this row's options",
+    "at": [
+     133,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 374 · in-flight-echoes-where-read",
+   {
+    "n": 374,
+    "file": "374-d066-in-flight-echoes-where-read.png",
+    "item": "L-17",
+    "option": "ifl",
+    "value": "echo",
+    "size": [
+     1864,
+     649
+    ],
+    "click": "echoes where read",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 375 · in-flight-chips-where-set",
+   {
+    "n": 375,
+    "file": "375-d066-in-flight-chips-where-set.png",
+    "item": "L-17",
+    "option": "ifl",
+    "value": "chips",
+    "size": [
+     1864,
+     649
+    ],
+    "click": "chips where set",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 376 · in-flight-back-to-lifelines",
+   {
+    "n": 376,
+    "file": "376-d066-in-flight-back-to-lifelines.png",
+    "item": "L-17",
+    "option": "ifl",
+    "value": "lane",
+    "size": [
+     110,
+     118
+    ],
+    "click": "a lifeline each",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 377 · close-the-in-flight-row-options",
+   {
+    "n": 377,
+    "file": "377-d066-close-the-in-flight-row-options.png",
+    "item": "L-17",
+    "size": [
+     120,
+     84
+    ],
+    "click": "In-flight state: this row's options",
+    "at": [
+     133,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 378 · open-the-proof-row-options",
+   {
+    "n": 378,
+    "file": "378-d066-open-the-proof-row-options.png",
+    "item": "CR-20",
+    "size": [
+     1864,
+     304
+    ],
+    "click": "Proof: this row's options",
+    "at": [
+     133,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 379 · earlier-requests-in-proofs-head",
+   {
+    "n": 379,
+    "file": "379-d066-earlier-requests-in-proofs-head.png",
+    "item": "CR-20",
+    "option": "jyb",
+    "value": "head",
+    "size": [
+     1864,
+     515
+    ],
+    "click": "in Proof's head",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 380 · earlier-requests-back-to-their-moment",
+   {
+    "n": 380,
+    "file": "380-d066-earlier-requests-back-to-their-moment.png",
+    "item": "CR-20",
+    "option": "jyb",
+    "value": "prior",
+    "size": [
+     1864,
+     304
+    ],
+    "click": "their own moment",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 381 · close-the-proof-row-options",
+   {
+    "n": 381,
+    "file": "381-d066-close-the-proof-row-options.png",
+    "item": "CR-20",
+    "size": [
+     120,
+     38
+    ],
+    "click": "Proof: this row's options",
+    "at": [
+     133,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 382 · the-examples-bench",
+   {
+    "n": 382,
+    "file": "382-d066-the-examples-bench.png",
+    "item": "L-23",
+    "option": "lay",
+    "value": "row",
+    "size": [
+     1872,
+     1121
+    ]
+   }
+  ],
+  [
+   "D-066 · 383 · bench-column-end",
+   {
+    "n": 383,
+    "file": "383-d066-bench-column-end.png",
+    "item": "L-23",
+    "size": [
+     280,
+     784
+    ],
+    "column": "ending"
+   }
+  ],
+  [
+   "D-066 · 384 · bench-column-table",
+   {
+    "n": 384,
+    "file": "384-d066-bench-column-table.png",
+    "item": "L-23",
+    "size": [
+     280,
+     652
+    ],
+    "column": "table"
+   }
+  ],
+  [
+   "D-066 · 385 · bench-column-schema",
+   {
+    "n": 385,
+    "file": "385-d066-bench-column-schema.png",
+    "item": "L-23",
+    "size": [
+     280,
+     706
+    ],
+    "column": "schema"
+   }
+  ],
+  [
+   "D-066 · 386 · bench-column-fn",
+   {
+    "n": 386,
+    "file": "386-d066-bench-column-fn.png",
+    "item": "L-23 L-13",
+    "size": [
+     280,
+     716
+    ],
+    "column": "function"
+   }
+  ],
+  [
+   "D-066 · 387 · bench-column-test",
+   {
+    "n": 387,
+    "file": "387-d066-bench-column-test.png",
+    "item": "L-23 L-08",
+    "size": [
+     280,
+     869
+    ],
+    "column": "test"
+   }
+  ],
+  [
+   "D-066 · 388 · bench-column-gate",
+   {
+    "n": 388,
+    "file": "388-d066-bench-column-gate.png",
+    "item": "L-23 L-11",
+    "size": [
+     280,
+     994
+    ],
+    "column": "gate or decision"
+   }
+  ],
+  [
+   "D-066 · 389 · bench-column-hook",
+   {
+    "n": 389,
+    "file": "389-d066-bench-column-hook.png",
+    "item": "L-23",
+    "size": [
+     280,
+     667
+    ],
+    "column": "client hook"
+   }
+  ],
+  [
+   "D-066 · 390 · bench-column-inf",
+   {
+    "n": 390,
+    "file": "390-d066-bench-column-inf.png",
+    "item": "L-23",
+    "size": [
+     280,
+     762
+    ],
+    "column": "in-flight value"
+   }
+  ],
+  [
+   "D-066 · 391 · test-column-on-c267",
+   {
+    "n": 391,
+    "file": "391-d066-test-column-on-c267.png",
+    "item": "L-23 L-08",
+    "size": [
+     280,
+     869
+    ],
+    "clicks": 0,
+    "arrow": null,
+    "shows": "case:C267"
+   }
+  ],
+  [
+   "D-066 · 392 · test-c267-open-its-chain",
+   {
+    "n": 392,
+    "file": "392-d066-test-c267-open-its-chain.png",
+    "item": "L-23 L-08",
+    "size": [
+     280,
+     1263
+    ],
+    "click": "C267 201 pass start session response carries recipe title tests it Authorization Idempotency-Key 201 · recipe_title",
+    "at": [
+     929,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 393 · test-c267-the-chain-wheeled-to-its-end",
+   {
+    "n": 393,
+    "file": "393-d066-test-c267-the-chain-wheeled-to-its-end.png",
+    "item": "L-23 L-08",
+    "size": [
+     258,
+     573
+    ],
+    "wheeled": "inside the open block, to its end",
+    "list": {
+     "max": 4943,
+     "h": 393,
+     "all": 5336
+    }
+   }
+  ],
+  [
+   "D-066 · 394 · test-column-on-c250",
+   {
+    "n": 394,
+    "file": "394-d066-test-column-on-c250.png",
+    "item": "L-23 L-08",
+    "size": [
+     280,
+     1245
+    ],
+    "clicks": 1,
+    "arrow": "the element before",
+    "shows": "case:C250"
+   }
+  ],
+  [
+   "D-066 · 395 · test-block-closed-again",
+   {
+    "n": 395,
+    "file": "395-d066-test-block-closed-again.png",
+    "item": "L-23",
+    "size": [
+     280,
+     851
+    ],
+    "click": "C250 pass cook complete history pantry loop sets up and checks Authorization Idempotency-Key 201",
+    "at": [
+     929,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 396 · table-parts-opened",
+   {
+    "n": 396,
+    "file": "396-d066-table-parts-opened.png",
+    "item": "L-23",
+    "size": [
+     280,
+     938
+    ],
+    "click": "parts",
+    "at": [
+     73,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 397 · drag-model-into-not-drawn",
+   {
+    "n": 397,
+    "file": "397-d066-drag-model-into-not-drawn.png",
+    "item": "L-23",
+    "size": [
+     280,
+     919
+    ],
+    "drag": "class",
+    "from": [
+     146,
+     540
+    ],
+    "to": [
+     148,
+     587
+    ],
+    "after": {
+     "drawn": false,
+     "tray": [
+      "model"
+     ]
+    }
+   }
+  ],
+  [
+   "D-066 · 398 · table-size-of-name",
+   {
+    "n": 398,
+    "file": "398-d066-table-size-of-name.png",
+    "item": "L-23",
+    "size": [
+     280,
+     729
+    ],
+    "click": "name",
+    "at": [
+     142,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 399 · table-colour-opened",
+   {
+    "n": 399,
+    "file": "399-d066-table-colour-opened.png",
+    "item": "L-23",
+    "size": [
+     280,
+     927
+    ],
+    "click": "colour",
+    "at": [
+     195,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 400 · table-back-to-the-default",
+   {
+    "n": 400,
+    "file": "400-d066-table-back-to-the-default.png",
+    "item": "L-23",
+    "size": [
+     280,
+     946
+    ],
+    "click": "back to the default",
+    "at": [
+     125,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 401 · table-colour-closed",
+   {
+    "n": 401,
+    "file": "401-d066-table-colour-closed.png",
+    "item": "L-23",
+    "size": [
+     258,
+     80
+    ],
+    "click": "colour",
+    "at": [
+     195,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 402 · gate-column-role-field-rule",
+   {
+    "n": 402,
+    "file": "402-d066-gate-column-role-field-rule.png",
+    "item": "L-23 L-11",
+    "size": [
+     280,
+     926
+    ],
+    "click": "field rule 4",
+    "at": [
+     1201,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 403 · gate-column-every-role-again",
+   {
+    "n": 403,
+    "file": "403-d066-gate-column-every-role-again.png",
+    "item": "L-23 L-11",
+    "size": [
+     258,
+     174
+    ],
+    "click": "all 21",
+    "at": [
+     1179,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 404 · gate-column-every-endpoint",
+   {
+    "n": 404,
+    "file": "404-d066-gate-column-every-endpoint.png",
+    "item": "L-23",
+    "option": "scope",
+    "value": "all",
+    "size": [
+     280,
+     1178
+    ],
+    "click": "every endpoint",
+    "at": [
+     1293,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 405 · gate-column-back-to-this-endpoint",
+   {
+    "n": 405,
+    "file": "405-d066-gate-column-back-to-this-endpoint.png",
+    "item": "L-23",
+    "option": "scope",
+    "value": "here",
+    "size": [
+     258,
+     266
+    ],
+    "click": "this endpoint",
+    "at": [
+     1193,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 406 · table-copy-line",
+   {
+    "n": 406,
+    "file": "406-d066-table-copy-line.png",
+    "item": "L-23",
+    "size": [
+     258,
+     280
+    ],
+    "click": "copy",
+    "at": [
+     70,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · the table's copy line, as copied",
+   "examples · table · households · on POST /cooking/sessions · block block (icon on model, chip on, name on, entity both, count badge, model both) · edge left solid 2px · chips count pill 100%, channel pill 90% · lines icon name | — / ent | count rw / model | — · sizes icon 13 rw 11 name 13 ent 12 count 11 model 12 · squares 14px gap 4 round as symbol by type · not drawn — (your DATA line, D-027)"
+  ],
+  [
+   "D-066 · 407 · bench-wrapped-rows",
+   {
+    "n": 407,
+    "file": "407-d066-bench-wrapped-rows.png",
+    "item": "L-23",
+    "option": "lay",
+    "value": "wrap",
+    "size": [
+     1872,
+     1737
+    ],
+    "click": "wrapped rows",
+    "at": [
+     240,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 408 · bench-an-upper-and-a-lower-row",
+   {
+    "n": 408,
+    "file": "408-d066-bench-an-upper-and-a-lower-row.png",
+    "item": "L-23",
+    "option": "lay",
+    "value": "half",
+    "size": [
+     1872,
+     1291
+    ],
+    "click": "an upper and a lower row",
+    "at": [
+     373,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 409 · bench-back-to-one-row",
+   {
+    "n": 409,
+    "file": "409-d066-bench-back-to-one-row.png",
+    "item": "L-23",
+    "option": "lay",
+    "value": "row",
+    "size": [
+     1872,
+     62
+    ],
+    "click": "one row across the page",
+    "at": [
+     109,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · round 1 · steps",
+   116
   ],
   [
    "rows at the end",
@@ -4021,6 +6075,1644 @@
   [
    "page errors",
    []
+  ],
+  [
+   "steps not taken",
+   []
   ]
+ ],
+ "round1": [
+  {
+   "n": 294,
+   "file": "294-d066-open-cooking-sessions.png",
+   "item": "D-066",
+   "size": [
+    1872,
+    52
+   ],
+   "click": "/cooking/sessions POST",
+   "at": [
+    185,
+    540
+   ]
+  },
+  {
+   "n": 295,
+   "file": "295-d066-hover-an-ending-by-its-label.png",
+   "item": "L-01 L-02 L-22",
+   "option": "ipo",
+   "value": "lines",
+   "size": [
+    520,
+    298
+   ],
+   "hover": "refusal",
+   "tip": "409 · refusal ┆ BEFORE ┆ inside AuthContext.require_household, called at api/cooking.py:125 ┆ CHECKS ┆ checks self.household is None, at context.py:55 ┆ GIVES ┆ answers 409: setup required ┆ not declared ┆ C237 asserts its status, which other endings share: it proves one of them, not which ┆ the screen code reads it: describeStartCookingError (cookingSessionModel.ts:389) ┆ counted in: endings · refused"
+  },
+  {
+   "n": 296,
+   "file": "296-d066-hovers-as-one-sentence.png",
+   "item": "L-22",
+   "option": "ipo",
+   "value": "sent",
+   "size": [
+    102,
+    72
+   ],
+   "click": "one sentence",
+   "at": [
+    319,
+    540
+   ]
+  },
+  {
+   "n": 297,
+   "file": "297-d066-hover-the-ending-one-sentence.png",
+   "item": "L-01 L-02 L-22",
+   "option": "ipo",
+   "value": "sent",
+   "size": [
+    520,
+    188
+   ],
+   "hover": "refusal",
+   "tip": "409 · refusal ┆ inside AuthContext.require_household, called at api/cooking.py:125 → checks self.household is None, at context.py:55 → answers 409: setup required; not declared; C237 asserts its status, which other endings share: it proves one of them, not which; the screen code reads it: describeStartCookingError (cookingSessionModel.ts:389) ┆ counted in: endings · refused"
+  },
+  {
+   "n": 298,
+   "file": "298-d066-hovers-back-to-labelled-lines.png",
+   "item": "L-22",
+   "option": "ipo",
+   "value": "lines",
+   "size": [
+    102,
+    72
+   ],
+   "click": "labelled lines",
+   "at": [
+    282,
+    540
+   ]
+  },
+  {
+   "n": 299,
+   "file": "299-d066-hover-the-first-429.png",
+   "item": "L-03",
+   "size": [
+    520,
+    460
+   ],
+   "hover": "refusal 429 sensitive",
+   "tip": "429 · sensitive · refusal ┆ BEFORE ┆ on paths that start with one of 7 prefixes: /api/v1/cooking/sessions · /api/v1/pantry/items/batch · /api/v1/pantry/reset/apply · +4 ┆ 23 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its sensitive limit, and answers when the count is over, at rate_limit.py:117 ┆ 20 per 60 seconds, counted per caller IP, apart for the sensitive limit ┆ the limit is the setting rate_limit_sensitive_per_minute (env GUSTIFY_RATE_LIMIT_SENSITIVE_PER_MINUTE) ┆ GIVES ┆ answers 429: Rate limit exceeded. Try again shortly. ┆ not declared ┆ sends a Retry-After header, its value worked out as it answers ┆ no test proves it ┆ describeStartCookingError has no branch for it ┆ counted in: endings · refused"
+  },
+  {
+   "n": 300,
+   "file": "300-d066-hover-the-second-429.png",
+   "item": "L-03",
+   "size": [
+    520,
+    424
+   ],
+   "hover": "refusal 429 global",
+   "tip": "429 · global · refusal ┆ BEFORE ┆ on every request but /healthz ┆ 79 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its global limit, and answers when the count is over, at rate_limit.py:121 ┆ 120 per 60 seconds, counted per caller IP, apart for the global limit ┆ the limit is the setting rate_limit_per_minute (env GUSTIFY_RATE_LIMIT_PER_MINUTE) ┆ GIVES ┆ answers 429: Rate limit exceeded. Try again shortly. ┆ not declared ┆ sends a Retry-After header, its value worked out as it answers ┆ no test proves it ┆ describeStartCookingError has no branch for it ┆ counted in: endings · refused"
+  },
+  {
+   "n": 301,
+   "file": "301-d066-hover-the-endings-row-name.png",
+   "item": "L-04",
+   "option": "leg",
+   "value": "hover",
+   "size": [
+    520,
+    563
+   ],
+   "hover": "Endings",
+   "tip": "Endings ┆ The ways a request can end, and the expected one among them. ┆ KINDS ┆ refusal ┆ — An ending where the app's own code says no. 9 here ┆ framework ┆ — An ending the framework produces while it reads the body: after the app's edge, before any dependency or code of the endpoint runs. 2 here ┆ validation ┆ — The ending where the input, the body, the query, the path or a header, does not fit its declared shape. 1 here ┆ success ┆ — An ending the endpoint means to reach. 1 here ┆ uncaught ┆ — The ending nobody translated: the 500. 1 here ┆ LABELS ┆ 429 ┆ ×2  ┆ 422 ┆ ×2  ┆ 400 ┆ ×2  ┆ 401 ┆ ×2  ┆ 409 ┆ ×2  ┆ 404 ┆ ×1  ┆ 403 ┆ ×1 — a client error status — The request is refused; the caller can change it and try again. ┆ 201 ┆ ×1 — a success status — The request went right. ┆ 500 ┆ ×1 — a server error status — The server failed; nothing the caller changes fixes it. ┆ 4xx ┆ hollow: The endpoint does not declare this status; a client reading its contract does not expect it. 10 here ┆ sensitive ┆ a word on a chip's face after its name: what tells it from a chip beside it that reads the same 4 here ┆ 4xx ┆ filled: The endpoint declares this status: the decorator's success status, a declared refusal, or the 422 FastAPI declares for every endpoint it checks. 3 here"
+  },
+  {
+   "n": 302,
+   "file": "302-d066-legend-above-the-table.png",
+   "item": "L-04",
+   "option": "leg",
+   "value": "strip",
+   "size": [
+    1872,
+    1475
+   ],
+   "click": "legend above the table",
+   "at": [
+    217,
+    540
+   ]
+  },
+  {
+   "n": 303,
+   "file": "303-d066-legend-back-on-the-row-name.png",
+   "item": "L-04",
+   "option": "leg",
+   "value": "hover",
+   "size": [
+    102,
+    72
+   ],
+   "click": "legend on the row's name",
+   "at": [
+    180,
+    540
+   ]
+  },
+  {
+   "n": 304,
+   "file": "304-d066-the-stage-band-and-the-fork.png",
+   "item": "L-05",
+   "option": "hdr",
+   "value": "band",
+   "size": [
+    1864,
+    258
+   ]
+  },
+  {
+   "n": 305,
+   "file": "305-d066-header-stages-roads-moments.png",
+   "item": "L-05",
+   "option": "hdr",
+   "value": "road",
+   "size": [
+    1864,
+    309
+   ],
+   "click": "stages, roads, moments",
+   "at": [
+    1163,
+    540
+   ]
+  },
+  {
+   "n": 306,
+   "file": "306-d066-header-back-to-the-band.png",
+   "item": "L-05",
+   "option": "hdr",
+   "value": "band",
+   "size": [
+    102,
+    72
+   ],
+   "click": "stages over moments",
+   "at": [
+    1126,
+    540
+   ]
+  },
+  {
+   "n": 307,
+   "file": "307-d066-saving-under-handler.png",
+   "item": "L-05",
+   "option": "save",
+   "value": "hand",
+   "size": [
+    1864,
+    309
+   ],
+   "click": "saving under HANDLER",
+   "at": [
+    1265,
+    540
+   ]
+  },
+  {
+   "n": 308,
+   "file": "308-d066-saving-back-under-effects.png",
+   "item": "L-05",
+   "option": "save",
+   "value": "eff",
+   "size": [
+    85,
+    72
+   ],
+   "click": "saving under EFFECTS",
+   "at": [
+    1228,
+    540
+   ]
+  },
+  {
+   "n": 309,
+   "file": "309-d066-the-endpoint-metadata-after-the-table.png",
+   "item": "L-06 L-07",
+   "option": "meta",
+   "value": "after",
+   "size": [
+    1872,
+    834
+   ]
+  },
+  {
+   "n": 310,
+   "file": "310-d066-metadata-before-the-table.png",
+   "item": "L-06 L-07",
+   "option": "meta",
+   "value": "before",
+   "size": [
+    1872,
+    902
+   ],
+   "click": "metadata before the table",
+   "at": [
+    1350,
+    540
+   ]
+  },
+  {
+   "n": 311,
+   "file": "311-d066-metadata-back-after-the-table.png",
+   "item": "L-06 L-07",
+   "option": "meta",
+   "value": "after",
+   "size": [
+    120,
+    72
+   ],
+   "click": "metadata after the table",
+   "at": [
+    1313,
+    540
+   ]
+  },
+  {
+   "n": 312,
+   "file": "312-d066-the-functions-row-head-columns.png",
+   "item": "L-20",
+   "size": [
+    120,
+    95
+   ]
+  },
+  {
+   "n": 313,
+   "file": "313-d066-light-the-deciders.png",
+   "item": "L-20",
+   "size": [
+    1864,
+    1080
+   ],
+   "click": "deciders 4",
+   "at": [
+    79,
+    540
+   ]
+  },
+  {
+   "n": 314,
+   "file": "314-d066-deciders-put-out.png",
+   "item": "L-20",
+   "size": [
+    120,
+    54
+   ],
+   "click": "deciders 4",
+   "at": [
+    79,
+    540
+   ]
+  },
+  {
+   "n": 315,
+   "file": "315-d066-widen-at-the-edge.png",
+   "item": "L-21",
+   "option": "wid",
+   "value": "names",
+   "size": [
+    1864,
+    439
+   ],
+   "click": "at the edge",
+   "at": [
+    616,
+    202
+   ]
+  },
+  {
+   "n": 316,
+   "file": "316-d066-widen-every-item-on-one-line.png",
+   "item": "L-21",
+   "option": "wid",
+   "value": "line",
+   "size": [
+    1864,
+    555
+   ],
+   "click": "every item on one line",
+   "at": [
+    439,
+    540
+   ]
+  },
+  {
+   "n": 317,
+   "file": "317-d066-widen-back-to-names-whole.png",
+   "item": "L-21",
+   "option": "wid",
+   "value": "names",
+   "size": [
+    137,
+    72
+   ],
+   "click": "names whole",
+   "at": [
+    402,
+    540
+   ]
+  },
+  {
+   "n": 318,
+   "file": "318-d066-hide-before-any-request.png",
+   "item": "L-21",
+   "size": [
+    1864,
+    222
+   ],
+   "click": "hide before any request",
+   "at": [
+    303,
+    540
+   ]
+  },
+  {
+   "n": 319,
+   "file": "319-d066-fit-to-the-box.png",
+   "item": "L-21",
+   "option": "fit",
+   "value": "min",
+   "size": [
+    1864,
+    464
+   ],
+   "click": "fit to the box",
+   "at": [
+    666,
+    540
+   ]
+  },
+  {
+   "n": 320,
+   "file": "320-d066-fit-wrap-into-bands.png",
+   "item": "L-21",
+   "option": "fit",
+   "value": "bands",
+   "size": [
+    1864,
+    337
+   ],
+   "click": "wrap into bands",
+   "at": [
+    576,
+    540
+   ]
+  },
+  {
+   "n": 321,
+   "file": "321-d066-fit-the-second-band.png",
+   "item": "L-21",
+   "option": "fit",
+   "value": "bands",
+   "size": [
+    1864,
+    316
+   ],
+   "look": "the second band, further down"
+  },
+  {
+   "n": 322,
+   "file": "322-d066-fit-back-to-narrow-the-rest.png",
+   "item": "L-21",
+   "option": "fit",
+   "value": "min",
+   "size": [
+    222,
+    72
+   ],
+   "click": "narrow the rest",
+   "at": [
+    539,
+    540
+   ]
+  },
+  {
+   "n": 323,
+   "file": "323-d066-fit-off.png",
+   "item": "L-21",
+   "size": [
+    222,
+    72
+   ],
+   "click": "fit to the box",
+   "at": [
+    666,
+    540
+   ]
+  },
+  {
+   "n": 324,
+   "file": "324-d066-show-all-columns.png",
+   "item": "L-21",
+   "size": [
+    371,
+    95
+   ],
+   "click": "show all",
+   "at": [
+    947,
+    540
+   ]
+  },
+  {
+   "n": 325,
+   "file": "325-d066-widen-given-back.png",
+   "item": "L-21",
+   "size": [
+    1864,
+    258
+   ],
+   "click": "at the edge",
+   "at": [
+    616,
+    540
+   ]
+  },
+  {
+   "n": 326,
+   "file": "326-d066-heads-ride-when-scrolled.png",
+   "item": "L-21",
+   "option": "stk",
+   "value": "ride",
+   "size": [
+    1864,
+    640
+   ],
+   "scrolled": "by the wheel, to Functions"
+  },
+  {
+   "n": 327,
+   "file": "327-d066-heads-stay-at-the-top.png",
+   "item": "L-21",
+   "option": "stk",
+   "value": "stay",
+   "size": [
+    180,
+    72
+   ],
+   "click": "stay at the top",
+   "at": [
+    1470,
+    540
+   ]
+  },
+  {
+   "n": 328,
+   "file": "328-d066-heads-stay-when-scrolled.png",
+   "item": "L-21",
+   "option": "stk",
+   "value": "stay",
+   "size": [
+    1864,
+    640
+   ],
+   "scrolled": "by the wheel, to Functions"
+  },
+  {
+   "n": 329,
+   "file": "329-d066-heads-back-to-ride.png",
+   "item": "L-21",
+   "option": "stk",
+   "value": "ride",
+   "size": [
+    180,
+    72
+   ],
+   "click": "ride under the pinned row",
+   "at": [
+    1433,
+    540
+   ]
+  },
+  {
+   "n": 330,
+   "file": "330-d066-the-gates-row.png",
+   "item": "L-09 L-10 L-11",
+   "option": "gdl",
+   "value": "head",
+   "size": [
+    1864,
+    611
+   ]
+  },
+  {
+   "n": 331,
+   "file": "331-d066-open-the-gates-row-options.png",
+   "item": "L-09 L-10 L-11",
+   "size": [
+    120,
+    521
+   ],
+   "click": "Gates and decisions: this row's options",
+   "at": [
+    133,
+    540
+   ]
+  },
+  {
+   "n": 332,
+   "file": "332-d066-gates-look-a-one-chain-per-gate.png",
+   "item": "L-09 L-10",
+   "option": "gdl",
+   "value": "chain",
+   "size": [
+    1864,
+    846
+   ],
+   "click": "one chain per gate",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 333,
+   "file": "333-d066-gates-look-c-side-by-side.png",
+   "item": "L-09 L-10",
+   "option": "gdl",
+   "value": "cols",
+   "size": [
+    1864,
+    846
+   ],
+   "click": "function · condition · effect",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 334,
+   "file": "334-d066-gdl-back-to-head.png",
+   "item": "L-09 L-10",
+   "option": "gdl",
+   "value": "head",
+   "size": [
+    110,
+    104
+   ],
+   "click": "function, gates under it",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 335,
+   "file": "335-d066-effect-e2-a-colour-per-stage.png",
+   "item": "L-10",
+   "option": "gef",
+   "value": "stage",
+   "size": [
+    1864,
+    846
+   ],
+   "click": "a colour per stage",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 336,
+   "file": "336-d066-gef-back-to-end.png",
+   "item": "L-10",
+   "option": "gef",
+   "value": "end",
+   "size": [
+    102,
+    67
+   ],
+   "click": "ending's colour, stage lit",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 337,
+   "file": "337-d066-gate-icons-one.png",
+   "item": "L-11",
+   "option": "gic",
+   "value": "one",
+   "size": [
+    1864,
+    846
+   ],
+   "click": "one gate icon",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 338,
+   "file": "338-d066-gate-icons-none.png",
+   "item": "L-11",
+   "option": "gic",
+   "value": "none",
+   "size": [
+    1864,
+    846
+   ],
+   "click": "no icon",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 339,
+   "file": "339-d066-gic-back-to-each.png",
+   "item": "L-11",
+   "option": "gic",
+   "value": "each",
+   "size": [
+    110,
+    104
+   ],
+   "click": "an icon per kind",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 340,
+   "file": "340-d066-gate-roles-r1-what-it-does.png",
+   "item": "L-11",
+   "option": "grl",
+   "value": "what",
+   "size": [
+    1864,
+    846
+   ],
+   "click": "what it does",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 341,
+   "file": "341-d066-gate-roles-r3-what-it-guards.png",
+   "item": "L-11",
+   "option": "grl",
+   "value": "guards",
+   "size": [
+    1864,
+    846
+   ],
+   "click": "what it guards",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 342,
+   "file": "342-d066-gate-roles-off.png",
+   "item": "L-11",
+   "option": "grl",
+   "value": "off",
+   "size": [
+    1864,
+    846
+   ],
+   "click": "no label",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 343,
+   "file": "343-d066-grl-back-to-where.png",
+   "item": "L-11",
+   "option": "grl",
+   "value": "where",
+   "size": [
+    110,
+    104
+   ],
+   "click": "where it decides",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 344,
+   "file": "344-d066-standard-m1-split-into-the-gates.png",
+   "item": "L-18",
+   "option": "std",
+   "value": "split",
+   "size": [
+    1864,
+    846
+   ]
+  },
+  {
+   "n": 345,
+   "file": "345-d066-standard-m2-merged-into-the-gates.png",
+   "item": "L-18",
+   "option": "std",
+   "value": "merge",
+   "size": [
+    1864,
+    846
+   ],
+   "click": "merge into the gates",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 346,
+   "file": "346-d066-standard-m3-kept-as-its-row.png",
+   "item": "L-18",
+   "option": "std",
+   "value": "keep",
+   "size": [
+    1864,
+    242
+   ],
+   "click": "keep the row",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 347,
+   "file": "347-d066-standard-back-to-split.png",
+   "item": "L-18",
+   "option": "std",
+   "value": "split",
+   "size": [
+    110,
+    132
+   ],
+   "click": "split into the gates",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 348,
+   "file": "348-d066-close-the-gates-row-options.png",
+   "item": "L-09 L-10 L-11 L-18",
+   "size": [
+    120,
+    84
+   ],
+   "click": "Gates and decisions: this row's options",
+   "at": [
+    133,
+    540
+   ]
+  },
+  {
+   "n": 349,
+   "file": "349-d066-hover-the-gates-row-head.png",
+   "item": "L-18",
+   "size": [
+    520,
+    1028
+   ],
+   "hover": "Gates and decisions",
+   "tip": "Gates and decisions ┆ Where can the request be stopped or sent another way: in which function, on what condition, and what happens then? ┆ also here — Standard or specialist: Is this endpoint built like the others, and what is unusual about it? A switch is set by the server's settings and changes a way the request can go; a rare piece is something few other endpoints have. ┆ The checks that stop a request and the forks that decide its ending. ┆ KINDS ┆ middleware — Code that runs on every request before the endpoint, in the order the app registers it. 1 here ┆ rate limit ┆ — A rate limit: it counts a caller's requests over a window and refuses the one past the limit. 2 here ┆ switch ┆ — A setting or a binding that changes what the request does. 2 here ┆ login check — The dependency that reads the caller's credential and decides who the caller is. 1 here ┆ catch ┆ — An except: an error raised below is caught here and turned into an answer, or let through. 4 here ┆ function — A function the request runs through. 3 here ┆ check ┆ — A check the endpoint's own code makes; when it holds, the request ends. 5 here ┆ handler — The endpoint's own function. 4 here ┆ fork ┆ — A branch whose arms lead the request different ways. 2 here ┆ LABELS ┆ 429 ┆ ×3  ┆ 401 ┆ ×3  ┆ 409 ┆ ×3  ┆ 400 ┆ ×1  ┆ 404 ┆ ×3  ┆ 403 ┆ ×1 — a client error status — The request is refused; the caller can change it and try again. ┆ 201 ┆ ×2 — a success status — The request went right. ┆ stage — the app band, before the endpoint is reached 3 here ┆ app-wide ┆ where it decides — In the app's middleware, before any endpoint's own code runs. 2 here ┆ stage — the login check 3 here ┆ at login ┆ where it decides — In the login check, while FastAPI works out who the caller is. 2 here ┆ caller ┆ function role — orchestrates — calls other functions, no store of its own 6 here ┆ gate ┆ function role — guards — auth / consent / idempotency before the work runs 1 here ┆ stage — the endpoint's own code decides 8 here ┆ inside a call ┆ where it decides — In a function the handler calls. 6 here ┆ in the handler ┆ where it decides — In the endpoint's own function. 4 here ┆ accessor ┆ function role — touches the store — reads/writes a DB table or a durable sink 1 here ┆ stage — the answer goes back; every success leaves here 2 here"
+  },
+  {
+   "n": 350,
+   "file": "350-d066-hover-ratelimitmiddleware.png",
+   "item": "L-09",
+   "size": [
+    520,
+    268
+   ],
+   "hover": "RateLimitMiddleware",
+   "tip": "RateLimitMiddleware · middleware ┆ BEFORE ┆ runs 2 of 3 ┆ CHECKS ┆ RateLimitMiddleware.dispatch, registered at main.py:127 ┆ does nothing when not (settings.rate_limit_enabled or settings.is_production) ┆ lets these paths through without its check: /healthz ┆ GIVES ┆ can end the request with 429 sensitive · 429 global"
+  },
+  {
+   "n": 351,
+   "file": "351-d066-hover-the-sensitive-limit.png",
+   "item": "L-09 L-10",
+   "size": [
+    520,
+    493
+   ],
+   "hover": "rate limit sensitive 20/60s → 429 app-wide",
+   "tip": "sensitive · rate limit ┆ BEFORE ┆ runs in RateLimitMiddleware ┆ on paths that start with one of 7 prefixes: /api/v1/cooking/sessions · /api/v1/pantry/items/batch · /api/v1/pantry/reset/apply · +4 ┆ 23 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its sensitive limit, and answers when the count is over, at rate_limit.py:117 ┆ 20 per 60 seconds, counted per caller IP, apart for the sensitive limit ┆ the limit is the setting rate_limit_sensitive_per_minute (env GUSTIFY_RATE_LIMIT_SENSITIVE_PER_MINUTE) ┆ GIVES ┆ ends the request with 429: Rate limit exceeded. Try again shortly. ┆ sends a Retry-After header, its value worked out as it answers ┆ counted in: rate"
+  },
+  {
+   "n": 352,
+   "file": "352-d066-data-effects-the-map.png",
+   "item": "L-12",
+   "option": "dfx",
+   "value": "one",
+   "size": [
+    1864,
+    762
+   ]
+  },
+  {
+   "n": 353,
+   "file": "353-d066-open-the-data-row-options.png",
+   "item": "L-12",
+   "size": [
+    120,
+    352
+   ],
+   "click": "Data effects: this row's options",
+   "at": [
+    133,
+    540
+   ]
+  },
+  {
+   "n": 354,
+   "file": "354-d066-data-effects-a-map-per-moment.png",
+   "item": "L-12",
+   "option": "dfx",
+   "value": "cell",
+   "size": [
+    1864,
+    649
+   ],
+   "click": "a small map per moment",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 355,
+   "file": "355-d066-data-effects-as-chips.png",
+   "item": "L-12",
+   "option": "dfx",
+   "value": "chips",
+   "size": [
+    1864,
+    767
+   ],
+   "click": "chips",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 356,
+   "file": "356-d066-data-effects-back-to-the-map.png",
+   "item": "L-12",
+   "option": "dfx",
+   "value": "one",
+   "size": [
+    110,
+    118
+   ],
+   "click": "one map for the endpoint",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 357,
+   "file": "357-d066-write-colour-his-words.png",
+   "item": "L-12",
+   "option": "dxc",
+   "value": "his",
+   "size": [
+    1864,
+    959
+   ],
+   "click": "his words' colours",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 358,
+   "file": "358-d066-write-colour-back-to-the-page.png",
+   "item": "L-12",
+   "option": "dxc",
+   "value": "page",
+   "size": [
+    110,
+    81
+   ],
+   "click": "the page's colours",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 359,
+   "file": "359-d066-close-the-data-row-options.png",
+   "item": "L-12",
+   "size": [
+    120,
+    70
+   ],
+   "click": "Data effects: this row's options",
+   "at": [
+    133,
+    540
+   ]
+  },
+  {
+   "n": 360,
+   "file": "360-d066-the-functions-row-with-marks.png",
+   "item": "L-13 L-14",
+   "option": "fnm",
+   "value": "on",
+   "size": [
+    1864,
+    959
+   ]
+  },
+  {
+   "n": 361,
+   "file": "361-d066-open-the-functions-row-options.png",
+   "item": "L-13",
+   "size": [
+    120,
+    210
+   ],
+   "click": "Functions: this row's options",
+   "at": [
+    133,
+    540
+   ]
+  },
+  {
+   "n": 362,
+   "file": "362-d066-functions-marks-off.png",
+   "item": "L-13",
+   "option": "fnm",
+   "value": "off",
+   "size": [
+    1864,
+    749
+   ],
+   "click": "name and role only",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 363,
+   "file": "363-d066-functions-marks-back-on.png",
+   "item": "L-13",
+   "option": "fnm",
+   "value": "on",
+   "size": [
+    110,
+    81
+   ],
+   "click": "what it decides and touches",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 364,
+   "file": "364-d066-close-the-functions-row-options.png",
+   "item": "L-13",
+   "size": [
+    120,
+    54
+   ],
+   "click": "Functions: this row's options",
+   "at": [
+    133,
+    540
+   ]
+  },
+  {
+   "n": 365,
+   "file": "365-d066-hover-resolutionsnapshot-violations-for.png",
+   "item": "L-14",
+   "size": [
+    520,
+    201
+   ],
+   "hover": "ResolutionSnapshot.violations_for",
+   "tip": "ResolutionSnapshot.violations_for · function ┆ BEFORE ┆ runs under assert_recipe_allergen_safe ┆ under the handler's call at api/cooking.py:150 ┆ assert_recipe_allergen_safe can end partway, before it calls this: a check that fires, or an error"
+  },
+  {
+   "n": 366,
+   "file": "366-d066-hover-the-refresh-chip.png",
+   "item": "L-15",
+   "size": [
+    518,
+    514
+   ],
+   "hover": "useStartCooking fetcher on success · refresh [\"cooking\"] ↳ useActiveCooking fetcher → /cooking/active GET ↳ useRemindersDue fetcher → /cooki",
+   "tip": "refresh · cache write ┆ BEFORE ┆ only while onSuccess ┆ CHECKS ┆ at useCookingSessions.ts:99 ┆ GIVES ┆ refreshes the cached [\"cooking\"] ┆ useActiveCooking fetches again: GET /cooking/active ┆ useActiveCooking gets back ActiveCookingResponse, read from cooking_photos · cooking_sessions · cooking_step_progress · +1 ┆ this request wrote cooking_sessions, which useActiveCooking reads ┆ useRemindersDue fetches again: GET /cooking/reminders/due ┆ useRemindersDue gets back DueRemindersResponse, read from cooking_stage_reminders ┆ this request wrote cooking_stage_reminders, which useRemindersDue reads ┆ counted in: screen"
+  },
+  {
+   "n": 367,
+   "file": "367-d066-hover-the-reads-403-line.png",
+   "item": "L-16",
+   "size": [
+    498,
+    282
+   ],
+   "hover": "reads 403 → “cooking.error.start_allergen”",
+   "tip": "reads 403 · in describeStartCookingError · reason site ┆ BEFORE ┆ in describeStartCookingError ┆ reached by 403 Recipe contains your allergen restrictions ┆ the error comes from useCookingLoopActions (303, 386) ┆ CHECKS ┆ reads the status: === 403, at cookingSessionModel.ts:381 ┆ GIVES ┆ what it does: hands back the text “cooking.error.start_allergen” ┆ counted in: reads"
+  },
+  {
+   "n": 368,
+   "file": "368-d066-in-flight-lifelines.png",
+   "item": "L-17",
+   "option": "ifl",
+   "value": "lane",
+   "size": [
+    1864,
+    408
+   ]
+  },
+  {
+   "n": 369,
+   "file": "369-d066-in-flight-lifelines-to-the-end.png",
+   "item": "L-17",
+   "option": "ifl",
+   "value": "lane",
+   "size": [
+    1864,
+    408
+   ],
+   "wheeled": "the box to its end"
+  },
+  {
+   "n": 370,
+   "file": "370-d066-open-the-rate-limiter-lane.png",
+   "item": "L-17",
+   "size": [
+    1864,
+    951
+   ],
+   "click": "▸ rate limit · 7 values kept by the server",
+   "at": [
+    124,
+    540
+   ]
+  },
+  {
+   "n": 371,
+   "file": "371-d066-fold-the-rate-limiter-lane.png",
+   "item": "L-17",
+   "size": [
+    179,
+    320
+   ],
+   "click": "▾rate limit · 7 values",
+   "at": [
+    234,
+    540
+   ]
+  },
+  {
+   "n": 372,
+   "file": "372-d066-hover-a-read-dot.png",
+   "item": "L-17",
+   "size": [
+    349,
+    129
+   ],
+   "hover": "409",
+   "tip": "ctx · checks ┆ read at api/cooking.py:125 ┆ handed to AuthContext.require_household ┆ can end the request with 409: setup required"
+  },
+  {
+   "n": 373,
+   "file": "373-d066-open-the-in-flight-row-options.png",
+   "item": "L-17",
+   "size": [
+    120,
+    277
+   ],
+   "click": "In-flight state: this row's options",
+   "at": [
+    133,
+    540
+   ]
+  },
+  {
+   "n": 374,
+   "file": "374-d066-in-flight-echoes-where-read.png",
+   "item": "L-17",
+   "option": "ifl",
+   "value": "echo",
+   "size": [
+    1864,
+    649
+   ],
+   "click": "echoes where read",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 375,
+   "file": "375-d066-in-flight-chips-where-set.png",
+   "item": "L-17",
+   "option": "ifl",
+   "value": "chips",
+   "size": [
+    1864,
+    649
+   ],
+   "click": "chips where set",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 376,
+   "file": "376-d066-in-flight-back-to-lifelines.png",
+   "item": "L-17",
+   "option": "ifl",
+   "value": "lane",
+   "size": [
+    110,
+    118
+   ],
+   "click": "a lifeline each",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 377,
+   "file": "377-d066-close-the-in-flight-row-options.png",
+   "item": "L-17",
+   "size": [
+    120,
+    84
+   ],
+   "click": "In-flight state: this row's options",
+   "at": [
+    133,
+    540
+   ]
+  },
+  {
+   "n": 378,
+   "file": "378-d066-open-the-proof-row-options.png",
+   "item": "CR-20",
+   "size": [
+    1864,
+    304
+   ],
+   "click": "Proof: this row's options",
+   "at": [
+    133,
+    540
+   ]
+  },
+  {
+   "n": 379,
+   "file": "379-d066-earlier-requests-in-proofs-head.png",
+   "item": "CR-20",
+   "option": "jyb",
+   "value": "head",
+   "size": [
+    1864,
+    515
+   ],
+   "click": "in Proof's head",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 380,
+   "file": "380-d066-earlier-requests-back-to-their-moment.png",
+   "item": "CR-20",
+   "option": "jyb",
+   "value": "prior",
+   "size": [
+    1864,
+    304
+   ],
+   "click": "their own moment",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 381,
+   "file": "381-d066-close-the-proof-row-options.png",
+   "item": "CR-20",
+   "size": [
+    120,
+    38
+   ],
+   "click": "Proof: this row's options",
+   "at": [
+    133,
+    540
+   ]
+  },
+  {
+   "n": 382,
+   "file": "382-d066-the-examples-bench.png",
+   "item": "L-23",
+   "option": "lay",
+   "value": "row",
+   "size": [
+    1872,
+    1121
+   ]
+  },
+  {
+   "n": 383,
+   "file": "383-d066-bench-column-end.png",
+   "item": "L-23",
+   "size": [
+    280,
+    784
+   ],
+   "column": "ending"
+  },
+  {
+   "n": 384,
+   "file": "384-d066-bench-column-table.png",
+   "item": "L-23",
+   "size": [
+    280,
+    652
+   ],
+   "column": "table"
+  },
+  {
+   "n": 385,
+   "file": "385-d066-bench-column-schema.png",
+   "item": "L-23",
+   "size": [
+    280,
+    706
+   ],
+   "column": "schema"
+  },
+  {
+   "n": 386,
+   "file": "386-d066-bench-column-fn.png",
+   "item": "L-23 L-13",
+   "size": [
+    280,
+    716
+   ],
+   "column": "function"
+  },
+  {
+   "n": 387,
+   "file": "387-d066-bench-column-test.png",
+   "item": "L-23 L-08",
+   "size": [
+    280,
+    869
+   ],
+   "column": "test"
+  },
+  {
+   "n": 388,
+   "file": "388-d066-bench-column-gate.png",
+   "item": "L-23 L-11",
+   "size": [
+    280,
+    994
+   ],
+   "column": "gate or decision"
+  },
+  {
+   "n": 389,
+   "file": "389-d066-bench-column-hook.png",
+   "item": "L-23",
+   "size": [
+    280,
+    667
+   ],
+   "column": "client hook"
+  },
+  {
+   "n": 390,
+   "file": "390-d066-bench-column-inf.png",
+   "item": "L-23",
+   "size": [
+    280,
+    762
+   ],
+   "column": "in-flight value"
+  },
+  {
+   "n": 391,
+   "file": "391-d066-test-column-on-c267.png",
+   "item": "L-23 L-08",
+   "size": [
+    280,
+    869
+   ],
+   "clicks": 0,
+   "arrow": null,
+   "shows": "case:C267"
+  },
+  {
+   "n": 392,
+   "file": "392-d066-test-c267-open-its-chain.png",
+   "item": "L-23 L-08",
+   "size": [
+    280,
+    1263
+   ],
+   "click": "C267 201 pass start session response carries recipe title tests it Authorization Idempotency-Key 201 · recipe_title",
+   "at": [
+    929,
+    540
+   ]
+  },
+  {
+   "n": 393,
+   "file": "393-d066-test-c267-the-chain-wheeled-to-its-end.png",
+   "item": "L-23 L-08",
+   "size": [
+    258,
+    573
+   ],
+   "wheeled": "inside the open block, to its end",
+   "list": {
+    "max": 4943,
+    "h": 393,
+    "all": 5336
+   }
+  },
+  {
+   "n": 394,
+   "file": "394-d066-test-column-on-c250.png",
+   "item": "L-23 L-08",
+   "size": [
+    280,
+    1245
+   ],
+   "clicks": 1,
+   "arrow": "the element before",
+   "shows": "case:C250"
+  },
+  {
+   "n": 395,
+   "file": "395-d066-test-block-closed-again.png",
+   "item": "L-23",
+   "size": [
+    280,
+    851
+   ],
+   "click": "C250 pass cook complete history pantry loop sets up and checks Authorization Idempotency-Key 201",
+   "at": [
+    929,
+    540
+   ]
+  },
+  {
+   "n": 396,
+   "file": "396-d066-table-parts-opened.png",
+   "item": "L-23",
+   "size": [
+    280,
+    938
+   ],
+   "click": "parts",
+   "at": [
+    73,
+    540
+   ]
+  },
+  {
+   "n": 397,
+   "file": "397-d066-drag-model-into-not-drawn.png",
+   "item": "L-23",
+   "size": [
+    280,
+    919
+   ],
+   "drag": "class",
+   "from": [
+    146,
+    540
+   ],
+   "to": [
+    148,
+    587
+   ],
+   "after": {
+    "drawn": false,
+    "tray": [
+     "model"
+    ]
+   }
+  },
+  {
+   "n": 398,
+   "file": "398-d066-table-size-of-name.png",
+   "item": "L-23",
+   "size": [
+    280,
+    729
+   ],
+   "click": "name",
+   "at": [
+    142,
+    540
+   ]
+  },
+  {
+   "n": 399,
+   "file": "399-d066-table-colour-opened.png",
+   "item": "L-23",
+   "size": [
+    280,
+    927
+   ],
+   "click": "colour",
+   "at": [
+    195,
+    540
+   ]
+  },
+  {
+   "n": 400,
+   "file": "400-d066-table-back-to-the-default.png",
+   "item": "L-23",
+   "size": [
+    280,
+    946
+   ],
+   "click": "back to the default",
+   "at": [
+    125,
+    540
+   ]
+  },
+  {
+   "n": 401,
+   "file": "401-d066-table-colour-closed.png",
+   "item": "L-23",
+   "size": [
+    258,
+    80
+   ],
+   "click": "colour",
+   "at": [
+    195,
+    540
+   ]
+  },
+  {
+   "n": 402,
+   "file": "402-d066-gate-column-role-field-rule.png",
+   "item": "L-23 L-11",
+   "size": [
+    280,
+    926
+   ],
+   "click": "field rule 4",
+   "at": [
+    1201,
+    540
+   ]
+  },
+  {
+   "n": 403,
+   "file": "403-d066-gate-column-every-role-again.png",
+   "item": "L-23 L-11",
+   "size": [
+    258,
+    174
+   ],
+   "click": "all 21",
+   "at": [
+    1179,
+    540
+   ]
+  },
+  {
+   "n": 404,
+   "file": "404-d066-gate-column-every-endpoint.png",
+   "item": "L-23",
+   "option": "scope",
+   "value": "all",
+   "size": [
+    280,
+    1178
+   ],
+   "click": "every endpoint",
+   "at": [
+    1293,
+    540
+   ]
+  },
+  {
+   "n": 405,
+   "file": "405-d066-gate-column-back-to-this-endpoint.png",
+   "item": "L-23",
+   "option": "scope",
+   "value": "here",
+   "size": [
+    258,
+    266
+   ],
+   "click": "this endpoint",
+   "at": [
+    1193,
+    540
+   ]
+  },
+  {
+   "n": 406,
+   "file": "406-d066-table-copy-line.png",
+   "item": "L-23",
+   "size": [
+    258,
+    280
+   ],
+   "click": "copy",
+   "at": [
+    70,
+    540
+   ]
+  },
+  {
+   "n": 407,
+   "file": "407-d066-bench-wrapped-rows.png",
+   "item": "L-23",
+   "option": "lay",
+   "value": "wrap",
+   "size": [
+    1872,
+    1737
+   ],
+   "click": "wrapped rows",
+   "at": [
+    240,
+    540
+   ]
+  },
+  {
+   "n": 408,
+   "file": "408-d066-bench-an-upper-and-a-lower-row.png",
+   "item": "L-23",
+   "option": "lay",
+   "value": "half",
+   "size": [
+    1872,
+    1291
+   ],
+   "click": "an upper and a lower row",
+   "at": [
+    373,
+    540
+   ]
+  },
+  {
+   "n": 409,
+   "file": "409-d066-bench-back-to-one-row.png",
+   "item": "L-23",
+   "option": "lay",
+   "value": "row",
+   "size": [
+    1872,
+    62
+   ],
+   "click": "one row across the page",
+   "at": [
+    109,
+    540
+   ]
+  }
  ]
 }

@@ -7,7 +7,7 @@
    clicked ringed. Nothing is selected by a script call; the page's data is READ only to know which control to look for. */
 import { createRequire } from 'node:module'; import path from 'node:path'; import fs from 'node:fs';
 const require = createRequire(import.meta.url);
-const HERE = path.dirname(new URL(import.meta.url).pathname), REPO = path.resolve(HERE, '../../..'), OUT = path.join(HERE, 'shots/all-endpoints');
+const HERE = path.dirname(new URL(import.meta.url).pathname), REPO = path.resolve(HERE, '../../..'), OUT = process.env.WALK_OUT || path.join(HERE, 'shots/all-endpoints');   /* WALK_OUT: a trial run's pictures somewhere else */
 const PW = path.join(REPO, 'docs/design/graft-adoption/spike/_build/node_modules/playwright-core'), CHROME = '/usr/bin/google-chrome-stable';
 const { chromium } = require(PW);
 fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
@@ -28,14 +28,25 @@ const unring = async () => p.$$eval('[data-__ring]', (els) => els.forEach((e) =>
 const step = async (name, sel, note) => {            // photograph with the target ringed, then click it with the mouse at its centre
   const el = await p.$(sel); if (!el) { say('MISSING ' + name, sel); return false; }
   await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(160);
-  await el.scrollIntoViewIfNeeded(); await ring(sel); await wait(100);
+  await el.scrollIntoViewIfNeeded();
+  // the click must land on the control: scrolled under the pinned row (D-039) the mouse meets the pin instead (found 2026-09-30, the
+  // info toggle of ONE ENDPOINT at y=2) — then the control is brought to the middle of the screen first
+  const lands = () => el.evaluate((e) => { const r = e.getBoundingClientRect(), h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return !!h && (h === e || e.contains(h)); });
+  if (!(await lands())) { await el.evaluate((e) => e.scrollIntoView({ block: 'center' })); await wait(150); if (!(await lands())) say('COVERED ' + name, sel); }
+  await ring(sel); await wait(100);
   await pic(name);
   const box = await el.boundingBox(), label = await txt(sel);
   await unring();
   say('step ' + (n) + ' · ' + name, { click: label.slice(0, 70), at: [Math.round(box.x), Math.round(box.y)], size: [Math.round(box.width), Math.round(box.height)], note: note || null });
   await p.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await wait(400); return true; };
 const rows = () => p.$$eval('#board tr.row[data-ep], #board .card[data-ep]', (els) => els.length);
+// WALK_FROM=<label>: a trial run that starts at one of the later sections (d053 · bymoment · d055 · d056 · d057 · d058 · d064 · d064r ·
+// d065 · d066); the parts before the first of them always run. The committed pictures come from a run with it unset
+const FROM = process.env.WALK_FROM || null; let reached = !FROM;
+const go = (label) => { if (!reached && label === FROM) reached = true; return reached; };
+let ROUND1 = null;   // D-066 round 1: one record per step (item · option · value), written into walk.json
 
+if (!FROM) {   // the walk's first part: the table, the rail, ONE ENDPOINT (a trial run from a later section skips it)
 // [pressed] · {dashed = my pick on a rail he has not ruled} — read off the squares' aria-labels and their drawn borders
 say('rails at load', await p.$$eval('.rgrp', (gs) => gs.map((g) => (g.querySelector('.rl') || {}).textContent + ': ' + [...g.querySelectorAll('.opt')].map((o) => {
   const on = o.getAttribute('aria-checked') === 'true', dash = getComputedStyle(o).borderTopStyle === 'dashed', w = o.getAttribute('aria-label');
@@ -279,7 +290,8 @@ await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
     await pic('point-at-a-gap-shown-in-part'); } else say('MISSING a gap shown in part', '#ocol-gaps .gap[data-part]'); }
 await step('more-information', '#more-btn', 'the more information button, at the end of the page');
 await pic('more-information-open');
-{ // D-053, LAST: the endings and the own checks as ONE table, in the order they happen — POST /recipe-creation/gustify (the operator's
+}
+if (go('d053')) { // D-053, LAST: the endings and the own checks as ONE table, in the order they happen — POST /recipe-creation/gustify (the operator's
   // screenshot endpoint) opened from the table; each look switched by its square and back; one own check lit, photographed where it
   // lands; then GET /recipes, the longest table. The table is photographed on its own after every change; the words are read off it
   const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
@@ -318,7 +330,7 @@ await pic('more-information-open');
   await step('open-get-recipes-from-the-table', '#board tr.row[data-ep="GET /recipes"] td.id', 'the row GET /recipes');
   const t2 = await table(); say('D-053 · GET /recipes, the endings in time order', { rows: t2.filter((x) => !x.startsWith('── ')).length - 1, table: t2 });
   await center(EX); await endPic('endings-longest-table-get-recipes'); }
-{ // BY MOMENT (his ask 2026-09-26), LAST: the code map's copy button, then the section below ONE ENDPOINT — the endpoint's moments
+if (go('bymoment')) { // BY MOMENT (his ask 2026-09-26), LAST: the code map's copy button, then the section below ONE ENDPOINT — the endpoint's moments
   // as columns (his default, D-055), its timed blocks as rows — on POST /recipe-creation/gustify: its info; each look switched and back; the path to the
   // 402 and back; one table lit from the grid, then POST /setup/complete opened with the light still on (the login dependency reads
   // that table, and the handler's call reads it again: two moments). The section is photographed from the page's top as a clip of the
@@ -368,8 +380,10 @@ await pic('more-information-open');
   say('BY MOMENT · the path to the 402', await grid()); await moPic('by-moment-path-to-the-402');
   await center('#mobar .mopath[data-path="all"]'); await step('all-paths-again', '#mobar .mopath[data-path="all"]', 'the path square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"');
   // one table lit from the grid: households, which the login dependency reads (the dependencies' row, Data effects)
-  const CH = '#mogrid td[data-mom="gate"][data-f="data"] .mc[data-key="table:households"]';
-  await center(CH); await step('light-households-in-by-moment', CH, 'the chip "' + (await txt(CH)).slice(0, 40) + '" in the dependencies\' column, Data effects');
+  /* CHANGED 2026-09-30 (D-070): Data effects is one map under its row (his default look now) — households is a table of that map, in
+     the dependencies' band (the band of its first step); its cells say how many */
+  const CH = '#mogrid tr.mdxr .mdxn[data-side="t"][data-key="table:households"]';
+  await center(CH); await step('light-households-in-by-moment', CH, 'the table "' + (await txt(CH)).slice(0, 40) + '" in the Data effects map, the dependencies\' band');
   say('BY MOMENT · households lit, where the light lands', await lands());
   await moPic('by-moment-households-lit');
   // another endpoint with the light on: POST /setup/complete, clicked in the table — the same table read at two moments
@@ -380,7 +394,7 @@ await pic('more-information-open');
   await moPic('by-moment-setup-complete-households-lit');
   await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
   await step('clear-the-by-moment-light', '#elclear', 'the clear link on the lit chip above the table'); }
-{ // D-055 (his ruling 2026-09-26), LAST: POST /cooking/sessions, his example — the path row's codes and their hovers, the handler heads and
+if (go('d055')) { // D-055 (his ruling 2026-09-26), LAST: POST /cooking/sessions, his example — the path row's codes and their hovers, the handler heads and
   // one's hover, then the code map's switch "what BY MOMENT carries": dim, hide, and back to show all, the code map photographed each time
   const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
   const paths = () => p.$$eval('#mobar .mopaths > *', (gs) => gs.map((g) => g.classList.contains('mopg') ? g.getAttribute('data-mom') + ': ' + [...g.querySelectorAll('.mopath')].map((x) => x.innerText.trim()).join(' ') : g.innerText.trim()).join(' │ '));
@@ -438,7 +452,7 @@ await pic('more-information-open');
   await step('back-to-cooking-sessions', '#board tr.row[data-ep="POST /cooking/sessions"] td.id', 'the row POST /cooking/sessions');
   await center('#ocol-cm .opt[data-carry="all"]'); await step('carry-show-all', '#ocol-cm .opt[data-carry="all"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="all"]')) + '" (my pick)');
   await cvSay('D-055 · the code map, show all again'); }
-{ // D-056 (his ruling "agree with your recommendations"), LAST: the twelve adds, on POST /cooking/sessions (his example), then the file
+if (go('d056')) { // D-056 (his ruling "agree with your recommendations"), LAST: the twelve adds, on POST /cooking/sessions (his example), then the file
   // that fetches GET /account/export and the stream's success — each read off the page after a real click or a real hover
   const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
   const clipOf = async (sel, maxH) => p.$eval(sel, (e, mh) => { const r = e.getBoundingClientRect(); return { x: Math.max(0, r.left + scrollX - 8), y: Math.max(0, r.top + scrollY - 8), width: r.width + 16, height: Math.min(mh, r.height + 16) }; }, maxH);
@@ -460,7 +474,13 @@ await pic('more-information-open');
   await hoverSay('d056 hover a not-declared 409', '#ocol-cm .pair[data-k="d:exits"] tr.erow[data-mom="checks"] .vc-status');
   await center('#sec-mo'); await shotOf('d056-by-moment-all-paths', '#sec-mo');
   await hoverSay('d056 hover a function behind', '#mogrid .mc[data-keys="fn:apps/api/services/long_prep.py::seed_stage_schedule"] .mt');
-  await hoverSay('d056 hover the race', '#mogrid td[data-mom="work"][data-f="data"] .mc:has(.mrc) .mt');
+  /* CHANGED 2026-09-30 (D-070 · R-04): the race is a badge on its link in the Data effects map — the link to cooking_sessions (read off
+     the page's data to know which badge; the hover is the mouse's) */
+  const raceSel = await p.evaluate(() => { document.querySelectorAll('[data-w66race]').forEach((x) => x.removeAttribute('data-w66race'));
+    const w = document.querySelector('#mogrid tr.mdxr .mdx'), D0 = window.__allep.data, R0 = D0.rows.find((q) => q.id === window.__allep.state.open), X0 = R0 && R0.mo.dx;
+    const bd = w && X0 ? [...w.querySelectorAll('.mdxrc')].find((x) => { const L0 = w._dx.L[+x.getAttribute('data-j')]; return L0 && D0.mo.keys[X0.t[L0.t]] === 'table:cooking_sessions'; }) : null;
+    if (!bd) return null; bd.setAttribute('data-w66race', '1'); return '[data-w66race="1"]'; });
+  if (raceSel) await hoverSay('d056 hover the race', raceSel); else say('MISSING d056 hover the race', 'the race badge on cooking_sessions');
   await hoverSay('d056 hover the first 429', '#mogrid td[data-mom="edge"][data-f="end"] .mc .vc-status');
   await hoverSay('d056 hover the limiter', '#mogrid .mc[data-keys="limiter:sensitive"] .mt');
   await hoverSay('d056 hover the login check', '#mogrid td[data-mom="gate"][data-f="gate"] .mc[data-key^="fn:"] .mt');
@@ -517,7 +537,7 @@ await pic('more-information-open');
   await step('review-open-the-stream', '#board tr.row[data-ep="GET /recipe-creation/gustify/stream"] td.id', 'the row GET /recipe-creation/gustify/stream');
   say('review · the stream, its answer', await p.$$eval('#mogrid td[data-mom="answer"][data-f="end"] .mc', (cs) => cs.map((c) => c.innerText.replace(/\s+/g, ' ').trim() + ' [' + [...c.querySelectorAll('.sksub')].map((v) => v.getAttribute('data-vc') + ':' + v.getAttribute('data-vv')).join(' ') + ']')));
   await shotPieces('review-the-stream-answer', '#sec-mo'); }
-{ // D-057 (his ruling "build 1 and 2"), LAST: POST /cooking/sessions — the switch's new count and hide; the two codes of the 201, hovered
+if (go('d057')) { // D-057 (his ruling "build 1 and 2"), LAST: POST /cooking/sessions — the switch's new count and hide; the two codes of the 201, hovered
   // and clicked; the check that raises the lost reason, the client branch, the functions behind at their caller, the Endings row's info
   // line; then PATCH …/timer's 500 and the function it escapes from, and POST /setup/complete's client branch — real clicks, real hovers
   const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
@@ -557,7 +577,12 @@ await pic('more-information-open');
   await center('#mobar'); await step('d057-all-paths-again', '#mobar .mopath[data-path="all"]', 'the square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"');
   const sa = await chipBy('work', 'gate', 'existing is not None and existing.user_id != user_id'); if (sa) await hoverSay('d057 hover the check that raises the lost reason', sa);
   await hoverSay('d057 hover the 404 after the catch', '#mogrid td[data-mom="fail"][data-f="end"] .mc');
-  const sb = await chipBy('after', 'client', 'cookingSessionModel.ts:389'); if (sb) await hoverSay('d057 hover the client branch that reads 409', sb);
+  /* CHANGED 2026-09-30 (D-069 (6)): the client's branches stand under describeStartCookingError, each line led by its verb — the line
+     that reads 409, found by the words on it */
+  const lineBy = async (mom, f, lead) => p.evaluate(([m, f0, w]) => { document.querySelectorAll('[data-w57]').forEach((x) => x.removeAttribute('data-w57'));
+    const c = [...document.querySelectorAll('#mogrid td[data-mom="' + m + '"][data-f="' + f0 + '"] .mgb > .mc')].find((x) => x.innerText.replace(/\s+/g, ' ').trim().startsWith(w));
+    if (!c) return null; c.setAttribute('data-w57', '1'); return '[data-w57="1"]'; }, [mom, f, lead]);
+  const sb = await lineBy('after', 'client', 'reads 409'); if (sb) await hoverSay('d057 hover the client branch that reads 409', sb); else say('MISSING the client line that reads 409', 'after');
   for (const w of ['_stages', '_label', 'derive_restrictions']) { const sd = await chipBy('work', 'fn', w); if (sd) await hoverSay('d057 hover ' + w + ' at the work', sd); else say('MISSING ' + w, 'work'); }
   await center('#itog-mo'); await step('d057-open-the-by-moment-info', '#itog-mo', 'the info toggle of BY MOMENT');
   say('D-057 · the Endings row, behind the info toggle', await p.$eval('#mo-nocode', (e) => e.textContent).catch(() => null));
@@ -569,7 +594,7 @@ await pic('more-information-open');
   const se = await chipBy(null, 'fn', 'set_session_timer'); if (se) await hoverSay('d057 hover set_session_timer', se);
   await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
   await step('d057-open-setup-complete', '#board tr.row[data-ep="POST /setup/complete"] td.id', 'the row POST /setup/complete');
-  const sc = await chipBy('after', 'client', 'SetupScreen.tsx:43'); if (sc) await hoverSay('d057 hover the setup client branch', sc);
+  const sc = await lineBy('after', 'client', 'reads'); if (sc) await hoverSay('d057 hover the setup client branch', sc); else say('MISSING the setup client branch', 'after');   /* CHANGED 2026-09-30 (D-069 (6)): its first line, by its verb */
   say('D-057 · POST /setup/complete, the path row', await paths());
   // the review of D-057 (F1 · F2 · F3), LAST: POST /cooking/sessions — the code map hidden where BY MOMENT carries it (its count in the
   // header); the two 201 codes hovered, the first-run one picked by the words its hover says (past every fork); on it the recipe check
@@ -594,12 +619,12 @@ await pic('more-information-open');
     const sr = await chipBy('work', 'gate', 'recipe is None'); if (sr) await center(sr); if (sr) await hoverSay('review hover the check that raises SessionNotFoundError', sr); else say('MISSING recipe is None', 'work');
     const sq = await chipBy('work', 'gate', 'concurrent_cap is not None and active + 1 > concurrent_cap'); if (sq) await center(sq); if (sq) await hoverSay('review hover the cap check', sq); else say('MISSING the cap check', 'work');
     await center('#mobar'); await step('review-all-paths-again', '#mobar .mopath[data-path="all"]', 'the square "' + (await txt('#mobar .mopath[data-path="all"]')) + '"'); }
-  const sv = await chipBy('after', 'client', 'cookingSessionModel.ts:389'); if (sv) await center(sv); if (sv) await hoverSay('review hover the client branch after the answer', sv); else say('MISSING the client branch', 'after');
+  const sv = await lineBy('after', 'client', 'reads 409'); if (sv) await center(sv); if (sv) await hoverSay('review hover the client branch after the answer', sv); else say('MISSING the client branch', 'after');
   const sn = await chipBy('work', 'fn', 'ResolutionSnapshot.violations_for'); if (sn) await center(sn); if (sn) await hoverSay('review hover a function known by name only', sn); else say('MISSING ResolutionSnapshot.violations_for', 'work');
   await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
   await step('review-open-session-complete', '#board tr.row[data-ep="POST /cooking/sessions/{session_id}/complete"] td.id', 'the row POST /cooking/sessions/{session_id}/complete');
   await center('#mogrid td[data-mom="uncaught"][data-f="end"] .mc .vc-status'); await hoverSay('review hover the 500 of complete', '#mogrid td[data-mom="uncaught"][data-f="end"] .mc .vc-status'); }
-{ // D-058 (his ruling 2026-09-26), LAST: POST /cooking/sessions — the Gabe Universe's own switch (show all, dim with a hover, hide), then
+if (go('d058')) { // D-058 (his ruling 2026-09-26), LAST: POST /cooking/sessions — the Gabe Universe's own switch (show all, dim with a hover, hide), then
   // THE GAPS' own switch on the universe → code map way (dim with a hover on derive_restrictions, hide) and on the code map → universe
   // way; each panel's count in its header, the "+n in BY MOMENT" notes; the page's copy text; both panels back to show all
   const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
@@ -665,42 +690,39 @@ await pic('more-information-open');
   say('D-058 review · beside the button', await p.$eval('#cmsaid', (e) => e.textContent));
   { const r = await p.$eval('#cmcopy', (e) => { const q = e.parentElement.getBoundingClientRect(); return { x: Math.max(0, q.left - 8), y: Math.max(0, q.top - 8), width: q.width + 16, height: q.height + 16 }; });
     n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-d058-review-copied.png'), clip: { x: r.x, y: r.y, width: Math.min(W - r.x, r.width), height: Math.min(H - r.y, r.height) } }); } }
-{ // D-064 (his ruling 2026-09-28), LAST: POST /cooking/sessions — (2) the table's last column, no moment: photographed, the box scrolled
+if (go('d064')) { // D-064 (his ruling 2026-09-28), LAST: POST /cooking/sessions — (2) the table's last column, no moment: photographed, the box scrolled
   // sideways by the mouse's wheel to reach it, its head and three of its chips hovered; the code map's hide header read before and after
   // the square; (1) assert_recipe_allergen_safe looked for in the work on the replay 201, the 404 and the first-run 201, each code clicked
   const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
-  const hoverSay = async (label, sel) => { const e = await p.$(sel); if (!e) { say('MISSING ' + label, sel); return; } await e.scrollIntoViewIfNeeded(); const bx = await e.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(250);
+  const hoverSay = async (label, sel) => { const e = await p.$(sel); if (!e) { say('MISSING ' + label, sel); return; } await e.evaluate((x) => x.scrollIntoView({ block: 'center' })); await wait(120); const bx = await e.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(250);
     say(label, await p.$eval('#tip', (t) => t.innerText.replace(/\n+/g, ' ┆ '))); n++;
     const tb = await p.$eval('#tip', (t) => { const r = t.getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; });
     const x0 = Math.max(0, Math.min(bx.x, tb.x) - 10), y0 = Math.max(0, Math.min(bx.y, tb.y) - 10);
     await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + label.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 40) + '.png'),
       clip: { x: x0, y: y0, width: Math.min(W - x0, Math.max(bx.x + bx.width, tb.x + tb.width) - x0 + 10), height: Math.min(H - y0, Math.max(bx.y + bx.height, tb.y + tb.height) - y0 + 10) } });
     await p.mouse.move(5, H - 10); await wait(100); };
-  const nmCells = () => p.$$eval('#mogrid td[data-nm]', (ts) => ts.map((t) => t.getAttribute('data-f') + ': ' + [...t.querySelectorAll('.mc')].map((c) => c.innerText.replace(/\s+/g, ' ').trim()).join(' | ')).filter((x) => !/: $/.test(x)));
+  /* CHANGED 2026-09-30 (D-068, his L-06/L-07): the "no moment" column left the table — what it held stands in the ENDPOINT METADATA,
+     one card per block, after the table; each card photographed, the metadata's title and three of its chips hovered */
+  const nmCards = () => p.$$eval('#mometa .mcard', (cs) => cs.map((c) => c.getAttribute('data-f') + ': ' + c.innerText.replace(/\s+/g, ' ').trim().slice(0, 160)));
   const workFns = () => p.$$eval('#mogrid td[data-mom="work"][data-f="fn"] .mc', (cs) => cs.map((c) => ((c.querySelector('.mt') || c).textContent || '').replace(/\s+/g, ' ').trim()));
   await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
   await step('d064-open-cooking-sessions', '#board tr.row[data-ep="POST /cooking/sessions"] td.id', 'the row POST /cooking/sessions');
-  await center('#sec-mo'); say('D-064 (2) · the no-moment column, cell by cell', await nmCells());
+  await center('#sec-mo'); say('D-064 (2) · the endpoint metadata, card by card (D-068: where the no-moment column went)', await nmCards());
   say('D-064 (2) · the band', await p.$eval('#moband', (e) => e.innerText.replace(/\s+/g, ' ').slice(0, 300)));
-  { const g = await p.$('#mogrid'); await g.scrollIntoViewIfNeeded(); const bx = await g.boundingBox();   /* the box's own scroll, sideways, by the wheel, to its end */
-    await p.mouse.move(bx.x + bx.width / 2, Math.min(bx.y + bx.height - 20, Math.max(bx.y + 20, H / 2)));   /* inside the box, below the pinned row */
-    for (let k = 0; k < 40; k++) { await p.mouse.wheel(300, 0); await wait(60); if (await p.$eval('#mogrid', (G) => G.scrollLeft >= G.scrollWidth - G.clientWidth - 1)) break; }
-    say('D-064 (2) · the box scrolled to its end', await p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, at: G.scrollLeft, note: !document.getElementById('moscroll').hidden }; })); }
-  // photographed row by row, in the browser's own window: a full-page capture resizes the window, and the page redraws BY MOMENT on a
-  // resize (the box back at its start) — so each block row that holds a fact is brought into view and its right end photographed,
-  // below the pinned row
+  say('D-064 (2) · the box, at its start', await p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, at: G.scrollLeft, metadataAfter: document.getElementById('mometa').previousElementSibling.id }; }));
+  // each card brought to the middle of the window and photographed there, below the pinned row (a full-page capture resizes the window)
   { await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide());
-    const fams = await p.$$eval('#mogrid td[data-nm]', (ts) => ts.filter((t) => t.querySelector('.mc')).map((t) => t.getAttribute('data-f')));
-    for (const f of fams) { await p.$eval('#mogrid tr[data-f="' + f + '"]', (e) => e.scrollIntoView({ block: 'center' })); await wait(150);
-      const r = await p.evaluate((f0) => { const tr = document.querySelector('#mogrid tr[data-f="' + f0 + '"]').getBoundingClientRect(), G = document.getElementById('mogrid').getBoundingClientRect(),
-        pin = document.getElementById('pin'), pb = pin && pin.getBoundingClientRect().height ? pin.getBoundingClientRect().bottom : 0, y = Math.max(tr.top - 4, pb, 0);
-        return { x: Math.max(0, G.right - 760), y, width: Math.min(760, G.right), height: Math.max(40, Math.min(tr.bottom + 4, innerHeight) - y), at: document.getElementById('mogrid').scrollLeft }; }, f);
-      n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-d064-no-moment-' + f + '.png'), clip: { x: r.x, y: r.y, width: r.width, height: r.height } });
-      say('D-064 (2) · the no-moment cell of ' + f + ' photographed', { box: r.at }); } }
-  await hoverSay('d064 hover the no-moment head', '#mogrid th.monmh');
-  await hoverSay('d064 hover the handler file and line', '#mogrid td[data-nm] .mc[data-nmk="file"] .mt');
-  await hoverSay('d064 hover the outline', '#mogrid td[data-nm] .mc[data-nmk="sig"] .mt');
-  await hoverSay('d064 hover the cluster', '#mogrid td[data-nm] .mc[data-nmk="cl"] .mt');
+    const fams = await p.$$eval('#mometa .mcard', (cs) => cs.map((c) => c.getAttribute('data-f')));
+    for (const f of fams) { await p.$eval('#mometa .mcard[data-f="' + f + '"]', (e) => e.scrollIntoView({ block: 'center' })); await wait(150);
+      const r = await p.evaluate((f0) => { const c = document.querySelector('#mometa .mcard[data-f="' + f0 + '"]').getBoundingClientRect(),
+        pin = document.getElementById('pin'), pb = pin && pin.getBoundingClientRect().height ? pin.getBoundingClientRect().bottom : 0, y = Math.max(c.top - 6, pb, 0);
+        return { x: Math.max(0, c.left - 6), y, width: Math.min(innerWidth - Math.max(0, c.left - 6), c.width + 12), height: Math.max(40, Math.min(c.bottom + 6, innerHeight) - y) }; }, f);
+      n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-d064-metadata-' + f + '.png'), clip: r });
+      say('D-064 (2) · the metadata card of ' + f + ' photographed', { h: Math.round(r.height) }); } }
+  await hoverSay('d064 hover the metadata title', '#mometa h3[data-tip="nmhead"]');
+  await hoverSay('d064 hover the handler file and line', '#mometa .nmc[data-nmk="file"]');
+  await hoverSay('d064 hover the outline', '#mometa .nmc[data-nmk="sig"]');
+  await hoverSay('d064 hover the cluster', '#mometa .nmc[data-nmk="cl"]');
   // (1) the allergen check behind start_session, per code (which square is which is read off the page's data; the clicks are the mouse's)
   const codeOf = (pred) => p.evaluate((pr) => { const R = window.AE_DATA.rows.find((q) => q.id === 'POST /cooking/sessions'); return R.mo.ex.findIndex(pr === 404 ? (x) => x[1] === 404 : (x) => x[1] === 201 && JSON.stringify(x[9] || []).includes(pr)); }, pred);
   for (const [name, pr] of [['the-replay-201', 'existing is not None'], ['the-404', 404], ['the-first-run-201', 'fall']]) { const i = await codeOf(pr), sel = '#mobar .mopath[data-path="' + i + '"]';
@@ -713,19 +735,13 @@ await pic('more-information-open');
   say('D-064 (2) · the code map\'s header, hide', await p.$eval('#cvcount', (e) => e.textContent));
   say('D-064 (2) · the code map\'s fields left in hide', await p.$$eval('#ocol-cm .pair[data-k]', (fs) => fs.filter((e) => e.offsetParent && !/^[ce]$/.test(e.getAttribute('data-cvs'))).map((e) => (e.querySelector('.pk') || {}).textContent)));
   await center('#ocol-cm .opt[data-carry="all"]'); await step('d064-carry-show-all', '#ocol-cm .opt[data-carry="all"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="all"]')) + '" (my pick)'); }
-{ // the review of D-064 (2026-09-28), LAST, on POST /cooking/sessions: BY MOMENT photographed from the section's top with its last column,
+if (go('d064r')) { // the review of D-064 (2026-09-28), LAST, on POST /cooking/sessions: BY MOMENT photographed from the section's top with its last column,
   // "no moment", in view (the box wheeled sideways to its end; a tall section in 8,000 px pieces); the entity chip and the file:line in
-  // that column hovered; the replay 201 picked (assert_recipe_allergen_safe no longer on it), all paths again; the code map in hide, its
+  // that column hovered — CHANGED 2026-09-30 (D-068): that column left the table, so BY MOMENT is photographed with its endpoint
+  // metadata after the table (the box at its start) and the two chips are hovered there; the replay 201 picked (assert_recipe_allergen_safe no longer on it), all paths again; the code map in hide, its
   // header photographed, then show all again
   const E = 'POST /cooking/sessions';
   const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); };
-  const wheelToEnd = async () => { const g = await p.$('#mogrid'); const bx = await g.boundingBox();
-    const pb = await p.evaluate(() => { const q = document.getElementById('pin'); return q && q.getBoundingClientRect().height ? q.getBoundingClientRect().bottom : 0; });
-    const y = Math.min(bx.y + bx.height - 20, Math.max(bx.y + 20, pb + 40, 60));   /* inside the box, below the pinned row */
-    await p.mouse.move(bx.x + bx.width / 2, Math.min(y, (p.viewportSize() || { height: H }).height - 20));
-    for (let k = 0; k < 40; k++) { await p.mouse.wheel(300, 0); await wait(60); if (await p.$eval('#mogrid', (G) => G.scrollLeft >= G.scrollWidth - G.clientWidth - 1)) break; }
-    await p.mouse.move(5, 5); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120);
-    return p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, at: G.scrollLeft }; }); };
   const hoverPic = async (label, sel) => { const e = await p.$(sel); if (!e) { say('MISSING ' + label, sel); return; } await e.scrollIntoViewIfNeeded(); await wait(100); const bx = await e.boundingBox();
     await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await wait(250);
     say(label, await p.$eval('#tip', (t) => t.innerText.replace(/\n+/g, ' ┆ '))); n++;
@@ -741,20 +757,20 @@ await pic('more-information-open');
       const pinH = await p.evaluate(() => { const q = document.getElementById('pin'); return q ? Math.ceil(q.getBoundingClientRect().height) : 0; });
       await p.setViewportSize({ width: W, height: ph + pinH + 16 }); await wait(500);
       await p.evaluate(([k0, pinH0]) => { const t = document.getElementById('sec-mo').getBoundingClientRect().top + scrollY; window.scrollTo(0, Math.max(0, t + k0 * 8000 - pinH0 - 8)); }, [k, pinH]); await wait(250);
-      const sc = await wheelToEnd();
+      await p.mouse.move(5, 5); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120);
       n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-' + name + (pieces > 1 ? '-' + (k + 1) : '') + '.png') });
-      say('review of D-064 · BY MOMENT photographed from its top' + (pieces > 1 ? ', piece ' + (k + 1) + ' of ' + pieces : ''), { section: hs, window: ph + pinH + 16, box: sc,
-        lastColumn: await p.$eval('#mogrid th.monmh', (h) => { const r = h.getBoundingClientRect(); return { left: Math.round(r.left), right: Math.round(r.right), inWindow: r.right <= innerWidth && r.left >= 0 }; }) }); }
+      /* CHANGED 2026-09-30 (D-068): the no-moment column left the table; the endpoint metadata stands after it, its cards read here */
+      say('review of D-064 · BY MOMENT photographed from its top' + (pieces > 1 ? ', piece ' + (k + 1) + ' of ' + pieces : ''), { section: hs, window: ph + pinH + 16,
+        box: await p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, at: G.scrollLeft }; }),
+        metadata: await p.$eval('#mometa', (m) => ({ after: m.previousElementSibling.id, cards: [...m.querySelectorAll('.mcard')].map((c) => c.getAttribute('data-f')) })) }); }
     await p.setViewportSize({ width: W, height: H }); await wait(500); };
   const open0 = await p.$eval('#mohead h3', (h) => h.getAttribute('aria-label')).catch(() => null);
   if (open0 !== E) { await p.evaluate(() => window.scrollTo(0, 0)); await wait(150); await step('d064r-open-cooking-sessions', '#board tr.row[data-ep="' + E + '"] td.id', 'the row ' + E); }
   say('review of D-064 · BY MOMENT is open on', await p.$eval('#mohead h3', (h) => h.getAttribute('aria-label')));
-  await secPics('d064r-by-moment-no-moment-column');
-  // the entity chip and the file:line in the last column, hovered with the mouse (the box wheeled to its end first, as a person would)
-  await center('#mogrid tr[data-f="over"]'); say('review of D-064 · the box, wheeled', await wheelToEnd());
-  await hoverPic('d064r hover the entity chip', '#mogrid td[data-nm] .mc[data-nmk="ent"]');
-  await center('#mogrid tr[data-f="fn"]'); await wheelToEnd();
-  await hoverPic('d064r hover the file and line', '#mogrid td[data-nm] .mc[data-nmk="file"]');
+  await secPics('d064r-by-moment-and-its-metadata');
+  // the entity chip and the file:line, in the endpoint metadata now (D-068), hovered with the mouse
+  await center('#mometa .nmc[data-nmk="ent"]'); await hoverPic('d064r hover the entity chip', '#mometa .nmc[data-nmk="ent"]');
+  await center('#mometa .nmc[data-nmk="file"]'); await hoverPic('d064r hover the file and line', '#mometa .nmc[data-nmk="file"]');
   // the replay 201: which square is which is read off the page's data; the click is the mouse's
   const iRe = await p.evaluate((ep) => { const R = window.AE_DATA.rows.find((q) => q.id === ep); return R.mo.ex.findIndex((x) => x[1] === 201 && JSON.stringify(x[9] || []).includes('existing is not None')); }, E);
   const selRe = '#mobar .mopath[data-path="' + iRe + '"]';
@@ -774,7 +790,7 @@ await pic('more-information-open');
     const r = await p.$eval('#cvcount', (e) => { const h = e.closest('h3').getBoundingClientRect(); return { x: Math.max(0, h.left - 8), y: Math.max(0, h.top - 8), width: h.width + 16, height: h.height + 16 }; });
     n++; await p.screenshot({ path: path.join(OUT, String(n).padStart(2, '0') + '-d064r-code-map-hide-header.png'), clip: { x: r.x, y: r.y, width: Math.min(W - r.x, r.width), height: Math.min(H - r.y, r.height) } }); }
   await center('#ocol-cm .opt[data-carry="all"]'); await step('d064r-code-map-show-all', '#ocol-cm .opt[data-carry="all"]', 'the square "' + (await txt('#ocol-cm .opt[data-carry="all"]')) + '" (my pick)'); }
-{ // D-065 (his ruling 2026-09-28, "build A and B") and its review (J1–J8), LAST, on POST /cooking/sessions: BY MOMENT photographed from
+if (go('d065')) { // D-065 (his ruling 2026-09-28, "build A and B") and its review (J1–J8), LAST, on POST /cooking/sessions: BY MOMENT photographed from
   // the section's top with the box at its start ("before any request") and wheeled to "after the answer" (the Proof row's journey chips
   // at the two outer moments); C250's before chip and its after chip hovered; "every step a chip" pressed, photographed, and back; the 404
   // picked (the journeys gone), all paths again; then DELETE /pantry/items/{item_id}: C705's two calls here, each its own chip, photographed
@@ -805,7 +821,8 @@ await pic('more-information-open');
   // at 1920 px: a chip whose words overflow it, and a journey chip's word broken across two lines — both should be none
   const cutSay = async (label) => say(label, await p.evaluate(() => ({ cut: [...document.querySelectorAll('#mogrid .mc')].filter((c) => c.scrollWidth > c.clientWidth + 1).map((c) => c.innerText.slice(0, 40)),
     broken: [...document.querySelectorAll('#mogrid [data-jy] .mt, #mogrid [data-jy] .mq')].filter((x) => x.getClientRects().length > 1).map((x) => x.textContent) })));
-  const proofSay = async (label) => say(label, await p.evaluate(() => ['start', 'after'].map((m) => m + ': ' + [...document.querySelectorAll('#mogrid td[data-mom="' + m + '"][data-f="proof"] [data-jy]')]
+  /* CHANGED 2026-09-30 (review CR-20): a journey's earlier requests stand at "earlier in the test" (prior), no longer "before any request" */
+  const proofSay = async (label) => say(label, await p.evaluate(() => ['prior', 'after'].map((m) => m + ': ' + [...document.querySelectorAll('#mogrid td[data-mom="' + m + '"][data-f="proof"] [data-jy]')]
     .filter((c) => !c.parentElement.closest('[data-jy]')).map((c) => c.innerText.replace(/\s+/g, ' ').trim()).join(' | '))));
   const hoverPic = async (label, sel) => { const e = await p.$(sel); if (!e) { say('MISSING ' + label, sel); return; }
     await p.$eval(sel, (x) => { const r = x.getBoundingClientRect(); if (r.top < 120 || r.bottom > innerHeight - 40) x.scrollIntoView({ block: 'center' }); }); await wait(120);
@@ -826,7 +843,7 @@ await pic('more-information-open');
   await secPics('d065-proof-before-any-request', null);
   await secPics('d065-proof-after-the-answer', '#mogrid .mom[data-mom="after"]');
   await center('#mogrid tr[data-f="proof"]');
-  await hoverPic('d065 hover C250 before chip', '#mogrid td[data-mom="start"][data-f="proof"] .mc[data-jy="C250|api"][data-side="b"]');
+  await hoverPic('d065 hover C250 before chip', '#mogrid td[data-mom="prior"][data-f="proof"] .mc[data-jy="C250|api"][data-side="b"]');
   await hoverPic('d065 hover C250 after chip', '#mogrid td[data-mom="after"][data-f="proof"] .mc[data-jy="C250|api"][data-side="a"]');
   const sqEach = '#mobar .opt[data-mopt="jy"][data-v="each"]', sqOne = '#mobar .opt[data-mopt="jy"][data-v="one"]';
   await center('#mobar'); await step('d065-every-step-a-chip', sqEach, 'the square "' + (await txt(sqEach)) + '"');
@@ -847,8 +864,309 @@ await pic('more-information-open');
   await cutSay('D-065 · ' + E705 + ' · chips cut or words broken at ' + W + ' px');
   await secPics('d065-delete-pantry-item-c705-two-calls', null);
   await center('#mogrid tr[data-f="proof"]');
-  await hoverPic('d065 hover C705 step 5 chip', '#mogrid td[data-mom="start"][data-f="proof"] .mc[data-jy="C705|api"][data-k="5"]'); }
+  await hoverPic('d065 hover C705 step 5 chip', '#mogrid td[data-mom="prior"][data-f="proof"] .mc[data-jy="C705|api"][data-k="5"]'); }
+if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D-067 … D-071 and the round-1 review fixes), LAST, on POST
+  // /cooking/sessions: each item of the note shown as he would meet it — a hover by the mouse, an option by a click on its square, a part
+  // of the bench moved by a real drag — and ONE ELEMENT picture per step (the row, the cell region, the hover box with what it hovers, the
+  // bench column), never the whole page. Every step is tagged in walk.json ("round1": item · option · value) so a picture is found by the
+  // item it answers. An option is put back to its default by a click once it is photographed; that click is a step too, photographed small
+  const E = 'POST /cooking/sessions', R1 = [];
+  if (n < 292) n = 292;                                                     /* the new pictures are numbered after his earlier ones (… 292) */
+  const VH = () => (p.viewportSize() || { height: H }).height;
+  const clear = async () => { await p.mouse.move(5, VH() - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120); };
+  const fname = (name) => String(++n).padStart(2, '0') + '-d066-' + name + '.png';
+  const rec = (name, file, t, what) => { const e = Object.assign({ n, file, item: t[0] }, t[1] ? { option: t[1], value: t[2] } : {}, what || {}); R1.push(e); say('D-066 · ' + n + ' · ' + name, e); };
+  const pinB = () => p.evaluate(() => { const q = document.getElementById('pin'); return q && q.getBoundingClientRect().height ? Math.max(0, q.getBoundingClientRect().bottom) : 0; });
+  const words = (h) => h.evaluate((e) => (e.getAttribute('aria-label') || e.innerText || e.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 140));
+  const boxOf = (h) => h.evaluate((e) => (e.closest('#mogrid') ? '#mogrid' : e.closest('#exgrid') ? '#exgrid' : null));
+  const lands = (x, y, sel) => p.evaluate(([x0, y0, s0]) => { const h = document.elementFromPoint(x0, y0), e0 = document.querySelector(s0); return !!h && !!e0 && (h === e0 || e0.contains(h)); }, [x, y, sel]);
+  // a box that scrolls sideways (BY MOMENT's, the bench's) wheeled by the mouse until `sel` stands inside it ('start' · 'end': its ends)
+  const wheelBox = async (sel, box) => { const g = await p.$(box); if (!g) return;
+    for (let k = 0; k < 40; k++) {
+      const dx = await p.evaluate(([s0, b0]) => { const G = document.querySelector(b0), gb = G.getBoundingClientRect(), max = G.scrollWidth - G.clientWidth;
+        if (s0 === 'start') return G.scrollLeft > 0 ? -Math.min(600, G.scrollLeft) : 0;
+        if (s0 === 'end') return G.scrollLeft < max - 1 ? Math.min(600, max - G.scrollLeft) : 0;
+        const e = document.querySelector(s0); if (!e) return 0; const r = e.getBoundingClientRect();
+        if (r.width > gb.width - 8) return r.left < gb.left + 2 && G.scrollLeft > 0 ? -Math.min(600, gb.left + 2 - r.left) : 0;
+        if (r.left < gb.left + 2 && G.scrollLeft > 0) return -Math.min(600, gb.left + 12 - r.left);
+        if (r.right > gb.right - 2 && G.scrollLeft < max - 1) return Math.min(600, r.right - gb.right + 12);
+        return 0; }, [sel, box]);
+      if (!dx) break;
+      const gb = await g.boundingBox(), pb = await pinB(), y = Math.min(gb.y + gb.height - 20, VH() - 20, Math.max(gb.y + 20, pb + 30));
+      await p.mouse.move(gb.x + gb.width / 2, y); await p.mouse.wheel(dx, 0); await wait(90); }
+    await clear(); };
+  // the picture: a clip of the window (a full-page capture resizes the window, and BY MOMENT redraws on a resize) — or, for the bench, which
+  // does not redraw, a clip of the full page (`page`), so a column taller than the window below the pinned row is whole
+  const clipShot = async (name, c, t, what, page) => { const f = fname(name), lim = page ? 1e9 : VH();
+    const x = Math.max(0, Math.round(c.x)), y = Math.max(0, Math.round(c.y)), clip = { x, y, width: Math.min(Math.round(c.width), W - x), height: Math.max(20, Math.min(Math.round(c.height), lim - y)) };
+    await p.screenshot(Object.assign({ path: path.join(OUT, f), clip }, page ? { fullPage: true } : {})); rec(name, f, t, Object.assign({ size: [clip.width, clip.height] }, what || {})); };
+  const rectOf = (sels, pad) => p.evaluate(([ss, pd]) => { let r = null; const pin = document.getElementById('pin'), pb = pin && pin.getBoundingClientRect().height ? Math.max(0, pin.getBoundingClientRect().bottom) : 0;
+    for (const s0 of ss) { const e = document.querySelector(s0); if (!e) continue; const b = e.getBoundingClientRect(), bx = e.closest('#mogrid, #exgrid'); let l = b.left, rr = b.right;
+      if (bx) { const g = bx.getBoundingClientRect(); l = Math.max(l, g.left); rr = Math.min(rr, g.right); }
+      r = r ? { l: Math.min(r.l, l), t: Math.min(r.t, b.top), r: Math.max(r.r, rr), b: Math.max(r.b, b.bottom) } : { l, t: b.top, r: rr, b: b.bottom }; }
+    if (!r) return null; const y = Math.max(r.t - pd, pb); return { x: r.l - pd, y, width: r.r - r.l + 2 * pd, height: r.b + pd - y }; }, [sels, pad == null ? 8 : pad]);
+  // an element brought to the middle of the window below the pinned row (its top under the row when it is taller), then photographed
+  const place = async (sel) => { const pb0 = await pinB(); await p.evaluate(([s0, pb]) => { const e = document.querySelector(s0); if (!e) return; e.scrollIntoView({ block: 'center' });
+      const r = e.getBoundingClientRect(), pin = document.getElementById('pin'), pb1 = pin && pin.offsetHeight ? pin.offsetHeight : pb, avail = innerHeight - pb1;
+      window.scrollBy(0, r.height + 20 < avail ? r.top - pb1 - (avail - r.height) / 2 : r.top - pb1 - 8); }, [sel, pb0]); await wait(220); };
+  const elShot = async (name, sels, t, what, o) => { o = o || {}; if (!(await p.$(sels[0]))) { say('MISSING ' + name, sels[0]); return; }
+    await clear(); if (!o.stay) await place(sels[0]); if (o.wheel) await wheelBox(o.wheel, o.box || '#mogrid'); await clear();
+    const r = await rectOf(sels, o.pad); if (!r) { say('MISSING ' + name, sels.join(' + ')); return; } await clipShot(name, r, t, what); };
+  // the page at its top first: scrolled, the pinned row (sticky) would be drawn over the clip
+  const pageShot = async (name, sels, t, what) => { sels = [].concat(sels); if (!(await p.$(sels[0]))) { say('MISSING ' + name, sels[0]); return; } await clear();
+    await p.evaluate(() => window.scrollTo(0, 0)); await wait(200);
+    const r = await p.evaluate((ss) => { let u = null; for (const s0 of ss) { const e = document.querySelector(s0); if (!e) continue; const b = e.getBoundingClientRect(), bx = e.closest('#mogrid, #exgrid'), g = bx ? bx.getBoundingClientRect() : b;
+        const l = Math.max(b.left, g.left), rr = Math.min(b.right, g.right); u = u ? { l: Math.min(u.l, l), t: Math.min(u.t, b.top), r: Math.max(u.r, rr), b: Math.max(u.b, b.bottom) } : { l, t: b.top, r: rr, b: b.bottom }; }
+      return u ? { x: u.l + scrollX - 8, y: u.t + scrollY - 8, width: u.r - u.l + 16, height: u.b - u.t + 16 } : null; }, sels);
+    if (!r) { say('MISSING ' + name, sels.join(' + ')); return; } await clipShot(name, r, t, what, true); };
+  // a row of BY MOMENT, right under its heads (which ride under the pinned row), the box at its start or wheeled to `wheel`; `pin` keeps
+  // the pinned row in the picture
+  const rowShot = async (name, rows, t, what, o) => { o = o || {}; if (!(await p.$(rows[0]))) { say('MISSING ' + name, rows[0]); return; } await clear();
+    await p.evaluate((s0) => { const tr = document.querySelector(s0), T = tr.closest('table'), hd = T.tHead, pin = document.getElementById('pin'), ph = pin && pin.offsetHeight ? pin.offsetHeight : 0;
+      window.scrollTo(0, Math.max(0, tr.getBoundingClientRect().top + scrollY - ph - (hd ? hd.offsetHeight : 0) - 4)); }, rows[0]); await wait(300);
+    await wheelBox(o.wheel || 'start', '#mogrid');
+    const r = await p.evaluate(([ss, wp]) => { const G = document.getElementById('mogrid').getBoundingClientRect(), pin = document.getElementById('pin'), pb = pin && pin.offsetHeight ? Math.max(0, pin.getBoundingClientRect().bottom) : 0;
+      let b = 0; for (const s0 of ss) { const e = document.querySelector(s0); if (e) b = Math.max(b, e.getBoundingClientRect().bottom); }
+      const y = wp ? 0 : pb; return { x: G.left - 4, y, width: G.width + 8, height: b + 6 - y }; }, [rows, !!o.pin]);
+    await clipShot(name, r, t, what); };
+  // the top of BY MOMENT's table — its stages, its moments and the rows named — with the head in its own place (not riding)
+  const topShot = async (name, rows, t, what, o) => { o = o || {}; await clear();
+    await p.evaluate((above) => { const T = document.querySelector('#mogrid table.motab'), a = above ? document.querySelector(above) : null, pin = document.getElementById('pin'), ph = pin && pin.offsetHeight ? pin.offsetHeight : 0;
+      const top = (a || T).getBoundingClientRect().top + scrollY; window.scrollTo(0, Math.max(0, top - ph - 12)); }, o.above || null); await wait(300);
+    await wheelBox(o.wheel || 'start', '#mogrid');
+    const r = await p.evaluate(([ss, above]) => { const G = document.getElementById('mogrid').getBoundingClientRect(), T = document.querySelector('#mogrid table.motab').getBoundingClientRect(), a = above ? document.querySelector(above).getBoundingClientRect() : null;
+      let b = document.querySelector('#mogrid table.motab thead').getBoundingClientRect().bottom; for (const s0 of ss) { const e = document.querySelector(s0); if (e) b = Math.max(b, e.getBoundingClientRect().bottom); }
+      const y = (a ? Math.min(a.top, T.top) : T.top) - 6, x = a ? Math.min(G.left, a.left) : G.left; return { x: x - 4, y, width: Math.max(G.right, a ? a.right : 0) - x + 8, height: b + 6 - y }; }, [rows, o.above || null]);
+    await clipShot(name, r, t, what); };
+  // the mouse to an element and the hover photographed with what it hovers (`at`: 'left' points at its first letters)
+  const hoverShot = async (name, sel, t, what, o) => { o = o || {}; const e = await p.$(sel); if (!e) { say('MISSING ' + name, sel); return null; }
+    await clear(); await e.evaluate((x) => x.scrollIntoView({ block: 'center' })); await wait(150);
+    const bx0 = await boxOf(e); if (bx0) await wheelBox(sel, bx0);
+    const b = await e.boundingBox(), at = o.at === 'left' ? [b.x + Math.min(10, b.width / 2), b.y + b.height / 2] : [b.x + b.width / 2, b.y + b.height / 2];
+    if (!(await lands(at[0], at[1], sel))) say('COVERED ' + name, sel);
+    await p.mouse.move(at[0], at[1], { steps: 4 }); await wait(320);
+    const tp = await p.$eval('#tip', (q) => { const r = q.getBoundingClientRect(); return { show: q.getAttribute('data-show') === 'true', text: q.innerText.replace(/\n+/g, ' ┆ '), l: r.left, t: r.top, r: r.right, b: r.bottom }; });
+    if (!tp.show) say('NO HOVER ' + name, sel);
+    const x0 = Math.min(b.x, tp.show ? tp.l : b.x) - 10, y0 = Math.min(b.y, tp.show ? tp.t : b.y) - 10, x1 = Math.max(b.x + b.width, tp.show ? tp.r : 0) + 10, y1 = Math.max(b.y + b.height, tp.show ? tp.b : 0) + 10;
+    await clipShot(name, { x: x0, y: y0, width: x1 - x0, height: y1 - y0 }, t, Object.assign({ hover: await words(e), tip: tp.show ? tp.text : null }, what || {}));
+    await clear(); return tp; };
+  // a control clicked by the mouse at its centre (brought to the middle of the window, its box wheeled to it), then `shoot` photographs
+  // what the click changed
+  const press = async (name, sel, t, shoot, what) => { const e = await p.$(sel); if (!e) { say('MISSING ' + name, sel); return false; }
+    await clear(); await e.evaluate((x) => x.scrollIntoView({ block: 'center' })); await wait(150);
+    const bx0 = await boxOf(e); if (bx0) await wheelBox(sel, bx0);
+    const b = await e.boundingBox(), w0 = await words(e), cx = b.x + b.width / 2, cy = b.y + b.height / 2;
+    if (!(await lands(cx, cy, sel))) say('COVERED ' + name, sel);
+    await p.mouse.click(cx, cy); await wait(450);
+    await shoot(name, t, Object.assign({ click: w0, at: [Math.round(cx), Math.round(cy)] }, what || {})); return true; };
+  const S = { el: (sels, o) => (nm, t, w) => elShot(nm, sels, t, w, o), row: (rows, o) => (nm, t, w) => rowShot(nm, rows, t, w, o), top: (rows, o) => (nm, t, w) => topShot(nm, rows, t, w, o),
+    page: (sels) => (nm, t, w) => pageShot(nm, sels, t, w) };
+  const sq = (g, v) => '#mobar .opt[data-mopt="' + g + '"][data-v="' + v + '"]', grp = (g) => '#mobar .mgrp[data-mopt="' + g + '"]';
+  const rsq = (f, g, v) => '#mogrid tbody th[data-f="' + f + '"] .mrop .opt[data-mopt="' + g + '"][data-v="' + v + '"]', rgrp = (f, g) => '#mogrid tbody th[data-f="' + f + '"] .mrop .mgrp[data-mopt="' + g + '"]';
+  const ROW = (f) => '#mogrid tbody tr[data-f="' + f + '"]', HEAD = (f) => '#mogrid tbody th[data-f="' + f + '"]', MAP = '#mogrid tbody tr.mdxr';
+  const CELL = (m, f) => '#mogrid td[data-mom="' + m + '"][data-f="' + f + '"]';
+  // an item found by the words on it (the page's data is not asked); marked so the mouse can go to it
+  const markNth = (scope, i) => p.evaluate(([sc, k]) => { document.querySelectorAll('[data-w66]').forEach((x) => x.removeAttribute('data-w66'));
+    const c = document.querySelectorAll(sc)[k]; if (!c) return null; c.setAttribute('data-w66', '1'); return '[data-w66="1"]'; }, [scope, i]);
+  const mark = (scope, lead, exact) => p.evaluate(([sc, w, ex]) => { document.querySelectorAll('[data-w66]').forEach((x) => x.removeAttribute('data-w66'));
+    const c = [...document.querySelectorAll(sc)].find((x) => { const s0 = x.innerText.replace(/\s+/g, ' ').trim(); return ex ? s0 === w : s0.startsWith(w); });
+    if (!c) return null; c.setAttribute('data-w66', '1'); return '[data-w66="1"]'; }, [scope, lead, !!exact]);
+
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await press('open-cooking-sessions', '#board tr.row[data-ep="' + E + '"] td.id', ['D-066'], S.el(['#sec-mo .sec-head']));
+  say('D-066 · BY MOMENT is open on', await p.$eval('#mohead h3', (h) => h.getAttribute('aria-label')).catch(() => null));
+
+  /* L-01 · L-02 · L-22: one hover per ending, in before · checks · gives — pointed at by its kind label ("refusal"), which once hovered apart */
+  const END409 = CELL('checks', 'end') + ' .mc[data-key="status:409"]';
+  await hoverShot('hover-an-ending-by-its-label', END409 + ' .vc-kind', ['L-01 L-02 L-22', 'ipo', 'lines'], null, { at: 'left' });
+  await press('hovers-as-one-sentence', sq('ipo', 'sent'), ['L-22', 'ipo', 'sent'], S.el([grp('ipo')]));
+  await hoverShot('hover-the-ending-one-sentence', END409 + ' .vc-kind', ['L-01 L-02 L-22', 'ipo', 'sent'], null, { at: 'left' });
+  await press('hovers-back-to-labelled-lines', sq('ipo', 'lines'), ['L-22', 'ipo', 'lines'], S.el([grp('ipo')]));
+  /* L-03: the two 429s at the edge, each its own words */
+  for (const [i, nm] of [[0, 'hover-the-first-429'], [1, 'hover-the-second-429']]) { const s9 = await markNth(CELL('edge', 'end') + ' .mc[data-key="status:429"]', i);
+    if (s9) await hoverShot(nm, s9, ['L-03']); else say('MISSING ' + nm, CELL('edge', 'end')); }
+  /* L-04: the Endings row's legend on its name (his placement, ruled); the other place, above the table */
+  await hoverShot('hover-the-endings-row-name', HEAD('end') + ' .mbn', ['L-04', 'leg', 'hover']);
+  await press('legend-above-the-table', sq('leg', 'strip'), ['L-04', 'leg', 'strip'], S.page([grp('leg'), '#moleg']));   /* taller than the window */
+  await press('legend-back-on-the-row-name', sq('leg', 'hover'), ['L-04', 'leg', 'hover'], S.el([grp('leg')]));
+
+  /* L-05: the stages over the moments, the fork bracketed "one of 4" (the box wheeled to the fork) · the header's other value · saving's */
+  const FK = '#mogrid th.mom .mfk[data-fkp="last"]';
+  await topShot('the-stage-band-and-the-fork', [ROW('end')], ['L-05', 'hdr', 'band'], null, { wheel: FK });
+  await press('header-stages-roads-moments', sq('hdr', 'road'), ['L-05', 'hdr', 'road'], S.top([], { above: grp('hdr'), wheel: '#mogrid thead th.mord.fk' }));
+  await press('header-back-to-the-band', sq('hdr', 'band'), ['L-05', 'hdr', 'band'], S.el([grp('hdr')]));
+  await press('saving-under-handler', sq('save', 'hand'), ['L-05', 'save', 'hand'], S.top([], { above: grp('save'), wheel: '#mogrid th.mosb .moseff' }));
+  await press('saving-back-under-effects', sq('save', 'eff'), ['L-05', 'save', 'eff'], S.el([grp('save')]));
+
+  /* L-06 · L-07: the endpoint metadata out of the table, after it (my pick) · before it */
+  await pageShot('the-endpoint-metadata-after-the-table', [ROW('stage'), '#mometa'], ['L-06 L-07', 'meta', 'after']);   /* the table's last row above it */
+  await press('metadata-before-the-table', sq('meta', 'before'), ['L-06 L-07', 'meta', 'before'], S.page([grp('meta'), '#mometa', '#mogrid table.motab thead']));
+  await press('metadata-back-after-the-table', sq('meta', 'after'), ['L-06 L-07', 'meta', 'after'], S.el([grp('meta')]));
+
+  /* L-20: a row's head carries its columns of the pinned row; "deciders" lights the members BY MOMENT draws (and its pinned-row cell) */
+  await elShot('the-functions-row-head-columns', [HEAD('fn') + ' .mbh', HEAD('fn') + ' .msub'], ['L-20']);
+  await press('light-the-deciders', HEAD('fn') + ' .msc[data-mcol="deciders"]', ['L-20'], S.row([ROW('fn')], { pin: true }));
+  say('D-066 · deciders lit', await p.evaluate(() => ({ chips: [...document.querySelectorAll('#mogrid .colon[data-keys]')].map((e) => (e.querySelector('.mt') || e).textContent.trim().slice(0, 40)), pin: !!document.querySelector('#pin td[data-mocol]') })));
+  await press('deciders-put-out', HEAD('fn') + ' .msc[data-mcol="deciders"]', ['L-20'], S.el([HEAD('fn') + ' .msub']));
+
+  /* L-21: a click on a head widens its column; its × hides it, the bar lists it; fit; the other values of "a head's click" and "fit";
+     the heads ride under the pinned row when the page scrolls (and the other value, they stay at the top) */
+  await press('widen-at-the-edge', '#mogrid th.mom[data-mom="edge"] .mh1', ['L-21', 'wid', 'names'], S.top([ROW('end'), ROW('proof')]));
+  await press('widen-every-item-on-one-line', sq('wid', 'line'), ['L-21', 'wid', 'line'], S.top([ROW('end'), ROW('proof')], { above: grp('wid') }));
+  await press('widen-back-to-names-whole', sq('wid', 'names'), ['L-21', 'wid', 'names'], S.el([grp('wid')]));
+  { const hx = '#mogrid th.mom[data-mom="start"] .mohx', h0 = await p.$('#mogrid th.mom[data-mom="start"]');   /* the × shows when the mouse is on the head */
+    if (h0) { await h0.evaluate((x) => x.scrollIntoView({ block: 'center' })); await wait(120); await wheelBox('start', '#mogrid'); const hb = await h0.boundingBox(); await p.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2, { steps: 3 }); await wait(200); }
+    await press('hide-before-any-request', hx, ['L-21'], S.top([], { above: '#mobar .mohid' })); }
+  await press('fit-to-the-box', '#mofit', ['L-21', 'fit', 'min'], S.top([ROW('end'), ROW('proof')], { above: grp('fit') }));
+  say('D-066 · fit', await p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, strips: G.querySelectorAll('th.mom.mmin').length }; }));
+  await press('fit-wrap-into-bands', sq('fit', 'bands'), ['L-21', 'fit', 'bands'], S.top([ROW('end')], { above: grp('fit') }));
+  { const t2 = await p.$$('#mogrid table.motab'); say('D-066 · fit, wrapped into bands', { tables: t2.length });   /* the second band: its own heads, further down */
+    if (t2.length > 1) { await clear(); await p.evaluate(() => { const T = document.querySelectorAll('#mogrid table.motab')[1], pin = document.getElementById('pin'), ph = pin && pin.offsetHeight ? pin.offsetHeight : 0;
+        window.scrollTo(0, Math.max(0, T.getBoundingClientRect().top + scrollY - ph - 12)); }); await wait(300);
+      const r = await p.evaluate(() => { const T = document.querySelectorAll('#mogrid table.motab')[1], G = document.getElementById('mogrid').getBoundingClientRect(), tb = T.getBoundingClientRect(), rws = T.querySelectorAll('tbody tr[data-f]');
+        const b = rws[1] ? rws[1].getBoundingClientRect().bottom : tb.top + 400; return { x: G.left - 4, y: tb.top - 6, width: G.width + 8, height: b - tb.top + 12 }; });
+      await clipShot('fit-the-second-band', r, ['L-21', 'fit', 'bands'], { look: 'the second band, further down' }); } else say('MISSING the second band', '#mogrid table.motab'); }
+  await press('fit-back-to-narrow-the-rest', sq('fit', 'min'), ['L-21', 'fit', 'min'], S.el([grp('fit')]));
+  await press('fit-off', '#mofit', ['L-21'], S.el([grp('fit')]));
+  await press('show-all-columns', '#mobar .mohall', ['L-21'], S.el(['#mobar .mset[data-set="cols"]']));
+  await press('widen-given-back', '#mogrid th.mom[data-mom="edge"] .mh1', ['L-21'], S.top([ROW('end')]));
+  // the page scrolled by the wheel until Functions stands under the pinned row: the heads ride with it (my pick) · stay at the top
+  const scrollTo = async (sel) => { await clear(); await p.mouse.move(W / 2, VH() / 2);
+    for (let k = 0; k < 40; k++) { const top = await p.$eval(sel, (e) => e.getBoundingClientRect().top), pb = await pinB();
+      if (top < pb + 260 && top > pb + 60) break; await p.mouse.wheel(0, Math.max(-500, Math.min(500, top - pb - 160))); await wait(120); }
+    await clear(); };
+  const scrolledShot = async (name, t, what) => { await scrollTo(ROW('fn')); const r = await p.evaluate(() => { const G = document.getElementById('mogrid').getBoundingClientRect(); return { x: G.left - 4, y: 0, width: G.width + 8, height: Math.min(innerHeight, 640) }; });
+    await clipShot(name, r, t, what); };
+  await scrolledShot('heads-ride-when-scrolled', ['L-21', 'stk', 'ride'], { scrolled: 'by the wheel, to Functions' });
+  await press('heads-stay-at-the-top', sq('stk', 'stay'), ['L-21', 'stk', 'stay'], S.el([grp('stk')]));
+  await scrolledShot('heads-stay-when-scrolled', ['L-21', 'stk', 'stay'], { scrolled: 'by the wheel, to Functions' });
+  await press('heads-back-to-ride', sq('stk', 'ride'), ['L-21', 'stk', 'ride'], S.el([grp('stk')]));
+
+  /* L-09 · L-10 · L-11: the Gates row (default look); its options slot: the looks A and C, the effect e2, gate icons one · none, gate
+     roles R1 · R3 · off; then the RateLimitMiddleware head and the sensitive limit hovered */
+  await rowShot('the-gates-row', [ROW('gate')], ['L-09 L-10 L-11', 'gdl', 'head']);
+  await press('open-the-gates-row-options', HEAD('gate') + ' .mro', ['L-09 L-10 L-11'], S.el([HEAD('gate') + ' .mbh', HEAD('gate') + ' .mrop']));
+  const GOPT = [['gdl', 'chain', 'gates-look-a-one-chain-per-gate', 'L-09 L-10'], ['gdl', 'cols', 'gates-look-c-side-by-side', 'L-09 L-10'], ['gdl', 'head', null, 'L-09 L-10'],
+    ['gef', 'stage', 'effect-e2-a-colour-per-stage', 'L-10'], ['gef', 'end', null, 'L-10'],
+    ['gic', 'one', 'gate-icons-one', 'L-11'], ['gic', 'none', 'gate-icons-none', 'L-11'], ['gic', 'each', null, 'L-11'],
+    ['grl', 'what', 'gate-roles-r1-what-it-does', 'L-11'], ['grl', 'guards', 'gate-roles-r3-what-it-guards', 'L-11'], ['grl', 'off', 'gate-roles-off', 'L-11'], ['grl', 'where', null, 'L-11']];
+  for (const [g, v, nm, it] of GOPT) await press(nm || (g + '-back-to-' + v), rsq('gate', g, v), [it, g, v], nm ? S.row([ROW('gate')]) : S.el([rgrp('gate', g)]));
+  /* L-18: Standard or specialist — M1 split into the gates (my pick), M2 merged into them, M3 kept as its row */
+  await rowShot('standard-m1-split-into-the-gates', [ROW('gate')], ['L-18', 'std', 'split']);
+  await press('standard-m2-merged-into-the-gates', rsq('gate', 'std', 'merge'), ['L-18', 'std', 'merge'], S.row([ROW('gate')]));
+  await press('standard-m3-kept-as-its-row', rsq('gate', 'std', 'keep'), ['L-18', 'std', 'keep'], S.row([ROW('std')]));
+  await press('standard-back-to-split', rsq('gate', 'std', 'split'), ['L-18', 'std', 'split'], S.el([rgrp('gate', 'std')]));
+  await press('close-the-gates-row-options', HEAD('gate') + ' .mro', ['L-09 L-10 L-11 L-18'], S.el([HEAD('gate') + ' .mbh']));
+  await hoverShot('hover-the-gates-row-head', HEAD('gate') + ' .mbn', ['L-18']);
+  await hoverShot('hover-ratelimitmiddleware', CELL('edge', 'gate') + ' .mgh .mgh0[data-key="middleware:RateLimitMiddleware"]', ['L-09']);
+  await hoverShot('hover-the-sensitive-limit', CELL('edge', 'gate') + ' .mc[data-key="limiter:sensitive"]', ['L-09 L-10']);
+
+  /* L-12: Data effects — the map (my pick), a small map per moment, the chips; the write colour, his words' colours */
+  await rowShot('data-effects-the-map', [ROW('data'), MAP], ['L-12', 'dfx', 'one']);
+  await press('open-the-data-row-options', HEAD('data') + ' .mro', ['L-12'], S.el([HEAD('data') + ' .mbh', HEAD('data') + ' .mrop']));
+  await press('data-effects-a-map-per-moment', rsq('data', 'dfx', 'cell'), ['L-12', 'dfx', 'cell'], S.row([ROW('data')]));
+  await press('data-effects-as-chips', rsq('data', 'dfx', 'chips'), ['L-12', 'dfx', 'chips'], S.row([ROW('data')]));
+  await press('data-effects-back-to-the-map', rsq('data', 'dfx', 'one'), ['L-12', 'dfx', 'one'], S.el([rgrp('data', 'dfx')]));
+  await press('write-colour-his-words', rsq('data', 'dxc', 'his'), ['L-12', 'dxc', 'his'], S.row([ROW('data'), MAP]));
+  await press('write-colour-back-to-the-page', rsq('data', 'dxc', 'page'), ['L-12', 'dxc', 'page'], S.el([rgrp('data', 'dxc')]));
+  await press('close-the-data-row-options', HEAD('data') + ' .mro', ['L-12'], S.el([HEAD('data') + ' .mbh']));
+
+  /* L-13 · L-14: the Functions row with its marks (my pick) · name and role only; a function known by name only, hovered */
+  await rowShot('the-functions-row-with-marks', [ROW('fn')], ['L-13 L-14', 'fnm', 'on']);
+  await press('open-the-functions-row-options', HEAD('fn') + ' .mro', ['L-13'], S.el([HEAD('fn') + ' .mbh', HEAD('fn') + ' .mrop']));
+  await press('functions-marks-off', rsq('fn', 'fnm', 'off'), ['L-13', 'fnm', 'off'], S.row([ROW('fn')]));
+  await press('functions-marks-back-on', rsq('fn', 'fnm', 'on'), ['L-13', 'fnm', 'on'], S.el([rgrp('fn', 'fnm')]));
+  await press('close-the-functions-row-options', HEAD('fn') + ' .mro', ['L-13'], S.el([HEAD('fn') + ' .mbh']));
+  { const vf = await mark(CELL('work', 'fn') + ' .mc', 'ResolutionSnapshot.violations_for');
+    if (vf) await hoverShot('hover-resolutionsnapshot-violations-for', vf, ['L-14']); else say('MISSING ResolutionSnapshot.violations_for', 'the work'); }
+
+  /* L-15: the refresh chip after the answer · L-16: the line that reads 403 */
+  await hoverShot('hover-the-refresh-chip', CELL('after', 'client') + ' .mc:has(.mrf)', ['L-15'], null, { at: 'left' });
+  { const r403 = await mark(CELL('after', 'client') + ' .mgb > .mc', 'reads 403');
+    if (r403) await hoverShot('hover-the-reads-403-line', r403, ['L-16'], null, { at: 'left' }); else say('MISSING the line that reads 403', 'after the answer'); }
+
+  /* L-17: the in-flight values as lifelines (my pick) — the row from its start and wheeled to its end; the folded rate limiter opened;
+     a read dot hovered; then the echoes and the chips */
+  await rowShot('in-flight-lifelines', [ROW('inf')], ['L-17', 'ifl', 'lane']);
+  await rowShot('in-flight-lifelines-to-the-end', [ROW('inf')], ['L-17', 'ifl', 'lane'], { wheeled: 'the box to its end' }, { wheel: 'end' });
+  await press('open-the-rate-limiter-lane', CELL('start', 'inf') + ' .milf[data-fold]', ['L-17'], S.row([ROW('inf')]));
+  await press('fold-the-rate-limiter-lane', CELL('start', 'inf') + ' .milh[data-fold]', ['L-17'], S.el([CELL('start', 'inf')]));
+  { const dot = await p.evaluate(() => { document.querySelectorAll('[data-w66]').forEach((x) => x.removeAttribute('data-w66'));
+      const d = [...document.querySelectorAll('#mogrid td[data-mom="checks"][data-f="inf"] .mild')].find((x) => /409/.test(x.innerText)); if (!d) return null; d.setAttribute('data-w66', '1'); return '[data-w66="1"]'; });
+    if (dot) await hoverShot('hover-a-read-dot', dot, ['L-17'], null, { at: 'left' }); else say('MISSING the read dot at the checks', 'In-flight'); }
+  await press('open-the-in-flight-row-options', HEAD('inf') + ' .mro', ['L-17'], S.el([HEAD('inf') + ' .mbh', HEAD('inf') + ' .mrop']));
+  await press('in-flight-echoes-where-read', rsq('inf', 'ifl', 'echo'), ['L-17', 'ifl', 'echo'], S.row([ROW('inf')]));
+  await press('in-flight-chips-where-set', rsq('inf', 'ifl', 'chips'), ['L-17', 'ifl', 'chips'], S.row([ROW('inf')]));
+  await press('in-flight-back-to-lifelines', rsq('inf', 'ifl', 'lane'), ['L-17', 'ifl', 'lane'], S.el([rgrp('inf', 'ifl')]));
+  await press('close-the-in-flight-row-options', HEAD('inf') + ' .mro', ['L-17'], S.el([HEAD('inf') + ' .mbh']));
+
+  /* CR-20: a test's earlier requests — their own moment (my pick) · in Proof's head */
+  await press('open-the-proof-row-options', HEAD('proof') + ' .mro', ['CR-20'], S.row([ROW('proof')]));
+  await press('earlier-requests-in-proofs-head', rsq('proof', 'jyb', 'head'), ['CR-20', 'jyb', 'head'], S.row([ROW('proof')]));
+  await press('earlier-requests-back-to-their-moment', rsq('proof', 'jyb', 'prior'), ['CR-20', 'jyb', 'prior'], S.row([ROW('proof')]));
+  await press('close-the-proof-row-options', HEAD('proof') + ' .mro', ['CR-20'], S.el([HEAD('proof') + ' .mbh']));
+
+  /* L-23: THE EXAMPLES BENCH — whole; each column's block (the bench wheeled to it); the test column on C267 by its own arrows, its chain
+     opened, then C250; a REAL drag of a part into "not drawn"; the size and colour controls; a role chip; a column on every endpoint;
+     the copy line; the bench's two other layouts */
+  const XC = (k) => '#exgrid .excol[data-k="' + k + '"]';
+  await pageShot('the-examples-bench', '#sec-ex', ['L-23', 'lay', 'row']);
+  for (const k of await p.$$eval('#exgrid .excol', (cs) => cs.map((c) => c.getAttribute('data-k')))) {
+    await clear(); await p.$eval(XC(k), (e) => e.scrollIntoView({ block: 'nearest' })).catch(() => {}); await wheelBox(XC(k), '#exgrid');
+    await pageShot('bench-column-' + k, XC(k), [{ test: 'L-23 L-08', fn: 'L-23 L-13', gate: 'L-23 L-11' }[k] || 'L-23'], { column: await p.$eval(XC(k) + ' h3', (h) => h.textContent).catch(() => k) }); }
+  // the test column: its own arrows until it shows C267 (each click read off the arrow); one picture of where they land
+  const stepTo = async (want) => { const clicks = []; for (let k = 0; k < 16; k++) {
+      const at = await p.evaluate(([c0, w]) => { const s0 = document.querySelector(c0 + ' .exselect'); if (!s0) return null; const vs = [...s0.options].map((o) => o.value); return { i: vs.indexOf(s0.value), j: vs.indexOf(w) }; }, [XC('test'), want]);
+      if (!at || at.j < 0 || at.i === at.j) break; const arrow = XC('test') + ' .expick > button.exstep:' + (at.j > at.i ? 'last' : 'first') + '-of-type';
+      await p.$eval(arrow, (e) => e.scrollIntoView({ block: 'center' })); await wheelBox(arrow, '#exgrid'); const b = await (await p.$(arrow)).boundingBox();
+      clicks.push(await words(await p.$(arrow))); await p.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await wait(250); }
+    return clicks; };
+  { const c1 = await stepTo('case:C267'); await pageShot('test-column-on-c267', XC('test'), ['L-23 L-08'], { clicks: c1.length, arrow: c1[0] || null, shows: await p.$eval(XC('test') + ' .exselect', (s0) => s0.value) }); }
+  await press('test-c267-open-its-chain', XC('test') + ' .blk .bkhd', ['L-23 L-08'], S.page(XC('test')));
+  { const FL = XC('test') + ' .blk .exfl';   /* the open list scrolls inside the block (a window of 380 px): wheeled by the mouse to its end, one picture */
+    const st0 = await p.$eval(FL, (e) => ({ max: e.scrollHeight - e.clientHeight, h: e.clientHeight, all: e.scrollHeight })).catch(() => null);
+    if (st0 && st0.max > 2) { await clear(); await p.$eval(FL, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); const b = await (await p.$(FL)).boundingBox();
+      await p.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+      for (let k = 0; k < 40; k++) { if (await p.$eval(FL, (e) => e.scrollTop >= e.scrollHeight - e.clientHeight - 2)) break; await p.mouse.wheel(0, 600); await wait(60); }
+      await pageShot('test-c267-the-chain-wheeled-to-its-end', XC('test') + ' .exw', ['L-23 L-08'], { wheeled: 'inside the open block, to its end', list: st0 }); }
+    else say('MISSING the open chain\'s scroll', FL); }
+  { const c2 = await stepTo('case:C250'); await pageShot('test-column-on-c250', XC('test'), ['L-23 L-08'], { clicks: c2.length, arrow: c2[0] || null, shows: await p.$eval(XC('test') + ' .exselect', (s0) => s0.value) }); }
+  await press('test-block-closed-again', XC('test') + ' .blk .bkhd', ['L-23'], S.page(XC('test')));
+  // the table column: its parts, then a REAL drag — the mouse down on the part "model", moved over "not drawn", up
+  await press('table-parts-opened', XC('table') + ' .exfold[data-fold="parts"]', ['L-23'], S.page(XC('table')));
+  { const from = XC('table') + ' .exz[data-line="2"] .expc[data-part="model"]', to = XC('table') + ' .exz.exoff';
+    if ((await p.$(from)) && (await p.$(to))) { await clear(); await p.$eval(from, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); await wheelBox(from, '#exgrid');
+      const a = await (await p.$(from)).boundingBox(), z = await (await p.$(to)).boundingBox(), fw = await words(await p.$(from));
+      await p.mouse.move(a.x + a.width / 2, a.y + a.height / 2); await p.mouse.down(); await p.mouse.move(a.x + a.width / 2 + 6, a.y + a.height / 2 + 6, { steps: 2 });
+      await p.mouse.move(z.x + Math.min(40, z.width / 2), z.y + z.height / 2, { steps: 12 }); await wait(120); await p.mouse.up(); await wait(400);
+      const after = await p.evaluate((c0) => ({ drawn: !!document.querySelector(c0 + ' .blk [data-part="model"]'), tray: [...document.querySelectorAll(c0 + ' .exz.exoff .expc')].map((x) => x.getAttribute('data-part')) }), XC('table'));
+      if (after.drawn || after.tray.indexOf('model') < 0) say('DRAG DID NOT LAND', after);
+      await pageShot('drag-model-into-not-drawn', XC('table'), ['L-23'], { drag: fw, from: [Math.round(a.x + a.width / 2), Math.round(a.y + a.height / 2)], to: [Math.round(z.x + Math.min(40, z.width / 2)), Math.round(z.y + z.height / 2)], after }); }
+    else say('MISSING the part "model" or "not drawn"', from); }
+  await press('table-size-of-name', XC('table') + ' .exz .expc[data-part="name"]', ['L-23'], S.page(XC('table')));
+  await press('table-colour-opened', XC('table') + ' .exfold[data-fold="colour"]', ['L-23'], S.page(XC('table')));
+  await press('table-back-to-the-default', XC('table') + ' .exreset', ['L-23'], S.page(XC('table')));
+  await press('table-colour-closed', XC('table') + ' .exfold[data-fold="colour"]', ['L-23'], S.el([XC('table') + ' .exfolds'], { box: '#exgrid' }));
+  // the gate column: a role chip, then every endpoint
+  await press('gate-column-role-field-rule', XC('gate') + ' .exrc[data-role="rule"]', ['L-23 L-11'], S.page(XC('gate')));
+  await press('gate-column-every-role-again', XC('gate') + ' .exrc[data-role=""]', ['L-23 L-11'], S.el([XC('gate') + ' .exroles'], { box: '#exgrid' }));
+  await press('gate-column-every-endpoint', XC('gate') + ' .exscope .opt[data-v="all"]', ['L-23', 'scope', 'all'], S.page(XC('gate')));
+  await press('gate-column-back-to-this-endpoint', XC('gate') + ' .exscope .opt[data-v="here"]', ['L-23', 'scope', 'here'], S.el([XC('gate') + ' .exsel'], { box: '#exgrid' }));
+  // the copy line: what the button copies is read off a watched clipboard (the page cannot be asked)
+  await p.evaluate(() => { window.__w66copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (s1) => { window.__w66copied = s1; return Promise.resolve(); } } }); });
+  await press('table-copy-line', XC('table') + ' .excopy', ['L-23'], S.el([XC('table') + ' .excp'], { box: '#exgrid' }));
+  say('D-066 · the table\'s copy line, as copied', await p.evaluate(() => window.__w66copied));
+  // the bench's layouts: wrapped rows · an upper and a lower row · back to one row across the page
+  await press('bench-wrapped-rows', '#exbar .opt[data-xopt="lay"][data-v="wrap"]', ['L-23', 'lay', 'wrap'], S.page('#sec-ex'));
+  await press('bench-an-upper-and-a-lower-row', '#exbar .opt[data-xopt="lay"][data-v="half"]', ['L-23', 'lay', 'half'], S.page('#sec-ex'));
+  await press('bench-back-to-one-row', '#exbar .opt[data-xopt="lay"][data-v="row"]', ['L-23', 'lay', 'row'], S.el(['#exbar']));
+  ROUND1 = R1; say('D-066 · round 1 · steps', R1.length); }
 say('rows at the end', await rows());
 say('page errors', errs);
-fs.writeFileSync(path.join(OUT, 'walk.json'), JSON.stringify({ viewport: [W, H], log }, null, 1));
+// a step that could not be taken (its control or item missing, the mouse meeting something else, no hover, a drag that did not land) fails
+// the walk: the pictures it names would otherwise be missing or wrong without anyone seeing
+const missed = log.filter(([k]) => /^(MISSING|COVERED|NO HOVER|DRAG DID NOT LAND)/.test(k)).map(([k, v]) => k + ' · ' + (typeof v === 'string' ? v : JSON.stringify(v)));
+say('steps not taken', missed);
+fs.writeFileSync(path.join(OUT, 'walk.json'), JSON.stringify(Object.assign({ viewport: [W, H], log }, ROUND1 ? { round1: ROUND1 } : {}), null, 1));
 await b.close();
+if (missed.length || errs.length) process.exitCode = 1;
