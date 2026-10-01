@@ -350,7 +350,9 @@ ok(labSha() === LAB0, 'the lab\'s own facts file is untouched by the sample');
   ok(!/\b(door|doors|lock|locks)\b/i.test(full), 'no string on the page says a word D-018 took out', (full.match(/.{30}\b(door|lock)s?\b.{30}/i) || [''])[0]);
   // CHANGED 2026-09-30 (D-071): a part of an examples block is sized by its look — his DATA line (D-027) sizes the channel chip and the count
   // at 11px, his choice below the floor as in the lab — so those parts are set aside here; the bench's controls and lists keep the floor
-  const small = await p.evaluate(() => { const bad = []; document.querySelectorAll('body *').forEach((e) => { if (!e.offsetParent && e.tagName !== 'BODY') return; if (e.closest('#sec-ex .blk .bkhd [data-part]')) return;
+  // CHANGED 2026-09-30 (review S4-24): only the TABLE's parts are set aside — his DATA line is the one ruled look below the floor; every
+  // other block's text parts now stand at the floor (my picks and the lab's looks alike)
+  const small = await p.evaluate(() => { const bad = []; document.querySelectorAll('body *').forEach((e) => { if (!e.offsetParent && e.tagName !== 'BODY') return; if (e.closest('#sec-ex .excol[data-k="table"] .blk .bkhd [data-part]')) return;
     const own = [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); if (!own) return; const fs = parseFloat(getComputedStyle(e).fontSize); if (fs < 12) bad.push(e.tagName + '.' + e.className + ' ' + fs); }); return bad; });
   ok(!small.length, 'no visible text under the 12px floor', small.slice(0, 4));
   // REMOVED 2026-09-23 (D-036): "Escape closes the side panel" — there is no panel to close; the section stays on the page
@@ -433,8 +435,10 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   // CHANGED 2026-09-30 (D-071, merged): the examples bench's lines come after BY MOMENT's — twenty-four plus one per kind of example
   // CHANGED 2026-09-30 (round-1 review S4-29): Data effects' write colour adds its line — twenty-five
   // CHANGED 2026-09-30 (round-1 review CR-20 · CR-07, lane F1b): where a test's earlier requests stand and what the heads do when scrolled — twenty-seven
-  ok(el0.length === 1 && set0.length === 27 + D.ex.kinds.length && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-(1 + set0.length))) === JSON.stringify([el0[0]].concat(set0))
-     && set0.slice(27).every((l) => l.startsWith(W8.ex.copy.where + ' · ')),
+  // CHANGED 2026-09-30 (review S4-06, lane F2; merged): the bench's two layout options (the columns · a click elsewhere) add their lines before the kinds'
+  ok(el0.length === 1 && set0.length === 27 + 2 + D.ex.kinds.length && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-(1 + set0.length))) === JSON.stringify([el0[0]].concat(set0))
+     && set0.slice(27).every((l) => l.startsWith(W8.ex.copy.where + ' · '))
+     && set0[27].startsWith(W8.ex.copy.where + ' · ' + W8.ex.opt.lay.label + ': ') && set0[28].startsWith(W8.ex.copy.where + ' · ' + W8.ex.opt.follow.label + ': '),
     'the copy text adds the endpoint shown, then the code map\'s, BY MOMENT\'s and the examples\' settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -2783,14 +2787,55 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(order.every((i, j) => i >= 0 && (!j || i > order[j - 1])) && ch8.toLowerCase().includes(WX.notKnown.title)
      && ch8.includes('Authorization') && ch8.includes(WX.notKnown.which.replace('{n}', '2').replace('{status}', '201')),
     'D-071 · EX-3 · the open block reads in order: the request → the checks it passes → the functions → the tables → the ending, and says what the test does not tell (which of the 2 ways to 201)', order);
-  /* ONE hover per block (L-02 · L-22): nothing inside the title lines carries a hover of its own; the card reads in → does → out */
-  const inner = await p.$$eval('#exgrid .blk .bkhd [data-tip]', (n) => n.length);
+  /* N3-13 · CR-08: the checks it passes include those inside a call (require_household's, on both ways), each said by what it checks,
+     the refusal it avoided after it — and the two limits are told apart */
+  ok(ch8.includes('setup required') && ch8.includes(WX.chain.lim.replace('{name}', 'sensitive').replace('{n}', '20').replace('{w}', '60'))
+     && ch8.includes(WX.chain.lim.replace('{name}', 'global').replace('{n}', '120').replace('{w}', '60')) && ch8.includes(WX.chain['else'].replace('{v}', '429')),
+    'review N3-13 · CR-08 · the checks a test passes name what they check (each limit apart), a check inside a call among them, the refusal avoided after it');
+  /* ONE hover per block (L-02 · L-22): nothing inside the title lines carries a hover of its own; the card reads in BY MOMENT's three
+     parts — before · checks · gives (CHANGED 2026-09-30, review S4-20: the bench's own in · does · out labels are gone) */
+  const inner = await p.$$eval('#exgrid .blk .bkhd [data-tip]', (n) => n.length), IOP = D.words.mo.io.parts;
   await p.hover(CX + '[data-k="table"] .blk .bkhd [data-part="name"]'); await p.waitForTimeout(120);
-  const tp = await p.$eval('#tip', (e) => ({ show: e.getAttribute('data-show'), io: [...e.querySelectorAll('.exio')].map((i) => i.textContent) }));
-  ok(!inner && tp.show === 'true' && JSON.stringify(tp.io) === JSON.stringify([WX.tip.in, WX.tip.do, WX.tip.out]), 'D-071 · one hover per block, reading in → does → out', { inner, tp });
-  /* the page's copy text: one line per kind, after BY MOMENT's */
+  const tp = await p.$eval('#tip', (e) => ({ show: e.getAttribute('data-show'), io: [...e.querySelectorAll('.io > i')].map((i) => i.textContent), txt: e.innerText }));
+  ok(!inner && tp.show === 'true' && JSON.stringify(tp.io) === JSON.stringify([IOP.b, IOP.c, IOP.g]), 'D-071 · one hover per block, reading before → checks → gives, as BY MOMENT\'s', { inner, tp });
+  ok(tp.txt.includes('household_id, idempotency_key') && tp.txt.includes('500'), 'review S4-21 · the table\'s race is BY MOMENT\'s sentence, filled with its unique key and the ending it escapes to', tp.txt.slice(0, 300));
+  await p.mouse.move(0, 0); await p.waitForTimeout(60);
+  /* the page's copy text: the bench's two options, then one line per kind, after BY MOMENT's (CHANGED 2026-09-30, review S4-06) */
   const cp8 = (await p.$eval('#out', (e) => e.value)).split('\n').filter((l) => l.startsWith(WX.copy.where + ' · '));
-  ok(cp8.length === 8 && cp8[1] === (await p.$eval(CX + '[data-k="table"] .exline', (e) => e.textContent)), 'D-071 · the page\'s copy text carries each example\'s line, the table\'s as its column shows it', cp8.length);
+  ok(cp8.length === 10 && cp8[3] === (await p.$eval(CX + '[data-k="table"] .exline', (e) => e.textContent)), 'D-071 · the page\'s copy text carries each example\'s line, the table\'s as its column shows it', cp8.length);
+  /* review smoke (D-037): N3-07 · CR-16 · F26 no twin faces in any column's list, the login check is its function; N3-24 the functions
+     are BY MOMENT's members; N3-19 the commit is the handler's; N3-14 a test that only checks while setting up proves nothing; CR-25 a
+     badge names its unit; CR-26 no title text overflows its part; CR-27 in-flight kinds in BY MOMENT's words; S4-04 · S4-30 dashed only
+     for a pick; S4-33 the controls carry no hover of their own */
+  const sm = await p.evaluate(() => { const X = window.__allepEx, D0 = window.__allep.data, cat = D0.ex.cat, out = {};
+    out.twins = ['end', 'table', 'schema', 'fn', 'test', 'gate', 'hook', 'inf'].map((k) => { const o = [...document.querySelectorAll('#exgrid .excol[data-k="' + k + '"] .exselect option')].map((x) => x.textContent); return [k, o.length - new Set(o).size]; }).filter((q) => q[1]);
+    out.login = X.items('gate').filter((it) => it.role === 'login').map((it) => cat[it.id].n);
+    const fns = X.items('fn').map((it) => cat[it.id].n); out.fns = ['get_idempotency_key', 'load_resolution_snapshot', 'derive_restrictions'].filter((n) => fns.indexOf(n) < 0);
+    out.commit = X.items('fn').filter((it) => cat[it.id].commits).map((it) => cat[it.id].n); out.commitK = X.items('fn').map((it) => [it.id.replace(/^fn:/, ''), !!cat[it.id].commits]);
+    X.pick('test', 'case:C250'); out.c250 = !!document.querySelector('#exgrid .excol[data-k="test"] .blk [data-part="proves"]');
+    out.badges = [...document.querySelectorAll('#exgrid .blk .bkn.badge')].map((b) => b.textContent).filter((t) => /^\d+$/.test(t.trim()));
+    out.cut = [...document.querySelectorAll('#exgrid .blk .bkhd [data-part]')].filter((e) => e.scrollWidth > e.clientWidth + 1).map((e) => e.getAttribute('data-part') + ':' + e.textContent.slice(0, 30));
+    const ifk = D0.words.enc.fam.ifk.vals; out.ifk = [...document.querySelectorAll('#exgrid .excol[data-k="inf"] .exrc[data-role]')].map((b) => b.getAttribute('data-role')).filter((r) => r && ifk[r] && b0(r));
+    function b0(r) { const b = document.querySelector('#exgrid .excol[data-k="inf"] .exrc[data-role="' + r + '"]'); return !b.textContent.startsWith(ifk[r].name + ' '); }
+    out.dash = [getComputedStyle(document.querySelector('#exgrid .exwho[data-whose="lab"]')).borderTopStyle];
+    out.tips = document.querySelectorAll('#exgrid .exfold[data-tip], #exgrid .exreset[data-tip], #exgrid .excopy[data-tip], #exgrid .exscope [data-tip]').length;
+    return out; });
+  ok(!sm.twins.length && JSON.stringify(sm.login) === JSON.stringify(['get_auth_context']), 'review N3-07 · CR-16 · F26 · no two items of one column wear the same face; the login check is its dependency function', sm);
+  const CF = new Set(Object.values(FJ.steps || {}).filter((s) => s.op === 'commit').map((s) => s.fn));   /* this probe's own reading of the feed */
+  ok(!sm.fns.length && sm.commit.includes('post_start_session') && !sm.commit.includes('start_session') && sm.commitK.every(([q, c]) => c === CF.has(q)),
+    'review N3-24 · N3-19 · the function list holds BY MOMENT\'s members; a function commits exactly when the feed\'s steps give it a commit (the handler, not start_session)', sm);
+  ok(!sm.c250 && !sm.badges.length && !sm.cut.length && !sm.ifk.length && sm.dash[0] === 'dashed' && !sm.tips,
+    'review N3-14 · CR-25 · CR-26 · CR-27 · S4-04 · S4-33 · C250 proves nothing here; badges name their unit; no title text cut; in-flight kinds in BY MOMENT\'s words; the lab\'s look dashed; no per-control hover', sm);
+  /* S4-16 · S4-20: BY MOMENT's gate icons and hovers options decide the bench's too */
+  /* the option's own state, then the bench drawn again (a gate row's looks sit in that row's legend, not always on the page) */
+  const moClick = (g, v) => p.evaluate(([g, v]) => { window.__allep.mo.looks[g] = v; window.__allepEx.render(); }, [g, v]);
+  await moClick('gic', 'none'); await p.waitForTimeout(120);
+  const gic = await p.evaluate(() => !!document.querySelector('#exgrid .excol[data-k="gate"] .blk [data-part="icon"]'));
+  await moClick('gic', 'each'); await moClick('ipo', 'sent'); await p.waitForTimeout(120);
+  await p.$eval('#sec-ex', (e) => e.scrollIntoView({ block: 'start' })); await p.hover(CX + '[data-k="fn"] .blk .bkhd [data-part="name"]'); await p.waitForTimeout(120);
+  const sent = await p.$eval('#tip', (e) => !!e.querySelector('.iosent') && !e.querySelector('.io > i'));
+  await p.mouse.move(0, 0); await moClick('ipo', 'lines'); await p.waitForTimeout(80);
+  ok(!gic && sent, 'review S4-16 · S4-20 · BY MOMENT\'s gate icons option takes the bench\'s gate glyph away; its one-sentence hovers reach the bench', { gic, sent });
   /* the layout options: my pick dashed; wrapped rows wraps */
   await p.click('#exbar .opt[data-xopt="lay"][data-v="wrap"]'); await p.waitForTimeout(80);
   const ly = await p.evaluate(() => [document.getElementById('exgrid').getAttribute('data-lay'), document.querySelector('#exbar .opt[data-xopt="lay"][data-v="row"]').getAttribute('data-pick')]);
