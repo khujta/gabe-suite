@@ -339,6 +339,8 @@
       if (!E.proves.length && !E.fits.length && !E.checks.length && !E.service.length) ln(2, K.provesNone);
       var here = o.here.map(function (i) { return c.calls[i]; }), sts = [], raw = [], fl = xAsserts(here).f;
       here.forEach(function (q) { q[6].forEach(function (s) { if (sts.indexOf(s) < 0) sts.push(s); }); raw = raw.concat(q[7]); });
+      var said = E.proves.concat(E.fits, E.checks, E.service).map(String);                 /* R-05: a status the lines above name is said once */
+      sts = sts.filter(function (s) { return said.indexOf(String(s)) < 0; });
       if (sts.length) ln(2, fill(K.outSt, { v: sts.join(" · ") })); if (fl.length) ln(2, fill(K.outFields, { v: fl.join(" · ") }));
       if (raw.length) ln(2, fill(A, { v: raw.join(" · ") })); }
     else if (k === "gate") { ln(0, it.role === "login" ? K.inLogin : it.role === "catch" && o.types ? fill(K.inCatch, { v: o.types }) : fill(K.in, { v: c.n })); if (c.raw) ln(0, fill(A, { v: c.raw }));

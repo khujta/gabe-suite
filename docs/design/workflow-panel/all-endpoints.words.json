@@ -2,6 +2,7 @@
   "_about": "Authored words for all-endpoints.html — the only strings on the page that are not facts. gen-all-endpoints.py refuses to build when a line here types a number (a {token} the generator or the page fills instead) or says a word D-018 took out. Tokens the generator fills are listed in its `tok`; the ones the page fills while it runs are listed in _runtime.",
   "_runtime": [
     "b",
+    "r",
     "f",
     "t",
     "was",
@@ -412,7 +413,7 @@
     },
     "none": {
       "name": "no own write",
-      "plain": "The path writes nothing of its own. The login check's writes are the gate's, named apart in the endpoint section's code map."
+      "plain": "The path writes nothing of its own. A write the login check makes is the login check's, not the endpoint's."
     }
   },
   "pieceWords": {
@@ -1219,9 +1220,9 @@
     },
     "band": {
       "title": "not placed",
-      "plain": "What should have a moment and the map cannot place, each with its reason. What has no moment by nature stands in the endpoint metadata, beside the journeys whose requests cannot be set in order around this one.",
+      "plain": "What should have a moment and has no known one, each with its reason. What has no moment by nature stands in the endpoint metadata, beside the journeys whose requests cannot be set in order around this one.",
       "count": "{n} not placed",
-      "all": "the map places every element that should have a moment"
+      "all": "every element that should have a moment has one"
     },
     "nm": {
       "_about": "D-064 (2), his ruling 2026-09-28: the facts no moment holds, per block. D-068, his ruling 2026-09-30 (L-06, L-07): out of the table, into the endpoint metadata, one card per block. Its place (after the table, my pick; before it, its option), its name and these words are my proposal; which facts stand there, and on which block's card, is read from the ruled tree's homes by gen-all-endpoints.py (no_moment) and proven there. `only` names the blocks whose every fact has no moment.",
@@ -1278,20 +1279,20 @@
       }
     },
     "why": {
-      "nolink": { "name": "no link to a call", "plain": "The map records no link from it to a call the handler makes, so where it happens inside the request is not known." },
-      "twomom": { "name": "calls at different moments", "plain": "It is reached from handler calls that stand at different moments." },
-      "notable": { "name": "no step", "plain": "The map says the endpoint touches this table, but no step it records says when." },
+      "nolink": { "name": "no known call to it", "plain": "No call the handler makes is known to lead to it, so when it happens in the request is not known." },
+      "twomom": { "name": "calls at different moments", "plain": "It is reached from handler calls made at different moments." },
+      "notable": { "name": "the step is not known", "plain": "The endpoint reads or writes this table, and which of its steps does it is not known." },
       "firstcall": { "name": "filled on a first call", "plain": "Its value is built by whichever request calls it first, and no one can say which." },
       "spans": { "name": "several moments", "plain": "The endings it stands for leave at several moments, so it has no single one." },
       "member": { "name": "a member has no moment", "plain": "It stands for endings or catches, and one of them has no moment of its own." },
       "noend": { "name": "proves no ending", "plain": "The test sends the request but none of its assertions fits an ending." },
-      "nosite": { "name": "outside the handler", "plain": "It stands at a line outside the handler's own code, and no call of the handler is recorded for it." },
-      "pathsonly": { "name": "paths only", "plain": "The map says which paths it is on, but not where on them." },
-      "fnnone": { "name": "no call reaches it", "plain": "The map names the function, but records no handler call that reaches it." },
-      "swmoves": { "name": "moves with the path", "plain": "Its paths place it at different moments." },
-      "nopath": { "name": "on no path", "plain": "The endpoint lists it, but none of its paths passes it, so no path can be followed to it." },
-      "noname": { "name": "by name only", "plain": "It is named behind the handler, and no single function carries the name, so no call can be followed to it; and no function placed at a moment names it behind it." },
-      "in500": { "name": "on the way to the 500", "plain": "It is called inside an except that passes the error on. The only way into that except the map knows ends in the uncaught 500, and the map does not follow that path through the handler's calls, so it has no moment to give it." }
+      "nosite": { "name": "outside the handler", "plain": "It sits at a line outside the handler's own code, and no call the handler makes is known to lead to it." },
+      "pathsonly": { "name": "place on its paths not known", "plain": "Which paths pass it is known, but not where on them." },
+      "fnnone": { "name": "reached by no known call", "plain": "The function is named, and no handler call is known to reach it." },
+      "swmoves": { "name": "moves with the path", "plain": "On different paths it happens at different moments." },
+      "nopath": { "name": "on no path", "plain": "It belongs to the endpoint, but none of its paths passes it, so no path can be followed to it." },
+      "noname": { "name": "no single function by this name", "plain": "No single function in the code carries this name, so no call can be followed to it, and no function at a moment of this request reaches it by that name." },
+      "in500": { "name": "on the way to the 500", "plain": "It is called inside an except that passes the error on, and every known way into that except ends in the uncaught 500." }
     },
     "empty": "nothing here at this moment",
     "proves": "proves",
@@ -1576,7 +1577,7 @@
       "assertsAttrs": "and asserts on the body ({n})",
       "assertsNone": "asserts no status",
       "hollow": "fits {n} endings; this is one of them",
-      "hollowPlain": "Its status fits several endings, so it is drawn hollow, once in each cell where some of them stand: it proves none of them, since the test does not show which one it gets.",
+      "hollowPlain": "Its status fits several endings: it proves none of them, since the test does not show which one it gets.",
       "inside": "inside {v}",
       "file": "a file, not a hook or component inside it",
       "_d057": "D-057 (his ruling \"build 1 and 2\"): a check says the error it raises and its words (a); a client branch what it reads and what it does (b); an error nothing catches its cause, on the 500 and on the function it is raised in (e)",
@@ -1661,9 +1662,10 @@
           "test": "the test mark: this page's own — the Gabe Universe draws no node for a test",
           "fold": "values set together and read alike, in one lane — open it to see each",
           "echo": "an echo: the value is read at this moment",
-          "r": "a green line: the function reads the table",
-          "w": "an orange line: the function writes the table",
-          "rw": "a green line and an orange one, in that order: the function reads the table, then writes it",
+          "r": "a line in {r}: the function reads the table",
+          "w": "a line in {w}: the function writes the table",
+          "rw": "a line in {r} and one in {w}, in that order: the function reads the table, then writes it",
+          "col": { "_about": "R-20: the colour words of the read and write lines, per mo.opt.dxc option — the legend says the colours the map draws", "page": { "r": "green", "w": "orange" }, "his": { "r": "green", "w": "red" } },
           "tick": "a tick on a function's line: a step with no table of its own — a flush sends the writes to the database, unsaved until a commit",
           "rule": "a rule across: a commit — every write above it on the path is saved"
         }
@@ -2093,11 +2095,11 @@
         "none": { "icon": "skip", "plain": "It decides by the status alone; the words the server sent are not read." },
         "unread": { "icon": "opacity", "plain": "What the branch does is not read: its condition is too long." },
         "_other": { "icon": "info", "plain": "What the branch does with the reason." } } },
-      "does": { "name": "what the map read of the branch", "ico": "mine", "vals": {
-        "read": { "icon": "claim", "plain": "Read: the rows the branch runs are named." },
+      "does": { "name": "what the branch runs", "ico": "mine", "vals": {
+        "read": { "icon": "claim", "plain": "What the branch runs is known, row by row." },
         "mixed": { "icon": "derived", "plain": "More than one check on a line shares these rows." },
         "empty": { "icon": "bubble" }, "beyond one level": { "icon": "drill" }, "no-rows": { "icon": "none" }, "unread": { "icon": "opacity" },
-        "_other": { "icon": "info", "plain": "What the map read of the branch." } } },
+        "_other": { "icon": "info", "plain": "What the branch runs." } } },
       "rule": { "name": "kind of 422 rule", "col": "table", "ico": "mine", "groups": {
         "length": { "icon": "radius", "name": "a length rule", "keywords": ["min_length", "max_length"] },
         "bound": { "icon": "angle", "name": "a bound on a number", "keywords": ["gt", "ge", "lt", "le", "multiple_of", "max_digits", "decimal_places", "allow_inf_nan"] },

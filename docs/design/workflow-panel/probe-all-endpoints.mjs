@@ -1537,7 +1537,11 @@ ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
     'D-055 · dim: the ' + c1.cvOp.length + ' carried marks fade and stay drawn, every bright item stays whole', { faded: c1.cvOp.filter(([o]) => o >= 0.5).length, dimBright: c1.brightOp.filter(([o]) => o !== 1).length });
   /* CHANGED 2026-09-28 (D-064 (2)): hide now takes away every field that holds something on this endpoint, so the empty field below the
      square rises under the pointer — pointed at, it comes back whole (by design); the pointer is moved off before the read */
-  await p.click('#ocol-cm .opt[data-carry="hide"]'); await p.waitForTimeout(150); await p.mouse.move(5, 5); await p.waitForTimeout(150);
+  /* CHANGED R-21 (legibility round 1b): the read waits for the hide to apply — the code map re-rendered under "hide", nothing in it
+     under the pointer, no fade still running — instead of two fixed timings; a wait that runs out leaves the assert to say what it sees */
+  await p.click('#ocol-cm .opt[data-carry="hide"]'); await p.mouse.move(5, 5);
+  await p.waitForFunction(() => { const C = document.getElementById('ocol-cm'); if (!C || C.getAttribute('data-carry') !== 'hide' || C.querySelector('[data-cve="1"]:hover, [data-cv="1"]:hover')) return false;
+    return document.getAnimations().every((a) => !(a.effect && a.effect.target && C.contains(a.effect.target)) || a.playState !== 'running'); }, null, { timeout: 5000, polling: 'raf' }).catch(() => {});
   const c2 = await readC(), partly = Object.values(R.cv).filter((v) => v[0] === 'p');
   ok(c2.carry === 'hide' && c2.cvOp.every(([, sh]) => !sh) && c2.brightOp.every(([, sh]) => sh) && c2.switchShown && c2.notes.length === partly.length
      && c2.cveOp.length === c0.empty && c2.cveOp.every(([o, sh]) => o < 1 && sh) && !c2.xnotes.length
@@ -2477,6 +2481,16 @@ ok(!errs.length, 'no page error after the D-065 checks', errs);
   const st0 = D.orders.stageRows.filter((x) => D.orders.kinds[x] !== 'screen')[0];
   ok(tCell && tHead && !tCell.text.includes(c0.plain) && tHead.text.includes(c0.plain) && tHead.text.includes(st0 + ' — ' + D.words.stages[st0]),
     'D-067 (P4) · the ' + c0.id + ' column says what it is on its head (with each stage), and its cells say only their own', { cell: (tCell || {}).text, head: (tHead || {}).text.slice(0, 120) });
+  /* R-01 (legibility round 1b): the five columns whose definition still rode every cell — their name stands on the head alone */
+  const r01 = []; for (const cid of ['fate', 'pieces', 'lacks', 'proof', 'alarms']) { const c9 = D.cols.find((c) => c.id === cid); if (!c9) { r01.push([cid, 'no column']); continue; }
+    /* the cell's own hover (dispatched on the cell, not on a dot or a stage inside it, which hover as themselves) */
+    const tc9 = await p.evaluate((cid) => { const e = document.querySelector('#board tr.row [data-tip="cell"][data-col="' + cid + '"]'); if (!e) return null;
+      e.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); const t = document.getElementById('tip'), out = t.getAttribute('data-show') === 'true' ? t.textContent : null;
+      document.body.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); return out; }, cid);
+    const th9 = await tipAt('#board thead th[data-tip="head"][data-col="' + cid + '"]');
+    r01.push([cid, !!tc9 && !tc9.includes(c9.name) && tc9.startsWith(c9.head), !!th9 && th9.text.includes(c9.name)]); }
+  ok(r01.length === 5 && r01.every(([, cell, head]) => cell === true && head === true),
+    'R-01 · fate · pieces · lacks · proven · alarms: each cell\'s hover says its endpoint and value, the column\'s definition only on its head', r01);
   /* (8) a code-map item hovers as itself, not as its field */
   const tIt = await tipAt('#ocol-cm .pair[data-k="d:tables"] li'), fld = D.attrs[(await p.$eval('#ocol-cm .pair[data-k="d:tables"]', (e) => e.getAttribute('data-attr'))).split(' ')[0]].plain;
   ok(tIt && !tIt.text.includes(fld) && (await p.$$eval('#ocol-cm .pair [data-tip="cmitem"] :is([data-tip="vc"], [data-tip="sk"], [data-tip="cell"])', (n) => n.length)) === 0,
@@ -2936,6 +2950,41 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(!jh.prior && jh.inHead === 3 && jh.out.includes(O.jyb.label + ': ' + O.jyb.opts.head.name), 'F1b · CR-20 · its option: the three journeys\' earlier requests stand in Proof\'s head, and the moment leaves; the copy text says the choice', [jh.prior, jh.inHead]);
   await p.evaluate(() => { localStorage.removeItem('gabe:allep:moments:v2'); }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready');
   ok(!errs.length, 'F1b · no page error', errs); }
+
+/* 32 · LEGIBILITY ROUND 1b, the small pass (remaining.json R-03 · R-04 · R-05 · R-06 · R-20; R-01 is in section 21, R-21 in the D-055 hide read) */
+{ const MW = D.words.mo, TG = D.words.terms.gate, C2 = MW.x.c2, fillW = (s0, x) => String(s0).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  const R06 = [['mo.x.hollowPlain', MW.x.hollowPlain], ['fates.none.plain', D.words.fates.none.plain], ['enc.fam.does.name', D.words.enc.fam.does.name]]
+    .concat(Object.entries(MW.why).flatMap(([k, v]) => [['mo.why.' + k + '.name', v.name], ['mo.why.' + k + '.plain', v.plain]]))
+    .concat(Object.entries(D.words.enc.fam.does.vals).filter(([, v]) => v.plain).map(([k, v]) => ['enc.fam.does.vals.' + k, v.plain]));
+  const talk = R06.filter(([, s]) => /\bmap\b|\bdrawn\b|\bdraws?\b|\brecords?\b/i.test(String(s || '')));
+  ok(!talk.length, 'R-06 · D-017 · the hollow test line, the fate words, the band\'s ' + Object.keys(MW.why).length + ' reasons and the branch family say what the code or the test does, never what the map drew or recorded', talk);
+  await open(PAGE, 'default'); await p.evaluate(() => window.__allep.pick('GET /recipes')); await p.waitForTimeout(250);
+  const g3 = await p.evaluate(() => { const fc = (c) => c.textContent.replace(/\s+/g, ' ').trim();
+    const fail = [...document.querySelectorAll('#mogrid td[data-mom="fail"][data-f="gate"]')].map((td) => [...td.querySelectorAll('.mc')].map((c) => [fc(c), (c.querySelector('.vc-gdk') || {}).textContent || null]));
+    const twins = [...document.querySelectorAll('#mogrid td[data-f="gate"]')].filter((td) => { const fs = [...td.querySelectorAll('.mc')].map(fc); return new Set(fs).size !== fs.length; }).length;
+    return { fail, twins }; });
+  ok(g3.fail.length >= 1 && g3.fail.every((cs) => cs.some((x) => x[1] === TG.catch) && cs.some((x) => x[1] === TG.check) && new Set(cs.map((x) => x[0])).size === cs.length) && !g3.twins,
+    'R-03 · GET /recipes · after a call failed (' + g3.fail.length + ' cells): the catch and the check read apart by the kind\'s noun on their face ("' + TG.catch + '", "' + TG.check + '"); no two gates in one cell read the same', g3);
+  await p.evaluate(() => window.__allep.pick('POST /cooking/sessions')); await p.waitForTimeout(300);
+  const r4 = await p.evaluate(() => { const tipOf = (e) => { e.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); const t = document.getElementById('tip'), s = t.getAttribute('data-show') === 'true' ? t.textContent : null; document.body.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); return s; };
+    return [...document.querySelectorAll('#mogrid .mdx .mdxrc')].map((bd) => { const w = bd.closest('.mdx'), g = w.querySelector('svg.mdxs g[data-tip="modxl"][data-j="' + bd.getAttribute('data-j') + '"]');
+      return { tipAttr: bd.hasAttribute('data-tip'), same: !!g && tipOf(bd.firstChild) === tipOf(g), txt: (g && tipOf(g) || '').slice(0, 80) }; }); });
+  ok(r4.length > 0 && r4.every((x) => !x.tipAttr && x.same), 'R-04 · POST /cooking/sessions · Data effects map: each of its ' + r4.length + ' race badges is part of its link — no hover of its own, the link\'s hover over it', r4);
+  const r5 = await p.evaluate(() => { const X = window.__allepEx, T = window.__allep.data.words.ex.tip.test, sts = (s) => String(s || '').match(/\b\d{3}\b/g) || [];
+    const pre = (k) => T[k].split('{')[0];
+    const gives = (h) => { const d = document.createElement('div'); d.innerHTML = h; return [...d.querySelectorAll('.io[data-part="g"] > span')].map((q) => q.textContent); };   /* the hover's "gives" lines */
+    return X.items('test').map((it) => X.tip('test', it)).filter((h) => /^<b>C237 /.test(h)).map((h) => ({ g: gives(h) })).map((P) => { const said = P.g.filter((l) => l.indexOf(pre('outSt')) !== 0 && [pre('proves'), pre('fits'), pre('checksSetup'), pre('checksOnly')].some((q) => l.indexOf(q) === 0)).flatMap(sts);
+      const out = P.g.filter((l) => l.indexOf(pre('outSt')) === 0).flatMap(sts); return { said, out, again: out.filter((s) => said.includes(s)) }; }); });
+  ok(r5.length > 0 && r5.every((x) => x.said.length && !x.again.length), 'R-05 · EXAMPLES · C237\'s hover says its statuses once (the fits line names them; no "checks the status is" repeats them)', r5);
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.$eval('#mogrid th[data-f="data"] .mro', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#mogrid th[data-f="data"] .mro'); await p.waitForTimeout(150);
+  const legOf = () => p.evaluate(() => { const h = document.querySelector('#mogrid th[data-f="data"]'); h.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); const t = document.getElementById('tip').textContent; document.body.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); return t; });
+  const lgPage = await legOf();
+  await p.click('#mogrid th[data-f="data"] .opt[data-mopt="dxc"][data-v="his"]'); await p.waitForTimeout(200);
+  const lgHis = await legOf(), fw = (k, o) => fillW(C2.lg[k], C2.lg.col[o]);
+  ok(lgPage.includes(fw('w', 'page')) && lgHis.includes(fw('w', 'his')) && !lgHis.includes(fw('w', 'page')) && C2.lg.col.his.w !== C2.lg.col.page.w,
+    'R-20 · the Data effects legend names the colours the write-colour option draws: "' + fw('w', 'page') + '" with the page\'s, "' + fw('w', 'his') + '" with his', [lgPage.slice(0, 200), lgHis.slice(0, 200)]);
+  await p.evaluate(() => { localStorage.removeItem('gabe:allep:moments:v2'); }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready');
+  ok(!errs.length, 'R-* · no page error', errs); }
 
 await b.close();
 console.log((fail ? 'FAIL ✗' : 'PASS ✓') + ` probe-all-endpoints · ${pass} passed · ${fail} failed · ${FEED.length} endpoints · sample ${SAMPLE.length} · page ${path.basename(PAGE)}`);

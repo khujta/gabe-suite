@@ -459,7 +459,7 @@
   .mc .mef[data-stg] { border-left-color: var(--stc); background: color-mix(in srgb, var(--stc) 18%, transparent); }
   .mc .mef .mefw { color: var(--muted); font-style: italic; }
   .vc-gdk, .vc-gdl, .vc-gdv, .vc-gdc { border-color: var(--rule); }
-  .vc-gdk { padding: 0 1px; } .vc-gdk svg { color: var(--ink-soft); }
+  .vc-gdk { padding: 0 4px 0 2px; color: var(--ink-soft); } .vc-gdk svg { color: var(--ink-soft); }
   .vc-gdl, .vc-gdv, .vc-gdc { color: var(--ink-soft); font-style: italic; }
   .mcs.m3 { flex-direction: column; align-items: stretch; }
   .mc.mc3 { display: grid !important; grid-template-columns: minmax(4.5em, 1fr) minmax(5em, 1.4fr) auto; column-gap: 6px; align-items: center; width: 100%; box-sizing: border-box; }
@@ -512,7 +512,7 @@
   .mdxm .mdxrl { background: var(--card); }
   .mdxro { font-weight: 650; } .mdxrf { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 3px; cursor: pointer; }
   .mdxrc { position: absolute; z-index: 2; transform: translate(-50%, -50%); display: inline-flex; gap: 3px; align-items: center; background: var(--card); border: 1px solid var(--alert);
-           border-radius: 8px; padding: 0 4px; font-size: var(--fs-min); line-height: 16px; color: var(--alert); font-weight: 650; }
+           border-radius: 8px; padding: 0 4px; font-size: var(--fs-min); line-height: 16px; color: var(--alert); font-weight: 650; cursor: help; }
   table.motab td.milc { padding-left: 0; padding-right: 0; }
   .mils.h { display: flex; flex-direction: column; gap: 3px; }
   .mils.h > .mil { display: flex; align-items: flex-start; min-height: 20px; }
@@ -1989,6 +1989,7 @@
       if (k0 === "cap") return fill(C2.lg.cap, { v: TL.req.name + " — " + TL.req.plain });   /* review S4-18: the one lifetime pair */
       if (k0 === "keep") return fill(C2.lg.keep, { v: TL.srv.name + " — " + TL.srv.plain });
       if (k0 === "unk") return fill(C2.lg.unk, { v: TL.unk.plain });
+      if (k0 === "r" || k0 === "w" || k0 === "rw") return fill(C2.lg[k0], C2.lg.col[MS.dxc] || C2.lg.col.page);   /* R-20: the colours the write-colour option draws */
       return C2.lg[k0] || key; }
     if (key === "mdp") return MW.x.depthPlain; if (key === "mrc") return LG.race; if (key === "mnest") return LG.nest; if (key === "hol") return MW.x.hollowPlain;
     if (key === "hol0") return LG.hol0; if (key === "mfa") return LG.answers; if (key === "mtw") return LG.twin;
@@ -2069,7 +2070,10 @@
      generator's r.mo.hio; its glyph and role label hover as it, their meaning in the row legend */
   function hostTip(h, K) { var hio = ((BYID[S.open] || {}).mo || {}).hio || {}; if (hio[K]) { h._x = { io: hio[K] }; h.setAttribute("data-ik", hio[K].h[1]); } h.setAttribute("data-tip", "mochip"); return h; }
   /* a gate's own kind: the station draws no node for it, so it wears this page's icon (my proposal, its legend line says so) */
-  function gdIcon(gk) { if (MS.gic === "none" || gk === "a") return null; var v = MS.gic === "one" ? "one" : gk, x = EF.gdk.vals[v]; return x ? vIco(vc("gdk", v, x.name), x.icon) : null; }
+  /* R-03 (legibility round 1b): the kind's noun (terms.gate, written into enc.fam.gdk) stands on the face beside its icon, so a catch and a
+     check whose code reads the same ("except ValueError") read apart without a hover; mo.opt.gic picks only the icon */
+  function gdIcon(gk) { var k = EF.gdk.vals[gk]; if (gk === "a" || !k) return null; var v = MS.gic === "one" ? "one" : gk, x = EF.gdk.vals[v], c = vc("gdk", v, k.name);
+    if (MS.gic !== "none" && x) vIco(c, x.icon); return vTxt(c, k.name); }
   /* the label at its end (his L-11): where it decides · what it does · what a check guards — or, for a switch split into the gates, "set by settings" */
   function gdRole(X) { if (X.gk === "w" && MS.std === "split") return el("span", "mstl", X.pn && W.pieceWords[X.pn[2]] ? fill(C1.norm, { w: W.pieceWords[X.pn[2]].name, n: X.pn[0], of: X.pn[1] }) : C1.set);   /* review F23: "the norm · 79 of 80" */
     var f = { where: "gdl", what: "gdv", guards: "gdc" }[MS.grl], v = f === "gdl" ? X.gl : f === "gdv" ? X.gv : f === "gdc" && X.gc != null ? String(X.gc) : null;
@@ -2271,7 +2275,7 @@
       sv.appendChild(g); mid[q.li] = { c: base, n: 0 };
       if (q.rc) { var m = bz(base, 0.5), bd = el("span", "mdxrc" + (on ? "" : " off")), rs = cStatus(q.rc[2]); kd(rs, ["status:" + q.rc[2]]); rs.removeAttribute("data-tip");
         bd.appendChild(el("span", null, MW.x.raceShort)); bd.appendChild(rs); bd.style.left = m[0] + "px"; bd.style.top = m[1] + "px";
-        bd.setAttribute("data-tip", "modxl"); bd.setAttribute("data-j", String(j)); bd.setAttribute("data-lg", "race"); w.appendChild(bd); } });
+        bd._lk = g; bd.setAttribute("data-j", String(j)); bd.setAttribute("data-lg", "race"); w.appendChild(bd); } });   /* R-04: the badge is part of its link — one item, one hover (the link's) */
     Z.K.forEach(function (o, i) { var q = o.q, m0 = mid[q[1]], g = svgEl("g"), ln = svgEl("path"), hit = svgEl("path"), d;
       if (m0) { var t = Math.min(0.9, 0.7 + 0.1 * m0.n++), P = bz(m0.c, t), Q = bz(m0.c, t + 0.02), ax = Q[0] - P[0], ay = Q[1] - P[1], l0 = Math.hypot(ax, ay) || 1, nx = -ay / l0 * 6, ny = ax / l0 * 6;
         d = "M" + (P[0] + nx) + " " + (P[1] + ny) + "L" + (P[0] - nx) + " " + (P[1] - ny); }
@@ -3025,10 +3029,8 @@
       return "<b>" + esc(c.head) + "</b> · " + esc(fill(W.strip, { n: bn.n, of: N, what: bn.what })) + "<span class=pl>" + esc(W.stripHint) + "</span>"; }
     if (kind === "agg") return "<b>" + esc(c.head) + "</b> · " + esc(c.name) + "<span class=pl>" + esc(W.group[{ union: "union", count: "has", ratio: "ratio" }[c.agg] || "sum"]) + "</span>";
     if (kind === "id" && r) return "<b>" + esc(r.m + " " + r.p) + "</b><span class=ln>" + esc(r.fn + " · " + r.file + ":" + r.line) + "</span><span class=ln>" + esc(r.full || "") + "</span>";
-    if (kind === "cell" && r) {
-      var h = "<b>" + esc(c.head) + "</b> · " + esc(c.name) + "<span class=ln>" + esc(r.m + " " + r.p) + "</span><span class=ln>" + esc(cellWords(c, r)) + "</span>";
-      if (c.kind === "spine") { var sub = t.closest("[data-stage]") || null; }
-      return h; }                                                                              /* D-067 (P4): the column's words are on its head */
+    if (kind === "cell" && r)                                                                 /* D-067 (P4) · R-01: what the column is stands on its head, once — a cell says its endpoint and its own value */
+      return "<b>" + esc(c.head) + "</b><span class=ln>" + esc(r.m + " " + r.p) + "</span><span class=ln>" + esc(cellWords(c, r)) + "</span>";
     return null;
   }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (ch) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]; }); }
@@ -3038,7 +3040,7 @@
   function tipOff() { clearTimeout(TIPH); TIPH = null; TIPAT = null; tip.setAttribute("data-show", "false"); tip.setAttribute("data-live", "false"); }
   document.addEventListener("mouseover", function (e) {
     if (e.target.closest && e.target.closest("#tip")) { clearTimeout(TIPH); TIPH = null; return; }
-    var t = e.target.closest("[data-tip]");
+    var rcb = e.target.closest(".mdxrc"), t = rcb && rcb._lk ? rcb._lk : e.target.closest("[data-tip]");   /* R-04: a race badge hovers as its link */
     if (!t && tip.getAttribute("data-live") === "true" && tip.getAttribute("data-show") === "true") { if (!TIPH) TIPH = setTimeout(function () { tipOff(); REFH.m = null; elRefHover(); }, 400); return; }
     clearTimeout(TIPH); TIPH = null;
     if (!t) { tipOff(); return; }
