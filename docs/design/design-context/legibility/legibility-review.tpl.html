@@ -1,0 +1,342 @@
+<title>Legibility Review</title>
+
+<!--__KIT1__-->
+<style>
+  /* ══ the page's own rules — the kit block above is pasted verbatim by gen-legibility-review.mjs ══
+     No motion (the kit's Motion group is dropped), no hovers (every word is on the face), the 12px floor: every size below is
+     one of the kit's --fs-* steps, which are absolute (computed from the roster's base), so nesting never shrinks them. */
+  .artifact-page { margin: 0 auto; }            /* operator rule: an artifact's column is centred */
+  .eyebrow { font-size: var(--fs-min); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 0; }
+  h1 { font-size: 2em; line-height: 1.15; margin: 8px 0 0; text-wrap: balance; }
+  h3 { margin: 0; font-size: 1.05em; text-wrap: balance; }
+  h4 { margin: 0; font-size: 1em; }
+  .lede { color: var(--ink-soft); max-width: 78ch; margin: 12px 0 0; }
+  .cap { font-size: var(--fs-sm); color: var(--ink-soft); margin: 0; max-width: 84ch; }
+  .take { font-size: var(--fs-sm); color: var(--ink); margin: 2px 0 0; border-left: 3px solid var(--accent); padding: 4px 0 4px 11px; max-width: 84ch; }
+  .sec-head { flex-wrap: wrap; }
+  .sec-head .n { flex: 0 1 auto; min-width: 0; font-variant-numeric: tabular-nums; }
+  .body { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .lab { font-size: var(--fs-min); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 14px; align-items: start; }
+
+  .key { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; font-size: var(--fs-sm); color: var(--ink-soft); margin-top: 14px; }
+  .key span { display: inline-flex; align-items: center; gap: 7px; }
+  .key .btn { pointer-events: none; }
+
+  .btn { font: inherit; font-size: var(--fs-sm); letter-spacing: inherit; cursor: pointer; border-radius: 8px; padding: 5px 11px; border: 1px solid var(--rule); background: var(--raised); color: var(--ink); text-align: left; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn[data-mine="true"] { border: 1.5px dashed var(--accent); color: var(--accent); }                       /* dashed = my pick */
+  .btn[aria-pressed="true"] { border: 1.5px solid var(--accent); background: var(--accent); color: var(--ground); }   /* filled = yours */
+  .btn.pri { background: var(--accent); border-color: var(--accent); color: var(--ground); }
+  .btn.nb { background: transparent; color: var(--ink-soft); font-size: var(--fs-xs); padding: 3px 9px; }
+  .btn.nb[data-has="true"] { border-color: var(--accent); color: var(--accent); }
+  .state { font-size: var(--fs-min); color: var(--muted); letter-spacing: .04em; }
+  [data-state="yours"] > .verdict .state, [data-state="yours"] .state.top { color: var(--accent); }
+  .verdict { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .note { font: inherit; letter-spacing: inherit; font-size: var(--fs-sm); color: var(--ink); background: var(--raised); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 10px; width: 100%; box-sizing: border-box; resize: vertical; min-height: 2.6em; }
+  .note[hidden] { display: none; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .chip { font-size: var(--fs-min); color: var(--ink); border: 1px solid var(--rule); border-radius: 10px; padding: 0 9px; line-height: 1.7; background: var(--card); max-width: 100%; box-sizing: border-box; }   /* wraps at a space, never inside a word */
+  .chip.acc { border-color: var(--accent); color: var(--accent); }
+  .chip[data-o="fixed"], .chip[data-v="answered"], .chip[data-o="closed"] { border-color: #2f9e44; color: #2f9e44; }
+  .chip[data-o="partly"], .chip[data-v="partly"] { border-color: #e8890c; color: #e8890c; }
+  .chip[data-o="left"], .chip[data-v="not"], .chip[data-o="open"] { border-color: #e03131; color: #e03131; }
+  .chip[data-o="his"] { border-color: var(--accent); color: var(--ground); background: var(--accent); }
+  :root:not([data-theme="light"]) .chip[data-o="fixed"], :root[data-theme="dark"] .chip[data-o="fixed"] { border-color: #69db7c; color: #69db7c; }
+
+  /* tables: inside their own scroller, so the page never scrolls sideways */
+  .tw { overflow-x: auto; max-width: 100%; }
+  table.t { border-collapse: collapse; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; width: 100%; }
+  table.t th, table.t td { text-align: left; padding: 5px 12px 5px 0; vertical-align: top; border-bottom: 1px solid var(--rule-soft); color: var(--ink); font-weight: 400; overflow-wrap: break-word; }
+  table.t td.id { white-space: nowrap; }
+  table.t th { color: var(--muted); font-size: var(--fs-min); letter-spacing: .06em; text-transform: uppercase; }
+  table.t td.num, table.t th.num { text-align: right; white-space: nowrap; overflow-wrap: normal; }
+  table.t td.lower { color: #2f9e44; font-weight: 650; }
+  :root:not([data-theme="light"]) table.t td.lower, :root[data-theme="dark"] table.t td.lower { color: #69db7c; }
+  table.t .sub { display: block; font-size: var(--fs-min); color: var(--muted); }
+
+  /* the review's outcome bar */
+  .bar { display: flex; height: 18px; border-radius: 6px; overflow: hidden; border: 1px solid var(--rule); }
+  .bar span { display: block; height: 100%; }
+  .bar [data-o="fixed"] { background: #2f9e44; } .bar [data-o="partly"] { background: #e8890c; } .bar [data-o="left"] { background: #e03131; } .bar [data-o="his"] { background: var(--accent); }
+
+  /* a call: its looks, each with its picture */
+  .call { gap: 10px; }
+  .call[data-state="yours"] { border-left-color: var(--strong) !important; }
+  .call .hd { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+  .looks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 12px; align-items: start; }
+  .look { display: flex; flex-direction: column; gap: 6px; padding: 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--raised); min-width: 0; }
+  .look .plain { font-size: var(--fs-sm); color: var(--ink-soft); margin: 0; }
+  .look .noshot { font-size: var(--fs-min); color: var(--muted); border: 1px dashed var(--rule); border-radius: 6px; padding: 10px; }
+  .sets { font-size: var(--fs-sm); color: var(--ink); margin: 0; }
+  .sets b { color: var(--muted); font-weight: 400; font-size: var(--fs-min); letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; }
+  .facts { font-size: var(--fs-sm); color: var(--ink-soft); margin: 0; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--raised); list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .facts b { color: var(--ink); font-weight: 650; margin-right: 6px; }
+
+  figure.pic { margin: 0; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  figure.pic a { display: block; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: #0b1020; }
+  figure.pic img { display: block; max-width: 100%; height: auto; }
+  figure.pic figcaption { font-size: var(--fs-min); color: var(--muted); overflow-wrap: anywhere; }
+  .pics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 10px; align-items: start; }
+
+  /* an item card */
+  .item h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+  .item blockquote { margin: 0; padding: 4px 0 4px 12px; border-left: 3px dashed var(--rule); color: var(--ink); font-size: 1em; }
+  details { font-size: var(--fs-sm); color: var(--ink-soft); }
+  details > summary { cursor: pointer; color: var(--accent); font-size: var(--fs-sm); }
+  details[open] > summary { margin-bottom: 6px; }
+  dl.kv { display: grid; grid-template-columns: minmax(0, 12em) minmax(0, 1fr); gap: 4px 14px; margin: 0; font-size: var(--fs-sm); }
+  dl.kv dt { color: var(--muted); font-size: var(--fs-min); letter-spacing: .06em; text-transform: uppercase; padding-top: 2px; }
+  dl.kv dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
+  @media (max-width: 720px) { dl.kv { grid-template-columns: minmax(0, 1fr); } }
+  ul.fl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; font-size: var(--fs-sm); }
+  ul.fl li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; align-items: baseline; color: var(--ink); }
+  ul.fl li .why { grid-column: 2; color: var(--ink-soft); font-size: var(--fs-min); }
+  ul.fl li > span { min-width: 0; overflow-wrap: break-word; }
+  @media (max-width: 720px) { ul.fl li { grid-template-columns: minmax(0, 1fr); } ul.fl li .why { grid-column: 1; } }
+  ol.ans { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; color: var(--ink); }
+  ol.ans li { overflow-wrap: anywhere; }
+  .q { font-size: 1.05em; color: var(--ink); margin: 0; }
+
+  /* patterns */
+  .why2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 10px; }
+  .why2 > div { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; background: var(--raised); font-size: var(--fs-sm); color: var(--ink); }
+  .why2 .lab { margin-bottom: 3px; }
+  .suite { display: flex; flex-direction: column; gap: 8px; }
+  .prop { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px; }
+  .prop[data-state="yours"] { border-color: var(--accent); }
+  .prop .what { font-size: var(--fs-sm); color: var(--ink); margin: 0; }
+  .landnote { font-size: 1em; color: var(--ink); margin: 0; border: 1.5px solid var(--accent); border-radius: 8px; padding: 8px 12px; }
+
+  .out { font: inherit; letter-spacing: inherit; font-size: var(--fs-sm); line-height: 1.5; color: var(--ink); background: var(--raised); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; width: 100%; box-sizing: border-box; min-height: 18em; resize: vertical; white-space: pre; overflow: auto; }
+  .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .said { font-size: var(--fs-sm); color: var(--accent); min-height: 1.4em; }
+</style>
+
+<div class="artifact-page">
+  <header>
+    <p class="eyebrow" id="eyebrow"></p>
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <p class="cap" id="source"></p>
+    <div class="key"><span><button class="btn" data-mine="true" type="button" tabindex="-1" id="key-dashed"></button><span id="key-mine"></span></span><span><button class="btn" aria-pressed="true" type="button" tabindex="-1" id="key-filled"></button><span id="key-yours"></span></span><span id="count" class="state"></span></div>
+  </header>
+
+  <section class="sec" data-sec="1" id="sec-glance">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body"></div><p class="take"></p>
+  </section>
+
+  <section class="sec" data-sec="2" id="sec-calls">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"></line><line x1="10" x2="3" y1="4" y2="4"></line><line x1="21" x2="12" y1="12" y2="12"></line><line x1="8" x2="3" y1="12" y2="12"></line><line x1="21" x2="16" y1="20" y2="20"></line><line x1="12" x2="3" y1="20" y2="20"></line><line x1="14" x2="14" y1="2" y2="6"></line><line x1="8" x2="8" y1="10" y2="14"></line><line x1="16" x2="16" y1="18" y2="22"></line></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body"></div><p class="take"></p>
+  </section>
+
+  <section class="sec" data-sec="3" id="sec-items">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body"></div><p class="take"></p>
+  </section>
+
+  <section class="sec" data-sec="4" id="sec-qs">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body"></div><p class="take"></p>
+  </section>
+
+  <section class="sec" data-sec="5" id="sec-gap">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><path d="M11 18H8a2 2 0 0 1-2-2V9"></path></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body"></div><p class="take"></p>
+  </section>
+
+  <section class="sec" data-sec="6" id="sec-pat">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"></path><rect x="3" y="14" width="7" height="7" rx="1"></rect><circle cx="17.5" cy="17.5" r="3.5"></circle></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body"></div><p class="take"></p>
+  </section>
+
+  <section class="sec" data-sec="7" id="sec-rem">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body"></div><p class="take"></p>
+  </section>
+
+  <section class="sec" data-sec="8" id="sec-copy">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg><span class="st"></span></h2><span class="n"></span></div>
+    <div class="body">
+      <p class="cap" id="copynote"></p>
+      <div class="panel">
+        <textarea class="out" id="out" readonly spellcheck="false"></textarea>
+        <div class="acts"><button class="btn pri" type="button" id="copy"></button><button class="btn" type="button" id="reset"></button><span class="said" id="said" aria-live="polite"></span></div>
+      </div>
+    </div>
+    <p class="take"></p>
+  </section>
+</div>
+
+<!--__KIT2__-->
+<!--__KIT3__-->
+<script>window.LEG_DATA = /*__DATA__*/null;</script>
+<script>
+(function () {
+  "use strict";
+  var D = window.LEG_DATA, U = D.ui, KEY = "gabe:legibility:r1";   /* a STABLE key: a republish keeps your choices; a choice that no longer exists is dropped on load */
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function $(id) { return document.getElementById(id); }
+  function rt(s, o) { return String(s).replace(/\{\{(\w+)\}\}/g, function (m, k) { return o[k] != null ? String(o[k]) : m; }); }   /* the page's own {{tokens}} */
+  function chip(text, attr, val, cls) { var c = el("span", "chip" + (cls ? " " + cls : ""), text); if (attr) c.setAttribute(attr, val); return c; }
+  function sec(id, w) { var s = $(id); s.querySelector(".st").textContent = w.title; s.querySelector(".n").textContent = w.n; s.querySelector(".take").textContent = w.take; return s.querySelector(".body"); }
+  function pic(p) { var f = el("figure", "pic"), a = el("a"), i = el("img"); a.href = D.shotBase + p.f; a.target = "_blank"; a.rel = "noopener";
+    i.src = D.shotBase + p.f; i.loading = "lazy"; i.width = p.w; i.height = p.h; i.alt = p.cap; a.appendChild(i); f.appendChild(a); f.appendChild(el("figcaption", null, p.cap)); return f; }
+  function pics(list, first) { var w = el("div"); if (!list.length) return w; var g = el("div", "pics"); list.slice(0, first).forEach(function (p) { g.appendChild(pic(p)); }); w.appendChild(g);
+    if (list.length > first) { var d = el("details"), s = el("summary", null, rt(U.items.morePics, { n: list.length - first })), g2 = el("div", "pics"); list.slice(first).forEach(function (p) { g2.appendChild(pic(p)); }); d.appendChild(s); d.appendChild(g2); w.appendChild(d); } return w; }
+  function table(head, rows, numCols, idCol) { var w = el("div", "tw"), t = el("table", "t"), tr = el("tr"); numCols = numCols || [];
+    head.forEach(function (h, i) { var th = el("th", numCols.indexOf(i) >= 0 ? "num" : null, h); tr.appendChild(th); }); t.appendChild(tr);
+    rows.forEach(function (r) { var x = el("tr"); r.forEach(function (c, i) { var td = el("td", numCols.indexOf(i) >= 0 ? "num" : i === idCol ? "id" : null); if (c && c.nodeType) td.appendChild(c); else td.textContent = c == null ? "" : String(c); x.appendChild(td); }); t.appendChild(x); });
+    w.appendChild(t); return w; }
+
+  /* ── header ── */
+  $("eyebrow").textContent = U.page.eyebrow; $("title").textContent = U.page.h1; $("lede").textContent = U.page.lede; $("source").textContent = U.page.source;
+  $("key-mine").textContent = U.page.keyMine; $("key-yours").textContent = U.page.keyYours; $("key-dashed").textContent = U.page.keyDashed; $("key-filled").textContent = U.page.keyFilled;
+  $("out").setAttribute("aria-label", U.copy.aria);
+
+  /* ── state: one value + one note per choice id; nothing is saved at boot ── */
+  var CH = {}; D.choices.forEach(function (c) { CH[c.id] = c; });
+  var state = (function () { try { var s = JSON.parse(window.localStorage.getItem(KEY) || "null"); if (s && s.v) { Object.keys(s.v).forEach(function (k) { var c = CH[k], x = s.v[k];
+          if (!c || !x || (x.v && !c.opts.some(function (o) { return o[0] === x.v; }))) delete s.v[k]; }); return s; } } catch (e) {} return { v: {} }; })();
+  function save() { try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function eff(c) { var s = state.v[c.id]; return (s && s.v) || c.ruled || null; }
+  var painters = [];
+  function repaint() { painters.forEach(function (p) { p(); }); paintOut(); }
+  function setV(id, v) { var s = state.v[id] || (state.v[id] = { v: null, n: "" }); s.v = s.v === v ? null : v; if (!s.v && !s.n) delete state.v[id]; save(); repaint(); }
+  function stateWord(c) { var s = state.v[c.id]; if (s && s.v) return s.v === c.mine ? U.copy.stateSame : U.copy.stateYours; return c.ruled ? U.copy.stateRuled : U.copy.stateMine; }
+  /* a choice's buttons: host gets one button per option (or the caller places them), plus a note and a state word */
+  function wire(btn, c, v) { btn.type = "button"; btn.setAttribute("data-v", v); btn.setAttribute("data-choice", c.id); btn.addEventListener("click", function () { setV(c.id, v); });
+    painters.push(function () { var e = eff(c); btn.setAttribute("aria-pressed", String(e === v)); btn.setAttribute("data-mine", String(!e && v === c.mine)); }); }
+  function tail(host, holder, c) { var v = el("div", "verdict"), nb = el("button", "btn nb", U.copy.noteBtn), st = el("span", "state top"), note = el("textarea", "note");
+    nb.type = "button"; nb.setAttribute("aria-expanded", "false"); note.hidden = true; note.rows = 2; note.placeholder = U.copy.notePh; note.setAttribute("aria-label", U.copy.noteBtn + " · " + c.id);
+    nb.addEventListener("click", function () { note.hidden = !note.hidden; nb.setAttribute("aria-expanded", String(!note.hidden)); if (!note.hidden) note.focus(); });
+    note.addEventListener("input", function () { var s = state.v[c.id] || (state.v[c.id] = { v: null, n: "" }); s.n = note.value; if (!s.v && !s.n) delete state.v[c.id]; save(); nb.setAttribute("data-has", String(!!note.value)); paintOut(); });
+    painters.push(function () { var s = state.v[c.id] || {}; st.textContent = stateWord(c); holder.setAttribute("data-state", (s.v || c.ruled) ? "yours" : "mine");
+      if (document.activeElement !== note) note.value = s.n || ""; nb.setAttribute("data-has", String(!!s.n)); if (s.n && note.hidden) { note.hidden = false; nb.setAttribute("aria-expanded", "true"); } });
+    v.appendChild(st); v.appendChild(nb); host.appendChild(v); host.appendChild(note); }
+  function optButtons(host, holder, c) { var row = el("div", "verdict"); c.opts.forEach(function (o) { var b = el("button", "btn", o[1]); wire(b, c, o[0]); row.appendChild(b); }); host.appendChild(row); tail(host, holder, c); }
+
+  /* ── 1 · at a glance ── */
+  (function () { var G = D.glance, W = U.sec.glance, B = sec("sec-glance", W), cols = el("div", "grid2");
+    var a = el("div", "panel"); a.appendChild(el("h3", null, W.itemsHead)); a.appendChild(table(["", ""], G.status.map(function (s) { return [s.word, s.n]; }), [1])); a.appendChild(el("p", "cap", W.itemsNote)); cols.appendChild(a);
+    var b = el("div", "panel"), R = G.review, bar = el("div", "bar"); b.appendChild(el("h3", null, W.findHead));
+    ["fixed", "partly", "left", "his"].forEach(function (k) { if (!R[k]) return; var s = el("span"); s.setAttribute("data-o", k); s.style.width = (100 * R[k] / R.total) + "%"; bar.appendChild(s); }); b.appendChild(bar);
+    var cs = el("div", "chips"); ["fixed", "partly", "left", "his"].forEach(function (k) { cs.appendChild(chip(R[k] + " " + U.outcome[k], "data-o", k)); }); b.appendChild(cs); b.appendChild(el("p", "cap", W.findNote)); cols.appendChild(b);
+    B.appendChild(cols);
+    var m = el("div", "panel"); m.appendChild(el("h3", null, W.measHead)); m.appendChild(el("p", "cap", W.measNote));
+    var rows = G.checks.map(function (c) { var nm = el("span", null, c.name); nm.appendChild(el("span", "sub", c.plain)); return [nm].concat(c.vals.map(function (v) { return v == null ? W.noSection : v; })); });
+    var tw = table([W.colCheck].concat(G.labels), rows, [1, 2, 3]); m.appendChild(tw);
+    G.checks.forEach(function (c, i) { var tr = tw.querySelectorAll("tr")[i + 1]; if (c.vals[0] != null && c.vals[2] != null && c.vals[2] < c.vals[0]) tr.children[3].classList.add("lower"); });
+    B.appendChild(m); })();
+
+  /* ── 2 · your calls ── */
+  (function () { var W = U.sec.calls, C = U.calls, B = sec("sec-calls", W); B.appendChild(el("p", "cap", W.note)); B.appendChild(el("p", "cap", W.motionNote));
+    ["table", "row", "bench"].forEach(function (wh) { var list = D.calls.filter(function (c) { return c.where === wh; }); if (!list.length) return;
+      var h = el("h3", null, C.where[wh]); B.appendChild(h); B.appendChild(el("p", "cap", C.whereNote[wh]));
+      list.forEach(function (c) { var ch = CH[c.id], card = el("div", "panel call"); card.setAttribute("data-call", c.id);
+        var hd = el("div", "hd"); hd.appendChild(el("h4", null, c.label)); var cs = el("div", "chips");
+        c.rows.forEach(function (r) { cs.appendChild(chip(C.inRow + " " + r, null, null, "acc")); });
+        cs.appendChild(chip(C.from + " " + c.from)); if (c.answers.length) cs.appendChild(chip(C.answers + " " + c.answers.join(" "))); hd.appendChild(cs); card.appendChild(hd);
+        var looks = el("div", "looks"); c.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
+          if (o.shot) t.appendChild(pic(o.shot)); else t.appendChild(el("div", "noshot", C.noShot));
+          var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); looks.appendChild(t); });
+        card.appendChild(looks);
+        var sets = el("p", "sets"); sets.appendChild(el("b", null, C.sets)); sets.appendChild(document.createTextNode(c.motion)); card.appendChild(sets);
+        tail(card, card, ch); B.appendChild(card); }); });
+    B.appendChild(el("h3", null, C.propsHead)); B.appendChild(el("p", "cap", C.propsNote));
+    D.proposals.forEach(function (p) { B.appendChild(proposalCard(p)); }); })();
+  function proposalCard(p, inGap) { var C = U.calls, ch = CH[p.id], card = el("div", "panel call"); card.setAttribute("data-call", p.id);
+    var hd = el("div", "hd"); hd.appendChild(el("h4", null, p.id + " · " + p.title)); card.appendChild(hd); card.appendChild(el("p", "cap", p.what));
+    if (p.facts.length) { card.appendChild(el("p", "lab", C.factsHead)); var ul = el("ul", "facts"); p.facts.forEach(function (f) { var li = el("li"); li.appendChild(el("b", null, f.id)); li.appendChild(document.createTextNode(f.text)); ul.appendChild(li); }); card.appendChild(ul); }
+    if (p.shots.length) card.appendChild(pics(p.shots, 2));
+    var looks = el("div", "looks"); p.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
+      var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); looks.appendChild(t); });
+    card.appendChild(looks); var sets = el("p", "sets"); sets.appendChild(el("b", null, C.sets)); sets.appendChild(document.createTextNode(p.motion)); card.appendChild(sets);
+    if (p.alsoIn) card.appendChild(el("p", "cap", inGap ? C.alsoInCalls : C.alsoIn)); tail(card, card, ch); return card; }
+
+  /* ── 3 · your items ── */
+  (function () { var W = U.sec.items, I = U.items, B = sec("sec-items", W); B.appendChild(el("p", "cap", W.note));
+    D.items.forEach(function (it) { var card = el("div", "panel item"); card.setAttribute("data-item", it.id);
+      var h = el("h3"); h.appendChild(el("span", null, it.id)); h.appendChild(chip(it.tag)); h.appendChild(chip(I.pattern + " " + it.pattern, null, null, "acc")); h.appendChild(chip(U.statusWord[it.kind])); card.appendChild(h);
+      card.appendChild(el("p", "lab", I.his)); card.appendChild(el("blockquote", null, "“" + it.first + "”"));
+      if (it.rest) { var d = el("details"); d.appendChild(el("summary", null, I.more)); d.appendChild(el("p", null, it.rest)); card.appendChild(d); }
+      var kv = el("dl", "kv"); [[I.readAs, it.readAs], [I.where, it.where], [I.couldNot, it.couldNot], [I.fix, it.fix], [I.status, it.status]].forEach(function (r) { if (!r[1]) return; kv.appendChild(el("dt", null, r[0])); kv.appendChild(el("dd", null, r[1])); }); card.appendChild(kv);
+      card.appendChild(el("p", "lab", I.review)); var vc = el("div", "chips"); it.verdicts.forEach(function (v) { vc.appendChild(chip(U.lens[v.lens] + ": " + (U.verdict[v.verdict] || v.verdict), "data-v", v.verdict)); }); card.appendChild(vc);
+      if (it.verdicts[0]) { var r0 = el("p", "cap"); r0.appendChild(el("b", null, I.remains + ": ")); r0.appendChild(document.createTextNode(it.verdicts[0].remains)); card.appendChild(r0); }
+      if (it.verdicts.length > 1) { var od = el("details"); od.appendChild(el("summary", null, I.otherLenses)); it.verdicts.slice(1).forEach(function (v) { var p = el("p"); p.appendChild(el("b", null, U.lens[v.lens] + ": ")); p.appendChild(document.createTextNode(v.remains)); od.appendChild(p); }); card.appendChild(od); }
+      card.appendChild(el("p", "lab", I.found));
+      if (it.findings.length) { var ul = el("ul", "fl"); it.findings.forEach(function (f) { var li = el("li"), cs = el("span", "chips"); cs.appendChild(chip(f.id)); cs.appendChild(chip(U.outcome[f.outcome], "data-o", f.outcome)); li.appendChild(cs);
+          li.appendChild(el("span", null, (U.sev[f.sev] || f.sev) + " · " + f.what)); if (f.why) li.appendChild(el("span", "why", f.why)); ul.appendChild(li); }); card.appendChild(ul); }
+      else card.appendChild(el("p", "cap", I.noFound));
+      card.appendChild(el("p", "lab", I.pics)); if (it.shots.length) card.appendChild(pics(it.shots, 3)); else card.appendChild(el("p", "cap", I.noPics));
+      B.appendChild(card); }); })();
+
+  /* ── 4 · your questions ── */
+  (function () { var W = U.sec.qs, Q = U.qs, B = sec("sec-qs", W); B.appendChild(el("p", "cap", W.note));
+    D.questions.forEach(function (q) { var card = el("div", "panel"); card.setAttribute("data-q", q.key);
+      card.appendChild(el("p", "lab", Q.his + " · " + q.items.join(" "))); card.appendChild(el("p", "q", "“" + q.q + "”")); if (q.about) card.appendChild(el("p", "cap", q.about));
+      var ol = el("ol", "ans"); q.lines.forEach(function (l) { ol.appendChild(el("li", null, l)); }); card.appendChild(ol);
+      if (q.verdict) { card.appendChild(el("p", "lab", Q.verdict)); var cs = el("div", "chips"); cs.appendChild(chip(U.verdict[q.verdict.verdict] || q.verdict.verdict, "data-v", q.verdict.verdict)); card.appendChild(cs); card.appendChild(el("p", "cap", q.verdict.remains)); }
+      if (q.findings.length) { card.appendChild(el("p", "lab", Q.findings)); var ul = el("ul", "fl"); q.findings.forEach(function (f) { var li = el("li"), cs = el("span", "chips"); cs.appendChild(chip(f.id)); cs.appendChild(chip(U.outcome[f.outcome], "data-o", f.outcome)); li.appendChild(cs); li.appendChild(el("span", null, f.what)); if (f.why) li.appendChild(el("span", "why", f.why)); ul.appendChild(li); }); card.appendChild(ul); }
+      if (q.shots.length) card.appendChild(pics(q.shots, 2));
+      B.appendChild(card); }); })();
+
+  /* ── 5 · the gap analysis ── */
+  (function () { var W = U.sec.gap, G = D.gap, X = U.gap, B = sec("sec-gap", W); B.appendChild(el("p", "cap", W.note));
+    var sp = el("div", "panel"), cs = el("div", "chips");
+    G.newSections.forEach(function (s) { cs.appendChild(chip(s, null, null, "acc")); }); G.undecided.forEach(function (s) { cs.appendChild(chip(s + " · " + X.undecided)); });
+    G.toMetadata.forEach(function (s) { cs.appendChild(chip(s + " · " + X.toMetadata)); }); G.asAxis.forEach(function (s) { cs.appendChild(chip(s + " · " + X.asAxis)); });
+    sp.appendChild(el("p", "lab", X.sections)); sp.appendChild(cs); sp.appendChild(el("p", "lab", X.pairing)); sp.appendChild(el("p", "cap", G.ruledPairing)); B.appendChild(sp);
+    var pp = el("div", "panel"); pp.appendChild(el("h3", null, X.partsHead));
+    pp.appendChild(table([X.colPart, X.colRows, X.colTo, X.colR3, X.colNone], G.parts.map(function (p) { var c = el("div", "chips"); p.to.forEach(function (t) { c.appendChild(chip(t[0] + " · " + t[1])); }); return [p.part, p.n, c, p.r3, p.none]; }), [1, 3, 4]));
+    var d = el("details"); d.appendChild(el("summary", null, X.rowsShow)); d.appendChild(table([X.colPart, X.colAttr, X.colR3, X.colWhere], [].concat.apply([], G.parts.map(function (p) { return p.rows.map(function (r) { return [p.part, r[0], r[1], r[2] || X.noHome]; }); })), [2])); pp.appendChild(d); B.appendChild(pp);
+    var sq = el("div", "panel"); sq.appendChild(el("h3", null, X.secHead)); sq.appendChild(table([X.colFact, X.colStatus, X.colWhere], G.security.map(function (r) { return [r[0], r[1], r[2] || X.noHome]; }))); B.appendChild(sq);
+    var two = el("div", "grid2"), wi = el("div", "panel"), oq = el("div", "panel");
+    wi.appendChild(el("h3", null, X.widHead)); wi.appendChild(table([X.colRung, X.colSection], G.widening.map(function (r) { return [r[0], r[1] || X.noHome]; })));
+    oq.appendChild(el("h3", null, X.orphHead)); oq.appendChild(table([X.colAttr, X.colWhat], G.orphaned.map(function (r) { return [r[0], r[1]]; }))); two.appendChild(wi); two.appendChild(oq); B.appendChild(two);
+    var rp = D.proposals.filter(function (p) { return p.alsoIn === "gap"; })[0]; if (rp) { B.appendChild(el("h3", null, X.recHead)); B.appendChild(proposalCard(rp, true)); }
+    var af = el("div", "panel"); af.appendChild(el("h3", null, X.alsoHead)); var ul = el("ul", "facts"); G.alsoFound.forEach(function (s) { ul.appendChild(el("li", null, s)); }); af.appendChild(ul); B.appendChild(af); })();
+
+  /* ── 6 · the patterns ── */
+  (function () { var W = U.sec.pat, X = U.pat, B = sec("sec-pat", W); B.appendChild(el("p", "landnote", W.landNote)); B.appendChild(el("p", "cap", W.note)); B.appendChild(el("p", "cap", W.pickRule));
+    D.patterns.forEach(function (p) { var card = el("div", "panel"); card.setAttribute("data-pattern", p.id);
+      card.appendChild(el("h3", null, p.id + " · " + p.name)); card.appendChild(el("p", "cap", p.line));
+      var cs = el("div", "chips"); cs.appendChild(chip(p.items.length + " " + X.items, null, null, "acc")); p.items.forEach(function (i) { cs.appendChild(chip(i)); }); card.appendChild(cs);
+      var fs = el("div", "chips"); fs.appendChild(chip(p.nFind + " " + X.findings, null, null, "acc")); ["fixed", "partly", "left", "his"].forEach(function (k) { if (p.out[k]) fs.appendChild(chip(p.out[k] + " " + U.outcome[k], "data-o", k)); });
+      if (p.nRem) fs.appendChild(chip(X.still + ": " + p.nOpen + " " + X.openOf + " " + p.nRem, "data-o", p.nOpen ? "open" : "closed")); card.appendChild(fs);
+      var w2 = el("div", "why2"), a = el("div"), b = el("div"); a.appendChild(el("p", "lab", X.model)); a.appendChild(el("p", null, p.whyModel)); b.appendChild(el("p", "lab", X.human)); b.appendChild(el("p", null, p.whyHuman)); w2.appendChild(a); w2.appendChild(b); card.appendChild(w2);
+      card.appendChild(el("p", "lab", X.checks));
+      if (p.checks.length) { var tw = table([U.sec.glance.colCheck].concat(D.glance.labels), p.checks.map(function (c) { return [c.name].concat(c.vals.map(function (v) { return v == null ? U.sec.glance.noSection : v; })); }), [1, 2, 3]);
+        p.checks.forEach(function (c, i) { if (c.vals[0] != null && c.vals[2] != null && c.vals[2] < c.vals[0]) tw.querySelectorAll("tr")[i + 1].children[3].classList.add("lower"); }); card.appendChild(tw); }
+      else card.appendChild(el("p", "cap", X.noChecks));
+      card.appendChild(el("p", "lab", X.suite)); var su = el("div", "suite");
+      p.suite.forEach(function (s) { var ch = CH[s.cid], pr = el("div", "prop"); pr.setAttribute("data-choice-card", s.cid); var c2 = el("div", "chips"); c2.appendChild(chip(s.cid)); c2.appendChild(chip(X.kind + " · " + s.kind)); c2.appendChild(chip(X.size + " · " + s.size)); pr.appendChild(c2);
+        pr.appendChild(el("p", "cap", X.target + ": " + s.target)); pr.appendChild(el("p", "what", s.what)); optButtons(pr, pr, ch); su.appendChild(pr); });
+      card.appendChild(su); B.appendChild(card); }); })();
+
+  /* ── 7 · still on the page ── */
+  (function () { var W = U.sec.rem, X = U.rem, B = sec("sec-rem", W); B.appendChild(el("p", "cap", W.note));
+    D.remaining.forEach(function (g) { var card = el("div", "panel"); card.setAttribute("data-rem", g.id); card.appendChild(el("h3", null, g.id + " · " + g.name));
+      card.appendChild(table(["", U.items.where, X.what, X.source, X.status], g.rows.map(function (r) { return [r.id, r.where, r.what, r.source, chip(r.open ? X.open : r.status, "data-o", r.open ? "open" : "fixed")]; }), [], 0)); B.appendChild(card); }); })();
+
+  /* ── 8 · copy ── */
+  var CW = U.copy, out = $("out"); sec("sec-copy", U.sec.copy); $("copynote").textContent = U.sec.copy.note; $("copy").textContent = CW.button; $("reset").textContent = CW.reset;
+  function nameOf(c, v) { var o = c.opts.filter(function (x) { return x[0] === v; })[0]; return o ? o[1] : v; }
+  function paintOut() { var yours = 0, mine = 0, body = [];
+    ["CALLS", "PROPOSALS", "PATTERNS"].forEach(function (g) { body.push(""); body.push(CW.groups[g]);
+      D.choices.filter(function (c) { return c.group === g; }).forEach(function (c) { var e = eff(c), s = state.v[c.id] || {}, how, val;
+        if (e) { yours++; val = nameOf(c, e); how = e === c.mine ? CW.same : rt(CW.differs, { mine: nameOf(c, c.mine) }); } else { mine++; val = nameOf(c, c.mine); how = CW.minePick; }
+        body.push(c.id + ": " + val + " (" + how + ")" + (s.n ? " · " + rt(CW.note, { note: s.n.replace(/\s+/g, " ").trim() }) : "")); }); });
+    out.value = [rt(CW.head, { pageSha: D.pageSha }), rt(CW.counts, { yours: yours, mine: mine })].concat(body).join("\n");
+    $("count").textContent = rt(U.page.count, { yours: yours, mine: mine }); }
+  $("copy").addEventListener("click", function () { var said = $("said"); out.select();
+    var done = function () { said.textContent = CW.copied; }, fail = function () { said.textContent = CW.failed; };
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(out.value).then(done, function () { try { document.execCommand("copy") ? done() : fail(); } catch (e) { fail(); } }); else { document.execCommand("copy") ? done() : fail(); } } catch (e) { fail(); } });
+  $("reset").addEventListener("click", function () { state = { v: {} }; save(); repaint(); $("said").textContent = ""; });
+  repaint();
+  window.__leg = { ready: true, key: KEY };
+})();
+</script>
