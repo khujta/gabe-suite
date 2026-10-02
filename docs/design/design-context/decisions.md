@@ -1243,3 +1243,17 @@ Consequence: confirmed — in the bar's menu every dashed circle is a choice sti
 exactly those: the header, saving, the seven bench kind looks, F24, L-19, EX-5 (the "after a decision" option sits in the bar's player
 options). He goes through them from there; no "decide now" section is built. His round-1 review text is kept as a record
 (`legibility/review-r1.his.txt`) for when a page has to know what still waits on him.
+
+## D-083 — A card's layout is decided on the all-endpoints bench, not on the review page
+Date: 2026-10-02 · Input: his message after D-082 ("eligibility review" read as the legibility review — dictation).
+Decision, his: "all the decisions that are related to the layout of any card for any element, let's leave them to be determined in the All
+Endpoints screen, where we have these cards. I will do the modification there and will let you know about the configuration that we should
+follow … we can defer these decisions on the eligibility review for now, pending a decision about those elements in the All Endpoints section,
+which is after we finish with this one. For example, for each card, the decision should be made in the All Endpoints, not here in the
+legibility".
+Consequence: on the review page the pending card-layout choices — the seven bench kind looks (ending, schema, function, test, gate or decision,
+client hook, in-flight value) and EX-5 (the bench's looks in the table's chips) — are marked DEFERRED, decided on the all-endpoints bench; they
+leave the count of choices waiting on him and the copy text says where they will be decided. Still pending on the review page: the header and
+saving (the table's layout), F24 and L-19. Trigger to take them up: the legibility work is finished; he then configures the cards on the
+all-endpoints bench and pastes the configuration (the bench's copy lines), which becomes the ruled default. His card rulings in D-081 stand,
+and their refinement joins the same bench work (L-39). The agent's sorting of which choices are card layouts is his to correct.
