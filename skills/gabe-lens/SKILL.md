@@ -52,6 +52,6 @@ A full Gabe Block has: THE PROBLEM (or WHAT IT ENABLES for tool/building-block c
 
 Apply a Gabe Block for architecture decisions, trade-off resolutions, failure modes, new abstractions, and counter-intuitive findings. Skip it for trivial facts, step-by-step procedures, self-explanatory code, and concepts the user has already demonstrated understanding of.
 
-**Plain** emits one sentence and nothing else: a concrete noun for what the thing IS, then at most one em dash introducing the clause that sharpens it. Written from the reader's side of the screen, present tense, no jargon the sentence has not earned, and the honest negative said out loud when that IS the meaning. It is what a legend column, an icon tooltip or a hover card opens with — never a paragraph, never a Gabe Block.
+**Plain** emits one sentence and nothing else: a concrete noun for what the thing IS, then at most one em dash introducing the clause that sharpens it. Written from the reader's side of the screen, present tense, no jargon the sentence has not earned, a role word always followed by its object (a fetcher OF what, a check IN which function), the meaning in words before any code, and the honest negative said out loud when that IS the meaning. It is what a legend column, an icon tooltip or a hover card opens with — never a paragraph, never a Gabe Block.
 
 The full output contract in the spec is binding.

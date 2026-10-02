@@ -266,7 +266,7 @@ only on demand. `/gabe-lens plain <concept>` · alias `pl` · "in plain-line voi
 **What it is NOT:** not a compressed Gabe Block. No analogy, no map, no constraint box, no handle.
 The suit does not apply — plain has one voice.
 
-**The rule, seven lines:**
+**The rule, nine lines:**
 
 1. ONE sentence. If it needs two, the concept needs splitting, not a longer line.
 2. Open with a concrete noun for what the thing IS — not its type name, not its class.
@@ -277,6 +277,16 @@ The suit does not apply — plain has one voice.
    explains it.
 6. When the honest answer is a negative, say it out loud rather than dressing it up.
 7. Never restate the label. "endpoint: an endpoint that…" is a wasted line.
+8. A role word needs its object. A role names a relation, so the line says what it relates to: a fetcher OF
+   what, a check IN which function, a branch ON which ending, a writer TO which table. "a fetcher" alone is
+   a question — fetching what, from where?
+9. The meaning first, in words; the code last, as written. A code spelling (an expression, an error id, a
+   feed id) never opens the line: when it is the only name there is, it ends the sentence after the dash,
+   exactly as written. "the check that stops a user with no household — `self.household is None`", never
+   "`self.household is None` — a household check".
+
+Rule 9 is the one a built page can check: `../../gabe-artifact/tools/legibility-audit.mjs` counts raw code on
+faces and hover openings (`machineWords`).
 
 **The canonical set** is `_LRDEF` in `templates/center/shell/gabe-universe.html` — 83 lines written by
 the operator for the universe legend's "what it is, in your words" column. Read it before writing a
@@ -294,8 +304,9 @@ unknown     "we could not tell" — said out loud, instead of calling it a modul
 ```
 
 **Self-check before emitting.** One sentence? Concrete noun first? At most one dash? Reader's side?
-Would someone who has never seen this system know what they are looking at? If the line only makes
-sense to someone who already knows, it has failed.
+Every role word followed by its object? Meaning in words before any code? Would someone who has never
+seen this system know what they are looking at? If the line only makes sense to someone who already
+knows, it has failed.
 
 **Where it sits in a hover card.** The plain line goes LAST, after the facts and a separator — the
 reader who already knows scans the numbers and stops; the reader who does not reads on and finds it.
