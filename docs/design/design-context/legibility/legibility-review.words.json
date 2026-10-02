@@ -1,6 +1,19 @@
 {
   "_about": "Every sentence the legibility review page draws (D-066, D-025.8). A number is a {token} gen-legibility-review.mjs fills from the inputs; a {{token}} is filled by the page itself when it runs (counts of your choices, the page's sha). A typed number stops the build, a JSON number too. The spoken summaries (spoken) are templates too: a voice reads them, so each is plain sentences with every number a {token}. Ids that carry a number (L-01, R-11, D-066, P1, G1, EX-5, a review finding id, r1) and HTTP statuses are labels, not counts.",
   "_before": "6170519",
+  "deferred": {
+    "_about": "D-083: how a card looks is decided on the all-endpoints bench, after the legibility work, so this page marks those choices deferred instead of waiting on you. The ONE list, keyed by choice id, each with the decision that deferred it. A deferred choice keeps its card, pictures and options, but its buttons are off, it is not counted as waiting, \"Next open decision\" skips it, and the copy text says where it is decided. Which choices are card layouts is the operator's to correct: change this list and rebuild. Only a look or a proposal can be deferred, and a ruled one cannot.",
+    "choices": {
+      "ex.kind.end": "D-083",
+      "ex.kind.schema": "D-083",
+      "ex.kind.fn": "D-083",
+      "ex.kind.test": "D-083",
+      "ex.kind.gate": "D-083",
+      "ex.kind.hook": "D-083",
+      "ex.kind.inf": "D-083",
+      "EX-5": "D-083"
+    }
+  },
   "page": {
     "eyebrow": "Legibility · round 1 and your reading of it · D-066 · D-072 · D-074",
     "h1": "Round 1 of your human reading: what changed, what you choose, and the patterns behind it",
@@ -10,7 +23,7 @@
     "keyFilled": "filled",
     "keyMine": "my pick, not a ruling",
     "keyYours": "yours",
-    "count": "{{yours}} yours · {{mine}} at my pick"
+    "count": "{{yours}} yours · {{mine}} at my pick · {{deferred}} deferred to the bench"
   },
   "sec": {
     "glance": {
@@ -30,10 +43,10 @@
     },
     "calls": {
       "title": "Your calls",
-      "n": "{nCalls} choices · {nLooks} looks · {nProps} proposals",
-      "note": "Every choice of a look added this round, grouped by where it lives on the page: an option group, or a kind's look on the bench. A look shows its picture from the walk where the walk took one; {nNoPic} looks have none, and their card says so. The dashed one is my pick; a filled one is yours. Click a look to make it yours; click it again to give it back. Under each choice, an example from {ep}, what each option would change, and what you would see after picking it: pictures from real clicks where the page can be in that state, a labelled mock where it cannot yet.",
+      "n": "{nCalls} choices · {nLooks} looks · {nProps} proposals · {nDeferred} deferred",
+      "note": "Every choice of a look added this round, grouped by where it lives on the page: an option group, or a kind's look on the bench. A look shows its picture from the walk where the walk took one; {nNoPic} looks have none, and their card says so. The dashed one is my pick; a filled one is yours. Click a look to make it yours; click it again to give it back. Under each choice, an example from {ep}, what each option would change, and what you would see after picking it: pictures from real clicks where the page can be in that state, a labelled mock where it cannot yet. A card marked deferred is decided on the bench, so its options here are for reading only.",
       "motionNote": "Choosing a look makes it what all-endpoints shows when it opens, ruled. The other looks stay until you say to drop them.",
-      "take": "Take from this: {nCalls} choices wait for you ({nRuled} already ruled) and {nProps} proposals need your yes or no. Pick by the pictures; a look you leave stays my pick, never a ruling.",
+      "take": "Take from this: {nWait} choices wait for you here and {nDeferred} are deferred to the all-endpoints bench; the rest are ruled. Pick by the pictures; a look you leave stays my pick, never a ruling.",
       "picsNote": "Click a picture to open it full size in a new tab, or show every picture here at full size, each in its own scroller."
     },
     "items": {
@@ -195,7 +208,7 @@
     "noShot": "Not pictured yet: the walk took no picture of this look.",
     "sets": "What choosing sets in motion",
     "propsHead": "Proposals that need your word",
-    "propsNote": "These are not looks on the page yet. Each needs your yes or no before anything is built.",
+    "propsNote": "These are not looks on the page yet. Each needs your yes or no before anything is built, except a ruled one and a deferred one.",
     "factsHead": "What the records say",
     "alsoIn": "The same choice stands in the gap analysis; choosing in one place sets both.",
     "alsoInCalls": "The same choice stands in Your calls; choosing in one place sets both.",
@@ -226,7 +239,9 @@
     "fullOn": "show the pictures at full size",
     "fullOff": "fit the pictures to their box",
     "kindsHead": "Each kind's look",
-    "kindsNote": "The look each kind's column draws when the bench opens. Ruled: {nKindsRuled} of the {nKinds}; the others are my picks. To change one, set it on the bench, press copy there, and paste its line beside this one."
+    "kindsNote": "The look each kind's column draws when the bench opens. Ruled: {nKindsRuled} of the {nKinds}; the other {nKindsDeferred} are deferred to the bench, where you set each one, press copy there and paste its line back.",
+    "deferredBanner": "You decide this on the all-endpoints bench, where the cards live, after the legibility work.",
+    "deferredBtn": "Decided on the bench, not here"
   },
   "proposals": [
     {
@@ -380,7 +395,8 @@
       "L-36": "a simpler bench: icons, a copy button, a width per column",
       "L-37": "a widened column you can drag",
       "L-38": "a wide table that slides with Shift and the wheel",
-      "L-39": "a bench section for each element's layout"
+      "L-39": "a bench section for each element's layout",
+      "L-40": "where the choices waiting on you are gathered"
     },
     "round2Head": "Raised on reading this page",
     "round2Note": "You raised these after you read this page, so the review has not read them yet. Where an item is built, the page you are reading is its picture, and its status says where each one stands.",
@@ -640,7 +656,7 @@
   },
   "copy": {
     "head": "REVIEW · legibility r1 · {{pageSha}} · {app} @{feedHead} · {workHead}",
-    "counts": "{{yours}} yours · {{mine}} left as my pick",
+    "counts": "{{yours}} yours · {{mine}} left as my pick · {{deferred}} deferred to the bench",
     "same": "yours, same as my pick",
     "differs": "yours, I picked {{mine}}",
     "minePick": "my pick, not ruled",
@@ -663,7 +679,9 @@
     "stateSame": "yours · same as my pick",
     "stateRuled": "yours · ruled",
     "ruled": "ruled, {{by}}",
-    "changedRuled": "yours, you ruled {{ruled}} in {{by}}"
+    "changedRuled": "yours, you ruled {{ruled}} in {{by}}",
+    "stateDeferred": "deferred to the bench",
+    "deferred": "deferred to the all-endpoints bench ({{by}})"
   },
   "toc": {
     "head": "On this page",
@@ -778,7 +796,8 @@
       "up": "A count that went up: more of that defect than at the start.",
       "code": "The question asks what the code does.",
       "page": "The question asks how the page reads.",
-      "map": "The question asks how the map reads."
+      "map": "The question asks how the map reads.",
+      "bench": "A choice about how a card looks. It is decided on the all-endpoints bench, so it is not counted as waiting here."
     }
   },
   "mark": {
@@ -794,7 +813,8 @@
     "map": "about the map",
     "countOf": "{{n}} {{word}}",
     "notyet": "my pick: not yet",
-    "kept": "yours, my pick kept"
+    "kept": "yours, my pick kept",
+    "bench": "deferred to the bench"
   },
   "say": {
     "head": "To read aloud",
@@ -882,7 +902,8 @@
       "place": "where",
       "pick": "my pick",
       "now": "now",
-      "proposal": "a proposal"
+      "proposal": "a proposal",
+      "tally": "{{open}} wait for your pick here · {{deferred}} are deferred to the bench · {{ruled}} are ruled · {{decided}} you have decided"
     },
     "qs": {
       "head": "Every question at a glance",
@@ -929,9 +950,9 @@
     ],
     "calls": [
       "Here are the calls that wait for you.",
-      "There are {nCalls} choices of look, and {nRuled} are already ruled.",
+      "There are {nCalls} choices of look, {nRuled} are already ruled, and {nCallsDeferred} wait for the all-endpoints bench.",
       "Of the {nLooks} looks between them, {nNoPic} have no picture yet, and their card says so.",
-      "{nProps} more proposals need your yes or no before anything is built.",
+      "Of the {nProps} more proposals, {nPropsOpen} still need your yes or no, and the rest are ruled or wait for the bench.",
       "Where I picked, the choice is drawn with a dashed line, and a pick is never a ruling.",
       "Choose by the pictures, then copy your review at the end."
     ],
@@ -977,7 +998,8 @@
         "open": "open: my pick stands, not a ruling",
         "yours": "decided by you",
         "ruled": "ruled by you",
-        "kept": "decided by you: my pick kept"
+        "kept": "decided by you: my pick kept",
+        "deferred": "deferred: decided on the bench"
       },
       "plainHead": "in plain words",
       "listen": "listen",
@@ -988,14 +1010,17 @@
         "open": "Open: you have not picked yet. My pick is {{pick}}.",
         "yours": "Decided by you: {{picked}}. My pick was {{pick}}.",
         "kept": "Decided by you: you kept my pick, {{pick}}.",
-        "ruled": "Ruled by you: {{ruled}}."
+        "ruled": "Ruled by you: {{ruled}}.",
+        "deferred": "Deferred: you decide this on the all-endpoints bench, not here."
       },
       "caretTip": "Open this section's decisions",
       "ocTip": "Still open here: {{n}} of {{decisions}}.",
       "groupTip": "{{id}} has {{props}} for the suite.",
       "copyTip": "Copy this decision's summary",
       "exampleLab": "Example",
-      "impactLab": "Impact"
+      "impactLab": "Impact",
+      "headDeferred": "{{title}}: {{n}} decisions, {{open}} still open, {{deferred}} deferred to the bench",
+      "ocTipDeferred": "Still open here: {{n}} of {{decisions}}, and {{deferred}} deferred to the bench."
     },
     "run": {
       "yours": "You picked {{name}}.",
@@ -1015,7 +1040,9 @@
       "pickRuled": "You already ruled it, as {pick}.",
       "pickSuite": "My pick is {pick}; nothing lands in the suite until you say land it.",
       "options": "You choose between {opts}.",
-      "optionsSuite": "You can land it, leave it for now, or ask for a change."
+      "optionsSuite": "You can land it, leave it for now, or ask for a change.",
+      "optionsDeferred": "When you come to decide it, you will choose between {opts}.",
+      "pickDeferred": "Nothing is picked here, because this choice is decided on the bench after the legibility work."
     },
     "kindWord": {
       "check": "check",
@@ -1471,7 +1498,8 @@
       "words": "a rule in words",
       "reference": "a written reference",
       "method": "a method step"
-    }
+    },
+    "deferredCard": "Deferred under {{by}}: you decide this choice on the all-endpoints bench, so its options here are for reading only."
   },
   "gabeLens": {
     "_about": "The words of the lens blocks (L-31, D-079): `ui` is drawn as it stands (labels, the legend, the kinds of pain and of picture, the size and impact words); `tpl` holds the hover and spoken templates the generator fills for each card, with {tokens} (name, Name, the counts, the option). The text inside each block (the pain, the picture, the cost, the handle) is in legibility-review.lens.json. A mark's word lives here once; icons.json has geometry only.",

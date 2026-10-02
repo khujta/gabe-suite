@@ -87,6 +87,14 @@
   /* a call: its looks, each with its picture */
   .call { gap: 10px; }
   .call[data-state="yours"] { border-left-color: var(--strong) !important; }
+  /* D-083: a choice deferred to the all-endpoints bench — its card is for reading, under one banner; its buttons are off and its menu entry is dimmed */
+  .call[data-state="deferred"], .prop[data-state="deferred"] { border-left-style: dashed !important; }
+  .defer { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1.5px dashed var(--ink-soft); border-radius: 8px; background: var(--raised); }
+  .defer p { margin: 0; font-size: var(--fs-sm); color: var(--ink); max-width: 112ch; }
+  .defer .mk .ico { width: 1.6em; height: 1.6em; }
+  .btn:disabled { cursor: not-allowed; opacity: .6; }
+  .btn:disabled:hover { border-color: var(--rule); color: var(--ink); }
+  .ddi[data-st="deferred"] .nm { color: var(--muted); }
   .call .hd { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
   .looks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 12px; align-items: start; }
   .look { display: flex; flex-direction: column; gap: 6px; padding: 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--raised); min-width: 0; }
@@ -423,7 +431,7 @@
   var MK = { built: ["built", U.statusWord.built], option: ["option", U.statusWord.option], question: ["question", U.statusWord.question], logged: ["logged", U.statusWord.logged], deferred: ["deferred", U.statusWord.deferred],
     fixed: ["fixed", U.outcome.fixed], partly: ["partly", U.outcome.partly], left: ["left", U.outcome.left], his: ["his", U.outcome.his], open: ["open", U.rem.open],
     surface: ["surface", U.rem.kind.surface], feed: ["feed", U.rem.kind.feed], process: ["process", U.rem.kind.process], yoursRem: ["his", U.rem.kind.yours],
-    mine: ["mine", U.mark.mine], yours: ["yours", U.mark.yours], kept: ["check", U.mark.kept], ruled: ["ruled", U.mark.ruled], land: ["land", U.mark.land], notyet: ["notyet", U.mark.notyet],
+    mine: ["mine", U.mark.mine], yours: ["yours", U.mark.yours], kept: ["check", U.mark.kept], ruled: ["ruled", U.mark.ruled], land: ["land", U.mark.land], notyet: ["notyet", U.mark.notyet], bench: ["bench", U.mark.bench],
     down: ["down", U.mark.down], same: ["same", U.mark.same], up: ["up", U.mark.up], code: ["code", U.mark.code], page: ["page", U.mark.page], map: ["map", U.mark.map],
     answered: ["fixed", U.verdict.answered], vpartly: ["partly", U.verdict.partly], vnot: ["left", U.verdict.not] };
   var VKEY = { answered: "answered", partly: "vpartly", not: "vnot" }, RKEY = { surface: "surface", feed: "feed", yours: "yoursRem", process: "process" };
@@ -471,9 +479,9 @@
   (function () { var P0 = (D.decide && D.decide.pats) || [], E0 = (D.decide && D.decide.entries) || [];   /* a pattern's own reading stands before its first proposal; it is read from its card and is no decision */
     E0.forEach(function (e) { P0.filter(function (q) { return q.before === e.key; }).forEach(function (q) { DEC.push(q); }); DEC.push(e); }); })();
   DEC.forEach(function (e, i) { e.ix = i; DECBY[e.key] = e; });
-  var STATEICON = { open: "mine", yours: "yours", ruled: "ruled", kept: "check" };
-  /* open = nobody has picked and it is not ruled; yours = you picked another; kept = you picked my pick; ruled = ruled earlier and left */
-  function decState(e) { if (e.pat) return "none"; var c = CH[e.id], s = state.v[e.id]; if (s && s.v) return c && s.v === c.mine ? "kept" : "yours"; return c && c.ruled ? "ruled" : "open"; }
+  var STATEICON = { open: "mine", yours: "yours", ruled: "ruled", kept: "check", deferred: "bench" };
+  /* open = nobody has picked and it is not ruled; yours = you picked another; kept = you picked my pick; ruled = ruled earlier and left; deferred = decided on the all-endpoints bench (D-083), never counted as waiting */
+  function decState(e) { if (e.pat) return "none"; var c = CH[e.id], s = state.v[e.id]; if (c && c.deferred) return "deferred"; if (s && s.v) return c && s.v === c.mine ? "kept" : "yours"; return c && c.ruled ? "ruled" : "open"; }
   /* the state of a decision, said as its own fact: what is open and what I picked, or what you decided (the state mark adds this to its item's hover) */
   function stateTipOf(e) { var c = CH[e.id], s = state.v[e.id], st = decState(e);
     return rt(U.decide.menu.stateTip[st], { pick: nameOf(c, c.mine), picked: s && s.v ? nameOf(c, s.v) : "", ruled: c.ruled ? nameOf(c, c.ruled) : "" }); }
@@ -527,11 +535,11 @@
     function paintDec(on) {
       DEC.forEach(function (e, i) { var cd = DECARD[e.key]; if (cd) { cd.setAttribute("data-reading", String(on && R.d === i)); cd.setAttribute("data-hot", String(HOT === i || (on && R.d === i))); } });
       var M2 = U.decide.menu;
-      Object.keys(DD).forEach(function (k) { var d = DD[k], n = 0;
-        d.items.forEach(function (it) { var st = decState(it.e); if (st === "open") n++;
-          if (it.st !== st) { it.st = st; it.slot.textContent = ""; it.slot.appendChild(mk(STATEICON[st], M2.state[st])); } it.btn.title = stateTipOf(it.e); it.btn.setAttribute("aria-current", String(on && R.d === it.e.ix)); });
-        var w = rt(M2.openCount, { n: n }); d.oc.textContent = String(n); d.oc.title = rt(M2.ocTip, { n: n, decisions: pl(d.items.length, "decision") }); d.oc.setAttribute("data-zero", String(n === 0)); d.link.setAttribute("aria-label", d.title + ", " + w);
-        d.head.textContent = rt(M2.head, { title: d.title, n: d.items.length, open: n }); });
+      Object.keys(DD).forEach(function (k) { var d = DD[k], n = 0, dn = 0;
+        d.items.forEach(function (it) { var st = decState(it.e); if (st === "open") n++; if (st === "deferred") dn++;
+          if (it.st !== st) { it.st = st; it.slot.textContent = ""; it.slot.appendChild(mk(STATEICON[st], M2.state[st])); } it.btn.setAttribute("data-st", st); it.btn.title = stateTipOf(it.e); it.btn.setAttribute("aria-current", String(on && R.d === it.e.ix)); });
+        var w = rt(M2.openCount, { n: n }); d.oc.textContent = String(n); d.oc.title = rt(dn ? M2.ocTipDeferred : M2.ocTip, { n: n, decisions: pl(d.items.length, "decision"), deferred: dn }); d.oc.setAttribute("data-zero", String(n === 0)); d.link.setAttribute("aria-label", d.title + ", " + w);
+        d.head.textContent = rt(dn ? M2.headDeferred : M2.head, { title: d.title, n: d.items.length, open: n, deferred: dn }); });
       if (c.nopen) c.nopen.disabled = !DEC.some(function (e) { return decState(e) === "open"; }); }
     function paint() { var on = R.on;
       btns.forEach(function (b) { var lit = isLit(b); b.el.setAttribute("data-on", String(lit)); b.el.setAttribute("aria-pressed", String(lit)); b.lab.textContent = lit ? X.stop : b.word; b.slot.textContent = ""; b.slot.appendChild(ico(lit ? "stop" : "play")); });
@@ -686,7 +694,7 @@
     var gs = group(Lg.state); ["built", "option", "question", "logged", "deferred"].filter(function (k) { return kinds[k]; }).concat(["open"]).forEach(function (k) { var p = plain(k); entry(gs, p[0], p[1], p[2]); });
     var go = group(Lg.outcome); ["fixed", "partly", "left"].forEach(function (k) { var p = plain(k); entry(go, p[0], p[1], p[2]); }); var ph = plain("his", Lg.hisBoth); entry(go, ph[0], ph[1], ph[2]); go.appendChild(el("p", "cap", Lg.verdictNote));
     var gw = group(Lg.why); ["surface", "feed", "process"].forEach(function (k) { var p = plain(k); entry(gw, p[0], p[1], p[2]); });
-    var gc = group(Lg.choice); ["mine", "yours", "kept", "ruled", "land", "notyet"].forEach(function (k) { var p = plain(k); entry(gc, p[0], p[1], p[2]); });
+    var gc = group(Lg.choice); ["mine", "yours", "kept", "ruled", "land", "notyet", "bench"].forEach(function (k) { var p = plain(k); entry(gc, p[0], p[1], p[2]); });
     var gh = group(Lg.change); ["down", "same", "up"].forEach(function (k) { var p = plain(k); entry(gh, p[0], p[1], p[2]); });
     var gj = group(Lg.subject); ["code", "page", "map"].forEach(function (k) { var p = plain(k); entry(gj, p[0], p[1], p[2]); });
     var gp = group(Lg.pattern, true); D.patterns.slice().sort(function (a, b) { return Number(a.id.slice(1)) - Number(b.id.slice(1)); }).forEach(function (p) { var m = el("span", "mk pm"); m.setAttribute("data-o", "pat"); m.appendChild(ico(D.patIcon[p.id])); entry(gp, m, p.id + " · " + p.name, p.line); });
@@ -696,26 +704,28 @@
   var CH = {}; D.choices.forEach(function (c) { CH[c.id] = c; });
   var PREFS = { bar: ["always", "playing"], follow: ["on", "off"], after: ["stop", "next", "section"] };   /* D-076: the bar shows all the time by default (his ruling); only-while-playing is the other option */
   var state = (function () { try { var s = JSON.parse(window.localStorage.getItem(KEY) || "null"); if (s && s.v) { Object.keys(s.v).forEach(function (k) { var c = CH[k], x = s.v[k];
-          if (!c || !x || (x.v && !c.opts.some(function (o) { return o[0] === x.v; }))) delete s.v[k]; });
+          if (!c || !x || (x.v && !c.opts.some(function (o) { return o[0] === x.v; }))) delete s.v[k];
+          else if (c.deferred && x.v) { x.v = null; if (!x.n) delete s.v[k]; } });   /* a pick kept from before the choice was deferred is not a pick now (D-083) */
         if (s.p && typeof s.p === "object") Object.keys(s.p).forEach(function (k) { if (!PREFS[k] || PREFS[k].indexOf(s.p[k]) < 0) delete s.p[k]; }); else delete s.p; return s; } } catch (e) {} return { v: {} }; })();
   /* the player's two options (L-27): kept per viewer beside the choices, in the same store; the first value of each is the default */
   function pref(k) { var v = state && state.p && state.p[k]; return PREFS[k].indexOf(v) >= 0 ? v : PREFS[k][0]; }
   function setPref(k, v) { state.p = state.p || {}; if (state.p[k] === v) delete state.p[k]; else state.p[k] = v; if (!Object.keys(state.p).length) delete state.p; save(); repaint(); }
   function save() { try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
-  function eff(c) { var s = state.v[c.id]; return (s && s.v) || c.ruled || null; }
+  function eff(c) { if (c.deferred) return null; var s = state.v[c.id]; return (s && s.v) || c.ruled || null; }
   var painters = [];
   function repaint() { painters.forEach(function (p) { p(); }); paintOut(); }
-  function setV(id, v) { var s = state.v[id] || (state.v[id] = { v: null, n: "" }); s.v = s.v === v ? null : v; if (!s.v && !s.n) delete state.v[id]; save(); repaint(); }
-  function stateWord(c) { var s = state.v[c.id]; if (s && s.v) return s.v === c.mine ? U.copy.stateSame : U.copy.stateYours; return c.ruled ? U.copy.stateRuled : U.copy.stateMine; }
-  function stateKind(c) { var s = state.v[c.id]; return s && s.v ? "yours" : c.ruled ? "ruled" : "mine"; }
+  function setV(id, v) { if (CH[id] && CH[id].deferred) return; var s = state.v[id] || (state.v[id] = { v: null, n: "" }); s.v = s.v === v ? null : v; if (!s.v && !s.n) delete state.v[id]; save(); repaint(); }
+  function stateWord(c) { if (c.deferred) return U.copy.stateDeferred; var s = state.v[c.id]; if (s && s.v) return s.v === c.mine ? U.copy.stateSame : U.copy.stateYours; return c.ruled ? U.copy.stateRuled : U.copy.stateMine; }
+  function stateKind(c) { var s = state.v[c.id]; return c.deferred ? "bench" : s && s.v ? "yours" : c.ruled ? "ruled" : "mine"; }
   /* a choice's buttons: host gets one button per option (or the caller places them), plus a note and a state word */
   function wire(btn, c, v) { btn.type = "button"; btn.setAttribute("data-v", v); btn.setAttribute("data-choice", c.id); btn.addEventListener("click", function () { setV(c.id, v); });
-    painters.push(function () { var e = eff(c); btn.setAttribute("aria-pressed", String(e === v)); btn.setAttribute("data-mine", String(!e && v === c.mine)); }); }
+    if (c.deferred) btn.title = U.calls.deferredBtn;   /* shown for reading, not pickable: it is decided on the bench (D-083) */
+    painters.push(function () { var e = eff(c); btn.setAttribute("aria-pressed", String(e === v)); btn.setAttribute("data-mine", String(!c.deferred && !e && v === c.mine)); btn.disabled = !!c.deferred; }); }
   function tail(host, holder, c) { var v = el("div", "verdict"), nb = el("button", "btn nb", U.copy.noteBtn), st = el("span", "state top"), note = el("textarea", "note");
     nb.type = "button"; nb.setAttribute("aria-expanded", "false"); note.hidden = true; note.rows = 2; note.placeholder = U.copy.notePh; note.setAttribute("aria-label", U.copy.noteBtn + " · " + c.id);
     nb.addEventListener("click", function () { note.hidden = !note.hidden; nb.setAttribute("aria-expanded", String(!note.hidden)); if (!note.hidden) note.focus(); });
     note.addEventListener("input", function () { var s = state.v[c.id] || (state.v[c.id] = { v: null, n: "" }); s.n = note.value; if (!s.v && !s.n) delete state.v[c.id]; save(); nb.setAttribute("data-has", String(!!note.value)); paintOut(); });
-    painters.push(function () { var s = state.v[c.id] || {}; st.textContent = stateWord(c); holder.setAttribute("data-state", (s.v || c.ruled) ? "yours" : "mine");
+    painters.push(function () { var s = state.v[c.id] || {}; st.textContent = stateWord(c); holder.setAttribute("data-state", c.deferred ? "deferred" : (s.v || c.ruled) ? "yours" : "mine");
       if (document.activeElement !== note) note.value = s.n || ""; nb.setAttribute("data-has", String(!!s.n)); if (s.n && note.hidden) { note.hidden = false; nb.setAttribute("aria-expanded", "true"); } });
     v.appendChild(st); v.appendChild(nb); host.appendChild(v); host.appendChild(note); }
   function optButtons(host, holder, c) { var row = el("div", "verdict"); c.opts.forEach(function (o) { var b = el("button", "btn", o[1]); wire(b, c, o[0]); row.appendChild(b); }); host.appendChild(row); tail(host, holder, c); }
@@ -881,13 +891,19 @@
       card.appendChild(el("p", "lab", X.suite)); var bc = el("p", "because"); bc.appendChild(el("b", null, X.because)); bc.appendChild(document.createTextNode(p.because)); card.appendChild(bc);
       var su = el("div", "suite"); p.suite.forEach(function (s) { su.appendChild(suiteCard(s, CH[s.cid])); }); card.appendChild(su); B.appendChild(card); }); })();
 
+  /* a choice deferred to the all-endpoints bench (D-083): its card keeps every picture and option, under one banner that says where it is decided */
+  function deferBanner(ch) { var b = el("div", "defer"); b.setAttribute("data-deferred", ch.deferred); b.setAttribute("role", "note");
+    b.appendChild(mk("bench", U.mark.bench, null, null, rt(TP.deferredCard, { by: ch.deferred }))); b.appendChild(el("p", null, U.calls.deferredBanner)); return b; }
   /* ── 4 · your calls ── */
   (function () { var W = U.sec.calls, C = U.calls, O = U.ov.calls, B = sec("sec-calls", W); B.appendChild(el("p", "cap", W.note)); B.appendChild(el("p", "cap", W.motionNote));
     var ov = el("div", "panel"); ov.appendChild(el("h3", null, O.head)); var orows = [], nows = [];
     D.calls.concat(D.proposals).forEach(function (c) { var prop = !c.opts[0] || !c.where, pk = c.opts.filter(function (o) { return o.v === c.pick; })[0]; var nm = prop ? c.id + " · " + c.title : c.label;
       var now = el("span"); nows.push({ c: CH[c.id], host: now }); orows.push([link(nm, "#call-" + c.id), prop ? O.proposal : C.where[c.where], pk ? pk.name : "", now]); });
+    var tally = el("p", "cap"); tally.setAttribute("data-tally", ""); ov.appendChild(tally);
     var ot = table([O.name, O.place, O.pick, O.now], orows, ["", "sv", "sv", "sv"]); ov.appendChild(ot); B.appendChild(ov);
-    painters.push(function () { nows.forEach(function (x) { x.host.textContent = ""; var k = stateKind(x.c), s = M(k, null, null, stateTipOf(DECBY[x.c.id])); x.host.appendChild(s); }); });
+    painters.push(function () { var t = { open: 0, deferred: 0, ruled: 0, decided: 0 };   /* the glance's own count, from the states the menu wears: nothing typed */
+      nows.forEach(function (x) { x.host.textContent = ""; var st = decState(DECBY[x.c.id]), s = M(stateKind(x.c), null, null, stateTipOf(DECBY[x.c.id])); x.host.appendChild(s); t[st === "yours" || st === "kept" ? "decided" : st === "open" ? "open" : st]++; });
+      tally.textContent = rt(O.tally, t); });
     var pn = el("div", "acts"), tg = el("button", "btn", C.fullOn); tg.type = "button"; tg.setAttribute("aria-pressed", "false"); tg.id = "fullsize";
     tg.addEventListener("click", function () { var on = !B.classList.contains("full"); B.classList.toggle("full", on); tg.textContent = on ? C.fullOff : C.fullOn; tg.setAttribute("aria-pressed", String(on)); });
     pn.appendChild(el("span", "cap", W.picsNote)); pn.appendChild(tg); B.appendChild(pn);
@@ -897,7 +913,7 @@
         if (c.kind && !(list[ci - 1] || {}).kind) { B.appendChild(el("h4", "sub2", C.kindsHead)); B.appendChild(el("p", "cap", C.kindsNote)); }
         var hd = el("div", "hd"); hd.appendChild(el("h4", null, c.label)); if (c.about) hd.appendChild(el("p", "cap", c.about)); var cs = el("div", "chips");
         c.rows.forEach(function (r) { cs.appendChild(chip(C.inRow + " " + r, null, null, "acc")); });
-        cs.appendChild(refChip(c.from, c.fromName, null, C.from)); c.answers.forEach(function (a) { cs.appendChild(refChip(a.id, a.name, null, C.answers)); }); hd.appendChild(cs); card.appendChild(hd); card.appendChild(lensBlocks(D.lens.decisions[c.id])); card.appendChild(decBlock(c.id, card));
+        cs.appendChild(refChip(c.from, c.fromName, null, C.from)); c.answers.forEach(function (a) { cs.appendChild(refChip(a.id, a.name, null, C.answers)); }); hd.appendChild(cs); card.appendChild(hd); if (ch.deferred) card.appendChild(deferBanner(ch)); card.appendChild(lensBlocks(D.lens.decisions[c.id])); card.appendChild(decBlock(c.id, card));
         var looks = el("div", "looks" + (c.side ? " side" : "")); if (c.side) looks.style.setProperty("--n", String(c.opts.length)); c.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
           if (o.shot) t.appendChild(pic(o.shot)); else t.appendChild(el("div", "noshot", o.note || C.noShot));
           var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); if (o.depict) t.appendChild(depictBlock(o.depict)); t.appendChild(impactLine(c.id, o.v)); looks.appendChild(t); });
@@ -920,7 +936,7 @@
       else { var a = el("a", "dimg"), i = el("img"); a.href = D.shotBase + f.pic.f; a.target = "_blank"; a.rel = "noopener"; i.src = D.shotBase + f.pic.f; i.loading = "lazy"; i.width = f.pic.w; i.height = f.pic.h; i.alt = f.cap; a.appendChild(i); fg.appendChild(a); }
       fg.appendChild(el("figcaption", null, f.cap)); g.appendChild(fg); }); w.appendChild(g); return w; }
   function proposalCard(p, inGap) { var C = U.calls, ch = CH[p.id], card = el("div", "panel call"); card.setAttribute("data-call", p.id); card.id = (inGap ? "gcall-" : "call-") + p.id;
-    var hd = el("div", "hd"); hd.appendChild(el("h4", null, p.id + " · " + p.title)); card.appendChild(hd); card.appendChild(lensBlocks(D.lens.decisions[p.id])); card.appendChild(el("p", "cap", p.what)); card.appendChild(decBlock(inGap ? p.id + ":gap" : p.id, card));
+    var hd = el("div", "hd"); hd.appendChild(el("h4", null, p.id + " · " + p.title)); card.appendChild(hd); if (ch.deferred) card.appendChild(deferBanner(ch)); card.appendChild(lensBlocks(D.lens.decisions[p.id])); card.appendChild(el("p", "cap", p.what)); card.appendChild(decBlock(inGap ? p.id + ":gap" : p.id, card));
     if (p.facts.length) { card.appendChild(el("p", "lab", C.factsHead)); var ul = el("ul", "facts"); p.facts.forEach(function (f) { var li = el("li"); li.appendChild(el("b", null, f.id)); li.appendChild(document.createTextNode(f.text)); ul.appendChild(li); }); card.appendChild(ul); }
     if (p.shots.length) card.appendChild(pics(p.shots, 2));
     var looks = el("div", "looks"); p.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
@@ -991,9 +1007,10 @@
   /* ── 8 · copy ── */
   var CW = U.copy, out = $("out"); sec("sec-copy", U.sec.copy); $("copynote").textContent = U.sec.copy.note; $("copy").textContent = CW.button; $("reset").textContent = CW.reset;
   function nameOf(c, v) { var o = c.opts.filter(function (x) { return x[0] === v; })[0]; return o ? o[1] : v; }
-  function paintOut() { var yours = 0, mine = 0, body = [];
+  function paintOut() { var yours = 0, mine = 0, benched = 0, body = [];
     ["CALLS", "PROPOSALS", "PATTERNS"].forEach(function (g) { body.push(""); body.push(CW.groups[g]);
       D.choices.filter(function (c) { return c.group === g; }).forEach(function (c) { var e = eff(c), s = state.v[c.id] || {}, how, val;
+        if (c.deferred) { benched++; body.push(c.id + ": " + rt(CW.deferred, { by: c.deferred }) + (s.n ? " · " + rt(CW.note, { note: s.n.replace(/\s+/g, " ").trim() }) : "")); return; }   /* D-083: not a pick, not left as mine */
         if (e) { yours++; val = nameOf(c, e); how = c.ruled ? (e === c.ruled ? rt(CW.ruled, { by: c.ruledBy }) : rt(CW.changedRuled, { ruled: nameOf(c, c.ruled), by: c.ruledBy })) : e === c.mine ? CW.same : rt(CW.differs, { mine: nameOf(c, c.mine) }); } else { mine++; val = nameOf(c, c.mine); how = CW.minePick; }
         body.push(c.id + ": " + val + " (" + how + ")" + (s.n ? " · " + rt(CW.note, { note: s.n.replace(/\s+/g, " ").trim() }) : "")); }); });
     /* the player's options ride the copy text too (L-27, L-29): bar = ruled by default, follow and after = my pick by default */
@@ -1003,8 +1020,8 @@
       if (ruled) { val = nm[e]; how = e === ruled ? rt(CW.ruled, { by: PL.ruledBy }) : rt(CW.changedRuled, { ruled: nm[ruled], by: PL.ruledBy }); }
       else if (st) { val = nm[st]; how = st === mine ? CW.same : rt(CW.differs, { mine: nm[mine] }); } else { val = nm[mine]; how = CW.minePick; }
       body.push(g[1] + ": " + val + " (" + how + ")"); });
-    out.value = [rt(CW.head, { pageSha: D.pageSha }), rt(CW.counts, { yours: yours, mine: mine })].concat(body).join("\n");
-    $("count").textContent = rt(U.page.count, { yours: yours, mine: mine }); }
+    out.value = [rt(CW.head, { pageSha: D.pageSha }), rt(CW.counts, { yours: yours, mine: mine, deferred: benched })].concat(body).join("\n");
+    $("count").textContent = rt(U.page.count, { yours: yours, mine: mine, deferred: benched }); }
   $("copy").addEventListener("click", function () { var said = $("said"); out.select();
     var done = function () { said.textContent = CW.copied; }, fail = function () { said.textContent = CW.failed; };
     try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(out.value).then(done, function () { try { document.execCommand("copy") ? done() : fail(); } catch (e) { fail(); } }); else { document.execCommand("copy") ? done() : fail(); } } catch (e) { fail(); } });

@@ -42,6 +42,14 @@
    will see", then its before and after (two different pictures of real clicks) or a mock that says it is one, each figure captioned, none under 12px · R-11
    shows ruled (filled, no depiction, not "my pick" in the copy text).
 
+   Round 8 (D-083): how a card looks is decided on the all-endpoints bench, so exactly eight choices (the seven bench kind looks and EX-5) are DEFERRED, each
+   by D-083, none ruled · each wears one banner at the top of its card with the plain sentence and the bench mark (its hover says the fact), keeps every look,
+   picture, depiction and impact, and has its buttons off: none pressed, none dashed, a forced click changes nothing · in the bar's menu its entry wears the
+   bench mark and a hover that says it is deferred, and "Your calls" counts only what waits (four: the header, saving, F24 and L-19) with the deferred count in
+   its hover · "next open decision" skips them · the legend says the bench mark once · the copy text writes each as "<id>: deferred to the all-endpoints bench
+   (D-083)", and its counts leave them out of yours and of my pick and add how many are deferred · a pick kept from before is not a pick now (its note stays) ·
+   the glance's tally and the spoken summary of Your calls recount from the data.
+
      node docs/design/design-context/legibility/probe-legibility-review.mjs [--html <file>] [--shots <dir>] [--bar <dir>] [--dec <dir>] [--lens <dir>]   # browser-gated; run it ALONE
        --shots <dir>   also save a picture of the top of each section there, at 1920 and at 1600 px wide (for looking, never committed)
        --bar <dir>     also save one picture at 1920 px of the frozen bar mid-page while the (mocked) reading is on it (never committed)
@@ -68,6 +76,7 @@ try {
   await p.goto('file://' + page); await p.waitForFunction('window.__leg && window.__leg.ready', { timeout: 20000 }).catch(() => {}); await p.waitForTimeout(300);
   const D = await p.evaluate(() => window.LEG_DATA);
   ok(!!D && errs.length === 0, 'the page loads with no page error', errs.slice(0, 2).join(' | '));
+  const DEFERRED = new Set(D.choices.filter((c) => c.deferred).map((c) => c.id));   /* D-083: decided on the all-endpoints bench, never waiting here */
   /* every section draws */
   const SECS = ['sec-glance', 'sec-calls', 'sec-items', 'sec-qs', 'sec-gap', 'sec-pat', 'sec-rem', 'sec-copy'];
   const secs = await p.evaluate((ids) => ids.map((id) => { const s = document.getElementById(id); return s ? { id, title: s.querySelector('.st').textContent.trim(), take: s.querySelector('.take').textContent.trim(), kids: s.querySelector('.body').children.length, h: s.getBoundingClientRect().height, icon: !!s.querySelector('.sec-head h2 svg') } : { id }; }), SECS);
@@ -84,8 +93,8 @@ try {
   /* untouched: each choice shows exactly one dashed pick, or its ruled value filled */
   { const wrong = await p.evaluate(() => window.LEG_DATA.choices.filter((c) => { const bs = [...document.querySelectorAll('[data-choice="' + CSS.escape(c.id) + '"]')];
       const dashed = bs.filter((x) => x.dataset.mine === 'true'), filled = bs.filter((x) => x.getAttribute('aria-pressed') === 'true');
-      return c.ruled ? !(dashed.length === 0 && filled.length >= 1 && filled.every((x) => x.dataset.v === c.ruled)) : !(dashed.length >= 1 && dashed.every((x) => x.dataset.v === c.mine) && filled.length === 0); }).map((c) => c.id));
-    ok(wrong.length === 0, 'untouched, each choice shows my pick dashed, or its ruling filled', wrong.join(',') || D.choices.length + ' choices'); }
+      return c.deferred ? !(dashed.length === 0 && filled.length === 0 && bs.length >= 1 && bs.every((x) => x.disabled)) : c.ruled ? !(dashed.length === 0 && filled.length >= 1 && filled.every((x) => x.dataset.v === c.ruled)) : !(dashed.length >= 1 && dashed.every((x) => x.dataset.v === c.mine) && filled.length === 0); }).map((c) => c.id));
+    ok(wrong.length === 0, 'untouched, each choice shows my pick dashed, or its ruling filled, or (deferred to the bench) its buttons off with nothing dashed or filled', wrong.join(',') || D.choices.length + ' choices'); }
   /* every picture file exists, and decodes */
   { const srcs = await p.$$eval('img', (els) => els.map((i) => i.getAttribute('src')));
     const missing = srcs.filter((s) => !fs.existsSync(path.resolve(path.dirname(SRC), s)));
@@ -99,13 +108,13 @@ try {
   /* the copy text carries every choice */
   { const out = await p.$eval('#out', (t) => t.value), lines = out.split('\n');
     const lost = D.choices.filter((c) => !lines.some((l) => l.startsWith(c.id + ': ')));
-    ok(lines[0].startsWith('REVIEW · legibility r1 · ' + D.pageSha + ' · ') && /^\d+ yours · \d+ left as my pick$/.test(lines[1]), 'the copy text opens with the page, the feed and the work, then the counts', lines[0] + ' / ' + lines[1]);
+    ok(lines[0].startsWith('REVIEW · legibility r1 · ' + D.pageSha + ' · ') && /^\d+ yours · \d+ left as my pick · \d+ deferred to the bench$/.test(lines[1]), 'the copy text opens with the page, the feed and the work, then the counts', lines[0] + ' / ' + lines[1]);
     ok(lost.length === 0, 'the copy text carries every choice, one line each', lost.map((c) => c.id).join(',') || D.choices.length + ' lines');
     ok(['CALLS', 'PROPOSALS', 'PATTERNS'].every((g) => lines.includes(g)), 'the copy text groups calls · proposals · patterns');
-    const notRuled = D.choices.filter((c) => !c.ruled).every((c) => lines.find((l) => l.startsWith(c.id + ': ')).endsWith('(my pick, not ruled)'));
+    const notRuled = D.choices.filter((c) => !c.ruled && !c.deferred).every((c) => lines.find((l) => l.startsWith(c.id + ': ')).endsWith('(my pick, not ruled)'));
     ok(notRuled, 'untouched, a line at my pick says it is not ruled'); }
   /* a click makes a look yours, the copy line follows, the store keeps it, and clear gives it back */
-  { const c = D.calls.find((x) => !x.ruled && x.opts.length > 1), other = c.opts.find((o) => o.v !== c.pick);
+  { const c = D.calls.find((x) => !x.ruled && !DEFERRED.has(x.id) && x.opts.length > 1), other = c.opts.find((o) => o.v !== c.pick);
     await p.click('[data-call="' + c.id + '"] [data-choice="' + c.id + '"][data-v="' + other.v + '"]');
     const out = await p.$eval('#out', (t) => t.value), ln = out.split('\n').find((l) => l.startsWith(c.id + ': '));
     const stored = await p.evaluate((k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return 'throws'; } }, 'gabe:legibility:r1');
@@ -315,7 +324,7 @@ try {
     const SAYBAD = [[/[A-Za-z]_[A-Za-z]/, 'a code name'], [/\b[a-z]+[A-Z][A-Za-z]*\b/, 'a code name'], [/\b[A-Z][a-z]+[A-Z][A-Za-z]*\b/, 'a code name'], [/[·→/×|#{}\\“”"`<>]/, 'a symbol'], [/\b(?:L|R|D|EX|CR|N3|S4)-\d+/, 'an id'], [/\b[PGFA]\d{1,2}\b/, 'an id'], [/(^|\s)[xg]:/i, 'an id'], [/\b[\w-]+\.(?:py|mjs|js|json|md|html|tsx?|css)\b/i, 'a file'],
       [/\bundefined\b|\bNaN\b|\{[^}]*\}|\{\{/, 'a missing value or token'], [/\b(?:he|him|his|himself)\b/i, 'he · him · his'], [/\d/, 'a number']];
     const nSent = (s) => (s.match(/[^.!?]+[.!?]+(\s|$)/g) || []).length;
-    const decOpen = (sec) => DEC.filter((e) => e.sec === sec && !RULED.has(e.id));
+    const decOpen = (sec) => DEC.filter((e) => e.sec === sec && !RULED.has(e.id) && !DEFERRED.has(e.id));   /* what waits: not ruled, and not deferred to the bench (D-083) */
     const heard = (pg) => pg.evaluate(() => window.__ss.said.map((x) => x.text));
     {
       const ids = new Set(DEC.map((e) => e.id)), want = new Set(D.choices.map((c) => c.id));
@@ -349,8 +358,8 @@ try {
       ok(bad.length === 0, 'each dropdown lists every one of its decisions, in the page\'s order', st.dd.map((d) => d.key + ' ' + d.items.length).join(' · '));
       const cnt = st.dd.filter((d) => Number(d.open) !== decOpen(d.key).length);
       ok(cnt.length === 0, 'the count of open ones on each chip is the section\'s decisions nobody has picked or ruled', st.dd.map((d) => d.key + ' ' + d.open).join(' · '));
-      const ic = st.dd.filter((d) => d.items.some((k, i) => d.icons[i] !== (RULED.has(DEC.find((e) => e.key === k).id) ? 'ruled' : 'mine')));
-      ok(ic.length === 0, 'untouched, each entry wears its state icon: the dashed mark for an open one, the ruled mark for a ruled one', ic.map((d) => d.key).join(',') || DEC.length + ' icons');
+      const ic = st.dd.filter((d) => d.items.some((k, i) => d.icons[i] !== (RULED.has(DEC.find((e) => e.key === k).id) ? 'ruled' : DEFERRED.has(DEC.find((e) => e.key === k).id) ? 'bench' : 'mine')));
+      ok(ic.length === 0, 'untouched, each entry wears its state icon: the dashed mark for an open one, the ruled mark for a ruled one, the bench mark for one deferred to the bench', ic.map((d) => d.key).join(',') || DEC.length + ' icons');
       const ca = st.dd.find((d) => d.key === 'calls');
       ok(ca.groups.length === 5 && /table/i.test(ca.groups[0]) && /row/i.test(ca.groups[1]) && /bench/i.test(ca.groups[2]) && /kind/i.test(ca.groups[3]) && /proposal/i.test(ca.groups[4]), 'Your calls groups its decisions as the page does: the table, each row, the bench, each kind, the proposals', ca.groups.join(' · '));
       const pt = st.dd.find((d) => d.key === 'pat'); ok(pt.groups.length === 11, 'The patterns lists the audit and each pattern\'s draft proposals under the pattern', pt.groups.length + ' groups');
@@ -595,8 +604,8 @@ try {
       const ns6 = (s) => (s.match(/[^.!?]+[.!?]+(\s|$)/g) || []).length, sp6 = [...DEC, ...D.decide.pats], bsp = [];
       for (const e of sp6) { const L = e.pat ? D.lens.patterns[e.id] : D.lens.decisions[e.id], n = ns6(e.parts.join(' '));
         if (e.parts.length !== 6 || e.parts[0] !== L.say.pain || e.parts[1] !== L.say.like || e.parts[2] !== L.say.toSolve || e.parts[3] !== L.say.ifNot) bsp.push(e.key + ': not pain, analogy, cost to solve, cost if not first');
-        else if (!(e.pat ? /^This pattern holds /.test(e.parts[4]) : /^(You choose between |You can land it)/.test(e.parts[4]))) bsp.push(e.key + ': the fifth part is not the options');
-        else if (!/^My pick |^You already ruled it/.test(e.parts[5])) bsp.push(e.key + ': the last part is not my pick');
+        else if (!(e.pat ? /^This pattern holds /.test(e.parts[4]) : DEFERRED.has(e.id) ? /^When you come to decide it, you will choose between /.test(e.parts[4]) : /^(You choose between |You can land it)/.test(e.parts[4]))) bsp.push(e.key + ': the fifth part is not the options');
+        else if (!(DEFERRED.has(e.id) ? /^Nothing is picked here, because this choice is decided on the bench/.test(e.parts[5]) : /^My pick |^You already ruled it/.test(e.parts[5]))) bsp.push(e.key + ': the last part is not my pick (or, deferred to the bench, not the line that says nothing is picked here)');
         if (n < 4 || n > 7) bsp.push(e.key + ': ' + n + ' sentences'); for (const [rx, w] of SB) { const m = rx.exec(e.parts.join(' ')); if (m) bsp.push(e.key + ': ' + w + ' “' + m[0] + '”'); } }
       ok(bsp.length === 0, 'the spoken summary of every pattern and every decision begins with its pain sentence and goes on in order: the analogy, the cost to solve, the cost if not, the options, my pick (4 to 7 sentences, no id, path, symbol, number or code)', bsp.slice(0, 3).join(' | ') || `${sp6.length} summaries (${D.decide.pats.length} patterns)`);
       /* a pattern is read from its own card: the pain first, its card lit, and the menu does not list it as a decision */
@@ -661,6 +670,73 @@ try {
       const st11 = await p.evaluate(() => { const bs = [...document.querySelectorAll('[data-choice="R-11"]')]; return { dashed: bs.filter((x) => x.dataset.mine === 'true').length, filled: bs.filter((x) => x.getAttribute('aria-pressed') === 'true').map((x) => x.dataset.v), depict: document.querySelectorAll('[data-call="R-11"] [data-depict]').length }; });
       const line11 = (await p.$eval('#out', (t) => t.value)).split('\n').find((l) => l.startsWith('R-11: ')) || '';
       ok(!!r11 && r11.ruled === r11.mine && r11.ruledBy === 'D-081' && c11.ruled === c11.pick && st11.dashed === 0 && st11.filled.length >= 1 && st11.filled.every((v) => v === r11.ruled) && st11.depict === 0 && !/not ruled/.test(line11), 'R-11 shows ruled: its choice filled, no dashed pick, no depiction, and the copy text does not call it my pick', `${st11.filled.join(',')} filled · ${st11.depict} depictions · “${line11.slice(0, 60)}”`);
+    }
+    /* ── round 8 (D-083): how a card looks is decided on the all-endpoints bench — those choices are deferred, not waiting ── */
+    {
+      const WANT8 = ['EX-5', 'ex.kind.end', 'ex.kind.fn', 'ex.kind.gate', 'ex.kind.hook', 'ex.kind.inf', 'ex.kind.schema', 'ex.kind.test'], dCh = D.choices.filter((c) => c.deferred);
+      const DEFER_LINE = (id) => id + ': ' + D.ui.copy.deferred.replace('{{by}}', 'D-083');
+      ok(JSON.stringify(dCh.map((c) => c.id).sort()) === JSON.stringify(WANT8) && dCh.every((c) => c.deferred === 'D-083' && !c.ruled), 'exactly eight choices are deferred, each by D-083 and none ruled: the seven bench kind looks and EX-5', dCh.map((c) => c.id).join(','));
+      const P8 = await open({ ms: 30 });
+      await run('the deferred cards', async () => {
+        const R8 = await P8.evaluate((ids) => ids.map((id) => { const card = document.querySelector('[data-call="' + CSS.escape(id) + '"]'); if (!card) return { id, missing: true };
+          const bn = card.querySelector(':scope > .defer'), mk = bn && bn.querySelector('.mk'), btns = [...card.querySelectorAll('[data-choice="' + CSS.escape(id) + '"]')], kids = [...card.children];
+          return { id, banner: bn ? bn.querySelector('p').textContent : null, nBanner: card.querySelectorAll('.defer').length, icon: mk ? mk.dataset.o : null, tip: mk ? mk.title : null, svg: !!(mk && mk.querySelector('svg')), state: card.dataset.state,
+            disabled: btns.length > 0 && btns.every((x) => x.disabled), pressed: btns.filter((x) => x.getAttribute('aria-pressed') === 'true').length, dashed: btns.filter((x) => x.dataset.mine === 'true').length, nBtn: btns.length,
+            looks: card.querySelectorAll('.look').length, lens: !!card.querySelector('.lens'), imps: card.querySelectorAll('[data-impact]').length, depicts: card.querySelectorAll('[data-depict]').length, word: card.querySelector('.state.top').textContent,
+            order: kids.findIndex((k) => k.classList.contains('defer')) > 0 && kids.findIndex((k) => k.classList.contains('defer')) < kids.findIndex((k) => k.classList.contains('lens')) }; }), WANT8);
+        const bad = []; for (const r of R8) { const c = [...D.calls, ...D.proposals].find((x) => x.id === r.id);
+          if (r.missing) { bad.push(r.id + ': no card'); continue; }
+          if (r.banner !== D.ui.calls.deferredBanner || r.nBanner !== 1) bad.push(r.id + ': the banner'); if (r.icon !== 'bench' || !r.svg || r.tip !== D.ui.tip.deferredCard.replace('{{by}}', 'D-083')) bad.push(r.id + ': the banner mark and its hover');
+          if (!r.order) bad.push(r.id + ': the banner is not above the lens blocks'); if (r.state !== 'deferred' || r.word !== D.ui.copy.stateDeferred) bad.push(r.id + ': state ' + r.state + ' / ' + r.word);
+          if (!r.disabled || r.pressed !== 0 || r.dashed !== 0 || r.nBtn !== c.opts.length) bad.push(r.id + ': the buttons are not all off, unpressed and undashed');
+          if (r.looks !== c.opts.length || !r.lens || r.imps !== c.opts.length || r.depicts !== c.opts.length) bad.push(r.id + ': content lost (' + r.looks + ' looks · ' + r.imps + ' impacts · ' + r.depicts + ' depictions of ' + c.opts.length + ')'); }
+        ok(bad.length === 0 && R8.length === WANT8.length, 'each deferred card shows one banner above its blocks, with the bench mark and its hover and the plain sentence, keeps every look, picture, depiction and impact, and has every button off, unpressed and undashed', bad.slice(0, 3).join(' | ') || R8.length + ' cards');
+        ok(D.ui.calls.deferredBanner === 'You decide this on the all-endpoints bench, where the cards live, after the legibility work.' && nSent(D.ui.calls.deferredBanner) === 1, 'the banner is the one plain sentence: where it is decided and when');
+        /* a forced click on a deferred button changes nothing, and a pick kept from before is not a pick now (its note stays) */
+        await P8.click('[data-call="ex.kind.end"] [data-choice="ex.kind.end"][data-v="change"]', { force: true }); await P8.waitForTimeout(80);
+        const l0 = (await P8.$eval('#out', (t) => t.value)).split('\n').find((l) => l.startsWith('ex.kind.end: ')), kept0 = await P8.evaluate(() => { try { return JSON.parse(localStorage.getItem('gabe:legibility:r1') || 'null'); } catch (e) { return 'throws'; } });
+        ok(l0 === DEFER_LINE('ex.kind.end') && (kept0 === null || kept0 === 'throws' || !kept0.v || !kept0.v['ex.kind.end']), 'a forced click on a deferred button changes nothing: the copy line still says deferred and the store holds no pick', l0);
+        await P8.evaluate(() => localStorage.setItem('gabe:legibility:r1', JSON.stringify({ v: { 'ex.kind.end': { v: 'change', n: 'keep this note' }, 'mo.hdr': { v: 'road', n: '' } } })));
+        await P8.reload(); await P8.waitForFunction('window.__leg && window.__leg.ready', { timeout: 20000 }).catch(() => {});
+        const L1 = (await P8.$eval('#out', (t) => t.value)).split('\n'), k1 = L1.find((l) => l.startsWith('ex.kind.end: ')), h1 = L1.find((l) => l.startsWith('mo.hdr: ')), hdr = D.choices.find((c) => c.id === 'mo.hdr');
+        ok(k1 === DEFER_LINE('ex.kind.end') + ' · ' + D.ui.copy.note.replace('{{note}}', 'keep this note') && h1.includes('(yours, I picked ') && h1.startsWith('mo.hdr: ' + hdr.opts.find((o) => o[0] === 'road')[1]), 'a pick kept from before the deferral is dropped (its note rides on the deferred line), and a pick on a choice that waits is kept', (k1 || '') + ' | ' + (h1 || '').slice(0, 50));
+        await P8.click('#reset'); await P8.waitForTimeout(80);
+      });
+      await run('the count and the menu', async () => {
+        const waiting = DEC.filter((e) => e.sec === 'calls' && !RULED.has(e.id) && !DEFERRED.has(e.id)).map((e) => e.key), nCalls = DEC.filter((e) => e.sec === 'calls').length;
+        const C8 = await P8.evaluate(() => { const d = document.querySelector('[data-dd="calls"]').closest('.dd'), oc = d.querySelector('.oc'); return { n: oc.textContent, tip: oc.title, head: d.querySelector('.dd-head').textContent, zero: oc.dataset.zero }; });
+        ok(C8.n === '4' && JSON.stringify(waiting) === JSON.stringify(['mo.hdr', 'mo.save', 'F24', 'L-19']), '"Your calls" counts four: only the header, the saving, F24 and L-19 wait; the deferred ones are not counted (it was twelve)', C8.n + ' · ' + waiting.join(','));
+        ok(C8.tip === D.ui.decide.menu.ocTipDeferred.replace('{{n}}', '4').replace('{{decisions}}', nCalls + ' decisions').replace('{{deferred}}', String(dCh.length)) && C8.head.includes(dCh.length + ' deferred to the bench'), 'the chip\'s hover and the menu\'s head say how many are deferred to the bench', C8.tip);
+        const M8 = await P8.evaluate((ids) => ids.map((id) => { const it = document.querySelector('[data-dec-item="' + CSS.escape(id) + '"]'), m = it && it.querySelector('.slot .mk'); return { id, icon: m ? m.dataset.o : null, st: it ? it.dataset.st : null, title: it ? it.title : null, mkTitle: m ? m.title : null, word: m ? m.getAttribute('aria-label') : null }; }), WANT8);
+        const badM = M8.filter((x) => x.icon !== 'bench' || x.st !== 'deferred' || x.title !== D.ui.decide.menu.stateTip.deferred || x.mkTitle !== '' || x.word !== D.ui.decide.menu.state.deferred);
+        ok(badM.length === 0, 'in the bar\'s menu each deferred entry wears the bench mark and one hover that says it is decided on the bench (the mark inside has none of its own)', badM.slice(0, 2).map((x) => JSON.stringify(x)).join(' | ') || M8.length + ' entries');
+        const lg = await P8.evaluate(() => [...document.querySelectorAll('#legend .lg')].filter((e) => e.querySelector('.mk[data-o="bench"]')).map((e) => ({ word: e.textContent.trim(), title: e.title })));
+        ok(lg.length === 1 && lg[0].word === D.ui.mark.bench && lg[0].title === D.ui.legend.def.bench, 'the legend says the bench mark once, with its meaning', lg.map((x) => x.word).join(' | '));
+        /* "next open decision" skips the deferred: from the last open look, the seven deferred kind looks stand between it and F24 */
+        const from = waiting[1], to = waiting[2], ixF = DEC.findIndex((e) => e.key === from), ixT = DEC.findIndex((e) => e.key === to), between = DEC.slice(ixF + 1, ixT).filter((e) => DEFERRED.has(e.id));
+        ok(to === 'F24' && between.length === dCh.filter((c) => c.group === 'CALLS').length, 'between the last open look and the next open decision the seven deferred kind looks stand (the test relies on it)', between.length + ' between ' + from + ' and ' + to);
+        await P8.click('[data-dd="calls"]'); await P8.click('[data-dec-item="' + from + '"]'); await waitFor(P8, () => !window.__leg.reading().on); await P8.waitForTimeout(100);
+        await P8.click('[data-act="nextopen"]'); await P8.waitForTimeout(200); const a = await barOf(P8), sd = await heard(P8);
+        ok(a.reading.on && a.reading.dec === to && !between.some((e) => sd.includes(e.parts[0])), '"next open decision" skips the deferred ones: from ' + from + ' it goes straight to ' + to, a.reading.dec + ' (skipped ' + between.length + ')');
+        await P8.click('[data-act="stop"]');
+        /* the deferred entry still opens its card from the menu, so it can be read */
+        await P8.click('[data-dd="calls"]'); await P8.click('[data-dec-item="ex.kind.end"]'); await P8.waitForTimeout(200); const b = await barOf(P8), parts = DEC.find((e) => e.key === 'ex.kind.end').parts;
+        ok(b.reading.dec === 'ex.kind.end' && parts[parts.length - 1] === JSON.parse(fs.readFileSync(path.join(HERE, 'legibility-review.words.json'), 'utf8')).decide.s.pickDeferred, 'a deferred entry still opens its card from the menu, and its summary ends by saying nothing is picked here', parts[parts.length - 1]);
+        await P8.click('[data-act="stop"]');
+      });
+      await run('the copy text and the recount', async () => {
+        const L = (await P8.$eval('#out', (t) => t.value)).split('\n'), yours = D.choices.filter((c) => c.ruled).length, mine = D.choices.filter((c) => !c.ruled && !c.deferred).length;
+        ok(L[1] === yours + ' yours · ' + mine + ' left as my pick · ' + dCh.length + ' deferred to the bench', 'the copy text\'s counts leave the deferred ones out of both yours and my pick, and add how many are deferred to the bench', L[1]);
+        const bad = dCh.filter((c) => !L.includes(DEFER_LINE(c.id))).map((c) => c.id);
+        ok(bad.length === 0 && DEFER_LINE('EX-5') === 'EX-5: deferred to the all-endpoints bench (D-083)', 'each deferred choice is written as “<id>: deferred to the all-endpoints bench (D-083)”', bad.join(',') || dCh.length + ' lines');
+        const cnt = await P8.$eval('#count', (e) => e.textContent); ok(cnt === D.ui.page.count.replace('{{yours}}', yours).replace('{{mine}}', mine).replace('{{deferred}}', dCh.length), 'the count beside the keys says the same', cnt);
+        const nW = D.choices.filter((c) => ['CALLS', 'PROPOSALS'].includes(c.group) && !c.ruled && !c.deferred).length, nR = D.choices.filter((c) => ['CALLS', 'PROPOSALS'].includes(c.group) && c.ruled).length;
+        const tl = await P8.$eval('#sec-calls [data-tally]', (e) => e.textContent); ok(tl === D.ui.ov.calls.tally.replace('{{open}}', nW).replace('{{deferred}}', dCh.length).replace('{{ruled}}', nR).replace('{{decided}}', '0') && nW === 4, 'the glance of every choice recounts from the data: four wait, eight are deferred, the rest are ruled', tl);
+        const sp = D.say.find((x) => x.key === 'calls').text, nCD = dCh.filter((c) => c.group === 'CALLS').length, nPO = D.choices.filter((c) => c.group === 'PROPOSALS' && !c.ruled && !c.deferred).length;
+        ok(sp.includes(nCD + ' wait for the all-endpoints bench') && sp.includes('Of the ' + D.proposals.length + ' more proposals, ' + nPO + ' still need your yes or no'), 'the spoken summary of Your calls counts what waits and what is deferred, generated', sp.slice(0, 200));
+        const tk = await P8.$eval('#sec-calls .take', (e) => e.textContent); ok(tk === D.ui.sec.calls.take && tk.includes('4 choices wait for you here and ' + dCh.length + ' are deferred'), 'the take-from-this line recounts too', tk.slice(0, 90));
+      });
+      ok(P8.__errs.length === 0, 'the deferred choices run with no page error', P8.__errs.slice(0, 2).join(' | ')); await P8.__ctx.close();
     }
     if (DECSHOT) { fs.mkdirSync(DECSHOT, { recursive: true }); const PD = await open({ ms: 600000 }, 1920); await PD.setViewportSize({ width: 1920, height: 1000 });
       await scrollInto(PD, IDS[3], 400); await PD.click('[data-choice="mo.save"][data-v="hand"]'); await PD.click('[data-choice="mo.hdr"][data-v="band"]'); await scrollInto(PD, IDS[3], 400); await PD.waitForTimeout(100);

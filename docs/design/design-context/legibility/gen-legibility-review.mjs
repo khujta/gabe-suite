@@ -47,6 +47,11 @@
    legibility-review.lens.json (section 13e sweeps them: a typed digit or number word, an id, a path, a symbol, code or he · him · his stops the build); the numbers are tokens
    filled from the data; the size of a suite proposal's cost, the marks of its options, the pain level and the balance are derived. The spoken summary of every decision, and of
    every pattern, is rebuilt in that order: the pain, the analogy, the cost, the options, my pick.
+   THE DEFERRED CHOICES (D-083): how a card looks is decided on the all-endpoints bench, after the legibility work, so a choice listed in
+   words.deferred.choices (the ONE list, keyed by choice id, each with the decision that deferred it) is marked deferred, not waiting: its card keeps
+   every picture and option under a banner that says where it is decided, its buttons are off, it leaves the count of what waits on you and is skipped
+   by "next open decision", the copy text says "deferred to the all-endpoints bench", and every count that names what is pending is generated here
+   (the tokens nWait · nDeferred · nCallsDeferred · nPropsOpen · nKindsDeferred) or by the page, never typed.
    No wallclock: same inputs, same bytes. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -79,7 +84,9 @@ const andList = (a) => (a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + 
 /* the page speaks TO you (L17, LT-16): a record written about "him" is turned to the second person before it is drawn, and the build
    stops on any he · him · his left in a drawn string (the check at the end, P10). The verb after "he" follows the person. */
 const VERB2 = { is: 'are', was: 'were', has: 'have', does: 'do' };
+const AND_VERB2 = { goes: 'go', does: 'do', has: 'have', is: 'are', was: 'were' };
 const you = (s) => (s == null ? s : String(s)
+  .replace(/\b([Hh])e (\w+) and (goes|does|has|is|was)\b/g, (m, h, v, c) => (h === 'H' ? 'You ' : 'you ') + v + ' and ' + AND_VERB2[c])   /* "he confirmed and goes" → "you confirmed and go" */
   .replace(/\b([Hh])e (is|was|has|does)\b/g, (m, h, v) => (h === 'H' ? 'You ' : 'you ') + VERB2[v])
   .replace(/\b([Hh])e ([a-z]+?)(ches|shes|sses|xes|s)\b/g, (m, h, w, e) => (h === 'H' ? 'You ' : 'you ') + w + (e.length > 1 ? e.slice(0, -2) : ''))
   .replace(/\b([Hh])is(?= to\b|\s*[.,;:)]|$)/g, (m, h) => (h === 'H' ? 'Yours' : 'yours'))
@@ -145,7 +152,8 @@ for (const it of items) { it.name = ITEM_NAME[it.id] || die('words.items.names h
 for (const k of Object.keys(ITEM_NAME)) if (k[0] !== '_' && !items.some((it) => it.id === k)) die('words.items.names names an item the ledger does not hold: ' + k);
 const EP = (/endpoint \*\*([A-Z]+ [^*]+)\*\*/.exec(LEDGER) || die('the ledger no longer names the endpoint he read on'))[1];
 const EPID = 'endpoint:' + EP;
-const statusKind = (s) => { const k = (/^(built|option|question|logged|deferred)\b/.exec(s) || die('ledger: a status that starts with no known word: ' + s.slice(0, 40)))[1]; return k; };
+/* a question answered by pointing at what is already there says "answered — already on the page" (L-40): it is the page's own kind, a question answered */
+const statusKind = (s) => { const k = (/^(built|option|question|logged|deferred|answered)\b/.exec(s) || die('ledger: a status that starts with no known word: ' + s.slice(0, 40)))[1]; return k === 'answered' ? 'question' : k; };
 const firstSentence = (w) => { const t = w.replace(/^"|"$/g, ''); const m = /^(.+?[.?!])(\s+|"\s|$)/.exec(t); return m ? [m[1], t.slice(m[1].length).trim()] : [t, '']; };
 
 /* ── 3 · decisions D-066..D-071 ────────────────────────────────────────────────────────────────────────────────────── */
@@ -583,6 +591,20 @@ const proposals = W.proposals.map((p) => {
   return { id: p.id, title: fill(p.title, PTOK, p.id), what: fill(p.what, PTOK, p.id), motion: fill(p.motion, PTOK, p.id), opts, pick, facts, shots, alsoIn: p.alsoIn || null, ruled: p.ruled ? pick : null, ruledBy: p.ruled || null };
 });
 T.nProps = proposals.length;
+/* ── 8b · the choices deferred to the all-endpoints bench (D-083) ───────────────────────────────────────────────────────
+   words.deferred.choices is the ONE list. A deferred choice keeps its card, pictures and options; it is not pickable, not counted as waiting,
+   skipped by "next open decision", and the copy text says where it is decided. Every count is generated: here for the words, in the page for the chip. */
+const DEFER = need(need(W, 'deferred', ''), 'choices', 'deferred');
+const isDeferred = (id) => Object.prototype.hasOwnProperty.call(DEFER, id);
+{ const pickable = new Map([...calls, ...proposals].map((c) => [c.id, c]));
+  for (const [id, by] of Object.entries(DEFER)) {
+    const c = pickable.get(id) || die(`words.deferred.choices names ${id}, which is not a look or a proposal of this page`);
+    if (c.ruled) die(`words.deferred.choices: ${id} is ruled (${c.ruledBy}); a ruled choice is not waiting, so it cannot be deferred`);
+    if (!decs[by]) die(`words.deferred.choices: ${id} is deferred by ${by}, which decisions.md does not hold`); } }
+{ const waiting = (c) => !c.ruled && !isDeferred(c.id);
+  Object.assign(T, { nDeferred: Object.keys(DEFER).length, nCallsDeferred: calls.filter((c) => isDeferred(c.id)).length, nKindsDeferred: kindCalls.filter((c) => isDeferred(c.id)).length,
+    nCallsOpen: calls.filter(waiting).length, nPropsOpen: proposals.filter(waiting).length });
+  T.nWait = T.nCallsOpen + T.nPropsOpen; }
 for (const c of calls) c.motion = fill(c.motion, T, 'calls.motion.' + c.id);
 T.nPics = used.size;
 const fillTree = (o, at) => (typeof o === 'string' ? fill(o, T, at) : Array.isArray(o) ? o.map((v, i) => fillTree(v, at + '[' + i + ']')) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => k[0] !== '_').map(([k, v]) => [k, fillTree(v, at + '.' + k)])) : o);
@@ -590,17 +612,17 @@ const omit = (o, ks) => Object.fromEntries(Object.entries(o).filter(([k]) => !ks
 const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, tip: W.tip, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, depict: need(DP, 'ui', 'depict'), decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord', 'ex', 'imp', 'sayWords', 'exSuite', 'impSuite']), gl: need(need(W, 'gabeLens', ''), 'ui', 'gabeLens') }, 'ui');
 
 /* ── 14 · the data, the hash, the page ─────────────────────────────────────────────────────────────────────────────── */
-const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, opts: c.opts.map((o) => [o.v, o.name]) })),
-  ...proposals.map((p) => ({ id: p.id, group: 'PROPOSALS', mine: p.pick, ruled: p.ruled, ruledBy: p.ruledBy, opts: p.opts.map((o) => [o.v, o.name]) })),
-  { id: audit.id, group: 'PATTERNS', mine: audit.pick, ruled: null, ruledBy: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) },
-  ...patterns.flatMap((p) => p.suite.map((s) => ({ id: s.cid, group: 'PATTERNS', mine: s.pick, ruled: null, ruledBy: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) })))];
+const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, deferred: DEFER[c.id] || null, opts: c.opts.map((o) => [o.v, o.name]) })),
+  ...proposals.map((p) => ({ id: p.id, group: 'PROPOSALS', mine: p.pick, ruled: p.ruled, ruledBy: p.ruledBy, deferred: DEFER[p.id] || null, opts: p.opts.map((o) => [o.v, o.name]) })),
+  { id: audit.id, group: 'PATTERNS', mine: audit.pick, ruled: null, ruledBy: null, deferred: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) },
+  ...patterns.flatMap((p) => p.suite.map((s) => ({ id: s.cid, group: 'PATTERNS', mine: s.pick, ruled: null, ruledBy: null, deferred: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) })))];
 if (new Set(choices.map((c) => c.id)).size !== choices.length) die('two choices share an id');
 
 /* ── 13b · the marks (L-25) and the spoken summaries (L-26) ──────────────────────────────────────────────────────────────
    The icons file holds geometry only; every mark's word is read from the words file, so a concept has one word. A pattern with no
    mark of its own, a mark two patterns share, or a mark the page needs and the file lacks stops the build. */
 const IC = rj(path.join(HERE, 'legibility-review.icons.json'));
-{ const NEED = ['built', 'option', 'question', 'logged', 'deferred', 'fixed', 'partly', 'left', 'open', 'his', 'mine', 'yours', 'ruled', 'land', 'notyet', 'surface', 'feed', 'process', 'down', 'same', 'up', 'code', 'page', 'map', 'copy', 'play', 'stop', 'speaker', 'check', 'pause', 'prev', 'next', 'follow', 'pin', 'caret', 'nextopen'];
+{ const NEED = ['built', 'option', 'question', 'logged', 'deferred', 'fixed', 'partly', 'left', 'open', 'his', 'mine', 'yours', 'ruled', 'land', 'notyet', 'surface', 'feed', 'process', 'down', 'same', 'up', 'code', 'page', 'map', 'copy', 'play', 'stop', 'speaker', 'check', 'pause', 'prev', 'next', 'follow', 'pin', 'caret', 'nextopen', 'bench'];
   for (const k of NEED) if (!IC.marks[k]) die('icons: the page needs a mark named ' + k);
   for (const k of ['lb-cost', 'lb-solve', 'lb-ifnot', 'lb-steps', 'lb-box', 'bx-not', 'bx-when', 'st-wrong', 'im-gain', 'im-cost', 'im-neutral', 'check', 'pin', 'scale']) if (!IC.marks[k]) die('icons: the lens needs a mark named ' + k);
   for (const g of ['painKind', 'process']) { if (!IC[g] || !Object.keys(IC[g]).length) die('icons: no ' + g + ' (the lens: which mark each kind wears)'); for (const [k, m] of Object.entries(IC[g])) if (!IC.marks[m]) die(`icons: ${g}.${k} wears “${m}”, which is not in marks`); }
@@ -914,11 +936,13 @@ for (const k of Object.keys(PATTERN_SRC)) if (k[0] !== '_' && !patById[k]) die('
     lensDecision(c.id, { name: c.kind ? 'the ' + c.label + ' look' : c.label, tok: Object.assign({}, XT), opts: c.opts.map((o) => [o.v, o.name]), suite: null });
     addDec({ key: c.id, id: c.id, sec: 'calls', gk: c.kind ? 'kinds' : c.where, gn: c.kind ? UI.calls.kindsHead : UI.calls.where[c.where], gp: null, name: c.label, tag: c.rows.length ? c.rows.join(' · ') : null,
       ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay,
-      parts: lensSay(c.id, fill(need(DS, 'options', 'decide.s'), { opts: orList(c.opts.map((o) => op[o.v])) }, sg('options')), decPick(c.pick, !!c.ruled, op, sg(c.ruled ? 'pickRuled' : 'pickMine'))), opts: op }); }
+      parts: lensSay(c.id, fill(need(DS, isDeferred(c.id) ? 'optionsDeferred' : 'options', 'decide.s'), { opts: orList(c.opts.map((o) => op[o.v])) }, sg('options')),
+        isDeferred(c.id) ? need(DS, 'pickDeferred', 'decide.s') : decPick(c.pick, !!c.ruled, op, sg(c.ruled ? 'pickRuled' : 'pickMine'))), opts: op }); }
   for (const p of proposals) { const ov = DSAY[p.id] || {}, op = spokenOpts(p.id, p.opts), nm = DNAME[p.id] || die('words.decide.name has no name for ' + p.id), order = p.opts.map((o) => o.v);
     const ei = exImp(p.id, XW[p.id], IW[p.id] || die('words.decide.imp has no entry for ' + p.id), order, op, XT);
     lensDecision(p.id, { name: nm, tok: Object.assign({}, XT), opts: p.opts.map((o) => [o.v, o.name]), suite: null });
-    const parts = lensSay(p.id, fill(need(DS, 'options', 'decide.s'), { opts: orList(p.opts.map((o) => op[o.v])) }, sg('options')), decPick(p.pick, !!p.ruled, op, sg(p.ruled ? 'pickRuled' : 'pickMine')));
+    const parts = lensSay(p.id, fill(need(DS, isDeferred(p.id) ? 'optionsDeferred' : 'options', 'decide.s'), { opts: orList(p.opts.map((o) => op[o.v])) }, sg('options')),
+      isDeferred(p.id) ? need(DS, 'pickDeferred', 'decide.s') : decPick(p.pick, !!p.ruled, op, sg(p.ruled ? 'pickRuled' : 'pickMine')));
     const extra = { ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay };
     addDec(Object.assign({ key: p.id, id: p.id, sec: 'calls', gk: 'props', gn: UI.calls.propsHead, gp: null, name: nm, tag: null, parts, opts: op }, extra));
     if (p.alsoIn === 'gap') addDec(Object.assign({ key: p.id + ':gap', id: p.id, sec: 'gap', gk: 'gap', gn: UI.gap.recHead, gp: null, name: nm, tag: null, parts, opts: op }, extra)); } }
