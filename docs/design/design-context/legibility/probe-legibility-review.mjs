@@ -37,6 +37,11 @@
    4 to 7 sentences, no id, path, symbol, number or code); the authored lens file holds no id, path, symbol, typed digit or number word; the blocks fold to
    one column at 390 px and no text in them is under 12px.
 
+   Round 7 (D-081): the header and the saving each show two tight crops of the region that changes, side by side, different pictures, each with its caption of
+   what to look at · every option the operator could not picture (each bench kind's look, F24, L-19, EX-5) shows a line that begins "After you pick this, you
+   will see", then its before and after (two different pictures of real clicks) or a mock that says it is one, each figure captioned, none under 12px · R-11
+   shows ruled (filled, no depiction, not "my pick" in the copy text).
+
      node docs/design/design-context/legibility/probe-legibility-review.mjs [--html <file>] [--shots <dir>] [--bar <dir>] [--dec <dir>] [--lens <dir>]   # browser-gated; run it ALONE
        --shots <dir>   also save a picture of the top of each section there, at 1920 and at 1600 px wide (for looking, never committed)
        --bar <dir>     also save one picture at 1920 px of the frozen bar mid-page while the (mocked) reading is on it (never committed)
@@ -389,14 +394,15 @@ try {
       await P4.click('[data-dec-listen="mo.fit"]'); await P4.waitForTimeout(100); const off = await P4.evaluate(() => ({ on: window.__leg.reading().on, label: document.querySelector('[data-dec-listen="mo.fit"]').textContent.trim() }));
       ok(!off.on && off.label === D.ui.decide.menu.listen, 'a second click stops it and the button is listen again', off.label);
     });
+    /* a look the operator has ruled says "You changed your ruling" and has no open mark to close, so this walk picks one still open (the save: under HANDLER, my pick being under EFFECTS) */
     await run('your pick joins the summary', async () => {
-      const e = DEC.find((x) => x.key === 'mo.ipo'); await P4.click('[data-choice="mo.ipo"][data-v="sent"]'); await P4.evaluate(() => { window.__ss.said.length = 0; });
-      const txt = await P4.$eval('[data-dec-text="mo.ipo"]', (n) => n.textContent), want = e.parts.concat([D.ui.decide.run.yours.replace('{{name}}', e.opts.sent), e.plain]);
+      const e = DEC.find((x) => x.key === 'mo.save'); await P4.click('[data-choice="mo.save"][data-v="hand"]'); await P4.evaluate(() => { window.__ss.said.length = 0; });
+      const txt = await P4.$eval('[data-dec-text="mo.save"]', (n) => n.textContent), want = e.parts.concat([D.ui.decide.run.yours.replace('{{name}}', e.opts.hand), e.plain]);
       ok(txt === want.join(' ') && nSent(want.slice(0, e.parts.length + 1).join(' ')) === nSent(e.parts.join(' ')) + 1, 'once you have picked, the summary adds one sentence about your pick (one more than the base) before the plain line', want[e.parts.length]);
-      await P4.click('[data-dd="calls"]'); await P4.click('[data-dec-item="mo.ipo"]'); await waitFor(P4, (n) => window.__ss.said.length >= n, want.length); const sd = await heard(P4);
+      await P4.click('[data-dd="calls"]'); await P4.click('[data-dec-item="mo.save"]'); await waitFor(P4, (n) => window.__ss.said.length >= n, want.length); const sd = await heard(P4);
       ok(JSON.stringify(sd.slice(0, want.length)) === JSON.stringify(want), 'and that sentence is read after the base summary and before the plain line', sd[e.parts.length]);
       await P4.click('[data-choice="mo.hdr"][data-v="band"]'); const k = await P4.$eval('[data-dec-text="mo.hdr"]', (n) => n.textContent); ok(k.includes(D.ui.decide.run.kept.replace('{{name}}', DEC.find((x) => x.key === 'mo.hdr').opts.band)), 'picking my own pick is said as keeping it', k.slice(-90, -40));
-      const ic = await P4.evaluate(() => ({ yours: document.querySelector('[data-dec-item="mo.ipo"] .slot .mk').dataset.o, kept: document.querySelector('[data-dec-item="mo.hdr"] .slot .mk').dataset.o, open: document.querySelector('[data-dd="calls"]').closest('.dd').querySelector('.oc').textContent }));
+      const ic = await P4.evaluate(() => ({ yours: document.querySelector('[data-dec-item="mo.save"] .slot .mk').dataset.o, kept: document.querySelector('[data-dec-item="mo.hdr"] .slot .mk').dataset.o, open: document.querySelector('[data-dd="calls"]').closest('.dd').querySelector('.oc').textContent }));
       ok(ic.yours === 'yours' && ic.kept === 'check' && Number(ic.open) === decOpen('calls').length - 2, 'a decided entry changes its icon (yours, or kept my pick) and the chip\'s count of open ones goes down', JSON.stringify(ic));
       await P4.click('#reset'); await P4.waitForTimeout(80); await P4.click('[data-act="stop"]').catch(() => {});
     });
@@ -610,8 +616,54 @@ try {
       ok(NB.cols === 1 && NB.side <= 1 && NB.small === 0 && NB.wide === 0, 'at 390 px the blocks fold to one column, nothing scrolls sideways, and no text in them is under 12px', `${NB.cols} column · page ${NB.side}px wider · ${NB.small} small · ${NB.wide} overflowing`);
       await p.setViewportSize({ width: 1500, height: 1000 }); await p.waitForTimeout(150);
     }
+    /* ── round 7 (L-34, L-35, R-11; D-081): pictures that show the difference, and what each option would show once it is picked ── */
+    {
+      const DP = D.ui.depict, bytes = (f) => fs.readFileSync(path.resolve(path.dirname(SRC), D.shotBase + f)).toString('base64');
+      await p.evaluate(() => { for (const i of document.querySelectorAll('img')) i.loading = 'eager'; });
+      await p.waitForFunction(() => [...document.querySelectorAll('img')].every((i) => i.complete), { timeout: 60000 }).catch(() => {});
+      /* L-34: the header and the saving show only the region that changes, one beside the other, each with the line of what to look at */
+      const S7 = await p.evaluate((ids) => ids.map((id) => { const card = document.querySelector('#sec-calls [data-call="' + id + '"]'), g = card && card.querySelector('.looks'), looks = g ? [...g.querySelectorAll('.look')] : [], bx = looks.map((l) => l.getBoundingClientRect()),
+          im = looks.map((l) => l.querySelector('figure.pic img')), cp = looks.map((l) => (l.querySelector('figure.pic figcaption') || {}).textContent || '');
+        return { id, side: !!g && g.classList.contains('side'), n: looks.length, row: bx.length === 2 && Math.abs(bx[0].top - bx[1].top) < 4 && bx[1].left >= bx[0].right - 2, ok: im.filter((i) => i && i.complete && i.naturalWidth > 0).length,
+          w: im.map((i) => (i ? i.naturalWidth : 0)), h: im.map((i) => (i ? i.naturalHeight : 0)), cp, src: im.map((i) => (i ? i.getAttribute('src') : '')) }; }), ['mo.hdr', 'mo.save']);
+      for (const s7 of S7) { const c = D.calls.find((x) => x.id === s7.id), files = c.opts.map((o) => o.shot && o.shot.f);
+        ok(s7.side && s7.n === 2 && s7.row && s7.ok === 2, s7.id + ': the two looks stand side by side, each with its picture', `${s7.n} looks · side ${s7.side} · one row ${s7.row} · ${s7.ok} decoded`);
+        ok(s7.w.every((w) => w > 0 && w <= 700) && s7.h.every((h) => h > 0 && h <= 400) && c.opts.every((o) => o.shot.region === true), s7.id + ': each picture is a tight crop of the region that changes, never the whole table', s7.w.map((w, i) => w + '×' + s7.h[i]).join(' · '));
+        ok(files.length === 2 && files[0] !== files[1] && bytes(files[0]) !== bytes(files[1]), s7.id + ': the two pictures are not the same picture', files.join(' · '));
+        ok(s7.cp.every((t, i) => t === c.opts[i].shot.cap && /\blook at\b/i.test(t) && t.length > 40), s7.id + ': each picture carries its caption: how it was reached and what to look at', (s7.cp[0] || '').slice(0, 80)); }
+      /* L-35: each option the operator could not picture shows its before and after (real clicks) or a mock labelled as one, under a line that begins "After you pick this, you will see" */
+      const kinds7 = D.calls.filter((c) => c.kind && !c.ruled).map((c) => c.id), want7 = [...kinds7, 'F24', 'L-19', 'EX-5'];
+      const cards7 = [...D.calls, ...D.proposals].filter((c) => want7.includes(c.id));
+      ok(cards7.length === want7.length && kinds7.length >= 1 && cards7.every((c) => c.opts.every((o) => o.depict && o.depict.line && o.depict.figs.length >= 1)), 'every bench kind\'s look, F24, L-19 and EX-5 has a depiction on every option', want7.length + ' choices · ' + cards7.reduce((a, c) => a + c.opts.length, 0) + ' options');
+      const R7 = await p.evaluate(([cards, lead, mockWord]) => { const out = []; for (const c of cards) for (const card of document.querySelectorAll('[data-call="' + c.id + '"]')) for (const o of c.opts) {
+          const look = card.querySelector('.look[data-look="' + o.v + '"]'), d = look && look.querySelector('[data-depict]'), r = { id: c.id, v: o.v, card: card.id, problems: [] };
+          if (!d) { r.problems.push('no depiction'); out.push(r); continue; }
+          const dl = d.querySelector('.dl'), figs = [...d.querySelectorAll('figure.dfig')]; if (!dl || !dl.textContent.startsWith(lead + ' ')) r.problems.push('the line does not begin “' + lead + '”');
+          if (figs.length !== o.depict.figs.length) r.problems.push('figures ' + figs.length + ' of ' + o.depict.figs.length);
+          figs.forEach((f, i) => { const want = o.depict.figs[i], mock = f.getAttribute('data-kind') === 'mock', cap = f.querySelector('figcaption');
+            if (mock !== !!want.mock) r.problems.push('figure ' + i + ' is ' + (mock ? 'a mock' : 'a picture') + ' but the data says the other');
+            if (mock && !(f.querySelector('.dmock') && f.querySelector('.dmock').textContent === mockWord && f.querySelector('.mock'))) r.problems.push('a mock not labelled as one');
+            if (!mock) { const im = f.querySelector('img'); if (!im || !im.complete || !im.naturalWidth) r.problems.push('a picture that does not decode'); }
+            if (!cap || !cap.textContent.trim()) r.problems.push('a figure with no caption');
+            if (figs.length > 1 && !f.querySelector('.dtag')) r.problems.push('a pair without its before and after tags'); });
+          const small = [...d.querySelectorAll('*')].filter((e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).length; if (small) r.problems.push(small + ' texts under 12px');
+          out.push(r); } return out; }, [cards7, DP.lead, DP.mock]);
+      const bad7 = R7.filter((r) => r.problems.length);
+      ok(bad7.length === 0 && R7.length >= cards7.reduce((a, c) => a + c.opts.length, 0), 'on every card of them, each option shows a line that begins “' + DP.lead + '”, then its pictures or its labelled mock, each with a caption, none under 12px', bad7.slice(0, 3).map((r) => r.card + '=' + r.v + ': ' + r.problems[0]).join(' | ') || R7.length + ' depictions in ' + new Set(R7.map((r) => r.card)).size + ' cards');
+      /* a real before and after are two different pictures; a mock is never mistaken for a picture of the page */
+      const pairs = [...D.calls, ...D.proposals].flatMap((c) => c.opts.filter((o) => o.depict && o.depict.figs.length === 2 && o.depict.figs.every((f) => f.pic)).map((o) => [c.id + '=' + o.v, o.depict.figs[0].pic.f, o.depict.figs[1].pic.f]));
+      ok(pairs.length >= 1 && pairs.every(([, a, z]) => a !== z && bytes(a) !== bytes(z)), 'a before and an after of real clicks are two different pictures', pairs.length + ' pairs: ' + pairs.map((x) => x[0]).join(', '));
+      const mocks = [...D.calls, ...D.proposals].flatMap((c) => c.opts.flatMap((o) => (o.depict ? o.depict.figs.filter((f) => f.mock).map(() => c.id + '=' + o.v) : [])));
+      const labelled = await p.$$eval('figure.dfig[data-kind="mock"]', (els) => els.filter((e) => e.querySelector('.dmock')).length);
+      ok(mocks.length >= 1 && labelled >= mocks.length, 'every drawn mock says it is a mock', mocks.length + ' mocks in the data · ' + labelled + ' labelled on the page');
+      /* R-11 is ruled: its card shows the ruling filled and no depiction, and the copy text says so */
+      const r11 = D.choices.find((c) => c.id === 'R-11'), c11 = D.proposals.find((x) => x.id === 'R-11');
+      const st11 = await p.evaluate(() => { const bs = [...document.querySelectorAll('[data-choice="R-11"]')]; return { dashed: bs.filter((x) => x.dataset.mine === 'true').length, filled: bs.filter((x) => x.getAttribute('aria-pressed') === 'true').map((x) => x.dataset.v), depict: document.querySelectorAll('[data-call="R-11"] [data-depict]').length }; });
+      const line11 = (await p.$eval('#out', (t) => t.value)).split('\n').find((l) => l.startsWith('R-11: ')) || '';
+      ok(!!r11 && r11.ruled === r11.mine && r11.ruledBy === 'D-081' && c11.ruled === c11.pick && st11.dashed === 0 && st11.filled.length >= 1 && st11.filled.every((v) => v === r11.ruled) && st11.depict === 0 && !/not ruled/.test(line11), 'R-11 shows ruled: its choice filled, no dashed pick, no depiction, and the copy text does not call it my pick', `${st11.filled.join(',')} filled · ${st11.depict} depictions · “${line11.slice(0, 60)}”`);
+    }
     if (DECSHOT) { fs.mkdirSync(DECSHOT, { recursive: true }); const PD = await open({ ms: 600000 }, 1920); await PD.setViewportSize({ width: 1920, height: 1000 });
-      await scrollInto(PD, IDS[3], 400); await PD.click('[data-choice="mo.ipo"][data-v="sent"]'); await PD.click('[data-choice="mo.hdr"][data-v="band"]'); await scrollInto(PD, IDS[3], 400); await PD.waitForTimeout(100);
+      await scrollInto(PD, IDS[3], 400); await PD.click('[data-choice="mo.save"][data-v="hand"]'); await PD.click('[data-choice="mo.hdr"][data-v="band"]'); await scrollInto(PD, IDS[3], 400); await PD.waitForTimeout(100);
       await PD.click('[data-dd="calls"]'); await PD.waitForTimeout(150); await PD.screenshot({ path: path.join(DECSHOT, 'dropdown-open-1920.png') });
       await PD.click('[data-dec-item="mo.gdl"]'); await PD.waitForTimeout(400); await PD.screenshot({ path: path.join(DECSHOT, 'decision-card-1920.png') }); console.log('  the dropdown and a lit decision card at 1920 px in ' + DECSHOT); await PD.__ctx.close(); }
     if (LENSSHOT) { fs.mkdirSync(LENSSHOT, { recursive: true }); const PL = await open({ ms: 600000 }, 1920); await PL.setViewportSize({ width: 1920, height: 1000 }); await PL.addStyleTag({ content: 'nav.toc { display: none !important; }' }); await PL.waitForTimeout(150);

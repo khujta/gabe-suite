@@ -4,7 +4,7 @@
   "page": {
     "eyebrow": "Legibility · round 1 and your reading of it · D-066 · D-072 · D-074",
     "h1": "Round 1 of your human reading: what changed, what you choose, and the patterns behind it",
-    "lede": "You read all-endpoints on {ep} as a person, one hover at a time, and raised {nItems} items. Each was logged in your words, worked on, then reviewed. This page shows what round 1b left, the patterns behind it with their suite proposals, the looks you pick by seeing, what changed on each item, your questions answered and the gap analysis you asked for. Then you read this page and raised {nRound2} more items: they are built here, and they are the last cards of Your items.",
+    "lede": "You read all-endpoints on {ep} as a person, one hover at a time, and raised {nItems} items. Each was logged in your words, worked on, then reviewed. This page shows what round 1b left, the patterns behind it with their suite proposals, the looks you pick by seeing, what changed on each item, your questions answered and the gap analysis you asked for. Then you read this page and raised {nRound2} more items; the built ones are worked on this page itself, and every one has a card at the end of Your items.",
     "source": "Pictures are real clicks on the page (the walk). Facts are read from {app} @{feedHead}. The work reviewed is at {workHead}.",
     "keyDashed": "dashed",
     "keyFilled": "filled",
@@ -31,7 +31,7 @@
     "calls": {
       "title": "Your calls",
       "n": "{nCalls} choices · {nLooks} looks · {nProps} proposals",
-      "note": "Every choice of a look added this round, grouped by where it lives on the page: an option group, or a kind's look on the bench. A look shows its picture from the walk where the walk took one; {nNoPic} looks have none, and their card says so. The dashed one is my pick; a filled one is yours. Click a look to make it yours; click it again to give it back. Under each choice, an example from {ep} and what each option would change.",
+      "note": "Every choice of a look added this round, grouped by where it lives on the page: an option group, or a kind's look on the bench. A look shows its picture from the walk where the walk took one; {nNoPic} looks have none, and their card says so. The dashed one is my pick; a filled one is yours. Click a look to make it yours; click it again to give it back. Under each choice, an example from {ep}, what each option would change, and what you would see after picking it: pictures from real clicks where the page can be in that state, a labelled mock where it cannot yet.",
       "motionNote": "Choosing a look makes it what all-endpoints shows when it opens, ruled. The other looks stay until you say to drop them.",
       "take": "Take from this: {nCalls} choices wait for you ({nRuled} already ruled) and {nProps} proposals need your yes or no. Pick by the pictures; a look you leave stays my pick, never a ruling.",
       "picsNote": "Click a picture to open it full size in a new tab, or show every picture here at full size, each in its own scroller."
@@ -202,26 +202,26 @@
     "motion": {
       "_about": "One line per look added this round: what choosing it sets in motion. A look missing here stops the build; a line for a look that was not added stops it too.",
       "mo.leg": "Already yours (D-067). Choosing the strip puts every row's legend above the table and leaves each row's name with its own words only.",
-      "mo.ipo": "Every BY MOMENT hover takes this form. The code map and the bench follow it when their hovers move to before · checks · gives.",
+      "mo.ipo": "Already yours (D-081). Every BY MOMENT hover takes this form. The code map and the bench follow it when their hovers move to before · checks · gives.",
       "mo.hdr": "BY MOMENT's header on every endpoint. Both headers show the same stages; only the row of roads differs.",
       "mo.save": "Where the handler's save stands on every endpoint: under EFFECTS, or under HANDLER with EFFECTS an empty outline.",
-      "mo.meta": "Where the endpoint metadata stands on every endpoint: after the table or before it.",
-      "mo.wid": "What a click on a moment's head gives its column.",
-      "mo.fit": "What the fit button does. If you also say yes to R-11 below, it is how a wide table opens.",
-      "mo.stk": "Whether the stage band and the moment heads follow you down while BY MOMENT scrolls.",
-      "mo.gdl": "The shape of every gate in Gates and decisions. The bench's gate column follows it once EX-5 is built.",
-      "mo.gef": "How a gate's effect is coloured. A colour per stage adds a stage palette to the page.",
-      "mo.gic": "The icon every gate wears in BY MOMENT. The bench's gate column, one shield today, is brought in line.",
-      "mo.grl": "The label at a gate's end: your L-11 question about roles for gates.",
-      "mo.std": "Where Standard or specialist's items stand. Split and merge take the row out of the table; keep leaves it.",
-      "mo.fnm": "Whether a function chip shows the statuses it decides and R or W for each table it touches.",
-      "mo.dfx": "How Data effects shows which function touches which table. With a map on, the row's cells only count.",
-      "mo.dxc": "The read and write colours in Data effects and its map. Your words' colours put a red write beside the station's red accessor label.",
-      "mo.jyb": "Where a test's earlier requests stand in the Proof row.",
-      "mo.ifl": "How In-flight state shows what each value affects: across the moments, where it is read, or only where it is set.",
-      "ex.lay": "How the bench's columns sit on the page.",
-      "ex.follow": "Whether a click elsewhere on the page changes what the bench shows.",
-      "ex.scope": "Which elements a bench column offers when the page opens."
+      "mo.meta": "Already yours (D-081). The endpoint metadata stands after the table on every endpoint.",
+      "mo.wid": "Already yours (D-081). A click on a moment's head widens its column until every item inside stands on one line.",
+      "mo.fit": "Already yours (D-081). The fit button wraps the table into bands, and with R-11 ruled it is how a wide table opens.",
+      "mo.stk": "Already yours (D-081). The stage band and the moment heads follow you down while BY MOMENT scrolls.",
+      "mo.gdl": "Already yours (D-081). Every gate in Gates and decisions stands under the function it runs in. The bench's gate column follows it once EX-5 is built.",
+      "mo.gef": "Already yours (D-081). A gate's effect is the ending's own colour with its stage lit.",
+      "mo.gic": "Already yours (D-081). Every gate wears an icon for its kind in BY MOMENT. The bench's gate column, one shield today, is brought in line.",
+      "mo.grl": "Already yours (D-081). The label at a gate's end says where it decides.",
+      "mo.std": "Already yours (D-081). Standard or specialist is split into the gates and leaves the table; its rare pieces are labels on what they name.",
+      "mo.fnm": "Already yours (D-081). A function chip shows the statuses it decides and R or W for each table it touches.",
+      "mo.dfx": "Already yours (D-081). Data effects shows a small map in each moment's cell; one map for the endpoint stays one square away.",
+      "mo.dxc": "Already yours (D-081). The page's own read and write colours draw Data effects and its map.",
+      "mo.jyb": "Already yours (D-081). A test's earlier requests stand at a moment of their own in the Proof row.",
+      "mo.ifl": "Already yours (D-081). In-flight state is a lifeline per value across the moments.",
+      "ex.lay": "Already yours (D-081). The bench's columns sit in an upper and a lower row.",
+      "ex.follow": "Already yours (D-081). A click elsewhere on the page shows that element in the bench.",
+      "ex.scope": "Already yours (D-081). A bench column offers the elements of the open endpoint when the page opens."
     },
     "fullOn": "show the pictures at full size",
     "fullOff": "fit the pictures to their box",
@@ -277,7 +277,7 @@
         }
       ],
       "pick": "fit",
-      "motion": "The table's opening state changes on the endpoints that overflow, and only there. Your fit look decides what the fitted table looks like.",
+      "motion": "Already yours (D-081). The table opens fitted on the endpoints where it would scroll sideways, and only there. Your fit look decides what the fitted table looks like.",
       "facts": [
         "R-11",
         "CR-40"
@@ -285,9 +285,11 @@
       "pics": [
         {
           "option": "fit",
-          "value": "min"
+          "value": "bands",
+          "cap": "a table wider than its box, opened fitted"
         }
-      ]
+      ],
+      "ruled": "D-081"
     },
     {
       "id": "EX-5",
@@ -371,11 +373,18 @@
       "L-29": "a nested menu with a summary per decision",
       "L-30": "an example and the impact on every decision, a hover for every icon",
       "L-31": "the pain and the cost behind every explanation",
-      "L-32": "icons and marks that show the weight of a situation"
+      "L-32": "icons and marks that show the weight of a situation",
+      "L-33": "one hover card format everywhere",
+      "L-34": "header and saving pictures that show the difference",
+      "L-35": "what each option would show once it is picked",
+      "L-36": "a simpler bench: icons, a copy button, a width per column",
+      "L-37": "a widened column you can drag",
+      "L-38": "a wide table that slides with Shift and the wheel",
+      "L-39": "a bench section for each element's layout"
     },
     "round2Head": "Raised on reading this page",
-    "round2Note": "You raised these after you read this page, so the review has not read them yet. They are built on this page itself: the page you are reading is their picture.",
-    "round2Card": "Raised after the review. Built on this page; its picture is this page.",
+    "round2Note": "You raised these after you read this page, so the review has not read them yet. Where an item is built, the page you are reading is its picture, and its status says where each one stands.",
+    "round2Card": "Raised after the review. Where it is built, this page is its picture; its status says where it stands.",
     "pickNone": "none"
   },
   "qs": {
@@ -673,8 +682,8 @@
       "_about": "Where to look in a look's picture, and what changes between the looks (L24) — one line per choice.",
       "mo.leg": "look at where each row's legend stands: on the row's name when you point at it, or in a strip above the table",
       "mo.ipo": "look at the hover box: labelled lines, or one line joined by arrows",
-      "mo.hdr": "look at the rows above the moments: the stage band with its bracket, or a row of roads between the stages and the moments",
-      "mo.save": "look at the stage band: the save stands under EFFECTS, or under HANDLER with EFFECTS an empty outline",
+      "mo.hdr": "look at the heads of the handler's moments: a bracket over the ways, or a row of roads between the stage band and the heads",
+      "mo.save": "look at the stage over the commit column: the save under EFFECTS in a cell of its own, or under HANDLER with EFFECTS an outline beside it",
       "mo.meta": "look at where the endpoint metadata stands: under the table, or above it",
       "mo.wid": "look at the clicked moment's column: how wide it grows",
       "mo.fit": "look at the columns that did not fit: narrowed to counts, or the table wrapped into bands",
@@ -1695,6 +1704,147 @@
         "patPickNot": "My pick is to leave {them} for now, and nothing lands in the suite until you say land it."
       },
       "costTip": "What it takes to solve {name}, and what keeps happening if you do not."
+    }
+  },
+  "depict": {
+    "_about": "L-35 (D-081): what each option would show once it is picked. `ui` is what the page draws; `tpl` holds captions the generator fills; `kind` is the line for a bench kind's two looks; `proposals` holds, per proposal and option, the line that follows “After you pick this, you will see” and its figures: a picture of the walk (`pic`, a depict key the walk tags) or a mock (`mock`, drawn by the page and labelled). A number here is a token, never typed.",
+    "ui": {
+      "lead": "After you pick this, you will see",
+      "before": "before",
+      "after": "after",
+      "mock": "a mock, not built",
+      "mockNote": "Drawn here to show the idea; the page does not do this yet.",
+      "control": "control",
+      "newRow": "new",
+      "lit": "lit"
+    },
+    "tpl": {
+      "capDrawn": "the {kind} column as the bench opens it",
+      "capBefore": "before: the {kind} column as drawn",
+      "capDragged": "after: “{part}” dragged into not drawn"
+    },
+    "kind": {
+      "drawn": "the {kind} column exactly as it opens now, as in the picture; nothing moves, and the controls under it stay for any change you want later.",
+      "change": "the same column after a change made with the controls under it: in the second picture one part has been dragged into not drawn. You make your own change there, copy the line, and paste it back here with your words."
+    },
+    "proposals": {
+      "F24": {
+        "sends": {
+          "line": "the Client head on the pinned row reading “sends it” where it reads “{oldHead}” now; the counts under it stay as they are, and BY MOMENT's Client head says the same.",
+          "figs": [
+            {
+              "role": "before",
+              "mock": {
+                "type": "head",
+                "col": "fetched",
+                "head": "{oldHead}"
+              },
+              "cap": "now: the head reads “{oldHead}”"
+            },
+            {
+              "role": "after",
+              "mock": {
+                "type": "head",
+                "col": "fetched",
+                "head": "sends it",
+                "changed": true
+              },
+              "cap": "after: the head reads “sends it”"
+            }
+          ]
+        },
+        "keep": {
+          "line": "the head still reading “{oldHead}”, as in the picture; its hover says it counts the hook that sends the request.",
+          "figs": [
+            {
+              "role": "after",
+              "mock": {
+                "type": "head",
+                "col": "fetched",
+                "head": "{oldHead}"
+              },
+              "cap": "the head stays “{oldHead}”"
+            }
+          ]
+        }
+      },
+      "L-19": {
+        "G1": {
+          "line": "a Security control over the rows: pressed, it lights every security element across the rows, the login check, the refusals at the edge and the limiters among them, and no row is added.",
+          "figs": [
+            {
+              "role": "after",
+              "mock": {
+                "type": "rows",
+                "control": "Security",
+                "lit": [
+                  "end",
+                  "gate",
+                  "data",
+                  "fn",
+                  "inf"
+                ]
+              },
+              "cap": "the rows with a Security control above them, lighting its elements in some of them"
+            }
+          ]
+        },
+        "G2": {
+          "line": "a Security row of its own under the others, repeating the login check, the refusals and the limiters that already stand in their own rows.",
+          "figs": [
+            {
+              "role": "after",
+              "mock": {
+                "type": "rows",
+                "add": "Security"
+              },
+              "cap": "the rows with a Security row added at the end"
+            }
+          ]
+        },
+        "G3": {
+          "line": "the rows exactly as they are now: no Security control and no new row, and the facts the feed's settings could fill stay missing.",
+          "figs": [
+            {
+              "role": "after",
+              "mock": {
+                "type": "rows"
+              },
+              "cap": "the rows as they stand"
+            }
+          ]
+        }
+      },
+      "EX-5": {
+        "wait": {
+          "line": "BY MOMENT's function chips exactly as they are today, as in the picture; nothing is built until you rule a kind's look on the bench.",
+          "figs": [
+            {
+              "role": "after",
+              "pic": "EX-5:wait:after",
+              "cap": "a function chip in BY MOMENT today"
+            }
+          ]
+        },
+        "now": {
+          "line": "a function chip in BY MOMENT drawn as the bench's function block: its title lines, its strip of marks and its one hover, the block standing where the chip stands.",
+          "figs": [
+            {
+              "role": "before",
+              "pic": "EX-5:now:before",
+              "cap": "now: the chip"
+            },
+            {
+              "role": "after",
+              "mock": {
+                "type": "frame",
+                "pic": "EX-5:now:after"
+              },
+              "cap": "after: the bench's block where the chip stands"
+            }
+          ]
+        }
+      }
     }
   }
 }

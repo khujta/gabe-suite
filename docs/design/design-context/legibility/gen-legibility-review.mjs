@@ -188,7 +188,7 @@ const pic = (s) => { used.add(s.file); const k = VERB_KEYS.find((x) => s[x] != n
 /* the walk photographs the click that puts an option back to its default SMALL — the options group itself, not the look (its own words:
    "that click is a step too, photographed small"). Such a crop is never a look's picture (LT-01, L8): under 300 px on both sides, or a
    strip under 100 px tall. */
-const isCrop = (s) => (s.size[0] < 300 && s.size[1] < 300) || s.size[1] < 100;
+const isCrop = (s) => !s.region && ((s.size[0] < 300 && s.size[1] < 300) || s.size[1] < 100);   /* a shot the walk marks `region` is a tight crop of the look itself (L-34), never of the options */
 const hasVerb = (s) => VERB_KEYS.some((x) => s[x] != null) || s.clicks != null;
 const itemsOfShot = (s) => String(s.item || '').split(/\s+/).filter(Boolean);
 
@@ -225,12 +225,12 @@ const samePlace = (a, b) => { const A = placeOf(a), B = placeOf(b); return A.whe
    shot of its place taken AS IT OPENS (no click yet, every option of the place at its default), nearest before the group's first shot —
    only for a group the walk pictured at all (a look that is a behaviour, like ex.follow, has no still picture to borrow) */
 const lookPic = (gid, v, k) => { const g = bareId(gid), own = R1.filter((s) => s.option === g);
-  const mine = own.filter((s) => s.value === k && !isCrop(s)).sort((a, b) => b.size[0] * b.size[1] - a.size[0] * a.size[1] || a.n - b.n)[0];
+  const mine = own.filter((s) => s.value === k && !isCrop(s)).sort((a, b) => (b.region ? 1 : 0) - (a.region ? 1 : 0) || b.size[0] * b.size[1] - a.size[0] * a.size[1] || a.n - b.n)[0];
   const look = LOOK_AT[gid] || die('words.calls.lookAt has no line for ' + gid + ' — where to look in its pictures');
   const capOf = (s, open) => { const k2 = VERB_KEYS.find((x) => s[x] != null);
     const how = open || !k2 ? fill(W.gen.capOpen, { place: W.gen.place[placeOf(gid).where] }, 'gen.capOpen') : k2 === 'hover' ? VERB.hover + ' ' + shotText('hover', s.hover) : k2 && k2 !== 'click' ? VERB[k2] + ' ' + shotText(k2, s[k2]) : W.gen.capClick;
     return you(how + ' · ' + look); };
-  const out = (s, open) => { if (isCrop(s)) die(`${gid}=${k}: its picture ${s.file} is a crop of the options, not the look`); used.add(s.file); return { f: s.file, w: s.size[0], h: s.size[1], cap: capOf(s, open), open: !!open }; };
+  const out = (s, open) => { if (isCrop(s)) die(`${gid}=${k}: its picture ${s.file} is a crop of the options, not the look`); used.add(s.file); return { f: s.file, w: s.size[0], h: s.size[1], cap: capOf(s, open), open: !!open, region: !!s.region }; };
   if (mine) return out(mine, false);
   if (k !== v.pick || !own.some((s) => !isCrop(s))) return null;
   const first = Math.min(...own.map((s) => s.n));
@@ -245,7 +245,7 @@ const calls = ADDED.map((gid) => {
   if (!v.opts[v.pick]) die(`${gid}: the pick “${v.pick}” is not one of its looks`);
   const opts = Object.entries(v.opts).map(([k, o]) => ({ v: k, name: you(o.name), plain: you(o.plain), shot: lookPic(gid, v, k) }));
   const from = decOfGroup(gid, v);
-  return { id: gid, where: P0.where, rows: P0.rows.map(rowName), label: v.label, pick: v.pick, ruled: v.ruled ? v.pick : null, ruledBy: v.ruled || null, from,
+  return { id: gid, where: P0.where, rows: P0.rows.map(rowName), label: v.label, pick: v.pick, ruled: v.ruled ? v.pick : null, ruledBy: v.ruled || null, from, side: opts.length > 1 && opts.every((o) => o.shot && o.shot.region),
     answers: itemsOfLook(gid, v), motion: MOTION[gid] || die('words.calls.motion has no line for ' + gid + ' — what choosing it sets in motion'), opts };
 });
 /* the bench's kind looks, added this round too (LT-09): one call per kind that is on the bench now and was not before, its column as
@@ -268,6 +268,31 @@ const refName = (id) => { if (decs[id]) return you(cutText(decs[id].title, 52));
 for (const c of calls) { c.fromName = refName(c.from); c.answers = c.answers.map((id) => ({ id, name: refName(id) })); }
 const WHERE_ORDER = ['table', 'row', 'bench'];
 calls.sort((a, b) => WHERE_ORDER.indexOf(a.where) - WHERE_ORDER.indexOf(b.where));
+
+/* ── 5b · what each option would show once it is picked (his L-35, D-081: "I will need a better depiction of what would happen on the different options") ──
+   A depiction is a line that follows "After you pick this, you will see" and one to two figures: a REAL picture pair (the walk's real clicks: the column before, and
+   after a part is dragged out — the walk tags each picture `depict: "<decision>:<option>:<slot>"`) where the option is a state the page can be in, and a small drawn
+   MOCK, always labelled as one, where the option is a proposal the page does not do yet. The words are authored in words.depict; a mock is data the page draws. */
+const DP = need(W, 'depict', ''), DTPL = need(DP, 'tpl', 'depict');
+const depictShot = (key) => { const s = R1.find((x) => (x.depict || []).includes(key)) || die('the walk took no picture for the depiction ' + key + ' — run the walk'); used.add(s.file);
+  return { f: s.file, w: s.size[0], h: s.size[1], dragged: s.dragged || null, kind: s.kind || null }; };
+const partWord = (k, p) => (((AEW.ex || {}).parts || {})[k] || {})[p] ? AEW.ex.parts[k][p].name : p;
+for (const c of kindCalls) { if (c.ruled) continue; const kd = KINDS[c.kind], tk = { kind: kd.name };
+  for (const o of c.opts) { const key = (slot) => c.id + ':' + o.v + ':' + slot;
+    if (o.v === 'drawn') o.depict = { line: you(fill(need(DP.kind, 'drawn', 'depict.kind'), tk, 'depict.kind.drawn')), figs: [{ role: 'after', pic: depictShot(key('after')), cap: you(fill(DTPL.capDrawn, tk, 'depict.tpl.capDrawn')) }] };
+    else { const b = depictShot(key('before')), a = depictShot(key('after'));
+      o.depict = { line: you(fill(need(DP.kind, 'change', 'depict.kind'), tk, 'depict.kind.change')), figs: [{ role: 'before', pic: b, cap: you(fill(DTPL.capBefore, tk, 'depict.tpl.capBefore')) },
+        { role: 'after', pic: a, cap: you(fill(DTPL.capDragged, { part: partWord(c.kind, a.dragged) }, 'depict.tpl.capDragged')) }] }; } } }
+/* a proposal's option: its line and its figures; a figure is a picture of the walk (`pic`: a depict key) or a mock (`mock`: the page draws it) */
+const mockOf = (m, tok, at) => { const t = m.type;
+  if (t === 'head') { const col = AE.cols.find((x) => x.id === m.col) || die(at + ': AE_DATA has no column ' + m.col); return { type: t, group: you(BLKNAME[col.home] || die(at + ': no block for ' + col.home)), head: you(fill(m.head, tok, at)), changed: !!m.changed }; }
+  if (t === 'rows') { const names = AE.mo.timed.map(rowName); const lit = (m.lit || []).map((f) => rowName(f));
+    return { type: t, rows: names, lit, add: m.add ? you(fill(m.add, tok, at)) : null, control: m.control ? you(fill(m.control, tok, at)) : null }; }
+  if (t === 'frame') return { type: t, pic: depictShot(m.pic) };
+  return die(at + ': an unknown mock ' + t); };
+const depictOpt = (pid, v, tok) => { const d = (((DP.proposals || {})[pid]) || die('words.depict.proposals has no ' + pid))[v] || die(`words.depict.proposals.${pid} has no ${v}`), at = `depict.proposals.${pid}.${v}`;
+  return { line: you(fill(need(d, 'line', at), tok, at + '.line')), figs: need(d, 'figs', at).map((f, i) => { const o = { role: need(f, 'role', at), cap: you(fill(need(f, 'cap', at), tok, at + '.cap')) };
+    if (f.pic) o.pic = depictShot(f.pic); else if (f.mock) { o.mock = mockOf(f.mock, tok, at + '.figs[' + i + ']'); o.mockLabel = true; } else die(at + '.figs[' + i + '] has neither a picture nor a mock'); return o; }) }; };
 
 /* ── 6 · the feed: facts his questions need, every number read here ─────────────────────────────────────────────── */
 const F = rj(FORMS), A = rj(ARCHMAP), FTXT = rd(FORMS);
@@ -553,18 +578,20 @@ const proposals = W.proposals.map((p) => {
   if (!opts.some((o) => o.v === pick)) die(`proposal ${p.id}: my pick “${pick}” is not one of its options`);
   const facts = (p.facts || []).map((k) => (rem[k] ? { id: k, text: you(rem[k].what) } : FIX.left[k] ? { id: k, text: you(FIX.left[k]) } : FIX.his[k] ? { id: k, text: you(FIX.his[k]) } : findings.find((f) => f.id === k) ? { id: k, text: you(findings.find((f) => f.id === k).what) } : die('proposal ' + p.id + ' cites nothing called ' + k)));
   const shots = (p.pics || []).map((q) => { const sh = pic(shotBy(q)); if (q.cap) sh.cap = you(fill(q.cap, PTOK, p.id + '.pics')); return sh; });
-  return { id: p.id, title: fill(p.title, PTOK, p.id), what: fill(p.what, PTOK, p.id), motion: fill(p.motion, PTOK, p.id), opts, pick, facts, shots, alsoIn: p.alsoIn || null };
+  if (p.ruled && !decs[p.ruled]) die(`proposal ${p.id}: ruled in ${p.ruled}, which decisions.md does not hold`);
+  if (!p.ruled) for (const o of opts) o.depict = depictOpt(p.id, o.v, PTOK);   /* a proposal you have ruled needs no depiction: it is built */
+  return { id: p.id, title: fill(p.title, PTOK, p.id), what: fill(p.what, PTOK, p.id), motion: fill(p.motion, PTOK, p.id), opts, pick, facts, shots, alsoIn: p.alsoIn || null, ruled: p.ruled ? pick : null, ruledBy: p.ruled || null };
 });
 T.nProps = proposals.length;
 for (const c of calls) c.motion = fill(c.motion, T, 'calls.motion.' + c.id);
 T.nPics = used.size;
 const fillTree = (o, at) => (typeof o === 'string' ? fill(o, T, at) : Array.isArray(o) ? o.map((v, i) => fillTree(v, at + '[' + i + ']')) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => k[0] !== '_').map(([k, v]) => [k, fillTree(v, at + '.' + k)])) : o);
 const omit = (o, ks) => Object.fromEntries(Object.entries(o).filter(([k]) => !ks.includes(k)));
-const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, tip: W.tip, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord', 'ex', 'imp', 'sayWords', 'exSuite', 'impSuite']), gl: need(need(W, 'gabeLens', ''), 'ui', 'gabeLens') }, 'ui');
+const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, tip: W.tip, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, depict: need(DP, 'ui', 'depict'), decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord', 'ex', 'imp', 'sayWords', 'exSuite', 'impSuite']), gl: need(need(W, 'gabeLens', ''), 'ui', 'gabeLens') }, 'ui');
 
 /* ── 14 · the data, the hash, the page ─────────────────────────────────────────────────────────────────────────────── */
 const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, opts: c.opts.map((o) => [o.v, o.name]) })),
-  ...proposals.map((p) => ({ id: p.id, group: 'PROPOSALS', mine: p.pick, ruled: null, ruledBy: null, opts: p.opts.map((o) => [o.v, o.name]) })),
+  ...proposals.map((p) => ({ id: p.id, group: 'PROPOSALS', mine: p.pick, ruled: p.ruled, ruledBy: p.ruledBy, opts: p.opts.map((o) => [o.v, o.name]) })),
   { id: audit.id, group: 'PATTERNS', mine: audit.pick, ruled: null, ruledBy: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) },
   ...patterns.flatMap((p) => p.suite.map((s) => ({ id: s.cid, group: 'PATTERNS', mine: s.pick, ruled: null, ruledBy: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) })))];
 if (new Set(choices.map((c) => c.id)).size !== choices.length) die('two choices share an id');
@@ -891,7 +918,7 @@ for (const k of Object.keys(PATTERN_SRC)) if (k[0] !== '_' && !patById[k]) die('
   for (const p of proposals) { const ov = DSAY[p.id] || {}, op = spokenOpts(p.id, p.opts), nm = DNAME[p.id] || die('words.decide.name has no name for ' + p.id), order = p.opts.map((o) => o.v);
     const ei = exImp(p.id, XW[p.id], IW[p.id] || die('words.decide.imp has no entry for ' + p.id), order, op, XT);
     lensDecision(p.id, { name: nm, tok: Object.assign({}, XT), opts: p.opts.map((o) => [o.v, o.name]), suite: null });
-    const parts = lensSay(p.id, fill(need(DS, 'options', 'decide.s'), { opts: orList(p.opts.map((o) => op[o.v])) }, sg('options')), decPick(p.pick, false, op, sg('pickMine')));
+    const parts = lensSay(p.id, fill(need(DS, 'options', 'decide.s'), { opts: orList(p.opts.map((o) => op[o.v])) }, sg('options')), decPick(p.pick, !!p.ruled, op, sg(p.ruled ? 'pickRuled' : 'pickMine')));
     const extra = { ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay };
     addDec(Object.assign({ key: p.id, id: p.id, sec: 'calls', gk: 'props', gn: UI.calls.propsHead, gp: null, name: nm, tag: null, parts, opts: op }, extra));
     if (p.alsoIn === 'gap') addDec(Object.assign({ key: p.id + ':gap', id: p.id, sec: 'gap', gk: 'gap', gn: UI.gap.recHead, gp: null, name: nm, tag: null, parts, opts: op }, extra)); } }

@@ -522,18 +522,23 @@ Round 3 — source: his REVIEW text from `legibility/legibility-review.html` (20
   this."
 - **where:** the review page · the header and saving choices' pictures
 - **could not tell:** what each option changes — the pictures of the different options look the same.
-- **fix:** each option's picture shows the region that changes, side by side, the difference visible at a glance.
+- **fix:** BUILT — the header and saving choices each show only the region that changes, as tight crops taken by real clicks in the walk: the stage
+  band over the moment heads (stages over moments against stages, roads, moments) and the commit column under its stage (saving under EFFECTS against
+  under HANDLER), each option's crop beside the other's on the review page with one line of what to look at. The two header looks differ on
+  POST /cooking/sessions (the road row), so no other endpoint was needed.
 - **tag:** `picture-shows-no-difference`
-- **status:** logged
+- **status:** built (D-081)
 
 ### L-35
 - **words:** "I will need a better depiction of what would happen on the different options on this. I don't get what is happening here."
   (on every bench kind's look, on F24, the L-19 recommendation and EX-5)
 - **where:** the review page · those choice cards
 - **could not tell:** what happens if he picks an option.
-- **fix:** each option shows what he would see after picking it (a before/after or a drawn example) and one line of what changes.
+- **fix:** BUILT — every bench kind's look, F24, the L-19 recommendation and EX-5 show what you would see after picking each option: a before and an
+  after picture, taken by real clicks in the walk where it is a page state (the bench columns), a small drawn mock labelled as a mock where it is a
+  proposal not yet built (F24's head, the L-19 rows, EX-5's chip), and one line that begins "after you pick this, you will see".
 - **tag:** `option-without-its-outcome`
-- **status:** logged
+- **status:** built (D-081)
 
 ### L-36
 - **words:** "let's simplify them. The options at the top of each container should be more icon-based. We don't need to show the string we are
@@ -542,27 +547,34 @@ Round 3 — source: his REVIEW text from `legibility/legibility-review.html` (20
   width - A compact width - The most compact version"
 - **where:** all-endpoints.html · the EXAMPLES bench columns
 - **could not tell:** the bench's controls at a glance — options were words, the copy string took space, the controls hid in folds.
-- **fix:** icon options, a copy button with no string shown, every control always visible, a width control per column.
+- **fix:** BUILT — the bench's options are icon squares (the layouts, follow or stay, this endpoint or every endpoint, the steps, back to the default and
+  copy), each hover a verb and its object; the copy line is never shown and the copy button copies it whole; parts, size and colour are always on the
+  page, none behind a fold; each column has a width (dynamic, full, shorter, compact, most compact; dynamic is my pick, dashed), kept per viewer and
+  part of the column's copy line.
 - **tag:** `controls-hidden-or-wordy`
-- **status:** logged
+- **status:** built (D-081)
 
 ### L-37
 - **words:** "Ideally the selected column that is widened should be adjustable. I should be able to go to the edges of the column and move left
   or right, with some limits as the maximum and minimum width."
 - **where:** all-endpoints.html · BY MOMENT · a widened column
 - **could not tell:** — (a control he wants)
-- **fix:** a widened column's edge can be dragged, within a minimum and a maximum.
+- **fix:** BUILT — a widened BY MOMENT column has an edge on its head: drag it with the mouse, or focus it and press the arrow keys (Shift for a bigger
+  step, Home and End for the smallest and the largest). The width stays between the column's floor (no name cut) and most of the box, is kept
+  like the other column state, rides the copy text, and a click on the head gives it back.
 - **tag:** `fixed-width-only`
-- **status:** logged
+- **status:** built (D-081)
 
 ### L-38
 - **words:** "If we don't have enough room, we can make the table bigger than they allow, so we can slide it to the right or left using Shift and
   the mouse wheel"
 - **where:** all-endpoints.html · BY MOMENT, when even fitted it is wider than the box
 - **could not tell:** — (a way he wants to move)
-- **fix:** the table may be wider than the box; Shift and the wheel slide it sideways.
+- **fix:** BUILT — a table that is still wider than its box after fit stays wider; Shift and the mouse wheel slide it sideways (the scroll box takes the
+  wheel itself), and a hint line above it says so whenever it overflows. A table opens fitted (R-11, ruled in D-081), so the hint shows only where
+  fit could not make it fit.
 - **tag:** `wide-table-without-a-way-across`
-- **status:** logged
+- **status:** built (D-081)
 
 ### L-39
 - **words:** "We would need a dedicated section to show the layout for representing this with all the different dimensions and draggable

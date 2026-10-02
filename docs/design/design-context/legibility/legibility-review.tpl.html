@@ -91,6 +91,32 @@
   .looks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 12px; align-items: start; }
   .look { display: flex; flex-direction: column; gap: 6px; padding: 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--raised); min-width: 0; }
   .look .plain { font-size: var(--fs-sm); color: var(--ink-soft); margin: 0; }
+  /* L-34: two looks whose pictures are tight crops of the region that changes stand always beside each other */
+  .looks.side { grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); }
+  .looks.side figure.pic a { align-self: stretch; } .looks.side figure.pic img { width: 100%; max-width: none; } .full .looks.side figure.pic img { width: auto; }   /* a tight crop fills its half, so the difference is large enough to see */
+  @media (max-width: 640px) { .looks.side { grid-template-columns: minmax(0, 1fr); } }
+  /* L-35: what you would see after picking an option — a line, then a picture pair (real clicks) or a mock drawn on the page and labelled as one */
+  .depict { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; border-top: 1px dashed var(--rule); }
+  .depict .dl { margin: 0; font-size: var(--fs-sm); color: var(--ink); }
+  .dfigs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 8px; align-items: start; }
+  .dfig { margin: 0; display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: 420px; }   /* one picture is never blown up to the width a pair shares */
+  .dfig .dimg { display: block; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: #0b1020; max-height: 340px; }
+  .dfig img { display: block; width: 100%; height: auto; }
+  .dfig figcaption { font-size: var(--fs-min); color: var(--muted); overflow-wrap: anywhere; }
+  .dfig .dtag { font-size: var(--fs-min); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); font-weight: 650; }
+  .dfig .dmock { align-self: flex-start; font-size: var(--fs-min); border: 1px dashed var(--ink-soft); border-radius: 999px; padding: 0 8px; color: var(--ink-soft); cursor: help; }
+  .mock { border: 1.5px dashed var(--ink-soft); border-radius: 8px; padding: 8px; background: var(--card); display: flex; flex-direction: column; gap: 5px; font-size: var(--fs-min); color: var(--ink); min-width: 0; }
+  .mock .mg { color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+  .mock .mh { border: 1px solid var(--rule); border-radius: 5px; padding: 3px 7px; font-weight: 650; background: var(--raised); }
+  .mock .mh.changed { border-color: var(--accent); box-shadow: 0 0 0 1.5px var(--accent); }
+  .mock .mcs { display: flex; gap: 4px; } .mock .mcs i { flex: 1; height: 8px; border-radius: 4px; background: var(--rule); }
+  .mock ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+  .mock li { border: 1px solid var(--rule); border-radius: 5px; padding: 2px 7px; background: var(--raised); }
+  .mock li.lit { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--raised)); }
+  .mock li.new { border-style: dashed; border-color: var(--ink-soft); font-weight: 650; }
+  .mock li .nt { margin-left: 6px; color: var(--muted); }
+  .mock .mctl { align-self: flex-start; border: 1.5px solid var(--accent); border-radius: 999px; padding: 1px 10px; font-weight: 650; color: var(--accent); }
+  .mock.mframe { padding: 4px; } .mock.mframe img { display: block; width: 100%; height: auto; border-radius: 4px; }
   .look .noshot { font-size: var(--fs-min); color: var(--muted); border: 1px dashed var(--rule); border-radius: 6px; padding: 10px; }
   .sets { font-size: var(--fs-sm); color: var(--ink); margin: 0; }
   .sets b { color: var(--muted); font-weight: 400; font-size: var(--fs-min); letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; }
@@ -98,7 +124,7 @@
   .facts b { color: var(--ink); font-weight: 650; margin-right: 6px; }
 
   figure.pic { margin: 0; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-  figure.pic a { display: block; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: #0b1020; }
+  figure.pic a { display: block; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: #0b1020; align-self: flex-start; max-width: 100%; }   /* a picture narrower than its box frames itself, with no dark void beside it */
   figure.pic img { display: block; max-width: 100%; height: auto; }
   figure.pic figcaption { font-size: var(--fs-min); color: var(--muted); overflow-wrap: anywhere; }
   .pics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 10px; align-items: start; }
@@ -172,7 +198,7 @@
   .against, .because { font-size: var(--fs-sm); color: var(--ink-soft); margin: 0; }
   .audit { border: 1.5px solid var(--accent); }
   /* pictures at full size, each in its own scroller (L10) */
-  .full figure.pic a { overflow-x: auto; overflow-y: hidden; }
+  .full figure.pic a { overflow-x: auto; overflow-y: hidden; align-self: stretch; }
   .full figure.pic img { max-width: none; width: auto; }
   .full .looks { grid-template-columns: minmax(0, 1fr); }
   .out { font: inherit; letter-spacing: inherit; font-size: var(--fs-sm); line-height: 1.5; color: var(--ink); background: var(--raised); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; width: 100%; box-sizing: border-box; min-height: 18em; resize: vertical; white-space: pre; overflow: auto; }
@@ -872,20 +898,33 @@
         var hd = el("div", "hd"); hd.appendChild(el("h4", null, c.label)); if (c.about) hd.appendChild(el("p", "cap", c.about)); var cs = el("div", "chips");
         c.rows.forEach(function (r) { cs.appendChild(chip(C.inRow + " " + r, null, null, "acc")); });
         cs.appendChild(refChip(c.from, c.fromName, null, C.from)); c.answers.forEach(function (a) { cs.appendChild(refChip(a.id, a.name, null, C.answers)); }); hd.appendChild(cs); card.appendChild(hd); card.appendChild(lensBlocks(D.lens.decisions[c.id])); card.appendChild(decBlock(c.id, card));
-        var looks = el("div", "looks"); c.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
+        var looks = el("div", "looks" + (c.side ? " side" : "")); if (c.side) looks.style.setProperty("--n", String(c.opts.length)); c.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
           if (o.shot) t.appendChild(pic(o.shot)); else t.appendChild(el("div", "noshot", o.note || C.noShot));
-          var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); t.appendChild(impactLine(c.id, o.v)); looks.appendChild(t); });
+          var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); if (o.depict) t.appendChild(depictBlock(o.depict)); t.appendChild(impactLine(c.id, o.v)); looks.appendChild(t); });
         card.appendChild(looks);
         var sets = el("p", "sets"); sets.appendChild(el("b", null, C.sets)); sets.appendChild(document.createTextNode(c.motion)); card.appendChild(sets);
         tail(card, card, ch); B.appendChild(card); }); });
     B.appendChild(el("h3", null, C.propsHead)); B.appendChild(el("p", "cap", C.propsNote));
     D.proposals.forEach(function (p) { B.appendChild(proposalCard(p)); }); })();
+  /* L-35 · what you would see after picking this option: one line, then its figures — a picture of the walk, or a mock that says it is one */
+  function mockEl(m) { var X = U.depict, b = el("div", "mock m" + m.type);
+    if (m.type === "head") { b.appendChild(el("span", "mg", m.group)); b.appendChild(el("span", "mh" + (m.changed ? " changed" : ""), m.head)); var cs = el("span", "mcs"); for (var i = 0; i < 3; i++) cs.appendChild(el("i")); b.appendChild(cs); }
+    else if (m.type === "rows") { if (m.control) b.appendChild(el("span", "mctl", m.control)); var ul = el("ul"); m.rows.forEach(function (r) { var li = el("li", m.lit.indexOf(r) >= 0 ? "lit" : "", r); if (m.lit.indexOf(r) >= 0) li.title = X.lit; ul.appendChild(li); });
+      if (m.add) { var nw = el("li", "new", m.add); nw.appendChild(el("span", "nt", X.newRow)); ul.appendChild(nw); } b.appendChild(ul); }
+    else if (m.type === "frame") { var im = el("img"); im.src = D.shotBase + m.pic.f; im.loading = "lazy"; im.width = m.pic.w; im.height = m.pic.h; im.alt = ""; b.appendChild(im); }
+    return b; }
+  function depictBlock(d) { if (!d) return null; var X = U.depict, w = el("div", "depict"), l = el("p", "dl"); w.setAttribute("data-depict", "1"); l.appendChild(el("b", null, X.lead + " ")); l.appendChild(document.createTextNode(d.line)); w.appendChild(l);
+    var g = el("div", "dfigs"); d.figs.forEach(function (f) { var fg = el("figure", "dfig"); fg.setAttribute("data-role", f.role); fg.setAttribute("data-kind", f.mock ? "mock" : "real");
+      if (d.figs.length > 1) fg.appendChild(el("span", "dtag", f.role === "before" ? X.before : X.after));
+      if (f.mock) { var mt = el("span", "dmock", X.mock); mt.title = X.mockNote; fg.appendChild(mt); fg.appendChild(mockEl(f.mock)); }
+      else { var a = el("a", "dimg"), i = el("img"); a.href = D.shotBase + f.pic.f; a.target = "_blank"; a.rel = "noopener"; i.src = D.shotBase + f.pic.f; i.loading = "lazy"; i.width = f.pic.w; i.height = f.pic.h; i.alt = f.cap; a.appendChild(i); fg.appendChild(a); }
+      fg.appendChild(el("figcaption", null, f.cap)); g.appendChild(fg); }); w.appendChild(g); return w; }
   function proposalCard(p, inGap) { var C = U.calls, ch = CH[p.id], card = el("div", "panel call"); card.setAttribute("data-call", p.id); card.id = (inGap ? "gcall-" : "call-") + p.id;
     var hd = el("div", "hd"); hd.appendChild(el("h4", null, p.id + " · " + p.title)); card.appendChild(hd); card.appendChild(lensBlocks(D.lens.decisions[p.id])); card.appendChild(el("p", "cap", p.what)); card.appendChild(decBlock(inGap ? p.id + ":gap" : p.id, card));
     if (p.facts.length) { card.appendChild(el("p", "lab", C.factsHead)); var ul = el("ul", "facts"); p.facts.forEach(function (f) { var li = el("li"); li.appendChild(el("b", null, f.id)); li.appendChild(document.createTextNode(f.text)); ul.appendChild(li); }); card.appendChild(ul); }
     if (p.shots.length) card.appendChild(pics(p.shots, 2));
     var looks = el("div", "looks"); p.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
-      var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); t.appendChild(impactLine(inGap ? p.id + ":gap" : p.id, o.v)); looks.appendChild(t); });
+      var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); if (o.depict) t.appendChild(depictBlock(o.depict)); t.appendChild(impactLine(inGap ? p.id + ":gap" : p.id, o.v)); looks.appendChild(t); });
     card.appendChild(looks); var sets = el("p", "sets"); sets.appendChild(el("b", null, C.sets)); sets.appendChild(document.createTextNode(p.motion)); card.appendChild(sets);
     if (p.alsoIn) card.appendChild(el("p", "cap", inGap ? C.alsoInCalls : C.alsoIn)); tail(card, card, ch); return card; }
 
