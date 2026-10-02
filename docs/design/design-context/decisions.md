@@ -1172,3 +1172,15 @@ icon on the review page gets a hover written by the rules this round named (D-06
 (an icon inside an item adds to that item's one hover; a standalone icon is its own item); the hover says the item's own fact in plain
 words, in before · checks · gives order where it fits; what a kind of icon means is said once, in the legend; a control's hover is very
 short (a verb and its object); no word about the page or the map. The read-aloud draft (D-076) takes the example and impact fields too.
+
+## D-079 — Every pattern and decision opens with the pain, a gabe-lens analogy, and the cost of solving it
+Date: 2026-10-02 · Input: his message after D-078, logged as legibility-feedback.md L-31.
+Decision, his: "The explanations used and read aloud in each one of the items on the patterns or the places where I need to make decisions
+are still too cryptic for me and difficult to follow. Can you use more analogies powered by the Gabe Lens? Especially, I would like to know
+the pain that we are trying to solve and the cost of solving it."
+Consequence: on the review page each of the 10 patterns and the 53 decisions gets, before anything else, written in his calibrated suit
+(Sequential-Procedural, ~/.claude/gabe-lens-profile.md): THE PAIN — what goes wrong for him today, as a step that fails, with the real case
+and its count; ONE ANALOGY — a process he knows (a recipe, an assembly line, a protocol), with where it stops; THE COST — what solving it
+takes (work, his time, run time, what it adds or bends) and what not solving it costs; a ONE-LINE HANDLE. The patterns also get the suit's
+box, DOES / DOES NOT / DECIDES WHEN. They are read aloud in that order, before the options. Numbers are generated; the words are authored with
+the gabe-lens method and checked for jargon.

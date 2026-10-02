@@ -465,3 +465,15 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
   at most. The read-aloud draft takes an optional `example` and `impact` on an item and states the hover rule for the bar's icons.
 - **tag:** `choice-without-example-or-impact`
 - **status:** built (D-078)
+
+### L-31
+- **words:** "The explanations used and read aloud in each one of the items on the patterns or the places where I need to make decisions are
+  still too cryptic for me and difficult to follow. Can you use more analogies powered by the Gabe Lens? Especially, I would like to know
+  the pain that we are trying to solve and the cost of solving it."
+- **where:** the review page · the ten pattern cards and the 53 decision cards, on the page and read aloud
+- **could not tell:** why a pattern or a choice matters — the words described the mechanism in the page's own terms, without the pain it
+  removes, a picture to hold it by, or what fixing it costs.
+- **fix:** every pattern and every decision opens with the pain (what goes wrong for you, as a step that fails), one gabe-lens analogy in his
+  suit (a process he knows), the cost of solving it (and of not solving it), and a one-line handle; read aloud in that order.
+- **tag:** `mechanism-without-its-pain`
+- **status:** logged
