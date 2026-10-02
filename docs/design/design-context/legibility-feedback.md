@@ -362,25 +362,36 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
 - **where:** the review page · every table · first seen on "What round 1b left", its first table's status column
 - **could not tell:** a row at a glance — short values (a status, a count) wrap onto a second line in a column narrower than they
   need, while the page leaves width unused at the sides.
-- **fix:** the page uses more of the screen's width; a short-value column never wraps; one row reads as one line.
+- **fix:** built: the page's column stays centred and takes the screen (up to 1800 px, or 96% of a narrower one); every table
+  spans it; a short value (a status, a count, an id, a kind, a verdict) sits in its own column on one line and never wraps, so a
+  row reads as one line wherever its values are short; the long-prose columns take the width that is left; the status of a row
+  in What round 1b left is two marks on one line; below phone width the page reflows. Measured at 1920 and at 1600 px.
 - **tag:** `short-values-wrapped`
-- **status:** logged
+- **status:** built (D-072)
 
 ### L-25
 - **words:** "Can we also use more encoding using icons and summarize things?"
 - **where:** the review page · every section
 - **could not tell:** where a section stands without reading it all — states and kinds are written out as words, and nothing sums a
   section up before its tables.
-- **fix:** states, kinds and patterns wear icons (with one legend); each section opens with what it sums up to.
+- **fix:** built: every state wears an icon and a colour (fixed, partly fixed, left, open, yours to rule, my pick, yours, ruled,
+  built, waiting on your pick, question answered, logged, and the kinds of an open row); each pattern wears its own icon wherever
+  it appears (cards, chips, tables); the words stand once in a legend near the top and in each icon's hover; a table cell shows
+  the icon and its number; a stacked bar shows fixed, partly, left and yours to rule per item, pattern and question; an overview
+  table opens each of Your items, the patterns, Your calls, Your questions and What round 1b left; each section opens with what
+  it sums up to (the spoken summary, L-26).
 - **tag:** `words-where-a-mark-would-do`
-- **status:** logged
+- **status:** built (D-072)
 
 ### L-26
 - **words:** "At the beginning of each set of tables, I would like a summary that I can copy and paste and read out loud in a chat that
   I have dedicated to reading out loud your messages."
 - **where:** the review page · the start of every section
 - **could not tell:** the page by ear — there was no text written to be read aloud: ids, file paths and symbols read badly when spoken.
-- **fix:** each section opens with a spoken summary (plain words, no ids, paths or symbols) and a copy button; one button copies all of
-  them in order.
+- **fix:** built: each section opens with a spoken summary of 3 to 6 sentences in plain words (no ids, paths or symbols; an item or a
+  pattern by its name), generated from the data, with a copy-to-read-aloud button whose text is the summary shown; one button at
+  the top copies every summary in page order, each headed by its section's name. My proposal, dashed: a listen button beside each
+  copy button reads the summary with the browser's own voice, at a speed you pick and the browser remembers; it hides where the
+  browser has no speech.
 - **tag:** `no-spoken-channel`
-- **status:** logged
+- **status:** built (D-072)

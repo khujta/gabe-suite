@@ -13,7 +13,8 @@
        --archmap <file>  default: archmap.json beside --forms
 
    READS   legibility-review.words.json (every authored sentence; a typed number stops the build — numbers are {tokens}) ·
-           ../legibility-feedback.md (the ledger L-01..L-23) · ../decisions.md (D-066..D-071) · patterns.json · review-r1.raw.json ·
+           legibility-review.icons.json (the inline-svg marks, and which mark each pattern wears — no words in it) ·
+           ../legibility-feedback.md (the ledger: round 1 L-01..L-23, round 2 from L-24) · ../decisions.md (D-066..D-072) · patterns.json · review-r1.raw.json ·
            fix-1b.json · remaining.json · gap-l19.json · measures.{before,r1,r1b}.json ·
            ../../workflow-panel/shots/all-endpoints/walk.json (the walk's pictures, tagged by item and option) ·
            ../../workflow-panel/all-endpoints.words.json NOW and at 6170519 (git show — the options ADDED this round are the option
@@ -23,7 +24,11 @@
            never re-derived here) · the gabe-artifact kit (../kit-blocks.js) · legibility-review.tpl.html
    WRITES  legibility-review.html (pictures referenced RELATIVELY — he opens pages from Windows Chrome, never an absolute path)
    The work's commit in the copy text is the last commit that touched the REVIEWED inputs (a "+" when they are dirty), not HEAD:
-   HEAD moves with this page's own commit, and the page must stay byte-identical to its inputs (--check).
+   HEAD moves with this page's own commit, and the page must stay byte-identical to its inputs (--check). The two LOGS the page
+   reads for content (the ledger and the decisions) are not among the reviewed inputs: they are written in the same commit as the
+   page they feed, and a head that counted them could never equal its own commit.
+   SPOKEN SUMMARIES (L-26): each section opens with a few sentences written to be read aloud — the words file holds the sentences as
+   templates, this generator fills every number, and the build stops on an id, a path, a symbol or a {token} left in one.
    No wallclock: same inputs, same bytes. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -99,16 +104,23 @@ const need = (o, k, at) => (o && o[k] !== undefined ? o[k] : die(`words: no ${at
 
 /* ── 2 · the ledger (his items, his words) ───────────────────────────────────────────────────────────────────────────── */
 const LEDGER = rd(path.join(DC, 'legibility-feedback.md'));
+/* the ledger is written in rounds ("Round 2 — source: …" stands above the first item of its round); an item's round is the last
+   round line above its heading. Round 1 is the reviewed round: its items carry a pattern, a review verdict and findings; a later
+   round's items are what you asked on reading this page, built here and not yet reviewed. */
+const ROUND_AT = [...LEDGER.matchAll(/^Round (\d+) — /gm)].map((m) => ({ n: Number(m[1]), at: m.index }));
+const roundOfAt = (at) => ROUND_AT.filter((r) => r.at < at).reduce((a, r) => Math.max(a, r.n), 1);
+let LAT = 0;
 const items = LEDGER.split(/^### /m).slice(1).filter((b) => /^L-\d\d\b/.test(b)).map((b) => {
-  const id = b.slice(0, 4), f = {}; let cur = null;
+  const id = b.slice(0, 4), f = {}; let cur = null; LAT = LEDGER.indexOf('### ' + id, LAT); const round = roundOfAt(LAT);
   for (const ln of b.split('\n').slice(1)) {
     const m = /^- \*\*([a-z ]+):\*\* ?(.*)$/.exec(ln);
     if (m) { cur = m[1]; f[cur] = m[2]; } else if (cur && /^ {2}\S/.test(ln)) f[cur] += ' ' + ln.trim(); else cur = null;
   }
   for (const k of ['words', 'where', 'could not tell', 'fix', 'tag', 'status']) if (!f[k]) die(`ledger ${id}: no ${k}`);
-  return { id, words: f.words, readAs: f['read as'] || null, where: f.where, couldNot: f['could not tell'], fix: f.fix, tag: f.tag.replace(/`/g, '').trim(), status: f.status };
+  return { id, round, words: f.words, readAs: f['read as'] || null, where: f.where, couldNot: f['could not tell'], fix: f.fix, tag: f.tag.replace(/`/g, '').trim(), status: f.status };
 });
 if (!items.length) die('the ledger holds no items');
+const items1 = items.filter((it) => it.round === 1), itemsLater = items.filter((it) => it.round > 1);
 /* each item's short name, so an id is never drawn alone (L11): an id chip reads "L-18 · what the row represents" and links to its card */
 const ITEM_NAME = need(W.items, 'names', 'items');
 for (const it of items) { it.name = ITEM_NAME[it.id] || die('words.items.names has no short name for ' + it.id); }
@@ -135,7 +147,7 @@ const outcomeOf = (id) => (FIX.fixed.includes(id) ? ['fixed', null] : FIX.partly
 { const all = new Set(findings.map((f) => f.id)); if (all.size !== findings.length) die('two review findings share an id');
   for (const k of [...FIX.fixed, ...Object.keys(FIX.partly), ...Object.keys(FIX.left), ...Object.keys(FIX.his)]) if (!all.has(k)) die('fix-1b.json names a finding the review does not hold: ' + k); }
 for (const f of findings) if (!P.reviewTagMap[f.pattern]) die(`a reviewer tag missing from patterns.json reviewTagMap: “${f.pattern}” (${f.id})`);
-for (const it of items) if (!P.ledgerTagMap[it.tag]) die(`a ledger tag missing from patterns.json ledgerTagMap: ${it.tag} (${it.id})`);
+for (const it of items1) if (!P.ledgerTagMap[it.tag]) die(`a ledger tag missing from patterns.json ledgerTagMap: ${it.tag} (${it.id})`);   /* a later round's items belong to no pattern: patterns.json is round 1's record */
 const PATS = P.patterns, patById = Object.fromEntries(PATS.map((p) => [p.id, p]));
 for (const r of REM.items) if (!patById[r.pattern]) die('remaining.json names no pattern ' + r.pattern + ' (' + r.id + ')');
 if (W.lens.length !== REV.length) die(`words.lens names ${W.lens.length} lenses; the review has ${REV.length}`);
@@ -385,8 +397,8 @@ const itemCards = items.map((it) => {
   const [first, rest] = firstSentence(it.words);
   const fs1 = findings.filter((f) => f.item === it.id).map((f) => { const [o, why] = outcomeOf(f.id); return { id: f.id, sev: f.severity, what: you(f.what), outcome: o, why: you(why) }; });
   const fix = plainFix(it.fix);
-  return { id: it.id, name: it.name, words: it.words, readAs: it.readAs, first, rest, where: you(it.where), couldNot: you(it.couldNot), fix, fixRecord: fix === you(it.fix) ? null : you(it.fix),
-    status: you(it.status), kind: statusKind(it.status), pattern: P.ledgerTagMap[it.tag], patternName: (patById[P.ledgerTagMap[it.tag]] || {}).name || null, verdicts: verdictsOf(it.id), findings: fs1,
+  return { id: it.id, round: it.round, name: it.name, words: it.words, readAs: it.readAs, first, rest, where: you(it.where), couldNot: you(it.couldNot), fix, fixRecord: fix === you(it.fix) ? null : you(it.fix),
+    status: you(it.status), kind: statusKind(it.status), pattern: P.ledgerTagMap[it.tag] || null, patternName: (patById[P.ledgerTagMap[it.tag]] || {}).name || null, verdicts: verdictsOf(it.id), findings: fs1,
     shots: R1.filter((s) => itemsOfShot(s).includes(it.id)).map(pic) };
 });
 const ITEM_BY = Object.fromEntries(itemCards.map((c) => [c.id, c]));
@@ -455,7 +467,7 @@ const patterns = PATS.map((p) => {
     checks, suite };
 /* your items first, then the review's findings (L5) — the biggest is the one you raised most */
 }).sort((a, b) => b.items.length - a.items.length || b.nFind - a.nFind || PATS.findIndex((x) => x.id === a.id) - PATS.findIndex((x) => x.id === b.id));
-{ const tagged = items.filter((it) => !patterns.some((p) => p.items.includes(it.id))); if (tagged.length) die('items no pattern holds: ' + tagged.map((x) => x.id).join(',')); }
+{ const tagged = items1.filter((it) => !patterns.some((p) => p.items.includes(it.id))); if (tagged.length) die('items no pattern holds: ' + tagged.map((x) => x.id).join(',')); }
 const auditParts = patterns.flatMap((p) => p.suite.filter((s) => s.partOf === AUDIT.id).map((s) => s.cid));
 if (!auditParts.length) die('no proposal is part of the audit ' + AUDIT.id);
 for (const k of ['id', 'name', 'what', 'lands', 'gate', 'battery', 'against']) if (!AUDIT[k]) die('patterns.json audit: no ' + k);
@@ -481,8 +493,8 @@ const remOpen = REM.items.filter((r) => r.status === 'open'), byKind = (k) => re
 const kinds = ['built', 'option', 'question', 'logged', 'deferred'];
 const shaOf = (m) => (/·\s*(\w+)\s*$/.exec(m.label) || die('a measure label names no commit: ' + m.label))[1];
 const MLAB = need(W.gen, 'measLabels', 'gen'); if (MLAB.length !== MEAS.length) die('words.gen.measLabels names ' + MLAB.length + ' columns; the measure has ' + MEAS.length);
-const glance = { status: kinds.map((k) => ({ k, word: W.statusWord[k] || die('words.statusWord has no ' + k), n: items.filter((it) => statusKind(it.status) === k).length })).filter((x) => x.n),
-  withOpt: items.filter((it) => /\boption\b/.test(it.status)).length,
+const glance = { status: kinds.map((k) => ({ k, word: W.statusWord[k] || die('words.statusWord has no ' + k), n: items1.filter((it) => statusKind(it.status) === k).length })).filter((x) => x.n),
+  withOpt: items1.filter((it) => /\boption\b/.test(it.status)).length,
   review: { total: findings.length, fixed: FIX.fixed.length, partly: Object.keys(FIX.partly).length, left: Object.keys(FIX.left).length, his: Object.keys(FIX.his).length },
   labels: MEAS.map((m, i) => fill(MLAB[i], { sha: shaOf(m) }, 'gen.measLabels')), checks: CHECK_ORDER.map(checkRow), viewport: MEAS[2].viewport };
 { const t = glance.review; if (t.fixed + t.partly + t.left + t.his !== t.total) die('fix-1b.json does not account for every finding'); }
@@ -490,16 +502,16 @@ const cmp = glance.checks.filter((c) => c.vals[0] !== null && c.vals[2] !== null
 const leftOut = glance.checks.filter((c) => !cmp.includes(c)).map((c) => c.name + ' (' + (c.blind || W.gen.noBefore) + ')').join(' · ');
 
 /* ── 13 · tokens for the page's own sentences, then the words filled ─────────────────────────────────────────────── */
-const workHead = (() => { const inputs = ['docs/design/design-context/legibility-feedback.md', 'docs/design/design-context/decisions.md', ...['patterns', 'review-r1.raw', 'fix-1b', 'remaining', 'gap-l19', 'measures.before', 'measures.r1', 'measures.r1b'].map((f) => 'docs/design/design-context/legibility/' + f + '.json'),
+const workHead = (() => { const inputs = [...['patterns', 'review-r1.raw', 'fix-1b', 'remaining', 'gap-l19', 'measures.before', 'measures.r1', 'measures.r1b'].map((f) => 'docs/design/design-context/legibility/' + f + '.json'),
     'docs/design/workflow-panel/shots/all-endpoints/walk.json', AEW_PATH, 'docs/design/workflow-panel/all-endpoints.html', 'docs/design/workflow-panel/all-endpoints.tpl.html'];
   const h = git('log', '-1', '--format=%H', '--', ...inputs).trim().slice(0, 7) || die('git knows no commit of the reviewed inputs'); const dirty = git('status', '--porcelain', '--', ...inputs).trim();
   return h + (dirty ? '+' : ''); })();
 const isLook = (c, o) => !c.kind || o.v === 'drawn';
 const nLooks = calls.reduce((a, c) => a + c.opts.filter((o) => isLook(c, o)).length, 0), nNoPic = calls.reduce((a, c) => a + c.opts.filter((o) => isLook(c, o) && !o.shot).length, 0);
-const optOnly = items.filter((it) => statusKind(it.status) === 'option').length;
+const optOnly = items1.filter((it) => statusKind(it.status) === 'option').length;
 const subj = (k) => questions.filter((q) => q.subject === k);
-const T = { ep: EP, nItems: items.length, nFindings: findings.length, nLenses: REV.length, nChecks: glance.checks.length, viewport: glance.viewport, withOpt: glance.withOpt, optOnly, optBeside: glance.withOpt - optOnly,
-  built: items.filter((it) => statusKind(it.status) === 'built').length, opts: glance.withOpt, down: cmp.filter((c) => c.vals[2] < c.vals[0]).length, same: cmp.filter((c) => c.vals[2] === c.vals[0]).length,
+const T = { ep: EP, nItems: items1.length, nAllItems: items.length, nRound2: itemsLater.length, nRound2Built: itemsLater.filter((it) => statusKind(it.status) === 'built').length, nFindings: findings.length, nLenses: REV.length, nChecks: glance.checks.length, viewport: glance.viewport, withOpt: glance.withOpt, optOnly, optBeside: glance.withOpt - optOnly,
+  built: items1.filter((it) => statusKind(it.status) === 'built').length, opts: glance.withOpt, down: cmp.filter((c) => c.vals[2] < c.vals[0]).length, same: cmp.filter((c) => c.vals[2] === c.vals[0]).length,
   up: cmp.filter((c) => c.vals[2] > c.vals[0]).length, nCompared: cmp.length, leftOut, smallPass: SMALL[0] || die('remaining.json: no row was fixed by a small pass'),
   nCalls: calls.length, nGroups: calls.filter((c) => !c.kind).length, nKinds: kindCalls.length, nKindsRuled: kindCalls.filter((c) => c.ruled).length, nLooks, nNoPic, nRuled: calls.filter((c) => c.ruled).length, nProps: 0,
   nPatterns: patterns.length, nSuite: patterns.reduce((a, p) => a + p.suite.length, 0), nLand: patterns.filter((p) => p.suite[0].pick === 'land').length, auditId: audit.id, nAuditParts: auditParts.length,
@@ -530,7 +542,7 @@ for (const c of calls) c.motion = fill(c.motion, T, 'calls.motion.' + c.id);
 T.nPics = used.size;
 const fillTree = (o, at) => (typeof o === 'string' ? fill(o, T, at) : Array.isArray(o) ? o.map((v, i) => fillTree(v, at + '[' + i + ']')) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => k[0] !== '_').map(([k, v]) => [k, fillTree(v, at + '.' + k)])) : o);
 const omit = (o, ks) => Object.fromEntries(Object.entries(o).filter(([k]) => !ks.includes(k)));
-const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy }, 'ui');
+const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, mark: W.mark, say: W.say, ov: W.ov }, 'ui');
 
 /* ── 14 · the data, the hash, the page ─────────────────────────────────────────────────────────────────────────────── */
 const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, opts: c.opts.map((o) => [o.v, o.name]) })),
@@ -538,9 +550,38 @@ const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, 
   { id: audit.id, group: 'PATTERNS', mine: audit.pick, ruled: null, ruledBy: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) },
   ...patterns.flatMap((p) => p.suite.map((s) => ({ id: s.cid, group: 'PATTERNS', mine: s.pick, ruled: null, ruledBy: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) })))];
 if (new Set(choices.map((c) => c.id)).size !== choices.length) die('two choices share an id');
-const DATA = { ep: EP, app: T.app, feedHead: T.feedHead, workHead, ui: UI, glance, calls, proposals, items: itemCards, itemNames: Object.fromEntries(items.map((it) => [it.id, it.name])), questions, gap, audit, patterns, remaining, choices };
+
+/* ── 13b · the marks (L-25) and the spoken summaries (L-26) ──────────────────────────────────────────────────────────────
+   The icons file holds geometry only; every mark's word is read from the words file, so a concept has one word. A pattern with no
+   mark of its own, a mark two patterns share, or a mark the page needs and the file lacks stops the build. */
+const IC = rj(path.join(HERE, 'legibility-review.icons.json'));
+{ const NEED = ['built', 'option', 'question', 'logged', 'deferred', 'fixed', 'partly', 'left', 'open', 'his', 'mine', 'yours', 'ruled', 'land', 'notyet', 'surface', 'feed', 'process', 'down', 'same', 'up', 'code', 'page', 'map', 'copy', 'play', 'stop', 'speaker', 'check'];
+  for (const k of NEED) if (!IC.marks[k]) die('icons: the page needs a mark named ' + k);
+  for (const [k, v] of Object.entries(IC.marks)) if (/<(script|style|a|foreignObject|image)\b|\bon\w+\s*=|javascript:/i.test(v)) die('icons: a mark that is not plain shapes: ' + k);
+  for (const p of PATS) { const n = IC.pattern[p.id]; if (!n) die(`icons: pattern ${p.id} wears no mark of its own`); if (!IC.marks[n]) die(`icons: pattern ${p.id} wears “${n}”, which is not in marks`); }
+  const worn = PATS.map((p) => IC.pattern[p.id]), dup = worn.filter((x, i) => worn.indexOf(x) !== i); if (dup.length) die('icons: two patterns wear one mark: ' + uniq(dup).join(', '));
+  for (const k of Object.keys(IC.pattern)) if (!patById[k]) die(`icons: a mark for ${k}, which patterns.json does not hold`); }
+/* the sections in the order the page draws them (the template's own order; the probe reads the DOM and says if they ever differ) */
+const SEC_ORDER = ['glance', 'rem', 'pat', 'calls', 'items', 'qs', 'gap', 'copy'];
+const remTop = remaining.map((g) => ({ id: g.id, n: g.open.length })).sort((a, b) => b.n - a.n)[0] || { id: patterns[0].id, n: 0 };
+Object.assign(T, { nAnswered: items1.filter((it) => statusKind(it.status) === 'question').length, nFixedF: FIX.fixed.length, nPartlyF: Object.keys(FIX.partly).length, nLeftF: Object.keys(FIX.left).length, nHisF: Object.keys(FIX.his).length,
+  nPatOpen: remaining.filter((g) => g.open.length).length, openTopName: patById[remTop.id].name, openTopN: remTop.n, nNotYet: patterns.length - T.nLand,
+  round2Names: andList(itemsLater.map((it) => it.name)), nPageQs: subj('page').length, nMapQs: subj('map').length, nChoices: choices.length });
+/* a spoken summary: 3 to 6 sentences a voice can read — no id, path, symbol, quote, code or token left in it */
+const SAY_BAD = [[/[·→/×|#{}\\“”"`<>]/, 'a symbol a voice cannot say'], [/\b(?:L|R|D|EX|CR|N3|S4)-\d+/, 'an id'], [/\b[PGFA]\d{1,2}\b/, 'an id'], [/(^|\s)[xg]:/i, 'an id'], [/\b[\w-]+\.(?:py|mjs|js|json|md|html|tsx?|css)\b/i, 'a file name'],
+  [/\bundefined\b|\bNaN\b/, 'a missing value'], [/\b(?:he|him|his|himself)\b/i, 'he · him · his']];
+const SPK = need(W, 'spoken', '');
+const say = SEC_ORDER.map((k) => {
+  const sents = SPK[k] || die('words.spoken has no ' + k), title = need(need(UI.sec, k, 'sec'), 'title', 'sec.' + k);
+  const text = sents.map((x, i) => fill(x, T, 'spoken.' + k + '[' + i + ']')).join(' ').replace(/\s+/g, ' ').trim();
+  for (const [rx, what] of SAY_BAD) { const m = rx.exec(text); if (m) die(`the spoken summary of ${k} holds ${what}: “${m[0]}” in “${text.slice(Math.max(0, m.index - 30), m.index + 30)}”`); }
+  const n = (text.match(/[^.!?]+[.!?]+(?:\s|$)/g) || []).length; if (n < 3 || n > 6) die(`the spoken summary of ${k} has ${n} sentences; it is 3 to 6`);
+  if (text.split(/(?<=[.!?])\s+/).some((x) => !/[.!?]$/.test(x))) die(`the spoken summary of ${k} has a sentence that does not end`);
+  return { key: k, id: 'sec-' + k, title, text }; });
+for (const k of Object.keys(SPK)) if (k[0] !== '_' && !SEC_ORDER.includes(k)) die('words.spoken names a section the page does not draw: ' + k);
+const DATA = { ep: EP, app: T.app, feedHead: T.feedHead, workHead, ui: UI, glance, calls, proposals, items: itemCards, itemNames: Object.fromEntries(items.map((it) => [it.id, it.name])), questions, gap, audit, patterns, remaining, choices, say, icons: IC.marks, patIcon: IC.pattern };
 /* the page speaks to you (L17): no he · him · his in anything drawn — his own quoted words aside, and an option's key is not drawn */
-{ const SKIP = new Set(['f', 'v', 'mine', 'pick', 'ruled', 'outcome', 'words', 'first', 'rest', 'readAs', 'q']); const hits = [];
+{ const SKIP = new Set(['f', 'v', 'mine', 'pick', 'ruled', 'outcome', 'words', 'first', 'rest', 'readAs', 'q', 'icons', 'patIcon']); const hits = [];
   const walk = (o, at) => { if (typeof o === 'string') { if (/\b(he|him|his|himself)\b/i.test(o)) hits.push(at + ': “' + o.slice(0, 80) + '”'); return; }
     if (Array.isArray(o)) return o.forEach((v, i) => walk(v, at + '[' + i + ']'));
     if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) { if (SKIP.has(k)) continue; if (k === 'opts' && at.startsWith('.choices')) { v.forEach((x, i) => walk(x[1], at + '.opts[' + i + ']')); continue; } walk(v, at + '.' + k); } };

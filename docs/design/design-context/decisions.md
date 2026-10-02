@@ -1070,3 +1070,35 @@ endpoint that has it; the role filter then counts every role it has anywhere); h
 lab's on/off picks are not repeated). A kind whose arm the feed lacks says absent. Not built: EX-5, the bench's looks drawn in
 BY MOMENT's chips (one hover per chip, L-02) — trigger: he rules a kind's look; that look then becomes the words file's default
 ("ruled") and a BY MOMENT cell option "blocks from the bench" is built and decided by seeing. Page-only: D-037's light checks.
+
+## D-072 — The review pages: more width, icons with one legend, a spoken summary at the start of each section
+Date: 2026-10-01 · Input: his message after reading legibility-review.html (legibility-feedback.md L-24..L-26)
+Decision, his: "I have been looking at the page. It's very dense. We can use more width to better accommodate the tables. There are
+some rows that might benefit from this and end up in one row only. The status column, for example, in the first table on the What
+Round 1B Left, is using two rows. It can change to just one. Can we also use more encoding using icons and summarize things? At the
+beginning of each set of tables, I would like a summary that I can copy and paste and read out loud in a chat that I have dedicated
+to reading out loud your messages."
+Consequence (his asks, built; how each is drawn is my reading; the listen button is my proposal): (1) Width (L-24): the page's column
+stays centred and takes the screen, min(96vw, 1800px), so 1800 px at 1920 and 1536 at 1600, and every table spans it. A table's
+columns are of two kinds: a short value (an id, a count, a status, a kind, a verdict, a mark) never wraps, a prose column takes the
+width that is left. The status of a What round 1b left row is now two marks on one line, and an item card's keys no longer wrap.
+The probe measures it at 1920 and at 1600: 779 cells of short-value columns in 28 tables, none taller than one line, no table wider
+than its box, no sideways scroll; the page still reflows at 390. (2) Icons (L-25): 39 inline-svg marks (Lucide geometry, the
+gabe-artifact kit's own; legibility-review.icons.json, geometry only, no words) for fixed, partly fixed, left, open, yours to
+rule, my pick, yours, ruled, built, waiting on your pick, question answered, logged, the three kinds of open row, how a measure
+moved and what a question is about; and one mark of its own for each of the 10 patterns (the build stops on a pattern with none or
+two sharing one), drawn on cards, chips and tables. The words stand once, in a legend under the page's head (7 groups, the patterns
+last), and in each mark's hover; a table cell shows the mark and its number. Prose counts became stacked bars (fixed, partly, left,
+yours to rule) per item, pattern and question, and five overview tables open Your items, The patterns, Your calls, Your questions
+and What round 1b left. (3) Spoken summary (L-26): each of the 8 sections opens with 3 to 6 sentences in plain words, an item or a
+pattern by its name and never an id, a path, a symbol or code, with a "copy to read aloud" button whose copied text is the text
+shown; "copy every summary" at the top copies all 8 in page order, each headed by its section's name. The summaries are GENERATED:
+the words file holds sentence templates, the generator fills every number from the data, and the build stops on an id, a path, a
+symbol, a quote, a {token} left in, or a sentence count outside 3 to 6. (4) My proposal, drawn dashed because you did not ask for
+it: a listen / stop button beside each copy button, and one for every summary, using the browser's own speech (free, nothing sent
+anywhere, works in Windows Chrome). It prefers an English voice named Natural or Google, reads sentence by sentence, has one speed
+control (slower, normal, faster) the browser remembers, and hides where the browser has no speech. The round-2 items (L-24..L-26)
+sit as the last 3 cards of Your items, built and not yet reviewed, and wear no pattern (patterns.json is round 1's record). The
+page's work head counts the reviewed work and no longer the two logs (the ledger and this file), which are written in the same
+commit as the page and could never name their own commit. Page-only: D-037's light checks (generator --check, the probe once: 42
+passed, a picture of each section's top at 1920 and at 1600).

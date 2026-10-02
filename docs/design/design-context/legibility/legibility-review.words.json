@@ -1,10 +1,10 @@
 {
-  "_about": "Every sentence the legibility review page draws (D-066, D-025.8). A number is a {token} gen-legibility-review.mjs fills from the inputs; a {{token}} is filled by the page itself when it runs (counts of your choices, the page's sha). A typed number stops the build, a JSON number too. Ids that carry a number (L-01, R-11, D-066, P1, G1, EX-5, a review finding id, r1) and HTTP statuses are labels, not counts.",
+  "_about": "Every sentence the legibility review page draws (D-066, D-025.8). A number is a {token} gen-legibility-review.mjs fills from the inputs; a {{token}} is filled by the page itself when it runs (counts of your choices, the page's sha). A typed number stops the build, a JSON number too. The spoken summaries (spoken) are templates too: a voice reads them, so each is plain sentences with every number a {token}. Ids that carry a number (L-01, R-11, D-066, P1, G1, EX-5, a review finding id, r1) and HTTP statuses are labels, not counts.",
   "_before": "6170519",
   "page": {
-    "eyebrow": "Legibility · round 1 · D-066",
+    "eyebrow": "Legibility · round 1 and your reading of it · D-066 · D-072",
     "h1": "Round 1 of your human reading: what changed, what you choose, and the patterns behind it",
-    "lede": "You read all-endpoints on {ep} as a person, one hover at a time, and raised {nItems} items. Each was logged in your words, worked on, then reviewed. This page shows what round 1b left, the patterns behind it with their suite proposals, the looks you pick by seeing, what changed on each item, your questions answered and the gap analysis you asked for.",
+    "lede": "You read all-endpoints on {ep} as a person, one hover at a time, and raised {nItems} items. Each was logged in your words, worked on, then reviewed. This page shows what round 1b left, the patterns behind it with their suite proposals, the looks you pick by seeing, what changed on each item, your questions answered and the gap analysis you asked for. Then you read this page and raised {nRound2} more items: they are built here, and they are the last cards of Your items.",
     "source": "Pictures are real clicks on the page (the walk). Facts are read from {app} @{feedHead}. The work reviewed is at {workHead}.",
     "keyDashed": "dashed",
     "keyFilled": "filled",
@@ -24,7 +24,9 @@
       "measNote": "Each check counts one kind of defect on {ep} at {viewport}. It is a prototype of a suite check: it reports, it stops nothing.",
       "colCheck": "check",
       "noSection": "no bench yet",
-      "take": "Take from this: {built} of your {nItems} items are built and {opts} leave a look for you to pick. Of the {nChecks} checks, {nCompared} compare from before to after the small pass: {down} went down, {same} stayed and {up} went up. Left out of that count: {leftOut}."
+      "take": "Take from this: {built} of your {nItems} items are built and {opts} leave a look for you to pick. Of the {nChecks} checks, {nCompared} compare from before to after the small pass: {down} went down, {same} stayed and {up} went up. Left out of that count: {leftOut}.",
+      "colWhat": "what it counts",
+      "colChange": "change"
     },
     "calls": {
       "title": "Your calls",
@@ -36,7 +38,7 @@
     },
     "items": {
       "title": "Your items",
-      "n": "{nItems} items",
+      "n": "{nAllItems} items · {nRound2} raised on reading this page",
       "note": "One card per item, in your order: your words, where, what changed, what the review found after round 1, and what round 1b closed.",
       "take": "Take from this: after round 1 the review's {nLenses} lenses still found something on {partlyItems} of your {nItems} items; round 1b fixed {closed} of the {itemFindings} findings tied to them."
     },
@@ -360,8 +362,15 @@
       "L-20": "the pinned row's columns in BY MOMENT",
       "L-21": "room for a column's contents",
       "L-22": "a hover that says what this item is",
-      "L-23": "a bench to decide one element's look"
-    }
+      "L-23": "a bench to decide one element's look",
+      "L-24": "wider tables with each row on one line",
+      "L-25": "icons in place of words",
+      "L-26": "a summary to copy for reading aloud"
+    },
+    "round2Head": "Raised on reading this page",
+    "round2Note": "You raised these after you read this page, so the review has not read them yet. They are built on this page itself: the page you are reading is their picture.",
+    "round2Card": "Raised after the review. Built on this page; its picture is this page.",
+    "pickNone": "none"
   },
   "qs": {
     "his": "your question",
@@ -715,5 +724,159 @@
     "rate_limit_sensitive_per_minute": "the sensitive limit per minute",
     "rate_limit_window_seconds": "the window in seconds",
     "rate_limit_per_minute": "the global limit per minute"
+  },
+  "legend": {
+    "head": "The marks on this page, said once",
+    "note": "A mark stands where a word would. Point at a mark to read its word.",
+    "state": "Where an item stands",
+    "outcome": "What the review found",
+    "verdictNote": "The review's verdict on an item or an answer wears the same marks: answered wears fixed's mark, partly wears partly fixed's, and not done wears left's.",
+    "why": "Why a row is still open",
+    "choice": "Your choices",
+    "change": "How a measure moved",
+    "subject": "What a question is about",
+    "pattern": "The patterns",
+    "hisBoth": "yours to rule, or left for your call"
+  },
+  "mark": {
+    "mine": "my pick, not a ruling",
+    "yours": "yours, picked by you",
+    "ruled": "ruled",
+    "land": "my pick: land it",
+    "down": "went down: fewer of the defect it counts",
+    "same": "stayed the same",
+    "up": "went up: more of the defect it counts",
+    "code": "about the code",
+    "page": "about the page",
+    "map": "about the map",
+    "countOf": "{{n}} {{word}}",
+    "notyet": "my pick: not yet"
+  },
+  "say": {
+    "head": "To read aloud",
+    "copy": "copy to read aloud",
+    "copied": "Copied. Paste it into the chat that reads aloud.",
+    "failed": "Copy was blocked here: select the summary and copy it.",
+    "listen": "listen",
+    "stop": "stop",
+    "copyAll": "copy every summary",
+    "listenAll": "listen to every summary",
+    "tip": "my proposal: your browser reads this aloud in its own voice",
+    "mineNote": "Each section opens with a summary written to be read aloud, from the numbers on this page. Copy one with its button, or every summary at once. The dashed buttons are my proposal, not something you asked for: they read a summary aloud with your browser's own voice, free, with nothing sent anywhere. The speed you pick is kept in this browser.",
+    "rateLabel": "reading speed",
+    "rates": [
+      "slower",
+      "normal",
+      "faster"
+    ]
+  },
+  "ov": {
+    "items": {
+      "head": "Every item at a glance",
+      "id": "item",
+      "name": "what you could not tell",
+      "status": "stands",
+      "pattern": "pattern",
+      "find": "the review's findings"
+    },
+    "pats": {
+      "head": "Every pattern at a glance",
+      "pat": "pattern",
+      "name": "what it is",
+      "items": "your items",
+      "find": "the review's findings",
+      "open": "round 1b left",
+      "props": "proposals",
+      "pick": "my pick"
+    },
+    "calls": {
+      "head": "Every choice at a glance",
+      "name": "choice",
+      "place": "where",
+      "pick": "my pick",
+      "now": "now",
+      "proposal": "a proposal"
+    },
+    "qs": {
+      "head": "Every question at a glance",
+      "q": "your question",
+      "about": "about",
+      "verdict": "the review",
+      "find": "findings"
+    },
+    "rem": {
+      "head": "What is left, by pattern",
+      "pat": "pattern",
+      "name": "what it is",
+      "open": "still open",
+      "left": "left or fixed partly",
+      "fixed": "fixed by the small pass",
+      "why": "why it is open"
+    }
+  },
+  "spoken": {
+    "_about": "One summary per section, in the page's order, written to be read aloud by a voice (L-26). Plain spoken sentences, second person, 3 to 6 of them; never an id, a path, a symbol, a quote or code; an item or a pattern by its name. Every number is a {token} the generator fills from the data; the build stops on anything a voice would trip on.",
+    "glance": [
+      "Here is round 1 at a glance.",
+      "You raised {nItems} items: {built} are built, {optOnly} wait on your pick with nothing built, and {nAnswered} were questions that now have an answer.",
+      "The review read the work through {nLenses} lenses and wrote {nFindings} findings.",
+      "After round 1b, {nFixedF} are fixed, {nPartlyF} are partly fixed, {nLeftF} are left with a reason, and {nHisF} are yours to rule.",
+      "The same {nChecks} checks ran before the work, after round 1, and after the small pass.",
+      "Of those, {nCompared} can be compared: {down} went down, {same} stayed the same and {up} went up, and a check that went down found fewer of the defect it counts."
+    ],
+    "rem": [
+      "Here is what round 1b left.",
+      "{nOpen} rows are still open after round 1b.",
+      "By cause, new surfaces account for {nSurf}, limits of the feed or the generator for {nFeed}, rows left for your call for {nYoursRem}, and slips in the work itself for {nProc}.",
+      "The review also left {nLeftFind} findings fixed only partly or left with a reason.",
+      "The pattern with the most still open is called {openTopName}, with {openTopN} rows.",
+      "The small pass since then fixed {nFixedSmall} more rows."
+    ],
+    "pat": [
+      "Here are the patterns behind your items.",
+      "The page was clear to a model but not to you in {nPatterns} ways, and each way is one pattern.",
+      "The biggest holds {topItems} of your items and {topFind} of the review's findings, and it is called {topPattern}.",
+      "Together the patterns have {nSuite} draft proposals for the suite, and {nAuditParts} of those share one audit.",
+      "My pick: land it on {nLand} patterns, and not yet on {nNotYet}.",
+      "Nothing lands in the suite until you say land it."
+    ],
+    "calls": [
+      "Here are the calls that wait for you.",
+      "There are {nCalls} choices of look, and {nRuled} are already ruled.",
+      "Of the {nLooks} looks between them, {nNoPic} have no picture yet, and their card says so.",
+      "{nProps} more proposals need your yes or no before anything is built.",
+      "Where I picked, the choice is drawn with a dashed line, and a pick is never a ruling.",
+      "Choose by the pictures, then copy your review at the end."
+    ],
+    "items": [
+      "Here are your items.",
+      "You raised {nItems} on your first reading, and {nRound2} more after reading this page.",
+      "After round 1, the review still found something on {partlyItems} of the first {nItems}.",
+      "Round 1b fixed {closed} of the {itemFindings} findings tied to them.",
+      "The {nRound2} new ones are about {round2Names}, and {nRound2Built} of them are built on this page.",
+      "Each card holds your words, what changed, and what the review found."
+    ],
+    "qs": [
+      "Here are your questions, answered.",
+      "You asked {nQs} questions.",
+      "{nCodeQs} answers are about the code, {nPageQs} about the page, and {nMapQs} about the map.",
+      "An answer about the map is kept here and not on the page.",
+      "Every number in an answer was read from the data when the page was built."
+    ],
+    "gap": [
+      "Here is the gap analysis you asked for.",
+      "It compares the lab's {nParts} parts with the {nNew} rows of the page.",
+      "Across the parts there are {nRows} attributes, and {nNone} of them have no home yet.",
+      "Security is the gap: {secMissing} facts are missing from both sides, and {secOrphan} sat in rows that are leaving.",
+      "My pick adds no row of its own.",
+      "It adds one security control that lights the security items across the existing rows."
+    ],
+    "copy": [
+      "Here is where you copy your review.",
+      "The review is one line per choice, {nChoices} lines in all, grouped as calls, proposals and patterns.",
+      "A note you write rides on its choice's line.",
+      "Press copy and paste the text back to me.",
+      "A line that says my pick is never a ruling."
+    ]
   }
 }
