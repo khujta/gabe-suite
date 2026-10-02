@@ -89,14 +89,14 @@ his words for a new "land it"; L-33 (the frontend lab's hover cards as the one h
 sections: the gate card, stage encoding, gate roles, function marks, the standard-or-specialist split, the metadata layout). Not yet:
 P5.1, P6.1, P6.2 — trigger: the navigation bar's consolidation. The read-aloud draft (D-076) still waits on its own "land it".
 
-## PAUSED at the disk gate (2026-10-02)
+## The round-3 page pass and the suite landing are done (2026-10-02)
 
-C: fell to 38 GB free (under the 40 GB rule; 25 GB at one point) from Windows memory pressure — the pagefile, as on 2026-09-16; the
-vhdx is unchanged at 383 GiB. No build runs until C: is back above 40 GB. Landed before the stop: the suite proposals (d72feba …
-6971efa, install, doctor CLEAN) and the all-endpoints part of the page pass (739d528, probe 746/0). Kept off the shared branch, NOT
-verified: the walk's new steps, the review page's side-by-side crops and before/after depictions, and the ledger lines L-34..L-38 —
-on local branch `wip/page-pass-r3` (6a5c1e9). Resume: check C: ≥ 40 GB; `git checkout wip/page-pass-r3 -- <its 5 files>` onto
-graft-adoption; run the walk (WALK_FROM=d066 trial, then full); build the review page, --check, its probe once; commit.
+Suite: A1 · P1.1 · P1.2 · P2.2 · P3.1 · P4.2 · P5.2 · P7.1 · P7.2 · P8.2 · P9.1 · P10.2 landed (d72feba … 6971efa; install; doctor CLEAN).
+Pages: his ruled looks are the defaults, the simpler bench with a width per column, a draggable widened column, Shift+wheel across a
+wide table (739d528, probe 746/0); the walk with real clicks (fcd1063, exit 0, 448 pictures); the review page with the header/saving
+crops side by side and a before/after or a labelled mock for every option he could not follow (c37cc0d, probe 163/0). A disk alarm
+paused the work at C: 38 GB; deleting the WSL crash dumps (10.9 GB) and the Windows pip cache (4.1 GB) brought it to 52 GB. Two old
+WSL swap files (5 GB) in Temp wait on his word.
 
 ## Open for you — on the review page
 
