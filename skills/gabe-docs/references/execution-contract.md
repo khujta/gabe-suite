@@ -143,6 +143,22 @@ Why parts 1–2 pass the no-unconditional-lines law: a beat just CHANGED cell st
 `NOW:`/`NEXT:` are state-carrying, not reassurance; the `CENTER:` pointer prints only where a
 center exists to point at. Part 3 keeps its own silence contract.
 
+## Generated pages — stated once, ruled 2026-10-02
+
+Any skill or generator that builds a page a person reads (a center page, a lab, a review page, a report) carries
+two clauses. The page rules themselves — hovers, faces, marks — live in
+`../../gabe-artifact/references/legibility.md`.
+
+- **STATE WORDS.** A page says what it could not read in the forms feed's own words (`docs/design/element-forms/review-a4.md`,
+  fix 6) — `unknown` (the arm ran and could not tell) · `absent` (nothing was run or read, and the page says what:
+  `absent: no pytest junit`) · `beyond one level` (the fact sits past the one call the arm follows). A bare `0`,
+  `none`, `—` or `[]` is drawn ONLY where the arm ran and proved there is none: unknown is never drawn as none or
+  0, and absent is said, never left blank.
+- **A PAGE RULE NEEDS ITS CHECK.** A page rule without a check is not a rule — it breaks on the next surface, the
+  first time nobody remembers it. When a rule is written, the same change names the check that holds it, on a rail
+  that already runs (the generator's build, the render gate, the commit gate, the legibility audit), or writes
+  `check: not yet` beside the rule so the gap is visible and a review asks for it.
+
 ## Orchestration restraint (0.5c)
 
 Before any multi-agent design/mockup fan-out, run the premise past the human with ONE cheap
