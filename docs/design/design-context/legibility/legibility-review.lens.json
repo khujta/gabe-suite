@@ -1,0 +1,1711 @@
+{
+ "_about": "The page's explanations in the gabe-lens voice, for the operator's calibrated suit (Sequential-Procedural: a thing is a sequence of steps and what breaks when one is skipped; see ~/.claude/gabe-lens-profile.md) - D-079, answering L-31. AUTHORED text: for each of the ten patterns a pain, one analogy (a process) with where it stops, the steps of how the defect happens (time top to bottom, the step where it goes wrong marked), a box (does, does not do, decides when), the cost (to solve, if not) and a handle; for each of the 53 decisions a pain, one analogy with where it stops, the cost and a handle. A number is a {token} gen-legibility-review.mjs fills from the data (the words sweep reaches this file too: a typed digit or number word stops the build); no id, path, code or symbol stands here. `kind` picks the pain's icon and `process` the analogy's icon (icons.json); `meter` says which real count the pain's meter draws (a measured check before and now, a count of a total, a tally, or how often the pattern came up); `size` is the cost to solve (small, medium or large) where the generator cannot derive it, and `sizeWhy` says in a few words what the size is counted in; `marks` says for each option of a look whether picking it gains, costs, both or is neutral.",
+ "patterns": {
+  "P1": {
+   "pain": {
+    "kind": "repeat",
+    "meter": {
+     "check": "repeatLine"
+    },
+    "text": "You point at a rate limit refusal on {ep} to learn why that request ended, and the hover defines every refusal there is. You point at the next refusal and read the same words, so you cannot tell them apart."
+   },
+   "like": {
+    "process": "pharmacy",
+    "analogy": "It is like a pharmacy that sticks the same leaflet about the whole drug family on every bottle and never prints the dose, so bottles of different strength look alike on the counter.",
+    "stops": "It stops being true where the leaflet is wanted, because what a kind means still has to be written once, in a key."
+   },
+   "steps": [
+    {
+     "t": "You point at the first refusal."
+    },
+    {
+     "t": "The hover opens and defines what every refusal is."
+    },
+    {
+     "t": "You point at the next refusal."
+    },
+    {
+     "t": "The same hover opens, word for word.",
+     "bad": true
+    },
+    {
+     "t": "You compare them from memory and cannot tell which is which."
+    }
+   ],
+   "box": {
+    "does": "Opens every item's hover with what its kind is.",
+    "doesNot": "Say what this item checks, what comes before it or what it gives.",
+    "decidesWhen": "It bites whenever items of one kind sit side by side and you need the difference."
+   },
+   "cost": {
+    "toSolve": "Landing both is a pass over the audit script that counts these defects, plus a few short written rules, and every count it raises needs your look before anything is fixed.",
+    "ifNot": "The next page an agent builds repeats the definition on every item again, as this page did {repeatLine_before} times at the start and still does {repeatLine_now} times.",
+    "sizeWhy": "a pass over one script and a few short rules"
+   },
+   "handle": "Dose on the bottle, leaflet in the drawer."
+  },
+  "P2": {
+   "pain": {
+    "kind": "noise",
+    "meter": {
+     "check": "pageTalk"
+    },
+    "text": "You point at an item to learn about the code, and the hover opens with a line about where the page took a colour or an icon from. At the start {pageTalk_before} hovers talked about the page or the tool that reads the code, and {pageTalk_now} still do."
+   },
+   "like": {
+    "process": "airport",
+    "analogy": "It is like an airport announcement that begins with how the loudspeaker works, so the gate and the boarding time you came for arrive late or never.",
+    "stops": "It stops being true where the speaker is the subject, because a panel about the code tool on purpose may talk about it."
+   },
+   "steps": [
+    {
+     "t": "You point at an item to learn something about the code."
+    },
+    {
+     "t": "The hover opens with a line about how the page drew it.",
+     "bad": true
+    },
+    {
+     "t": "You read it, looking for a fact about the code."
+    },
+    {
+     "t": "The fact is further down, or it is not there."
+    }
+   ],
+   "box": {
+    "does": "Tells you where the page took a colour or an icon, or what the code tool could not read.",
+    "doesNot": "Tell you anything about the code, which is what you came to read.",
+    "decidesWhen": "It bites whenever a fact about how the page was built sits where a fact about the code should be."
+   },
+   "cost": {
+    "toSolve": "Landing both is a pass over the audit script, a stop list in each page generator, the program that builds a page, and one written rule, with room for panels that talk about the tool.",
+    "ifNot": "Every new page brings its own sentences about itself, and {pageTalk_now} hovers talk about the page today.",
+    "sizeWhy": "a pass over the audit script and a stop list in each generator"
+   },
+   "handle": "Announce the gate, not the loudspeaker."
+  },
+  "P3": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "check": "bare"
+    },
+    "text": "You scan a row on {ep} and some of its small labels are bare words, with no icon and no kind, so you stop at each one to ask what it is. The count of items without an icon was {bare_before} at the start and is {bare_now} now."
+   },
+   "like": {
+    "process": "triage",
+    "analogy": "It is like a hospital ward where some patients wear no wristband, so every nurse stops at the bed to ask who this is before doing anything.",
+    "stops": "It stops being true where a wristband is cheap, because an icon on every label can crowd a dense row."
+   },
+   "steps": [
+    {
+     "t": "You scan a row of small labels."
+    },
+    {
+     "t": "Some wear an icon and some are only a word."
+    },
+    {
+     "t": "You stop at a bare word and ask what kind of thing it is.",
+     "bad": true
+    },
+    {
+     "t": "You open it or ask, and only then read on."
+    }
+   ],
+   "box": {
+    "does": "Draws an item as a bare word, with no kind and no role.",
+    "doesNot": "Say what the item is or what it does.",
+    "decidesWhen": "It bites when an item is a kind the page has no mark for."
+   },
+   "cost": {
+    "toSolve": "Landing both is a pass over the audit script that counts bare items, plus one written rule, and the count waits on your ruling about gate icons.",
+    "ifNot": "New items keep arriving as bare words, {bare_now} still wear no icon, and you keep asking what each one is.",
+    "sizeWhy": "a pass over the audit script and one rule"
+   },
+   "handle": "Every wrist gets a band."
+  },
+  "P4": {
+   "pain": {
+    "kind": "half",
+    "meter": {
+     "came": true
+    },
+    "text": "You read a condition on {ep} and cannot tell which function checks it, or you see a refresh and not what it fetches. The page drew one end of the link, so every half link is a question you have to go and answer yourself."
+   },
+   "like": {
+    "process": "ticket",
+    "analogy": "It is like a booking form for a train ticket that prints the station you leave from and not the one you reach, so you still have to ask where it goes.",
+    "stops": "It stops being true where a ticket is one object, because here the ends are separate records the page could have joined."
+   },
+   "steps": [
+    {
+     "t": "The record joins a function to its condition."
+    },
+    {
+     "t": "The page draws the condition and leaves the function out.",
+     "bad": true
+    },
+    {
+     "t": "You read the condition and look for who checks it."
+    },
+    {
+     "t": "You find a file name and a line number, and no function."
+    },
+    {
+     "t": "You go and ask, or open the code."
+    }
+   ],
+   "box": {
+    "does": "Draws one end of a link and leaves the other end to the record behind it.",
+    "doesNot": "Name the function, the table or the fetch at the other end.",
+    "decidesWhen": "It bites whenever a record joins a pair of things and the page shows only one."
+   },
+   "cost": {
+    "toSolve": "Landing both is a check in each page generator, the program that builds a page, that stops the build, plus one written rule, and each generator must first say which records join a pair of things.",
+    "ifNot": "Pages keep drawing half a link, and you keep asking checked where, or fetched from what.",
+    "sizeWhy": "a check in each page generator that stops the build"
+   },
+   "handle": "A ticket needs both stations."
+  },
+  "P5": {
+   "pain": {
+    "kind": "cut",
+    "meter": {
+     "check": "midWord"
+    },
+    "text": "You read down the table that lays a request out step by step on {ep}, where a column holds no step, a mark has no key, and a long name breaks inside a word. At the start {midWord_before} words broke in the middle."
+   },
+   "like": {
+    "process": "timetable",
+    "analogy": "It is like a bus timetable that prints a fare in the column of departure times and cuts a station name in half at the paper's edge.",
+    "stops": "It stops being true where paper is fixed, because a page can be made wider, and that width is the cost the fix pays."
+   },
+   "steps": [
+    {
+     "t": "You read down a column of steps in time order."
+    },
+    {
+     "t": "One column holds a fact with no time in it.",
+     "bad": true
+    },
+    {
+     "t": "You take it for one more step and read it as one."
+    },
+    {
+     "t": "A name inside it breaks mid-word and stops your reading."
+    },
+    {
+     "t": "You work out what the column is from its neighbours."
+    }
+   ],
+   "box": {
+    "does": "Puts a timeless fact in a timeline, or leaves a mark without its key.",
+    "doesNot": "Tell you which columns are steps or what a mark means.",
+    "decidesWhen": "It bites when a column's kind or a mark's meaning lives only in a hover."
+   },
+   "cost": {
+    "toSolve": "Landing both is new checks in the gate that runs before a publish, each with a test case, plus one written rule, and a failing check can hold back a page you want.",
+    "ifNot": "Each new surface brings its own cut words and unmarked columns, and you find them by eye.",
+    "sizeWhy": "new checks in the render gate that holds back a publish"
+   },
+   "handle": "Keep fares out of the timetable."
+  },
+  "P6": {
+   "pain": {
+    "kind": "mixed",
+    "meter": {
+     "came": true
+    },
+    "text": "You look on {ep} for the piece of the web app that sends the request and find it under several names, so you take each name for a different thing. Elsewhere one word stands for a kind and for a lifetime, so you take them for one."
+   },
+   "like": {
+    "process": "post",
+    "analogy": "It is like a post office where one parcel is called a package at one counter and an item at the next, so the clerk files it twice.",
+    "stops": "It stops being true where a clerk can see the parcel, because a page has only words, and telling concepts apart from words alone is a guess."
+   },
+   "steps": [
+    {
+     "t": "You see a name for something in one view."
+    },
+    {
+     "t": "In another view the same thing has another name.",
+     "bad": true
+    },
+    {
+     "t": "You take the second name for a second thing."
+    },
+    {
+     "t": "Or one word stands for a kind and a lifetime and you take them for one."
+    },
+    {
+     "t": "You build a wrong picture, and only a list of the names would show it."
+    }
+   ],
+   "box": {
+    "does": "Gives one thing several names, or several things one name.",
+    "doesNot": "Let you match a thing across views by its word.",
+    "decidesWhen": "It bites whenever a page shows the same thing in more than one view."
+   },
+   "cost": {
+    "toSolve": "Landing both is a pass over the audit script to flag one word for several ideas, plus a short line in each style guide, and every flag needs your look.",
+    "ifNot": "A second name keeps reading as a second thing, and one word for several things keeps reading as one, in every new view.",
+    "sizeWhy": "a pass over the audit script and short lines"
+   },
+   "handle": "One parcel, one name."
+  },
+  "P7": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "check": "machineWords"
+    },
+    "text": "You read a label on {ep} and meet a condition spelled as the code spells it, or a library's error name where a reason belongs. You are a programmer and still have to decode it, and the text of an error is often not the message at all."
+   },
+   "like": {
+    "process": "protocol",
+    "analogy": "It is like the radio talk between a pilot and the tower, exact codes that mean everything to them and nothing to a passenger who wants to know when the plane lands.",
+    "stops": "It stops being true where the code is exactly what you came for, because a raw word is sometimes the only name there is."
+   },
+   "steps": [
+    {
+     "t": "The code holds a condition as an expression."
+    },
+    {
+     "t": "The page copies the expression onto a label.",
+     "bad": true
+    },
+    {
+     "t": "You read it and have to decode what it means."
+    },
+    {
+     "t": "You are not sure the expression is the message at all."
+    },
+    {
+     "t": "You open the code to be sure."
+    }
+   ],
+   "box": {
+    "does": "Shows an expression as the code spells it.",
+    "doesNot": "Say in words what the expression means.",
+    "decidesWhen": "It bites when the page copies a value out of the code without turning it into a sentence."
+   },
+   "cost": {
+    "toSolve": "Landing both is a pass over the audit script that counts raw words on labels, plus one written rule, and each hit needs your look.",
+    "ifNot": "Labels keep showing the code's spelling, as {machineWords_before} did at the start, and you keep decoding it.",
+    "sizeWhy": "a pass over the audit script and one rule"
+   },
+   "handle": "Meaning first, then the shorthand."
+  },
+  "P8": {
+   "pain": {
+    "kind": "false",
+    "meter": {
+     "came": true
+    },
+    "text": "You read a label on {ep} that says no headers were sent, or that a test proves an ending, when the rule behind it never read the headers or only fits the ending. You trust the label, and the page tells you something that is not true."
+   },
+   "like": {
+    "process": "bank",
+    "analogy": "It is like a bank statement headed balance whose figure is only the total of deposits, so the teller trusts the heading and signs.",
+    "stops": "It stops being true where the bank states its rule, because a page's label is held to its rule only where the generator states both."
+   },
+   "steps": [
+    {
+     "t": "The generator computes a number by one rule."
+    },
+    {
+     "t": "The page prints the number under a label."
+    },
+    {
+     "t": "The label says more than the rule counts.",
+     "bad": true
+    },
+    {
+     "t": "You read the label literally and trust it."
+    },
+    {
+     "t": "You act on a fact that is looser than it sounds."
+    }
+   ],
+   "box": {
+    "does": "Prints a label stronger than the rule behind it, or shows unknown as none.",
+    "doesNot": "Say what the rule really counts.",
+    "decidesWhen": "It bites when a label is typed into a template and does not come from the rule."
+   },
+   "cost": {
+    "toSolve": "Landing both is a check in each page generator that stops the build, plus one clause in the execution contract every skill follows.",
+    "ifNot": "Labels keep promising more than their rule counts, and a bare zero keeps hiding that nobody looked.",
+    "sizeWhy": "a check in each generator and a clause that reaches every skill"
+   },
+   "handle": "Print the rule beside the figure."
+  },
+  "P9": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "came": true
+    },
+    "text": "You are asked how a table, a schema or a test should look, and the only place to see one is a dense table with every other kind drawn around it. You judge the look in the crowd, never on the element alone."
+   },
+   "like": {
+    "process": "recipe",
+    "analogy": "It is like a restaurant asked to judge a new sauce only after it is already on every plate of the menu, so nobody ever tastes it alone.",
+    "stops": "It stops being true where the sauce is already settled, because for an element whose look is decided a bench, a page where one element stands alone, is a detour."
+   },
+   "steps": [
+    {
+     "t": "The page draws every element at once in a dense table."
+    },
+    {
+     "t": "You are asked how one kind should look."
+    },
+    {
+     "t": "You look for it and find it among many others.",
+     "bad": true
+    },
+    {
+     "t": "You cannot judge its parts, its size and its controls alone."
+    },
+    {
+     "t": "You decide a look you have never seen by itself."
+    }
+   ],
+   "box": {
+    "does": "Draws many elements at once before one has been decided alone.",
+    "doesNot": "Give you one element, with its parts and its controls, to look at.",
+    "decidesWhen": "It bites at the moment a look is to be decided, before the dense view exists."
+   },
+   "cost": {
+    "toSolve": "Landing it is one step added to the mockup method and a note beside it, both in words, and the bench, a page where one element stands alone, costs a page before the dense view.",
+    "ifNot": "Each new kind of element is drawn many times before you have seen it once.",
+    "sizeWhy": "one step and one note, in words"
+   },
+   "handle": "Taste the sauce alone, then plate it."
+  },
+  "P10": {
+   "pain": {
+    "kind": "forgot",
+    "meter": {
+     "came": true
+    },
+    "text": "An agent is told a rule and breaks it on the next page, with a choice made alone, an option the copy dropped, or a number typed by hand. You find each break by reading, which is the work the rule was meant to save you."
+   },
+   "like": {
+    "process": "line",
+    "analogy": "It is like a factory that paints a safety rule on the wall and fits no sensor on the machine, so the wall asks and the machine runs on.",
+    "stops": "It stops being true where a sensor is cheap, because a check per rule grows each generator, and a rule that is easy to keep by eye may not be worth one."
+   },
+   "steps": [
+    {
+     "t": "A rule is written for the agents."
+    },
+    {
+     "t": "The next agent builds a new page."
+    },
+    {
+     "t": "The rule has no check on a rail that already runs.",
+     "bad": true
+    },
+    {
+     "t": "The page breaks the rule."
+    },
+    {
+     "t": "You find the break by reading."
+    }
+   ],
+   "box": {
+    "does": "Keeps a rule in words alone.",
+    "doesNot": "Stop a page that breaks the rule, or tell anyone it was broken.",
+    "decidesWhen": "It bites at each new page, because nothing runs the rule there."
+   },
+   "cost": {
+    "toSolve": "Landing both is checks in each generator's build and test run and in the audit script, plus one clause in the execution contract every skill follows.",
+    "ifNot": "Rules that live only in words keep breaking on the next page, and you stay the one who has to notice.",
+    "sizeWhy": "checks in every generator and the audit"
+   },
+   "handle": "Fit the sensor, not just the sign."
+  }
+ },
+ "decisions": {
+  "P1.1": {
+   "pain": {
+    "kind": "repeat",
+    "meter": {
+     "check": "repeatLine"
+    },
+    "text": "An agent builds a new page and you find the same line repeated in its hovers by pointing at items one at a time. At the start {repeatLine_before} hovers carried a repeated line, and nothing counted them until the measure ran."
+   },
+   "like": {
+    "process": "line",
+    "analogy": "It is like a quality inspector at the end of an assembly line who counts the defects in each batch, instead of waiting for a customer to complain.",
+    "stops": "It stops being true where the inspector can reject a batch, because the audit only reports and stops nothing."
+   },
+   "cost": {
+    "toSolve": "A pass over the audit script to add counts for a hover inside a hover, a repeated line and twins in one cell, each with a test case that fires and one that stays silent.",
+    "ifNot": "The next page repeats its hovers again and nobody counts it, so you find it by hand, the way you found it on this page.",
+    "sizeWhy": "a pass over one script and its test cases"
+   },
+   "handle": "Count the defect before the customer finds it."
+  },
+  "P1.2": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "came": true
+    },
+    "text": "An agent writes the hover for a new item and begins with the definition of its kind, because no rule says to begin with the item. You read to the bottom to learn what this one checks."
+   },
+   "like": {
+    "process": "recipe",
+    "analogy": "It is like the first line of a recipe card, which names the dish on the counter and says what to do first, while the history of the cuisine waits in the cookbook's introduction.",
+    "stops": "It stops being true where a card is skimmed by a cook who knows the cuisine, while you read every hover cold, so the item must come first for you."
+   },
+   "cost": {
+    "toSolve": "One rule in the plain mode of the lens and one in the artifact rules, both in words, so a short sitting of your review and nothing runs.",
+    "ifNot": "Each new hover is written kind first again, and you tell the agent so by pointing at twins.",
+    "sizeWhy": "short rules in words"
+   },
+   "handle": "Name the dish, then the cuisine."
+  },
+  "P2.1": {
+   "pain": {
+    "kind": "noise",
+    "meter": {
+     "check": "pageTalk"
+    },
+    "text": "You point at an item to learn about the code and read where the page took a colour or an icon from. At the start {pageTalk_before} hovers talked about the page or the tool that reads the code, and {pageTalk_now} still do."
+   },
+   "like": {
+    "process": "airport",
+    "analogy": "It is like an airport announcement that opens with how the loudspeaker works, so the gate and the boarding time you came for arrive late or never.",
+    "stops": "It stops being true where the speaker is the subject, because a panel about the code tool on purpose may talk about it."
+   },
+   "cost": {
+    "toSolve": "A pass over the audit script to count hovers about the page, plus a stop list in each page generator's word check that lets some panels talk about the tool.",
+    "ifNot": "Hovers keep talking about the page, {pageTalk_now} of them today, and every new page brings its own.",
+    "sizeWhy": "a count in the audit and a stop list in each generator"
+   },
+   "handle": "Announce the gate, not the loudspeaker."
+  },
+  "P2.2": {
+   "pain": {
+    "kind": "noise",
+    "meter": {
+     "came": true
+    },
+    "text": "An agent writes a new page and says in a hover how the code tool found a fact. Nothing in the artifact rules says that how the tool knows is not what you came to read."
+   },
+   "like": {
+    "process": "shipping",
+    "analogy": "It is like a parcel tracker that tells you which clerk typed the label before it tells you where the parcel is.",
+    "stops": "It stops being true where a fact is only a guess, because then the page must say so once, in plain words, as a limit."
+   },
+   "cost": {
+    "toSolve": "One rule in the artifact rules, written in words and later also in the execution contract, and alone it holds only as far as the check behind it.",
+    "ifNot": "Each new page keeps telling you where its facts came from, which is the agent's concern and not yours.",
+    "sizeWhy": "one rule in words"
+   },
+   "handle": "Say what the code does, never how you found out."
+  },
+  "P3.1": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "check": "bare"
+    },
+    "text": "You scan a row on {ep} and some items wear no icon, so you cannot tell what kind of thing they are. The count of items without an icon was {bare_before} at the start and is {bare_now} now."
+   },
+   "like": {
+    "process": "triage",
+    "analogy": "It is like a hospital that issues wristbands, where every patient wears one and an inspector counts the bare wrists on the ward each morning.",
+    "stops": "It stops being true where a wristband is mandatory, because an icon on every label can crowd a row, and the count says where one is missing, not that it is needed."
+   },
+   "cost": {
+    "toSolve": "A pass over the audit script to count bare items, with a test case that fires and one that stays silent, and the count waits on your ruling about gate icons.",
+    "ifNot": "New items keep arriving as bare words, and you keep asking what each one is.",
+    "sizeWhy": "a count in the audit and its test cases"
+   },
+   "handle": "Count the bare wrists every morning."
+  },
+  "P3.2": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "came": true
+    },
+    "text": "A kind that the Gabe Universe, the map of the code, does not draw arrives on the page as a bare word, and you have to ask what it is. No rule says it must wear a mark of the page's own."
+   },
+   "like": {
+    "process": "shipping",
+    "analogy": "It is like a warehouse that tags every kind of crate with its own sticker before it goes on the shelf, so nobody has to open a crate to learn what it holds.",
+    "stops": "It stops being true where stickers multiply, because a mark for every kind grows the key, and on a small page that is more to learn than the bare word."
+   },
+   "cost": {
+    "toSolve": "One rule in the artifact rules, written in words, and the key grows by one entry for each new kind.",
+    "ifNot": "Each kind the Gabe Universe does not draw keeps arriving as a bare word.",
+    "sizeWhy": "one rule in words"
+   },
+   "handle": "A sticker on every crate before the shelf."
+  },
+  "P4.1": {
+   "pain": {
+    "kind": "half",
+    "meter": {
+     "came": true
+    },
+    "text": "You read a condition on {ep} and cannot tell which function checks it, because the page drew one end of the link and nothing in its build made it draw the other. Each half link is a question you have to go and answer yourself."
+   },
+   "like": {
+    "process": "ticket",
+    "analogy": "It is like a booking form for a train ticket that refuses to print until both the departure and the arrival boxes are filled.",
+    "stops": "It stops being true where a form knows its boxes, because the build can check only the links the generator lists, and a link it does not list stays unchecked."
+   },
+   "cost": {
+    "toSolve": "A check in the build of each page generator, one pass per generator, and each generator must first say which records join a pair of things.",
+    "ifNot": "Pages keep drawing half a link, and you keep asking checked where, or fetched from what.",
+    "sizeWhy": "a check in each page generator that stops the build"
+   },
+   "handle": "Refuse to print half a ticket."
+  },
+  "P4.2": {
+   "pain": {
+    "kind": "half",
+    "meter": {
+     "came": true
+    },
+    "text": "You read a role word on a label, fetcher or check, and ask of what and in which function. The word names the role and leaves out what it acts on, and no rule asks for it."
+   },
+   "like": {
+    "process": "checklist",
+    "analogy": "It is like a checklist line that says inspect with no object, which the crew member ticks and nobody knows what was inspected.",
+    "stops": "It stops being true where the object is obvious, because on a label with one purpose the object is clear and need not be named."
+   },
+   "cost": {
+    "toSolve": "One rule in the plain mode of the lens, written in words with no check behind it, and each role word grows by an object, so a label gets longer.",
+    "ifNot": "Role words keep arriving without their object, and you keep asking fetcher of what.",
+    "sizeWhy": "one rule in words"
+   },
+   "handle": "A verb needs its object."
+  },
+  "P5.1": {
+   "pain": {
+    "kind": "cut",
+    "meter": {
+     "check": "midWord"
+    },
+    "text": "You read names on {ep} that break in the middle of a word, or text that stops with dots, and you cannot read the whole name. At the start {midWord_before} words broke in the middle."
+   },
+   "like": {
+    "process": "line",
+    "analogy": "It is like the proofreader at a print shop who checks every page for a word cut at the edge before the run is released.",
+    "stops": "It stops being true where a cut is wanted, because a gate that fails on a cut word can hold back a page you want published as it is."
+   },
+   "cost": {
+    "toSolve": "A pass over the gate that runs before a publish, to add the checks with a test case for each, so the run you wait for before every publish grows a little.",
+    "ifNot": "Words keep breaking and text keeps getting cut on each new surface, and you find them by eye.",
+    "sizeWhy": "new checks in the render gate that holds back a publish"
+   },
+   "handle": "Proofread the edge before the run."
+  },
+  "P5.2": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "came": true
+    },
+    "text": "You see a mark on a stage and no key says what it means, or a number with no noun, and the meaning waits in a hover. You read the page and still do not know what was counted."
+   },
+   "like": {
+    "process": "road",
+    "analogy": "It is like a road map with its symbols and its key printed on the same sheet, so you never turn the page to learn what a symbol means.",
+    "stops": "It stops being true where a key costs nothing to print, because here a key takes room beside every mark."
+   },
+   "cost": {
+    "toSolve": "One rule in the artifact rules, written in words, and a mark with a visible key and a number with its noun make a page wider by a few words.",
+    "ifNot": "Marks keep carrying their meaning only in a hover, and counts keep arriving with no noun.",
+    "sizeWhy": "one rule in words"
+   },
+   "handle": "Print the key beside the mark."
+  },
+  "P6.1": {
+   "pain": {
+    "kind": "mixed",
+    "meter": {
+     "came": true
+    },
+    "text": "You search the page on {ep} for the piece of the web app that sends the request and find it under several names, so you take them for several things. Elsewhere one word stands for a kind and for a lifetime."
+   },
+   "like": {
+    "process": "post",
+    "analogy": "It is like a post office where one parcel is called a package at one counter and an item at the next, and a clerk checks the forms for names that differ.",
+    "stops": "It stops being true where a clerk can see the parcel, because telling concepts apart from their words alone is a guess, so the count will flag words that only look alike."
+   },
+   "cost": {
+    "toSolve": "A pass over the audit script to flag one word for several ideas or several words for one, and every flag needs your look because it is a guess from words.",
+    "ifNot": "A second name keeps reading as a second thing, and one word for several things keeps reading as one.",
+    "sizeWhy": "a count in the audit that is a guess from words"
+   },
+   "handle": "One name for one parcel."
+  },
+  "P6.2": {
+   "pain": {
+    "kind": "mixed",
+    "meter": {
+     "came": true
+    },
+    "text": "The rule that one idea gets one word is written for prose, so the words a page shows are not held to it. You meet a new name for a known thing in a hover or on a label."
+   },
+   "like": {
+    "process": "library",
+    "analogy": "It is like a library that keeps one subject heading for each topic in its card index but lets every shelf label say whatever it likes.",
+    "stops": "It stops being true where a register is a trial, because the rule lives in this repo's register and reaches no other project yet."
+   },
+   "cost": {
+    "toSolve": "One line in the style file called the register and one in the docs standard, both in words.",
+    "ifNot": "Each new page invents a name for a known idea, and you find it by reading.",
+    "sizeWhy": "short lines in words"
+   },
+   "handle": "One heading in the index, one label on the shelf."
+  },
+  "P7.1": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "check": "machineWords"
+    },
+    "text": "You read a label or a hover on {ep} and meet the code's own spelling, a condition as the code writes it, or a library's error name where a reason belongs. At the start {machineWords_before} labels showed a raw word."
+   },
+   "like": {
+    "process": "protocol",
+    "analogy": "It is like the radio talk between a pilot and the tower, full of codes that mean everything to them and nothing to a passenger who wants to know when the plane lands.",
+    "stops": "It stops being true where a raw word is all the page has, so the count needs a list of names you want to keep."
+   },
+   "cost": {
+    "toSolve": "A pass over the audit script to count raw words on labels and in hovers, with a test case that fires and one that stays silent, and each hit needs your look.",
+    "ifNot": "Labels keep showing the code's spelling, and you keep decoding it.",
+    "sizeWhy": "a count in the audit and its test cases"
+   },
+   "handle": "Say it so the passenger can follow."
+  },
+  "P7.2": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "came": true
+    },
+    "text": "A label gives the code first and the meaning, if any, in a hover. You are a programmer and still must decode each one, and the expression is not always the message."
+   },
+   "like": {
+    "process": "road",
+    "analogy": "It is like a phrasebook that prints the foreign sentence first and the meaning in small type underneath, when the traveller needs the meaning first.",
+    "stops": "It stops being true where the code is what you came for, because sometimes the exact code is the thing to read, so it stays, last and as written."
+   },
+   "cost": {
+    "toSolve": "One rule in the plain mode of the lens, written in words, with the raw-words count behind it once that lands.",
+    "ifNot": "Labels keep giving the code first and the meaning after.",
+    "sizeWhy": "one rule in words"
+   },
+   "handle": "Meaning first, code last, as written."
+  },
+  "P8.1": {
+   "pain": {
+    "kind": "false",
+    "meter": {
+     "came": true
+    },
+    "text": "You read a count on {ep} and its label says one thing while the rule that made it counts another, or a value nobody read is shown as none. You trust the label, and the page tells you something that is not true."
+   },
+   "like": {
+    "process": "bank",
+    "analogy": "It is like a bank statement headed balance whose figure is only the total of deposits, so the teller trusts the heading and signs.",
+    "stops": "It stops being true where the bank states its rule, because a check can hold a label to its rule only where the generator states both."
+   },
+   "cost": {
+    "toSolve": "A check in the build of each page generator, one pass per generator, so that a count's label comes from the very rule that computes it.",
+    "ifNot": "Labels keep promising more than their rule counts, and unknown keeps showing as none.",
+    "sizeWhy": "a check in each page generator that stops the build"
+   },
+   "handle": "The label is the rule, written out."
+  },
+  "P8.2": {
+   "pain": {
+    "kind": "false",
+    "meter": {
+     "came": true
+    },
+    "text": "You read none, or an empty list, where the truth is that nobody looked, or that the thing is absent, or that it lies beyond one level. A bare zero says there is nothing when the page does not know."
+   },
+   "like": {
+    "process": "triage",
+    "analogy": "It is like a lab report that prints a blank when the test was never run, which a doctor reads as healthy.",
+    "stops": "It stops being true where a report is one page, because a clause in the execution contract reaches every skill at once, so its wording needs a review of its own."
+   },
+   "cost": {
+    "toSolve": "One clause in the execution contract, written in words, and its wording needs a review of its own, a few minutes of yours.",
+    "ifNot": "Unknown keeps looking like none, and a zero keeps telling you something the page does not know.",
+    "sizeWhy": "one clause that reaches every skill"
+   },
+   "handle": "Say untested, never zero."
+  },
+  "P9.1": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "came": true
+    },
+    "text": "You are asked how a table, a schema or a test should look, and the only place to see one is a dense table full of the others. You judge it in the crowd, never alone."
+   },
+   "like": {
+    "process": "recipe",
+    "analogy": "It is like a restaurant that tastes one sauce alone before it goes on every plate of the menu.",
+    "stops": "It stops being true where the sauce is already settled, because for an element whose look is decided a bench is a detour."
+   },
+   "cost": {
+    "toSolve": "One step in the mockup skill's first-draft stage and a note in the method file, both in words, and the bench, a page for one element alone, adds a page before the dense view.",
+    "ifNot": "Each new element is drawn many times before you have seen it once.",
+    "sizeWhy": "one step and one note, in words"
+   },
+   "handle": "Taste the sauce alone, then plate it."
+  },
+  "P10.1": {
+   "pain": {
+    "kind": "forgot",
+    "meter": {
+     "came": true
+    },
+    "text": "An agent is told the rule and breaks it on the next page, with a choice made alone, an option the copy dropped or a number typed by hand. You find each break by reading."
+   },
+   "like": {
+    "process": "line",
+    "analogy": "It is like a factory that writes a safety rule on the wall and also fits a sensor on the machine, where the sensor stops the line and the wall only asks.",
+    "stops": "It stops being true where a sensor is cheap, because a check per rule grows each generator, and a rule that is easy to keep by eye may not be worth one."
+   },
+   "cost": {
+    "toSolve": "Checks added to each generator's build and test run and to the audit script, one pass per rule, where the build checks stop the build and the audit only reports.",
+    "ifNot": "Rules that live only in words keep breaking on the next surface, and you stay the one who has to notice.",
+    "sizeWhy": "checks in every generator and the audit"
+   },
+   "handle": "A rule with no sensor is a wall poster."
+  },
+  "P10.2": {
+   "pain": {
+    "kind": "forgot",
+    "meter": {
+     "came": true
+    },
+    "text": "A page rule is written down and the check that would hold it is never named. You are told the rule exists and cannot tell whether anything would catch a breach."
+   },
+   "like": {
+    "process": "checklist",
+    "analogy": "It is like a safety poster that names who inspects the line and when, instead of only telling the workers to be careful.",
+    "stops": "It stops being true where the poster is itself a rule, because the clause holds only if a review asks for the check."
+   },
+   "cost": {
+    "toSolve": "One clause in the execution contract, written in words, which reaches every skill at once, so its wording needs a review of its own.",
+    "ifNot": "New rules keep arriving with no check named, and nobody can tell if one would catch a breach.",
+    "sizeWhy": "one clause that reaches every skill"
+   },
+   "handle": "Name the inspector in the same breath."
+  },
+  "A1": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "n": "nDown",
+     "of": "nCompared",
+     "noun": "of the counts the audit can compare went down since the start"
+    },
+    "text": "To learn how many hovers repeat a line or how many names break, you ran a prototype by hand on one page, the page for {ep}. It is not in the suite, so no other page is measured and nothing says when you last ran it."
+   },
+   "like": {
+    "process": "line",
+    "analogy": "It is like bolting a quality inspector's hand-held gauge to the assembly line as a fixed inspection station, so every part passes it and not only the ones somebody remembers to bring.",
+    "stops": "It stops being true where a station sees every part, because the audit reads one page at one width, and a defect on another endpoint or at another width stays unseen."
+   },
+   "cost": {
+    "toSolve": "The prototype of {auditN} lines moves into the artifact skill, a new battery proves each count can fire and stay silent, and the suite check gains a longer run that opens a browser.",
+    "ifNot": "The measure stays a script you run by hand on one page, and the checks the other proposals share have no home.",
+    "sizeWhy": "a script moved, a battery added and a longer suite run"
+   },
+   "handle": "Bolt the gauge to the line."
+  },
+  "mo.leg": {
+   "pain": {
+    "kind": "repeat",
+    "meter": {
+     "check": "repeatLine"
+    },
+    "text": "You point at a refusal on {ep} to learn why it ended, and the hover spends its words on what every refusal means. Those words belong in one key, but a key has to stand where you will see it."
+   },
+   "like": {
+    "process": "ticket",
+    "analogy": "It is like the abbreviation key of a kitchen order ticket, which can hang on the wall over the stove all shift or wait with the head chef until a cook is stuck.",
+    "stops": "It stops being true where a wall takes room, because a strip above the table pushes the table down, while the head chef costs nothing until asked."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both keys are built, and the strip adds a key line for each row above the table, so the table starts lower on the screen.",
+    "ifNot": "Every hover keeps opening with the meaning of its kind, and the count of hovers with a repeated line stays at {repeatLine_now}.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Post the key once, where the eye lands.",
+   "marks": {
+    "hover": "gain",
+    "strip": "both"
+   }
+  },
+  "mo.ipo": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "check": "repeatText"
+    },
+    "text": "You point at the {sName} rate limit on {ep} and want what comes before it, what it checks and what it gives. The hover hands you the facts in a shape you have to unpack first."
+   },
+   "like": {
+    "process": "pharmacy",
+    "analogy": "It is like a pharmacy bottle's label, which can print what to take it with, what not to exceed and what it does on separate lines, or run them into one sentence.",
+    "stops": "It stops being true where a label is read in a hurry by someone who knows the drug, while you read every hover cold."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both shapes are built, and the lines make a taller hover while the sentence makes a shorter one.",
+    "ifNot": "The hovers keep their mixed shape, and you keep unpacking the same facts on every item.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Before, checks, gives, always in that order.",
+   "marks": {
+    "lines": "gain",
+    "sent": "gain"
+   }
+  },
+  "mo.hdr": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "n": "nExcepts",
+     "noun": "ways the handler can end in a failure, each an alternative column and not a later step"
+    },
+    "text": "You read the stage names over the columns on {ep} and cannot tell which columns are steps taken in turn and which are ways a request can go instead. Some columns wear the stage mark and some do not, and nothing says why."
+   },
+   "like": {
+    "process": "timetable",
+    "analogy": "It is like a railway timetable, where one train's stops come in order and connections are other trains you could take, and only a heading says which is which.",
+    "stops": "It stops being true where a train takes one line for good, while a request can take one of several ways inside a single step."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both headers are built, and the road line makes the header one line taller.",
+    "ifNot": "Alternative columns keep looking like later steps, and you keep stopping to ask which is which.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Mark the road, not only the stops.",
+   "marks": {
+    "band": "neutral",
+    "road": "both"
+   }
+  },
+  "mo.save": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "n": "nCommits",
+     "noun": "saves along this request, one of them the handler's own"
+    },
+    "text": "On {ep} the handler writes the session and then saves it, and the save stands among the handler's other steps. You cannot tell whether saving is the handler's own work or a leftover the request leaves behind."
+   },
+   "like": {
+    "process": "bank",
+    "analogy": "It is like the last step of a bank transfer, where the teller presses confirm, which can be listed with the counter work or with the entry left in the ledger.",
+    "stops": "It stops being true where a confirm is one act, because here the save is code that runs once and leaves the written rows behind."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and either the save moves into the column of what is left behind or it stays with the handler and that column becomes an empty outline.",
+    "ifNot": "The save keeps standing where you cannot tell whether it belongs to the handler or to what the handler leaves behind.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "A save ends the work and starts the record.",
+   "marks": {
+    "eff": "gain",
+    "hand": "cost"
+   }
+  },
+  "mo.meta": {
+   "pain": {
+    "kind": "mixed",
+    "meter": {
+     "check": "timeless"
+    },
+    "text": "On {ep} the table that lays a request out step by step once carried a column that held no step, only facts about the request itself, and it read as one more step. Pulled out of the table, those facts still have to stand somewhere, above it or below it."
+   },
+   "like": {
+    "process": "shipping",
+    "analogy": "It is like the waybill on a parcel, which can sit on the front for the carrier to read first or in the paperwork behind it, with the same goods inside either way.",
+    "stops": "It stops being true where order is free, because a waybill on the front delays nobody, while facts above the table push the table down the screen."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both places are built, and above the table the facts are read first and the table starts lower on the screen.",
+    "ifNot": "Nothing breaks, because the facts stay under the table, but you keep meeting them last, after the whole table.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Keep trip facts off the timetable.",
+   "marks": {
+    "after": "gain",
+    "before": "both"
+   }
+  },
+  "mo.wid": {
+   "pain": {
+    "kind": "cut",
+    "meter": {
+     "check": "midWord"
+    },
+    "text": "You click a column's head on {ep} to give it room, and the names inside either stop breaking in the middle of a word or every label lands on one line. In a column too narrow you read names that wrap letter by letter."
+   },
+   "like": {
+    "process": "tailor",
+    "analogy": "It is like a tailor letting out a seam, where you can stop as soon as the shirt stops pinching or keep going until every fold hangs straight, which takes much more cloth.",
+    "stops": "It stops being true where cloth is spare, because the table has only so much width, and a wide column takes it from the others."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and widening until every item sits on one line makes the column wider, so the table scrolls sideways sooner.",
+    "ifNot": "The click keeps widening a column only until no name breaks, and a long label may still wrap at a space.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Stop widening when the words stop breaking.",
+   "marks": {
+    "names": "gain",
+    "line": "both"
+   }
+  },
+  "mo.fit": {
+   "pain": {
+    "kind": "squeezed",
+    "meter": {
+     "n": "nScroll",
+     "of": "nEp",
+     "noun": "endpoints whose table runs past its box"
+    },
+    "text": "On {ep} the columns run past the edge of the box and the last ones are cut off, so you scroll sideways to read them. The fit button has to narrow or wrap something, and each way gives up something you used to read."
+   },
+   "like": {
+    "process": "packing",
+    "analogy": "It is like a suitcase that will not close, where you can squash the thin things into a corner or split the load into a second bag.",
+    "stops": "It stops being true where a squashed shirt is still a shirt, because a narrowed strip shows only how many items a column holds, until you click it."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and narrowing leaves strips you widen by clicking while wrapping makes the table taller.",
+    "ifNot": "The table keeps running past its box on {nScroll} of {nEp} endpoints, and fit keeps doing what it does today.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Squash the thin, or split the load.",
+   "marks": {
+    "min": "both",
+    "bands": "both"
+   }
+  },
+  "mo.stk": {
+   "pain": {
+    "kind": "false",
+    "meter": {
+     "n": "nBlocks",
+     "noun": "rows to scroll through before you reach the end of the table"
+    },
+    "text": "You scroll down {ep} and read cells far below their column heads, and the heads still in view belong to the row pinned at the top, not to this table. You read a step under the wrong head."
+   },
+   "like": {
+    "process": "library",
+    "analogy": "It is like the sign at the end of a long library aisle, which you can no longer see once you walk down the shelves, unless a copy of it rides along beside you.",
+    "stops": "It stops being true where a sign costs nothing to carry, because heads that ride along take screen height from the cells."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and heads that ride along keep the stage band in view under the pinned row, at the cost of a strip of screen height.",
+    "ifNot": "Scrolled down, you keep reading cells under the pinned row's heads instead of this table's.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Carry the label down the aisle.",
+   "marks": {
+    "ride": "both",
+    "stay": "neutral"
+   }
+  },
+  "mo.gdl": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "n": "nWorkChecks",
+     "of": "nChecks",
+     "noun": "of the endpoint's checks sit in this one function"
+    },
+    "text": "On {ep} one function holds {nWorkChecks} checks and {nWorkForks} forks, and the small labels either repeat the function's name or hide it. You cannot tell which function a condition belongs to, or what its result does."
+   },
+   "like": {
+    "process": "checklist",
+    "analogy": "It is like a pre-flight checklist, where the name of whoever does a check can repeat on every line, stand once at the top, or sit in a column beside the check.",
+    "stops": "It stops being true where a crew knows who checks what, because you read the page cold, so the owner of a check matters more to you than to them."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since every look is built, and the repeated name makes each label long, the head makes the row short, and the columns line the effects up.",
+    "ifNot": "Check labels keep leaving you to guess which function evaluates the condition and what its result does.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Name the owner of the check, once.",
+   "marks": {
+    "chain": "cost",
+    "head": "gain",
+    "cols": "gain"
+   }
+  },
+  "mo.gef": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "n": "nRefused",
+     "of": "nEndings",
+     "noun": "of the endings are refusals, each with a colour to read"
+    },
+    "text": "On {ep} the {sName} rate limit ends in a {limStatus} refusal, and its label is coloured by one rule or another. You read the colour and do not know whether it names the answer or the stage the request had reached."
+   },
+   "like": {
+    "process": "line",
+    "analogy": "It is like an assembly line that paints a rejected part, where the paint can say how the part ended, accepted or rejected, or at which station it was stopped.",
+    "stops": "It stops being true where a part is stopped at one station only, because a request can fail at the edge and still be coloured by its status."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and a colour for each stage adds a stage palette to the page, a new set of colours to learn.",
+    "ifNot": "A check's colour keeps meaning whatever the last builder meant by it, and you keep asking which.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Paint by how it ended, mark where it stopped.",
+   "marks": {
+    "end": "gain",
+    "stage": "cost"
+   }
+  },
+  "mo.gic": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "check": "bare"
+    },
+    "text": "On {ep} the places that check something and decide what happens next are of {nGateKinds} kinds, rate limits, checks, forks, catches and switches, and their labels look alike. You scan the row and cannot tell which kind you are pointing at without opening it."
+   },
+   "like": {
+    "process": "airport",
+    "analogy": "It is like the lanes at airport check-in, where each lane can wear its own sign, all lanes can wear the same sign, or none can wear one and you ask the person at the front.",
+    "stops": "It stops being true where a lane is long enough to read from afar, because a label is small, so an icon has to be told apart at a glance."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since every look is built, and an icon for each of the {nGateKinds} kinds is {nGateKinds} marks to learn, said once in the key.",
+    "ifNot": "The labels keep looking alike, and you keep opening them to tell the kinds apart.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "One kind, one sign.",
+   "marks": {
+    "each": "both",
+    "one": "neutral",
+    "none": "neutral"
+   }
+  },
+  "mo.grl": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "n": "nChecks",
+     "noun": "checks on this endpoint that say nothing of where they decide"
+    },
+    "text": "On {ep} a label for a check says which function it lives in but not at which level it decides, at login, in a dependency, in the handler or inside a call. You see it and cannot tell how much of the request it can stop."
+   },
+   "like": {
+    "process": "triage",
+    "analogy": "It is like a hospital triage tag, which can say where the patient was found, what was done or what the patient may do next, and a nurse acts on each differently.",
+    "stops": "It stops being true where a tag is one card on one patient, because a check can sit at several levels and the label names only one."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since every look is built, and each label adds a word to every check and to the key, while a label of what it guards names only the checks.",
+    "ifNot": "A check keeps showing only its function, so you cannot say how much of the request it can stop.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Say where the check sits in the chain.",
+   "marks": {
+    "where": "gain",
+    "what": "gain",
+    "guards": "both",
+    "off": "neutral"
+   }
+  },
+  "mo.fnm": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "n": "nWritten",
+     "of": "nTables",
+     "noun": "of the tables the request touches are written by the handler's own code"
+    },
+    "text": "On {ep} the function that does the work decides a {st404} and a {st409} answer and touches tables, but its label shows only a name and a role. You cannot tell what it does without opening the code."
+   },
+   "like": {
+    "process": "recipe",
+    "analogy": "It is like a recipe card for one step, which with only the step's name and the cook's title cannot say what it takes from the pantry and puts back unless the card lists it.",
+    "stops": "It stops being true where a card is small, because more on a label makes it taller and heavier to scan."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and each function label grows taller with its answers and its read and write marks, so the row is heavier to read.",
+    "ifNot": "Function labels keep naming only a name and a role, and you keep opening the code to find what they touch.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "A function's card lists what it takes and changes.",
+   "marks": {
+    "on": "both",
+    "off": "neutral"
+   }
+  },
+  "mo.std": {
+   "pain": {
+    "kind": "mixed",
+    "meter": {
+     "n": "nFlagEps",
+     "of": "nEp",
+     "noun": "endpoints carry the setting that switches a check"
+    },
+    "text": "On {ep} one row lists a setting that switches a check on or off, found on {nFlagEps} of {nEp} endpoints, beside pieces only a few endpoints have. You read the row and cannot tell whether it stands for a norm or an exception."
+   },
+   "like": {
+    "process": "recipe",
+    "analogy": "It is like a restaurant with house rules every dish follows and a board of specials only a few dishes have, and you can pin each rule beside its step or keep the board apart.",
+    "stops": "It stops being true where a special is rare by choice, because in code a piece is rare only when few endpoints need it."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since every look is built, and splitting or merging takes the row out of the table while keeping it leaves the row in lanes.",
+    "ifNot": "The row keeps mixing a norm with a rarity under one name, and you keep asking what it stands for.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "File the house rule beside its step.",
+   "marks": {
+    "split": "both",
+    "merge": "gain",
+    "keep": "neutral"
+   }
+  },
+  "mo.dfx": {
+   "pain": {
+    "kind": "half",
+    "meter": {
+     "n": "nWritten",
+     "of": "nTables",
+     "noun": "of the tables touched are written by the handler's own code"
+    },
+    "text": "On {ep} the data row touches {nTables} tables and the handler's own code writes {nWritten} of them, but it lists the tables with a read or write mark and never says which function does which. You cannot follow a function to the table it changes."
+   },
+   "like": {
+    "process": "road",
+    "analogy": "It is like a transit system, where a list of stations says where you can go but not how, until someone draws a map of each district or one map of the whole trip.",
+    "stops": "It stops being true where a map is read once, because here a function can read a table and then write it, so the lines carry both colours in order."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since every look is built, and a map in each step makes every cell taller while one map for the endpoint leaves the cells to count only.",
+    "ifNot": "The row keeps listing tables with no line from the function that touches them, and you keep tracing that link in your head.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Draw the line from the function to the table.",
+   "marks": {
+    "chips": "neutral",
+    "cell": "both",
+    "one": "both"
+   }
+  },
+  "mo.dxc": {
+   "pain": {
+    "kind": "mixed",
+    "meter": {
+     "n": "nWritten",
+     "noun": "tables written by the handler, each link drawn in the write colour"
+    },
+    "text": "On {ep} the function that does the work reads the session and then writes it, and you asked for writes in red. The page draws them orange, and the Gabe Universe, the map of the code, already uses red for another mark beside a function."
+   },
+   "like": {
+    "process": "airport",
+    "analogy": "It is like the colour-coded tags on airport luggage, where red already means fragile, so when red also marks priority bags the handler has to read each tag to know which red it is.",
+    "stops": "It stops being true where a tag carries a word, because here the colour is all a link says, and the key is the only word."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and your colours make red mean both a write and that other mark beside a function.",
+    "ifNot": "Writes keep their own orange, a colour for writes that you did not choose.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Give each red one meaning.",
+   "marks": {
+    "page": "neutral",
+    "his": "both"
+   }
+  },
+  "mo.jyb": {
+   "pain": {
+    "kind": "mixed",
+    "meter": {
+     "n": "nPriorTests",
+     "noun": "tests send requests before they call this one"
+    },
+    "text": "On {ep} {nPriorTests} tests send requests before they call it, up to {maxPrior} each, and the proof row mixes those earlier requests in with the steps of this one. A test's past reads as part of this request's time."
+   },
+   "like": {
+    "process": "recipe",
+    "analogy": "It is like a recipe that says marinate overnight, where the marinade can get a line before the cooking starts or be folded into the dish's title, since it is no time of the cooking.",
+    "stops": "It stops being true where the marinade is plainly separate, because a test's earlier request is itself a request and reads like one of this endpoint's."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and a step of their own adds a column before the request while the heading option adds only a line in the head.",
+    "ifNot": "Earlier requests keep standing among the steps, and you keep reading a test's past as part of the request's time.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Prep belongs before the clock starts.",
+   "marks": {
+    "prior": "both",
+    "head": "gain"
+   }
+  },
+  "mo.ifl": {
+   "pain": {
+    "kind": "half",
+    "meter": {
+     "n": "nReq",
+     "of": "nInf",
+     "noun": "of the values alive in a request go away with the answer"
+    },
+    "text": "On {ep} {nInf} values are alive while the request runs, {nReq} that go with the answer and {nSrv} that the server keeps. A label at the step where a value is set shows nothing about where it is read or what that read decides."
+   },
+   "like": {
+    "process": "shipping",
+    "analogy": "It is like tracking a parcel, where you can show only where it was sent, its whole journey with a dot at every scan, or an echo at each stop that read the label.",
+    "stops": "It stops being true where a parcel is one object, because values set together and read alike fold into one lane that opens."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since every look is built, and a lifeline for each value makes the row taller while echoes add a small mark at every step that reads it.",
+    "ifNot": "A value keeps showing only where it is set, and you keep guessing what it affects.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Follow the value to where it is read.",
+   "marks": {
+    "chips": "neutral",
+    "lane": "both",
+    "echo": "both"
+   }
+  },
+  "ex.lay": {
+   "pain": {
+    "kind": "squeezed",
+    "meter": {
+     "n": "nBenchKinds",
+     "noun": "columns on the bench to lay out"
+    },
+    "text": "On the bench, the row of columns where you judge one kind of thing alone, the {nBenchKinds} kinds stand side by side and run off the edge when the page is narrow. You scroll sideways to find one kind, or lose the order you learned when they wrap."
+   },
+   "like": {
+    "process": "road",
+    "analogy": "It is like laying out market stalls in one long street, in a street that bends at the corner when the road runs out, or on an upper and a lower level.",
+    "stops": "It stops being true where a market is walked in one go, because you compare a column with its neighbour and a wrap puts the neighbour on another row."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since every look is built, and wrapping or splitting makes the bench taller while one row makes the page scroll sideways when it is narrow.",
+    "ifNot": "The bench keeps its columns as they open now, and you keep scrolling sideways to reach the kinds off the edge.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Walk the whole row before you wrap it.",
+   "marks": {
+    "row": "both",
+    "wrap": "both",
+    "half": "both"
+   }
+  },
+  "ex.follow": {
+   "pain": {
+    "kind": "help",
+    "meter": {
+     "n": "nBenchKinds",
+     "noun": "columns a click elsewhere could change"
+    },
+    "text": "On the bench for {ep} you click the {sName} rate limit in the table, and the bench either shows it in its column or keeps what you picked. You lose the element you were studying, or you wonder why your click did nothing there."
+   },
+   "like": {
+    "process": "protocol",
+    "analogy": "It is like a switchboard call when you move to another desk, where the call can be transferred to follow you or can stay on the first desk until you hang up.",
+    "stops": "It stops being true where you move once, because on this page you click again and again, and each click is a possible transfer."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and following means the bench changes under your clicks elsewhere while staying means a click in the table no longer reaches it.",
+    "ifNot": "The bench keeps following your clicks as it does now, and a click elsewhere keeps replacing what you were studying.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Follow the call, or hold the line.",
+   "marks": {
+    "on": "both",
+    "off": "both"
+   }
+  },
+  "ex.scope": {
+   "pain": {
+    "kind": "missing",
+    "meter": {
+     "n": "nEp",
+     "noun": "endpoints whose checks a column could offer"
+    },
+    "text": "On the bench, the column of checks offers the checks of {ep} alone, or the checks of any of the {nEp} endpoints. You choose from a short list that may lack the one you want, or from a long list where you lose it."
+   },
+   "like": {
+    "process": "library",
+    "analogy": "It is like the catalogue of a library branch, where you can search only this branch's shelves, which is quick, or the whole system's, which has your book but takes longer to read.",
+    "stops": "It stops being true where a branch is a subset of the system, because an element missing here is drawn as it is on the first endpoint that has it."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and every endpoint makes a column long while this endpoint alone keeps it short and may miss the one you want.",
+    "ifNot": "The bench keeps offering what the open endpoint has, so an element from another endpoint is not there to compare.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Search the branch first, the system second.",
+   "marks": {
+    "here": "gain",
+    "all": "both"
+   }
+  },
+  "ex.kind.end": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "n": "nKindsOpen",
+     "of": "nBenchKinds",
+     "noun": "kinds whose look nobody has decided yet"
+    },
+    "text": "On {ep} the ending column offers {nEndings} ways to end, from the {limStatus} refusal at the edge to the {st404} answer for a missing recipe. An ending only ever appears as a small label in a dense table, so you cannot judge how one should look alone."
+   },
+   "like": {
+    "process": "line",
+    "analogy": "It is like a print shop that pulls one proof sheet to judge the ink before it runs the whole job.",
+    "stops": "It stops being true where a proof is cheap, because a look from the bench has to be pasted back here before anything is built."
+   },
+   "cost": {
+    "toSolve": "One pick of yours, where as drawn is built and change it means you set the ending's parts, size and colour on the bench, where one kind stands alone, and paste its copy line back here.",
+    "ifNot": "Endings keep being judged only inside the dense table, where you meet many of them before you meet one.",
+    "size": "small",
+    "sizeWhy": "one pick of yours, and a few minutes on the bench if you change it"
+   },
+   "handle": "Pull one proof before the whole run.",
+   "marks": {
+    "drawn": "gain",
+    "change": "both"
+   }
+  },
+  "ex.kind.table": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "n": "nKindsOpen",
+     "of": "nBenchKinds",
+     "noun": "kinds whose look nobody has decided yet"
+    },
+    "text": "On {ep} the request touches {nTables} tables and writes {nWritten} of them, and a table shows up only as a small label inside the table of steps. You cannot judge how a table, with its fields, should look until you see one alone."
+   },
+   "like": {
+    "process": "tailor",
+    "analogy": "It is like a tailor who pins one jacket on you before cutting all the others, so you judge the cut on the one you can see.",
+    "stops": "It stops being true where a fitting is quick, because a look from the bench has to be pasted back here before anything is built."
+   },
+   "cost": {
+    "toSolve": "You already ruled it as drawn, so keeping it costs nothing, and changing it means setting its parts, size and colour on the bench, where one kind stands alone, and pasting its copy line back here.",
+    "ifNot": "Tables keep being judged only as small labels in the dense table, never with their fields laid out.",
+    "size": "small",
+    "sizeWhy": "one pick of yours, and a few minutes on the bench if you change it"
+   },
+   "handle": "Pin one jacket before you cut the cloth.",
+   "marks": {
+    "drawn": "gain",
+    "change": "both"
+   }
+  },
+  "ex.kind.schema": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "n": "nKindsOpen",
+     "of": "nBenchKinds",
+     "noun": "kinds whose look nobody has decided yet"
+    },
+    "text": "On {ep} the reply carries {nResFields} fields, and a schema shows up only as a small label. You cannot judge how a shape of data should look when you never see its fields laid out alone."
+   },
+   "like": {
+    "process": "tailor",
+    "analogy": "It is like a dressmaker who cuts one pattern in paper and tries it on a dress form before cutting the cloth.",
+    "stops": "It stops being true where paper is free, because a look from the bench still has to be pasted back here before anything is built."
+   },
+   "cost": {
+    "toSolve": "One pick of yours, where as drawn is built and change it means you set the schema's parts, size and colour on the bench, where one kind stands alone, and paste its copy line back here.",
+    "ifNot": "Schemas keep being drawn as small labels, and their fields stay out of sight.",
+    "size": "small",
+    "sizeWhy": "one pick of yours, and a few minutes on the bench if you change it"
+   },
+   "handle": "Cut it in paper before cloth.",
+   "marks": {
+    "drawn": "gain",
+    "change": "both"
+   }
+  },
+  "ex.kind.fn": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "n": "nKindsOpen",
+     "of": "nBenchKinds",
+     "noun": "kinds whose look nobody has decided yet"
+    },
+    "text": "On {ep} the handler calls a chain of functions, and each shows as a name and a role. You cannot judge how a function should look, with what it decides and what it touches, until you see one alone."
+   },
+   "like": {
+    "process": "line",
+    "analogy": "It is like a test drive of one car from the line before the dealer tunes every car on the lot.",
+    "stops": "It stops being true where a drive is short, because a function's look also has to carry what it decides and what it touches."
+   },
+   "cost": {
+    "toSolve": "One pick of yours, where as drawn is built and change it means you set the function's parts, size and colour on the bench, where one kind stands alone, and paste its copy line back here.",
+    "ifNot": "Functions keep being judged as names and roles, never as the work they do.",
+    "size": "small",
+    "sizeWhy": "one pick of yours, and a few minutes on the bench if you change it"
+   },
+   "handle": "Drive one car before you tune them all.",
+   "marks": {
+    "drawn": "gain",
+    "change": "both"
+   }
+  },
+  "ex.kind.test": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "n": "nKindsOpen",
+     "of": "nBenchKinds",
+     "noun": "kinds whose look nobody has decided yet"
+    },
+    "text": "On {ep} {nAct} tests send this request, and each shows as a name in the proof row. You cannot judge how a test should look, with what it sends and what it proves, until you see one alone."
+   },
+   "like": {
+    "process": "recipe",
+    "analogy": "It is like a chef who tastes one spoonful of the sauce before it goes on every plate.",
+    "stops": "It stops being true where a spoonful is the whole dish, because a test's look must carry the requests it sends and what it proves."
+   },
+   "cost": {
+    "toSolve": "One pick of yours, where as drawn is built and change it means you set the test's parts, size and colour on the bench, where one kind stands alone, and paste its copy line back here.",
+    "ifNot": "Tests keep showing as names in a row, and you keep guessing what each one proves.",
+    "size": "small",
+    "sizeWhy": "one pick of yours, and a few minutes on the bench if you change it"
+   },
+   "handle": "Taste a spoonful before the whole pan.",
+   "marks": {
+    "drawn": "gain",
+    "change": "both"
+   }
+  },
+  "ex.kind.gate": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "n": "nKindsOpen",
+     "of": "nBenchKinds",
+     "noun": "kinds whose look nobody has decided yet"
+    },
+    "text": "On {ep} the places that check something and decide what happens next come to {nChecks} checks, {nForks} forks, {nCatches} catches and {nLimits} rate limits, and each shows as a small label. You cannot judge how such a place should look, with what it decides, until you see one alone."
+   },
+   "like": {
+    "process": "signs",
+    "analogy": "It is like a sign painter who paints one road sign and checks it from a car before painting every sign on the route.",
+    "stops": "It stops being true where a road has one kind of sign, because here the same look must tell a rate limit from a fork."
+   },
+   "cost": {
+    "toSolve": "One pick of yours, where as drawn is built and change it means you set the check's parts, size and colour on the bench, where one kind stands alone, and paste its copy line back here.",
+    "ifNot": "Checks keep being judged as small labels among many, and the decision each one makes stays out of view.",
+    "size": "small",
+    "sizeWhy": "one pick of yours, and a few minutes on the bench if you change it"
+   },
+   "handle": "Check one sign from the car first.",
+   "marks": {
+    "drawn": "gain",
+    "change": "both"
+   }
+  },
+  "ex.kind.hook": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "n": "nKindsOpen",
+     "of": "nBenchKinds",
+     "noun": "kinds whose look nobody has decided yet"
+    },
+    "text": "On {ep} one hook of the web app sends this request, and it shows as a name in the pinned row. You cannot judge how a hook should look, with what it sends and where it sends it, until you see it alone."
+   },
+   "like": {
+    "process": "protocol",
+    "analogy": "It is like a dress rehearsal for one actor before the whole company runs the show.",
+    "stops": "It stops being true where an actor works alone, because a hook's look also has to say what it fetches."
+   },
+   "cost": {
+    "toSolve": "One pick of yours, where as drawn is built and change it means you set the hook's parts, size and colour on the bench, where one kind stands alone, and paste its copy line back here.",
+    "ifNot": "Hooks keep showing as bare names, and what each one fetches stays a question.",
+    "size": "small",
+    "sizeWhy": "one pick of yours, and a few minutes on the bench if you change it"
+   },
+   "handle": "Rehearse one part before the show.",
+   "marks": {
+    "drawn": "gain",
+    "change": "both"
+   }
+  },
+  "ex.kind.inf": {
+   "pain": {
+    "kind": "hidden",
+    "meter": {
+     "n": "nKindsOpen",
+     "of": "nBenchKinds",
+     "noun": "kinds whose look nobody has decided yet"
+    },
+    "text": "On {ep} {nInf} values are alive while the request runs, and each shows as a small label. You cannot judge how such a value should look, with where it is set and where it is read, until you see one alone."
+   },
+   "like": {
+    "process": "recipe",
+    "analogy": "It is like a baker who bakes one loaf to judge the crust before filling the whole oven.",
+    "stops": "It stops being true where a loaf is a single thing, because a value's look has to show where it is set and where it is read."
+   },
+   "cost": {
+    "toSolve": "One pick of yours, where as drawn is built and change it means you set the value's parts, size and colour on the bench, where one kind stands alone, and paste its copy line back here.",
+    "ifNot": "Values that live while a request runs keep showing as small labels, and where each is read stays hidden.",
+    "size": "small",
+    "sizeWhy": "one pick of yours, and a few minutes on the bench if you change it"
+   },
+   "handle": "Bake one loaf before the oven is full.",
+   "marks": {
+    "drawn": "gain",
+    "change": "both"
+   }
+  },
+  "F24": {
+   "pain": {
+    "kind": "false",
+    "meter": {
+     "n": "nEp",
+     "noun": "endpoints whose pinned row carries this head"
+    },
+    "text": "On {ep} the pinned row's column head says {oldHead}, but it counts the hook that sends the request, and the screen that stands beside it is not counted. You read a number under the wrong word."
+   },
+   "like": {
+    "process": "shipping",
+    "analogy": "It is like a delivery ledger with a column headed customer that in fact counts the vans that go out, so everyone reads the number as customers.",
+    "stops": "It stops being true where the word is yours, because you may like the word for what it stands for, and then the head's own hover must say it counts the sender."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since renaming changes the head in a few places and keeping it changes only the head's own hover.",
+    "ifNot": "The head keeps promising one thing and counting another, and anyone reading the count takes it for screens.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Head the column with what it counts.",
+   "marks": {
+    "sends": "gain",
+    "keep": "neutral"
+   }
+  },
+  "L-19": {
+   "pain": {
+    "kind": "missing",
+    "meter": {
+     "n": "secMissing",
+     "noun": "security facts missing from both the lab and the page"
+    },
+    "text": "On {ep} the facts about security sit in different rows, and {secMissing} of them are missing from both the lab and the page. To learn what protects the request you walk from row to row, and some facts you cannot find at all."
+   },
+   "like": {
+    "process": "bank",
+    "analogy": "It is like a bank whose vault checks are written in different offices, so to learn what protects one account you walk from office to office, and some checks are written down nowhere.",
+    "stops": "It stops being true where an office is a place, because a row can repeat a fact, and repeating is exactly what a ninth row would do."
+   },
+   "cost": {
+    "toSolve": "The first option builds one security control, moves {nSecItems} items into the Gates and decisions row and reads {secMissing} missing facts from the app's settings, the second adds a ninth row, and the third builds nothing.",
+    "ifNot": "The security facts keep sitting in different rows and {secMissing} stay missing, so what protects the request stays a hunt.",
+    "size": "medium",
+    "sizeWhy": "one control to build and a few facts newly read, if you take the first"
+   },
+   "handle": "Gather the checks in one office.",
+   "marks": {
+    "G1": "both",
+    "G2": "cost",
+    "G3": "neutral"
+   }
+  },
+  "R-11": {
+   "pain": {
+    "kind": "squeezed",
+    "meter": {
+     "n": "nScroll",
+     "of": "nEp",
+     "noun": "endpoints whose table runs past its box"
+    },
+    "text": "Names now stay whole, so on {nScroll} of {nEp} endpoints the table that lays a request out step by step is wider than its box and you scroll sideways. You open an endpoint and the columns near the answer are already off the screen."
+   },
+   "like": {
+    "process": "packing",
+    "analogy": "It is like a shirt back from the laundry, which can arrive already folded to fit the drawer or loose, folded only when you reach for it.",
+    "stops": "It stops being true where a folded shirt is still a shirt, because a fitted table is narrowed or wrapped, so something you read whole is squeezed."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since opening fitted changes a default on the {nScroll} endpoints that overflow and leaves the others as they are.",
+    "ifNot": "On {nScroll} of {nEp} endpoints you keep scrolling sideways, one click away from fitting.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Fold it for the drawer, or leave it loose.",
+   "marks": {
+    "fit": "both",
+    "scroll": "neutral"
+   }
+  },
+  "EX-5": {
+   "pain": {
+    "kind": "mixed",
+    "meter": {
+     "n": "nBenchKinds",
+     "noun": "kinds whose bench look the table's labels cannot use yet"
+    },
+    "text": "On {ep} the bench draws the function that does the work as a block, while the table draws the same function as a small label. A look you decide on the bench never reaches the table, so the look you chose is not the one you read."
+   },
+   "like": {
+    "process": "line",
+    "analogy": "It is like approving a prototype on the workshop bench and then running the production line from a different drawing, so the thing you approved is not the thing that ships.",
+    "stops": "It stops being true where a prototype is a one-off, because here a bench look can become the table's look the day you rule one."
+   },
+   "cost": {
+    "toSolve": "Waiting costs nothing and builds the new cell option once you rule a kind's look, while building it now adds one more cell option on looks that are only my picks.",
+    "ifNot": "A look decided on the bench keeps not reaching the table, and you keep reading different looks for one function.",
+    "size": "medium",
+    "sizeWhy": "one more cell option in the table if built now, nothing if it waits"
+   },
+   "handle": "Approve the sample before you tool the line.",
+   "marks": {
+    "wait": "neutral",
+    "now": "both"
+   }
+  }
+ }
+}

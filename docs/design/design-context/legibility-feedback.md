@@ -473,10 +473,16 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
 - **where:** the review page · the ten pattern cards and the 53 decision cards, on the page and read aloud
 - **could not tell:** why a pattern or a choice matters — the words described the mechanism in the page's own terms, without the pain it
   removes, a picture to hold it by, or what fixing it costs.
-- **fix:** every pattern and every decision opens with the pain (what goes wrong for you, as a step that fails), one gabe-lens analogy in his
-  suit (a process he knows), the cost of solving it (and of not solving it), and a one-line handle; read aloud in that order.
+- **fix:** built: every pattern card and every decision card (the 29 looks, the 4 proposals, the 19 draft suite proposals, the audit, and the L-19
+  recommendation where it stands twice) opens with blocks written in his suit, Sequential-Procedural, with the gabe-lens method: THE PAIN (what goes wrong
+  for you today, as a step that fails, with the real case from POST /cooking/sessions and its count), ONE analogy from everyday life, a process, with
+  where it stops, THE COST (what solving it takes, in your review time, passes of work or suite run time, and what keeps happening if it is not solved)
+  and a one-line handle; a pattern adds the steps of how the defect happens, time from the top with the failing step marked, and the box: does, does not
+  do, decides when. The spoken summary of every pattern and decision is rebuilt in that order, the pain first, then the analogy, the cost, the options and
+  my pick, 4 to 7 sentences, and a pattern has a listen button of its own. The words are in legibility-review.lens.json; every number in them is generated,
+  and the build stops on an id, a path, a symbol, code or a typed number there.
 - **tag:** `mechanism-without-its-pain`
-- **status:** logged
+- **status:** built (D-079)
 
 ### L-32
 - **words:** "in all these blocks where we are trying to communicate something that needs to be decided or a situation, let's use more icons
@@ -484,8 +490,13 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
   give a little explanation of what they are trying to communicate."
 - **where:** the review page · the pain, analogy, cost, handle, steps, box and options blocks of every pattern and decision (D-079)
 - **could not tell:** the weight of a situation at a glance — sizes, costs and gains were sentences to read, not marks to see.
-- **fix:** each block wears icons and small visual encodings (a pain meter, the analogy's process icon, a cost meter and balance, numbered
-  steps with the failing one marked, the box as does / does not / decides-when marks, gains and costs on each option); every icon's hover
-  says what it communicates there, by the D-078 rules.
+- **fix:** built: the blocks wear icons and small visual encodings, and every icon's hover says what it shows there: the pain wears an icon for its kind
+  (cannot tell, the same words again, out of sight, not true, cut or broken, no room, mixed up, a rule nobody checks, a piece missing, talk about the page, half
+  a link) and a meter drawn from its real count (a measured check at the start and now, a count of a total, a tally, or how often the pattern came up and how
+  many are still there); the analogy wears an icon for its kind of everyday process (a recipe, an assembly line, an order ticket, a checklist, a protocol and
+  so on); the cost shows a small, medium or large bar for what it takes to solve (derived from a proposal's kind and gate) beside the if-not mark, and the patterns
+  and the suite proposals a two-pan balance of pain against cost; the handle wears a pin; a pattern's steps are numbered chips joined by arrows with the failing
+  one marked, and its box reads as does, does not do and decides-when marks; each option's impact is marked as a gain, a cost, both or neutral. The legend says
+  each new mark once.
 - **tag:** `weight-told-not-shown`
-- **status:** logged
+- **status:** built (D-080)

@@ -369,7 +369,9 @@
       "L-27": "a player bar that stays in view",
       "L-28": "the player bar all the time",
       "L-29": "a nested menu with a summary per decision",
-      "L-30": "an example and the impact on every decision, a hover for every icon"
+      "L-30": "an example and the impact on every decision, a hover for every icon",
+      "L-31": "the pain and the cost behind every explanation",
+      "L-32": "icons and marks that show the weight of a situation"
     },
     "round2Head": "Raised on reading this page",
     "round2Note": "You raised these after you read this page, so the review has not read them yet. They are built on this page itself: the page you are reading is their picture.",
@@ -795,7 +797,7 @@
     "copyAll": "copy every summary",
     "listenAll": "listen to every summary",
     "tip": "Read this summary aloud",
-    "mineNote": "Each section opens with a summary written to be read aloud, from the numbers on this page. Copy one with its button, or every summary at once. The dashed buttons are my proposal, not something you asked for: they read a summary aloud with your browser's own voice, free, with nothing sent anywhere. While a voice plays, the contents bar freezes at the top and carries the player, as you asked: stop it, skip to another section, and the page goes there too. The speed you pick and the options beside it are kept in this browser. When you have saved a voice in the voice lab, this page reads with it. The section chips with a caret open a menu of that section's decisions: pick one and the page and the reading go to it, with a short summary and a plain line, and the option after a decision says what happens next.",
+    "mineNote": "Each section opens with a summary written to be read aloud, from the numbers on this page. Copy one with its button, or every summary at once. The dashed buttons are my proposal, not something you asked for: they read a summary aloud with your browser's own voice, free, with nothing sent anywhere. While a voice plays, the contents bar freezes at the top and carries the player, as you asked: stop it, skip to another section, and the page goes there too. The speed you pick and the options beside it are kept in this browser. When you have saved a voice in the voice lab, this page reads with it. The section chips with a caret open a menu of that section's decisions: pick one and the page and the reading go to it, with a short summary and a plain line, and the option after a decision says what happens next. Each pattern card has a listen button of its own, which reads its pain, a picture, its cost and my pick.",
     "rateLabel": "reading speed",
     "rateTip": "Pick the reading speed",
     "rates": [
@@ -1002,7 +1004,9 @@
       "decides": "This decides {rest}",
       "pickMine": "My pick is {pick}, and it is not a ruling.",
       "pickRuled": "You already ruled it, as {pick}.",
-      "pickSuite": "My pick is {pick}; nothing lands in the suite until you say land it."
+      "pickSuite": "My pick is {pick}; nothing lands in the suite until you say land it.",
+      "options": "You choose between {opts}.",
+      "optionsSuite": "You can land it, leave it for now, or ask for a change."
     },
     "kindWord": {
       "check": "check",
@@ -1458,6 +1462,239 @@
       "words": "a rule in words",
       "reference": "a written reference",
       "method": "a method step"
+    }
+  },
+  "gabeLens": {
+    "_about": "The words of the lens blocks (L-31, D-079): `ui` is drawn as it stands (labels, the legend, the kinds of pain and of picture, the size and impact words); `tpl` holds the hover and spoken templates the generator fills for each card, with {tokens} (name, Name, the counts, the option). The text inside each block (the pain, the picture, the cost, the handle) is in legibility-review.lens.json. A mark's word lives here once; icons.json has geometry only.",
+    "ui": {
+      "label": {
+        "pain": "The pain",
+        "like": "Like",
+        "cost": "The cost",
+        "toSolve": "To solve",
+        "ifNot": "If not",
+        "handle": "The handle",
+        "steps": "The steps",
+        "box": "The box",
+        "does": "Does",
+        "doesNot": "Does not do",
+        "decides": "Decides when",
+        "balance": "Cost against pain",
+        "meter": "Pain meter",
+        "wrong": "Where it goes wrong"
+      },
+      "size": {
+        "small": "small",
+        "medium": "medium",
+        "large": "large"
+      },
+      "meter": {
+        "start": "start",
+        "now": "now",
+        "of": "of"
+      },
+      "pain": {
+        "help": {
+          "word": "cannot tell",
+          "short": "you cannot tell things apart, or what a thing is",
+          "def": "You cannot tell one thing from another, or what a thing is, without opening it or asking."
+        },
+        "repeat": {
+          "word": "same words again",
+          "short": "the same words come back on item after item",
+          "def": "The same words come back on item after item, so nothing tells the items apart."
+        },
+        "hidden": {
+          "word": "out of sight",
+          "short": "what you need to see is out of sight",
+          "def": "What you need to see is out of sight, so you decide without it."
+        },
+        "false": {
+          "word": "not true",
+          "short": "a word or a number says something that is not true",
+          "def": "A word or a number says something that is not true, and you trust it."
+        },
+        "cut": {
+          "word": "cut or broken",
+          "short": "text is cut off or broken in the middle",
+          "def": "Text is cut off or broken in the middle, so you cannot read it whole."
+        },
+        "squeezed": {
+          "word": "no room",
+          "short": "there is too little room, so you scroll or lose the order",
+          "def": "There is too little room, so you scroll sideways or lose the order you learned."
+        },
+        "mixed": {
+          "word": "mixed up",
+          "short": "things are mixed together, or one thing goes by several names",
+          "def": "Things that belong apart are mixed together, or one thing goes by several names."
+        },
+        "forgot": {
+          "word": "a rule nobody checks",
+          "short": "a rule lives only in words, so it breaks when nobody checks",
+          "def": "A rule lives only in words, so it breaks the moment nobody is checking."
+        },
+        "missing": {
+          "word": "a piece missing",
+          "short": "a piece is missing, so you go and hunt for it",
+          "def": "A piece is missing, so you walk from place to place to find it."
+        },
+        "noise": {
+          "word": "talk about the page",
+          "short": "the words are about the page and not about the code",
+          "def": "The words are about the page itself, where words about the code should be."
+        },
+        "half": {
+          "word": "half a link",
+          "short": "one end of a link is drawn and the other is not",
+          "def": "One end of a link is drawn and the other end is not."
+        }
+      },
+      "process": {
+        "recipe": {
+          "word": "a recipe",
+          "def": "Steps in a fixed order, where one skipped step spoils the dish."
+        },
+        "line": {
+          "word": "an assembly line",
+          "def": "Stations in a fixed order, where a defect passed on at one station shows up at the next."
+        },
+        "ticket": {
+          "word": "an order ticket",
+          "def": "A slip that travels with the work and says what to do at each stop."
+        },
+        "checklist": {
+          "word": "a checklist",
+          "def": "Items ticked in order, where an item nobody ticked is a step nobody did."
+        },
+        "protocol": {
+          "word": "a protocol",
+          "def": "An agreed exchange of steps between sides, which works only if each side follows it."
+        },
+        "pharmacy": {
+          "word": "a pharmacy",
+          "def": "A counter where each step, from the prescription to the label, is checked before the next."
+        },
+        "post": {
+          "word": "a post office",
+          "def": "A parcel passes counters in order, and each counter reads its label."
+        },
+        "road": {
+          "word": "a road trip",
+          "def": "A route of stops in order, where a missed turn changes where you end up."
+        },
+        "library": {
+          "word": "a library",
+          "def": "You look up the catalogue first and walk to the shelf second."
+        },
+        "shipping": {
+          "word": "a shipment",
+          "def": "A parcel with a waybill that travels with it through every handover."
+        },
+        "airport": {
+          "word": "an airport",
+          "def": "Check-in, security and boarding in a fixed order, each with its own sign."
+        },
+        "bank": {
+          "word": "a bank",
+          "def": "A transfer that passes its checks in order before it is confirmed."
+        },
+        "timetable": {
+          "word": "a timetable",
+          "def": "Stops in time order, with connections as alternatives."
+        },
+        "triage": {
+          "word": "a triage ward",
+          "def": "Each patient is tagged on arrival, and the tag decides the next step."
+        },
+        "tailor": {
+          "word": "a tailor",
+          "def": "Measure, pin and cut, in that order, because cloth once cut is gone."
+        },
+        "packing": {
+          "word": "packing a bag",
+          "def": "Things go in one after another, and what does not fit is squashed or split."
+        },
+        "signs": {
+          "word": "road signs",
+          "def": "A sign is read in passing and says what to do next."
+        }
+      },
+      "impact": {
+        "gain": {
+          "word": "gains",
+          "def": "Picking this gives you something: a clearer page, a shorter table, or a slip caught."
+        },
+        "cost": {
+          "word": "costs",
+          "def": "Picking this costs something: room, work to carry, or a pain left standing."
+        },
+        "both": {
+          "word": "gains and costs",
+          "def": "Picking this gives something and costs something, and its line says both."
+        },
+        "neutral": {
+          "word": "no change",
+          "def": "Picking this changes nothing you would see on the page."
+        }
+      },
+      "legend": {
+        "head": "What a card opens with",
+        "kinds": "Kinds of pain",
+        "processes": "What the picture is",
+        "blocks": "The cost, the handle, the steps and the box",
+        "impact": "What an option does for you",
+        "def": {
+          "cost": "What it takes to solve, and what keeps happening if you leave it.",
+          "toSolve": "The cost to solve as a small, medium or large bar: small is one click of yours, large is a new tool or a longer suite run.",
+          "ifNot": "What keeps happening if nothing is done.",
+          "balance": "The pain on the left, the cost to solve on the right, and the beam tips to the heavier.",
+          "meter": "A small bar for how big the pain is, drawn from the page's own counts.",
+          "handle": "One line to keep when the rest is forgotten.",
+          "steps": "How the defect happens, step by step, in time order from the top.",
+          "wrong": "The step where it goes wrong.",
+          "does": "What it does.",
+          "doesNot": "What it does not do.",
+          "decides": "When it starts to matter."
+        },
+        "note": "Every card of a pattern or a decision opens with the pain, a picture from everyday life, the cost and a handle. The marks are the same wherever they appear."
+      }
+    },
+    "tpl": {
+      "painTip": "The pain of {name}: {short}.",
+      "likeTip": "The picture for {name} is {word}: read it in order, step by step.",
+      "meterBa": "{noun}: {before} at the start, {now} now.",
+      "meterCame": "{Name} came up {before} times, from your items and the review's findings, and {now} are still there.",
+      "meterFrac": "{n} of {of} {noun}.",
+      "meterTally": "{n} {noun}.",
+      "sizeTip": "{Size} to solve {name}: {sizeWhy}.",
+      "ifTip": "What keeps happening if you leave {name} alone.",
+      "handleTip": "The line to keep for {name}, for when the rest is forgotten.",
+      "balance": {
+        "pain": "The pain weighs more: it came up {came} times, and it is {size} to solve.",
+        "cost": "The cost weighs more: it is {size} to solve, and the pain came up {came} times.",
+        "even": "Pain and cost weigh about the same: it came up {came} times, and it is {size} to solve."
+      },
+      "stepsTip": "How {name} happens, in time order from the top.",
+      "stepBadTip": "Step {i} is where {name} goes wrong.",
+      "boxTip": "What {name} does, what it does not do, and when it matters.",
+      "boxRow": {
+        "does": "What {name} does when it happens.",
+        "doesNot": "What {name} fails to do, which tells it apart from its neighbours.",
+        "decides": "The moment when {name} starts to matter."
+      },
+      "markTip": {
+        "gain": "{Opt} gains you something, and its line says what.",
+        "cost": "{Opt} costs something, and its line says what.",
+        "both": "{Opt} gains you something and costs something, and its line says both.",
+        "neutral": "{Opt} changes nothing you would see on the page."
+      },
+      "say": {
+        "patOptions": "This pattern holds {props} for the suite, and each one is yours to land or leave.",
+        "patPickLand": "My pick is to land {them}, and nothing lands in the suite until you say land it.",
+        "patPickNot": "My pick is to leave {them} for now, and nothing lands in the suite until you say land it."
+      },
+      "costTip": "What it takes to solve {name}, and what keeps happening if you do not."
     }
   }
 }

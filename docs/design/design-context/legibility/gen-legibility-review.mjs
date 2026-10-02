@@ -13,7 +13,8 @@
        --archmap <file>  default: archmap.json beside --forms
 
    READS   legibility-review.words.json (every authored sentence; a typed number stops the build — numbers are {tokens}) ·
-           legibility-review.icons.json (the inline-svg marks, and which mark each pattern wears — no words in it) ·
+           legibility-review.icons.json (the inline-svg marks, and which mark each pattern, each kind of pain and each everyday process wears — no words in it) ·
+           legibility-review.lens.json (D-079: the pain, the analogy, the cost and the handle of every pattern and decision, in the gabe-lens voice; swept like the words) ·
            ../legibility-feedback.md (the ledger: round 1 L-01..L-23, round 2 from L-24) · ../decisions.md (D-066..D-074) · patterns.json · review-r1.raw.json ·
            fix-1b.json · remaining.json · gap-l19.json · measures.{before,r1,r1b}.json ·
            ../../workflow-panel/shots/all-endpoints/walk.json (the walk's pictures, tagged by item and option) ·
@@ -41,6 +42,11 @@
    option, authored as templates in words.decide.ex / imp / exSuite / impSuite with every number and name a {token} filled from the feed, once for
    the card and once for the voice (section 13d); they join the spoken summary after what choosing sets in motion and before my pick (base 2 to 5
    sentences). THE HOVERS (words.tip, words.legend.def): one hover per item, written in the page's template (the probe holds the rules).
+   THE LENS (L-31, D-079; L-32, D-080): every pattern and decision card opens with THE PAIN, ONE analogy (a process, in the operator's Sequential-Procedural suit) and where it
+   stops, THE COST (to solve · if not) and a HANDLE; a pattern adds the steps (the failing one marked) and the box (does · does not do · decides when). The words are authored in
+   legibility-review.lens.json (section 13e sweeps them: a typed digit or number word, an id, a path, a symbol, code or he · him · his stops the build); the numbers are tokens
+   filled from the data; the size of a suite proposal's cost, the marks of its options, the pain level and the balance are derived. The spoken summary of every decision, and of
+   every pattern, is rebuilt in that order: the pain, the analogy, the cost, the options, my pick.
    No wallclock: same inputs, same bytes. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -554,7 +560,7 @@ for (const c of calls) c.motion = fill(c.motion, T, 'calls.motion.' + c.id);
 T.nPics = used.size;
 const fillTree = (o, at) => (typeof o === 'string' ? fill(o, T, at) : Array.isArray(o) ? o.map((v, i) => fillTree(v, at + '[' + i + ']')) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => k[0] !== '_').map(([k, v]) => [k, fillTree(v, at + '.' + k)])) : o);
 const omit = (o, ks) => Object.fromEntries(Object.entries(o).filter(([k]) => !ks.includes(k)));
-const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, tip: W.tip, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord', 'ex', 'imp', 'sayWords', 'exSuite', 'impSuite']) }, 'ui');
+const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, tip: W.tip, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord', 'ex', 'imp', 'sayWords', 'exSuite', 'impSuite']), gl: need(need(W, 'gabeLens', ''), 'ui', 'gabeLens') }, 'ui');
 
 /* ── 14 · the data, the hash, the page ─────────────────────────────────────────────────────────────────────────────── */
 const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, opts: c.opts.map((o) => [o.v, o.name]) })),
@@ -569,6 +575,8 @@ if (new Set(choices.map((c) => c.id)).size !== choices.length) die('two choices 
 const IC = rj(path.join(HERE, 'legibility-review.icons.json'));
 { const NEED = ['built', 'option', 'question', 'logged', 'deferred', 'fixed', 'partly', 'left', 'open', 'his', 'mine', 'yours', 'ruled', 'land', 'notyet', 'surface', 'feed', 'process', 'down', 'same', 'up', 'code', 'page', 'map', 'copy', 'play', 'stop', 'speaker', 'check', 'pause', 'prev', 'next', 'follow', 'pin', 'caret', 'nextopen'];
   for (const k of NEED) if (!IC.marks[k]) die('icons: the page needs a mark named ' + k);
+  for (const k of ['lb-cost', 'lb-solve', 'lb-ifnot', 'lb-steps', 'lb-box', 'bx-not', 'bx-when', 'st-wrong', 'im-gain', 'im-cost', 'im-neutral', 'check', 'pin', 'scale']) if (!IC.marks[k]) die('icons: the lens needs a mark named ' + k);
+  for (const g of ['painKind', 'process']) { if (!IC[g] || !Object.keys(IC[g]).length) die('icons: no ' + g + ' (the lens: which mark each kind wears)'); for (const [k, m] of Object.entries(IC[g])) if (!IC.marks[m]) die(`icons: ${g}.${k} wears “${m}”, which is not in marks`); }
   for (const [k, v] of Object.entries(IC.marks)) if (/<(script|style|a|foreignObject|image)\b|\bon\w+\s*=|javascript:/i.test(v)) die('icons: a mark that is not plain shapes: ' + k);
   for (const p of PATS) { const n = IC.pattern[p.id]; if (!n) die(`icons: pattern ${p.id} wears no mark of its own`); if (!IC.marks[n]) die(`icons: pattern ${p.id} wears “${n}”, which is not in marks`); }
   const worn = PATS.map((p) => IC.pattern[p.id]), dup = worn.filter((x, i) => worn.indexOf(x) !== i); if (dup.length) die('icons: two patterns wear one mark: ' + uniq(dup).join(', '));
@@ -708,7 +716,7 @@ const exImp = (id, exTpl, impTpls, order, op, tok) => {
 const SAY_NAMES = [[/[A-Za-z]_[A-Za-z]/, 'a code name'], [/\b[a-z]+[A-Z][A-Za-z]*\b/, 'a code name'], [/\b[A-Z][a-z]+[A-Z][A-Za-z]*\b/, 'a code name']];   /* a decision's voice never reads a code name: it is spoken as words (speakName) */
 const DECS = [], DECIDS = new Set();
 const addDec = (e) => { if (DECS.some((x) => x.key === e.key)) die('two decisions share the key ' + e.key);
-  checkSay(e.parts.join(' '), 'the summary of ' + e.key, 2, 5);
+  checkSay(e.parts.join(' '), 'the summary of ' + e.key, 4, 7);
   if (SAY_NAMES.some(([rx]) => rx.test(e.parts.join(' ')))) { const r = SAY_NAMES.find(([rx]) => rx.test(e.parts.join(' '))); die(`the summary of ${e.key} holds ${r[1]}: “${r[0].exec(e.parts.join(' '))[0]}”`); }
   e.plain = DPLAIN[e.id] || die('words.decide.plain has no line for the decision ' + e.id + ' — what it means for you, in the plain voice');
   checkPlain(e.id, e.plain); e.si = SEC_ORDER.indexOf(e.sec); DECIDS.add(e.id); DECS.push(e); };
@@ -735,14 +743,139 @@ const tk2 = (tok, k, c, s) => { tok[k] = { c: String(c), s: String(s === undefin
 const suiteImpTpls = (does, gate, p, nOpen, id, audit_) => {
   const dp = String(does).replace(/^Landing it\s+/, ''); if (dp === String(does)) die('words.decide.say.' + id + '.does must start with “Landing it”');
   return { land: IMS.land, notyet: audit_ ? IMS.notyetAudit : nOpen ? IMS.notyet : IMS.notyet0, change: IMS.change, dp, gate }; };
+/* ── 13e · the lens (L-31, D-079) ──────────────────────────────────────────────────────────────────────────────────────────
+   Every pattern and every decision opens with THE PAIN (what goes wrong for you today, as a step that fails), ONE analogy from everyday life
+   (a process: your suit is Sequential-Procedural) and where it stops, THE COST (to solve · if not) and a HANDLE; a pattern also shows the steps of
+   how the defect happens (the step where it goes wrong marked) and the box (does · does not do · decides when). The words are authored in
+   legibility-review.lens.json with the gabe-lens method. This section reads them, SWEEPS them (a typed digit or number word, an id, a path, a
+   symbol, code, he · him · his, a colon chain stops the build), fills every number from the data once for the card and once, spelled out, for
+   the voice, and DERIVES what is not authored: the size of a suite proposal's cost (from its kind and its gate), the marks of its options, the pain
+   level and the balance. Each decision's spoken summary is rebuilt in this order: the pain, the analogy, the cost (to solve, if not), the options
+   with what each changes, my pick. */
+const LENS = rj(path.join(HERE, 'legibility-review.lens.json'));
+const LW = need(W, 'gabeLens', ''), LUI = need(LW, 'ui', 'gabeLens'), LTPL = need(LW, 'tpl', 'gabeLens'), LPAIN = need(LUI, 'pain', 'gabeLens.ui'), LPROC = need(LUI, 'process', 'gabeLens.ui');
+const LENS_SKIP = new Set(['meter', 'kind', 'process', 'size', 'marks']);
+const LENS_BAD = [[/[·→/×|#\\“”"`<>—:;]/, 'a symbol'], [/\b(?:L|R|D|EX|CR|N3|S4)-\d+/, 'an id'], [/\b[PGFA]\d{1,2}\b/, 'an id'], [/\b[\w-]+\.(?:py|mjs|js|json|md|html|tsx?|css)\b/i, 'a file name'],
+  [/\b(?:he|him|his|himself)\b/i, 'he · him · his'], [/[A-Za-z]_[A-Za-z]/, 'a code name'], [/\b[a-z]+[A-Z][A-Za-z]*\b/, 'a code name'], [/\bundefined\b|\bNaN\b/, 'a missing value']];
+(function sweepLens(o, at) {
+  if (typeof o === 'number') die(`a typed number in the lens file — make it a {token} the generator fills · ${at}: ${o}`);
+  if (typeof o === 'string') { const s = o.replace(/\{[a-zA-Z]\w*\}/g, ' ');
+    if (BANNED.test(s)) die(`a word D-018 took out of every string the pages draw · ${at}: “${o.slice(0, 90)}”`);
+    for (const [rx, what] of LENS_BAD) { const m = rx.exec(s); if (m) die(`the lens file holds ${what} · ${at}: “${m[0]}” in “${o.slice(0, 90)}”`); }
+    const m = s.match(/\d/) || s.match(NUMWORD); if (m) die(`a typed number in the lens file — make it a {token} the generator fills · ${at}: “${o.slice(0, 90)}” (found “${m[0]}”)`); return; }
+  if (Array.isArray(o)) return o.forEach((v, i) => sweepLens(v, at + '[' + i + ']'));
+  if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) { if (k[0] === '_' || LENS_SKIP.has(k)) continue; sweepLens(v, at + '.' + k); }
+})(LENS, 'lens');
+const PAINK = IC.painKind, PROC = IC.process;
+for (const k of Object.keys(PAINK)) if (!LPAIN[k]) die('words.gabeLens.ui.pain has no words for the kind of pain ' + k);
+for (const k of Object.keys(PROC)) if (!LPROC[k]) die('words.gabeLens.ui.process has no words for the process ' + k);
+for (const g of ['size', 'impact', 'label', 'meter', 'legend']) need(LUI, g, 'gabeLens.ui');
+const SIZES = ['small', 'medium', 'large'], sizeLvl = (z) => SIZES.indexOf(z) + 1, IMPACTS = ['gain', 'cost', 'both', 'neutral'];
+/* the tokens the lens fills: the page's own (XT) and the measures, before and now */
+for (const id of CHECK_ORDER) { const v = MEAS.map((m) => CHECKS[id](m)); if (typeof v[0] === 'number') tn(id + '_before', v[0]); if (typeof v[2] === 'number') tn(id + '_now', v[2]); }
+tn('nBlocks', AE.blocks.length); tn('nKindsOpen', Number(XT.nBenchKinds.c) - T.nKindsRuled);
+/* how often a pattern came up (your items and the review's findings), how many are still there, and the level that gives the balance its pain pan */
+const PCAME = Object.fromEntries(patterns.map((p) => [p.id, p.items.length + p.nFind])), CAME_MAX = Math.max(...Object.values(PCAME));
+const lvl = (n) => (n >= CAME_MAX * 2 / 3 ? 3 : n >= CAME_MAX / 3 ? 2 : 1);
+const SUITE_OF = {}; for (const p of patterns) for (const s of p.suite) SUITE_OF[s.cid] = { p, s };
+const AUDIT_PATS = uniq(auditParts.map((c) => SUITE_OF[c].p.id)), AUDIT_CAME = Math.max(...AUDIT_PATS.map((q) => PCAME[q]));
+/* a proposal's size, derived from the data: words, a reference or a method is small; a check that only reports is medium; a check that stops the build or the publish is large */
+const suiteSize = (s) => (s.kind !== 'check' ? 'small' : /stops? the build|fails the render gate/i.test(s.gate) ? 'large' : 'medium');
+const fillv = (tpl, vars, at) => String(tpl).replace(/\{(\w+)\}/g, (m, k) => (k in vars && vars[k] !== undefined && vars[k] !== null ? String(vars[k]) : die(`no value for {${k}} in a lens template (${at || ''}): “${String(tpl).slice(0, 60)}”`)));
+const nSentL = (t) => (t.match(/[^.!?]+[.!?]+(?:\s|$)/g) || []).length, wcL = (t) => t.trim().split(/\s+/).length;
+const lensTxt = (o, k, at, lo, hi) => { const t = o && o[k]; if (typeof t !== 'string' || !t.trim()) die(`${at}.${k}: the lens file has no text`);
+  const n = nSentL(t); if (n < lo || n > hi) die(`${at}.${k} has ${n} sentences; it is ${lo} to ${hi}: “${t.slice(0, 80)}”`);
+  if (!/[.!?]$/.test(t.trim())) die(`${at}.${k} does not end in a full stop`);
+  for (const x of t.split(/(?<=[.!?])\s+/)) if (wcL(x) > 48) die(`${at}.${k} has a sentence of more than 48 words, too long to hear: “${x.slice(0, 80)}”`);
+  return t; };
+const fld = (o, pth, at) => pth.split('.').reduce((a, k) => (a && a[k] !== undefined ? a[k] : die(`${at}: the lens file has no ${pth}`)), o);
+const numTok = (k, at) => { const t = XT[k]; if (!t || !Number.isFinite(Number(t.c))) die(`${at}: the meter names a count that is not a number: ${k}`); return Number(t.c); };
+/* the pain's meter: a measured check before and now, a count of a total, a tally, or how often the pattern came up and how many are still there */
+const meterOf = (spec, o, at) => {
+  if (!spec || typeof spec !== 'object') die(`${at}: no meter`);
+  if (spec.check) { if (!CHECKS[spec.check]) die(`${at}: the meter names a check the measure does not keep: ${spec.check}`);
+    const v = MEAS.map((m) => CHECKS[spec.check](m)), nm = (W.checks[spec.check] || die(`${at}: words.checks has no ${spec.check}`)).name;
+    if (typeof v[2] !== 'number') die(`${at}: the measure holds no number now for ${spec.check}`);
+    return typeof v[0] === 'number' ? { type: 'ba', before: v[0], now: v[2], tip: fillv(LTPL.meterBa, { noun: nm, before: v[0], now: v[2] }, at) } : { type: 'tally', n: v[2], tip: fillv(LTPL.meterTally, { n: v[2], noun: nm }, at) }; }
+  if (spec.came) { if (o.came == null || o.still == null) die(`${at}: a meter of how often it came up needs a pattern`);
+    return { type: 'ba', before: o.came, now: o.still, tip: fillv(LTPL.meterCame, { Name: ucFirst(o.cname || o.pname || o.name), before: o.came, now: o.still }, at) }; }
+  if (spec.n) { const noun = spec.noun; if (typeof noun !== 'string' || !noun.trim() || /[.!?]/.test(noun) || wcL(noun) > 24) die(`${at}.noun is a plain phrase with no full stop: “${noun}”`);
+    const n = numTok(spec.n, at);
+    if (spec.of) { const of = numTok(spec.of, at); if (n > of) die(`${at}: the meter counts ${n} of ${of}`); return { type: 'frac', n, of, tip: fillv(LTPL.meterFrac, { n, of, noun }, at) }; }
+    return { type: 'tally', n, tip: fillv(LTPL.meterTally, { n, noun }, at) }; }
+  return die(`${at}: a meter is a check, a count of a total, a tally or how often it came up`); };
+const LENSD = {}, LENSP = {}, LSAY = {};
+/* one entry's card data and its spoken sentences; the words are the lens file's, the numbers the data's */
+function lensBuild(id, S, o, at) {
+  const kind = fld(S, 'pain.kind', at), proc = fld(S, 'like.process', at), nm = o.pname || o.name;
+  if (!PAINK[kind]) die(`${at}: no icon for the kind of pain ${kind}`); if (!PROC[proc]) die(`${at}: no icon for the process ${proc}`);
+  const f2 = (obj, k, lo, hi) => fill2(lensTxt(obj, k, at, lo, hi), o.tok, at + '.' + k);
+  const pain = f2(S.pain, 'text', 1, 2), like = f2(S.like, 'analogy', 1, 1), stops = f2(S.like, 'stops', 1, 1), toSolve = f2(S.cost || {}, 'toSolve', 1, 1), ifNot = f2(S.cost || {}, 'ifNot', 1, 1);
+  const hd = lensTxt(S, 'handle', at, 1, 1); if (wcL(hd) > 10) die(`${at}.handle is more than ten words: “${hd}”`);
+  const why = fld(S, 'cost.sizeWhy', at); if (typeof why !== 'string' || /[.!?]/.test(why) || wcL(why) > 16) die(`${at}.cost.sizeWhy is a short phrase with no full stop (16 words at most): “${why}”`);
+  let size = S.cost.size;
+  if (o.derived) { if (size !== undefined) die(`${at}.cost.size is derived from the proposal's kind and gate; the lens file must not state it`); size = o.derived.size; }
+  else if (!SIZES.includes(size)) die(`${at}.cost.size must be one of ${SIZES.join(' · ')}`);
+  let balance = null;
+  if (o.derived) { const pl = o.derived.level, cl = sizeLvl(size), lean = pl > cl ? 'pain' : pl < cl ? 'cost' : 'even';
+    balance = { lean, diff: pl - cl, tip: fillv(LTPL.balance[lean], { came: o.derived.came, size: LUI.size[size] }, at) }; }
+  const Lc = { name: o.name,
+    pain: { text: pain.c, kind, icon: PAINK[kind], tip: fillv(LTPL.painTip, { name: nm, short: LPAIN[kind].short }, at), meter: meterOf(fld(S, 'pain.meter', at), o, at + '.pain.meter') },
+    like: { process: proc, icon: PROC[proc], text: like.c, stops: stops.c, tip: fillv(LTPL.likeTip, { name: nm, word: LPROC[proc].word }, at) },
+    cost: { toSolve: toSolve.c, ifNot: ifNot.c, size, sizeWord: LUI.size[size], sizeLvl: sizeLvl(size), sizeTip: fillv(LTPL.sizeTip, { Size: ucFirst(LUI.size[size]), name: nm, sizeWhy: why }, at), ifTip: fillv(LTPL.ifTip, { name: nm }, at), tip: fillv(LTPL.costTip, { name: nm }, at), balance },
+    handle: { text: hd, tip: fillv(LTPL.handleTip, { name: nm }, at) } };
+  /* the spoken sentences: each must be a sentence a voice can say, with no digit, id, path, symbol or code */
+  const say = { pain: pain.s, like: like.s, toSolve: toSolve.s, ifNot: ifNot.s };
+  Lc.say = say;   /* the spoken sentences ride with the card's data, so the probe can hold the summary to its order */
+  checkSay(say.pain, at + ' (the pain, spoken)', 1, 2); checkSay(say.like, at + ' (the analogy, spoken)', 1, 1); checkSay(say.toSolve, at + ' (the cost to solve, spoken)', 1, 1); checkSay(say.ifNot, at + ' (the cost if not, spoken)', 1, 1);
+  return { Lc, say }; }
+function lensMarks(id, S, opts, derived) {   /* an option's impact: gains, costs, both or neutral; a suite proposal's are derived, the others authored */
+  const out = {};
+  if (derived) { for (const [v, nm] of opts) { const k = derived[v] || die(`lens ${id}: no derived mark for ${v}`); out[v] = { kind: k, tip: fillv(LTPL.markTip[k], { Opt: ucFirst(nm) }, id) }; } return out; }
+  const m = S.marks || die(`lens ${id}: the lens file has no marks (what picking each option does)`);
+  for (const k of Object.keys(m)) if (!opts.some(([v]) => v === k)) die(`lens ${id}: marks names an option the decision does not hold: ${k}`);
+  for (const [v, nm] of opts) { const k = m[v]; if (!IMPACTS.includes(k)) die(`lens ${id}: marks.${v} must be one of ${IMPACTS.join(' · ')}`); out[v] = { kind: k, tip: fillv(LTPL.markTip[k], { Opt: ucFirst(nm) }, id) }; }
+  return out; }
+const DECISION_SRC = need(LENS, 'decisions', 'lens'), PATTERN_SRC = need(LENS, 'patterns', 'lens');
+function lensDecision(id, o) {
+  if (LENSD[id]) return;
+  const S = DECISION_SRC[id] || die(`the lens file has no entry for the decision ${id}: its pain, its analogy, its cost and its handle`);
+  if (o.suite && S.marks) die(`lens ${id}: a proposal's marks are derived; the lens file must not state them`);
+  const b = lensBuild(id, S, Object.assign({ came: o.suite ? o.suite.came : null, still: o.suite ? o.suite.still : null, cname: o.suite ? 'the pattern behind this proposal' : null,
+    derived: o.suite ? { size: o.suite.size, level: o.suite.level, came: o.suite.came } : null }, o), 'lens.' + id);
+  b.Lc.marks = lensMarks(id, S, o.opts, o.suite ? o.suite.marks : null); LENSD[id] = b.Lc; LSAY[id] = b.say; }
+const lensSay = (id, options, pick) => { const s = LSAY[id] || die('no lens sentences for ' + id); return [s.pain, s.like, s.toSolve, s.ifNot, options, pick]; };
+const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's'), pluralS = (n, w) => numW(n) + ' ' + w + (n === 1 ? '' : 's');
+const PATDECS = [];
+for (const p of patterns) {
+  const S = PATTERN_SRC[p.id] || die(`the lens file has no entry for the pattern ${p.id}`), at = 'lens.' + p.id, size = SIZES[Math.max(...p.suite.map((s) => sizeLvl(suiteSize(s)))) - 1];
+  const o = { name: p.name, pname: 'this pattern', tok: Object.assign({}, XT), came: PCAME[p.id], still: p.stillThere, derived: { size, level: lvl(PCAME[p.id]), came: PCAME[p.id] } };
+  const b = lensBuild(p.id, S, o, at), Lc = b.Lc;
+  const st = fld(S, 'steps', at); if (!Array.isArray(st) || st.length < 3 || st.length > 5) die(`${at}.steps: three to five steps, in time order`);
+  if (st.filter((x) => x.bad).length !== 1) die(`${at}.steps: exactly one step is marked as the one where it goes wrong`);
+  Lc.stepsTip = fillv(LTPL.stepsTip, { name: 'this pattern' }, at);
+  Lc.steps = st.map((x, i) => ({ t: fill2(lensTxt(x, 't', at + '.steps[' + i + ']', 1, 1), o.tok, at + '.steps[' + i + ']').c, bad: !!x.bad, tip: x.bad ? fillv(LTPL.stepBadTip, { i: i + 1, name: 'this pattern' }, at) : null }));
+  Lc.boxTip = fillv(LTPL.boxTip, { name: 'this pattern' }, at);
+  Lc.box = Object.fromEntries([['does', 'does'], ['doesNot', 'doesNot'], ['decides', 'decidesWhen']].map(([k, f]) => [k, { text: fill2(lensTxt(fld(S, 'box', at), f, at + '.box', 1, 1), o.tok, at + '.box.' + f).c, tip: fillv(LTPL.boxRow[k], { name: 'this pattern' }, at) }]));
+  LENSP[p.id] = Lc;
+  const nP = p.suite.length, tok = { props: { c: plural(nP, 'draft proposal'), s: pluralS(nP, 'draft proposal') }, them: { c: nP === 1 ? 'it' : 'them', s: nP === 1 ? 'it' : 'them' } };
+  const say = LTPL.say, pk = p.suite[0].pick === 'land' ? say.patPickLand : say.patPickNot;
+  const parts = [b.say.pain, b.say.like, b.say.toSolve, b.say.ifNot, fill2(say.patOptions, tok, at + '.say').s, fill2(pk, tok, at + '.say').s];
+  checkSay(parts.join(' '), 'the summary of ' + p.id, 4, 7);
+  { const m = SAY_NAMES.find(([rx]) => rx.test(parts.join(' '))); if (m) die(`the summary of ${p.id} holds ${m[1]}: “${m[0].exec(parts.join(' '))[0]}”`); }
+  PATDECS.push({ key: 'pat:' + p.id, id: p.id, sec: 'pat', pat: true, before: p.suite[0].cid, gk: p.id, gn: p.name, gp: p.id, name: p.name, tag: null, parts, opts: {}, plain: '', si: SEC_ORDER.indexOf('pat') }); }
+for (const k of Object.keys(PATTERN_SRC)) if (k[0] !== '_' && !patById[k]) die('the lens file names a pattern the page does not hold: ' + k);
+
 /* in the page's order: the audit and the patterns' draft proposals, then the looks and the proposals, then the L-19 recommendation again in the gap analysis */
 { const sg = (k) => (k ? 'decide.s.' + k : 'decide');
   const suiteEntry = (s, gk, gn, gp, name, sentence1, pick, id, ctx) => { const ov = DSAY[s] || {}, does = ov.does || die('words.decide.say.' + id + '.does: what landing it does');
     const t = suiteImpTpls(does, ctx.gate, ctx.p, ctx.nOpen, id, !ctx.p), tok = Object.assign({}, ctx.tok);
+    lensDecision(id, { name, tok: Object.assign({}, ctx.tok), opts: Object.entries(CHOICE_NAME), suite: { size: ctx.p ? suiteSize(SUITE_OF[id].s) : 'large', marks: { land: 'both', notyet: !ctx.p || ctx.nOpen ? 'cost' : 'neutral', change: 'neutral' },
+      came: ctx.p ? PCAME[ctx.p.id] : AUDIT_CAME, still: ctx.p ? ctx.p.stillThere : null, level: ctx.p ? lvl(PCAME[ctx.p.id]) : Math.max(...AUDIT_PATS.map((q) => lvl(PCAME[q]))) } });
     tk2(tok, 'doesCap', ucFirst(t.dp), ''); tk2(tok, 'gate', ctx.gate, ''); tk2(tok, 'gateClause', '', gateClause(ctx.gate, id));
     const order = Object.keys(CHOICE_NAME), op = CHOICE_NAME, ei = exImp(id, ctx.ex, { land: t.land, notyet: t.notyet, change: t.change }, order, op, tok);
     addDec({ key: s, id, sec: 'pat', gk, gn, gp, name, tag: null, ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay,
-      parts: [sentence1, does, ei.ex.s, ei.impSay, fill(DS.pickSuite, { pick: CHOICE_NAME[pick] }, 'decide.s.pickSuite')], opts: CHOICE_NAME }); };
+      parts: lensSay(id, need(DS, 'optionsSuite', 'decide.s'), fill(DS.pickSuite, { pick: CHOICE_NAME[pick] }, 'decide.s.pickSuite')), opts: CHOICE_NAME }); };
   { const nm = DNAME[audit.id] || die('words.decide.name has no name for ' + audit.id), tok = Object.assign({}, XT);
     suiteEntry(audit.id, audit.id, UI.sec.pat.auditHead, null, nm, fill(DS.audit, { name: ucFirst(nm) }, sg('audit')), audit.pick, audit.id, { gate: audit.gate, p: null, nOpen: 0, tok, ex: EXS.audit }); }
   for (const p of patterns) for (const s of p.suite) { const nm = DNAME[s.cid] || die('words.decide.name has no name for ' + s.cid), pe = patEx(p, s, s.cid);
@@ -751,15 +884,19 @@ const suiteImpTpls = (does, gate, p, nOpen, id, audit_) => {
   for (const c of calls) { const ov = DSAY[c.id] || {}, op = spokenOpts(c.id, c.opts), name = ov.name || c.label, order = c.opts.map((o) => o.v);
     const ei = exImp(c.id, XW[c.id], c.kind ? need(IW, 'kind', 'decide.imp') : IW[c.id] || die('words.decide.imp has no entry for ' + c.id), order, op, XT);
     const tpl = c.kind ? DS.kind : DS[c.where] || die('decide.s has no template for the place ' + c.where);
+    lensDecision(c.id, { name: c.kind ? 'the ' + c.label + ' look' : c.label, tok: Object.assign({}, XT), opts: c.opts.map((o) => [o.v, o.name]), suite: null });
     addDec({ key: c.id, id: c.id, sec: 'calls', gk: c.kind ? 'kinds' : c.where, gn: c.kind ? UI.calls.kindsHead : UI.calls.where[c.where], gp: null, name: c.label, tag: c.rows.length ? c.rows.join(' · ') : null,
       ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay,
-      parts: [fill(tpl, { name, rows: c.rows.join(', and also '), opts: orList(c.opts.map((o) => op[o.v])) }, sg(c.kind ? 'kind' : c.where)), motionLine(c, ov), ei.ex.s, ei.impSay, decPick(c.pick, !!c.ruled, op, sg(c.ruled ? 'pickRuled' : 'pickMine'))], opts: op }); }
+      parts: lensSay(c.id, fill(need(DS, 'options', 'decide.s'), { opts: orList(c.opts.map((o) => op[o.v])) }, sg('options')), decPick(c.pick, !!c.ruled, op, sg(c.ruled ? 'pickRuled' : 'pickMine'))), opts: op }); }
   for (const p of proposals) { const ov = DSAY[p.id] || {}, op = spokenOpts(p.id, p.opts), nm = DNAME[p.id] || die('words.decide.name has no name for ' + p.id), order = p.opts.map((o) => o.v);
     const ei = exImp(p.id, XW[p.id], IW[p.id] || die('words.decide.imp has no entry for ' + p.id), order, op, XT);
-    const parts = [fill(DS.proposal, { name: nm, opts: orList(p.opts.map((o) => op[o.v])) }, sg('proposal')), motionLine(p, ov), ei.ex.s, ei.impSay, decPick(p.pick, false, op, sg('pickMine'))];
+    lensDecision(p.id, { name: nm, tok: Object.assign({}, XT), opts: p.opts.map((o) => [o.v, o.name]), suite: null });
+    const parts = lensSay(p.id, fill(need(DS, 'options', 'decide.s'), { opts: orList(p.opts.map((o) => op[o.v])) }, sg('options')), decPick(p.pick, false, op, sg('pickMine')));
     const extra = { ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay };
     addDec(Object.assign({ key: p.id, id: p.id, sec: 'calls', gk: 'props', gn: UI.calls.propsHead, gp: null, name: nm, tag: null, parts, opts: op }, extra));
     if (p.alsoIn === 'gap') addDec(Object.assign({ key: p.id + ':gap', id: p.id, sec: 'gap', gk: 'gap', gn: UI.gap.recHead, gp: null, name: nm, tag: null, parts, opts: op }, extra)); } }
+for (const k of Object.keys(DECISION_SRC)) if (k[0] !== '_' && !LENSD[k]) die('the lens file names a decision the page does not hold: ' + k);
+for (const c of choices) if (!LENSD[c.id]) die('a choice with no lens entry: ' + c.id);
 for (const k of Object.keys(XW)) if (k[0] !== '_' && !DECIDS.has(k)) die('words.decide.ex names no decision: ' + k);
 for (const k of Object.keys(IW)) if (k[0] !== '_' && k !== 'kind' && !DECIDS.has(k)) die('words.decide.imp names no decision: ' + k);
 for (const c of choices) if (!DECIDS.has(c.id)) die('a choice with no decision entry: ' + c.id);
@@ -770,7 +907,7 @@ for (const [k, v] of Object.entries(UI.decide.run)) checkSay(v.replace('{{name}}
 for (const e of DECS) { const w = [e.name, e.gn, e.tag, ...Object.values(e.opts)].filter(Boolean); for (const x of w) if (/\{|\bundefined\b/.test(x)) die('a decision word holds a token or a missing value: ' + e.key + ' “' + x + '”'); }
 /* D-075: his pasted voice pick is the default reading voice — the same file the voice lab reads (voices/voice.ruled.json) */
 const VOICE = (({ _about, ruled, ...v }) => v)(rj(path.join(HERE, 'voices', 'voice.ruled.json')));
-const DATA = { ep: EP, app: T.app, voice: VOICE, feedHead: T.feedHead, workHead, ui: UI, glance, calls, proposals, items: itemCards, itemNames: Object.fromEntries(items.map((it) => [it.id, it.name])), questions, gap, audit, patterns, remaining, choices, say, icons: IC.marks, patIcon: IC.pattern, decide: { entries: DECS } };
+const DATA = { ep: EP, app: T.app, voice: VOICE, feedHead: T.feedHead, workHead, ui: UI, glance, calls, proposals, items: itemCards, itemNames: Object.fromEntries(items.map((it) => [it.id, it.name])), questions, gap, audit, patterns, remaining, choices, say, icons: IC.marks, patIcon: IC.pattern, decide: { entries: DECS, pats: PATDECS }, lens: { patterns: LENSP, decisions: LENSD, kindIcon: PAINK, procIcon: PROC, used: { pain: Object.keys(PAINK).filter((k) => [...Object.values(LENSP), ...Object.values(LENSD)].some((l) => l.pain.kind === k)), process: Object.keys(PROC).filter((k) => [...Object.values(LENSP), ...Object.values(LENSD)].some((l) => l.like.process === k)) } } };
 /* the page speaks to you (L17): no he · him · his in anything drawn — his own quoted words aside, and an option's key is not drawn */
 { const SKIP = new Set(['f', 'v', 'mine', 'pick', 'ruled', 'outcome', 'words', 'first', 'rest', 'readAs', 'q', 'icons', 'patIcon']); const hits = [];
   const walk = (o, at) => { if (typeof o === 'string') { if (/\b(he|him|his|himself)\b/i.test(o)) hits.push(at + ': “' + o.slice(0, 80) + '”'); return; }

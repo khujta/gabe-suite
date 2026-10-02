@@ -262,6 +262,52 @@
   .look .impact { font-size: var(--fs-sm); color: var(--ink); margin: 0; padding-top: 4px; border-top: 1px dashed var(--rule); }
   ul.imps { list-style: none; margin: 0; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--raised); display: flex; flex-direction: column; gap: 5px; font-size: var(--fs-sm); color: var(--ink); }
   ul.imps > li > .on { color: var(--accent); font-weight: 650; margin-right: 4px; }
+
+  /* the lens blocks (L-31, D-079; L-32, D-080): the pain, the picture, the cost and the handle come first on a card; a pattern adds its steps and its box.
+     Every icon is inside an item with its own hover; what a kind of mark means is in the legend. */
+  .lens { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 10px; align-items: stretch; }
+  @media (max-width: 720px) { .lens { grid-template-columns: minmax(0, 1fr); } }
+  .lb { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 8px 10px; border: 1px solid var(--rule); border-left-width: 3px; border-radius: 8px; background: var(--raised); }
+  .lb[data-lb="pain"] { border-left-color: var(--bad); } .lb[data-lb="like"] { border-left-color: var(--accent); } .lb[data-lb="cost"] { border-left-color: var(--warn); }
+  .lb[data-lb="handle"] { border-left-color: var(--ok); } .lb[data-lb="steps"], .lb[data-lb="box"] { border-left-color: var(--muted); }
+  .lbh { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; }
+  .lbr { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .lbt { margin: 0; font-size: var(--fs-sm); color: var(--ink); max-width: 80ch; }
+  .lbt.hd { font-weight: 650; }
+  .lbs { margin: 0; font-size: var(--fs-min); color: var(--muted); max-width: 80ch; }
+  .mk.lbl { font-size: var(--fs-min); letter-spacing: .1em; text-transform: uppercase; gap: 6px; }
+  .mk.lbl .ico { width: 1.6em; height: 1.6em; }
+  .lb[data-lb="pain"] .mk.lbl { color: var(--bad); } .lb[data-lb="like"] .mk.lbl { color: var(--accent); } .lb[data-lb="cost"] .mk.lbl { color: var(--warn); }
+  .lb[data-lb="handle"] .mk.lbl { color: var(--ok); } .lb[data-lb="steps"] .mk.lbl, .lb[data-lb="box"] .mk.lbl { color: var(--ink-soft); }
+  .mk.lbl.ok { color: var(--ok) !important; } .mk.lbl.no { color: var(--bad) !important; } .mk.lbl.wh { color: var(--accent) !important; }
+  .mt { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-min); color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .mt .mrs { display: inline-flex; flex-direction: column; gap: 3px; }
+  .mt .mr { display: inline-grid; grid-template-columns: 6.5rem auto auto; align-items: center; gap: 6px; }
+  .mt .bar { display: block; height: 6px; border-radius: 3px; background: var(--rule-soft); overflow: hidden; }
+  .mt .bar > i { display: block; height: 100%; border-radius: 3px; background: var(--bad); }
+  .mt .bar.was > i { background: var(--muted); }
+  .mt .mn { color: var(--ink); font-weight: 650; } .mt .ml { color: var(--muted); }
+  .mt .tl { display: inline-flex; flex-wrap: wrap; gap: 2px; max-width: 9rem; } .mt .tl > i { display: block; width: 9px; height: 9px; border-radius: 2px; background: var(--bad); }
+  .mk.cs { gap: 6px; font-size: var(--fs-min); letter-spacing: .1em; text-transform: uppercase; color: var(--warn); }
+  .mk.cs .ico { width: 1.6em; height: 1.6em; }
+  .mk.cs .sg { display: inline-flex; gap: 2px; } .mk.cs .sg > i { display: block; width: 13px; height: 9px; border-radius: 2px; background: var(--rule); }
+  .mk.cs[data-size="small"] .sg > i:nth-child(-n+1), .mk.cs[data-size="medium"] .sg > i:nth-child(-n+2), .mk.cs[data-size="large"] .sg > i { background: var(--warn); }
+  .mk.cs .sw { color: var(--ink); font-weight: 650; text-transform: none; letter-spacing: 0; font-size: var(--fs-min); }
+  .mk.bl .bal { width: 2.8em; height: 1.7em; } .mk.bl .bal path { fill: none; } .mk.bl .bal .pl { stroke: var(--bad); } .mk.bl .bal .pr { stroke: var(--warn); } .mk.bl .bal .bm { stroke: var(--ink-soft); }
+  ol.stp { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+  ol.stp li { position: relative; display: flex; align-items: flex-start; gap: 9px; font-size: var(--fs-sm); color: var(--ink); min-width: 0; }
+  ol.stp .sn { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); background: var(--card); font-size: var(--fs-min); font-weight: 650; font-variant-numeric: tabular-nums; }
+  ol.stp .stx { padding-top: 2px; min-width: 0; overflow-wrap: break-word; }
+  ol.stp li:not(:last-child)::before { content: ""; position: absolute; left: 11px; top: 25px; height: 11px; border-left: 2px solid var(--rule); }
+  ol.stp li:not(:last-child)::after { content: ""; position: absolute; left: 7px; top: 35px; border: 5px solid transparent; border-top: 6px solid var(--muted); border-bottom: 0; }
+  ol.stp li[data-bad="true"] .sn { background: var(--bad); border-color: var(--bad); color: var(--ground); }
+  ol.stp li[data-bad="true"] .stx { font-weight: 650; }
+  ol.stp li .ico { flex: 0 0 auto; color: var(--bad); width: 1.4em; height: 1.4em; margin-top: 1px; }
+  .bxr { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 4px 12px; align-items: start; }
+  @media (max-width: 720px) { .bxr { grid-template-columns: minmax(0, 1fr); } }
+  .im { display: inline-flex; gap: 2px; vertical-align: middle; margin-right: 6px; } .im .ico { width: 1.2em; height: 1.2em; }
+  .im .g { color: var(--ok); } .im .c { color: var(--warn); } .im .n { color: var(--muted); }
+  .lg .mt, .lg .im { margin: 0; }
 </style>
 
 <div class="artifact-page">
@@ -395,15 +441,17 @@
   /* ── the decisions (L-29, D-077): every choice on the page, in the page's order; a card, a menu entry and a reading each ──
      An entry carries the base summary (what it decides, what choosing sets in motion, my pick: generated), the plain line (authored) and the
      spoken names of its options. Your own pick adds one sentence at run time; the plain line is read last. */
-  var DEC = (D.decide && D.decide.entries) || [], DECBY = {}, DECARD = {}, HOT = -1;
+  var DEC = [], DECBY = {}, DECARD = {}, HOT = -1;
+  (function () { var P0 = (D.decide && D.decide.pats) || [], E0 = (D.decide && D.decide.entries) || [];   /* a pattern's own reading stands before its first proposal; it is read from its card and is no decision */
+    E0.forEach(function (e) { P0.filter(function (q) { return q.before === e.key; }).forEach(function (q) { DEC.push(q); }); DEC.push(e); }); })();
   DEC.forEach(function (e, i) { e.ix = i; DECBY[e.key] = e; });
   var STATEICON = { open: "mine", yours: "yours", ruled: "ruled", kept: "check" };
   /* open = nobody has picked and it is not ruled; yours = you picked another; kept = you picked my pick; ruled = ruled earlier and left */
-  function decState(e) { var c = CH[e.id], s = state.v[e.id]; if (s && s.v) return c && s.v === c.mine ? "kept" : "yours"; return c && c.ruled ? "ruled" : "open"; }
+  function decState(e) { if (e.pat) return "none"; var c = CH[e.id], s = state.v[e.id]; if (s && s.v) return c && s.v === c.mine ? "kept" : "yours"; return c && c.ruled ? "ruled" : "open"; }
   /* the state of a decision, said as its own fact: what is open and what I picked, or what you decided (the state mark adds this to its item's hover) */
   function stateTipOf(e) { var c = CH[e.id], s = state.v[e.id], st = decState(e);
     return rt(U.decide.menu.stateTip[st], { pick: nameOf(c, c.mine), picked: s && s.v ? nameOf(c, s.v) : "", ruled: c.ruled ? nameOf(c, c.ruled) : "" }); }
-  function decParts(e) { var c = CH[e.id], s = state.v[e.id], R2 = U.decide.run, out = e.parts.slice();
+  function decParts(e) { if (e.pat) return e.parts.slice(); var c = CH[e.id], s = state.v[e.id], R2 = U.decide.run, out = e.parts.slice();
     if (s && s.v) out.push(rt(s.v === c.mine ? R2.kept : c.ruled ? R2.changedRuled : R2.yours, { name: e.opts[s.v] }));
     out.push(e.plain); return out; }
 
@@ -507,7 +555,7 @@
     function beginDecision(ix, how) { clearTimer(); R.gen++; cancelTalk(); R.on = true; R.paused = false; R.all = false; enterDec(ix, how); later(R.gen, 80); }
     function afterDec(g) { var a = pref("after"), e = DEC[R.d], nx = -1;
       if (a === "next") nx = nextOpen(R.d, false);
-      else if (a === "section") { if (DEC[R.d + 1] && DEC[R.d + 1].sec === e.sec) nx = R.d + 1; else if (R.i < N - 1) { R.all = true; enter(R.i + 1, "auto"); later(g, pauseMs("sec")); return; } }
+      else if (a === "section") { var j = R.d + 1; while (DEC[j] && DEC[j].pat) j++; if (DEC[j] && DEC[j].sec === e.sec) nx = j; else if (R.i < N - 1) { R.all = true; enter(R.i + 1, "auto"); later(g, pauseMs("sec")); return; } }
       if (nx >= 0) { enterDec(nx, "auto"); later(g, pauseMs("sec")); return; }
       stop(); }
     function pickDecision(ix) { HOT = ix; if (ok) beginDecision(ix, "pick"); else { revealDec(ix, true); paint(); } }
@@ -576,7 +624,7 @@
           [c.pp, c.stop, c.prev, c.next, c.nopen, voxEl, this.rate(true), c.follow].forEach(function (x) { pl.appendChild(x); }); nav.appendChild(pl); }
         tcs = el("div", "row tcs"); tcs.appendChild(el("span", "lab", head));
         secs.forEach(function (s, k) { var a = el("a", "tc", s.title); a.href = "#" + s.id; a.setAttribute("data-toc", s.id); a.addEventListener("click", function (e) { if (R.on) { e.preventDefault(); skipTo(k); } }); chips.push(a);
-          var ents = DEC.filter(function (e) { return e.sec === s.key; });
+          var ents = DEC.filter(function (e) { return e.sec === s.key && !e.pat; });
           if (ents.length) tcs.appendChild(makeDD(s, a, ents).wrap); else tcs.appendChild(a); });   /* a section that holds decisions is a chip with a caret; one with none stays a plain chip */
         nav.appendChild(tcs);
         if (typeof ResizeObserver === "function") { try { new ResizeObserver(setBarH).observe(nav); } catch (e) {} }
@@ -602,6 +650,7 @@
     host.appendChild(ca); var la = speech.button("all", 0, X.listenAll); la.id = "listenall"; host.appendChild(la); host.appendChild(speech.rate()); host.appendChild(said);
     $("mine-note").textContent = X.mineNote; })();
 
+  var LGH = null;
   /* ── the legend: every mark's word, said once (L-25) ── */
   (function () { var Lg = U.legend, g = $("lg-groups"); $("legend-h").textContent = Lg.head; $("legend-note").textContent = Lg.note;
     function group(head, wide) { var x = el("div", "lgg" + (wide ? " wide" : "")), l = el("div", "lgl"); x.appendChild(el("p", "lab", head)); x.appendChild(l); g.appendChild(x); return l; }
@@ -614,7 +663,8 @@
     var gc = group(Lg.choice); ["mine", "yours", "kept", "ruled", "land", "notyet"].forEach(function (k) { var p = plain(k); entry(gc, p[0], p[1], p[2]); });
     var gh = group(Lg.change); ["down", "same", "up"].forEach(function (k) { var p = plain(k); entry(gh, p[0], p[1], p[2]); });
     var gj = group(Lg.subject); ["code", "page", "map"].forEach(function (k) { var p = plain(k); entry(gj, p[0], p[1], p[2]); });
-    var gp = group(Lg.pattern, true); D.patterns.slice().sort(function (a, b) { return Number(a.id.slice(1)) - Number(b.id.slice(1)); }).forEach(function (p) { var m = el("span", "mk pm"); m.setAttribute("data-o", "pat"); m.appendChild(ico(D.patIcon[p.id])); entry(gp, m, p.id + " · " + p.name, p.line); }); })();
+    var gp = group(Lg.pattern, true); D.patterns.slice().sort(function (a, b) { return Number(a.id.slice(1)) - Number(b.id.slice(1)); }).forEach(function (p) { var m = el("span", "mk pm"); m.setAttribute("data-o", "pat"); m.appendChild(ico(D.patIcon[p.id])); entry(gp, m, p.id + " · " + p.name, p.line); });
+    LGH = { group: group, entry: entry }; })();
 
   /* ── state: one value + one note per choice id; nothing is saved at boot ── */
   var CH = {}; D.choices.forEach(function (c) { CH[c.id] = c; });
@@ -665,16 +715,80 @@
     group("after", P.optAfter, P.optAfterTip, [{ v: "stop", name: P.optAfterStop, mine: true }, { v: "next", name: P.optAfterNext }, { v: "section", name: P.optAfterSection }]);   /* L-29: what follows a decision that has been read; my pick (dashed) is to stop there */
     painters.push(function () { speech.refresh(); }); })();
 
-  /* the impact of an option (L-30): what changes on the page, for your reading, or in the suite if you pick it */
-  function impactLine(key, v) { var e = DECBY[key], p = el("p", "impact"); p.setAttribute("data-impact", v); p.appendChild(el("b", null, U.decide.menu.impactLab)); p.appendChild(document.createTextNode(e.imp[v])); return p; }
-  function impactList(key) { var e = DECBY[key], ul = el("ul", "imps"); Object.keys(e.imp).forEach(function (v) { var li = el("li"); li.setAttribute("data-impact", v);
-      li.appendChild(el("span", "on", nameOf(CH[e.id], v) + ":")); li.appendChild(document.createTextNode(" " + e.imp[v])); ul.appendChild(li); }); return ul; }
+  /* the impact of an option (L-30): what changes on the page, for your reading, or in the suite if you pick it; its mark says whether picking it gains, costs, both or nothing (L-32), and the line's one hover says so for this option */
+  function impMark(m) { var s = el("span", "im"), a; s.setAttribute("data-k", m.kind);
+    if (m.kind === "gain" || m.kind === "both") { a = ico("im-gain"); a.classList.add("g"); s.appendChild(a); }
+    if (m.kind === "cost" || m.kind === "both") { a = ico("im-cost"); a.classList.add("c"); s.appendChild(a); }
+    if (m.kind === "neutral") { a = ico("im-neutral"); a.classList.add("n"); s.appendChild(a); } return s; }
+  function impactLine(key, v) { var e = DECBY[key], p = el("p", "impact"), m = D.lens.decisions[e.id].marks[v]; p.setAttribute("data-impact", v); p.title = m.tip; p.appendChild(el("b", null, U.decide.menu.impactLab)); p.appendChild(impMark(m)); p.appendChild(document.createTextNode(e.imp[v])); return p; }
+  function impactList(key) { var e = DECBY[key], ul = el("ul", "imps"); Object.keys(e.imp).forEach(function (v) { var li = el("li"), m = D.lens.decisions[e.id].marks[v]; li.setAttribute("data-impact", v); li.title = m.tip;
+      li.appendChild(impMark(m)); li.appendChild(el("span", "on", nameOf(CH[e.id], v) + ":")); li.appendChild(document.createTextNode(" " + e.imp[v])); ul.appendChild(li); }); return ul; }
+
+  /* ── the lens blocks (L-31, D-079; L-32, D-080): the pain, the picture, the cost and the handle come first on every pattern and decision card;
+        a pattern adds the steps of how the defect happens and the box. Each block's label wears its icon; a meter, a size and a balance are drawn from the data. ── */
+  var GL = U.gl, LB = GL.label;
+  function lbl(icon, text, tip, cls) { var s = el("span", "mk lbl" + (cls ? " " + cls : "")); s.title = tip; s.appendChild(ico(icon)); s.appendChild(el("span", "lt", text)); return s; }
+  function bar(pct, was) { var b = el("span", "bar" + (was ? " was" : "")), i = el("i"); i.style.width = (pct > 0 ? Math.max(3, Math.min(100, pct)) : 0) + "%"; b.appendChild(i); return b; }
+  function meterNode(m) { var w = el("span", "mt"), r; w.title = m.tip; w.setAttribute("data-meter", m.type);
+    if (m.type === "ba") { var c = el("span", "mrs"), r1 = el("span", "mr"), r2 = el("span", "mr");
+      r1.appendChild(bar(100, true)); r1.appendChild(el("span", "mn", String(m.before))); r1.appendChild(el("span", "ml", GL.meter.start));
+      r2.appendChild(bar(m.before ? m.now / m.before * 100 : 0, false)); r2.appendChild(el("span", "mn", String(m.now))); r2.appendChild(el("span", "ml", GL.meter.now)); c.appendChild(r1); c.appendChild(r2); w.appendChild(c); }
+    else if (m.type === "frac") { r = el("span", "mr"); r.appendChild(bar(m.n / m.of * 100, false)); r.appendChild(el("span", "mn", m.n + " " + GL.meter.of + " " + m.of)); r.appendChild(el("span")); w.appendChild(r); }
+    else { var t = el("span", "tl"); for (var i = 0; i < Math.min(m.n, 12); i++) t.appendChild(el("i")); w.appendChild(t); w.appendChild(el("span", "mn", String(m.n) + (m.n > 12 ? "+" : ""))); }
+    return w; }
+  function sizeNode(c) { var s = el("span", "mk cs"), sg = el("span", "sg"); s.setAttribute("data-size", c.size); s.title = c.sizeTip; s.appendChild(ico("lb-solve")); s.appendChild(el("span", "lt", LB.toSolve));
+    for (var i = 0; i < 3; i++) sg.appendChild(el("i")); s.appendChild(sg); s.appendChild(el("span", "sw", c.sizeWord)); return s; }
+  /* a two-pan balance: the pain on the left, the cost to solve on the right; the beam tips toward the heavier (diff is the pain level less the cost level, one to two steps either way) */
+  function balanceNode(b) { var s = el("span", "mk bl"), a = Math.max(-2, Math.min(2, b.diff)) * 9 * Math.PI / 180, L = 15, cx = 20, cy = 7, dx = L * Math.cos(a), dy = L * Math.sin(a), lx = cx - dx, ly = cy + dy, rx = cx + dx, ry = cy - dy, f = function (n) { return Math.round(n * 10) / 10; };
+    s.title = b.tip; s.setAttribute("data-lean", b.lean);
+    s.innerHTML = '<svg class="ico bal" viewBox="0 0 40 26" aria-hidden="true" focusable="false"><path class="bm" d="M20 24V7M14 24h12M' + f(lx) + " " + f(ly) + "L" + f(rx) + " " + f(ry) + '"/><path class="pl" d="M' + f(lx) + " " + f(ly) + "l-4 8h8z" + '"/><path class="pr" d="M' + f(rx) + " " + f(ry) + "l-4 8h8z" + '"/></svg>'; return s; }
+  function lbox(key) { var b = el("div", "lb"); b.setAttribute("data-lb", key); return b; }
+  function lensBlocks(L, pat) { var w = el("div", "lens"), c = L.cost, b, h, r;
+    b = lbox("pain"); h = el("div", "lbh"); h.appendChild(lbl(L.pain.icon, LB.pain, L.pain.tip)); h.appendChild(meterNode(L.pain.meter)); b.appendChild(h); b.appendChild(el("p", "lbt", L.pain.text)); w.appendChild(b);
+    b = lbox("like"); h = el("div", "lbh"); h.appendChild(lbl(L.like.icon, LB.like, L.like.tip)); b.appendChild(h); b.appendChild(el("p", "lbt", L.like.text)); b.appendChild(el("p", "lbs", L.like.stops)); w.appendChild(b);
+    b = lbox("cost"); h = el("div", "lbh"); h.appendChild(lbl("lb-cost", LB.cost, c.tip)); if (c.balance) h.appendChild(balanceNode(c.balance)); b.appendChild(h);
+    r = el("div", "lbr"); r.appendChild(sizeNode(c)); r.appendChild(el("p", "lbt", c.toSolve)); b.appendChild(r);
+    r = el("div", "lbr"); r.appendChild(lbl("lb-ifnot", LB.ifNot, c.ifTip)); r.appendChild(el("p", "lbt", c.ifNot)); b.appendChild(r); w.appendChild(b);
+    b = lbox("handle"); h = el("div", "lbh"); h.appendChild(lbl("pin", LB.handle, L.handle.tip)); b.appendChild(h); b.appendChild(el("p", "lbt hd", L.handle.text)); w.appendChild(b);
+    if (pat) {
+      b = lbox("steps"); h = el("div", "lbh"); h.appendChild(lbl("lb-steps", LB.steps, L.stepsTip)); b.appendChild(h); var ol = el("ol", "stp");
+      L.steps.forEach(function (s, i) { var li = el("li"); li.setAttribute("data-step", String(i + 1)); if (s.bad) { li.setAttribute("data-bad", "true"); li.title = s.tip; }
+        li.appendChild(el("span", "sn", String(i + 1))); li.appendChild(el("span", "stx", s.t)); if (s.bad) li.appendChild(ico("st-wrong")); ol.appendChild(li); }); b.appendChild(ol); w.appendChild(b);
+      b = lbox("box"); h = el("div", "lbh"); h.appendChild(lbl("lb-box", LB.box, L.boxTip)); b.appendChild(h);
+      [["does", "check", "ok"], ["doesNot", "bx-not", "no"], ["decides", "bx-when", "wh"]].forEach(function (k) { var x = el("div", "bxr"), y = L.box[k[0]]; x.setAttribute("data-bx", k[0]); x.appendChild(lbl(k[1], LB[k[0]], y.tip, k[2])); x.appendChild(el("p", "lbt", y.text)); b.appendChild(x); }); w.appendChild(b); }
+    return w; }
+
+  /* the legend says the lens marks once: the kinds of pain and of picture in use, the cost, the handle, the steps, the box and what an option does for you */
+  (function () { var G = U.gl, LG = G.legend, GD = LG.def, used = D.lens.used, H = LGH;
+    function samp(icon, color) { var s = el("span", "mk"); if (color) s.style.color = color; s.appendChild(ico(icon)); return s; }
+    var gk = H.group(LG.kinds, true); used.pain.forEach(function (k) { H.entry(gk, samp(D.lens.kindIcon[k], "var(--bad)"), G.pain[k].word, G.pain[k].def); });
+    var gq = H.group(LG.processes, true); used.process.forEach(function (k) { H.entry(gq, samp(D.lens.procIcon[k], "var(--accent)"), G.process[k].word, G.process[k].def); });
+    var gb = H.group(LG.blocks, true);
+    H.entry(gb, samp("lb-cost", "var(--warn)"), LB.cost, GD.cost);
+    H.entry(gb, (function () { var s = el("span", "mk cs"), sg = el("span", "sg"); s.setAttribute("data-size", "medium"); s.appendChild(ico("lb-solve")); for (var i = 0; i < 3; i++) sg.appendChild(el("i")); s.appendChild(sg); return s; })(), LB.toSolve, GD.toSolve);
+    H.entry(gb, samp("lb-ifnot", "var(--warn)"), LB.ifNot, GD.ifNot);
+    H.entry(gb, (function () { var s = el("span", "mk bl"); s.innerHTML = '<svg class="ico bal" viewBox="0 0 40 26" aria-hidden="true" focusable="false"><path class="bm" d="M20 24V7M14 24h12M5.5 11.2L34.5 2.8"/><path class="pl" d="M5.5 11.2l-4 8h8z"/><path class="pr" d="M34.5 2.8l-4 8h8z"/></svg>'; return s; })(), LB.balance, GD.balance);
+    H.entry(gb, (function () { var s = el("span", "mt"), r = el("span", "mr"); r.appendChild(bar(60, false)); s.appendChild(r); return s; })(), LB.meter, GD.meter);
+    H.entry(gb, samp("pin", "var(--ok)"), LB.handle, GD.handle);
+    H.entry(gb, samp("lb-steps", "var(--ink-soft)"), LB.steps, GD.steps);
+    H.entry(gb, samp("st-wrong", "var(--bad)"), LB.wrong, GD.wrong);
+    H.entry(gb, samp("check", "var(--ok)"), LB.does, GD.does);
+    H.entry(gb, samp("bx-not", "var(--bad)"), LB.doesNot, GD.doesNot);
+    H.entry(gb, samp("bx-when", "var(--accent)"), LB.decides, GD.decides);
+    var gi = H.group(LG.impact, true); ["gain", "cost", "both", "neutral"].forEach(function (k) { H.entry(gi, impMark({ kind: k }), G.impact[k].word, G.impact[k].def); }); })();
+
   /* a decision's block on its card (L-29): the plain line, a listen button, and what is read aloud (its summary then its plain line, with a copy button) */
   function decBlock(key, card) { var e = DECBY[key], M3 = U.decide.menu, box = el("div", "decb"), pl = el("p", "plainline"), acts = el("div", "acts"), said = el("span", "said"), d = el("details", "spk"), tx = el("p", "say-text"), cp = el("button", "btn ic nb");
     card.setAttribute("data-dec-card", key); DECARD[key] = card;
     pl.setAttribute("data-plain", key); pl.appendChild(el("span", "lab", M3.plainHead)); pl.appendChild(el("span", "pl-text", e.plain));
     acts.appendChild(speech.decButton(e.ix, M3.listen)); acts.appendChild(said); var row = el("div", "decrow"); row.appendChild(pl); row.appendChild(acts); box.appendChild(row);
     var ex = el("p", "example"); ex.setAttribute("data-example", key); ex.appendChild(el("b", null, M3.exampleLab)); ex.appendChild(document.createTextNode(e.ex)); box.appendChild(ex);
+    d.appendChild(el("summary", null, M3.fold)); tx.setAttribute("data-dec-text", key); d.appendChild(tx);
+    cp.type = "button"; cp.title = M3.copyTip; cp.setAttribute("data-dec-copy", key); cp.appendChild(ico("copy")); cp.appendChild(el("span", null, M3.copy)); cp.addEventListener("click", function () { copyText(tx.textContent, said); }); d.appendChild(cp); box.appendChild(d);
+    painters.push(function () { tx.textContent = decParts(e).join(" "); }); return box; }
+  /* a pattern's own reading: its listen button and what is read aloud; it is no decision, so it has no plain line, no example and no options */
+  function patBlock(pid, card) { var key = "pat:" + pid, e = DECBY[key], M3 = U.decide.menu, box = el("div", "decb"), acts = el("div", "acts"), said = el("span", "said"), d = el("details", "spk"), tx = el("p", "say-text"), cp = el("button", "btn ic nb");
+    card.setAttribute("data-dec-card", key); DECARD[key] = card; acts.appendChild(speech.decButton(e.ix, M3.listen)); acts.appendChild(said); box.appendChild(acts);
     d.appendChild(el("summary", null, M3.fold)); tx.setAttribute("data-dec-text", key); d.appendChild(tx);
     cp.type = "button"; cp.title = M3.copyTip; cp.setAttribute("data-dec-copy", key); cp.appendChild(ico("copy")); cp.appendChild(el("span", null, M3.copy)); cp.addEventListener("click", function () { copyText(tx.textContent, said); }); d.appendChild(cp); box.appendChild(d);
     painters.push(function () { tx.textContent = decParts(e).join(" "); }); return box; }
@@ -715,7 +829,7 @@
   function suiteCard(s, ch) { var pr = el("div", "prop"); pr.setAttribute("data-choice-card", s.cid); pr.id = "prop-" + s.cid; var X = U.pat, c2 = el("div", "chips");
     c2.appendChild(pchip(s.cid)); if (s.kind) c2.appendChild(chip(X.kind + " · " + s.kind)); if (s.partOf) c2.appendChild(chip(X.partOf + " " + s.partOf, null, null, "acc"));
     (s.waits || []).forEach(function (w) { c2.appendChild(chip(X.waits + " " + w.label, null, null, "acc")); }); pr.appendChild(c2);
-    if (s.name) pr.appendChild(el("h4", null, s.name)); if (s.target) pr.appendChild(el("p", "cap", X.target + ": " + s.target)); pr.appendChild(el("p", "what", s.what)); pr.appendChild(decBlock(s.cid, pr));
+    if (s.name) pr.appendChild(el("h4", null, s.name)); pr.appendChild(lensBlocks(D.lens.decisions[s.cid])); if (s.target) pr.appendChild(el("p", "cap", X.target + ": " + s.target)); pr.appendChild(el("p", "what", s.what)); pr.appendChild(decBlock(s.cid, pr));
     var cl = el("p", "costl"); cl.appendChild(el("b", null, X.cost)); cl.appendChild(document.createTextNode(X.lands + " " + s.lands + ". " + s.gate + (s.battery ? " " + s.battery : "") + (s.lines ? " " + s.lines : "") + (s.flags ? " " + s.flags : ""))); pr.appendChild(cl);
     var ag = el("p", "against"); ag.appendChild(el("b", null, X.against)); ag.appendChild(document.createTextNode(s.against)); pr.appendChild(ag);
     pr.appendChild(el("p", "lab", U.decide.menu.impactLab)); pr.appendChild(impactList(s.cid));
@@ -731,7 +845,7 @@
     var parts = el("div", "chips"); A.parts.forEach(function (c) { parts.appendChild(pchip(c, true)); }); ac.appendChild(parts);
     ac.appendChild(suiteCard({ cid: A.id, name: A.name, what: A.what, lands: A.lands, gate: A.gate, battery: A.battery, lines: A.lines, against: A.against }, CH[A.id])); B.appendChild(ac);
     D.patterns.forEach(function (p) { var card = el("div", "panel"); card.setAttribute("data-pattern", p.id); card.id = "pat-" + p.id;
-      var hd = el("h3", "hp"); hd.appendChild(pmark(p.id, "icon", patTip(p.id))); hd.appendChild(el("span", null, p.id + " · " + p.name)); card.appendChild(hd); card.appendChild(el("p", "cap", p.line));
+      var hd = el("h3", "hp"); hd.appendChild(pmark(p.id, "icon", patTip(p.id))); hd.appendChild(el("span", null, p.id + " · " + p.name)); card.appendChild(hd); card.appendChild(lensBlocks(D.lens.patterns[p.id], true)); card.appendChild(patBlock(p.id, card)); card.appendChild(el("p", "cap", p.line));
       var cs = el("div", "chips"); cs.appendChild(chip(p.items.length + " " + X.items, null, null, "acc")); p.items.forEach(function (i) { cs.appendChild(itemChip(i)); }); card.appendChild(cs);
       var fs = el("div", "chips"); fs.appendChild(chip(p.nFind + " " + X.findings, null, null, "acc")); fs.appendChild(stack(outParts(p.out), null, rt(TP.subject.pat, { id: p.id })));
       ["fixed", "partly", "left", "his"].forEach(function (k) { if (p.out[k]) fs.appendChild(M(k, p.out[k], null, outN(k, p.out[k], p.nFind, p.id + "'s"))); }); fs.appendChild(mk("open", X.still, p.stillThere, p.stillThere ? "" : "zero", stillTip(p))); card.appendChild(fs);
@@ -757,7 +871,7 @@
         if (c.kind && !(list[ci - 1] || {}).kind) { B.appendChild(el("h4", "sub2", C.kindsHead)); B.appendChild(el("p", "cap", C.kindsNote)); }
         var hd = el("div", "hd"); hd.appendChild(el("h4", null, c.label)); if (c.about) hd.appendChild(el("p", "cap", c.about)); var cs = el("div", "chips");
         c.rows.forEach(function (r) { cs.appendChild(chip(C.inRow + " " + r, null, null, "acc")); });
-        cs.appendChild(refChip(c.from, c.fromName, null, C.from)); c.answers.forEach(function (a) { cs.appendChild(refChip(a.id, a.name, null, C.answers)); }); hd.appendChild(cs); card.appendChild(hd); card.appendChild(decBlock(c.id, card));
+        cs.appendChild(refChip(c.from, c.fromName, null, C.from)); c.answers.forEach(function (a) { cs.appendChild(refChip(a.id, a.name, null, C.answers)); }); hd.appendChild(cs); card.appendChild(hd); card.appendChild(lensBlocks(D.lens.decisions[c.id])); card.appendChild(decBlock(c.id, card));
         var looks = el("div", "looks"); c.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
           if (o.shot) t.appendChild(pic(o.shot)); else t.appendChild(el("div", "noshot", o.note || C.noShot));
           var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); t.appendChild(impactLine(c.id, o.v)); looks.appendChild(t); });
@@ -767,7 +881,7 @@
     B.appendChild(el("h3", null, C.propsHead)); B.appendChild(el("p", "cap", C.propsNote));
     D.proposals.forEach(function (p) { B.appendChild(proposalCard(p)); }); })();
   function proposalCard(p, inGap) { var C = U.calls, ch = CH[p.id], card = el("div", "panel call"); card.setAttribute("data-call", p.id); card.id = (inGap ? "gcall-" : "call-") + p.id;
-    var hd = el("div", "hd"); hd.appendChild(el("h4", null, p.id + " · " + p.title)); card.appendChild(hd); card.appendChild(el("p", "cap", p.what)); card.appendChild(decBlock(inGap ? p.id + ":gap" : p.id, card));
+    var hd = el("div", "hd"); hd.appendChild(el("h4", null, p.id + " · " + p.title)); card.appendChild(hd); card.appendChild(lensBlocks(D.lens.decisions[p.id])); card.appendChild(el("p", "cap", p.what)); card.appendChild(decBlock(inGap ? p.id + ":gap" : p.id, card));
     if (p.facts.length) { card.appendChild(el("p", "lab", C.factsHead)); var ul = el("ul", "facts"); p.facts.forEach(function (f) { var li = el("li"); li.appendChild(el("b", null, f.id)); li.appendChild(document.createTextNode(f.text)); ul.appendChild(li); }); card.appendChild(ul); }
     if (p.shots.length) card.appendChild(pics(p.shots, 2));
     var looks = el("div", "looks"); p.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);

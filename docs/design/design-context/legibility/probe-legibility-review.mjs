@@ -29,10 +29,19 @@
    page equals the legend's definition of its kind (the legend says what a kind means, once), a control's hover is six words or fewer, a state mark on a
    decision says that decision's own fact, and a mark's hover is never only its kind's word.
 
-     node docs/design/design-context/legibility/probe-legibility-review.mjs [--html <file>] [--shots <dir>] [--bar <dir>] [--dec <dir>]   # browser-gated; run it ALONE
+   Round 6 (D-079, D-080): every pattern and decision card opens with the lens blocks, before its plain line, example, options and choices: the pain, the
+   picture, the cost and the handle (a pattern adds its steps and its box), in that order, each with its icon and one hover that says what it shows there
+   (the pain's kind and its meter, the picture's process, the cost's size and balance and the if-not mark, the pin, numbered steps joined by arrows with the
+   failing one marked, the box's does · does not do · decides-when marks, a gain or cost mark on every option's impact); the legend says each new mark once;
+   the spoken summary of every decision and of every pattern is rebuilt in that order (the pain first, then the analogy, the cost, the options, my pick;
+   4 to 7 sentences, no id, path, symbol, number or code); the authored lens file holds no id, path, symbol, typed digit or number word; the blocks fold to
+   one column at 390 px and no text in them is under 12px.
+
+     node docs/design/design-context/legibility/probe-legibility-review.mjs [--html <file>] [--shots <dir>] [--bar <dir>] [--dec <dir>] [--lens <dir>]   # browser-gated; run it ALONE
        --shots <dir>   also save a picture of the top of each section there, at 1920 and at 1600 px wide (for looking, never committed)
        --bar <dir>     also save one picture at 1920 px of the frozen bar mid-page while the (mocked) reading is on it (never committed)
-       --dec <dir>     also save two pictures at 1920 px: the bar with a dropdown open, and a decision card lit with its plain line (never committed) */
+       --dec <dir>     also save two pictures at 1920 px: the bar with a dropdown open, and a decision card lit with its plain line (never committed)
+       --lens <dir>    also save pictures at 1920 px of a pattern card's blocks and of a fully encoded decision card, the bar hidden (never committed) */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -41,7 +50,7 @@ const require = createRequire(import.meta.url);
 const HERE = path.dirname(new URL(import.meta.url).pathname), REPO = path.resolve(HERE, '../../../..');
 const PW = path.join(REPO, 'docs/design/graft-adoption/spike/_build/node_modules/playwright-core'), CHROME = '/usr/bin/google-chrome-stable';
 const args = process.argv.slice(2), opt = (k) => (args.indexOf(k) >= 0 ? args[args.indexOf(k) + 1] : null);
-const SRC = path.resolve(opt('--html') || path.join(HERE, 'legibility-review.html')), SHOTS = opt('--shots'), BARSHOT = opt('--bar'), DECSHOT = opt('--dec');
+const SRC = path.resolve(opt('--html') || path.join(HERE, 'legibility-review.html')), SHOTS = opt('--shots'), BARSHOT = opt('--bar'), DECSHOT = opt('--dec'), LENSSHOT = opt('--lens');
 if (!fs.existsSync(CHROME) || !fs.existsSync(PW)) { console.log('SKIP ⚠ — no system chrome / playwright-core on this host (RENDER COVERAGE DID NOT RUN)'); process.exit(0); }
 const { chromium } = require(PW);
 let pass = 0, fail = 0; const ok = (c, m, extra) => { if (c) { pass++; console.log('  ok   ' + m + (extra ? ' — ' + extra : '')); } else { fail++; console.log('  FAIL ' + m + (extra ? ' — ' + extra : '')); } };
@@ -307,17 +316,16 @@ try {
       const ids = new Set(DEC.map((e) => e.id)), want = new Set(D.choices.map((c) => c.id));
       ok(ids.size === want.size && [...want].every((x) => ids.has(x)) && DEC.length === want.size + 1 && DEC.filter((e) => e.key.endsWith(':gap')).length === 1,
         'every choice on the page is a decision with an entry (the L-19 recommendation stands in the gap analysis too)', `${ids.size} decisions · ${DEC.length} entries`);
-      const hits = []; for (const e of DEC) { const base = e.parts.join(' '), n = nSent(base); if (n < 2 || n > 5) hits.push(e.key + ': base of ' + n + ' sentences');
+      const hits = []; for (const e of DEC) { const base = e.parts.join(' '), n = nSent(base); if (n < 4 || n > 7) hits.push(e.key + ': base of ' + n + ' sentences');
         for (const [rx, w] of SAYBAD) { const m = rx.exec(base + ' ' + e.plain); if (m) hits.push(e.key + ': ' + w + ' “' + m[0] + '”'); } }
-      ok(hits.length === 0, 'every decision has a spoken summary of 2 to 5 sentences (one more once you have picked, so 6 at most) with no id, path, symbol, number, code name or {token}', hits.slice(0, 3).join(' | ') || DEC.length + ' summaries');
-      /* round 5 (D-078): the example and the impact stand in the summary, after what choosing sets in motion and before my pick */
+      ok(hits.length === 0, 'every decision has a spoken summary of 4 to 7 sentences (one more once you have picked) with no id, path, symbol, number, code name or {token}', hits.slice(0, 3).join(' | ') || DEC.length + ' summaries');
+      /* round 5 (D-078): the example and the impact of every decision; round 6 (D-079) rebuilds the spoken summary around them */
       { const bad = []; for (const e of DEC) { const opts = Object.keys(e.opts);
           if (!e.ex || !e.exSay || !e.impSay) { bad.push(e.key + ': no example or impact'); continue; }
-          if (e.parts[2] !== e.exSay || e.parts[3] !== e.impSay) bad.push(e.key + ': the example and the impact are not the third and fourth sentences of the summary');
           if (nSent(e.exSay) !== 1 || nSent(e.impSay) !== 1) bad.push(e.key + ': the example or the impact is not one sentence');
           if (JSON.stringify(Object.keys(e.imp).sort()) !== JSON.stringify(opts.sort())) bad.push(e.key + ': an option has no impact line');
           if (/\d/.test(e.exSay + e.impSay) || Object.values(e.imp).some((x) => !x || /\{|undefined/.test(x))) bad.push(e.key + ': a number or a token in the impact'); }
-        ok(bad.length === 0, 'every decision has an example and an impact for each option, and the summary reads them third and fourth, one sentence each', bad.slice(0, 3).join(' | ') || DEC.length + ' decisions · ' + DEC.reduce((a, e) => a + Object.keys(e.imp).length, 0) + ' impact lines');
+        ok(bad.length === 0, 'every decision has an example and an impact for each option, one sentence each, and both stay on its card (the summary is rebuilt in round 6\'s order, below)', bad.slice(0, 3).join(' | ') || DEC.length + ' decisions · ' + DEC.reduce((a, e) => a + Object.keys(e.imp).length, 0) + ' impact lines');
         const named = DEC.filter((e) => (/^(mo|ex)\./.test(e.key) || ['F24', 'L-19', 'R-11', 'EX-5'].includes(e.id)) && !e.ex.includes(D.ep));
         ok(named.length === 0, 'the example of every look and proposal is a case on the endpoint the page pictures', named.map((e) => e.key).join(',') || D.ep); }
       const bp = DEC.filter((e) => !e.plain || nSent(e.plain) !== 1 || (e.plain.match(/—/g) || []).length > 1 || /[;:]/.test(e.plain) || e.plain.split(/\s+/).length > 34 || /^[a-z]/.test(e.plain));
@@ -365,7 +373,7 @@ try {
       ok(near(card.top, s) && card.hot === 'true' && card.hots === 1, 'picking a decision scrolls the page to its card just under the bar and lights that one card', `card top ${card.top} · bar bottom ${s.bottom} · lit ${card.hots}`);
       ok(s.reading.on && s.reading.dec === 'mo.hdr' && s.lit === 3 && card.menuHidden && card.litItem === 'true', 'with nothing playing the pick starts the reading at that decision: the menu closes, its section\'s chip and its entry are lit', `dec ${s.reading.dec} · chip ${s.lit}`);
       await waitFor(P4, (n) => window.__ss.said.length >= n, e.parts.length + 1); const said = await heard(P4);
-      ok(e.parts.every((x, i) => said[i] === x), 'the first thing spoken is the decision\'s own summary, sentence by sentence: what it decides, what choosing sets in motion, the example, the impact, my pick', said[0].slice(0, 60));
+      ok(e.parts.every((x, i) => said[i] === x), 'the first thing spoken is the decision\'s own summary, part by part: the pain, the analogy, the cost to solve, the cost if not, the options, my pick', said[0].slice(0, 60));
       ok(said[e.parts.length] === e.plain, 'its plain line is read right after the summary', (said[e.parts.length] || '').slice(0, 60));
       await waitFor(P4, () => !window.__leg.reading().on); const end = await P4.evaluate(() => ({ on: window.__leg.reading().on, said: window.__ss.said.length, hot: document.querySelector('[data-dec-card="mo.hdr"]').dataset.hot, reading: document.querySelector('[data-dec-card="mo.hdr"]').dataset.reading }));
       ok(!end.on && end.said === e.parts.length + 1 && end.hot === 'true' && end.reading === 'false', 'by default the reading stops after the decision (my pick, dashed); the card stays lit where you are', `${end.said} sentences`);
@@ -373,7 +381,7 @@ try {
     await run('the card', async () => {
       const e = DEC.find((x) => x.key === 'mo.fit'), c = await P4.evaluate(() => { const k = document.querySelector('[data-dec-card="mo.fit"]'); const pl = k.querySelector('.plainline'); return { plain: pl && pl.querySelector('.pl-text').textContent, lab: pl && pl.querySelector('.lab').textContent, listen: !!k.querySelector('[data-dec-listen="mo.fit"]'), shown: k.querySelector('[data-dec-listen]').getBoundingClientRect().width > 0, fold: k.querySelector('details.spk summary').textContent, text: k.querySelector('[data-dec-text]').textContent, n: document.querySelectorAll('[data-dec-card]').length, pls: document.querySelectorAll('.plainline').length }; });
       ok(c.plain === e.plain && c.lab === D.ui.decide.menu.plainHead && c.listen && c.shown, 'a decision card shows its plain line under "in plain words" and a listen button', c.lab);
-      ok(c.n === DEC.length && c.pls === DEC.length, 'every decision card, the gap analysis\'s too, has its plain line', c.n + ' cards · ' + c.pls + ' lines');
+      ok(c.n === DEC.length + D.patterns.length && c.pls === DEC.length, 'every decision card, the gap analysis\'s too, has its plain line (a pattern\'s own reading is lit the same way and has none)', c.n + ' cards · ' + c.pls + ' lines');
       ok(c.text === e.parts.concat(e.plain).join(' ') && c.fold === D.ui.decide.menu.fold, 'what is read aloud is shown on the card, folded: the summary and then the plain line', c.text.slice(0, 50));
       await scrollInto(P4, 'call-mo.fit', -40); await P4.waitForTimeout(80); const y0 = await P4.evaluate(() => window.scrollY); await P4.evaluate(() => { window.__ss.said.length = 0; });
       await P4.click('[data-dec-listen="mo.fit"]'); await P4.waitForTimeout(250); const y1 = await P4.evaluate(() => window.scrollY), sd = await heard(P4), rd = await P4.evaluate(() => ({ r: window.__leg.reading(), pressed: document.querySelector('[data-dec-listen="mo.fit"]').getAttribute('aria-pressed'), label: document.querySelector('[data-dec-listen="mo.fit"]').textContent.trim() }));
@@ -384,7 +392,7 @@ try {
     await run('your pick joins the summary', async () => {
       const e = DEC.find((x) => x.key === 'mo.ipo'); await P4.click('[data-choice="mo.ipo"][data-v="sent"]'); await P4.evaluate(() => { window.__ss.said.length = 0; });
       const txt = await P4.$eval('[data-dec-text="mo.ipo"]', (n) => n.textContent), want = e.parts.concat([D.ui.decide.run.yours.replace('{{name}}', e.opts.sent), e.plain]);
-      ok(txt === want.join(' ') && nSent(want.slice(0, e.parts.length + 1).join(' ')) === e.parts.length + 1, 'once you have picked, the summary adds one sentence about your pick (one more than the base) before the plain line', want[e.parts.length]);
+      ok(txt === want.join(' ') && nSent(want.slice(0, e.parts.length + 1).join(' ')) === nSent(e.parts.join(' ')) + 1, 'once you have picked, the summary adds one sentence about your pick (one more than the base) before the plain line', want[e.parts.length]);
       await P4.click('[data-dd="calls"]'); await P4.click('[data-dec-item="mo.ipo"]'); await waitFor(P4, (n) => window.__ss.said.length >= n, want.length); const sd = await heard(P4);
       ok(JSON.stringify(sd.slice(0, want.length)) === JSON.stringify(want), 'and that sentence is read after the base summary and before the plain line', sd[e.parts.length]);
       await P4.click('[data-choice="mo.hdr"][data-v="band"]'); const k = await P4.$eval('[data-dec-text="mo.hdr"]', (n) => n.textContent); ok(k.includes(D.ui.decide.run.kept.replace('{{name}}', DEC.find((x) => x.key === 'mo.hdr').opts.band)), 'picking my own pick is said as keeping it', k.slice(-90, -40));
@@ -503,10 +511,115 @@ try {
       await p.click('[data-choice="mo.hdr"][data-v="band"]'); const h2 = await p.$eval('[data-dec-item="mo.hdr"]', (e) => e.title); await p.click('#reset');
       const want1 = T.yours.replace('{{picked}}', nm('mo.hdr', 'road')).replace('{{pick}}', nm('mo.hdr', 'band')), want2 = T.kept.replace('{{pick}}', nm('mo.hdr', 'band'));
       ok(h0 === want0 && o0 === want0 && h1 === want1 && o1 === want1 && h2 === want2, 'a state mark on a decision says that decision\'s own fact, in the menu and in the table of choices, and follows the pick (open, yours, my pick kept)', h0 + ' → ' + h1 + ' → ' + h2); }
+    /* ── round 6 (L-31, D-079; L-32, D-080): the pain, the picture, the cost and the handle come first, and wear icons ── */
+    {
+      /* the authored lens file: no id, path, symbol, typed digit or number word; the sets are the page's; a handle is ten words at most */
+      const src = JSON.parse(fs.readFileSync(path.join(HERE, 'legibility-review.lens.json'), 'utf8'));
+      const BADSRC = [[/[·→/×|#\\“”"`<>]/, 'a symbol'], [/\b(?:L|R|D|EX|CR|N3|S4)-\d+/, 'an id'], [/\b[PGFA]\d{1,2}\b/, 'an id'], [/(^|\s)[xg]:/i, 'an id'], [/\b[\w-]+\.(?:py|mjs|js|json|md|html|tsx?|css)\b/i, 'a path'], [/\bundefined\b|\bNaN\b/, 'undefined'], [/\d/, 'a typed digit'],
+        [/\b(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|forty|fifty|hundred|dozen)\b/i, 'a number word'], [/\b(?:he|him|his|himself)\b/i, 'he · him · his']];
+      const hits = [], SKIPK = new Set(['meter', 'kind', 'process', 'size', 'marks']);
+      (function walk(o, at) { if (typeof o === 'string') { const s = o.replace(/\{[a-zA-Z]\w*\}/g, ' '); for (const [rx, w] of BADSRC) { const m = rx.exec(s); if (m) hits.push(at + ': ' + w + ' “' + m[0] + '”'); } }
+        else if (Array.isArray(o)) o.forEach((v, i) => walk(v, at + '[' + i + ']')); else if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) { if (k[0] === '_' || SKIPK.has(k)) continue; walk(v, at + '.' + k); } })(src, 'lens');
+      ok(hits.length === 0, 'the lens file holds no id, path, symbol, typed digit, number word or he · him · his: every number is a {token} the generator fills', hits.slice(0, 3).join(' | ') || 'clean');
+      const wantD = new Set(D.choices.map((c) => c.id)), haveD = Object.keys(src.decisions), haveP = Object.keys(src.patterns);
+      ok(haveD.length === wantD.size && haveD.every((x) => wantD.has(x)) && haveP.length === D.patterns.length && D.patterns.every((x) => haveP.includes(x.id)), 'the lens file has one entry for each pattern and each decision, and no other', `${haveP.length} patterns · ${haveD.length} decisions`);
+      const wc = (s) => s.trim().split(/\s+/).length, longH = [...Object.entries(src.patterns), ...Object.entries(src.decisions)].filter(([, v]) => wc(v.handle) > 10).map(([k]) => k);
+      ok(longH.length === 0, 'every handle is ten words or fewer', longH.join(',') || 'all short');
+      const stepsOk = Object.entries(src.patterns).filter(([, v]) => !(v.steps.length >= 3 && v.steps.length <= 5 && v.steps.filter((s) => s.bad).length === 1)).map(([k]) => k);
+      ok(stepsOk.length === 0, 'every pattern has three to five steps and exactly one is marked as the one where it goes wrong', stepsOk.join(',') || 'all');
+
+      /* the rendered cards: the blocks stand first, in order, each with its icon and its one hover, and say what the data says */
+      const R6 = await p.evaluate((D) => {
+        const lensOf = (e) => (e.pat ? D.lens.patterns[e.id] : D.lens.decisions[e.id]);
+        const cards = [...D.decide.entries.map((e) => ({ e, sel: '[data-dec-card="' + CSS.escape(e.key) + '"]', pat: false })), ...D.patterns.map((q) => ({ e: { key: q.id, id: q.id, pat: true }, sel: '[data-pattern="' + q.id + '"]', pat: true }))];
+        const out = [];
+        for (const c of cards) {
+          const card = document.querySelector(c.sel), L = lensOf(c.e), r = { key: c.e.key, pat: c.pat, problems: [] };
+          if (!card) { r.problems.push('no card'); out.push(r); continue; }
+          const lens = card.querySelector('.lens'); if (!lens) { r.problems.push('no lens'); out.push(r); continue; }
+          const blocks = [...lens.children].map((b) => b.dataset.lb), want = c.pat ? ['pain', 'like', 'cost', 'handle', 'steps', 'box'] : ['pain', 'like', 'cost', 'handle'];
+          if (blocks.join() !== want.join()) r.problems.push('blocks ' + blocks.join());
+          /* first: only the title row and chips may stand before it among the card's own children */
+          const kids = [...card.children], li = kids.indexOf(lens), later = ['.decb', '.looks', '.verdict', '.cap', 'p.what', '.why2', 'ul.imps', 'p.sets', '.suite'];
+          const firstLater = kids.findIndex((k) => later.some((s) => k.matches(s))); if (li < 0 || (firstLater >= 0 && firstLater < li)) r.problems.push('the blocks do not come first');
+          const norm = (m) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.innerHTML = m; return s.innerHTML; };   /* the browser writes a mark back its own way */
+          const B = (n) => lens.querySelector('[data-lb="' + n + '"]'), icon = (n) => (D.icons[n] ? norm(D.icons[n]) : '#none');
+          const pain = B('pain'), like = B('like'), cost = B('cost'), handle = B('handle');
+          if (!pain || pain.querySelector('.lbt').textContent !== L.pain.text) r.problems.push('pain text'); if (!like || like.querySelector('.lbt').textContent !== L.like.text || like.querySelector('.lbs').textContent !== L.like.stops) r.problems.push('like text');
+          const ct = cost ? [...cost.querySelectorAll('.lbt')].map((x) => x.textContent) : []; if (ct[0] !== L.cost.toSolve || ct[1] !== L.cost.ifNot) r.problems.push('cost text'); if (!handle || handle.querySelector('.lbt').textContent !== L.handle.text) r.problems.push('handle text');
+          const lab = (b, i) => { const m = b && b.querySelectorAll('.mk.lbl')[i]; return m && { title: m.title, svg: m.querySelector('svg') && m.querySelector('svg').innerHTML, text: m.textContent.trim() }; };
+          const pl = lab(pain, 0), ll = lab(like, 0), cl = lab(cost, 0), il = lab(cost, 1), hl = lab(handle, 0);
+          if (!pl || pl.title !== L.pain.tip || pl.svg !== icon(L.pain.icon) || pl.text !== D.ui.gl.label.pain) r.problems.push('pain label'); if (!ll || ll.title !== L.like.tip || ll.svg !== icon(L.like.icon) || ll.text !== D.ui.gl.label.like) r.problems.push('like label');
+          if (!cl || cl.title !== L.cost.tip || cl.svg !== icon('lb-cost')) r.problems.push('cost label'); if (!il || il.title !== L.cost.ifTip || il.svg !== icon('lb-ifnot') || il.text !== D.ui.gl.label.ifNot) r.problems.push('if-not label'); if (!hl || hl.title !== L.handle.tip || hl.svg !== icon('pin')) r.problems.push('handle label');
+          const mt = pain && pain.querySelector('.mt'); if (!mt || mt.title !== L.pain.meter.tip || mt.dataset.meter !== L.pain.meter.type || !mt.textContent.trim()) r.problems.push('pain meter');
+          const cs = cost && cost.querySelector('.mk.cs'); if (!cs || cs.title !== L.cost.sizeTip || cs.dataset.size !== L.cost.size || !cs.querySelector('svg') || cs.querySelector('.sw').textContent !== L.cost.sizeWord) r.problems.push('size meter');
+          const bl = cost && cost.querySelector('.mk.bl'); if (!!bl !== !!L.cost.balance || (bl && (bl.title !== L.cost.balance.tip || !bl.querySelector('svg.bal')))) r.problems.push('balance');
+          if (c.pat) {
+            const st = B('steps'), lis = st ? [...st.querySelectorAll('ol.stp > li')] : [];
+            if (lis.length !== L.steps.length || lis.some((x, i) => x.querySelector('.sn').textContent !== String(i + 1) || x.querySelector('.stx').textContent !== L.steps[i].t)) r.problems.push('steps');
+            const bad = lis.filter((x) => x.dataset.bad === 'true'); if (bad.length !== 1 || !bad[0].querySelector('svg') || bad[0].title !== L.steps.find((s) => s.bad).tip || lis.filter((x) => x.title).length !== 1) r.problems.push('the failing step');
+            if (lis.slice(0, -1).some((x) => getComputedStyle(x, '::after').content === 'none') || getComputedStyle(lis[lis.length - 1], '::after').content !== 'none') r.problems.push('arrows between the steps');
+            const sl = lab(st, 0); if (!sl || sl.title !== L.stepsTip || sl.svg !== icon('lb-steps')) r.problems.push('steps label');
+            const bx = B('box'), rows = bx ? [...bx.querySelectorAll('.bxr')] : [], bi = ['check', 'bx-not', 'bx-when'], bk = ['does', 'doesNot', 'decides'];
+            if (rows.length !== 3 || rows.some((x, i) => x.dataset.bx !== bk[i] || x.querySelector('.mk.lbl').title !== L.box[bk[i]].tip || x.querySelector('svg').innerHTML !== icon(bi[i]) || x.querySelector('.lbt').textContent !== L.box[bk[i]].text)) r.problems.push('box rows');
+            const bl2 = lab(bx, 0); if (!bl2 || bl2.title !== L.boxTip || bl2.svg !== icon('lb-box')) r.problems.push('box label');
+          } else {
+            /* the options' impact: a gain, cost, both or neutral mark, and the line's one hover says it for that option */
+            const imps = [...card.querySelectorAll('[data-impact]')]; if (imps.length !== Object.keys(L.marks).length) r.problems.push('impact lines ' + imps.length);
+            for (const x of imps) { const m = L.marks[x.dataset.impact], im = x.querySelector('.im'); if (!m || !im || im.dataset.k !== m.kind || x.title !== m.tip || im.querySelectorAll('svg').length !== (m.kind === 'both' ? 2 : 1)) { r.problems.push('mark of ' + x.dataset.impact); break; } }
+          }
+          out.push(r);
+        } return out; }, D);
+      const bad6 = R6.filter((r) => r.problems.length);
+      ok(bad6.length === 0 && R6.length === D.decide.entries.length + D.patterns.length, 'every pattern and decision card opens with its blocks, in order, before its plain line, example, options and choices, and each block, mark and meter is what the data says', bad6.slice(0, 3).map((r) => r.key + ': ' + r.problems.join(', ')).join(' | ') || `${R6.filter((r) => r.pat).length} patterns (six blocks) · ${R6.filter((r) => !r.pat).length} decision cards (four blocks)`);
+      /* every icon of the blocks is inside an item with a hover that says its own fact; none repeats the legend's meaning */
+      const IC6 = await p.evaluate(() => { const icons = [...document.querySelectorAll('.lens svg.ico, [data-impact] svg.ico')], bare = icons.filter((i) => !i.closest('[title]') || !i.closest('[title]').title.trim()), words = icons.filter((i) => i.closest('[title]') && i.closest('[title]').title.trim().split(/\s+/).length < 4);
+        const lg = new Set([...document.querySelectorAll('#legend .lg')].map((e) => e.title)); const same = [...document.querySelectorAll('.lens [title], [data-impact][title]')].filter((e) => lg.has(e.title)).length; return { n: icons.length, bare: bare.length, words: words.length, same }; });
+      ok(IC6.n > 600 && IC6.bare === 0 && IC6.words === 0 && IC6.same === 0, 'every icon in the blocks and on the options sits inside an item with its own hover of four words or more, and none repeats the legend', `${IC6.n} icons · ${IC6.bare} bare · ${IC6.words} thin · ${IC6.same} like the legend`);
+      /* the legend says each new mark once */
+      const LG6 = await p.evaluate((D) => { const g = [...document.querySelectorAll('#legend .lgg')].map((x) => ({ head: x.querySelector('.lab').textContent, defs: [...x.querySelectorAll('.lg')].map((e) => ({ title: e.title, svg: !!e.querySelector('svg'), word: e.textContent.trim() })) })), G = D.ui.gl;
+        const find = (h) => g.find((x) => x.head === h) || { defs: [] };
+        return { kinds: find(G.legend.kinds).defs, procs: find(G.legend.processes).defs, blocks: find(G.legend.blocks).defs, impact: find(G.legend.impact).defs }; }, D);
+      const G6 = D.ui.gl;
+      ok(LG6.kinds.length === D.lens.used.pain.length && D.lens.used.pain.every((k, i) => LG6.kinds[i].title === G6.pain[k].def && LG6.kinds[i].word === G6.pain[k].word && LG6.kinds[i].svg), 'the legend says each kind of pain in use once, with its icon', `${LG6.kinds.length} kinds`);
+      ok(LG6.procs.length === D.lens.used.process.length && D.lens.used.process.every((k, i) => LG6.procs[i].title === G6.process[k].def && LG6.procs[i].word === G6.process[k].word && LG6.procs[i].svg), 'the legend says each everyday process in use once, with its icon', `${LG6.procs.length} processes`);
+      ok(LG6.blocks.length === 11 && LG6.blocks.every((x) => x.title && x.word) && LG6.impact.length === 4 && LG6.impact.every((x, i) => x.svg && x.title === G6.impact[['gain', 'cost', 'both', 'neutral'][i]].def), 'the legend says the cost, the size, the if-not mark, the balance, the meter, the handle, the steps, the failing step and the box once each, and what an option does for you', `${LG6.blocks.length} block marks · ${LG6.impact.length} impact marks`);
+      /* the spoken summaries: the pain first, then the analogy, the cost, the options, my pick */
+      const SB = [[/[A-Za-z]_[A-Za-z]/, 'a code name'], [/\b[a-z]+[A-Z][A-Za-z]*\b/, 'a code name'], [/[·→/×|#{}\\“”"`<>]/, 'a symbol'], [/\b(?:L|R|D|EX|CR|N3|S4)-\d+/, 'an id'], [/\b[PGFA]\d{1,2}\b/, 'an id'], [/\b[\w-]+\.(?:py|mjs|js|json|md|html|tsx?|css)\b/i, 'a file'], [/\d/, 'a number'], [/\bundefined\b|\bNaN\b/, 'undefined'], [/\b(?:he|him|his|himself)\b/i, 'he · him · his']];
+      const ns6 = (s) => (s.match(/[^.!?]+[.!?]+(\s|$)/g) || []).length, sp6 = [...DEC, ...D.decide.pats], bsp = [];
+      for (const e of sp6) { const L = e.pat ? D.lens.patterns[e.id] : D.lens.decisions[e.id], n = ns6(e.parts.join(' '));
+        if (e.parts.length !== 6 || e.parts[0] !== L.say.pain || e.parts[1] !== L.say.like || e.parts[2] !== L.say.toSolve || e.parts[3] !== L.say.ifNot) bsp.push(e.key + ': not pain, analogy, cost to solve, cost if not first');
+        else if (!(e.pat ? /^This pattern holds /.test(e.parts[4]) : /^(You choose between |You can land it)/.test(e.parts[4]))) bsp.push(e.key + ': the fifth part is not the options');
+        else if (!/^My pick |^You already ruled it/.test(e.parts[5])) bsp.push(e.key + ': the last part is not my pick');
+        if (n < 4 || n > 7) bsp.push(e.key + ': ' + n + ' sentences'); for (const [rx, w] of SB) { const m = rx.exec(e.parts.join(' ')); if (m) bsp.push(e.key + ': ' + w + ' “' + m[0] + '”'); } }
+      ok(bsp.length === 0, 'the spoken summary of every pattern and every decision begins with its pain sentence and goes on in order: the analogy, the cost to solve, the cost if not, the options, my pick (4 to 7 sentences, no id, path, symbol, number or code)', bsp.slice(0, 3).join(' | ') || `${sp6.length} summaries (${D.decide.pats.length} patterns)`);
+      /* a pattern is read from its own card: the pain first, its card lit, and the menu does not list it as a decision */
+      const P8 = await open({ ms: 30 });
+      await run('a pattern reading', async () => {
+        const pe = D.decide.pats[0], listen = '[data-dec-listen="' + pe.key + '"]'; await P8.click(listen); await waitFor(P8, (n) => window.__ss.said.length >= n, pe.parts.length); const said = await heard(P8);
+        const st = await P8.evaluate((k) => ({ hot: document.querySelector('[data-dec-card="' + k + '"]').dataset.hot, r: window.__leg.reading(), txt: document.querySelector('[data-dec-text="' + k + '"]').textContent }), pe.key);
+        ok(said[0] === pe.parts[0] && pe.parts.every((x, i) => said[i] === x) && st.r.dec === pe.key && st.hot === 'true', 'a pattern\'s listen button reads its summary from the pain sentence, part by part, and lights its card', (said[0] || '').slice(0, 50));
+        ok(st.txt === pe.parts.join(' '), 'what a pattern reads aloud is shown folded on its card, as the generator wrote it', st.txt.slice(0, 40));
+        await waitFor(P8, () => !window.__leg.reading().on); const nm = await P8.evaluate(() => document.querySelectorAll('[data-dec-item^="pat:"]').length); ok(nm === 0, 'the menu lists decisions only: no pattern reading is a menu entry', nm + ' entries'); });
+      await P8.__ctx.close();
+      /* 390 px: the blocks fold to one column, nothing scrolls sideways, no text under 12px in them */
+      await p.setViewportSize({ width: 390, height: 900 }); await p.waitForTimeout(200);
+      const NB = await p.evaluate(() => { const l = document.querySelector('[data-pattern="P1"] .lens'), cols = getComputedStyle(l).gridTemplateColumns.trim().split(/\s+/).length, side = document.documentElement.scrollWidth - window.innerWidth;
+        const small = []; const w = document.createTreeWalker(document.querySelector('[data-pattern="P1"]'), NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (!n.nodeValue.trim()) continue; const e = n.parentElement; if (!e.getClientRects().length) continue; if (parseFloat(getComputedStyle(e).fontSize) < 12) small.push(n.nodeValue.trim().slice(0, 20)); }
+        const wide = [...document.querySelectorAll('.lens, .lb')].filter((x) => x.scrollWidth > x.clientWidth + 1).length; return { cols, side, small: small.length, wide }; });
+      ok(NB.cols === 1 && NB.side <= 1 && NB.small === 0 && NB.wide === 0, 'at 390 px the blocks fold to one column, nothing scrolls sideways, and no text in them is under 12px', `${NB.cols} column · page ${NB.side}px wider · ${NB.small} small · ${NB.wide} overflowing`);
+      await p.setViewportSize({ width: 1500, height: 1000 }); await p.waitForTimeout(150);
+    }
     if (DECSHOT) { fs.mkdirSync(DECSHOT, { recursive: true }); const PD = await open({ ms: 600000 }, 1920); await PD.setViewportSize({ width: 1920, height: 1000 });
       await scrollInto(PD, IDS[3], 400); await PD.click('[data-choice="mo.ipo"][data-v="sent"]'); await PD.click('[data-choice="mo.hdr"][data-v="band"]'); await scrollInto(PD, IDS[3], 400); await PD.waitForTimeout(100);
       await PD.click('[data-dd="calls"]'); await PD.waitForTimeout(150); await PD.screenshot({ path: path.join(DECSHOT, 'dropdown-open-1920.png') });
       await PD.click('[data-dec-item="mo.gdl"]'); await PD.waitForTimeout(400); await PD.screenshot({ path: path.join(DECSHOT, 'decision-card-1920.png') }); console.log('  the dropdown and a lit decision card at 1920 px in ' + DECSHOT); await PD.__ctx.close(); }
+    if (LENSSHOT) { fs.mkdirSync(LENSSHOT, { recursive: true }); const PL = await open({ ms: 600000 }, 1920); await PL.setViewportSize({ width: 1920, height: 1000 }); await PL.addStyleTag({ content: 'nav.toc { display: none !important; }' }); await PL.waitForTimeout(150);
+      const pc = await PL.$('[data-pattern="P1"]'), pb = await pc.boundingBox(), end = await PL.evaluate(() => { const r = document.querySelector('[data-dec-text="pat:P1"]').closest('.decb').getBoundingClientRect(); return r.bottom + window.scrollY; });
+      await PL.screenshot({ path: path.join(LENSSHOT, 'pattern-card-1920.png'), fullPage: true, clip: { x: pb.x, y: pb.y, width: pb.width, height: Math.round(end - pb.y + 8) } });
+      const dc = await PL.$('[data-call="mo.gdl"]'); await dc.screenshot({ path: path.join(LENSSHOT, 'decision-card-1920.png') });
+      const sc = await PL.$('[data-choice-card="P1.1"]'); await sc.screenshot({ path: path.join(LENSSHOT, 'decision-card-suite-1920.png') });
+      console.log('  a pattern card\'s blocks, a fully encoded look card and a suite proposal card at 1920 px in ' + LENSSHOT); await PL.__ctx.close(); }
     if (BARSHOT) { const PB = await open({ ms: 600000 }, 1920); await PB.setViewportSize({ width: 1920, height: 1000 }); await scrollInto(PB, IDS[4], 40); await PB.click('[data-say="items"] [data-listen]'); await PB.waitForTimeout(300);
       fs.mkdirSync(BARSHOT, { recursive: true }); await PB.screenshot({ path: path.join(BARSHOT, 'frozen-bar-1920.png') }); console.log('  the frozen bar at 1920 px in ' + BARSHOT); await PB.__ctx.close(); } }
   if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true });
