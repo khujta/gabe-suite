@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-081). Updated 2026-10-01 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-083). Updated 2026-10-02 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -10,9 +10,10 @@ Loop 1 is the API endpoint card. Its display half lives on ONE page, `../workflo
 `05007957`, frozen feed). On 2026-09-30 he read that page as a HUMAN and dictated 23 items of feedback (D-066): much that was clear
 to the model was not clear to him. Round 1 fixed them AND named the patterns behind them, so they can be carried into the Gabe Suite.
 
-**Now: he reviews round 1 on `legibility/legibility-review.html`** — a generated decision page: his calls (the looks added this
-round, my picks dashed, real-click pictures), his 23 items, his questions answered, the L-19 gap analysis, the ten patterns with
-draft suite proposals, what is still on the page, and one copy button. His pasted REVIEW text is the next input.
+**Now: five choices are his on `legibility/legibility-review.html`** — the header (`mo.hdr`), saving (`mo.save`), F24,
+L-19 and the player's "after a decision" (`pl.after`). His round-1 rulings are read from the record `legibility/review-r1.his.txt`
+(a815ad5), so any fresh browser shows them ruled; the copy head reads "41 yours · 4 left as my pick · 8 deferred to the bench".
+Every card's LAYOUT is decided on the all-endpoints bench, not here (D-083): he sets it there and tells me the configuration.
 
 ## Round 1 — what happened (D-066 … D-071)
 
@@ -98,14 +99,16 @@ crops side by side and a before/after or a labelled mock for every option he cou
 paused the work at C: 38 GB; deleting the WSL crash dumps (10.9 GB) and the Windows pip cache (4.1 GB) brought it to 52 GB. Two old
 WSL swap files (5 GB) in Temp wait on his word.
 
-## Open for you — on the review page
+## Open for you
 
-1. **The looks added this round** (29 choices on the page): pick or keep each; my picks are dashed.
-2. **Four proposals**: rename his "screen" column to "sends it" · L-19 — a Security control over the rows (G1, my pick), a ninth
-   row (G2), or nothing new (G3) · open BY MOMENT fitted when it overflows · EX-5, the bench's looks into BY MOMENT's chips.
-3. **The ten patterns' suite proposals**: land it · not yet · change it, each. My pick is "land it" where the pattern is still open.
-4. **Older opens, still standing** (from the previous STATE): the agent-added rules of D-064, which handler line a handler shows,
-   the 2026-09-23 opens (D-035's section map, the four standpoints, the lab's picks, M3's first face, the command layout).
+1. **On the review page** — the header, saving, F24, L-19 (G1 Security control · G2 a ninth row · G3 nothing new; my pick G1),
+   and "after a decision"; then paste the copy text. Picking only changes the browser until the text is pasted.
+2. **On the all-endpoints bench** (D-083) — the seven kind looks (endpoint · schema · function · test · gate · hook · in-flight) and
+   EX-5; his configuration comes back as words, not a review line.
+3. **The read-aloud draft** (`legibility/drafts/gabe-artifact-read-aloud/`) — "land it" or not.
+4. **Two old WSL swap files** in Windows Temp (≈5 GB) — "delete the old swaps" or keep.
+5. **Older opens, still standing**: the agent-added rules of D-064, which handler line a handler shows, the 2026-09-23 opens
+   (D-035's section map, the four standpoints, the lab's picks, M3's first face, the command layout).
 
 ## Generation items open (suite code; each needs its regime, D-063)
 
@@ -119,10 +122,11 @@ secrets a path reads (settings{} has them, unjoined).
 
 ## Next, in order
 
-1. **His "land it" (or not) on the read-aloud draft**, and **his REVIEW text** for round 1 → act on each line (a ruling = a D-entry in the same commit); "my pick, not ruled" is never a ruling.
-2. **The patterns into the Gabe Suite** — only the proposals he marks "land it", as a draft first (iterate-before-implement).
-3. **M3** (the channel budget for the first prism), then **the gallery**.
-4. Generation items above, each under its D-063 regime.
+1. **His five rulings** (copy text) → each a D-entry in the same commit; "my pick, not ruled" is never a ruling.
+2. **On his "go"**: P4.1 · P8.1 · P10.1 (build checks in the page generators); P3.2 and P2.1 redrafted to his words for a new
+   "land it"; L-33 (the frontend lab's hover cards as the one hover format — trace its origin first); L-39 (bench sections).
+3. **The card layouts** from his bench configuration (D-083), after the legibility work.
+4. **M3** (the channel budget for the first prism), then **the gallery**; generation items above, each under its D-063 regime.
 
 Later: the twins' code-vs-map COVERAGE AUDIT (a parallel session; its files under `coverage/` are that session's — never touch) ·
 piece 9 (D-016) · 12b (D-019) · the robot for every kind · the "more information" toggle (D-017) · pages for the blocks with none
