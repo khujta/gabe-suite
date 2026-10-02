@@ -26,17 +26,17 @@
           --el:#c48a00;
           --vcink:#fff; /* D-043: the ink on a filled kind chip — the slot's white on the light theme, dark on the dark theme's lighter fills */
           /* D-069 (his L-17, L-10): the In-flight row's one hue (my pick) · a colour per stage for a gate's effect (its option, my proposal) */
-          --if:#0e7490; --st-EDGE:#475569; --st-GATE:#a16207; --st-INPUT:#0e7490; --st-HANDLER:#4f46e5; --st-EFFECTS:#0f766e; --st-ANSWER:#15803d; --st-UNCAUGHT:#b91c1c; }
+          --secrow:#be123c; --if:#0e7490; --st-EDGE:#475569; --st-GATE:#a16207; --st-INPUT:#0e7490; --st-HANDLER:#4f46e5; --st-EFFECTS:#0f766e; --st-ANSWER:#15803d; --st-UNCAUGHT:#b91c1c; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --alert:#f0a35a; --alert-soft:#3b2914;
           --k-success:#5fc28e; --k-refusal:#e5b454; --k-framework:#94a3b8; --k-validation:#a78bfa; --k-uncaught:#f47272;
           --f-saved:#5fc28e; --f-maybe:#f2c94c; --f-rolled:#94a3b8; --f-unsaved:#f0955a; --f-after:#6fa8e8; --p-norm:#3b4658; --p-common:#64748b;
           --m-GET:#6fa8e8; --m-POST:#5fc28e; --m-PUT:#e5b454; --m-PATCH:#b69cf0; --m-DELETE:#f47272; --sh:#f472b6; --shp:32%; --el:#facc15; --vcink:#0b0e13;
-          --if:#5ec8dc; --st-EDGE:#a8b3c4; --st-GATE:#e5b454; --st-INPUT:#5ec8dc; --st-HANDLER:#a5a8f5; --st-EFFECTS:#5fd0bf; --st-ANSWER:#5fc28e; --st-UNCAUGHT:#f47272; } }
+          --secrow:#fb7185; --if:#5ec8dc; --st-EDGE:#a8b3c4; --st-GATE:#e5b454; --st-INPUT:#5ec8dc; --st-HANDLER:#a5a8f5; --st-EFFECTS:#5fd0bf; --st-ANSWER:#5fc28e; --st-UNCAUGHT:#f47272; } }
   :root[data-theme="dark"] { --alert:#f0a35a; --alert-soft:#3b2914;
           --k-success:#5fc28e; --k-refusal:#e5b454; --k-framework:#94a3b8; --k-validation:#a78bfa; --k-uncaught:#f47272;
           --f-saved:#5fc28e; --f-maybe:#f2c94c; --f-rolled:#94a3b8; --f-unsaved:#f0955a; --f-after:#6fa8e8; --p-norm:#3b4658; --p-common:#64748b;
           --m-GET:#6fa8e8; --m-POST:#5fc28e; --m-PUT:#e5b454; --m-PATCH:#b69cf0; --m-DELETE:#f47272; --sh:#f472b6; --shp:32%; --el:#facc15; --vcink:#0b0e13;
-          --if:#5ec8dc; --st-EDGE:#a8b3c4; --st-GATE:#e5b454; --st-INPUT:#5ec8dc; --st-HANDLER:#a5a8f5; --st-EFFECTS:#5fd0bf; --st-ANSWER:#5fc28e; --st-UNCAUGHT:#f47272; }
+          --secrow:#fb7185; --if:#5ec8dc; --st-EDGE:#a8b3c4; --st-GATE:#e5b454; --st-INPUT:#5ec8dc; --st-HANDLER:#a5a8f5; --st-EFFECTS:#5fd0bf; --st-ANSWER:#5fc28e; --st-UNCAUGHT:#f47272; }
   body { background: var(--ground); }
 
   .eyebrow { font-size: var(--fs-min); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 0; }
@@ -630,6 +630,13 @@
   .msc:hover { border-color: var(--accent); }
   .msc[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--ink); }
   .msc:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  /* D-084: the Security row's head states — what each home fact is on this endpoint (a count, "none on this endpoint", "not recorded"); they point at nothing */
+  .mss { font-size: 12px; line-height: 16px; border: 1px solid var(--rule-soft); border-radius: 4px; color: var(--ink-soft); padding: 0 4px; display: inline-flex; flex-wrap: wrap; gap: 0 3px; text-align: left; max-width: 100%; }
+  .mss .msv { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }
+  .mss[data-st="unrec"] .msv, .mss[data-st="none"] .msv { font-weight: 400; font-style: italic; }
+  #mogrid .mc[data-secmk] { cursor: pointer; }
+  #mogrid .mc[data-secmk]:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  #mogrid .secflash { outline: 3px solid var(--secrow); outline-offset: 1px; border-radius: 4px; }
   .mrop { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; padding: 4px; border: 1px dashed var(--rule); border-radius: 5px; font-weight: 400; }
   .mroi { font: inherit; font-size: 12px; border: 1px solid var(--rule); border-radius: 5px; background: var(--raised); color: var(--ink-soft); padding: 1px 6px; cursor: pointer; }
   .mroi:hover { border-color: var(--accent); color: var(--ink); }
@@ -1792,6 +1799,9 @@
      reason. The two looks' defaults are his (D-055: moments as columns, cells as chips), remembered per viewer; a look remembered before
      his ruling must not override it, so the old key is dropped. ══ */
   var MW = W.mo, MO = D.mo, MKEY = "gabe:allep:moments:v3", MS = {}, MPATH = { ep: null, i: null };   /* D-065: jy, the journeys' look · D-067: leg, the legend's place (his), ipo, the hovers' form · D-068: hdr, the header · save, the stage saving stands in · meta, where the metadata stands · wid, what widening gives · fit, what fit does (my picks) */
+  /* D-084 (his L-19, ruled G2): BY MOMENT's Security row is no block of the ruled tree — it takes the block shapes the rows read (a name, a plain
+     line, a mark, my pick: the lab has no page for it) so every control a row has works on it unchanged */
+  BLK.security = { key: "security", name: MW.sec.name, plain: MW.sec.plain }; D.marks.security = { icon: MO.sec.icon, col: MO.sec.col, from: "own", part: "no page yet", surface: "none" };
   Object.keys(MW.opt).forEach(function (g) { MS[g] = MW.opt[g].pick; });
   try { window.localStorage.removeItem("gabe:allep:moments:v1"); window.localStorage.removeItem("gabe:allep:moments:v2"); } catch (e) {}   /* D-081: the looks he ruled are the defaults — a look remembered before his ruling must not override them */
   try { var mv = JSON.parse(window.localStorage.getItem(MKEY) || "null"); if (mv) Object.keys(MS).forEach(function (g) { if (mv[g] && MW.opt[g].opts[mv[g]]) MS[g] = mv[g]; }); } catch (e) {}
@@ -1843,7 +1853,10 @@
                 ifl: { chips: '<rect x="3" y="9" width="8" height="6" rx="2"/><path d="M14 12h7" stroke-dasharray="2 2"/>',
                        lane: '<rect x="2" y="9" width="6" height="6" rx="2"/><path d="M8 12h11"/><circle cx="13" cy="12" r="1.8" fill="currentColor"/><path d="M19 9l3 3-3 3"/>',
                        echo: '<rect x="2" y="9" width="6" height="6" rx="2"/><rect x="11" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/>' },
-                fit: { min: '<path d="M4 5v14M7.5 5v14"/><rect x="11" y="5" width="10" height="14" rx="1.2"/>', bands: '<rect x="3" y="4" width="18" height="6" rx="1.2"/><rect x="3" y="14" width="11" height="6" rx="1.2"/>' } };
+                fit: { min: '<path d="M4 5v14M7.5 5v14"/><rect x="11" y="5" width="10" height="14" rx="1.2"/>', bands: '<rect x="3" y="4" width="18" height="6" rx="1.2"/><rect x="3" y="14" width="11" height="6" rx="1.2"/>' },
+                /* D-084: a mark in Security with an arrow down to the row that holds the fact · the fact moved up into Security's own box */
+                secmv: { marks: '<rect x="3" y="3" width="18" height="6" rx="1.5"/><rect x="6" y="5" width="5" height="2" rx="1"/><path d="M12 11v6"/><path d="M9 14l3 3 3-3"/><path d="M4 21h16"/>',
+                         moved: '<rect x="3" y="3" width="18" height="9" rx="1.5"/><rect x="7" y="6" width="7" height="3" rx="1.2"/><path d="M12 21v-6"/><path d="M9 18l3-3 3 3"/>' } };
   /* D-068 (his L-21: "click the columns … give a little more width … hide other columns … a button that will force accommodation by
      minimizing or moving the other columns"): the columns' own state, apart from the looks — a widened column and a hidden moment of
      the handler belong to one endpoint (another endpoint starts with none), a hidden fixed moment and a hidden row to every endpoint,
@@ -1863,8 +1876,14 @@
   /* D-068 (his L-06/L-07): a block nothing of which acts at a moment (the Overview) is no row — its facts stand in the endpoint metadata;
      a row he hid is left out (`all`: every row, hidden or not) */
   function moFams(all) { var byB = {}; Object.keys(MO.fam).forEach(function (f) { byB[MO.fam[f]] = f; });
-    return D.orders[S.bord].map(function (b) { return byB[b]; }).filter(function (f) { return f && MO.untimed.indexOf(f) < 0 && (all || MC.hidR.indexOf(f) < 0)
-      && (all || f !== "std" || MS.std === "keep"); }); }                                                  /* D-069: Standard or specialist split or merged into the gates is no row */
+    var out = D.orders[S.bord].map(function (b) { return byB[b]; }).filter(function (f) { return f && MO.untimed.indexOf(f) < 0 && (all || MC.hidR.indexOf(f) < 0)
+      && (all || f !== "std" || MS.std === "keep"); });
+    if (all || secRowOn()) { var gi = out.indexOf(MO.sec.after); out.splice(gi < 0 ? out.length : gi + 1, 0, "sec"); }   /* D-084: the Security row stands after Gates and decisions, wherever the block order puts that */
+    return out; }
+  /* D-084 · the Security row: a home fact is drawn in it whenever it is shown (X.sh); a fact whose home is another row (X.sx) is drawn there, and
+     marked here — or, in the option's other look, moved here and left out of its row, with the maps and lanes that row draws (X.so: its place in a cell) */
+  function secRowOn() { return MC.hidR.indexOf("sec") < 0; }
+  function secMoved(e) { return !!e && (e[7] || {}).sx != null && MS.secmv === "moved" && secRowOn(); }                                                  /* D-069: Standard or specialist split or merged into the gates is no row */
   function moK(ix) { return ix.map(function (i) { return MO.keys[i]; }); }
   function onPath(e) { return MPATH.i == null || e[5] == null || ((e[5] >>> MPATH.i) & 1) === 1; }
   /* a moment's words: its name; a catch's group names what raised and where it was caught (D-053's words); a handler run its lines */
@@ -1938,6 +1957,7 @@
       P.b.push(MPATH.i == null ? fill(XW.leftInAll, { via: q[0] }) : fill(XW.leftIn, { via: q[0] })); });
     if (X.fa && MPATH.i != null && X.fa[MPATH.i]) P.g.push(fill(XW.fate, { v: X.fa[MPATH.i].map(function (f) { return W.fates[f].name; }).join(" \u00b7 ") }));   /* D-056 (4) */
     if (X.ra && MS.std === "split") X.ra.forEach(function (q) { P.g.push(fill(C1.rare, { v: q[2], n: q[0], of: q[1] })); });   /* D-069: a rare piece it carries */
+    if (X.mk) P.c.push(fill(IOW.l.markIn, { v: BLK[MO.fam[X.mk[1]]].name }));      /* D-084: the row a mark points to */
     return P; }
   /* the two forms (MS.ipo): labelled lines, top to bottom (my pick, dashed) · one sentence, the parts joined by arrows. `bold` the index
      of a line to set in bold (a journey's own request) as [part, i] */
@@ -2075,7 +2095,7 @@
      value's lifetime; how rare a piece is); the page draws it in the look its row's options pick (mo.opt gdl · gef · gic · grl · fnm ·
      std — my picks dashed, D-025.2). Nothing here is a fact ══ */
   var TL = W.terms.life;                                          /* review S4-18 · F25: ONE lifetime pair, on chip, hover, cap and legend */
-  var C1 = MW.x.c1, C2 = MW.x.c2, ROWOPT = { gate: ["gdl", "gef", "gic", "grl", "std"], fn: ["fnm"], std: ["std"], data: ["dfx", "dxc"], inf: ["ifl"], proof: ["jyb"] };   /* D-070: the data map and the lifelines, their rows' own looks */
+  var C1 = MW.x.c1, C2 = MW.x.c2, ROWOPT = { gate: ["gdl", "gef", "gic", "grl", "std"], fn: ["fnm"], std: ["std"], data: ["dfx", "dxc"], inf: ["ifl"], proof: ["jyb"], sec: ["secmv"] };   /* D-070: the data map and the lifelines, their rows' own looks */
   /* the function (or the middleware) a gate runs in — a station element, so skAll draws its glyph and its role (D-052); a click lights it */
   function gdHost(gh) { var h = kd(el("span", "mgh0"), [gh[0]]); moTxt(h, gh[1]); return h; }
   /* review F09 · S4-07: a host head is ONE item — its hover the function's (or the middleware's) before · checks · gives, the
@@ -2141,9 +2161,9 @@
      my pick) · a client function's branches under that function (his L-16), with the way its error comes · the specialist row's
      lanes (mo.opt.std keep) · the send chain in tap order, arrows between (client P5) */
   function moCell(es, f, mom) { var w = el("div", "mcs"), out = [], grp = {};
-    if (f === "gate" && MS.gdl === "cols") w.classList.add("m3");
+    if ((f === "gate" || f === "sec") && MS.gdl === "cols") w.classList.add("m3");
     es.forEach(function (e) { var X = e[7] || {}, gk = null;
-      if (f === "gate" && MS.gdl === "head" && X.gh && (e[0] === "gate" || (X.gk === "w" && MS.std === "split"))) gk = "h:" + X.gh[0];
+      if ((f === "gate" || f === "sec") && MS.gdl === "head" && X.gh && (e[0] === "gate" || (X.gk === "w" && MS.std === "split"))) gk = "h:" + X.gh[0];
       else if (f === "client" && X.pc) gk = "p:" + X.pc[0];
       else if (f === "std" && MS.std === "keep") gk = "l:" + (X.gk === "w" ? "set" : "rare");
       if (!gk) { out.push({ e: e }); return; }
@@ -2163,7 +2183,11 @@
     return w; }
   /* D-069 (his L-18): where Standard or specialist's items stand — split into the gates (a piece that names a drawn item becomes its
      label, my pick), merged into the gates as they are, or kept as its own row; its family here decides its row */
-  function moFam(e) { if (e[0] !== "std" || MS.std === "keep") return e[0]; var X = e[7] || {}; return MS.std === "split" && X.rr && X.tg ? null : "gate"; }
+  function moFam(e) { var X = e[7] || {};
+    if (X.sh && secRowOn()) return "sec";                                            /* D-084: a home fact of the Security row */
+    if (secMoved(e)) return "sec";                                                   /* D-084: a fact moved into it */
+    if (e[0] === "sec" && X.mk && MS.secmv === "moved") return null;                  /* D-084: a mark only while the facts stay in their rows */
+    if (e[0] !== "std" || MS.std === "keep") return e[0]; return MS.std === "split" && X.rr && X.tg ? null : "gate"; }
   /* review CR-33: a 422 rule said as the rule — "planned_portions ≥ 1", "recipe_id required"; the error type stays in its hover */
   function ruleFace(loc, type, rule) { var R0 = MW.rule, l = String(loc || ""), f = l === "body" ? R0.body : l.indexOf("body.") === 0 ? l.slice(5) : l.indexOf(".") > 0 ? fill(R0.in, { f: l.slice(l.indexOf(".") + 1), v: l.slice(0, l.indexOf(".")) }) : l;
     var v = rule ? String(rule).slice(String(rule).indexOf("=") + 1).replace(/^"|"$/g, "") : ""; return fill(R0[type] || R0._other, { f: f, v: v, t: type }); }
@@ -2173,8 +2197,13 @@
     var f = e[0], ch = e[4] || [], c = el("span", "mc"), X = e[7] || {}; c.setAttribute("data-f", f); c.setAttribute("data-tip", "mochip"); c._x = X;
     if (X.io) c.setAttribute("data-ik", X.io.h[1]);                                  /* D-067: its kind, for the row's legend */
     if (e[6] != null) c.setAttribute("data-hint", String(e[6])); var ks = moK(e[2]); if (ks.length) kd(c, ks); else if (f === "stage" && X.xk) kd(c, X.xk);   /* review S4-15: the middleware glyph */
+    if (X.sx != null) c.setAttribute("data-sx", X.sx);                              /* D-084: the fact a mark points to */
     if (f === "end") c.setAttribute("data-ek", ch[1] || "");                             /* review CR-06: the ending's kind, the columns it counts in */
     var txt = function (t, cls) { if (t) c.appendChild(moTxt(el("span", cls || "mt"), String(t))); };
+    if (ch[0] === "mark") { var hb = MO.fam[X.mk[1]]; c.setAttribute("data-secmk", X.mk[0]); c.setAttribute("role", "button"); c.tabIndex = 0; c.appendChild(markEl(hb)); txt(e[3]);   /* D-084: a short mark — the item, then the row that holds it */
+      c.appendChild(el("span", "mq", "\u2192 " + BLK[hb].name + (X.mk[2] > 1 ? " " + fill(C1.times, { n: X.mk[2] }) : ""))); return c; }
+    if (ch[0] === "sec") { c.appendChild(vIco(el("span", "mifg"), ch[1] === "cors" ? "globe" : "key")); txt(e[3]);   /* D-084: the allowed origins, a secret read on the way */
+      if (ch[1] === "cors") c.appendChild(el("span", "mq", X.co.join(" \u00b7 ") + (X.con > X.co.length ? " +" + (X.con - X.co.length) : ""))); return c; }
     if (X.ho || X.am) { c.classList.add("hol"); c.setAttribute("data-ho", String(X.ho || X.am)); }
     if (X.in) c.appendChild(el("span", "mnest", "\u21b3"));
     if (X.gh && X.gk !== "a" && (f === "gate" || (X.gk === "w" && MS.std === "split"))) return moTail(gdChip(e, c, X, MS.gdl), X);   /* D-069 (his L-09, L-10) */
@@ -2207,6 +2236,7 @@
       (X.rs || []).forEach(function (st) { if (!rby[st]) { rby[st] = 0; rod.push(st); } rby[st]++; });
       rod.forEach(function (st) { c.appendChild(kd(cStatus(st), ["status:" + st])); if (rby[st] > 1) c.appendChild(el("span", "mq", fill(C1.times, { n: rby[st] }))); }); }
     else { txt(e[3]); if (ch[1] != null) c.appendChild(el("span", "mq", String(ch[1]))); if (X.sm) c.appendChild(el("span", "mq", fill(C1.sendsM, { m: X.sm }))); }   /* review F32 */
+    if (X.rn) c.insertBefore(el("span", "mq", String(X.rn)), c.firstChild);          /* D-084: a middleware's place in the run order, first on its face */
     if (X.dp) c.appendChild(el("span", "mdp", "\u2193" + X.dp));                     /* D-056 (1): how many calls below the handler */
     if (X.fa && MPATH.i != null && X.fa[MPATH.i]) X.fa[MPATH.i].forEach(function (fa) { c.appendChild(cFate(fa)); });   /* D-056 (4): this path's verdict */
     if (X.rc) { var rc = el("span", "mrc", MW.x.raceShort), rs = cStatus(X.rc[3]); kd(rs, ["status:" + X.rc[3]]); rc.appendChild(rs); c.appendChild(rc); }   /* D-056 (5) */
@@ -2235,9 +2265,10 @@
   function kName(K) { return K.slice(K.indexOf(":") + 1).split("::").pop(); }
   /* a map over the moments `sis`: every band of the endpoint (its map, under the row) or one moment (a cell's own map) */
   function dxView(r, M, sis, mini) { var X = M.dx; if (!X) return null; var want = {}; sis.forEach(function (s) { want[s] = 1; });
-    var L = [], K = [], R = X.c.filter(function (q) { return want[q[2]]; });
-    X.l.forEach(function (q, li) { var ops = q[2].filter(function (o) { return want[o[1]]; }); if (ops.length) L.push({ li: li, f: q[0], t: q[1], ops: ops, rc: q[3] }); });
-    X.k.forEach(function (q) { if (want[q[3]]) K.push({ q: q }); });
+    var gone = function (i) { return i != null && secMoved(M.el[i]); };                  /* D-084: an operation whose chip moved into Security is not drawn in this map */
+    var L = [], K = [], R = X.c.filter(function (q) { return want[q[2]] && !gone(q[5]); });
+    X.l.forEach(function (q, li) { var ops = q[2].filter(function (o) { return want[o[1]] && !gone(o[5]); }); if (ops.length) L.push({ li: li, f: q[0], t: q[1], ops: ops, rc: q[3] }); });
+    X.k.forEach(function (q) { if (want[q[3]] && !gone(q[6])) K.push({ q: q }); });
     if (!L.length && !K.length && !R.length) return null;
     var fB = {}, tB = {}, low = function (o, k, s) { if (o[k] == null || s < o[k]) o[k] = s; };      /* a node stands in the band of its first step */
     L.forEach(function (q) { q.ops.forEach(function (o) { low(fB, q.f, o[1]); low(tB, q.t, o[1]); }); });
@@ -2298,9 +2329,10 @@
   /* the in-flight lanes shown on this endpoint, on this path: a closed fold is ONE lane over its members; an open one its header, then
      its members, a lane each */
   function ilLanes(r, M) { var I = M.il; if (!I) return []; if (MIL.ep !== r.id) { MIL.ep = r.id; MIL.open = {}; }
-    var of = {}, out = [], seen = {}; I.f.forEach(function (F0, fi) { F0[2].forEach(function (j) { of[j] = fi; }); });
-    I.l.forEach(function (L, j) { var fi = of[j]; if (fi == null) { out.push(ilOne(M, [L], null, null)); return; } if (seen[fi]) return; seen[fi] = 1;
-      var F0 = I.f[fi], ms = F0[2].map(function (k) { return I.l[k]; });
+    var of = {}, out = [], seen = {}, gone = function (m) { return secMoved(M.el[m[0]]); };   /* D-084: a value moved into Security has no lane here */
+    I.f.forEach(function (F0, fi) { F0[2].forEach(function (j) { of[j] = fi; }); });
+    I.l.forEach(function (L, j) { if (gone(L)) return; var fi = of[j]; if (fi == null) { out.push(ilOne(M, [L], null, null)); return; } if (seen[fi]) return; seen[fi] = 1;
+      var F0 = I.f[fi], ms = F0[2].map(function (k) { return I.l[k]; }).filter(function (m) { return !gone(m); });
       if (MIL.open[fi]) { var h = ilOne(M, ms, fi, F0); h.head = 1; out.push(h); ms.forEach(function (m) { out.push(ilOne(M, [m], fi, null)); }); }
       else out.push(ilOne(M, ms, fi, F0)); });
     return out.filter(function (x) { return x.on; }); }
@@ -2351,6 +2383,7 @@
     return box; }
   function ilFoldChip(M, ln) { var e0 = M.el[ln.ms[0][0]], ik = (EF.ifk.vals || {})[(e0[4] || [])[1]] || {}, c = el("span", "mc milf");
     kd(c, ln.keys, false); c.setAttribute("data-f", "inf"); c.setAttribute("data-tip", "moilf"); c.setAttribute("data-fold", String(ln.fi)); c.setAttribute("data-life", ln.lt);
+    if ((e0[7] || {}).sx != null) c.setAttribute("data-sx", e0[7].sx);                  /* D-084: a mark in Security points to this fold */
     c.setAttribute("data-lg", "fold"); c.setAttribute("role", "button"); c.setAttribute("tabindex", "0"); c.setAttribute("aria-expanded", "false"); c._ln = ln;
     c.appendChild(el("span", "milfa", "▸")); if (ik.icon) c.appendChild(vIco(el("span", "mifg"), ik.icon)); c.appendChild(moTxt(el("span", "mt"), ilName(M, ln)));
     var lt = vc("life", ln.lt || "unk", (TL[ln.lt] || TL.unk).name, "mlt"); lt.setAttribute("data-life", ln.lt);
@@ -2503,6 +2536,9 @@
     if (cs.length) { var sub = el("span", "msub"); cs.forEach(function (cid) { var c = COL[cid], bt = el("button", "msc"); bt.type = "button"; bt.setAttribute("data-mcol", cid);
         bt.setAttribute("aria-pressed", MCOL.col === cid ? "true" : "false"); bt.setAttribute("data-tip", "mosub");
         bt.appendChild(el("span", "msh", c.head)); bt.appendChild(el("span", "msv", cellVal(c, r))); sub.appendChild(bt); }); th.appendChild(sub); }
+    if (f === "sec") { var sb = el("span", "msub");                                      /* D-084: what each home fact is on this endpoint — a count, "none on this endpoint" or "not recorded" */
+      r.mo.sec.hd.forEach(function (h) { var q = el("span", "mss"); q.setAttribute("data-sec", h[0]); q.setAttribute("data-st", h[2]); q.appendChild(el("span", "msh", MW.sec.head[h[0]]));
+        q.appendChild(el("span", "msv", h[2] === "ok" ? String(h[1]) : MW.sec.state[h[2]])); sb.appendChild(q); }); th.appendChild(sb); }
     if (f === "proof" && MS.jyb === "head") { var M9 = r.mo, jb = M9.el.filter(function (e) { return M9.sp[e[1]][0] === "prior" && onPath(e); });   /* review CR-20: their option */
       if (jb.length) { var jw = el("div", "mcs mjyh"); jw.appendChild(el("span", "mjyl", MW.moms.prior.name)); jb.forEach(function (e) { jw.appendChild(moChip(e)); }); th.appendChild(jw); } }
     if (MROW.f === f) th.appendChild(rowPop(f));
@@ -2648,6 +2684,7 @@
       if (x[0] === "prior" && (MS.jyb === "head" || !M.el.some(function (e) { return e[1] === si && onPath(e); }))) return false;   /* review CR-20: only when a test's earlier requests stand there (or they stand in Proof's head) */
       return MO.fixed.indexOf(x[0]) >= 0 ? MC.hidF.indexOf(x[0]) < 0 : hidH.indexOf(String(si)) < 0; });
     var cell = {}; M.el.forEach(function (e) { if (!onPath(e)) return; var fm0 = moFam(e); if (!fm0) return; var k = e[1] + "|" + fm0; (cell[k] = cell[k] || []).push(e); });   /* D-069: a family's row (mo.opt.std) */
+    Object.keys(cell).forEach(function (k) { if (k.slice(-4) === "|sec") cell[k].sort(function (a, b) { return ((a[7] || {}).so || 0) - ((b[7] || {}).so || 0); }); });   /* D-084: home facts first (the middleware in run order), then marks, then what moved in */
     ILN = MS.ifl === "chips" ? [] : ilLanes(r, M);                                     /* D-070: the in-flight lanes, folds applied */
     var G = $("mogrid"); G.textContent = ""; var dcAll = MS.lay === "rows" ? fams : rowsOn;
     var T0 = moSize(G, moTable(G, r, M, fams, rowsOn, dcAll, {}, cell));
@@ -3088,7 +3125,7 @@
   function cmLines() { var C = W.copy.lines; return [optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),
     optLine(C.uni, W.carry, PV.uni), optLine(C.gaps, W.carry, PV.gaps),                   /* D-058: the two panels' own switches */
     optLine(C.mo, W.mo.opt.lay, MS.lay), optLine(C.mo, W.mo.opt.cell, MS.cell), optLine(C.mo, W.mo.opt.jy, MS.jy),   /* D-065: the journeys' look */
-    optLine(C.mo, W.mo.opt.leg, MS.leg), optLine(C.mo, W.mo.opt.ipo, MS.ipo)].concat(["hdr", "save", "meta", "wid", "fit", "gdl", "gef", "gic", "grl", "fnm", "std", "dfx", "dxc", "ifl", "jyb", "stk"].map(function (g) { return optLine(C.mo, W.mo.opt[g], MS[g]); })); }   /* D-069: the rows' own looks */   /* D-067: the legend's place, the hovers' form · D-068: the header, saving's stage, the metadata's place, widening, fit */
+    optLine(C.mo, W.mo.opt.leg, MS.leg), optLine(C.mo, W.mo.opt.ipo, MS.ipo)].concat(["hdr", "save", "meta", "wid", "fit", "gdl", "gef", "gic", "grl", "fnm", "std", "dfx", "dxc", "ifl", "jyb", "stk", "secmv"].map(function (g) { return optLine(C.mo, W.mo.opt[g], MS[g]); })); }   /* D-069: the rows' own looks */   /* D-067: the legend's place, the hovers' form · D-068: the header, saving's stage, the metadata's place, widening, fit */
   /* the code map's own copy (his ask 2026-09-26): the page, the endpoint, every option of the code map, then room for his words */
   function cmText(r) { var C = W.copy.lines; return [C.page + ": all-endpoints · " + T.app + " @ " + T.head, C.open + ": " + r.id,
     optLine(C.cm, W.endings.opt.mom, EM.mom), optLine(C.cm, W.endings.opt.chk, EM.chk), optLine(C.cm, W.carry, CV),
@@ -3146,13 +3183,27 @@
     if ((q = t.closest("[data-fold]"))) { var fo = +q.getAttribute("data-fold"); MIL.open[fo] = !MIL.open[fo]; moRedraw('#mogrid [data-fold="' + fo + '"]'); return; }   /* D-070: a fold opens, a lane each */
     if ((q = t.closest(".mro"))) { var f0 = q.getAttribute("data-rowopt"); MROW.f = MROW.f === f0 ? null : f0; moRedraw('#mogrid .mro[data-rowopt="' + f0 + '"]'); return; }
     if ((q = t.closest("[data-hiderow]"))) { var f1 = q.getAttribute("data-hiderow"); if (MC.hidR.indexOf(f1) < 0) MC.hidR.push(f1); MROW.f = null; mcSave(); moRedraw(); return; }
+    if ((q = t.closest(".mc[data-secmk]"))) { secGo(q); return; }                          /* D-084: a mark goes to the row that holds its fact */
     if ((q = t.closest(".msc"))) { var cid = q.getAttribute("data-mcol"); MCOL.ep = r.id; MCOL.col = MCOL.col === cid ? null : cid; applyMoCol(); return; }
     if ((q = t.closest("#mofit"))) { MC.fit = !MC.fit; mcSave(); moRedraw("#mofit"); return; }
     if ((q = t.closest("[data-wcol]")) && !t.closest("button, [data-key], .mfk, .mowh")) moWiden(q.getAttribute("data-wcol")); });
   $("sec-mo").addEventListener("keydown", function (e) { var q = e.target;
     if ((e.key === "Enter" || e.key === " ") && q.matches && q.matches("[data-wcol]")) { e.preventDefault(); moWiden(q.getAttribute("data-wcol")); return; }
-    if ((e.key === "Enter" || e.key === " ") && q.matches && q.matches(".milf[data-fold]")) { e.preventDefault(); q.click(); return; }
+    if ((e.key === "Enter" || e.key === " ") && q.matches && q.matches(".milf[data-fold], .mc[data-secmk]")) { e.preventDefault(); q.click(); return; }
     if (e.key === "Escape" && MROW.f) { var f0 = MROW.f; MROW.f = null; moRedraw('#mogrid .mro[data-rowopt="' + f0 + '"]'); } });
+  /* ══ D-084 · a mark in Security goes to its fact: scroll to the chips that stand in the home row (the ones its group names), else to the row's
+     cell at that moment, else to the row; each flashes. The flash is an outline that stays a moment, so it reads without motion ══ */
+  var SECT = null;
+  function secGo(mk) { var X = mk._x || {}, g = X.sxg, fam = X.mk && X.mk[1]; if (!g) return; tipOff();
+    var td = mk.closest("td"), mom = td && td.getAttribute("data-mom"), G = $("mogrid");
+    var hit = [].slice.call(G.querySelectorAll(".mc[data-sx]")).filter(function (n) { var c = n.closest("td"); return n.getAttribute("data-sx") === g && c && c.getAttribute("data-f") === fam; });
+    var cell = G.querySelector('td[data-f="' + fam + '"][data-mom="' + mom + '"]'), head = G.querySelector('th[data-block][data-f="' + fam + '"]');
+    var tg = hit.length ? hit : cell ? [cell] : head ? [head] : []; if (!tg.length) return;
+    [].slice.call(G.querySelectorAll(".secflash")).forEach(function (n) { n.classList.remove("secflash"); }); clearTimeout(SECT);
+    var rep = tg[0].closest("tr"); if (rep && rep.querySelector("th[data-block]")) rep.querySelector("th[data-block]").classList.add("secflash");
+    tg.forEach(function (n) { n.classList.add("secflash"); });
+    tg[0].scrollIntoView({ block: "center", inline: "nearest" });
+    SECT = setTimeout(function () { [].slice.call(G.querySelectorAll(".secflash")).forEach(function (n) { n.classList.remove("secflash"); }); }, 2400); }
   /* ══ L-37 · the edge of a widened column, dragged by the mouse or moved by the arrow keys, between the column's floor and its maximum
      (his words: "go to the edges of the column and move left or right, with some limits as the maximum and minimum width"). The width is
      kept in MC.wpx beside the other column state and rides the copy text; a head's click again gives it back ══ */

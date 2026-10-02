@@ -440,9 +440,10 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   // CHANGED 2026-09-30 (round-1 review S4-29): Data effects' write colour adds its line — twenty-five
   // CHANGED 2026-09-30 (round-1 review CR-20 · CR-07, lane F1b): where a test's earlier requests stand and what the heads do when scrolled — twenty-seven
   // CHANGED 2026-09-30 (review S4-06, lane F2; merged): the bench's two layout options (the columns · a click elsewhere) add their lines before the kinds'
-  ok(el0.length === 1 && set0.length === 27 + 2 + D.ex.kinds.length && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-(1 + set0.length))) === JSON.stringify([el0[0]].concat(set0))
-     && set0.slice(27).every((l) => l.startsWith(W8.ex.copy.where + ' · '))
-     && set0[27].startsWith(W8.ex.copy.where + ' · ' + W8.ex.opt.lay.label + ': ') && set0[28].startsWith(W8.ex.copy.where + ' · ' + W8.ex.opt.follow.label + ': '),
+  // CHANGED 2026-10-02 (D-084): the Security row's option adds its line — twenty-eight
+  ok(el0.length === 1 && set0.length === 28 + 2 + D.ex.kinds.length && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-(1 + set0.length))) === JSON.stringify([el0[0]].concat(set0))
+     && set0.slice(28).every((l) => l.startsWith(W8.ex.copy.where + ' · '))
+     && set0[28].startsWith(W8.ex.copy.where + ' · ' + W8.ex.opt.lay.label + ': ') && set0[29].startsWith(W8.ex.copy.where + ' · ' + W8.ex.opt.follow.label + ': '),
     'the copy text adds the endpoint shown, then the code map\'s, BY MOMENT\'s and the examples\' settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -1321,7 +1322,9 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
      metadata, one card per block that has any; the band holds no line of it */
   /* CHANGED 2026-09-30 (D-069, his L-18): Standard or specialist split into the gates (my pick) or merged into them is no row of its own */
   const stdRow = await p.evaluate(() => window.__allep.mo.looks.std === 'keep');
+  /* CHANGED 2026-10-02 (D-084, his L-19 ruled G2): the Security row stands right after Gates and decisions */
   const wantHeads = D.orders[D.words.rail.bord.pick].filter((k) => !D.mo.untimed.includes(byB[k]) && (stdRow || byB[k] !== 'std')).map((k) => D.blocks.find((b0) => b0.key === k).name);
+  wantHeads.splice(wantHeads.indexOf(D.blocks.find((b0) => byB[b0.key] === 'gate').name) + 1, 0, D.words.mo.sec.name);
   const wantCards = new Set(ROW[E14].mo.nm.map((x) => x[0]).concat(Object.keys(D.mo.meta).map((b0) => byB[b0]))).size;
   const cmEnds = await p.$$eval('#ocol-cm .pair[data-k="d:exits"] table.etab tr.erow .vc-status', (cs) => cs.map((c) => c.textContent));
   const failRow = m0.rows.findIndex((r) => r[0] === 'fail'), grp = ROW[E14].xd.exits.map((x, i) => [x, ROW[E14].d.exits.items[i]]).filter(([x]) => typeof x[0] === 'number').map(([, e]) => String(e[2]));
@@ -1396,7 +1399,9 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
   /* CHANGED 2026-09-28 (D-064 (2)): the no-moment column is one more column under moFloor — on this endpoint the columns look's floors
      now pass the 1920 px box (its fifteen columns at their widest badge or their two-line head), so the box scrolls and says so, a
      chip never cut; the rows look still fits */
-  ok(g1.over <= 1 && !g1.note && !g0.cut && !g1.cut && (g0.over <= 1 ? !g0.note : g0.note), 'BY MOMENT · at 1920 px no chip is cut in either look: the rows look fits its box, the columns look ' + (g0.over <= 1 ? 'fits too' : 'scrolls ' + g0.over + ' px and says so'), { cols: g0, rows: g1 });
+  /* CHANGED 2026-10-02 (D-084): the Security row is one more column in the rows look — at 1920 px its floors pass the box by a few px, so that look
+     scrolls and says so too, a chip never cut */
+  ok(!g0.cut && !g1.cut && (g1.over <= 1 ? !g1.note : g1.note) && (g0.over <= 1 ? !g0.note : g0.note), 'BY MOMENT · at 1920 px no chip is cut in either look, and one that is wider than its box says so: the rows look ' + (g1.over <= 1 ? 'fits its box' : 'scrolls ' + g1.over + ' px') + ', the columns look ' + (g0.over <= 1 ? 'fits too' : 'scrolls ' + g0.over + ' px'), { cols: g0, rows: g1 });
   // CHANGED 2026-09-26 (D-055): the path picker is ONE row of codes; the moment and the words that told two of one status apart are in
   // each code's hover — read below, on POST /cooking/sessions (section 15)
   const p87 = await p.$$eval('#mogrid td[data-f="proof"] .mc', (cs) => cs.filter((c) => /^C87/.test(c.textContent.trim())).map((c) => [...c.querySelectorAll('.vc-status')].map((x) => x.textContent)));
@@ -2676,9 +2681,11 @@ ok(!errs.length, 'no page error after the D-068 checks', errs);
   await setLook({ gdl: 'chain', std: 'keep' });
   const o = await p.evaluate(() => ({ host: [...document.querySelectorAll('#mogrid td[data-f="gate"] .mc')].filter((x) => x.querySelector('.mgh0[data-key]')).length,
     groups: document.querySelectorAll('#mogrid td[data-f="gate"] .mgb').length, rows: [...document.querySelectorAll('#mogrid tbody tr[data-f]')].map((r) => r.getAttribute('data-f')),
-    lanes: [...document.querySelectorAll('#mogrid td[data-f="std"] .mlane')].map((x) => x.textContent) }));
-  ok(o.host > 10 && !o.groups && o.rows.includes('std') && o.lanes.includes(C1.set) && o.lanes.includes(C1.rareHere),
-    'D-069 (e) · "' + MW.opt.gdl.opts.chain.name + '" puts the function in each gate chip; "' + MW.opt.std.opts.keep.name + '" brings the row back, in its lanes', o);
+    lanes: [...document.querySelectorAll('#mogrid td[data-f="std"] .mlane')].map((x) => x.textContent), secSw: document.querySelectorAll('#mogrid td[data-f="sec"] .mc[data-ik="switch"]').length }));
+  /* CHANGED 2026-10-02 (D-084): the two switches that turn a check on (rate limiting, the token checker) have their home in the Security row, whatever this
+     option says; this endpoint has no other switch, so the row's "set by settings" lane is empty and not drawn — its rare pieces stand in their lane */
+  ok(o.host > 10 && !o.groups && o.rows.includes('std') && !o.lanes.includes(C1.set) && o.lanes.includes(C1.rareHere) && o.secSw === 2,
+    'D-069 (e) · "' + MW.opt.gdl.opts.chain.name + '" puts the function in each gate chip; "' + MW.opt.std.opts.keep.name + '" brings the row back, in its lane of rare pieces (its two switches stand in Security, D-084)', o);
   const qt = await (async () => { const h = await p.$('#mogrid tbody th[data-f="std"] .mbn'); if (!h) return ''; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const bx = await h.boundingBox();
     await p.mouse.move(bx.x + 4, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; })();
   ok(qt.includes(MW.rowq.std), 'D-069 (e) · the row\'s head says the question it answers', qt.slice(0, 160));
@@ -2935,7 +2942,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
       metaPlain: meta.filter((m) => tipOf(m).includes(W.mo.nm.plain)).length, titleTip: tipOf(document.querySelector('#mometa h3[data-tip="nmhead"]')).includes(W.mo.nm.plain),
       alarms: [...document.querySelectorAll('#mometa .nmc[data-nmk="alarm"]')].map((c) => c.textContent.trim()), erow: [...document.querySelectorAll('#ocol-cm tr.erow [data-tip], #ocol-cm .hdl [data-tip]')].length,
       titles: [...document.querySelectorAll('#ocol-uni [title]')].length, band: [...G.querySelectorAll('thead th.mosb .mosc')].map((c) => c.textContent),
-      work: (G.querySelector('th.mom[data-mom="work"]') || {}).getAttribute('data-face'), cors: !!G.querySelector('td[data-f="stage"] .mc[data-key="middleware:CORSMiddleware"] .skg'),
+      work: (G.querySelector('th.mom[data-mom="work"]') || {}).getAttribute('data-face'), cors: !!G.querySelector('td[data-f="sec"] .mc[data-key="middleware:CORSMiddleware"] .skg'),   /* CHANGED 2026-10-02 (D-084): the middleware stand in the Security row */
       tests: G.querySelectorAll('td[data-f="proof"] .mc .mtg').length, rule: [...G.querySelectorAll('td[data-f="stage"] .mc .mt')].map((t) => t.textContent),
       life: [...G.querySelectorAll('td[data-f="inf"] .mlt')].map((x) => x.textContent), gateCols: [...G.querySelectorAll('th[data-f="gate"] .msc')].map((b) => b.getAttribute('data-mcol')),
       risk: (document.querySelector('#mometa .nmc[data-nmk="risk"]') || {}).textContent, ow: getComputedStyle(G.querySelector('.mc .mt')).overflowWrap,
@@ -3080,6 +3087,118 @@ ok(!errs.length, 'no page error on the fixture', errs);
     'D-081 · L-38 · a table still wider than its box (' + ov.over + ' px) says so, naming Shift and the wheel; the plain wheel leaves it, Shift and the wheel slide it ' + sh + ' px', { ov, plain, sh });
   await p.setViewportSize({ width: 1920, height: 1080 }); await p.waitForTimeout(250);
   ok(!errs.length, 'D-081 · no page error', errs); }
+
+/* 34 · D-084 (his ruling 2026-10-02, L-19 ruled G2 + F24) — smoke checks (D-037): (1) the pinned row's Client column is headed "sends it" there, in BY MOMENT's
+   Client head and in the hover that names it; (2) BY MOMENT's Security row on POST /cooking/sessions stands after Gates and decisions and says, from the feed
+   alone, its middleware in run order, the switches that turn a check on, the CORS origins and the secrets read on the way (each recomputed HERE from
+   forms.json), with a mark for each fact that lives in another row; (3) a fact the feed lacks reads "not recorded" (a fixture with the settings arm off), one
+   it proves absent "none on this endpoint" (GET /healthz), never a bare 0; (4) the option: marks (my pick, dashed) or moved into Security, kept per viewer and
+   in the copy line, the rows the facts left and the maps and lanes they leave; (5) a mark clicked goes to its fact */
+{ const E = 'POST /cooking/sessions', E0 = 'GET /healthz', FE = FJ.endpoints['endpoint:' + E], MW = D.words.mo, SW = MW.sec, IOW = MW.io, R = ROW[E], CL = D.words.copy.lines;
+  /* (1) F24 — the column's head word, wherever it is named */
+  await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400);
+  const f24 = await p.evaluate(() => { const c = window.__allep.data.cols.find((x) => x.id === 'fetched');
+    return { col: [c.head, c.name, c.zero], pin: [...document.querySelectorAll('#pin [data-col="fetched"], #board thead [data-col="fetched"]')].map((e) => e.textContent.trim()).filter(Boolean),
+      mo: [...document.querySelectorAll('#mogrid th[data-f="client"] .msc[data-mcol="fetched"] .msh')].map((e) => e.textContent),
+      screens: [...document.querySelectorAll('#pin .msh, #pin th, #mogrid th[data-f="client"] .msh')].filter((e) => e.textContent.trim() === 'screen').length }; });
+  await p.$eval('#mogrid th[data-f="client"] .msc[data-mcol="fetched"]', (e) => e.scrollIntoView({ block: 'center' })); const hb = await (await p.$('#mogrid th[data-f="client"] .msc[data-mcol="fetched"]')).boundingBox();
+  await p.mouse.move(hb.x + 6, hb.y + 6); await p.waitForTimeout(160); const f24tip = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5);
+  ok(f24.col[0] === 'sends it' && f24.col[1].includes('send it') && !/screen/.test(f24.col[2]) && f24.pin.includes('sends it') && f24.mo.length > 0 && f24.mo.every((w) => w === 'sends it') && !f24.screens && f24tip.startsWith('sends it ') && f24tip.includes(f24.col[1]),
+    'D-084 · F24 · the pinned row\'s Client column is headed "sends it" (its words: ' + f24.col[1] + ' / ' + f24.col[2] + '), BY MOMENT\'s Client head reads it and its hover names it; no head still says "screen" for it', { f24, f24tip: f24tip.slice(0, 120) });
+  /* (2) the Security row: where it stands, and every home fact recomputed from the feed */
+  const order = await p.evaluate(() => [...document.querySelectorAll('#mogrid tr[data-f]')].map((t) => t.getAttribute('data-f')));
+  const mws = Object.entries(FJ.middleware).map(([k, m]) => [k.split(':')[1], m.order.runs]).sort((a, b) => a[1] - b[1]).map((x) => x[0]);
+  const auth = FE.auth || {}, X = FE.produced.concat(FE.framework_exits || []);
+  const SX = new Set([...(auth.schemes || []).map((q) => q.exit), ...X.filter((x) => x.status === 401 && ['security', 'dependency'].includes(x.phase)).map((x) => x.id), ...(auth.requires || []).map((q) => q.exit), ...((FE.rate || {}).limits || []).map((q) => q.exit)].filter(Boolean));
+  const swWant = FE.switches.filter((w) => [...(w.refs || []), ...(w.proves || [])].some((x) => SX.has(x)));
+  const cors = FJ.settings['setting:cors_allow_origins'], corsWant = String(cors.default).replace(/^'|'$/g, '').split(',');
+  const way = new Set(R.mo.el.flatMap((e) => e[2].map((ki) => D.mo.keys[ki]).filter((k) => k.startsWith('fn:')).map((k) => k.slice(3))).concat(Object.values(FJ.middleware).map((m) => m.method).filter(Boolean), [FE.handler]));
+  const isSecret = (s) => /SecretStr/.test(String(s.annotation)) || (['str', 'bytes'].includes(String(s.annotation).replace(/\s*\|\s*None|None\s*\|\s*|Optional\[|\]/g, '').trim()) && ((s.environment || {}).files || []).some((f) => f.value === '<redacted>'));   /* a string the feed redacted — auth_provider, an enum, is redacted by its name and is no secret */
+  const secWant = Object.entries(FJ.settings).filter(([, s]) => isSecret(s) && (s.readers || []).some((q) => way.has(q.fn))).map(([k]) => k.split(':')[1]).sort();
+  const sc = await p.evaluate(() => { const tr = document.querySelector('#mogrid tr[data-f="sec"]'), t = (e) => e.innerText.replace(/\s+/g, ' ').trim();
+    return { name: tr.querySelector('th .mbn').textContent, mark: tr.querySelector('th .bm').getAttribute('data-icon'), dashed: tr.querySelector('th .bm').hasAttribute('data-pick'),
+      hd: [...tr.querySelectorAll('th .mss')].map((q) => [q.getAttribute('data-sec'), q.getAttribute('data-st'), q.querySelector('.msv').textContent]),
+      edge: [...tr.querySelectorAll('td[data-mom="edge"] .mc')].map((c) => [t(c), c.getAttribute('data-f'), c.hasAttribute('data-secmk'), c.querySelectorAll('[data-tip]').length]),
+      all: [...tr.querySelectorAll('td .mc')].map((c) => [t(c), c.closest('td').getAttribute('data-mom'), c.getAttribute('data-ik'), c.getAttribute('data-secmk')]) }; });
+  const mwChips = sc.edge.filter((c) => c[1] === 'stage').map((c) => c[0]);
+  const secChips = sc.all.filter((c) => c[2] === 'secret').map((c) => c[0]).sort();
+  const markKinds = [...new Set(sc.all.filter((c) => c[3]).map((c) => c[3]))].sort();
+  ok(order.indexOf('sec') === order.indexOf('gate') + 1 && order.indexOf('gate') > 0 && sc.name === SW.name && sc.mark === D.mo.sec.icon && sc.dashed,
+    'D-084 · L-19 · BY MOMENT\'s Security row stands right after Gates and decisions on ' + E + ', named "' + SW.name + '", wearing my pick\'s dashed shield (the lab has no page for it)', { order, sc: [sc.name, sc.mark, sc.dashed] });
+  ok(JSON.stringify(mwChips) === JSON.stringify(mws.map((n, i) => (i + 1) + ' ' + n)) && sc.hd.find((h) => h[0] === 'mw')[2] === String(mws.length),
+    'D-084 · the Security row draws the app-wide middleware in the feed\'s run order, each with its place: ' + mwChips.join(' · '), { mwChips, mws, hd: sc.hd });
+  ok(swWant.length === 2 && sc.hd.find((h) => h[0] === 'sw')[2] === String(swWant.length) && sc.all.filter((c) => c[2] === 'switch').length === swWant.length,
+    'D-084 · the switches that turn a check on are the endpoint\'s switches whose refs or proofs are a login or rate-limit ending (' + swWant.map((w) => w.kind + ' ' + (w.port || w.expr)).join(' · ') + ') — drawn here, in full', { swWant: swWant.map((w) => w.id), got: sc.all.filter((c) => c[2] === 'switch').map((c) => c[0]) });
+  ok(sc.hd.find((h) => h[0] === 'cors')[2] === String(corsWant.length) && corsWant.every((o) => sc.edge.some((c) => c[0].includes(o))) && sc.edge.some((c) => c[0].startsWith(SW.cors)),
+    'D-084 · the CORS allowed origins come from the feed\'s settings (' + corsWant.join(', ') + '), drawn at the edge beside the CORS middleware', { corsWant, edge: sc.edge.map((c) => c[0]) });
+  ok(secWant.length >= 1 && JSON.stringify(secChips) === JSON.stringify(secWant) && sc.hd.find((h) => h[0] === 'sec')[2] === String(secWant.length),
+    'D-084 · the secrets read on this path are the feed\'s settings the feed marks secret and a function on the way reads (' + secWant.join(', ') + ')', { secWant, secChips });
+  /* each fact that lives in another row has ONE mark per home row per moment, and the marks name the five items the feed itself records */
+  const wantItems = ['household', 'login', 'provision', 'rate', 'repeat'].filter((k) => ({ login: (auth.schemes || []).length, household: (auth.requires || []).length, rate: ((FE.rate || {}).limits || []).length, provision: (auth.provisions || []).length, repeat: !!(FE.repeat || {}).required })[k]);
+  const homes = await p.evaluate(() => [...document.querySelectorAll('#mogrid tr[data-f="sec"] .mc[data-secmk]')].map((c) => [c.getAttribute('data-secmk'), c.innerText.replace(/\s+/g, ' ').trim()]));
+  const rowNames = Object.fromEntries(D.blocks.map((b) => [b.key, b.name])), famName = (f) => rowNames[D.mo.fam[f]];
+  ok(JSON.stringify(markKinds) === JSON.stringify(wantItems) && homes.every(([, t]) => /→ /.test(t) && ['end', 'gate', 'inf', 'data'].some((f) => t.includes('→ ' + famName(f)))) && homes.some(([, t]) => t.includes('→ ' + famName('end')) && /×2/.test(t)),
+    'D-084 · a mark for each fact that lives in another row — ' + wantItems.join(' · ') + ' — each naming the row that holds it ("→ Endings ×2" for the two 429s)', { markKinds, homes });
+  ok(sc.edge.every((c) => c[3] === 0) && sc.all.length > 5, 'D-084 · one hover per item: no chip of the Security row carries a second hover inside it', sc.edge);
+  /* hovers: a mark names what it holds and the row it is in; the row's legend lists the mark kind once */
+  const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40); const bx = await h.boundingBox();
+    await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(120); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+  const tMark = await tipAt('#mogrid tr[data-f="sec"] .mc[data-secmk="rate"]'), tHead = await tipAt('#mogrid tr[data-f="sec"] th .mbn');
+  const fillW = (t, x) => String(t).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  ok(tMark && tMark.startsWith(SW.items.rate.name) && (tMark.includes(fillW(IOW.l.markIn, { v: famName('end') })) || tMark.includes(fillW(IOW.l.markIn, { v: famName('gate') })) || tMark.includes(fillW(IOW.l.markIn, { v: famName('inf') }))) && tMark.includes(IOW.l.markGo),
+    'D-084 · a mark\'s hover names its item, what it holds, the row it points to, and what a click does', { tMark });
+  ok(tHead && tHead.includes(MW.rowq.sec) && tHead.includes(IOW.k.secmark.plain) && tHead.includes(IOW.k.cors.plain) && tHead.includes(IOW.k.secret.plain),
+    'D-084 · the row\'s legend (its head\'s hover) says once what a mark, the allowed origins and a secret are', { tHead: (tHead || '').slice(0, 200) });
+  /* (3) a fact the feed lacks says "not recorded"; one it proves absent says "none on this endpoint"; never a bare 0 */
+  await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E0); await p.waitForTimeout(400);
+  const h0 = await p.evaluate(() => ({ hd: [...document.querySelectorAll('#mogrid tr[data-f="sec"] th .mss')].map((q) => [q.getAttribute('data-sec'), q.getAttribute('data-st'), q.querySelector('.msv').textContent]),
+    marks: document.querySelectorAll('#mogrid tr[data-f="sec"] .mc[data-secmk]').length, chips: [...document.querySelectorAll('#mogrid tr[data-f="sec"] td .mc')].map((c) => c.getAttribute('data-ik')) }));
+  const F0 = FJ.endpoints['endpoint:' + E0], hv = (k) => h0.hd.find((h) => h[0] === k);
+  ok(!(F0.switches || []).length && !((F0.auth || {}).schemes || []).length && h0.marks === 0 && hv('sw')[1] === 'none' && hv('sw')[2] === SW.state.none
+     && hv('sec')[1] === 'none' && hv('sec')[2] === SW.state.none && hv('mw')[1] === 'ok' && h0.chips.every((k) => ['mw', 'cors'].includes(k)),
+    'D-084 · ' + E0 + ' · Security is honest-empty where the feed proves it: no switches, no secrets, no marks — "' + SW.state.none + '" — while its middleware and origins stand', { h0, sw: (F0.switches || []).length });
+  ok(!sc.hd.concat(h0.hd).some((h) => h[2] === '0'), 'D-084 · the row\'s head never says a bare 0', { sc: sc.hd, h0: h0.hd });
+  { const copy = JSON.parse(JSON.stringify(FJ)); copy.arms.short.parts.setting.present = false; copy.arms.short.parts.setting.reason = 'switched off for the probe';
+    const fx = path.join(SCRATCH, 'forms-settings-off.json'), page = path.join(SCRATCH, 'fixture-settings-off.html'); fs.writeFileSync(fx, JSON.stringify(copy));
+    execFileSync('python3', [GEN, '--forms', fx, '--archmap', ARCHMAP, '--only', E, '--only', E0, '--out', page], { cwd: HERE, stdio: 'pipe' });
+    await open(page); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400);
+    const u = await p.evaluate(() => ({ hd: [...document.querySelectorAll('#mogrid tr[data-f="sec"] th .mss')].map((q) => [q.getAttribute('data-sec'), q.getAttribute('data-st'), q.querySelector('.msv').textContent]),
+      chips: [...document.querySelectorAll('#mogrid tr[data-f="sec"] td .mc')].map((c) => c.getAttribute('data-ik')) }));
+    ok(['cors', 'sec'].every((k) => { const h = u.hd.find((x) => x[0] === k); return h && h[1] === 'unrec' && h[2] === SW.state.unrec; }) && !u.chips.includes('cors') && !u.chips.includes('secret') && u.hd.find((h) => h[0] === 'mw')[1] === 'ok',
+      'D-084 · on a fixture whose feed lacks the settings arm, the origins and the secrets read "' + SW.state.unrec + '" — no chip invented, never a 0 — while the middleware, which the feed holds, stands', u); }
+  /* (4) the option: marks (my pick, dashed) or moved into Security */
+  await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400);
+  const SEC = '#mogrid tr[data-f="sec"]', cnt = (sel) => p.$$eval(sel, (n) => n.length), look = () => p.evaluate(() => window.__allep.mo.looks.secmv);
+  const homeCount = () => p.evaluate(() => ({ end: [...document.querySelectorAll('#mogrid td[data-f="end"] .mc .vc-status')].map((v) => v.textContent), lim: document.querySelectorAll('#mogrid td[data-f="gate"] .mc[data-ik="limiter"]').length,
+    login: document.querySelectorAll('#mogrid td[data-f="gate"] .mc[data-ik="login"]').length, inf: document.querySelectorAll('#mogrid tr[data-f="inf"] .milf, #mogrid tr[data-f="inf"] .mc[data-ik="inflight"]').length,
+    users: document.querySelectorAll('#mogrid td[data-f="data"] .mc[data-sx^="provision"]').length, secEnds: document.querySelectorAll('#mogrid tr[data-f="sec"] td[data-mom="edge"] .vc-status').length }));
+  const before = await homeCount();
+  await p.$eval(SEC + ' .mro', (e) => e.scrollIntoView({ block: 'center' })); await p.click(SEC + ' .mro'); await p.waitForTimeout(150);
+  const sq = await p.$$eval('#mogrid .mrop .opt[data-mopt="secmv"]', (os) => os.map((o) => [o.getAttribute('data-v'), o.getAttribute('aria-label'), o.getAttribute('aria-checked'), o.getAttribute('data-pick'), o.getAttribute('data-ruled'), getComputedStyle(o).borderTopStyle]));
+  ok(sq.length === 2 && JSON.stringify(sq.map((q) => q[1])) === JSON.stringify(['marks', 'moved'].map((v) => MW.opt.secmv.opts[v].name)) && sq[0][2] === 'true' && sq[0][3] === 'true' && sq[0][4] === null && sq[0][5] === 'dashed' && sq[1][2] === 'false' && !MW.opt.secmv.ruled && MW.opt.secmv.pick === 'marks',
+    'D-084 · the option "' + MW.opt.secmv.label + '" has two icon squares — ' + sq.map((q) => q[1]).join(' · ') + ' — and my pick, the marks, is pressed and dashed (not ruled until he rules)', { sq });
+  await p.click('#mogrid .mrop .opt[data-mopt="secmv"][data-v="moved"]'); await p.waitForTimeout(500);
+  const after = await homeCount(), lk = await look(), marksGone = await cnt(SEC + ' .mc[data-secmk]');
+  const outv = await p.$eval('#out', (e) => e.value);
+  ok(lk === 'moved' && marksGone === 0 && before.end.includes('429') && before.end.includes('401') && !after.end.includes('429') && !after.end.includes('401') && before.lim === 2 && after.lim === 0 && before.login === 1 && after.login === 0
+     && before.inf > after.inf && before.users === 1 && after.users === 0 && after.secEnds >= 4 && outv.includes(CL.mo + ' · ' + MW.opt.secmv.label + ': ' + MW.opt.secmv.opts.moved.name + ' (' + D.words.copy.his + ')'),
+    'D-084 · "' + MW.opt.secmv.opts.moved.name + '": the marks go; the 401 and 429 endings, the limiters, the login check and the row the login adds leave their rows (' + JSON.stringify(before.end) + ' → ' + JSON.stringify(after.end) + ') and stand in Security in full; the in-flight lanes leave out the limiters; the copy line says the choice', { before, after, marksGone });
+  const inSec = await p.evaluate(() => ({ ik: [...document.querySelectorAll('#mogrid tr[data-f="sec"] td .mc[data-sx]')].map((c) => c.getAttribute('data-ik')), lanesOpen: document.querySelectorAll('#mogrid tr[data-f="inf"] .milf').length }));
+  ok(['end:refusal', 'limiter', 'login', 'guard', 'table'].every((k) => inSec.ik.includes(k)) && inSec.lanesOpen === 0, 'D-084 · what moved in keeps its own chip and its own hover: ' + [...new Set(inSec.ik)].join(' · '), inSec);
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
+  ok((await look()) === 'moved' && (await cnt(SEC + ' .mc[data-secmk]')) === 0, 'D-084 · the choice is kept per viewer through a reload');
+  await p.$eval(SEC + ' .mro', (e) => e.scrollIntoView({ block: 'center' })); await p.click(SEC + ' .mro'); await p.waitForTimeout(150); await p.click('#mogrid .mrop .opt[data-mopt="secmv"][data-v="marks"]'); await p.waitForTimeout(400);
+  const back = await homeCount();
+  ok((await look()) === 'marks' && JSON.stringify(back) === JSON.stringify(before), 'D-084 · "' + MW.opt.secmv.opts.marks.name + '" puts every fact back in its row as it was', { back, before });
+  /* (5) a mark goes to its fact: a real click on the login mark that points to Endings flashes the two 401 endings and their row */
+  const endMark = await p.evaluate(() => [...document.querySelectorAll('#mogrid tr[data-f="sec"] .mc[data-secmk="login"]')].findIndex((c) => c.innerText.indexOf('→ ' + window.__allep.data.blocks.find((b) => b.key === window.__allep.data.mo.fam.end).name) >= 0));
+  const marksL = await p.$$(SEC + ' .mc[data-secmk="login"]');
+  await marksL[endMark].evaluate((e) => e.scrollIntoView({ block: 'center' })); const eb = await marksL[endMark].boundingBox();
+  await p.mouse.click(eb.x + eb.width / 2, eb.y + eb.height / 2); await p.waitForTimeout(450);
+  const fl = await p.evaluate(() => ({ chips: [...document.querySelectorAll('#mogrid .mc.secflash')].map((c) => [c.closest('td').getAttribute('data-f'), c.getAttribute('data-sx')]), head: [...document.querySelectorAll('#mogrid th.secflash')].map((h) => h.getAttribute('data-f')) }));
+  ok(endMark >= 0 && fl.chips.length === 2 && fl.chips.every(([f, g]) => f === 'end' && /^login\|end\|/.test(g)) && fl.head.includes('end'),
+    'D-084 · a click on the "login check → Endings" mark scrolls to the two 401 endings and flashes them and the Endings row', { endMark, fl });
+  ok(!errs.length, 'D-084 · no page error', errs); }
 
 await b.close();
 console.log((fail ? 'FAIL ✗' : 'PASS ✓') + ` probe-all-endpoints · ${pass} passed · ${fail} failed · ${FEED.length} endpoints · sample ${SAMPLE.length} · page ${path.basename(PAGE)}`);

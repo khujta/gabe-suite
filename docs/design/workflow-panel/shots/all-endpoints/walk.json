@@ -1535,20 +1535,21 @@
     "Endings endings 20 ok 1 refused 15 body 2 shape 1 uncaught 1 refusal 429 sensitive refusal 429 global framework 422 framework 400 refusal 401 Not authenticated refusal 40",
     "Proof tests 18 beyond 12 C81 1 request before C79 fits 429 2 of 5 C73 fits 400 1 of 3 C74 fits 400 1 of 3 C72 fits 401 2 of 3 C83 proves 422 C971 proves 403 C72 fits 403 ",
     "Gates and decisions checks 11 login HTTPBearer forks 0 catches 7 rate global · sensitive switches 4 RateLimitMiddleware rate limit sensitive 20/60s → 429 app-wide rate li",
+    "Security middleware 3 check switches 2 origins 2 secrets 3 rate limit → In-flight state ×7 1 CORSMiddleware 2 RateLimitMiddleware 3 IdempotencyMiddleware RateLimitMiddlew",
     "Data effects tables 16 writes 3 fate 1 7 · in the map below 31 · in the map belowrare · claims its key with begin_nested · 4 of 80 1 · in the map below ",
     "functions, in the order they first touch data which function reads or writes which table tables, in the order they are first touched the dependencies resolve_or_create_us",
     "Functions deciders 3 data fns 14 get_auth_context caller build_auth_context caller FirebaseTokenVerifier.verify pure MockTokenVerifier.verify pure load_household_context ",
     "Structures reply 7 fields 2 IN GustifyCreateRequest mode model_tier OUT GustifyCreationResponse · 7 ↳ CreationRequestResponse ↳ GeneratedCandidateOut ↳ GustifyUsage ↳ Res",
-    "Client screen 0 reads 0 ",
+    "Client sends it 0 reads 0 ",
     "In-flight state request 3 server 8 ▸ rate limit · 7 values kept by the server 429 sensitive 429 global idempotency_key on the request until the answer rare · reads a repe",
-    "Stages and order steps 22 rules 4 CORSMiddleware IdempotencyMiddleware mode required mode: at most 40 characters model_tier: one of its allowed values the body required "
+    "Stages and order steps 22 rules 4 mode required mode: at most 40 characters model_tier: one of its allowed values the body required "
    ]
   ],
   [
    "BY MOMENT · fits its box",
    {
     "box": 1854,
-    "table": 2004,
+    "table": 2025,
     "scrollsSideways": true
    }
   ],
@@ -1714,14 +1715,15 @@
     "before any request × earlier in the test × the screen sends it × at the edge × reads the body × the dependencies × checks the fields × checks × the work generate_gustify_",
     "Endings endings 20 ok 1 refused 15 body 2 shape 1 uncaught 1 2 2 2 1 3 8 1 1",
     "Proof tests 18 beyond 12 1 1 2 1 1 4 7 11 ",
-    "Gates and decisions checks 11 login HTTPBearer forks 0 catches 7 rate global · sensitive switches 4 3 3 4 6 9 ",
+    "Gates and decisions checks 11 login HTTPBearer forks 0 catches 7 rate global · sensitive switches 4 2 2 4 6 9 ",
+    "Security middleware 3 check switches 2 origins 2 secrets 3 1 8 6 4 2 ",
     "Data effects tables 16 writes 3 fate 1 7 31 1 ",
     "functions, in the order they first touch data which function reads or writes which table tables, in the order they are first touched the dependencies resolve_or_create_us",
     "Functions deciders 3 data fns 14 10 3 30 1 1 ",
     "Structures reply 7 fields 2 1 2 5 ",
-    "Client screen 0 reads 0 ",
+    "Client sends it 0 reads 0 ",
     "In-flight state request 3 server 8 7 1 3 ",
-    "Stages and order steps 22 rules 4 2 4 "
+    "Stages and order steps 22 rules 4 4 "
    ]
   ],
   [
@@ -1762,13 +1764,14 @@
     "Endings endings 20 ok 1 refused 15 body 2 shape 1 uncaught 1 refusal 429 sensitive refusal 429 global framework 422 framework 400 refusal 401 Not authenticated refusal 40",
     "Proof tests 18 beyond 12 C81 1 request before C80 proves 402 C81 proves 402 ",
     "Gates and decisions checks 11 login HTTPBearer forks 0 catches 7 rate global · sensitive switches 4 RateLimitMiddleware rate limit sensitive 20/60s → 429 app-wide rate li",
+    "Security middleware 3 check switches 2 origins 2 secrets 3 rate limit → In-flight state ×7 1 CORSMiddleware 2 RateLimitMiddleware 3 IdempotencyMiddleware RateLimitMiddlew",
     "Data effects tables 16 writes 3 fate 1 7 · in the map below 31 · in the map belowrare · claims its key with begin_nested · 4 of 80 ",
     "functions, in the order they first touch data which function reads or writes which table tables, in the order they are first touched the dependencies resolve_or_create_us",
     "Functions deciders 3 data fns 14 get_auth_context caller build_auth_context caller FirebaseTokenVerifier.verify pure MockTokenVerifier.verify pure load_household_context ",
     "Structures reply 7 fields 2 IN GustifyCreateRequest mode model_tier ",
-    "Client screen 0 reads 0 ",
+    "Client sends it 0 reads 0 ",
     "In-flight state request 3 server 8 ▸ rate limit · 7 values kept by the server 429 sensitive 429 global idempotency_key on the request until the answer rare · reads a repe",
-    "Stages and order steps 22 rules 4 CORSMiddleware IdempotencyMiddleware mode required mode: at most 40 characters model_tier: one of its allowed values the body required "
+    "Stages and order steps 22 rules 4 mode required mode: at most 40 characters model_tier: one of its allowed values the body required "
    ]
   ],
   [
@@ -2122,7 +2125,7 @@
      "data fns",
      "fields",
      "request body",
-     "screen",
+     "sends it",
      "reads",
      "screens above them",
      "reason sites"
@@ -2417,7 +2420,7 @@
    "picture · review-by-moment-path-to-the-201",
    {
     "pieces": 1,
-    "height": 4261
+    "height": 4643
    }
   ],
   [
@@ -2498,7 +2501,7 @@
    "picture · review-the-stream-answer",
    {
     "pieces": 1,
-    "height": 4144
+    "height": 4595
    }
   ],
   [
@@ -3532,7 +3535,7 @@
    "D-064 (2) · the box, at its start",
    {
     "box": 1854,
-    "table": 2497,
+    "table": 2518,
     "at": 14,
     "metadataAfter": "mogrid"
    }
@@ -3731,11 +3734,11 @@
   [
    "review of D-064 · BY MOMENT photographed from its top",
    {
-    "section": 4580,
-    "window": 4718,
+    "section": 5054,
+    "window": 5192,
     "box": {
      "box": 1854,
-     "table": 2497,
+     "table": 2518,
      "at": 0
     },
     "metadata": {
@@ -3862,11 +3865,11 @@
   [
    "D-065 · d065-proof-before-any-request · BY MOMENT photographed from its top",
    {
-    "section": 4580,
-    "window": 4718,
+    "section": 5054,
+    "window": 5192,
     "box": {
      "box": 1854,
-     "table": 2497,
+     "table": 2518,
      "at": 0
     }
    }
@@ -3874,12 +3877,12 @@
   [
    "D-065 · d065-proof-after-the-answer · BY MOMENT photographed from its top",
    {
-    "section": 4580,
-    "window": 4718,
+    "section": 5054,
+    "window": 5192,
     "box": {
      "box": 1854,
-     "table": 2497,
-     "at": 643
+     "table": 2518,
+     "at": 664
     }
    }
   ],
@@ -3916,12 +3919,12 @@
   [
    "D-065 · d065-proof-every-step-a-chip-after · BY MOMENT photographed from its top",
    {
-    "section": 4902,
-    "window": 5040,
+    "section": 5376,
+    "window": 5514,
     "box": {
      "box": 1854,
-     "table": 2498,
-     "at": 644
+     "table": 2519,
+     "at": 665
     }
    }
   ],
@@ -3965,8 +3968,8 @@
   [
    "D-065 · d065-the-404-journeys-gone · BY MOMENT photographed from its top",
    {
-    "section": 3878,
-    "window": 4016,
+    "section": 4242,
+    "window": 4380,
     "box": {
      "box": 1854,
      "table": 1854,
@@ -4025,11 +4028,11 @@
   [
    "D-065 · d065-delete-pantry-item-c705-two-calls · BY MOMENT photographed from its top",
    {
-    "section": 3497,
-    "window": 3635,
+    "section": 3901,
+    "window": 4039,
     "box": {
      "box": 1854,
-     "table": 2068,
+     "table": 2089,
      "at": 0
     }
    }
@@ -4183,7 +4186,7 @@
     "value": "strip",
     "size": [
      1872,
-     1438
+     1578
     ],
     "click": "legend above the table",
     "at": [
@@ -4449,11 +4452,11 @@
     "value": "line",
     "size": [
      1864,
-     421
+     367
     ],
     "click": "at the edge",
     "at": [
-     625,
+     630,
      202
     ]
    }
@@ -4504,11 +4507,11 @@
     "item": "L-21",
     "size": [
      1864,
-     185
+     151
     ],
     "click": "hide before any request",
     "at": [
-     303,
+     312,
      540
     ]
    }
@@ -4523,7 +4526,7 @@
     "value": "bands",
     "size": [
      1864,
-     464
+     376
     ]
    }
   ],
@@ -4532,14 +4535,14 @@
    {
     "box": 1854,
     "table": 1854,
-    "tables": 2,
+    "tables": 3,
     "strips": 0
    }
   ],
   [
    "D-066 · fit, wrapped into bands",
    {
-    "tables": 2
+    "tables": 3
    }
   ],
   [
@@ -4578,7 +4581,7 @@
    "D-066 · fit off",
    {
     "box": 1854,
-    "table": 3090,
+    "table": 3344,
     "hint": true
    }
   ],
@@ -4666,7 +4669,7 @@
     ],
     "click": "at the edge",
     "at": [
-     702,
+     868,
      540
     ]
    }
@@ -4749,7 +4752,7 @@
     "value": "head",
     "size": [
      1864,
-     509
+     441
     ]
    }
   ],
@@ -5094,10 +5097,10 @@
     "item": "L-18",
     "size": [
      520,
-     1028
+     987
     ],
     "hover": "Gates and decisions",
-    "tip": "Gates and decisions ┆ Where can the request be stopped or sent another way: in which function, on what condition, and what happens then? ┆ also here — Standard or specialist: Is this endpoint built like the others, and what is unusual about it? A switch is set by the server's settings and changes a way the request can go; a rare piece is something few other endpoints have. ┆ The checks that stop a request and the forks that decide its ending. ┆ KINDS ┆ middleware — Code that runs on every request before the endpoint, in the order the app registers it. 1 here ┆ rate limit ┆ — A rate limit: it counts a caller's requests over a window and refuses the one past the limit. 2 here ┆ switch ┆ — A setting or a binding that changes what the request does. 2 here ┆ login check — The dependency that reads the caller's credential and decides who the caller is. 1 here ┆ catch ┆ — An except: an error raised below is caught here and turned into an answer, or let through. 4 here ┆ function — A function the request runs through. 3 here ┆ check ┆ — A check the endpoint's own code makes; when it holds, the request ends. 5 here ┆ handler — The endpoint's own function. 4 here ┆ fork ┆ — A branch whose arms lead the request different ways. 2 here ┆ LABELS ┆ 429 ┆ ×3  ┆ 401 ┆ ×3  ┆ 409 ┆ ×3  ┆ 400 ┆ ×1  ┆ 404 ┆ ×3  ┆ 403 ┆ ×1 — a client error status — The request is refused; the caller can change it and try again. ┆ 201 ┆ ×2 — a success status — The request went right. ┆ stage — the app band, before the endpoint is reached 3 here ┆ app-wide ┆ where it decides — In the app's middleware, before any endpoint's own code runs. 2 here ┆ stage — the login check 3 here ┆ at login ┆ where it decides — In the login check, while FastAPI works out who the caller is. 2 here ┆ caller ┆ function role — orchestrates — calls other functions, no store of its own 6 here ┆ gate ┆ function role — guards — auth / consent / idempotency before the work runs 1 here ┆ stage — the endpoint's own code decides 8 here ┆ inside a call ┆ where it decides — In a function the handler calls. 6 here ┆ in the handler ┆ where it decides — In the endpoint's own function. 4 here ┆ accessor ┆ function role — touches the store — reads/writes a DB table or a durable sink 1 here ┆ stage — the answer goes back; every success leaves here 2 here"
+    "tip": "Gates and decisions ┆ Where can the request be stopped or sent another way: in which function, on what condition, and what happens then? ┆ also here — Standard or specialist: Is this endpoint built like the others, and what is unusual about it? A switch is set by the server's settings and changes a way the request can go; a rare piece is something few other endpoints have. ┆ The checks that stop a request and the forks that decide its ending. ┆ KINDS ┆ middleware — Code that runs on every request before the endpoint, in the order the app registers it. 1 here ┆ rate limit ┆ — A rate limit: it counts a caller's requests over a window and refuses the one past the limit. 2 here ┆ login check — The dependency that reads the caller's credential and decides who the caller is. 1 here ┆ catch ┆ — An except: an error raised below is caught here and turned into an answer, or let through. 4 here ┆ function — A function the request runs through. 2 here ┆ check ┆ — A check the endpoint's own code makes; when it holds, the request ends. 5 here ┆ handler — The endpoint's own function. 4 here ┆ fork ┆ — A branch whose arms lead the request different ways. 2 here ┆ LABELS ┆ 429 ┆ ×2  ┆ 401 ┆ ×2  ┆ 409 ┆ ×3  ┆ 400 ┆ ×1  ┆ 404 ┆ ×3  ┆ 403 ┆ ×1 — a client error status — The request is refused; the caller can change it and try again. ┆ 201 ┆ ×2 — a success status — The request went right. ┆ stage — the app band, before the endpoint is reached 2 here ┆ app-wide ┆ where it decides — In the app's middleware, before any endpoint's own code runs. 2 here ┆ stage — the login check 2 here ┆ at login ┆ where it decides — In the login check, while FastAPI works out who the caller is. 2 here ┆ caller ┆ function role — orchestrates — calls other functions, no store of its own 5 here ┆ gate ┆ function role — guards — auth / consent / idempotency before the work runs 1 here ┆ stage — the endpoint's own code decides 8 here ┆ inside a call ┆ where it decides — In a function the handler calls. 6 here ┆ in the handler ┆ where it decides — In the endpoint's own function. 4 here ┆ accessor ┆ function role — touches the store — reads/writes a DB table or a durable sink 1 here ┆ stage — the answer goes back; every success leaves here 2 here"
    }
   ],
   [
@@ -5108,7 +5111,7 @@
     "item": "L-09",
     "size": [
      520,
-     268
+     254
     ],
     "hover": "RateLimitMiddleware",
     "tip": "RateLimitMiddleware · middleware ┆ BEFORE ┆ runs 2 of 3 ┆ CHECKS ┆ RateLimitMiddleware.dispatch, registered at main.py:127 ┆ does nothing when not (settings.rate_limit_enabled or settings.is_production) ┆ lets these paths through without its check: /healthz ┆ GIVES ┆ can end the request with 429 sensitive · 429 global"
@@ -5122,7 +5125,7 @@
     "item": "L-09 L-10",
     "size": [
      520,
-     493
+     460
     ],
     "hover": "rate limit sensitive 20/60s → 429 app-wide",
     "tip": "sensitive · rate limit ┆ BEFORE ┆ runs in RateLimitMiddleware ┆ on paths that start with one of 7 prefixes: /api/v1/cooking/sessions · /api/v1/pantry/items/batch · /api/v1/pantry/reset/apply · +4 ┆ 23 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its sensitive limit, and answers when the count is over, at rate_limit.py:117 ┆ 20 per 60 seconds, counted per caller IP, apart for the sensitive limit ┆ the limit is the setting rate_limit_sensitive_per_minute (env GUSTIFY_RATE_LIMIT_SENSITIVE_PER_MINUTE) ┆ GIVES ┆ ends the request with 429: Rate limit exceeded. Try again shortly. ┆ sends a Retry-After header, its value worked out as it answers ┆ counted in: rate"
@@ -5188,7 +5191,7 @@
     "value": "chips",
     "size": [
      1864,
-     622
+     674
     ],
     "click": "chips",
     "at": [
@@ -5382,7 +5385,7 @@
      514
     ],
     "hover": "useStartCooking fetcher on success · refresh [\"cooking\"] ↳ useActiveCooking fetcher → /cooking/active GET ↳ useRemindersDue fetcher → /cooki",
-    "tip": "refresh · cache write ┆ BEFORE ┆ only while onSuccess ┆ CHECKS ┆ at useCookingSessions.ts:99 ┆ GIVES ┆ refreshes the cached [\"cooking\"] ┆ useActiveCooking fetches again: GET /cooking/active ┆ useActiveCooking gets back ActiveCookingResponse, read from cooking_photos · cooking_sessions · cooking_step_progress · +1 ┆ this request wrote cooking_sessions, which useActiveCooking reads ┆ useRemindersDue fetches again: GET /cooking/reminders/due ┆ useRemindersDue gets back DueRemindersResponse, read from cooking_stage_reminders ┆ this request wrote cooking_stage_reminders, which useRemindersDue reads ┆ counted in: screen"
+    "tip": "refresh · cache write ┆ BEFORE ┆ only while onSuccess ┆ CHECKS ┆ at useCookingSessions.ts:99 ┆ GIVES ┆ refreshes the cached [\"cooking\"] ┆ useActiveCooking fetches again: GET /cooking/active ┆ useActiveCooking gets back ActiveCookingResponse, read from cooking_photos · cooking_sessions · cooking_step_progress · +1 ┆ this request wrote cooking_sessions, which useActiveCooking reads ┆ useRemindersDue fetches again: GET /cooking/reminders/due ┆ useRemindersDue gets back DueRemindersResponse, read from cooking_stage_reminders ┆ this request wrote cooking_stage_reminders, which useRemindersDue reads ┆ counted in: sends it"
    }
   ],
   [
@@ -5409,7 +5412,7 @@
     "value": "lane",
     "size": [
      1864,
-     355
+     337
     ]
    }
   ],
@@ -5423,7 +5426,7 @@
     "value": "lane",
     "size": [
      1864,
-     355
+     337
     ],
     "wheeled": "the box to its end"
    }
@@ -5436,7 +5439,7 @@
     "item": "L-17",
     "size": [
      1864,
-     898
+     880
     ],
     "click": "▸ rate limit · 7 values kept by the server",
     "at": [
@@ -5453,7 +5456,7 @@
     "item": "L-17",
     "size": [
      179,
-     268
+     250
     ],
     "click": "▾rate limit · 7 values",
     "at": [
@@ -6524,7 +6527,7 @@
     "file": "436-d066-ex5-a-function-chip-in-by-moment.png",
     "item": "EX-5",
     "size": [
-     306,
+     305,
      70
     ],
     "depict": [
@@ -6560,7 +6563,7 @@
     ],
     "click": "at the edge",
     "at": [
-     625,
+     630,
      540
     ]
    }
@@ -6568,8 +6571,8 @@
   [
    "D-081 · the edge after the drag",
    [
-    "149",
-    "376",
+    "170",
+    "630",
     "1668"
    ]
   ],
@@ -6611,7 +6614,7 @@
     ],
     "click": "at the edge",
     "at": [
-     714,
+     865,
      540
     ]
    }
@@ -6624,11 +6627,11 @@
     "item": "L-38",
     "size": [
      844,
-     224
+     210
     ],
     "click": "at the edge",
     "at": [
-     657,
+     653,
      500
     ]
    }
@@ -6694,6 +6697,180 @@
   [
    "D-066 · round 1 · steps",
    152
+  ],
+  [
+   "step 446 · d084-open-cooking-sessions",
+   {
+    "click": "/cooking/sessionsPOST",
+    "at": [
+     33,
+     958
+    ],
+    "size": [
+     304,
+     21
+    ],
+    "note": "the row POST /cooking/sessions"
+   }
+  ],
+  [
+   "D-084 · F24 · the pinned row names the column",
+   [
+    "sends it",
+    "1"
+   ]
+  ],
+  [
+   "D-084 · F24 · BY MOMENT's Client head names it",
+   [
+    "sends it1",
+    "reads3",
+    "sends it1",
+    "reads3"
+   ]
+  ],
+  [
+   "step 447 · d084-the-sends-it-head",
+   {
+    "click": "sends it1",
+    "at": [
+     40,
+     425
+    ],
+    "size": [
+     78,
+     18
+    ],
+    "note": "the head \"sends it\""
+   }
+  ],
+  [
+   "step 449 · d084-the-sends-it-head-off",
+   {
+    "click": "sends it1",
+    "at": [
+     40,
+     425
+    ],
+    "size": [
+     78,
+     18
+    ],
+    "note": "the same head, to turn the light off"
+   }
+  ],
+  [
+   "D-084 · the Security row",
+   {
+    "head": "Security middleware 3 check switches 2 origins 2 secrets 2",
+    "cells": [
+     [
+      "start",
+      [
+       "rate limit → In-flight state ×7"
+      ]
+     ],
+     [
+      "edge",
+      [
+       "1 CORSMiddleware",
+       "2 RateLimitMiddleware",
+       "3 IdempotencyMiddleware",
+       "switch environment, rate_limit_enabled decides 429 ×2 the norm · 79 of 80",
+       "allowed origins http://localhost:5173 · http://localhost:3000",
+       "rate limit → Endings ×2",
+       "rate limit → Gates and decisions ×2",
+       "repeat key → In-flight state"
+      ]
+     ],
+     [
+      "gate",
+      [
+       "switch TokenVerifier can end at 401 the norm · 79 of 80",
+       "firebase_credentials_json",
+       "firebase_credentials_path",
+       "login check → Endings ×2",
+       "login check → Gates and decisions ×2",
+       "row added at login → Data effects"
+      ]
+     ],
+     [
+      "checks",
+      [
+       "household required → Endings",
+       "household required → Gates and decisions",
+       "repeat key → Endings",
+       "repeat key → Gates and decisions"
+      ]
+     ],
+     [
+      "work",
+      [
+       "repeat key → Data effects"
+      ]
+     ]
+    ]
+   }
+  ],
+  [
+   "step 451 · d084-open-the-security-rows-options",
+   {
+    "click": "Security: this row's options",
+    "at": [
+     122,
+     298
+    ],
+    "size": [
+     22,
+     22
+    ],
+    "note": "the options square on the row's head"
+   }
+  ],
+  [
+   "step 453 · d084-moved-into-security",
+   {
+    "click": "moved into Security",
+    "at": [
+     82,
+     539
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"moved into Security\""
+   }
+  ],
+  [
+   "step 456 · d084-marks-to-their-home-row-again",
+   {
+    "click": "marks to their home row",
+    "at": [
+     45,
+     446
+    ],
+    "size": [
+     32,
+     32
+    ],
+    "note": "the square \"marks to their home row\""
+   }
+  ],
+  [
+   "step 458 · d084-a-mark-goes-to-its-fact",
+   {
+    "click": "login check→ Endings ×2",
+    "at": [
+     839,
+     427
+    ],
+    "size": [
+     198,
+     20
+    ],
+    "note": "the mark \"login check→ Endings ×2\""
+   }
   ],
   [
    "rows at the end",
@@ -6824,7 +7001,7 @@
    "value": "strip",
    "size": [
     1872,
-    1438
+    1578
    ],
    "click": "legend above the table",
    "at": [
@@ -7026,11 +7203,11 @@
    "value": "line",
    "size": [
     1864,
-    421
+    367
    ],
    "click": "at the edge",
    "at": [
-    625,
+    630,
     202
    ]
   },
@@ -7072,11 +7249,11 @@
    "item": "L-21",
    "size": [
     1864,
-    185
+    151
    ],
    "click": "hide before any request",
    "at": [
-    303,
+    312,
     540
    ]
   },
@@ -7088,7 +7265,7 @@
    "value": "bands",
    "size": [
     1864,
-    464
+    376
    ]
   },
   {
@@ -7187,7 +7364,7 @@
    ],
    "click": "at the edge",
    "at": [
-    702,
+    868,
     540
    ]
   },
@@ -7255,7 +7432,7 @@
    "value": "head",
    "size": [
     1864,
-    509
+    441
    ]
   },
   {
@@ -7543,10 +7720,10 @@
    "item": "L-18",
    "size": [
     520,
-    1028
+    987
    ],
    "hover": "Gates and decisions",
-   "tip": "Gates and decisions ┆ Where can the request be stopped or sent another way: in which function, on what condition, and what happens then? ┆ also here — Standard or specialist: Is this endpoint built like the others, and what is unusual about it? A switch is set by the server's settings and changes a way the request can go; a rare piece is something few other endpoints have. ┆ The checks that stop a request and the forks that decide its ending. ┆ KINDS ┆ middleware — Code that runs on every request before the endpoint, in the order the app registers it. 1 here ┆ rate limit ┆ — A rate limit: it counts a caller's requests over a window and refuses the one past the limit. 2 here ┆ switch ┆ — A setting or a binding that changes what the request does. 2 here ┆ login check — The dependency that reads the caller's credential and decides who the caller is. 1 here ┆ catch ┆ — An except: an error raised below is caught here and turned into an answer, or let through. 4 here ┆ function — A function the request runs through. 3 here ┆ check ┆ — A check the endpoint's own code makes; when it holds, the request ends. 5 here ┆ handler — The endpoint's own function. 4 here ┆ fork ┆ — A branch whose arms lead the request different ways. 2 here ┆ LABELS ┆ 429 ┆ ×3  ┆ 401 ┆ ×3  ┆ 409 ┆ ×3  ┆ 400 ┆ ×1  ┆ 404 ┆ ×3  ┆ 403 ┆ ×1 — a client error status — The request is refused; the caller can change it and try again. ┆ 201 ┆ ×2 — a success status — The request went right. ┆ stage — the app band, before the endpoint is reached 3 here ┆ app-wide ┆ where it decides — In the app's middleware, before any endpoint's own code runs. 2 here ┆ stage — the login check 3 here ┆ at login ┆ where it decides — In the login check, while FastAPI works out who the caller is. 2 here ┆ caller ┆ function role — orchestrates — calls other functions, no store of its own 6 here ┆ gate ┆ function role — guards — auth / consent / idempotency before the work runs 1 here ┆ stage — the endpoint's own code decides 8 here ┆ inside a call ┆ where it decides — In a function the handler calls. 6 here ┆ in the handler ┆ where it decides — In the endpoint's own function. 4 here ┆ accessor ┆ function role — touches the store — reads/writes a DB table or a durable sink 1 here ┆ stage — the answer goes back; every success leaves here 2 here"
+   "tip": "Gates and decisions ┆ Where can the request be stopped or sent another way: in which function, on what condition, and what happens then? ┆ also here — Standard or specialist: Is this endpoint built like the others, and what is unusual about it? A switch is set by the server's settings and changes a way the request can go; a rare piece is something few other endpoints have. ┆ The checks that stop a request and the forks that decide its ending. ┆ KINDS ┆ middleware — Code that runs on every request before the endpoint, in the order the app registers it. 1 here ┆ rate limit ┆ — A rate limit: it counts a caller's requests over a window and refuses the one past the limit. 2 here ┆ login check — The dependency that reads the caller's credential and decides who the caller is. 1 here ┆ catch ┆ — An except: an error raised below is caught here and turned into an answer, or let through. 4 here ┆ function — A function the request runs through. 2 here ┆ check ┆ — A check the endpoint's own code makes; when it holds, the request ends. 5 here ┆ handler — The endpoint's own function. 4 here ┆ fork ┆ — A branch whose arms lead the request different ways. 2 here ┆ LABELS ┆ 429 ┆ ×2  ┆ 401 ┆ ×2  ┆ 409 ┆ ×3  ┆ 400 ┆ ×1  ┆ 404 ┆ ×3  ┆ 403 ┆ ×1 — a client error status — The request is refused; the caller can change it and try again. ┆ 201 ┆ ×2 — a success status — The request went right. ┆ stage — the app band, before the endpoint is reached 2 here ┆ app-wide ┆ where it decides — In the app's middleware, before any endpoint's own code runs. 2 here ┆ stage — the login check 2 here ┆ at login ┆ where it decides — In the login check, while FastAPI works out who the caller is. 2 here ┆ caller ┆ function role — orchestrates — calls other functions, no store of its own 5 here ┆ gate ┆ function role — guards — auth / consent / idempotency before the work runs 1 here ┆ stage — the endpoint's own code decides 8 here ┆ inside a call ┆ where it decides — In a function the handler calls. 6 here ┆ in the handler ┆ where it decides — In the endpoint's own function. 4 here ┆ accessor ┆ function role — touches the store — reads/writes a DB table or a durable sink 1 here ┆ stage — the answer goes back; every success leaves here 2 here"
   },
   {
    "n": 352,
@@ -7554,7 +7731,7 @@
    "item": "L-09",
    "size": [
     520,
-    268
+    254
    ],
    "hover": "RateLimitMiddleware",
    "tip": "RateLimitMiddleware · middleware ┆ BEFORE ┆ runs 2 of 3 ┆ CHECKS ┆ RateLimitMiddleware.dispatch, registered at main.py:127 ┆ does nothing when not (settings.rate_limit_enabled or settings.is_production) ┆ lets these paths through without its check: /healthz ┆ GIVES ┆ can end the request with 429 sensitive · 429 global"
@@ -7565,7 +7742,7 @@
    "item": "L-09 L-10",
    "size": [
     520,
-    493
+    460
    ],
    "hover": "rate limit sensitive 20/60s → 429 app-wide",
    "tip": "sensitive · rate limit ┆ BEFORE ┆ runs in RateLimitMiddleware ┆ on paths that start with one of 7 prefixes: /api/v1/cooking/sessions · /api/v1/pantry/items/batch · /api/v1/pantry/reset/apply · +4 ┆ 23 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its sensitive limit, and answers when the count is over, at rate_limit.py:117 ┆ 20 per 60 seconds, counted per caller IP, apart for the sensitive limit ┆ the limit is the setting rate_limit_sensitive_per_minute (env GUSTIFY_RATE_LIMIT_SENSITIVE_PER_MINUTE) ┆ GIVES ┆ ends the request with 429: Rate limit exceeded. Try again shortly. ┆ sends a Retry-After header, its value worked out as it answers ┆ counted in: rate"
@@ -7619,7 +7796,7 @@
    "value": "chips",
    "size": [
     1864,
-    622
+    674
    ],
    "click": "chips",
    "at": [
@@ -7780,7 +7957,7 @@
     514
    ],
    "hover": "useStartCooking fetcher on success · refresh [\"cooking\"] ↳ useActiveCooking fetcher → /cooking/active GET ↳ useRemindersDue fetcher → /cooki",
-   "tip": "refresh · cache write ┆ BEFORE ┆ only while onSuccess ┆ CHECKS ┆ at useCookingSessions.ts:99 ┆ GIVES ┆ refreshes the cached [\"cooking\"] ┆ useActiveCooking fetches again: GET /cooking/active ┆ useActiveCooking gets back ActiveCookingResponse, read from cooking_photos · cooking_sessions · cooking_step_progress · +1 ┆ this request wrote cooking_sessions, which useActiveCooking reads ┆ useRemindersDue fetches again: GET /cooking/reminders/due ┆ useRemindersDue gets back DueRemindersResponse, read from cooking_stage_reminders ┆ this request wrote cooking_stage_reminders, which useRemindersDue reads ┆ counted in: screen"
+   "tip": "refresh · cache write ┆ BEFORE ┆ only while onSuccess ┆ CHECKS ┆ at useCookingSessions.ts:99 ┆ GIVES ┆ refreshes the cached [\"cooking\"] ┆ useActiveCooking fetches again: GET /cooking/active ┆ useActiveCooking gets back ActiveCookingResponse, read from cooking_photos · cooking_sessions · cooking_step_progress · +1 ┆ this request wrote cooking_sessions, which useActiveCooking reads ┆ useRemindersDue fetches again: GET /cooking/reminders/due ┆ useRemindersDue gets back DueRemindersResponse, read from cooking_stage_reminders ┆ this request wrote cooking_stage_reminders, which useRemindersDue reads ┆ counted in: sends it"
   },
   {
    "n": 369,
@@ -7801,7 +7978,7 @@
    "value": "lane",
    "size": [
     1864,
-    355
+    337
    ]
   },
   {
@@ -7812,7 +7989,7 @@
    "value": "lane",
    "size": [
     1864,
-    355
+    337
    ],
    "wheeled": "the box to its end"
   },
@@ -7822,7 +7999,7 @@
    "item": "L-17",
    "size": [
     1864,
-    898
+    880
    ],
    "click": "▸ rate limit · 7 values kept by the server",
    "at": [
@@ -7836,7 +8013,7 @@
    "item": "L-17",
    "size": [
     179,
-    268
+    250
    ],
    "click": "▾rate limit · 7 values",
    "at": [
@@ -8714,7 +8891,7 @@
    "file": "436-d066-ex5-a-function-chip-in-by-moment.png",
    "item": "EX-5",
    "size": [
-    306,
+    305,
     70
    ],
    "depict": [
@@ -8744,7 +8921,7 @@
    ],
    "click": "at the edge",
    "at": [
-    625,
+    630,
     540
    ]
   },
@@ -8778,7 +8955,7 @@
    ],
    "click": "at the edge",
    "at": [
-    714,
+    865,
     540
    ]
   },
@@ -8788,11 +8965,11 @@
    "item": "L-38",
    "size": [
     844,
-    224
+    210
    ],
    "click": "at the edge",
    "at": [
-    657,
+    653,
     500
    ]
   },

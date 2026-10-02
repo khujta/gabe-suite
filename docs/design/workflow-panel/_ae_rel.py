@@ -59,8 +59,8 @@ def data_links(el: list, pas: list, live: set, lab: str, die, tally: collections
     b: [moment …] the bands, top to bottom} — el is by_moment's final list (time order within a moment)."""
     F, T, fi, ti, links, li, ticks, rules, n_data = [], [], {}, {}, [], {}, [], [], 0
     last_w = {}                                                    # function index → its last write link so far (time order)
-    for x in el:
-        if x[0] != "data":
+    for i, x in enumerate(el):                                    # D-084: every operation, tick and rule ends with its element's index in `el`
+        if x[0] != "data":                                        # (the Security row can move a chip out of its row: the map leaves it out too)
             continue
         n_data += 1
         f, si, keys, chip, mask, hint, xx = x[0], x[1], x[2], x[4] or [], x[5], x[6], x[7] or {}
@@ -82,17 +82,17 @@ def data_links(el: list, pas: list, live: set, lab: str, die, tally: collections
             if pair not in li:
                 li[pair] = len(links); links.append([pair[0], pair[1], [], None])
             fa = xx.get("fa") if chip[1] == "w" else None
-            links[li[pair]][2].append([chip[1], si, hint, mask, fa])
+            links[li[pair]][2].append([chip[1], si, hint, mask, fa, i])
             if chip[1] == "w":
                 last_w[fi[fk]] = li[pair]
             continue
         if chip[:1] != ["opw"]:
             die(f"{lab}: D-070 — the table-less data chip {fk} {hint} wears {chip}")
         if chip[1] in RULE_OPS:
-            rules.append([fk, chip[1], si, hint, mask]); tally["c2:rule"] += 1
+            rules.append([fk, chip[1], si, hint, mask, i]); tally["c2:rule"] += 1
             continue
         lw = last_w.get(fi[fk], -1)
-        ticks.append([fi[fk], lw, chip[1], si, hint, mask]); tally["c2:tick"] += 1
+        ticks.append([fi[fk], lw, chip[1], si, hint, mask, i]); tally["c2:tick"] += 1
         if xx.get("rc"):                                         # D-056 (5): the race breaks at this flush — its badge rides the link
             cons, tbl, uniq, st = xx["rc"]
             pair = (fi[fk], ti.get("table:" + str(tbl)))

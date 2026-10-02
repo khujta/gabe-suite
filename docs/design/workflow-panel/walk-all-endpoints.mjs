@@ -1248,6 +1248,40 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
   await p.setViewportSize({ width: W, height: H }); await wait(500); await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
   await press('l38-click-the-head-to-give-the-width-back', '#mogrid th.mom[data-mom="edge"] .mh1', ['L-38'], S.top([ROW('end')]));
   ROUND1 = R1; say('D-066 · round 1 · steps', R1.length); }
+if (go('d084')) { // D-084 (his ruling 2026-10-02: F24 — the Client column is headed "sends it" — and L-19 ruled G2 — a Security row), LAST, on POST /cooking/sessions:
+  // real clicks, the words read off each control — the head, the row, the option switched to "moved into Security" and back, a mark clicked to go to its fact.
+  // Its pictures are numbered after everything above and are not part of the round-1 record (they answer his later note)
+  const E = 'POST /cooking/sessions';
+  await p.evaluate(() => { try { for (const k of Object.keys(localStorage)) if (/^gabe:allep/.test(k)) localStorage.removeItem(k); } catch (e) {} });
+  await p.goto('file://' + path.join(HERE, 'all-endpoints.html')); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await wait(300);
+  const center = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await wait(250); };
+  const clear = async () => { await p.mouse.move(5, H - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(220); };   /* the mouse away: a hover card is not left over the row */
+  const SEC = '#mogrid tbody tr[data-f="sec"]', mrop = (g, v) => '#mogrid tbody th[data-f="sec"] .mrop .opt[data-mopt="' + g + '"][data-v="' + v + '"]';
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await step('d084-open-cooking-sessions', '#board tr.row[data-ep="' + E + '"] td.id', 'the row ' + E);
+  // F24 · the Client column's head, in the pinned row and in BY MOMENT's Client head; a click on the head in BY MOMENT lights what the column counts
+  say('D-084 · F24 · the pinned row names the column', await p.$$eval('#pin [data-col="fetched"]', (ns) => ns.map((e) => e.textContent.trim()).filter(Boolean)));
+  say('D-084 · F24 · BY MOMENT\'s Client head names it', await p.$$eval('#mogrid tbody th[data-f="client"] .msc', (ns) => ns.map((e) => e.textContent.trim())));
+  await center('#mogrid tbody th[data-f="client"]');
+  await step('d084-the-sends-it-head', '#mogrid tbody th[data-f="client"] .msc[data-mcol="fetched"]', 'the head "' + (await txt('#mogrid tbody th[data-f="client"] .msc[data-mcol="fetched"] .msh')) + '"');
+  await pic('d084-the-sends-it-head-lit-in-the-pinned-row');
+  await step('d084-the-sends-it-head-off', '#mogrid tbody th[data-f="client"] .msc[data-mcol="fetched"]', 'the same head, to turn the light off');
+  // L-19 G2 · the Security row, as the page opens: the marks (my pick)
+  await center(SEC);
+  say('D-084 · the Security row', await p.$eval(SEC, (tr) => ({ head: tr.querySelector('th').innerText.replace(/\s+/g, ' '), cells: [...tr.querySelectorAll('td')].map((td) => [td.getAttribute('data-mom'), [...td.querySelectorAll('.mc')].map((c) => c.innerText.replace(/\s+/g, ' ').trim())]).filter((c) => c[1].length) })));
+  await clear(); await pic('d084-the-security-row-marks-to-their-home-row');
+  await step('d084-open-the-security-rows-options', SEC + ' th .mro', 'the options square on the row\'s head');
+  await clear(); await pic('d084-the-option-the-marks-pressed-and-dashed');
+  await step('d084-moved-into-security', mrop('secmv', 'moved'), 'the square "' + (await txt(mrop('secmv', 'moved'))) + '"');
+  await center(SEC); await clear(); await pic('d084-the-security-row-with-the-facts-moved-in');
+  await center('#mogrid tbody tr[data-f="end"]'); await clear(); await pic('d084-the-endings-row-without-the-401-and-429');
+  await center(SEC);
+  await step('d084-marks-to-their-home-row-again', mrop('secmv', 'marks'), 'the square "' + (await txt(mrop('secmv', 'marks'))) + '"');
+  await center(SEC); await clear(); await pic('d084-the-security-row-back-to-marks');
+  // a mark goes to its fact
+  const mk = SEC + ' .mc[data-secmk="login"]';
+  await step('d084-a-mark-goes-to-its-fact', mk, 'the mark "' + (await txt(mk)) + '"');
+  await wait(250); await clear(); await pic('d084-the-endings-it-points-to-flash'); }
 say('rows at the end', await rows());
 say('page errors', errs);
 // a step that could not be taken (its control or item missing, the mouse meeting something else, no hover, a drag that did not land) fails

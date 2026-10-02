@@ -563,9 +563,9 @@
       "icon": "schema"
     },
     "fetched": {
-      "head": "screen",
-      "name": "frontend pieces that call it: a hook or a component",
-      "zero": "no screen of the app calls it",
+      "head": "sends it",
+      "name": "frontend pieces that send it: a hook or a component",
+      "zero": "no hook or component of the app sends it",
       "icon": "hook"
     },
     "reasons": {
@@ -1154,6 +1154,21 @@
             "plain": "The chip stays where the value is set; a small echo stands at each moment that reads it, with what that read can decide."
           }
         }
+      },
+      "secmv": {
+        "_about": "D-084, his L-19 (ruled G2, a row of its own): the security facts that already stand in other rows — the 401 and 429 endings, the limiters, the row the login adds, the login check, the repeat key. Where they stand is a choice made alone, so it is an option; the marks are my pick (dashed) until he rules.",
+        "label": "security facts that live elsewhere",
+        "pick": "marks",
+        "opts": {
+          "marks": {
+            "name": "marks to their home row",
+            "plain": "A short mark in Security names each such fact and the row that holds it; the fact stays in its own row, in full. Click a mark to go there."
+          },
+          "moved": {
+            "name": "moved into Security",
+            "plain": "Each such fact leaves its row and stands here, in full. The row it came from no longer draws it."
+          }
+        }
       }
     },
     "sets": { "table": "the table", "items": "the items", "cols": "the columns" },
@@ -1365,6 +1380,18 @@
         "orch": {
           "name": "hook on the way",
           "plain": "Frontend code between the screen and the hook that sends the request: it calls that hook and takes its errors."
+        },
+        "cors": {
+          "name": "allowed origins",
+          "plain": "The websites the CORS middleware lets call the API from a browser: the default the code gives, and what an example env file sets instead."
+        },
+        "secret": {
+          "name": "secret",
+          "plain": "A setting that holds a secret and is read on this request's way. Its value is never shown here."
+        },
+        "secmark": {
+          "name": "mark",
+          "plain": "A security fact that stays in its own row, in full. The mark names it and the row that holds it; click it to go there."
         }
       },
       "outcome": {
@@ -1372,6 +1399,17 @@
         "pass-through": "lets the error pass on"
       },
       "l": {
+        "corsAllow": "lets these websites call the API, by default: {v}",
+        "corsGuard": "checked when the app starts, by {fn}",
+        "corsEnv": "an example env file sets it to {v}",
+        "corsEnvC": "an example env file names {v}, commented out",
+        "secRead": "read by {fn}, at {at}",
+        "secEnvdefined": "an example env file defines it; the value is not shown",
+        "secEnvexternal": "an example env file names it, commented out; the value is not shown",
+        "secEnvdefault": "no example env file sets it; the code's default stands",
+        "markHolds": "holds {v}",
+        "markIn": "in {v}",
+        "markGo": "click to go to it",
         "limScope": "on paths that start with one of {n} prefixes: {v}",
         "limAll": "on every request but {v}",
         "limAllNone": "on every request",
@@ -1699,8 +1737,24 @@
       "string_pattern_mismatch": "{f} matches {v}", "value_error": "{f}: passes its validator", "_other": "{f}: {t}",
       "body": "the body", "in": "{f} in the {v}"
     },
+    "sec": {
+      "_about": "D-084, his L-19 (ruled G2: \"9th row because security might grow in the future\"): the Security row's words. Its home facts are read from the forms feed per endpoint — the middleware in run order, the switches that turn a check on, the CORS allowed origins and the secrets read on the way (from the feed's settings). \"none on this endpoint\" is said only when the arm that would record it ran; otherwise the head says \"not recorded\", never a bare 0 (D-017). Its mark, a shield, is my pick: the lab has no page for it.",
+      "name": "Security",
+      "plain": "What guards the request and what turns each guard on: the middleware every request passes, in the order it runs; the switches that decide whether a check runs; the websites allowed to call the API; the secrets the code reads on the way. The facts that stand in other rows — the login check, the rate limit, the repeat key — are told here by marks to their home row, or moved here, as the option says.",
+      "cors": "allowed origins",
+      "head": { "mw": "middleware", "sw": "check switches", "cors": "origins", "sec": "secrets" },
+      "state": { "none": "none on this endpoint", "unrec": "not recorded" },
+      "items": {
+        "login": { "name": "login check" },
+        "household": { "name": "household required" },
+        "rate": { "name": "rate limit" },
+        "provision": { "name": "row added at login" },
+        "repeat": { "name": "repeat key" }
+      }
+    },
     "rowq": {
       "_about": "D-069 (his L-17, L-18): the question a row answers, in plain words, on its head's hover.",
+      "sec": "What guards this request: which middleware it passes and in what order, which switches turn a check on, which websites may call it, and which secrets it reads?",
       "data": "Which function reads or writes which table, when, and is the write saved?",
       "gate": "Where can the request be stopped or sent another way: in which function, on what condition, and what happens then?",
       "inf": "What does the request carry while it runs, and how long does each value live: until the answer, or kept by the server?",

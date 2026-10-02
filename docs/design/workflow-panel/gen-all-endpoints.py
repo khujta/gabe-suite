@@ -60,6 +60,7 @@ import _ae_els as ELS  # noqa: E402  (D-069 — every BY MOMENT element says wha
 import _ae_rel as REL  # noqa: E402  (D-070 — the relations across the moments: data connectors, in-flight lifelines)
 import _ae_bench as BENCH  # noqa: E402  (D-071 — the examples bench, his L-23)
 import _ae_truth as TRUTH  # noqa: E402  (round-1 review F1a — readings corrected once, before any block reads the facts)
+import _ae_sec as SEC  # noqa: E402  (D-084 — the Security row: its home facts, the marks to the facts that live in other rows)
 
 
 def die(msg: str) -> None:
@@ -572,6 +573,7 @@ def decl_of(x: dict, dset: set):
 # from its twins — read off its own hover lines, in their order: the first token its line holds that differs from every twin's (a
 # limit's name, the first words its message or its condition differs by, the place it stands). A face still twinned stops the build.
 W_TAG = {"line": "{n}"}                                           # its words: mo.x.tagLine, set at load
+W_SEC: dict = {}                                                  # D-084: mo.sec, set at load (the Security row's own words)
 _TOKW = re.compile(r"[A-Za-z_][\w.]*|\d+")
 
 
@@ -2156,6 +2158,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     IOC.radj, IOC.fninfo, IOC.lvbeh = X["radj"], X["fninfo"], X.get("lvbeh") or {}
     IOC.drawn = {k[3:] for e in els if e["f"] == "fn" for k in e["keys"][:2] if k.startswith("fn:")}
     IOC.depth_of = {k[3:]: e["x"]["dp"] for e in els if e["f"] == "fn" and (e.get("x") or {}).get("dp") for k in e["keys"][:2] if k.startswith("fn:")}
+    SC = SEC.Ctx(F, fj, fep, XS)                                 # D-084: the security facts of this endpoint, to stamp the elements that are or hold them
     for e in els:
         if e["w"][0] == "nm":                                    # D-064 (2): no moment by nature — the last column, never the band
             nmv.append([e["f"], "piece", e["keys"], e["text"], e.get("x") or None]); rn[e["f"]].update(e["rec"])
@@ -2203,6 +2206,7 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
         if mask == 0:
             die(f"{lab}: {e['f']} {e['id']} is placed on no path")
         xx = dict(e.get("x") or {})
+        SC.flag(e, xx, si)
         if e.get("pb"):                                          # D-056 (4): per path (the picker's index), the fate it gives the write
             xx["fa"] = {str(PI[pid]): [f for f in FATES if f in bs] for pid, bs in sorted(e["pb"].items(), key=lambda kv: PI.get(kv[0], -1)) if pid in PI}
         if "cq" in xx:                                           # review F1: the picker's indices of the paths a check rides only by its call
@@ -2467,8 +2471,9 @@ def by_moment(L: dict, fj: dict, fep: dict, r: dict, X: dict, adj: dict, memo: d
     KM.update(k for x in nmv if x[1] != "jy" for k in x[2])
     # the elements each block holds, counted — a journey is counted apart (review J7): its chips and its name are no element of Proof
     ne = lambda xs: len([q for q in xs if not str(q).startswith("j:")])
+    sec = SEC.build(SC, el, sp, IOC, {"mo": {"sec": W_SEC}}, fep, H)       # D-084: the Security row's own elements, after everything above is proven
     return {"sp": sp, "el": el, "un": un, "ex": ex, "pass": pas, "fk": fks, "hio": hio, "n": {f: [ne(rp[f]), ne(ru[f]), ne(rn[f])] for f, _a in MO_FAM if ne(rp[f]) or ne(ru[f]) or ne(rn[f])},
-            "nm": nmv, "_P": PM | PX, "_Pw": PW, "_K": KM, **({"dx": dx} if dx else {}), **({"il": il} if il else {})}
+            "nm": nmv, "_P": PM | PX, "_Pw": PW, "_K": KM, "sec": sec, **({"dx": dx} if dx else {}), **({"il": il} if il else {})}
 
 
 MO_ORDER = [f for f, _a in MO_FAM]
@@ -3103,10 +3108,11 @@ def mo_block(rows: list, W: dict, A: dict, blocks: list, tally: collections.Coun
         die(f"BY MOMENT: the data-effects sources add up to {sum(src.values())}, the paths list {tally['occ']} step occurrences")
     if sorted(TOKEN.findall(MW["src"])) != sorted(["{occ}"] + ["{" + k + "}" for k in MO_SRC]):
         die(f"BY MOMENT: the words' source line says {sorted(TOKEN.findall(MW['src']))}, the build counts {list(MO_SRC)}")
-    return {"fam": fam, "timed": [f for f, _a in MO_FAM if f not in untimed], "untimed": untimed, "cov": cov, "why": dict(whys),
+    return {"fam": {**fam, "sec": "security"}, "timed": [f for f, _a in MO_FAM if f not in untimed], "untimed": untimed, "cov": cov, "why": dict(whys),
             "src": src, "occ": tally["occ"], "off": tally["off"], "offocc": tally["offocc"], "faces": tally["faces"], "keys": list(KT),
-            "cols": mrow, "meta": meta, "band": band, "stg": MO_STAGE, "stgAlt": MO_STAGE_ALT, "out": list(MO_OUT), "fixed": list(MO_PRE + MO_POST),
-            "nmCol": NM_COL, "fk": [tally["fk"], tally["fkArms"]]}
+            "cols": {**mrow, "sec": []}, "meta": meta, "band": band, "stg": MO_STAGE, "stgAlt": MO_STAGE_ALT, "out": list(MO_OUT), "fixed": list(MO_PRE + MO_POST),
+            "nmCol": NM_COL, "fk": [tally["fk"], tally["fkArms"]],
+            "sec": {"icon": "pg:shield", "col": "var(--secrow)", "after": next(f for f, _a in MO_FAM if f == "gate")}}      # D-084: the Security row stands after Gates and decisions
 
 
 def run_facts(target: str, forms: Path, archmap: Path, tmp: Path, cache: Path | None, key: str) -> dict:
@@ -3381,7 +3387,7 @@ def distill(L: dict, fj: dict, W: dict, bridge: list) -> dict:
     fb = L["widening"]["fetched_by"]
     # PROOF (D-062 (4), cols.fetched.name): the column counts the frontend pieces that fetch it, each a hook or a component
     if any(q.get("kind") not in ("hook", "component") for q in fb):
-        die(f"{ident.get('label')}: the screen column says it counts hooks and components, yet a {sorted({str(q.get('kind')) for q in fb} - {'hook', 'component'})} piece fetches it")
+        die(f"{ident.get('label')}: the sends-it column says it counts hooks and components, yet a {sorted({str(q.get('kind')) for q in fb} - {'hook', 'component'})} piece fetches it")
     put("fetched", len(fb), len(fb), Z["fetched"]["zero"])
     rs = F["frontend"].get("reason_sites") or []
     put("reasons", len(rs), len(rs), Z["reasons"]["zero"], [s2["id"] for s2 in rs])
@@ -3959,6 +3965,8 @@ PAGE_GLYPH = {
                        'C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
     "pg:split": '<path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/>',
     "pg:reply": '<polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>',
+    "pg:shield": '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0'
+                 'C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
     "pg:diamond": '<path d="M2.7 10.3a2.41 2.41 0 0 0 0 3.41l7.59 7.59a2.41 2.41 0 0 0 3.41 0l7.59-7.59a2.41 2.41 0 0 0 0-3.41l-7.59-7.59a2.41 2.41 0 0 0-3.41 0Z"/>',
 }
 RDER = collections.Counter()                                  # D-069: the roles the station's own rule gives here, counted for the build line
@@ -4074,6 +4082,7 @@ def build(argv: list) -> tuple:
     TRUTH.SAY.update(exc=W["mo"]["x"]["saysExc"], pyd=W["mo"]["x"]["saysPyd"])   # review CR-10: an ending's words as the caller gets them
     terms(W)                                                           # review r1 (F1b): one word per concept, read by every surface
     W_TAG.update(line=W["mo"]["x"]["tagLine"])
+    W_SEC.update(W["mo"]["sec"])
     TRUTH.TERMS.update(W["terms"])
     ids = [c[0] for c in COLS]
     if sorted(W["cols"]) != sorted(ids):
