@@ -57,7 +57,7 @@ a rating is checked against (a 3 that is empty on most endpoints is a finding ab
 freeze guard except `gen-review.js`'s `review-leftovers.ruled.json` (both now in `records/review/`); `gen-gaps.js`, `gen-rate-sheet.js` and round 1 of
 `gen-matrices.js` need the same.
 
-## The rules the agent works under (guide §11, adopted; 10–13 added from D-025)
+## The rules the agent works under (guide §11, adopted; 10–13 added from D-025, 14 from D-081)
 
 Rules 10–13 come from his rulings, but parts of them are the agent's reading, and D-025 marks each: the same-commit clause
 of 10, the real-click method in 11, and "before he is asked to rule" in 13.
@@ -80,6 +80,8 @@ of 10, the real-click method in 11, and "before he is asked to rule" in 13.
 12. **Explanations are Gabe Artifact pictures, one part per page**, built from the kit and pattern libraries; the dense page
     stays a record (D-025.7).
 13. **Two navigation systems get a page of their own** explaining how they relate, before he is asked to rule (D-025.9).
+14. **A bench before a dense view** — one element per column, its parts and its controls, before a view of many
+    (D-081, from the legibility patterns: P9). The same step stands in the suite at `skills/gabe-mockup/references/spike.md` S5a.
 
 ## The guide's unknowns — answered from the codebase (2026-09-18)
 
