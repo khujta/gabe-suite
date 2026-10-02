@@ -1159,3 +1159,16 @@ decision gets a short spoken summary (what it decides, its options and what each
 from the page's data) and one sentence in the gabe-lens plain voice saying what it means for him; picking a decision scrolls the page
 there and moves the reading to it. Scoping the summaries to decision points is the agent's reading of "especially in the parts where we
 have to make decisions", his to widen. The read-aloud draft for gabe-artifact (D-076) takes the same nested shape.
+
+## D-078 — Every decision shows an example and its impact; every icon's hover follows this round's hover rules
+Date: 2026-10-02 · Input: his dictated message after D-077, logged as legibility-feedback.md L-30 (the "read as" line is the agent's
+reading of the dictation, his to correct).
+Decision, his: "include examples a d impact on the desición items and for icons use the rules we identified to.pjt text to show about the
+icons when we hover them"
+Consequence: (1) each of the 53 decision cards (and its spoken summary) gains an EXAMPLE — one concrete case from the real page (POST
+/cooking/sessions on the frozen feed) of what the choice is about — and the IMPACT of each option: what changes on the page, for him, or in
+the suite if he picks it, generated from the page's data where the data holds it and authored with tokens where it does not. (2) every
+icon on the review page gets a hover written by the rules this round named (D-067, D-009, D-017, the patterns P1/P2/P7): one hover per item
+(an icon inside an item adds to that item's one hover; a standalone icon is its own item); the hover says the item's own fact in plain
+words, in before · checks · gives order where it fits; what a kind of icon means is said once, in the legend; a control's hover is very
+short (a verb and its object); no word about the page or the map. The read-aloud draft (D-076) takes the example and impact fields too.

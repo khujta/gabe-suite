@@ -445,3 +445,17 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
   next open decision, go on with the section) and a "next open decision" button in the bar.
 - **tag:** `decision-without-its-own-summary`
 - **status:** built (D-077)
+
+### L-30
+- **words:** "include examples a d impact on the desición items and for icons use the rules we identified to.pjt text to show about the
+  icons when we hover them"
+- **read as:** "include examples and impact on the decision items, and for icons use the rules we identified to put text to show about
+  the icons when we hover them"
+- **where:** the review page · every decision card (D-077) and every icon (the state marks, the pattern marks, the bar's buttons)
+- **could not tell:** what a choice would look like or change before choosing it; and what an icon says about THIS item — a hover gave
+  the icon's word, not the item's fact.
+- **fix:** each decision shows an example (one concrete case from the real page) and the impact of each option; every icon's hover
+  follows this round's hover rules — the item's own fact in plain words, the meaning of the kind once in the legend, very short on a
+  control.
+- **tag:** `choice-without-example-or-impact`
+- **status:** logged
