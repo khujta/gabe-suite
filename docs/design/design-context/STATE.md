@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-077). Updated 2026-10-01 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-078). Updated 2026-10-01 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -70,7 +70,8 @@ speed 1.15, pitch 1.0, pause between sentences 250 ms — the default on both pa
 (volume, pause between sections and section names stay my picks). It is a Chrome online voice; elsewhere the pages fall back and say so.
 Then D-076/D-077: the bar shows ALL THE TIME on both pages (his ruling, having played it); its menu nests — The patterns,
 Your calls and The gap analysis are dropdowns of their 53 decisions, each with a spoken summary and a gabe-lens plain line, a
-"next open decision" button. **Draft for the suite, awaiting his "land it":** `legibility/drafts/gabe-artifact-read-aloud/` —
+"next open decision" button; each decision also shows an example from the real page and the impact of each option, and every
+icon's hover follows this round's rules (one per item, the item's own fact, the meaning once in the legend — D-078). **Draft for the suite, awaiting his "land it":** `legibility/drafts/gabe-artifact-read-aloud/` —
 the read-aloud bar as a reusable gabe-artifact part (H7 clause, reference, module, demo, a gate that fires without the bar and
 stays silent with it, a battery); its README says what lands where and the cost (+1 browser battery ≈ 35 s on the doctor).
 
