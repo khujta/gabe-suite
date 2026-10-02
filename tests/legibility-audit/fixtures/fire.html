@@ -1,0 +1,88 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>legibility-audit — fire fixture</title>
+<style>
+  body { font: 15px/1.5 sans-serif; margin: 16px; }
+  svg { width: 12px; height: 12px; vertical-align: -1px; margin-right: 4px; }
+  td { border: 1px solid #bbb; padding: 6px 8px; vertical-align: top; }
+  td > span { display: inline-block; margin-right: 10px; }
+  .grp { margin: 0 0 10px; }
+  .grp > span { display: inline-block; margin-right: 12px; }
+  #tip { position: fixed; left: 8px; bottom: 8px; max-width: 30rem; background: #222; color: #fff; padding: 6px 8px; opacity: 0; pointer-events: none; }
+  #tip[data-show="true"] { opacity: 1; }
+  #tip div { display: block; }
+</style>
+<h1>fire</h1>
+<section id="hov">
+  <!-- nested: 1 (the inner target sits inside the outer one) -->
+  <div class="grp"><span data-tip="Outer item|Its own facts first"><b>outer</b> <span data-tip="Inner part|A second hover on the same item">inner</span></span></div>
+  <!-- repeatLine 12 · repeatMajority 6: group A is mostly the repeated line, group B is mostly its own content -->
+  <div class="grp" id="repA">
+  <span data-tip="A1 refuses a login|Every item of this kind is explained here, again, in full.">A1</span>
+  <span data-tip="A2 refuses a login|Every item of this kind is explained here, again, in full.">A2</span>
+  <span data-tip="A3 refuses a login|Every item of this kind is explained here, again, in full.">A3</span>
+  <span data-tip="A4 refuses a login|Every item of this kind is explained here, again, in full.">A4</span>
+  <span data-tip="A5 refuses a login|Every item of this kind is explained here, again, in full.">A5</span>
+  <span data-tip="A6 refuses a login|Every item of this kind is explained here, again, in full.">A6</span>
+  </div>
+  <div class="grp" id="repB">
+  <span data-tip="B1 is refused for its own reason, stated here in some length|B1 also says what it checks, on the second line, in its own words|Every kind of this thing is a shared meaning stated again.">B1</span>
+  <span data-tip="B2 is refused for its own reason, stated here in some length|B2 also says what it checks, on the second line, in its own words|Every kind of this thing is a shared meaning stated again.">B2</span>
+  <span data-tip="B3 is refused for its own reason, stated here in some length|B3 also says what it checks, on the second line, in its own words|Every kind of this thing is a shared meaning stated again.">B3</span>
+  <span data-tip="B4 is refused for its own reason, stated here in some length|B4 also says what it checks, on the second line, in its own words|Every kind of this thing is a shared meaning stated again.">B4</span>
+  <span data-tip="B5 is refused for its own reason, stated here in some length|B5 also says what it checks, on the second line, in its own words|Every kind of this thing is a shared meaning stated again.">B5</span>
+  <span data-tip="B6 is refused for its own reason, stated here in some length|B6 also says what it checks, on the second line, in its own words|Every kind of this thing is a shared meaning stated again.">B6</span>
+  </div>
+</section>
+<section id="rows">
+<table id="grid"><tbody><tr>
+  <!-- twins 1: two items, one cell, the same hover, different faces -->
+  <td id="c-twins">
+    <span data-tip="Refusal|Same text for both"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>429 window</span>
+    <span data-tip="Refusal|Same text for both"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>429 key</span>
+  </td>
+  <!-- twinFaces 1: two items, one cell, the same face, different hovers -->
+  <td id="c-twinfaces">
+    <span data-tip="Login check|Before: a token is sent"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>refused</span>
+    <span data-tip="Role check|Before: a role is needed"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>refused</span>
+  </td>
+  <!-- bare 2: two items with no glyph -->
+  <td id="c-bare">
+    <span data-tip="Save step|Gives: a row">save</span>
+    <span data-tip="Reply|Gives: a body">reply body</span>
+  </td>
+  <!-- machineWords: faces 5 (python expression · library error id · feed id · i18n key · call) + 1 hover opening;
+       the kebab word is page-specific, so only --machine finds it -->
+  <td id="c-machine">
+    <span data-tip="Branch|Checks the row"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>only when not (existing is not None)</span>
+    <span data-tip="422 rule|Checks the length"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>string_too_short</span>
+    <span data-tip="Hook|Fetches the list"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>fe:src/hooks/useX.ts#useX</span>
+    <span data-tip="Message|Gives the text"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>errors.auth.invalid_token</span>
+    <span data-tip="Reason|Gives the reason"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>str(exc)</span>
+    <span data-tip="str(exc)|Before: a failure is raised"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>refusal message</span>
+    <span data-tip="Kind|Gives a kind"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>dependency-value</span>
+  </td>
+  <!-- unfilled 2: a face with {status}, a hover that says undefined; the URL {id} is a path parameter, not a hole -->
+  <td id="c-unfilled">
+    <span data-tip="Count|Gives a number"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>{status}</span>
+    <span data-tip="Total|undefined items"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>total</span>
+    <span data-tip="Path|Gives a route"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>/users/{id}</span>
+  </td>
+</tr></tbody></table>
+</section>
+
+<div id="tip" role="tooltip" data-show="false"></div>
+<script>
+/* the hover convention of the suite's generated pages in miniature: data-tip on a target, one #tip box, shown on mouseover;
+   a "|" in the attribute is a line break in the hover */
+(function () {
+  var tip = document.getElementById("tip");
+  document.addEventListener("mouseover", function (e) {
+    var t = e.target && e.target.closest ? e.target.closest("[data-tip]") : null;
+    if (!t) { tip.setAttribute("data-show", "false"); return; }
+    tip.textContent = "";
+    t.getAttribute("data-tip").split("|").forEach(function (l) { var d = document.createElement("div"); d.textContent = l; tip.appendChild(d); });
+    tip.setAttribute("data-show", "true");
+  });
+})();
+</script>

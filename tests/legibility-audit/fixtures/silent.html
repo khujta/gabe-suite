@@ -1,0 +1,80 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>legibility-audit — silent fixture</title>
+<style>
+  body { font: 15px/1.5 sans-serif; margin: 16px; }
+  svg { width: 12px; height: 12px; vertical-align: -1px; margin-right: 4px; }
+  td { border: 1px solid #bbb; padding: 6px 8px; vertical-align: top; }
+  td > span { display: inline-block; margin-right: 10px; }
+  .grp { margin: 0 0 10px; }
+  .grp > span { display: inline-block; margin-right: 12px; }
+  #tip { position: fixed; left: 8px; bottom: 8px; max-width: 30rem; background: #222; color: #fff; padding: 6px 8px; opacity: 0; pointer-events: none; }
+  #tip[data-show="true"] { opacity: 1; }
+  #tip div { display: block; }
+</style>
+<h1>silent</h1>
+<section id="hov">
+  <!-- siblings, not nested -->
+  <div class="grp"><span data-tip="First item|Its own facts first"><b>first</b></span> <span data-tip="Second item|Its own facts, not the first one's">second</span></div>
+  <!-- a LABEL may repeat: "Refusal" (7) and "A short repeated note" (21) are shorter than the 24-character label length -->
+  <div class="grp" id="labels">
+  <span data-tip="Refusal|Item C1 is refused because its own token is missing|A short repeated note">C1</span>
+  <span data-tip="Refusal|Item C2 is refused because its own token is missing|A short repeated note">C2</span>
+  <span data-tip="Refusal|Item C3 is refused because its own token is missing|A short repeated note">C3</span>
+  <span data-tip="Refusal|Item C4 is refused because its own token is missing|A short repeated note">C4</span>
+  <span data-tip="Refusal|Item C5 is refused because its own token is missing|A short repeated note">C5</span>
+  <span data-tip="Refusal|Item C6 is refused because its own token is missing|A short repeated note">C6</span>
+  </div>
+  <!-- a long line, but repeated by only four hovers: under the five that make it a legend candidate -->
+  <div class="grp" id="four">
+  <span data-tip="D1 has its own first line|This long line is repeated only four times.">D1</span>
+  <span data-tip="D2 has its own first line|This long line is repeated only four times.">D2</span>
+  <span data-tip="D3 has its own first line|This long line is repeated only four times.">D3</span>
+  <span data-tip="D4 has its own first line|This long line is repeated only four times.">D4</span>
+  </div>
+</section>
+<section id="rows">
+<table id="grid"><tbody><tr>
+  <!-- distinct hovers and distinct faces in one cell -->
+  <td id="c-distinct">
+    <span data-tip="Login check|Before: a token is sent"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>token sent</span>
+    <span data-tip="Role check|Before: a role is needed"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>role needed</span>
+  </td>
+  <!-- a target drawn INSIDE an svg is itself a mark: not a bare item -->
+  <td id="c-mark">
+    <svg viewBox="0 0 8 8" aria-hidden="true"><g data-tip="Mark|Gives a drawn mark"><circle cx="4" cy="4" r="3"/><text x="0" y="7" font-size="3">ok</text></g></svg>
+  </td>
+  <!-- the same hover and the same face, but in DIFFERENT cells: not twins of one container -->
+  <td id="c-other-1">
+    <span data-tip="Refusal|Same text in another cell"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>refused</span>
+  </td>
+  <td id="c-other-2">
+    <span data-tip="Refusal|Same text in another cell"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>refused</span>
+  </td>
+  <!-- words on the face; a hover whose code comes LAST; names the audit must not take for raw words; a bare number is a value -->
+  <td id="c-words">
+    <span data-tip="Reason|Checks what was raised|str(exc)"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>the reason text</span>
+    <span data-tip="Answer|Gives the status"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>returns 401</span>
+    <span data-tip="Route|Gives a path"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>/users/{id}</span>
+    <span data-tip="Docs|Opens the reference"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>docs.python.org</span>
+    <span data-tip="Limit|Checks the window at the file"><svg viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="3"/></svg>rate_limit.py:117</span>
+    <span data-tip="Count|Gives a number">12</span>
+  </td>
+</tr></tbody></table>
+</section>
+
+<div id="tip" role="tooltip" data-show="false"></div>
+<script>
+/* the hover convention of the suite's generated pages in miniature: data-tip on a target, one #tip box, shown on mouseover;
+   a "|" in the attribute is a line break in the hover */
+(function () {
+  var tip = document.getElementById("tip");
+  document.addEventListener("mouseover", function (e) {
+    var t = e.target && e.target.closest ? e.target.closest("[data-tip]") : null;
+    if (!t) { tip.setAttribute("data-show", "false"); return; }
+    tip.textContent = "";
+    t.getAttribute("data-tip").split("|").forEach(function (l) { var d = document.createElement("div"); d.textContent = l; tip.appendChild(d); });
+    tip.setAttribute("data-show", "true");
+  });
+})();
+</script>
