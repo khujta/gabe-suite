@@ -14,6 +14,15 @@
       "EX-5": "D-083"
     }
   },
+  "ruling": {
+    "_about": "What the page says where a choice it speaks of may be waiting or ruled (the gap analysis's recommendation, L-19; the lead of the calls summary). The generator picks the line from the data, so the page says ruled as soon as a record rules it. A line that names the ruling holds {by}, the decision the record gave; {name} is the option's own name (spoken: the spoken name in decide.say).",
+    "gapTakeMine": "My pick is {name}.",
+    "gapTakeRuled": "You ruled {name} ({by}).",
+    "gapSayMine": "My pick is {name}.",
+    "gapSayRuled": "You ruled {name}.",
+    "callsLeadOpen": "Here are the calls that wait for you.",
+    "callsLeadNone": "Here are your calls, none of them waiting for your word."
+  },
   "page": {
     "eyebrow": "Legibility · round 1 and your reading of it · D-066 · D-072 · D-074",
     "h1": "Round 1 of your human reading: what changed, what you choose, and the patterns behind it",
@@ -65,7 +74,7 @@
       "title": "The gap analysis",
       "n": "{nParts} parts · {nRows} attributes",
       "note": "You asked for a gap analysis between the lab's {nParts} parts and the page's {nNew} rows (L-19). Here it is, counted from its record: {nRows} attributes, {nNone} with no home yet.",
-      "take": "Take from this: the page carries the lab's parts except {nNone} attributes with no home yet. Security is the gap: {secMissing} facts are missing from both, and {secOrphan} sat in rows that leave: {orphanFates}. My pick, G1, adds no ninth row: a Security control lights the security items across the rows."
+      "take": "Take from this: the page carries the lab's parts except {nNone} attributes with no home yet. Security is the gap: {secMissing} facts are missing from both, and {secOrphan} sat in rows that leave: {orphanFates}. {gapTake}"
     },
     "pat": {
       "title": "The patterns",
@@ -208,6 +217,7 @@
     "noShot": "Not pictured yet: the walk took no picture of this look.",
     "sets": "What choosing sets in motion",
     "propsHead": "Proposals that need your word",
+    "propsHeadNone": "Proposals, none waiting for your word",
     "propsNote": "These are not looks on the page yet. Each needs your yes or no before anything is built, except a ruled one and a deferred one.",
     "factsHead": "What the records say",
     "alsoIn": "The same choice stands in the gap analysis; choosing in one place sets both.",
@@ -216,8 +226,8 @@
       "_about": "One line per look added this round: what choosing it sets in motion. A look missing here stops the build; a line for a look that was not added stops it too.",
       "mo.leg": "Already yours (D-067). Choosing the strip puts every row's legend above the table and leaves each row's name with its own words only.",
       "mo.ipo": "Already yours (D-081). Every BY MOMENT hover takes this form. The code map and the bench follow it when their hovers move to before · checks · gives.",
-      "mo.hdr": "BY MOMENT's header on every endpoint. Both headers show the same stages; only the row of roads differs.",
-      "mo.save": "Where the handler's save stands on every endpoint: under EFFECTS, or under HANDLER with EFFECTS an empty outline.",
+      "mo.hdr": "Already yours ({by}). BY MOMENT's header stays as it is on every endpoint: the stages over the moments, with no line of roads under them.",
+      "mo.save": "Already yours ({by}). The handler's save stays under EFFECTS on every endpoint.",
       "mo.meta": "Already yours (D-081). The endpoint metadata stands after the table on every endpoint.",
       "mo.wid": "Already yours (D-081). A click on a moment's head widens its column until every item inside stands on one line.",
       "mo.fit": "Already yours (D-081). The fit button wraps the table into bands, and with R-11 ruled it is how a wide table opens.",
@@ -261,7 +271,7 @@
         }
       ],
       "pick": "sends",
-      "motion": "The head word changes on the pinned row, on BY MOMENT's Client head and in every hover that says counted in.",
+      "motion": "Already yours ({by}). The head word changes on the pinned row, on BY MOMENT's Client head and in every hover that says counted in.",
       "facts": [
         "F24",
         "CR-41"
@@ -272,7 +282,7 @@
       "title": "Where the security facts go",
       "what": "From the gap analysis (L-19): the page has no Security section, and {secMissing} facts are missing from both the lab and the page.",
       "opts": "@gap",
-      "motion": "With G1, a Security control is built over the rows, the middleware and the switches move into Gates and decisions, and the missing facts are read from the feed's settings. With G2, a ninth row of its own. With G3, nothing new.",
+      "motion": "Already yours ({by}). BY MOMENT gains a Security row after Gates and decisions. The middleware that runs on every request, the switches that turn a check on, the allowed origins and the secrets read on the path sit in it in full; the security facts that already stand in other rows are drawn as options, a short mark in Security that points to their row, or the fact moved in.",
       "alsoIn": "gap"
     },
     {
@@ -597,6 +607,7 @@
     "colAttr": "attribute",
     "colWhat": "what happens to it",
     "recHead": "The recommendation, your call",
+    "recHeadRuled": "The recommendation, ruled",
     "alsoHead": "Defects the analysis found in the lab",
     "noHome": "no home yet",
     "scale": "Ratings run from {lowRating} to {topRating}, as on your rating sheet; {topRating} is the top."
@@ -949,7 +960,7 @@
       "Nothing lands in the suite until you say land it."
     ],
     "calls": [
-      "Here are the calls that wait for you.",
+      "{callsLead}",
       "There are {nCalls} choices of look, {nRuled} are already ruled, and {nCallsDeferred} wait for the all-endpoints bench.",
       "Of the {nLooks} looks between them, {nNoPic} have no picture yet, and their card says so.",
       "Of the {nProps} more proposals, {nPropsOpen} still need your yes or no, and the rest are ruled or wait for the bench.",
@@ -976,8 +987,7 @@
       "It compares the lab's {nParts} parts with the {nNew} rows of the page.",
       "Across the parts there are {nRows} attributes, and {nNone} of them have no home yet.",
       "Security is the gap: {secMissing} facts are missing from both sides, and {secOrphan} sat in rows that are leaving.",
-      "My pick adds no row of its own.",
-      "It adds one security control that lights the security items across the existing rows."
+      "{gapSay}"
     ],
     "copy": [
       "Here is where you copy your review.",

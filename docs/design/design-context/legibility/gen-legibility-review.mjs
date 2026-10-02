@@ -17,6 +17,7 @@
            legibility-review.lens.json (D-079: the pain, the analogy, the cost and the handle of every pattern and decision, in the gabe-lens voice; swept like the words) ·
            ../legibility-feedback.md (the ledger: round 1 L-01..L-23, round 2 from L-24) · ../decisions.md (D-066..D-074) · patterns.json · review-r1.raw.json ·
            fix-1b.json · remaining.json · gap-l19.json · measures.{before,r1,r1b}.json ·
+           review-r1.his.txt · review-r1b.his.txt (his pasted reviews, kept verbatim and read IN ORDER: what each "yours" line rules, section 3b) ·
            ../../workflow-panel/shots/all-endpoints/walk.json (the walk's pictures, tagged by item and option) ·
            ../../workflow-panel/all-endpoints.words.json NOW and at 6170519 (git show — the options ADDED this round are the option
            groups present now and absent then, derived, never typed) · ../../workflow-panel/all-endpoints.tpl.html (ROWOPT: which
@@ -161,40 +162,54 @@ const DEC = rd(path.join(DC, 'decisions.md'));
 const decs = {}; for (const m of DEC.matchAll(/^## (D-\d{3}) — (.+)$/gm)) decs[m[1]] = { id: m[1], title: m[2], at: m.index };
 const ROUND_D = ['D-066', 'D-067', 'D-068', 'D-069', 'D-070', 'D-071'];
 for (const d of ROUND_D) if (!decs[d]) die('decisions.md has no ' + d);
-/* ── 3b · his round-1 rulings, read from the record (D-081, D-082) ─────────────────────────────────────────────────────
-   His rulings live in his browser's storage, so a fresh page would show them as undecided. His review text is kept as a record,
-   review-r1.his.txt, one line per choice: "<id>: <value> (<how>)", under the group lines CALLS · PROPOSALS · PATTERNS · PLAYER. A line whose
-   how starts "yours" is a ruling of D-081 (he picked it, same as mine or not); "ruled, D-nnn" is a ruling an earlier decision made;
-   "my pick, not ruled" is NOT a ruling and stays open. A choice the words already mark ruled (all-endpoints.words.json) must agree with its
-   line; a choice deferred to the bench (D-083) stays deferred, so a ruling line for one stops the build. The build also stops on a
-   record line that names a choice the page does not have, or a value that is not one of that choice's options. */
-const REC_FILE = path.join(HERE, 'review-r1.his.txt'), REC_BY = 'D-081';
-if (!decs[REC_BY]) die('decisions.md has no ' + REC_BY + ' — the ruling the record carries');
+/* ── 3b · his rulings, read from the records (D-081, D-082, D-084) ───────────────────────────────────────────────────────
+   His rulings live in his browser's storage, so a fresh page would show them as undecided. Each time he pastes a review, the text is kept as a
+   record, one line per choice: "<id>: <value> (<how>)" with, after " · note: ", his own note (never read as a value), under the group lines
+   CALLS · PROPOSALS · PATTERNS · PLAYER. The records are read IN ORDER (RECORDS below), each with the decision that ruled what its "yours"
+   lines pick: a line whose how starts "yours" is a ruling of that record's decision (he picked it, same as mine or not); "ruled, D-nnn" is a
+   ruling an earlier decision made, and it must agree with what is already ruled (the words file, or an earlier record); "deferred to the
+   all-endpoints bench (D-nnn)" must match the decision words.deferred.choices holds for that choice; "my pick, not ruled" is NOT a ruling
+   and stays open. A later record may RULE a choice an earlier one left as my pick; it may never change, or un-rule, an earlier ruling —
+   the build stops on it. The build also stops on a record line naming a choice the page does not have, a value that is not one of that
+   choice's options, a how it does not know, a ruling for a deferred choice, and a record whose own head counts differ from its lines. */
+const RECORDS = [{ file: 'review-r1.his.txt', by: 'D-081' }, { file: 'review-r1b.his.txt', by: 'D-084' }];
+for (const r of RECORDS) if (!decs[r.by]) die('decisions.md has no ' + r.by + ' — the ruling ' + r.file + ' carries');
 const REC_GROUPS = ['CALLS', 'PROPOSALS', 'PATTERNS', 'PLAYER'];
-const REC = (() => { const rec = new Map(); let group = null;
-  rd(REC_FILE).split('\n').forEach((raw, i) => { const ln = raw.trim(), at = `review-r1.his.txt:${i + 1}`;
-    if (!ln) return; if (REC_GROUPS.includes(ln)) { group = ln; return; } if (!group) return;   /* the head lines above the first group */
-    const m = /^(\S+): (.+) \(([^()]+)\)$/.exec(ln) || die(`${at}: not a record line “${ln.slice(0, 60)}” (id: value (how))`);
+const DEFER_BY = (W.deferred && W.deferred.choices) || {};   /* the deferral list, read here because the first ruling is asked before it is validated (8b) */
+const RECS = RECORDS.map((R, ri) => { const rec = new Map(); let group = null, head = null;
+  rd(path.join(HERE, R.file)).split('\n').forEach((raw, i) => { let ln = raw.trim(); const at = `${R.file}:${i + 1}`;
+    if (!ln) return; if (REC_GROUPS.includes(ln)) { group = ln; return; }
+    if (!group) { head = head || /^(\d+) yours · (\d+) left as my pick(?: · (\d+) deferred to the bench)?$/.exec(ln); return; }   /* the head lines above the first group */
+    const nt = / · note:(?: |$)/.exec(ln); if (nt) ln = ln.slice(0, nt.index);   /* his note after the how is his, not a value */
+    const df = /^(\S+): deferred to the all-endpoints bench \((D-\d{3})\)$/.exec(ln);   /* a deferred line carries no value: the bench decides it */
+    const m = df ? [ln, df[1], null, null] : /^(\S+): (.+) \(([^()]+)\)$/.exec(ln) || die(`${at}: not a record line “${ln.slice(0, 60)}” (id: value (how))`);
     const how = m[3]; let kind, by = null, x;
-    if (/^yours(?:, same as my pick|, I picked .+)$/.test(how)) { kind = 'yours'; by = REC_BY; }
+    if (df) { kind = 'deferred'; by = df[2]; }
+    else if (/^yours(?:, same as my pick|, I picked .+)$/.test(how)) { kind = 'yours'; by = R.by; }
     else if ((x = /^ruled, (D-\d{3})$/.exec(how))) { kind = 'ruled'; by = x[1]; }
     else if (how === 'my pick, not ruled') kind = 'mine';
     else die(`${at}: a how this build does not know: “${how}”`);
-    if (by && !decs[by]) die(`${at}: ruled in ${by}, which decisions.md does not hold`);
+    if (by && !decs[by]) die(`${at}: ${kind} in ${by}, which decisions.md does not hold`);
     if (rec.has(m[1])) die(`${at}: ${m[1]} is on two lines of the record`);
-    rec.set(m[1], { id: m[1], group, value: m[2], kind, by, at, used: false }); });
-  if (!rec.size) die('the record holds no choices: ' + path.relative(ROOT, REC_FILE));
-  return rec; })();
-/* the ruling the record gives one choice: { v, by } when its line says yours or ruled, else the base (what the page already holds).
+    rec.set(m[1], { id: m[1], group, value: m[2], kind, by, at, ri, used: false }); });
+  if (!rec.size) die('the record holds no choices: ' + R.file);
+  return { ...R, rec, head }; });
+/* the ruling the records give one choice: { v, by } when a line says yours or ruled, else the base (what the page already holds).
    opts: [{ v, name }]; the value must be one of the names the page draws for it, and an earlier ruling must agree with it. */
-const ruleOf = (id, group, opts, base) => { const r = REC.get(id); if (!r) return base;
-  if (r.group !== group) die(`${r.at}: ${id} is under ${r.group}, but the page holds it under ${group}`);
-  r.used = true;
-  const o = opts.find((x) => x.name === r.value) || die(`${r.at}: “${r.value}” is not one of the options of ${id} (${opts.map((x) => '“' + x.name + '”').join(' · ')})`);
-  if (r.kind === 'mine') return base;
-  if (base && base.v !== o.v) die(`${r.at}: the record says ${id} is “${r.value}”, but the page already holds it ruled as “${(opts.find((x) => x.v === base.v) || {}).name}”`);
-  if (base && r.kind === 'ruled' && base.by !== r.by) die(`${r.at}: the record says ${id} was ruled in ${r.by}, the page says ${base.by}`);
-  return base || { v: o.v, by: r.by }; };
+const ruleOf = (id, group, opts, base0) => { let base = base0;
+  for (const { file, rec } of RECS) { const r = rec.get(id); if (!r) continue;
+    if (r.group !== group) die(`${r.at}: ${id} is under ${r.group}, but the page holds it under ${group}`);
+    r.used = true;
+    const o = r.kind === 'deferred' ? null : opts.find((x) => x.name === r.value) || die(`${r.at}: “${r.value}” is not one of the options of ${id} (${opts.map((x) => '“' + x.name + '”').join(' · ')})`);
+    const had = base ? `already holds it ruled as “${(opts.find((x) => x.v === base.v) || {}).name}” (${base.by})` : null;
+    if (r.kind === 'mine') { if (base && r.ri > 0) die(`${r.at}: the record says ${id} is my pick, not ruled, but the page ${had}`); continue; }
+    if (r.kind === 'deferred') { if (DEFER_BY[id] !== r.by) die(`${r.at}: the record says ${id} is deferred to the bench in ${r.by}, but words.deferred.choices holds ${DEFER_BY[id] ? 'it as ' + DEFER_BY[id] : 'no such deferral'}`);
+      if (base) die(`${r.at}: the record says ${id} is deferred to the bench, but the page ${had}`); continue; }
+    if (base && base.v !== o.v) die(`${r.at}: the record says ${id} is “${r.value}”, but the page ${had}`);
+    if (r.kind === 'ruled' && base && base.by !== r.by) die(`${r.at}: the record says ${id} was ruled in ${r.by}, the page says ${base.by}`);
+    if (r.kind === 'ruled' && !base && r.ri > 0) die(`${r.at}: the record says ${id} was ruled in ${r.by}, but nothing the page reads has ruled it`);
+    base = base || { v: o.v, by: r.by }; }
+  return base; };
 const decText = (d) => { const ids = Object.keys(decs).sort((a, b) => decs[a].at - decs[b].at), i = ids.indexOf(d); return DEC.slice(decs[d].at, i + 1 < ids.length ? decs[ids[i + 1]].at : DEC.length); };
 
 /* ── 4 · the round's records ─────────────────────────────────────────────────────────────────────────────────────── */
@@ -628,7 +643,7 @@ const proposals = W.proposals.map((p) => {
   if (p.ruled && !decs[p.ruled]) die(`proposal ${p.id}: ruled in ${p.ruled}, which decisions.md does not hold`);
   const rl = ruleOf(p.id, 'PROPOSALS', opts, p.ruled ? { v: pick, by: p.ruled } : null);   /* the words file's ruling, or the one his record gives */
   if (!rl) for (const o of opts) o.depict = depictOpt(p.id, o.v, PTOK);   /* a proposal you have ruled needs no depiction: it is built */
-  return { id: p.id, title: fill(p.title, PTOK, p.id), what: fill(p.what, PTOK, p.id), motion: fill(p.motion, PTOK, p.id), opts, pick, facts, shots, alsoIn: p.alsoIn || null, ruled: rl ? rl.v : null, ruledBy: rl ? rl.by : null };
+  return { id: p.id, title: fill(p.title, PTOK, p.id), what: fill(p.what, PTOK, p.id), motion: fill(p.motion, rl ? { ...PTOK, by: rl.by } : PTOK, p.id), opts, pick, facts, shots, alsoIn: p.alsoIn || null, ruled: rl ? rl.v : null, ruledBy: rl ? rl.by : null };
 });
 T.nProps = proposals.length;
 /* ── 8b · the choices deferred to the all-endpoints bench (D-083) ───────────────────────────────────────────────────────
@@ -645,6 +660,14 @@ const isDeferred = (id) => Object.prototype.hasOwnProperty.call(DEFER, id);
   Object.assign(T, { nDeferred: Object.keys(DEFER).length, nCallsDeferred: calls.filter((c) => isDeferred(c.id)).length, nKindsDeferred: kindCalls.filter((c) => isDeferred(c.id)).length,
     nCallsOpen: calls.filter(waiting).length, nPropsOpen: proposals.filter(waiting).length });
   T.nWait = T.nCallsOpen + T.nPropsOpen; }
+/* what the page says where a choice may be waiting or ruled (words.ruling): the gap analysis's recommendation (L-19) takes its line from the ruling the records gave,
+   the spoken name of its option from words.decide.say, and the calls summary leads with what waits only when something does */
+let gapRuled = false;
+{ const RW = need(W, 'ruling', ''), rp = proposals.find((p) => p.alsoIn === 'gap') || die('no proposal stands in the gap analysis'), v = rp.ruled || rp.pick,
+    o = rp.opts.find((x) => x.v === v) || die('the gap proposal has no option ' + v), spoken = (((W.decide || {}).say || {})[rp.id] || {}).opts || {};
+  T.gapTake = fill(need(RW, rp.ruled ? 'gapTakeRuled' : 'gapTakeMine', 'ruling'), { name: o.name, by: rp.ruledBy }, 'ruling.gapTake');
+  T.gapSay = fill(need(RW, rp.ruled ? 'gapSayRuled' : 'gapSayMine', 'ruling'), { name: spoken[v] || die(`words.decide.say.${rp.id}.opts has no spoken name for ${v} — the gap summary says it aloud`) }, 'ruling.gapSay');
+  T.callsLead = need(RW, T.nWait ? 'callsLeadOpen' : 'callsLeadNone', 'ruling'); gapRuled = !!rp.ruled; }
 /* the patterns' side of the same count: the draft proposals and the audit, ruled or still waiting (a pattern choice is never deferred) */
 { const pc = patterns.flatMap((p) => p.suite).concat([audit]), got = (v) => pc.filter((x) => x.ruled === v).length;
   Object.assign(T, { nPcChoices: pc.length, nPcRuled: pc.filter((x) => x.ruled).length, nPcOpen: pc.filter((x) => !x.ruled).length, nPcLand: got('land'), nPcNotYet: got('notyet'), nPcChange: got('change') }); }
@@ -653,12 +676,16 @@ const PLW = need(W, 'player', '');
 const PREFS = Object.fromEntries([['bar', [['always', PLW.optBarAlways], ['playing', PLW.optBarPlaying]]], ['follow', [['on', PLW.optOn], ['off', PLW.optOff]]],
   ['after', [['stop', PLW.optAfterStop], ['next', PLW.optAfterNext], ['section', PLW.optAfterSection]]]].map(([k, o]) => { const id = need(PLW, 'line' + k[0].toUpperCase() + k.slice(1), 'player'),
   rl = ruleOf(id, 'PLAYER', o.map(([v, name]) => ({ v, name })), null); return [k, rl ? { id, v: rl.v, by: rl.by } : null]; }));
-for (const r of REC.values()) if (!r.used) die(`${r.at}: the record names ${r.id}, which is not a choice of this page`);
-for (const c of calls) c.motion = fill(c.motion, T, 'calls.motion.' + c.id);
+for (const { rec } of RECS) for (const r of rec.values()) if (!r.used) die(`${r.at}: the record names ${r.id}, which is not a choice of this page`);
+/* a record's own head is the page's count when he copied it, so a line lost or cut off in the paste shows here, after every line has been read on its own */
+for (const { file, rec, head } of RECS) if (head) { const L = [...rec.values()].filter((r) => r.group !== 'PLAYER'), n = (f) => L.filter(f).length;
+  const want = [n((r) => r.kind === 'yours' || r.kind === 'ruled'), n((r) => r.kind === 'mine') + n((r) => r.kind === 'deferred' && head[3] === undefined), n((r) => r.kind === 'deferred')];
+  if (Number(head[1]) !== want[0] || Number(head[2]) !== want[1] || (head[3] !== undefined && Number(head[3]) !== want[2])) die(`${file}: its head says “${head[0]}”, but its lines add up to ${want[0]} yours · ${want[1]} left as my pick · ${want[2]} deferred`); }
+for (const c of calls) c.motion = fill(c.motion, c.ruledBy ? { ...T, by: c.ruledBy } : T, 'calls.motion.' + c.id);   /* {by}: the decision that ruled it; a line that says "Already yours" on a look nobody ruled stops the build */
 T.nPics = used.size;
 const fillTree = (o, at) => (typeof o === 'string' ? fill(o, T, at) : Array.isArray(o) ? o.map((v, i) => fillTree(v, at + '[' + i + ']')) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => k[0] !== '_').map(([k, v]) => [k, fillTree(v, at + '.' + k)])) : o);
 const omit = (o, ks) => Object.fromEntries(Object.entries(o).filter(([k]) => !ks.includes(k)));
-const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, tip: W.tip, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, depict: need(DP, 'ui', 'depict'), decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord', 'ex', 'imp', 'sayWords', 'exSuite', 'impSuite']), gl: need(need(W, 'gabeLens', ''), 'ui', 'gabeLens') }, 'ui');
+const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: Object.assign(omit(W.calls, ['motion', 'propsHeadNone']), T.nPropsOpen ? {} : { propsHead: W.calls.propsHeadNone }),  statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: Object.assign(omit(W.gap, ['recHeadRuled']), gapRuled ? { recHead: W.gap.recHeadRuled } : {}), pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, tip: W.tip, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, depict: need(DP, 'ui', 'depict'), decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord', 'ex', 'imp', 'sayWords', 'exSuite', 'impSuite']), gl: need(need(W, 'gabeLens', ''), 'ui', 'gabeLens') }, 'ui');
 
 /* ── 14 · the data, the hash, the page ─────────────────────────────────────────────────────────────────────────────── */
 const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, deferred: DEFER[c.id] || null, opts: c.opts.map((o) => [o.v, o.name]) })),
