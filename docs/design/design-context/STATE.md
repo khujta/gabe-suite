@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-083). Updated 2026-10-02 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-084). Updated 2026-10-02 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -10,10 +10,12 @@ Loop 1 is the API endpoint card. Its display half lives on ONE page, `../workflo
 `05007957`, frozen feed). On 2026-09-30 he read that page as a HUMAN and dictated 23 items of feedback (D-066): much that was clear
 to the model was not clear to him. Round 1 fixed them AND named the patterns behind them, so they can be carried into the Gabe Suite.
 
-**Now: five choices are his on `legibility/legibility-review.html`** — the header (`mo.hdr`), saving (`mo.save`), F24,
-L-19 and the player's "after a decision" (`pl.after`). His round-1 rulings are read from the record `legibility/review-r1.his.txt`
-(a815ad5), so any fresh browser shows them ruled; the copy head reads "41 yours · 4 left as my pick · 8 deferred to the bench".
-Every card's LAYOUT is decided on the all-endpoints bench, not here (D-083): he sets it there and tells me the configuration.
+**Now: round 1 is ruled (D-081, D-084).** His second paste ruled the header (stages over moments), saving (under EFFECTS), F24 (the
+Client head reads "sends it") and L-19 G2 (a ninth row, Security) — built on all-endpoints.html (`365625d`: the Security row with the
+middleware in run order, the check switches, the CORS origins and the secrets; probe 766/0, walk 462 pictures). The review page reads both
+records (`0f7a6f3`, `abea15b`, probe 202/0): fresh head "45 yours · 1 left as my pick · 8 deferred to the bench". The ONE open call is the
+new Security look — the facts that live in other rows as **marks to their home row** (my pick, dashed) or **moved into Security**; the
+player's "after a decision" is still my pick. Every card's LAYOUT is decided on the all-endpoints bench (D-083).
 
 ## Round 1 — what happened (D-066 … D-071)
 
@@ -101,8 +103,9 @@ WSL swap files (5 GB) in Temp wait on his word.
 
 ## Open for you
 
-1. **On the review page** — the header, saving, F24, L-19 (G1 Security control · G2 a ninth row · G3 nothing new; my pick G1),
-   and "after a decision"; then paste the copy text. Picking only changes the browser until the text is pasted.
+1. **On the review page** — the Security look (marks · moved; seen on all-endpoints.html → POST /cooking/sessions → BY MOMENT's
+   Security row → its options square) and the player's "after a decision"; then paste the copy text. Seen while building: the rate
+   limit middleware stands twice at the edge (the numbered middleware, and the host of its switch) — his to merge or keep.
 2. **On the all-endpoints bench** (D-083) — the seven kind looks (endpoint · schema · function · test · gate · hook · in-flight) and
    EX-5; his configuration comes back as words, not a review line.
 3. **The read-aloud draft** (`legibility/drafts/gabe-artifact-read-aloud/`) — "land it" or not.
@@ -122,7 +125,7 @@ secrets a path reads (settings{} has them, unjoined).
 
 ## Next, in order
 
-1. **His five rulings** (copy text) → each a D-entry in the same commit; "my pick, not ruled" is never a ruling.
+1. **His Security look and "after a decision"** (copy text) → each a D-entry in the same commit; "my pick, not ruled" is never a ruling.
 2. **On his "go"**: P4.1 · P8.1 · P10.1 (build checks in the page generators); P3.2 and P2.1 redrafted to his words for a new
    "land it"; L-33 (the frontend lab's hover cards as the one hover format — trace its origin first); L-39 (bench sections).
 3. **The card layouts** from his bench configuration (D-083), after the legibility work.
