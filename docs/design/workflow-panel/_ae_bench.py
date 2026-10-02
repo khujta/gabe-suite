@@ -32,6 +32,7 @@ LAB_HTML, LAB_PANELS, LAB_CSS = HERE / "endpoint-lab.html", HERE / "_lab-ep-pane
 PROBE_EPLAB = HERE / "probe-eplab.mjs"
 BENCH_JS, BENCH_CSS = HERE / "_ae-bench.js", HERE / "_ae-bench.css"
 KINDS = ("end", "table", "schema", "fn", "test", "gate", "hook", "inf")          # his order (L-23), the columns left to right
+WIDTHS = ["dynamic", "full", "shorter", "compact", "tight"]            # L-36: his five widths, in his order (the page draws them in _ae-bench.css by data-w)
 LAB_KINDS = {"table": "DATACFG", "schema": "SCHCFG", "fn": "FNCFG"}
 GATE_ROLES = ("limiter", "scheme", "login", "rule", "own", "down", "branch", "catch", "switch")   # EX-4: the feed's own groups
 TEST_ROLES = ("act", "check", "arrange", "service", "helper")
@@ -821,6 +822,14 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
     for g, O in EW["opt"].items():
         if O.get("pick") not in O["opts"]:
             die(f"ex.opt.{g}: its default {O.get('pick')!r} is not one of its options")
+        if "ruled" in O and not re.fullmatch(r"D-\d{3}", str(O["ruled"])):                  # his default names the ruling, like a rail's
+            die(f"ex.opt.{g}: `ruled` must name the ruling (D-nnn), not {O['ruled']!r}")
+    WD = EW.get("width") or die("ex.width: the columns' width control has no words (L-36)")
+    if list(WD["opts"]) != WIDTHS or WD.get("pick") not in WD["opts"] or "ruled" in WD:       # his five widths in his order; the default is my pick (no ruling names it)
+        die(f"ex.width: the options must be {WIDTHS}, the default one of them and no ruling: {list(WD['opts'])} · {WD.get('pick')!r}")
+    for key in ("scopeHere", "scopeAll", "width", "role", "roleAll", "prev", "next", "copy", "reset"):
+        if not all(isinstance((EW.get("act") or {}).get(key, {}).get(q), str) for q in ("verb", "obj")):
+            die(f"ex.act.{key}: a control's hover is a verb and its object (L-36)")
     if not re.fullmatch(r"D-\d{3}", str(EW["look"]["table"].get("ruled", ""))):
         die("ex.look.table must name the ruling that made the DATA line his (D-nnn)")
     # the looks: the lab's three lifted, my five from MINE, all on one shape

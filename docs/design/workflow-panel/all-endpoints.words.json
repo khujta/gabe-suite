@@ -829,7 +829,7 @@
       "An element stands at the moment the map records for it: its stage, its line in the handler, or the handler call it runs inside. A check stands where it is evaluated: on the paths whose chain carries it, and for a check inside a call, on the paths that make that call, less those the map shows leaving before it (on a path it rides only by the call, its hover says a path may skip it); its ending stands where the request leaves. A check the map ties only to a catch stands where that catch raises its ending. A test has no time inside the request: it rides the ending it proves. What has no moment by nature stands in the endpoint metadata; what should have a moment and the map cannot place is left in the band below, with its reason.",
       "A step is placed once for each path it is on: with the dependencies when a dependency runs it, else at the call that path makes. So one step can stand at more than one moment: the login dependency reads a table, and a handler call reads it again. When a path's own chain names no call reaching the step, it stands at the calls the endpoint's other paths make to its function, never after that path has left.",
       "The path: every path at once, or one path to its ending. Each path is a code, in the order its ending happens, a small gap between the moments they leave at; an ending several paths reach is several codes, told apart by the fork each takes, else by what FastAPI checks on it. A code's hover says the fork, the moment, what the ending says, its limiter, and whether it is the path in force. A picked path keeps only the moments it passes and the elements it passes there; an ending it passes by without leaving is kept.",
-      "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it names one) and the class its except takes; the checks say so; the work names the first function it calls, and how many more; saving names what the handler's own step does there. Its full name, where the catch stands and its lines are in its hover; its stage is the band above it. Clicking a head widens its column to what it holds, again gives the width back; its × hides it, and the bar brings it back.",
+      "A moment's head says little: a handler moment after a call failed names the function the map shows raising (when it names one) and the class its except takes; the checks say so; the work names the first function it calls, and how many more; saving names what the handler's own step does there. Its full name, where the catch stands and its lines are in its hover; its stage is the band above it. Clicking a head widens its column to what it holds, again gives the width back; a widened column has an edge on its head to drag, or to move with the arrow keys, between the smallest width that cuts no name and most of the box. The table opens fitted when it is wider than its box, and where even that is not enough it stays wider and slides sideways with Shift and the mouse wheel. The × hides a head, and the bar brings it back.",
       "With one path picked, a write wears what that path does with it: saved, maybe saved, rolled back or left unsaved. An ending's status is drawn hollow when the endpoint does not declare it. A test whose status fits endings at several moments rides each of them, its chip hollow and dashed. A function behind the handler stands at the handler call that reaches it, the arrow saying how many calls below the handler it is, on the paths of the function it hangs under, less the paths the map shows leaving before it: a fork that returns, or a check that fires first, in the function that calls it (the rule a check inside a call follows); a call written inside an except stands only on the paths that enter that except. One the map reaches through no call stands where a function placed at a moment names it behind it (the Gabe Universe's behind lists), on that function's paths; its hover names any placed function whose list is cut that may also run it. One no placed function names stands in the band, and so does one that functions at different moments name. A raise called before it counts as a leaving point too, where the path's chain fires that raise or its ending was read to it. Where the map records no line the function is called at, no path can be dropped from it: on a path that leaves the function it hangs under partway, or that an error from the handler call ends with no line the map names for its raise, its hover says it may never be called there; where that function's own paths are an upper bound, its hover says so, naming the same call. A function called only inside an except the map records no path entering, while the uncaught 500 passes an error on through that except, stands in the band, on the way to the 500.",
       "The endpoint metadata, after the table (or before it, its option), holds per block the facts no moment of a request holds: what the endpoint is (its method and path, the path it is served at, its first segment, its entity and the cluster the Gabe Universe draws it in, the station's flags, the handler's file with the line its route is declared at and the line its def stands at, its outline, its docstring) and what sums it up (how many functions stand behind it, its proof, its alarms, each path's fate, its longest path, the cases that only arrange through it, its rare pieces that name what it is, the norms it lacks), each on the card of the block it belongs to; what sums it up drawn as the pinned row draws it, under the same head word. The path row never hides it: each fact is true of every path.",
       "A test that walks across several endpoints, a journey, keeps each of its calls here where it is, and around each one has its other requests at the outer moments of Proof: the ones it makes earlier before any request, the later ones after the answer, one chip per journey on each side (the walk in its hover) or each request a chip of its own; a call here is never drawn among them. With a path picked, a call here keeps its chips only when it ends on that path: at the ending it proves, else, for a call that arranges, at the one ending of the status it asserts; on each path to that ending, since which one it takes is not recorded. A journey whose requests cannot be set in order here is named in the endpoint metadata, on Proof's card, with its reason: a group of web or end-to-end cases whose report is not read, a test with no record of its requests, one that records one request, one none of whose recorded requests calls this endpoint, or one whose every request calls it."
@@ -915,6 +915,7 @@
       "ipo": {
         "label": "the hovers",
         "pick": "lines",
+        "ruled": "D-081",
         "opts": {
           "lines": { "name": "labelled lines", "plain": "An item's hover as labelled lines, top to bottom: what comes before it, what it checks, what it gives." },
           "sent": { "name": "one sentence", "plain": "An item's hover as one line: what comes before it, then what it checks, then what it gives, joined by arrows." }
@@ -939,36 +940,40 @@
         }
       },
       "meta": {
-        "_about": "D-068, his L-06 (\"separate from the table at the end. Or at the beginning\"): where the endpoint metadata stands. After the table, his first words, is my pick, dashed.",
+        "_about": "D-068, his L-06 (\"separate from the table at the end. Or at the beginning\"): where the endpoint metadata stands. After the table, his first words, is yours: ruled in his review of round 1.",
         "label": "the metadata",
         "pick": "after",
+        "ruled": "D-081",
         "opts": {
           "after": { "name": "metadata after the table", "plain": "The endpoint metadata stands under the table, before what the map cannot place." },
           "before": { "name": "metadata before the table", "plain": "The endpoint metadata stands above the table, under the bar." }
         }
       },
       "wid": {
-        "_about": "D-068, his L-21 (\"click the columns for accommodation … give a little more width to put the contents as is expected\"): what a click on a head gives its column. Both are my proposal; names whole is my pick, dashed.",
+        "_about": "D-068, his L-21 (\"click the columns for accommodation … give a little more width to put the contents as is expected\"): what a click on a head gives its column. Both are my proposal; every item on one line is yours, ruled in his review of round 1 over my names whole.",
         "label": "a head's click",
-        "pick": "names",
+        "pick": "line",
+        "ruled": "D-081",
         "opts": {
           "names": { "name": "names whole", "plain": "Clicking a moment's head widens its column until no name inside breaks in the middle of a word; a name still breaks after its _ . / or at a space." },
           "line": { "name": "every item on one line", "plain": "Clicking a moment's head widens its column until every item inside stands on one line." }
         }
       },
       "fit": {
-        "_about": "D-068, his L-21 (\"a button that will force accommodation by minimizing or moving the other columns around\"): what the fit button does. Both are my proposal; narrowing the rest is my pick, dashed.",
+        "_about": "D-068, his L-21 (\"a button that will force accommodation by minimizing or moving the other columns around\"): what the fit button does. Both are my proposal; wrapping into bands is yours, ruled in his review of round 1 over my narrowing the rest.",
         "label": "fit",
-        "pick": "min",
+        "pick": "bands",
+        "ruled": "D-081",
         "opts": {
           "min": { "name": "narrow the rest", "plain": "The fit button narrows the columns that do not fit, the ones with fewest items first, to a strip where each cell says how many items it holds; click a strip to widen it. A widened column keeps its width." },
           "bands": { "name": "wrap into bands", "plain": "The fit button wraps the table into bands of moments that fit the box, one under the other: time runs left to right, then down." }
         }
       },
       "gdl": {
-        "_about": "D-069, his L-10 (\"we will most likely mutate that to have a chain of functions with the actual gates and decisions … and then the effect of that\"): how a gate's chain function → condition → effect is drawn. All three are my proposal (D-025.2); the function as a head with its gates under it is my pick, dashed.",
+        "_about": "D-069, his L-10 (\"we will most likely mutate that to have a chain of functions with the actual gates and decisions … and then the effect of that\"): how a gate's chain function → condition → effect is drawn. All three are my proposal (D-025.2); the function as a head with its gates under it is yours, ruled in his review of round 1.",
         "label": "the gates",
         "pick": "head",
+        "ruled": "D-081",
         "opts": {
           "chain": {
             "name": "one chain per gate",
@@ -985,9 +990,10 @@
         }
       },
       "gef": {
-        "_about": "D-069, his L-10 (\"we should encode that with some color … for that branch or the stage\"): how a gate's effect is coloured. Both are my proposal; the ending's own colour with the stage lit is my pick, dashed.",
+        "_about": "D-069, his L-10 (\"we should encode that with some color … for that branch or the stage\"): how a gate's effect is coloured. Both are my proposal; the ending's own colour with the stage lit is yours, ruled in his review of round 1.",
         "label": "the effect",
         "pick": "end",
+        "ruled": "D-081",
         "opts": {
           "end": {
             "name": "ending's colour, stage lit",
@@ -1000,9 +1006,10 @@
         }
       },
       "gic": {
-        "_about": "D-069, his L-09: the station draws no node for a gate, so a gate wears this page's own icon. An icon per kind is my pick, dashed.",
+        "_about": "D-069, his L-09: the station draws no node for a gate, so a gate wears this page's own icon. An icon per kind is yours, ruled in his review of round 1.",
         "label": "gate icons",
         "pick": "each",
+        "ruled": "D-081",
         "opts": {
           "each": {
             "name": "an icon per kind",
@@ -1019,9 +1026,10 @@
         }
       },
       "grl": {
-        "_about": "D-069, his L-11 (\"can we also put some roles in the gates and decisions themselves? … they validate things on different levels\"): the label at a gate's end. Where it decides is my pick, dashed.",
+        "_about": "D-069, his L-11 (\"can we also put some roles in the gates and decisions themselves? … they validate things on different levels\"): the label at a gate's end. Where it decides is yours, ruled in his review of round 1.",
         "label": "gate roles",
         "pick": "where",
+        "ruled": "D-081",
         "opts": {
           "where": {
             "name": "where it decides",
@@ -1042,9 +1050,10 @@
         }
       },
       "fnm": {
-        "_about": "D-069 (lost-columns P2, his L-20 and L-12): a function chip shows what gets it counted in the pinned row. Showing them is my pick, dashed.",
+        "_about": "D-069 (lost-columns P2, his L-20 and L-12): a function chip shows what gets it counted in the pinned row. Showing them is yours, ruled in his review of round 1.",
         "label": "function marks",
         "pick": "on",
+        "ruled": "D-081",
         "opts": {
           "on": {
             "name": "what it decides and touches",
@@ -1057,9 +1066,10 @@
         }
       },
       "std": {
-        "_about": "D-069, his L-18 (\"I'm not sure what we are representing here … maybe merged with gates and decisions … tell me about that\"): where Standard or specialist's items stand. All three are my proposal; splitting it is my pick, dashed. In each, the row's head says the question it answers.",
+        "_about": "D-069, his L-18 (\"I'm not sure what we are representing here … maybe merged with gates and decisions … tell me about that\"): where Standard or specialist's items stand. All three are my proposal; splitting it is yours, ruled in his review of round 1. In each, the row's head says the question it answers.",
         "label": "standard or specialist",
         "pick": "split",
+        "ruled": "D-081",
         "opts": {
           "split": {
             "name": "split into the gates",
@@ -1076,9 +1086,10 @@
         }
       },
       "dfx": {
-        "_about": "D-070, his L-12 (\"put functions … in blocks … on the left, and in the right the tables, and have sort of a mind map … where the connectors will describe the kind of operation … we are affecting these tables, but how? With what function?\"): how Data effects shows which function does what to which table. The chips are what stood there; the two maps are my proposal; one map for the endpoint, opening under the row, is my pick, dashed. The colours are the page's own read and write colours.",
+        "_about": "D-070, his L-12 (\"put functions … in blocks … on the left, and in the right the tables, and have sort of a mind map … where the connectors will describe the kind of operation … we are affecting these tables, but how? With what function?\"): how Data effects shows which function does what to which table. The chips are what stood there; the two maps are my proposal; a small map per moment is yours, ruled in his review of round 1 over my one map for the endpoint. The colours are the page's own read and write colours.",
         "label": "data effects",
-        "pick": "one",
+        "pick": "cell",
+        "ruled": "D-081",
         "opts": {
           "chips": {
             "name": "chips",
@@ -1095,36 +1106,40 @@
         }
       },
       "dxc": {
-        "_about": "Round-1 review S4-29, his L-12 words \"write red, read green\": the colours of a read and a write, in the Data effects chips and its map. He also said \"I think that somehow we have already encoded that\": the page's own colours (read green, write orange, both amber) are my pick, dashed; his words' colours are the other option.",
+        "_about": "Round-1 review S4-29, his L-12 words \"write red, read green\": the colours of a read and a write, in the Data effects chips and its map. He also said \"I think that somehow we have already encoded that\": the page's own colours (read green, write orange, both amber) are yours, ruled in his review of round 1; his words' colours are the other option.",
         "label": "write colour",
         "pick": "page",
+        "ruled": "D-081",
         "opts": {
           "page": { "name": "the page's colours", "plain": "Read green, write orange, both amber: the colours the page already gives R and W, beside the station's red for a function that touches the store." },
           "his": { "name": "his words' colours", "plain": "Write red, read green, both orange: the colours he named. Red is also the colour of the station's accessor label beside a function." }
         }
       },
       "jyb": {
-        "_about": "Review CR-20: where a test's earlier requests stand — the review offered both places; my pick, dashed: a moment of their own.",
+        "_about": "Review CR-20: where a test's earlier requests stand — the review offered both places; yours, ruled in his review of round 1: a moment of their own.",
         "label": "a test's earlier requests",
         "pick": "prior",
+        "ruled": "D-081",
         "opts": {
           "prior": { "name": "their own moment", "plain": "Earlier in the test: a moment of their own before this request is sent, apart from the server starting." },
           "head": { "name": "in Proof's head", "plain": "In the Proof row's head, out of the moments: a test's earlier requests are no time of this request." }
         }
       },
       "stk": {
-        "_about": "Review CR-07: what the heads do while BY MOMENT scrolls past the pinned row — the review offered heads that ride down or a folded pin; my pick, dashed: the heads ride down.",
+        "_about": "Review CR-07: what the heads do while BY MOMENT scrolls past the pinned row — the review offered heads that ride down or a folded pin; yours, ruled in his review of round 1: the heads ride down.",
         "label": "the heads, scrolled",
         "pick": "ride",
+        "ruled": "D-081",
         "opts": {
           "ride": { "name": "ride under the pinned row", "plain": "The stage band and the moment heads ride down under the pinned row while the table scrolls past, so the pinned row's heads are never read as BY MOMENT's." },
           "stay": { "name": "stay at the top", "plain": "The heads stay at the table's top; scrolled down, only the pinned row's heads are in view." }
         }
       },
       "ifl": {
-        "_about": "D-070, his L-17 (\"visualize or surface what we are affecting … dig deeper … possibilities\"): how In-flight state shows what each value affects. The chips are what stood there; lifelines and echoes are my proposal; a lifeline each is my pick, dashed.",
+        "_about": "D-070, his L-17 (\"visualize or surface what we are affecting … dig deeper … possibilities\"): how In-flight state shows what each value affects. The chips are what stood there; lifelines and echoes are my proposal; a lifeline each is yours, ruled in his review of round 1.",
         "label": "in-flight values",
         "pick": "lane",
+        "ruled": "D-081",
         "opts": {
           "chips": {
             "name": "chips where set",
@@ -1182,7 +1197,11 @@
       "copy": "the columns",
       "cWid": "widened {v}",
       "cHid": "hidden {v}",
-      "cFit": "fit on, {v}"
+      "cFit": "fit on, {v}",
+    "cFitOff": "fit off",
+    "cPx": " at {w}px",
+    "edge": "resize {v}",
+    "edgePlain": "Drag this edge left or right, or focus it and press the arrow keys (Shift for a bigger step). The column keeps a width no name is cut at, and no more than most of the box; click the head to give the width back."
     },
     "rowh": {
       "_about": "D-068, his L-20 (\"those are interesting pieces that I would like to see reflected here\"): a row's head repeats its block's columns of the pinned row, with the same head words and this endpoint's values. The options slot holds what is the row's alone. Both are my proposal.",
@@ -1300,7 +1319,7 @@
     "fitsOf": "{n} of {of}",
     "svcFace": "from the service side",
     "atRaise": "where its ending is raised",
-    "scrolls": "The columns do not fit this width: the box scrolls sideways for the rest.",
+    "scrolls": "The table is wider than its box: slide it sideways with Shift and the mouse wheel, or with the scroll bar.",
     "handler": "the handler starts here",
     "body": "the body",
     "io": {
@@ -2618,8 +2637,8 @@
   "ex": {
     "_about": "D-071 (his L-23 · L-08 · L-13 · L-11): the examples bench — one column per kind of element, in his order, each an example drawn as a block with its controls below it. The table's look is his DATA line (D-027); the schema's and the function's boot on the lab's looks, which is my choice (dashed); the other five kinds' parts and looks are my picks, dashed. Where BY MOMENT already has words for a thing (an in-flight value's kind, how long it lives, a gate's kind and where it decides, a race, the three parts of a hover, the reply), the bench reads those words, never a copy.",
     "title": "examples",
-    "lede": "One example of each kind of element this page draws, a column each, in the order a request meets them: an ending, a table, a schema, a function, a test, a gate or decision, a client hook, an in-flight value. Pick the element at the top of a column, narrow it by its role, and change what its block shows with the controls below it.",
-    "how": "A block reads top to bottom: its title lines, then a strip of marks — a table's or a schema's fields, the tables a function touches, the requests a test makes, the checks on an ending's way, what a gate waits for, the endings a hook answers, the places a value is read — then a list that opens when you click the block. Its hover says what comes before it, what it checks and what it gives, in the form BY MOMENT's hovers option picks. Over each block: this endpoint shows the elements of the endpoint the table has open, every endpoint shows every element of the kind (one not on the open endpoint is drawn as it is on the first endpoint that has it), and the chips under them narrow the column to one role. Under each block: parts, size and colour each open one group of controls and close the others; back to the default puts the block on its first look; copy copies the block's settings as one line, to paste back with your words.",
+    "lede": "One example of each kind of element this page draws, a column each, in the order a request meets them: an ending, a table, a schema, a function, a test, a gate or decision, a client hook, an in-flight value. Pick the element at the top of a column, narrow it by its role, set the column's width, and change what its block shows with the controls under it.",
+    "how": "A block reads top to bottom: its title lines, then a strip of marks — a table's or a schema's fields, the tables a function touches, the requests a test makes, the checks on an ending's way, what a gate waits for, the endings a hook answers, the places a value is read — then a list that opens when you click the block. Its hover says what comes before it, what it checks and what it gives, in the form BY MOMENT's hovers option picks. Above each block, icon squares (point at one for what it does): the elements of this endpoint or of every endpoint (one not on the open endpoint is drawn as it is on the first endpoint that has it), and the column's width — dynamic, full, shorter, compact, most compact; the chips narrow the column to one role and the arrows step through the elements. Under each block, always in view: the parts to drag between the lines or into not drawn, their sizes and the colours; the squares at the bottom put the block back on its first look and copy its settings as one line, to paste back with your words.",
     "whoseTitle": "whose look",
     "whose": {
       "his": { "name": "your DATA line", "plain": "The table block boots on the DATA line you pasted in the endpoint lab, word for word ({v}). Its chip and its count stand at {lo}px, under the page's {hi}px floor, as your line sets them; every other part of the bench keeps the floor." },
@@ -2640,17 +2659,29 @@
     "icons": { "end": "target", "test": "test", "gate": "shield", "hook": "hook", "file": "file", "link": "link", "up": "up", "down": "down",
                "entity": "entity", "doc": "doc", "key": "key", "info": "info", "role": "role", "journey": "journey", "target": "target", "schema": "schema", "function": "function" },
     "opt": {
-      "lay": { "label": "the columns", "pick": "row", "opts": {
+      "lay": { "label": "the columns", "pick": "half", "ruled": "D-081", "opts": {
         "row": { "name": "one row across the page", "plain": "Every kind side by side, left to right; each column keeps the width a name needs, and the row scrolls sideways when the page is narrower." },
         "wrap": { "name": "wrapped rows", "plain": "The columns wrap onto a new row when the page runs out of width." },
         "half": { "name": "an upper and a lower row", "plain": "The first half of the kinds on top, the second half below." } } },
-      "follow": { "label": "a click elsewhere", "pick": "on", "opts": {
+      "follow": { "label": "a click elsewhere", "pick": "on", "ruled": "D-081", "opts": {
         "on": { "name": "follow it", "plain": "Clicking an element in ONE ENDPOINT or BY MOMENT shows it in its kind's column, when the column holds it." },
         "off": { "name": "stay", "plain": "The columns keep the element you picked." } } },
-      "scope": { "label": "which elements", "pick": "here", "opts": {
+      "scope": { "label": "which elements", "pick": "here", "ruled": "D-081", "opts": {
         "here": { "name": "this endpoint", "plain": "The elements of the endpoint the table has open." },
         "all": { "name": "every endpoint", "plain": "Every element of this kind on any endpoint. One that is not on the open endpoint is drawn as it is on the first endpoint that has it." } } }
     },
+    "width": { "_about": "L-36, his words \"Dynamic width - Full width - A shorter width - A compact width - The most compact version\": the width of each column of the bench. Dynamic, the layout's own share of the row, is my pick, dashed; the others are his five. Kept per viewer, and part of the column's copy line.",
+      "label": "width", "pick": "dynamic", "opts": {
+        "dynamic": { "name": "dynamic", "plain": "The column takes its share of the row: the layout decides, and it grows with the room." },
+        "full": { "name": "full", "plain": "The column is as wide as the whole bench; the others wait beside or under it." },
+        "shorter": { "name": "shorter", "plain": "A fixed width, a little under the fullest a column needs." },
+        "compact": { "name": "compact", "plain": "A fixed width that keeps the title lines and the strip on a few lines." },
+        "tight": { "name": "most compact", "plain": "The narrowest width the block still reads at: its parts wrap onto more lines." } } },
+    "act": { "_about": "L-36: the hover of every icon on the bench is a verb and its object, nothing more; the roles keep the line that says what the role is.",
+      "scopeHere": { "verb": "show", "obj": "the elements of this endpoint" }, "scopeAll": { "verb": "show", "obj": "the elements of every endpoint" },
+      "width": { "verb": "set the width to", "obj": "{v}" }, "role": { "verb": "narrow to", "obj": "{v}" }, "roleAll": { "verb": "show", "obj": "every role" },
+      "prev": { "verb": "show", "obj": "the element before" }, "next": { "verb": "show", "obj": "the element after" },
+      "copy": { "verb": "copy", "obj": "this column's settings as one line" }, "reset": { "verb": "put back", "obj": "this column's first look" } },
     "roles": {
       "table": { "r": { "name": "reads" }, "w": { "name": "writes" }, "rw": { "name": "reads and writes" } },
       "schema": { "in": { "plain": "The shape FastAPI reads the request's body into." }, "out": { "plain": "The shape the reply's body is built from." },
@@ -2734,8 +2765,8 @@
       "channel": { "word": "the chip's colour", "plain": "The glyph takes the colour of the block's chip: its status, its role, its lifetime." }
     },
     "ctl": {
-      "parts": "parts", "size": "size", "colour": "colour", "tray": "not drawn", "line": "line {i}", "left": "left", "right": "right",
-      "partsPlain": "Drag a part to another line or side, or into not drawn to hide it. Click a part to size it.",
+      "widthIs": "width", "parts": "parts", "size": "size", "colour": "colour", "tray": "not drawn", "line": "line {i}", "left": "left", "right": "right",
+      "partsPlain": "Drag a part to another line or side, or into not drawn to hide it. Click a part to show its size below.",
       "sizeOf": "size of {name}", "pickPart": "Click a part under parts to size it.", "mode": "shown as", "markSize": "mark size", "gap": "gap between marks",
       "glyph": "glyph colour", "edgeSide": "edge", "edgePat": "edge pattern", "edgeW": "edge thickness", "chipBox": "chip box", "chipFill": "chip fill",
       "cntBox": "count box", "cntFill": "count fill", "enc": "marks drawn as", "pal": "marks coloured by", "shape": "mark corners",

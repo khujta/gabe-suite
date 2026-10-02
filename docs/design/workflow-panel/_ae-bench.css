@@ -2,12 +2,19 @@
    _ae_bench.py and scoped here: the lab's tokens are the page's) ══ */
 #sec-ex { --line: var(--rule); --chip-bg: var(--raised); --panel: var(--card); --font-mono: var(--af-stack); }
 .exbar { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: flex-start; margin: 0 0 10px; }
-/* the columns — A: one row across the page, each column as wide as a name needs, the row sideways when narrower (my pick, CR-26) ·
-   B: wrapped rows · C: two rows */
-.exgrid { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(264px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 8px; align-items: start; }
-.exgrid[data-lay="wrap"] { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, minmax(264px, 1fr)); }
-.exgrid[data-lay="half"] { grid-auto-flow: row; grid-template-columns: repeat(4, minmax(264px, 1fr)); }
-.excol { display: flex; flex-direction: column; gap: 8px; min-width: 0; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 10px; }
+/* the columns (D-071, D-081) — A: one row across the page, each column as wide as its width says, the row sideways when narrower · B: wrapped rows ·
+   C: an upper and a lower row (his ruling). A column's width is its own (L-36): dynamic (the layout's share, my pick) · full (the whole box) · shorter ·
+   compact · most compact */
+.exgrid { display: flex; flex-wrap: nowrap; gap: 12px; align-items: flex-start; overflow-x: auto; padding-bottom: 8px; }
+.exgrid[data-lay="wrap"] { flex-wrap: wrap; overflow-x: visible; }
+.exgrid[data-lay="half"] { flex-direction: column; align-items: stretch; }
+.exrow { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.excol { flex: 1 1 264px; min-width: 264px; }
+.excol[data-w="full"] { flex: 1 0 100%; min-width: min(100%, 264px); }
+.excol[data-w="shorter"] { flex: 0 0 376px; min-width: 0; max-width: 100%; }
+.excol[data-w="compact"] { flex: 0 0 300px; min-width: 0; max-width: 100%; }
+.excol[data-w="tight"] { flex: 0 0 232px; min-width: 0; max-width: 100%; }
+.excol { display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 10px; }
 .exhd { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .exhd h3 { display: flex; align-items: center; gap: 6px; margin: 0; font-size: var(--fs-sm); letter-spacing: .08em; text-transform: uppercase; }
 .exwho { font-size: var(--fs-min); color: var(--muted); border: 1.5px solid var(--rule); border-radius: 999px; padding: 1px 8px; white-space: nowrap; cursor: help; }
@@ -15,15 +22,21 @@
 /* S4-04: the lab's look is no ruling — booting on it was my choice, so it is dashed like my pick */
 .exwho[data-whose="mine"], .exwho[data-whose="lab"] { border-style: dashed; border-color: var(--ink-soft); }
 .exsel { display: flex; flex-direction: column; gap: 6px; }
-.opt.exo { width: auto; height: auto; padding: 3px 9px; font-size: var(--fs-min); }
+/* L-36: the bench's options are icon squares — the page's own `.opt`, a little smaller than BY MOMENT's bar */
+.opt.exo.exi { width: 30px; height: 30px; }
+.opt.exo.exi svg { width: 17px; height: 17px; }
+.extop { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.extop .opts { gap: 4px; }
+.extop .exwidth { padding-left: 12px; border-left: 2px solid var(--rule-soft); }
+.exrc svg { width: 13px; height: 13px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .exroles { display: flex; flex-wrap: wrap; gap: 4px; }
-.exrc { font: inherit; font-size: var(--fs-min); cursor: pointer; border: 1px solid var(--rule); background: var(--raised); color: var(--ink-soft); border-radius: 999px; padding: 1px 8px; }
+.exrc { font: inherit; font-size: var(--fs-min); cursor: pointer; border: 1px solid var(--rule); background: var(--raised); color: var(--ink-soft); border-radius: 999px; padding: 1px 8px; display: inline-flex; align-items: center; gap: 4px; }
 .exrc:hover { border-color: var(--accent); }
 .exrc[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--ground); }
 /* CR-26: the element selector as wide as its column; the steps before and after it under it */
-.expick { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
-.exselect { flex: 1 1 100%; width: 100%; min-width: 0; font: inherit; font-size: var(--fs-min); padding: 3px 4px; border: 1px solid var(--rule); border-radius: 6px; background: var(--raised); color: var(--ink); }
-.exstep { padding: 2px 8px; }
+.expick { display: flex; flex-wrap: nowrap; gap: 4px; align-items: center; }
+.exselect { flex: 1 1 0; width: auto; min-width: 0; font: inherit; font-size: var(--fs-min); padding: 3px 4px; border: 1px solid var(--rule); border-radius: 6px; background: var(--raised); color: var(--ink); }
+.exstep { flex: none; }
 .exon, .exnone { margin: 0; font-size: var(--fs-min); color: var(--muted); }
 /* the block: the lab's, with the page's hover cursor; a strip mark that is this endpoint's request, a check passed, a branch not taken */
 #sec-ex .exw .bkhd { cursor: pointer; }
@@ -75,10 +88,9 @@
 .exr.exnk, .exr.exnote { color: var(--ink-soft); font-weight: 500; }
 /* the controls under the block */
 .exctl { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--rule); padding-top: 6px; }
-.exfolds { display: flex; flex-wrap: wrap; gap: 4px; }
-.exfold[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
-.expane { display: flex; flex-direction: column; gap: 6px; }
-.expane:empty { display: none; }
+.exsec { display: flex; flex-direction: column; gap: 6px; }
+.exsh { margin: 4px 0 0; font-size: var(--fs-min); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+.exgrid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px 14px; }
 .exhint { margin: 0; font-size: var(--fs-min); color: var(--muted); }
 .exctl .lnrow { display: flex; align-items: center; gap: 6px; }
 .exctl .dzl { flex: none; width: 58px; font-size: 12px; color: var(--muted); }
@@ -97,7 +109,6 @@
 .exrg .rl { flex: none; width: 112px; color: var(--muted); font-size: 12px; }
 .exrg input[type="range"], .exrg select { flex: 1; min-width: 0; font: inherit; font-size: 12px; }
 .exv { width: 28px; text-align: right; font-variant-numeric: tabular-nums; }
-.excp { display: flex; align-items: flex-start; gap: 6px; flex-wrap: wrap; }
-/* CR-26: the copy line is shown whole — it wraps, never scrolls inside a box */
-.exline { flex: 1 1 100%; min-width: 0; font-size: 12px; line-height: 1.4; color: var(--ink-soft); word-break: break-word; background: var(--raised);
-          border: 1px solid var(--rule); border-radius: 6px; padding: 4px 6px; }
+.excp { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; border-top: 1px solid var(--rule); padding-top: 6px; }
+/* L-36: the copy line is never shown (the element is hidden); the copy button copies it whole */
+.exline[hidden] { display: none; }

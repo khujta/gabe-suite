@@ -601,6 +601,12 @@
   table.motab th[data-wcol]:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   table.motab th[data-wcol][aria-pressed="true"] { box-shadow: inset 0 -3px 0 var(--accent); }
   .mwm { display: block; font-size: 12px; color: var(--accent); font-weight: 650; }
+  /* L-37: the edge of a widened column — a thin handle on the right side of its head, a grip showing when the pointer or the focus is on it */
+  table.motab .mowh { position: absolute; top: 0; right: 0; bottom: 0; width: 9px; cursor: col-resize; z-index: 3; touch-action: none; }
+  table.motab .mowh::after { content: ""; position: absolute; top: 18%; bottom: 18%; left: 4px; width: 3px; border-radius: 2px; background: var(--rule); transition: background .12s; }
+  table.motab th:hover .mowh::after { background: var(--ink-soft); }
+  table.motab .mowh:hover::after, table.motab .mowh:focus-visible::after, table.motab .mowh[data-drag="true"]::after { background: var(--accent); }
+  table.motab .mowh:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; border-radius: 3px; }
   table.motab th.mom.mmin { text-align: center; padding: 4px 2px; }
   table.motab th.mom.mmin .mminx { display: block; color: var(--accent); font-weight: 650; }
   table.motab th.mmin .mbh > :not(.bm), table.motab th.mmin .msub, table.motab th.mmin .moinf, table.motab th.mmin .mrop { display: none; }
@@ -1785,9 +1791,9 @@
      ending's path: the moments it passes (r.mo.pass) and the elements on it. What has no moment is in the band below, with its
      reason. The two looks' defaults are his (D-055: moments as columns, cells as chips), remembered per viewer; a look remembered before
      his ruling must not override it, so the old key is dropped. ══ */
-  var MW = W.mo, MO = D.mo, MKEY = "gabe:allep:moments:v2", MS = {}, MPATH = { ep: null, i: null };   /* D-065: jy, the journeys' look · D-067: leg, the legend's place (his), ipo, the hovers' form · D-068: hdr, the header · save, the stage saving stands in · meta, where the metadata stands · wid, what widening gives · fit, what fit does (my picks) */
+  var MW = W.mo, MO = D.mo, MKEY = "gabe:allep:moments:v3", MS = {}, MPATH = { ep: null, i: null };   /* D-065: jy, the journeys' look · D-067: leg, the legend's place (his), ipo, the hovers' form · D-068: hdr, the header · save, the stage saving stands in · meta, where the metadata stands · wid, what widening gives · fit, what fit does (my picks) */
   Object.keys(MW.opt).forEach(function (g) { MS[g] = MW.opt[g].pick; });
-  try { window.localStorage.removeItem("gabe:allep:moments:v1"); } catch (e) {}
+  try { window.localStorage.removeItem("gabe:allep:moments:v1"); window.localStorage.removeItem("gabe:allep:moments:v2"); } catch (e) {}   /* D-081: the looks he ruled are the defaults — a look remembered before his ruling must not override them */
   try { var mv = JSON.parse(window.localStorage.getItem(MKEY) || "null"); if (mv) Object.keys(MS).forEach(function (g) { if (mv[g] && MW.opt[g].opts[mv[g]]) MS[g] = mv[g]; }); } catch (e) {}
   /* their squares: a list of bars (rows) · the same bars standing (columns) · a cell of chips · a cell with a number */
   var MICON = { lay: { rows: '<rect x="3" y="3" width="6" height="18" rx="1.2"/><path d="M12 6h9M12 12h9M12 18h9"/>', cols: '<rect x="3" y="3" width="18" height="6" rx="1.2"/><path d="M6 12v9M12 12v9M18 12v9"/>' },
@@ -1843,12 +1849,14 @@
      the handler belong to one endpoint (another endpoint starts with none), a hidden fixed moment and a hidden row to every endpoint,
      fit on or off; remembered per viewer (a convenience: the page draws the same without it) and applied inside renderMo, so a resize
      keeps it. MROW: the row whose options are open · MCOL: the pinned-row column lit from a row's head (his L-20) */
-  var MCKEY = "gabe:allep:moments:cols:v1", MC = { ep: null, wid: [], hidH: [], hidF: [], hidR: [], fit: false }, MROW = { f: null }, MCOL = { ep: null, col: null };
+  var MCKEY = "gabe:allep:moments:cols:v2", MC = { ep: null, wid: [], wpx: {}, hidH: [], hidF: [], hidR: [], fit: true }, MROW = { f: null }, MCOL = { ep: null, col: null };
   try { var mc0 = JSON.parse(window.localStorage.getItem(MCKEY) || "null");
     if (mc0 && typeof mc0 === "object") { ["wid", "hidH", "hidF", "hidR"].forEach(function (k) { if (Array.isArray(mc0[k])) MC[k] = mc0[k].map(String); });
-      MC.ep = typeof mc0.ep === "string" ? mc0.ep : null; MC.fit = mc0.fit === true; } } catch (e) {}
+      if (mc0.wpx && typeof mc0.wpx === "object" && !Array.isArray(mc0.wpx)) Object.keys(mc0.wpx).forEach(function (k) { if (Number.isFinite(mc0.wpx[k])) MC.wpx[k] = Math.round(mc0.wpx[k]); });   /* L-37: a widened column's own width */
+      MC.ep = typeof mc0.ep === "string" ? mc0.ep : null; if (typeof mc0.fit === "boolean") MC.fit = mc0.fit; } } catch (e) {}   /* R-11 (ruled, D-081): a table wider than its box opens fitted; his own switch is remembered */
+  try { window.localStorage.removeItem("gabe:allep:moments:cols:v1"); } catch (e) {}
   function mcSave() { try { window.localStorage.setItem(MCKEY, JSON.stringify(MC)); } catch (e) {} }
-  function mcDefault() { return !MC.wid.length && !MC.hidH.length && !MC.hidF.length && !MC.hidR.length && !MC.fit; }
+  function mcDefault() { return !MC.wid.length && !MC.hidH.length && !MC.hidF.length && !MC.hidR.length && MC.fit; }
   /* D-068 · the stage a moment stands in, the generator's (MO.stg, proven against each ending's stage): none for a moment outside the
      request; the handler's own save under EFFECTS, or, in its option, under HANDLER */
   function moStage(m) { return MO.out.indexOf(m) >= 0 ? null : (MS.save === "hand" && MO.stgAlt[m]) || MO.stg[m] || null; }
@@ -1884,6 +1892,9 @@
   /* a moment's head (D-068: the stage mark left it — the stage stands in the band above). `o`: fk, the bracket segment of the fork it
      is a way of ({ k, pos, label }) · wc, its column's id when a click widens it (moments as columns) · wide · mini, narrowed to a
      strip (fit) — its name is in its hover. Its × hides it (his L-21) */
+  /* L-37 · the edge of a widened column: a thin handle on its right side — drag it with the mouse, or focus it and press the arrow keys (Shift for a bigger step) */
+  function moEdge(id, name) { var h = el("span", "mowh"); h.setAttribute("role", "separator"); h.setAttribute("aria-orientation", "vertical"); h.tabIndex = 0;
+    h.setAttribute("data-wedge", id); h.setAttribute("aria-label", fill(MW.col.edge, { v: name })); h.setAttribute("data-tip", "moedge"); return h; }
   function moHead(r, x, tag, si, o) { var h = el(tag, "mom"), f = moFace(r, x), ln = moLines(x); o = o || {};
     h.setAttribute("data-mom", x[0]); h.setAttribute("data-tip", "momrow"); h.setAttribute("data-si", String(si)); h.setAttribute("data-face", f.join(" · "));
     if (ln) h.setAttribute("data-lines", ln); h.setAttribute("aria-label", moName(r, x) + (ln ? " · " + ln : ""));
@@ -1894,6 +1905,7 @@
     else { var sb = moSub(r, x), l1 = el("span", "mh1" + (sb ? " one" : moWraps(x) ? " wrap" : f.length === 1 ? " one" : ""));
       l1.appendChild(el("span", "mn" + (f.length > 1 && !sb ? " mfn" : ""), f[0])); h.appendChild(l1); if (f[1]) h.appendChild(el("span", "mh2" + (sb ? " mhs" : ""), f[1]));
       if (o.wide) h.appendChild(el("span", "mwm", "\u2194 " + MW.col.wide)); }
+    if (o.wide && o.wc) h.appendChild(moEdge(o.wc, moName(r, x)));
     var hx = el("button", "mohx", "\u00d7"); hx.type = "button"; hx.setAttribute("data-hide", String(si)); hx.setAttribute("aria-label", fill(MW.col.hide, { v: moName(r, x) })); hx.setAttribute("data-tip", "mohx");
     h.appendChild(hx); return h; }
   /* how wide a head needs to be, in characters (+2 for its padding): the narrowest width at which it stands on two lines — a name that
@@ -2494,7 +2506,7 @@
     if (f === "proof" && MS.jyb === "head") { var M9 = r.mo, jb = M9.el.filter(function (e) { return M9.sp[e[1]][0] === "prior" && onPath(e); });   /* review CR-20: their option */
       if (jb.length) { var jw = el("div", "mcs mjyh"); jw.appendChild(el("span", "mjyl", MW.moms.prior.name)); jb.forEach(function (e) { jw.appendChild(moChip(e)); }); th.appendChild(jw); } }
     if (MROW.f === f) th.appendChild(rowPop(f));
-    if (o.wc) { th.setAttribute("data-wcol", o.wc); th.tabIndex = 0; th.setAttribute("aria-pressed", o.wide ? "true" : "false"); if (o.wide) nm.appendChild(el("span", "mwm", "↔")); }
+    if (o.wc) { th.setAttribute("data-wcol", o.wc); th.tabIndex = 0; th.setAttribute("aria-pressed", o.wide ? "true" : "false"); if (o.wide) { nm.appendChild(el("span", "mwm", "↔")); th.appendChild(moEdge(o.wc, BLK[b].name)); } }
     if (o.mini) th.classList.add("mmin");
     return th; }
   /* ══ D-068 · ONE TABLE of BY MOMENT over `dc`, its data columns — the moments shown (moments as columns) or the blocks shown (moments
@@ -2570,7 +2582,11 @@
         fw[c._ci] = Math.max(fw[c._ci], x.getBoundingClientRect().width + ins + pad); }); });
     t.classList.remove("mmword");
     var flo = dcs.map(function (c, j) { return mini[j] ? Math.ceil(MINI * em) : Math.max(fl[j] > 0 ? Math.ceil(fl[j] + (rowsLook ? 12 : 8) + 18) : 0, 6.5 * em, !rowsLook && chPx > 0 ? Math.ceil(T.need[j] * chPx) + 8 : 0, Math.ceil(fw[j]) + 2); });   /* its badge + the cell's padding + the chip's 12 + a label's 4px + 2 · the column floor · its head on two lines */
-    var fix = dcs.map(function (c, j) { return mini[j] ? flo[j] : wide[j] ? Math.max(flo[j], cw[j]) : null; });
+    /* L-37: a widened column's edge can be dragged — its width is kept in MC.wpx, between the floor (nothing cut) and the larger of the box's
+       nine tenths and what it needed on its own */
+    var wmax = dcs.map(function (c, j) { return Math.max(Math.floor(G.clientWidth * 0.9), flo[j], cw[j]); });
+    var fix = dcs.map(function (c, j) { if (mini[j]) return flo[j]; if (!wide[j]) return null; var px = MC.wpx[T.wcol(T.dc[j])];
+      return px == null ? Math.max(flo[j], cw[j]) : Math.min(wmax[j], Math.max(flo[j], px)); });
     var leadW = sum(T.lead.map(function (h) { return h.getBoundingClientRect().width; })), room = G.clientWidth - leadW - 2, free = fix.map(function (w) { return w == null; }), avail = Math.max(0, room - sum(fix));
     var tot = rowsLook ? free.filter(Boolean).length : sum(T.need.map(function (q, j) { return free[j] ? q : 0; }));
     var ww = dcs.map(function (c, j) { return fix[j] != null ? fix[j] : tot > 0 ? Math.floor((rowsLook ? 1 : T.need[j]) * avail / tot) : flo[j]; });
@@ -2579,7 +2595,10 @@
     if (over > 0 && sl > 0) ww = ww.map(function (w, j) { return Math.floor(w - Math.min(slack[j], over * slack[j] / sl)); });
     dcs.forEach(function (c, j) { c.style.width = ww[j] + "px"; });
     t.style.minWidth = Math.ceil(sum(ww) + leadW) + "px";
-    T.flo = flo; T.fix = fix; T.room = room; T.ww = ww; return T; }
+    T.flo = flo; T.fix = fix; T.room = room; T.ww = ww; T.wmax = wmax; T.leadW = leadW; t._T = T;
+    T.dc.forEach(function (d, j) { var h = t.querySelector('.mowh[data-wedge="' + T.wcol(d) + '"]'); if (!h) return;   /* the edge says its range */
+      h.setAttribute("aria-valuemin", String(flo[j])); h.setAttribute("aria-valuemax", String(wmax[j])); h.setAttribute("aria-valuenow", String(ww[j])); });
+    return T; }
   /* D-068 · fit (his "a button that will force accommodation by minimizing or moving the other columns"): F-a narrows the columns that do
      not fit to a strip of counts, the ones with fewest items first, a widened one never; F-b wraps the columns into bands, one under the
      other, time left to right then down */
@@ -2594,7 +2613,7 @@
     if (cur.length) bands.push(cur); return bands; }
   function renderMo() { var r = BYID[S.open]; if (!r) return; var M = r.mo;
     if (MPATH.ep !== r.id) { MPATH.ep = r.id; MPATH.i = null; }                       /* another endpoint: every path again */
-    if (MC.ep !== r.id) { MC.ep = r.id; MC.wid = []; MC.hidH = []; mcSave(); }        /* D-068: and its own widened columns and hidden handler moments */
+    if (MC.ep !== r.id) { MC.ep = r.id; MC.wid = []; MC.wpx = {}; MC.hidH = []; mcSave(); }        /* D-068: and its own widened columns and hidden handler moments */
     if (MCOL.ep !== r.id) { MCOL.ep = r.id; MCOL.col = null; }
     var fams = moFams();
     var hd = $("mohead"); hd.textContent = ""; var h = el("h3"); h.appendChild(el("span", null, r.p)); skEp(h, r); h.setAttribute("aria-label", r.id); hd.appendChild(h);
@@ -2947,6 +2966,7 @@
         + ways.map(function (si, p) { return "<span class=ln>" + esc(fill(FKW.way, { i: p + 1, v: moName(rf, rf.mo.sp[si]) })) + "</span>"; }).join("")
         + (tk === undefined ? "" : "<span class=ln><b>" + esc(tk == null ? FKW.none : fill(FKW["this"], { v: moName(rf, rf.mo.sp[tk]) })) + "</b></span>"); }
     if (kind === "mohx") return esc(W.mo.col.hidePlain);
+    if (kind === "moedge") return "<b>" + esc(t.getAttribute("aria-label")) + "</b><span class=pl>" + esc(W.mo.col.edgePlain) + "</span>";
     if (kind === "mohxr") return esc(W.mo.col.hideRowPlain);
     if (kind === "mohun") return esc(t.getAttribute("aria-label"));
     if (kind === "mofitb") return "<b>" + esc(W.mo.col.fit) + "</b> \u00b7 " + esc(W.mo.opt.fit.opts[MS.fit].name) + "<span class=pl>" + esc(W.mo.col.fitPlain) + "</span>";
@@ -3088,9 +3108,9 @@
       + " (" + rm.mo.ex[MPATH.i][0] + (rm.mo.ex[MPATH.i][9] ? " · " + rm.mo.ex[MPATH.i][8] : "") + ")"));   /* D-057 (c): the path, where its ending has several */
     if (rm && !mcDefault()) { var cw0 = [], parts = [], ch0 = moHidden(rm).map(function (x) { return x[1]; });   /* D-068: the columns, only when not as they open */
       if (MC.ep === rm.id) MC.wid.forEach(function (w) { var d = w.slice(2), x = w.charAt(0) === "m" ? rm.mo.sp[+d] : null;
-        cw0.push(x ? moFace(rm, x).join(" \u00b7 ") + (moLines(x) ? " (" + moLines(x) + ")" : "") : BLK[MO.fam[d]] ? BLK[MO.fam[d]].name : d); });
+        cw0.push((x ? moFace(rm, x).join(" \u00b7 ") + (moLines(x) ? " (" + moLines(x) + ")" : "") : BLK[MO.fam[d]] ? BLK[MO.fam[d]].name : d) + (MC.wpx[w] != null ? fill(W.mo.col.cPx, { w: MC.wpx[w] }) : "")); });   /* L-37: a dragged width rides along */
       if (cw0.length) parts.push(fill(W.mo.col.cWid, { v: cw0.join(", ") })); if (ch0.length) parts.push(fill(W.mo.col.cHid, { v: ch0.join(", ") }));
-      if (MC.fit) parts.push(fill(W.mo.col.cFit, { v: W.mo.opt.fit.opts[MS.fit].name }));
+      parts.push(MC.fit ? fill(W.mo.col.cFit, { v: W.mo.opt.fit.opts[MS.fit].name }) : W.mo.col.cFitOff);   /* R-11: fit is on unless he turned it off */
       if (parts.length) lines.push(C.mo + " · " + W.mo.col.copy + ": " + parts.join(" · ")); }
     lines = lines.concat(exLines());                          /* D-071: each example's look, one line per kind */
     lines.push("", C.your, "");
@@ -3114,11 +3134,12 @@
      moment · a strip in the bar brings one back, or all · a row's options slot opens and closes · "hide this row" · a row head's column
      lights what it counts · fit · a click on a head (or Enter) widens its column, again gives the width back */
   function moRedraw(focusSel) { tipOff(); renderMo(); applyEl(); writeOut(LAST.L, LAST.GS); var nb = focusSel && document.querySelector(focusSel); if (nb) nb.focus({ preventScroll: true }); }
-  function moWiden(id) { var i = MC.wid.indexOf(id); if (i >= 0) MC.wid.splice(i, 1); else MC.wid.push(id); mcSave(); moRedraw('#mogrid [data-wcol="' + id + '"]'); }
+  function moWiden(id) { var i = MC.wid.indexOf(id); if (i >= 0) { MC.wid.splice(i, 1); delete MC.wpx[id]; } else MC.wid.push(id); mcSave();   /* L-37: the width given back is the dragged one too */
+    moRedraw('#mogrid [data-wcol="' + id + '"]'); }
   $("sec-mo").addEventListener("click", function (e) { var t = e.target, r = BYID[S.open], q; if (!r || !t.closest) return;
     if ((q = t.closest(".mohx"))) { e.stopPropagation(); var si = q.getAttribute("data-hide"), x = r.mo.sp[+si]; if (!x) return;
       if (MO.fixed.indexOf(x[0]) >= 0) { if (MC.hidF.indexOf(x[0]) < 0) MC.hidF.push(x[0]); } else if (MC.hidH.indexOf(si) < 0) MC.hidH.push(si);
-      MC.wid = MC.wid.filter(function (w) { return w !== "m:" + si; }); mcSave(); moRedraw(); return; }
+      MC.wid = MC.wid.filter(function (w) { return w !== "m:" + si; }); delete MC.wpx["m:" + si]; mcSave(); moRedraw(); return; }
     if ((q = t.closest("[data-unhide]"))) { var u = q.getAttribute("data-unhide");
       if (u === "*") { MC.hidF = []; MC.hidH = []; MC.hidR = []; } else { var lst = { f: "hidF", h: "hidH", r: "hidR" }[u.charAt(0)], v0 = u.slice(2); MC[lst] = MC[lst].filter(function (x) { return x !== v0; }); }
       mcSave(); moRedraw(); return; }
@@ -3127,11 +3148,34 @@
     if ((q = t.closest("[data-hiderow]"))) { var f1 = q.getAttribute("data-hiderow"); if (MC.hidR.indexOf(f1) < 0) MC.hidR.push(f1); MROW.f = null; mcSave(); moRedraw(); return; }
     if ((q = t.closest(".msc"))) { var cid = q.getAttribute("data-mcol"); MCOL.ep = r.id; MCOL.col = MCOL.col === cid ? null : cid; applyMoCol(); return; }
     if ((q = t.closest("#mofit"))) { MC.fit = !MC.fit; mcSave(); moRedraw("#mofit"); return; }
-    if ((q = t.closest("[data-wcol]")) && !t.closest("button, [data-key], .mfk")) moWiden(q.getAttribute("data-wcol")); });
+    if ((q = t.closest("[data-wcol]")) && !t.closest("button, [data-key], .mfk, .mowh")) moWiden(q.getAttribute("data-wcol")); });
   $("sec-mo").addEventListener("keydown", function (e) { var q = e.target;
     if ((e.key === "Enter" || e.key === " ") && q.matches && q.matches("[data-wcol]")) { e.preventDefault(); moWiden(q.getAttribute("data-wcol")); return; }
     if ((e.key === "Enter" || e.key === " ") && q.matches && q.matches(".milf[data-fold]")) { e.preventDefault(); q.click(); return; }
     if (e.key === "Escape" && MROW.f) { var f0 = MROW.f; MROW.f = null; moRedraw('#mogrid .mro[data-rowopt="' + f0 + '"]'); } });
+  /* ══ L-37 · the edge of a widened column, dragged by the mouse or moved by the arrow keys, between the column's floor and its maximum
+     (his words: "go to the edges of the column and move left or right, with some limits as the maximum and minimum width"). The width is
+     kept in MC.wpx beside the other column state and rides the copy text; a head's click again gives it back ══ */
+  var MOKEY = 16, MOBIG = 64;                                  /* an arrow key's step in px; with Shift */
+  function moEdgeAt(h) { var t = h.closest("table"), T = t && t._T; if (!T) return null; var id = h.getAttribute("data-wedge"), j = T.dc.map(T.wcol).indexOf(id); return j < 0 ? null : { T: T, j: j, id: id }; }
+  function moEdgeSet(E, w) { var T = E.T, j = E.j, v = Math.round(Math.min(T.wmax[j], Math.max(T.flo[j], w))); T.ww[j] = v; T.dcs[j].style.width = v + "px";
+    T.t.style.minWidth = Math.ceil(T.ww.reduce(function (a, b) { return a + (b || 0); }, 0) + T.leadW) + "px"; return v; }
+  function moEdgeKeep(id, v) { MC.wpx[id] = v; mcSave(); moRedraw('#mogrid .mowh[data-wedge="' + id + '"]'); }
+  $("mogrid").addEventListener("pointerdown", function (e) { var h = e.target.closest && e.target.closest(".mowh"); if (!h || (e.button != null && e.button > 0)) return; var E = moEdgeAt(h); if (!E) return;
+    e.preventDefault(); e.stopPropagation(); tipOff(); var x0 = e.clientX, w0 = E.T.ww[E.j], cur = w0;
+    try { h.setPointerCapture(e.pointerId); } catch (x) {} h.setAttribute("data-drag", "true");
+    function mv(ev) { cur = moEdgeSet(E, w0 + ev.clientX - x0); h.setAttribute("aria-valuenow", String(cur)); }
+    function up() { h.removeEventListener("pointermove", mv); h.removeEventListener("pointerup", up); h.removeEventListener("pointercancel", up); h.removeAttribute("data-drag");
+      try { h.releasePointerCapture(e.pointerId); } catch (x) {} if (cur !== w0) moEdgeKeep(E.id, cur); }
+    h.addEventListener("pointermove", mv); h.addEventListener("pointerup", up); h.addEventListener("pointercancel", up); });
+  $("mogrid").addEventListener("keydown", function (e) { var h = e.target.closest && e.target.closest(".mowh"); if (!h) return; var E = moEdgeAt(h); if (!E) return;
+    var T = E.T, j = E.j, w = T.ww[j], step = e.shiftKey ? MOBIG : MOKEY, to = null;
+    if (e.key === "ArrowRight") to = w + step; else if (e.key === "ArrowLeft") to = w - step; else if (e.key === "Home") to = T.flo[j]; else if (e.key === "End") to = T.wmax[j]; else return;
+    e.preventDefault(); e.stopPropagation(); var v = Math.round(Math.min(T.wmax[j], Math.max(T.flo[j], to))); if (v !== w) moEdgeKeep(E.id, v); });
+  /* ══ L-38 · a table wider than its box, even fitted, may stay wider: Shift and the mouse wheel slide it sideways (the browser's own
+     Shift + wheel on a scroll box is made certain here, and only while the box has somewhere to go) ══ */
+  $("mogrid").addEventListener("wheel", function (e) { var G = $("mogrid"); if (!e.shiftKey || G.scrollWidth <= G.clientWidth + 1) return;
+    var d = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY; if (!d) return; e.preventDefault(); G.scrollLeft += d; }, { passive: false });
   /* the toggle beside each title (D-038): closed by default, remembered per viewer (a convenience — the page draws the same without it) */
   var IKEY = "gabe:allep:info:v1", INFO = { board: false, one: false, mo: false, ex: false };
   try { var ir = window.localStorage.getItem(IKEY); if (ir) { var io = JSON.parse(ir); Object.keys(INFO).forEach(function (k) { INFO[k] = io[k] === true; }); } } catch (e) {}

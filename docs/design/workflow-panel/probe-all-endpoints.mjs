@@ -144,9 +144,13 @@ const p = await ctx.newPage(), errs = [];
 p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
 /* CHANGED 2026-09-30 (round-1 review CR-31): with the map on (the default) a Data effects cell folds to its count; the sections that read
    the Data effects chips open on the chips look — open(file, 'default') opens on the page's own defaults */
+/* CHANGED 2026-10-02 (D-081, his ruling of the looks): the page opens on the looks he ruled — a click on a head puts every item on one line, fit wraps
+   into bands, Data effects is a small map per moment, and a table wider than its box opens fitted (R-11). The sections that prove the TABLE'S
+   STRUCTURE (its moments, stages, cells, widths) were written against the looks before the ruling, so open(file) still opens on those: chips for
+   Data effects, names whole, fit narrowing the rest, fit off. open(file, 'default') opens on the page's own defaults; section 33 proves the ruled ones. */
 const open = async (file, look) => { await p.goto('file://' + file); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });
   await p.evaluate((dflt) => { try { for (const k of Object.keys(localStorage)) if (/^gabe:allep/.test(k)) localStorage.removeItem(k);
-    if (!dflt) localStorage.setItem('gabe:allep:moments:v2', JSON.stringify({ dfx: 'chips' })); } catch (e) {} }, look === 'default');
+    if (!dflt) { localStorage.setItem('gabe:allep:moments:v3', JSON.stringify({ dfx: 'chips', wid: 'names', fit: 'min' })); localStorage.setItem('gabe:allep:moments:cols:v2', JSON.stringify({ fit: false })); } } catch (e) {} }, look === 'default');
   await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); };
 const pick = async (rail, v) => { await p.click(`.opt[data-rail="${rail}"][data-v="${v}"]`); await p.waitForTimeout(40); };
 const drawn = () => p.evaluate(() => [...document.querySelectorAll('#board tr.row[data-ep], #board .card[data-ep]')].map((e) => e.getAttribute('data-ep')));
@@ -421,7 +425,7 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   const isSet = (l) => l.startsWith(CL.cm + ' · ') || l.startsWith(CL.mo + ' · ') || l.startsWith(CL.uni + ' · ') || l.startsWith(CL.gaps + ' · ') || l.startsWith(W8.ex.copy.where + ' · ');
   const asPaste = (out) => { const blk = out.slice(0, out.indexOf('')), his = blk.filter((l) => !isSlook(l) && !isEp(l) && !isSet(l));
     return { blk, his, same: his.length === paste.length && his[0] === 'page: all-endpoints · ' + D.tok.app + ' @ ' + D.tok.head && JSON.stringify(his.slice(1)) === JSON.stringify(paste.slice(1)) }; };
-  await open(PAGE);
+  await open(PAGE, 'default');   /* D-081: a cold start on the page's own defaults — fit on is how it opens, so the copy text names no columns */
   const c0 = await cold(), a0 = asPaste(c0.out);
   ok(a0.same, 'a cold start\'s copy text is his paste line for line, with the Shared treatment\'s and the endpoint\'s lines set aside', { page: a0.his, his: paste });
   const sl = a0.blk.filter(isSlook), colsAt = a0.blk.findIndex((l) => l.startsWith(CL.cols + ': ')), el0 = a0.blk.filter(isEp);
@@ -2473,7 +2477,7 @@ ok(!errs.length, 'no page error after the D-065 checks', errs);
   await p.click('#mobar .opt[data-mopt="leg"][data-v="hover"]'); await p.click('#mobar .opt[data-mopt="ipo"][data-v="sent"]'); await p.waitForTimeout(150);
   const tSent = await tipAt('#mogrid td[data-mom="edge"][data-f="end"] .mc');
   await p.click('#mobar .opt[data-mopt="ipo"][data-v="lines"]'); await p.waitForTimeout(100);
-  ok(sq.length === 4 && sq.some(([g, v, on, ruled]) => g === 'leg' && v === 'hover' && on === 'true' && ruled === 'true') && sq.some(([g, v, on, , pk]) => g === 'ipo' && v === 'lines' && on === 'true' && pk === 'true')
+  ok(sq.length === 4 && sq.some(([g, v, on, ruled]) => g === 'leg' && v === 'hover' && on === 'true' && ruled === 'true') && sq.some(([g, v, on, ruled]) => g === 'ipo' && v === 'lines' && on === 'true' && ruled === 'true')   /* D-081: the labelled lines are his */
      && !strip[0] && strip[1] === strip[2] && tLeg2 && !tLeg2.text.includes(MW.leg.kinds) && tSent && tSent.html.includes('iosent') && !tSent.html.includes('class="io"') && tSent.text.includes(IO.arrow.trim()),
     'D-067 (P2 B2 · P3b) · the legend above the table shows one line per row and leaves the row\'s name its own words; the hovers as one sentence read before → checks → gives', { sq, strip });
   /* (7) a column's words on its head, never on each cell */
@@ -2599,7 +2603,7 @@ ok(!errs.length, 'no page error after the D-067 checks', errs);
   await clk('#mofit');
   const f1 = await colW();
   const out1 = await outCols();
-  ok(f1.over <= 1 && f1.mini >= 1 && out1.length === 1 && out1[0].includes(fillW(MW.col.cHid, { v: MW.moms.start.name })) && out1[0].includes(fillW(MW.col.cFit, { v: MW.opt.fit.opts[MW.opt.fit.pick].name })),
+  ok(f1.over <= 1 && f1.mini >= 1 && out1.length === 1 && out1[0].includes(fillW(MW.col.cHid, { v: MW.moms.start.name })) && out1[0].includes(fillW(MW.col.cFit, { v: MW.opt.fit.opts.min.name })),   /* the section opens on fit narrowing the rest (open()) */
     'D-068 (L-21) · fit: no sideways scroll, ' + f1.mini + ' column(s) narrowed to a strip of counts; the copy text says the columns — ' + (out1[0] || ''), { over: f1.over, mini: f1.mini, out1 });
   await p.setViewportSize({ width: 1600, height: 1080 }); await p.waitForTimeout(250);
   await p.waitForFunction(() => { const G = document.getElementById('mogrid'); return G.scrollWidth - G.clientWidth <= 1; }, null, { timeout: 4000 }).catch(() => {});   /* the redraw on resize, settled */
@@ -2616,7 +2620,8 @@ ok(!errs.length, 'no page error after the D-067 checks', errs);
   await clk('#mobar .mohall'); await clk('#mofit'); await clk('#mogrid th.mom[data-mom="edge"]');
   const back = await p.evaluate(() => ({ moms: document.querySelectorAll('#mogrid th.mom').length, rows: document.querySelectorAll('#mogrid tbody tr[data-f]').length, strip: document.querySelectorAll('#mobar [data-unhide]').length }));
   const out2 = (await outCols()).length;
-  ok(back.moms === band.heads && back.rows === rh.length && !back.strip && !out2, 'D-068 · show all, fit off and the width given back: the table as it opens, and the copy text no longer names the columns', { back, out2 });
+  const out2s = await outCols();
+  ok(back.moms === band.heads && back.rows === rh.length && !back.strip && out2 === 1 && out2s[0].endsWith(': ' + MW.col.cFitOff), 'D-068 · D-081 (R-11) · show all and the width given back: the table as it opens; the one thing the copy text still names is that fit is off (on is how a table opens)', { back, out2, out2s });
   await p.evaluate(() => window.scrollTo(0, 0)); }
 ok(!errs.length, 'no page error after the D-068 checks', errs);
 
@@ -2692,7 +2697,7 @@ ok(!errs.length, 'no page error after the D-069 checks', errs);
   const setLook = async (st) => { await p.evaluate((st) => { const A = window.__allep; Object.assign(A.mo.looks, st); localStorage.setItem(A.mo.key, JSON.stringify(A.mo.looks)); }, st);
     await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });
     await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + E + '"] td.id'); await p.waitForTimeout(250); };
-  await setLook({ dfx: MW.opt.dfx.pick, ifl: MW.opt.ifl.pick, lay: MW.opt.lay.pick, cell: MW.opt.cell.pick });
+  await setLook({ dfx: 'one', ifl: MW.opt.ifl.pick, lay: MW.opt.lay.pick, cell: MW.opt.cell.pick });   /* D-081: a small map per moment is how it opens; one map for the endpoint is the other look */
   const dx = R.mo.dx, sc = dx.l.findIndex((q) => MK[dx.f[q[0]]] === 'fn:apps/api/services/cooking.py::start_session' && MK[dx.t[q[1]]] === 'table:cooking_sessions');
   const a = await p.evaluate((sc) => { const tr = document.querySelector('#mogrid tbody tr[data-f="data"]'), nx = tr && tr.nextElementSibling;
     const w = nx && nx.querySelector('.mdx'), gs = w ? [...w.querySelectorAll('svg.mdxs g.mdxk[data-j]')] : [];
@@ -2701,10 +2706,10 @@ ok(!errs.length, 'no page error after the D-069 checks', errs);
       sc: g0 ? [...g0.querySelectorAll('.mdxst')].map((x) => x.getAttribute('data-op')) : null, race: w ? [...w.querySelectorAll('.mdxrc .vc-status')].map((x) => x.textContent) : [],
       rules: w ? [...w.querySelectorAll('.mdxru')].map((x) => [x.getAttribute('data-op'), (x.querySelector('.mdxrf') || {}).getAttribute('data-key')]) : [],
       bands: w ? [...w.querySelectorAll('.mdxb')].map((b) => +b.getAttribute('data-si')) : [] }; }, sc);
-  ok(MW.opt.dfx.pick === 'one' && a.under && a.links === dx.l.length && a.links > 10 && a.strokes.every((x) => x === 'r|' + OP.r.col || x === 'w|' + OP.w.col)
+  ok(MW.opt.dfx.opts.one && MW.opt.dfx.pick === 'cell' && MW.opt.dfx.ruled === 'D-081' && a.under && a.links === dx.l.length && a.links > 10 && a.strokes.every((x) => x === 'r|' + OP.r.col || x === 'w|' + OP.w.col)
      && JSON.stringify(a.sc) === JSON.stringify(['r', 'w']) && JSON.stringify(a.race) === JSON.stringify(['500', '500']) && JSON.stringify(a.bands) === JSON.stringify(dx.b)
      && a.rules.some((q) => q[0] === 'commit' && q[1] === 'fn:apps/api/api/cooking.py::post_start_session') && a.rules.some((q) => q[0] === 'commit' && q[1] === 'fn:apps/api/auth/context.py::build_auth_context'),
-    'D-070 (a) · ' + E + ': the map (my pick) opens under Data effects — ' + a.links + ' links, green reads, orange writes; start_session → cooking_sessions reads then writes, the race\'s 500 on it and on the login\'s first add of a user (review N3-18); a commit rule names post_start_session and build_auth_context', a);
+    'D-070 (a) · ' + E + ': the map (his other look) opens under Data effects — ' + a.links + ' links, green reads, orange writes; start_session → cooking_sessions reads then writes, the race\'s 500 on it and on the login\'s first add of a user (review N3-18); a commit rule names post_start_session and build_auth_context', a);
   const b = await p.evaluate(() => { const T = document.querySelector('#mogrid'), fold = T.querySelector('.milf[data-fold]');
     const dotsOf = (k) => [...T.querySelectorAll('td.milc .mil[data-k="' + k + '"] .mild')].map((d) => [d.closest('td').getAttribute('data-mom'), [...d.querySelectorAll('.vc-status')].map((x) => x.textContent).join(','), !!d.querySelector('.milcl[data-key="table:cooking_sessions"]')]);
     const kOf = (n) => { const c = [...T.querySelectorAll('td.milc .mil > .mc[data-key]')].find((x) => x.getAttribute('data-key').includes('|' + n + '|')); return c ? c.closest('.mil').getAttribute('data-k') : null; };
@@ -2772,7 +2777,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
   const tb0 = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol[data-k="table"] .blk .bkln')].map((l) => [...l.querySelectorAll(':scope > .bkcol.l > [data-part]')].map((n) => n.getAttribute('data-part')).join(' ') + ' | ' + [...l.querySelectorAll(':scope > .bkcol.r > [data-part]')].map((n) => n.getAttribute('data-part')).join(' ')));
   ok(JSON.stringify(tb0) === JSON.stringify(['icon name | ', 'ent | count rw', 'model | ']), 'D-071 · the table block draws its parts on his three lines', tb0);
   /* a real drag: the channel chip from line 2's right side to line 1's right side */
-  await p.click(CX + '[data-k="table"] .exfold[data-fold="parts"]'); await p.waitForTimeout(80);
+  /* CHANGED 2026-10-02 (L-36, D-081): the parts' zones are always on the page — no fold to open */
   await p.dragAndDrop(CX + '[data-k="table"] .exz[data-line="1"][data-side="r"] .expc[data-part="rw"]', CX + '[data-k="table"] .exz[data-line="0"][data-side="r"]'); await p.waitForTimeout(120);
   const dr = await p.evaluate(() => ({ l1: [...document.querySelectorAll('#exgrid .excol[data-k="table"] .blk .bkln:first-child [data-part]')].map((n) => n.getAttribute('data-part')),
     cp: document.querySelector('#exgrid .excol[data-k="table"] .exline').textContent }));
@@ -2832,14 +2837,16 @@ ok(!errs.length, 'no page error on the fixture', errs);
     const ifk = D0.words.enc.fam.ifk.vals; out.ifk = [...document.querySelectorAll('#exgrid .excol[data-k="inf"] .exrc[data-role]')].map((b) => b.getAttribute('data-role')).filter((r) => r && ifk[r] && b0(r));
     function b0(r) { const b = document.querySelector('#exgrid .excol[data-k="inf"] .exrc[data-role="' + r + '"]'); return !b.textContent.startsWith(ifk[r].name + ' '); }
     out.dash = [getComputedStyle(document.querySelector('#exgrid .exwho[data-whose="lab"]')).borderTopStyle];
-    out.tips = document.querySelectorAll('#exgrid .exfold[data-tip], #exgrid .exreset[data-tip], #exgrid .excopy[data-tip], #exgrid .exscope [data-tip]').length;
+    const ctls = [...document.querySelectorAll('#exgrid .exreset, #exgrid .excopy, #exgrid .exscope .opt, #exgrid .exwidth .opt, #exgrid .exstep')];   /* L-36: each icon's hover is a verb and its object */
+    out.ctls = ctls.length; out.tips = ctls.filter((c) => c.getAttribute('data-tip') === 'exctl' && c.getAttribute('data-verb') && c.getAttribute('data-obj') && c.getAttribute('aria-label') === c.getAttribute('data-verb') + ' ' + c.getAttribute('data-obj')).length;
+    out.folds = document.querySelectorAll('#exgrid .exctl .exfold, #exgrid .exctl [aria-expanded], #exgrid .exctl details').length;
     return out; });
   ok(!sm.twins.length && JSON.stringify(sm.login) === JSON.stringify(['get_auth_context']), 'review N3-07 · CR-16 · F26 · no two items of one column wear the same face; the login check is its dependency function', sm);
   const CF = new Set(Object.values(FJ.steps || {}).filter((s) => s.op === 'commit').map((s) => s.fn));   /* this probe's own reading of the feed */
   ok(!sm.fns.length && sm.commit.includes('post_start_session') && !sm.commit.includes('start_session') && sm.commitK.every(([q, c]) => c === CF.has(q)),
     'review N3-24 · N3-19 · the function list holds BY MOMENT\'s members; a function commits exactly when the feed\'s steps give it a commit (the handler, not start_session)', sm);
-  ok(!sm.c250 && !sm.badges.length && !sm.cut.length && !sm.ifk.length && sm.dash[0] === 'dashed' && !sm.tips,
-    'review N3-14 · CR-25 · CR-26 · CR-27 · S4-04 · S4-33 · C250 proves nothing here; badges name their unit; no title text cut; in-flight kinds in BY MOMENT\'s words; the lab\'s look dashed; no per-control hover', sm);
+  ok(!sm.c250 && !sm.badges.length && !sm.cut.length && !sm.ifk.length && sm.dash[0] === 'dashed' && sm.ctls > 40 && sm.tips === sm.ctls && !sm.folds,
+    'review N3-14 · CR-25 · CR-26 · CR-27 · S4-04 · S4-33 · C250 proves nothing here; badges name their unit; no title text cut; in-flight kinds in BY MOMENT\'s words; the lab\'s look dashed; every icon control a verb and its object, no fold', sm);
   /* S4-16 · S4-20: BY MOMENT's gate icons and hovers options decide the bench's too */
   /* the option's own state, then the bench drawn again (a gate row's looks sit in that row's legend, not always on the page) */
   const moClick = (g, v) => p.evaluate(([g, v]) => { window.__allep.mo.looks[g] = v; window.__allepEx.render(); }, [g, v]);
@@ -2851,10 +2858,12 @@ ok(!errs.length, 'no page error on the fixture', errs);
   await p.mouse.move(0, 0); await moClick('ipo', 'lines'); await p.waitForTimeout(80);
   ok(!gic && sent, 'review S4-16 · S4-20 · BY MOMENT\'s gate icons option takes the bench\'s gate glyph away; its one-sentence hovers reach the bench', { gic, sent });
   /* the layout options: my pick dashed; wrapped rows wraps */
+  const ly0 = await p.evaluate(() => [document.getElementById('exgrid').getAttribute('data-lay'), document.querySelectorAll('#exgrid > .exrow').length, document.querySelector('#exbar .opt[data-xopt="lay"][data-v="half"]').getAttribute('data-ruled'),
+    document.querySelectorAll('#exbar .opt[data-pick]').length, document.querySelector('#exbar .opt[data-xopt="follow"][data-v="on"]').getAttribute('data-ruled')]);
   await p.click('#exbar .opt[data-xopt="lay"][data-v="wrap"]'); await p.waitForTimeout(80);
-  const ly = await p.evaluate(() => [document.getElementById('exgrid').getAttribute('data-lay'), document.querySelector('#exbar .opt[data-xopt="lay"][data-v="row"]').getAttribute('data-pick')]);
-  ok(ly[0] === 'wrap' && ly[1] === 'true', 'D-071 · the column layouts are options, one row across the page my pick (dashed)', ly);
-  await p.click('#exbar .opt[data-xopt="lay"][data-v="row"]'); await p.waitForTimeout(60);
+  const ly = await p.evaluate(() => [document.getElementById('exgrid').getAttribute('data-lay'), document.querySelectorAll('#exgrid > .excol').length]);
+  ok(ly0[0] === 'half' && ly0[1] === 2 && ly0[2] === 'true' && !ly0[3] && ly0[4] === 'true' && ly[0] === 'wrap' && ly[1] === 8, 'D-071 · D-081 · the column layouts are options, an upper and a lower row his ruling (no dash), and so is following a click; wrapped rows wraps', { ly0, ly });
+  await p.click('#exbar .opt[data-xopt="lay"][data-v="half"]'); await p.waitForTimeout(60);
   ok(!errs.length, 'D-071 · no page error on the examples bench', errs); }
 
 /* 30 · ROUND-1 REVIEW, lane F1a (2026-09-30) — the page said things the code does not do; each fix, smoke-checked on the page data and once on screen */
@@ -2889,8 +2898,10 @@ ok(!errs.length, 'no page error on the fixture', errs);
     'F1a · CR-38 · F32 · N3-20 · a reason site is titled by what it reads; the sending hook says "sends POST"; the rest line holds the body\'s parse endings too');
   const arr = GR.mo.nm.filter((x) => x[1] === 'arr'), c859 = arr.find((x) => x[3] === 'C859');
   ok(arr.every((x) => x[4].nm) && c859 && c859[4].t === 1, 'F1a · F12 · N3-15 · an arranging case leads with its name; C859, which also tests GET /recipes, says so', arr.map((x) => [x[3], x[4].t || 0]));
-  ok(D.words.mo.opt.dxc && D.words.mo.opt.dxc.pick === 'page' && D.words.mo.opt.dxc.opts.his && !D.words.mo.opt.dxc.ruled, 'F1a · S4-29 · the write colour is an option — the page\'s colours my pick (dashed), his words\' colours beside');
-  await open(PAGE, 'default'); await p.evaluate(() => window.__allep.pick('POST /cooking/sessions')); await p.waitForTimeout(200);
+  ok(D.words.mo.opt.dxc && D.words.mo.opt.dxc.pick === 'page' && D.words.mo.opt.dxc.opts.his && D.words.mo.opt.dxc.ruled === 'D-081', 'F1a · S4-29 · D-081 · the write colour is an option — the page\'s colours are his ruling, his words\' colours beside');
+  /* D-081: a small map per moment is how Data effects opens; this reads the other look, one map under the row (its cells say how many), on the table as it was before fit */
+  await open(PAGE); await p.evaluate(() => { const A = window.__allep; A.mo.looks.dfx = 'one'; localStorage.setItem(A.mo.key, JSON.stringify(A.mo.looks)); }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready');
+  await p.evaluate(() => window.__allep.pick('POST /cooking/sessions')); await p.waitForTimeout(200);
   const sc = await p.evaluate(() => ({ cnt: document.querySelectorAll('#mogrid td[data-f="data"] .mdxcnt').length, mc: document.querySelectorAll('#mogrid td[data-f="data"] .mc').length,
     fits: [...document.querySelectorAll('#mogrid td[data-f="proof"] .mc .mpv')].map((x) => x.textContent), b0: document.querySelectorAll('#mogrid .mdxb0 > .mdxru').length }));
   ok(sc.cnt > 0 && !sc.mc && sc.fits.includes(D.words.mo.fits) && sc.fits.includes(D.words.mo.svcFace) && sc.b0 >= 1,
@@ -2943,12 +2954,12 @@ ok(!errs.length, 'no page error on the fixture', errs);
   const st = await p.evaluate(() => { const h = document.querySelector('#mogrid th.mom'), pin = document.getElementById('pin'); return { tr: h.style.transform, top: h.getBoundingClientRect().top, pin: pin.getBoundingClientRect().bottom }; });
   ok(/translateY/.test(st.tr) && st.top >= st.pin - 2, 'F1b · CR-07 · scrolled down to Functions, the moment heads stand right under the pinned row', st);
   const O = D.words.mo.opt;
-  ok(O.jyb.pick === 'prior' && O.jyb.opts.head && !O.jyb.ruled && O.stk.pick === 'ride' && O.stk.opts.stay && !O.stk.ruled, 'F1b · CR-20 · CR-07 · the two places the review offered are options: a test\'s earlier requests at their own moment (my pick) or in Proof\'s head; the heads ride down (my pick) or stay');
+  ok(O.jyb.pick === 'prior' && O.jyb.opts.head && O.jyb.ruled === 'D-081' && O.stk.pick === 'ride' && O.stk.opts.stay && O.stk.ruled === 'D-081',   /* D-081: both are his now */ 'F1b · CR-20 · CR-07 · the two places the review offered are options: a test\'s earlier requests at their own moment (my pick) or in Proof\'s head; the heads ride down (my pick) or stay');
   await p.evaluate(() => window.scrollTo(0, 0)); await p.$eval('#mogrid th[data-f="proof"] .mro', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#mogrid th[data-f="proof"] .mro'); await p.waitForTimeout(150);
   await p.click('#mogrid th[data-f="proof"] .opt[data-mopt="jyb"][data-v="head"]'); await p.waitForTimeout(200);
-  const jh = await p.evaluate(() => ({ prior: document.querySelectorAll('#mogrid th.mom[data-mom="prior"]').length, inHead: document.querySelectorAll('#mogrid th[data-f="proof"] .mjyh .mc[data-jy]').length, out: document.getElementById('out').value }));
-  ok(!jh.prior && jh.inHead === 3 && jh.out.includes(O.jyb.label + ': ' + O.jyb.opts.head.name), 'F1b · CR-20 · its option: the three journeys\' earlier requests stand in Proof\'s head, and the moment leaves; the copy text says the choice', [jh.prior, jh.inHead]);
-  await p.evaluate(() => { localStorage.removeItem('gabe:allep:moments:v2'); }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready');
+  const jh = await p.evaluate(() => ({ prior: document.querySelectorAll('#mogrid th.mom[data-mom="prior"]').length, inHead: document.querySelectorAll('#mogrid th[data-f="proof"] .mjyh .mc[data-jy]').length, bands: document.querySelectorAll('#mogrid table.motab').length, out: document.getElementById('out').value }));
+  ok(!jh.prior && jh.inHead === 3 * jh.bands &&   /* D-081: the table opens fitted into bands, and each band's Proof head holds the three */ jh.out.includes(O.jyb.label + ': ' + O.jyb.opts.head.name), 'F1b · CR-20 · its option: the three journeys\' earlier requests stand in Proof\'s head (in each band), and the moment leaves; the copy text says the choice', [jh.prior, jh.inHead, jh.bands]);
+  await p.evaluate(() => { localStorage.removeItem('gabe:allep:moments:v3'); }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready');
   ok(!errs.length, 'F1b · no page error', errs); }
 
 /* 32 · LEGIBILITY ROUND 1b, the small pass (remaining.json R-03 · R-04 · R-05 · R-06 · R-20; R-01 is in section 21, R-21 in the D-055 hide read) */
@@ -2983,8 +2994,92 @@ ok(!errs.length, 'no page error on the fixture', errs);
   const lgHis = await legOf(), fw = (k, o) => fillW(C2.lg[k], C2.lg.col[o]);
   ok(lgPage.includes(fw('w', 'page')) && lgHis.includes(fw('w', 'his')) && !lgHis.includes(fw('w', 'page')) && C2.lg.col.his.w !== C2.lg.col.page.w,
     'R-20 · the Data effects legend names the colours the write-colour option draws: "' + fw('w', 'page') + '" with the page\'s, "' + fw('w', 'his') + '" with his', [lgPage.slice(0, 200), lgHis.slice(0, 200)]);
-  await p.evaluate(() => { localStorage.removeItem('gabe:allep:moments:v2'); }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready');
+  await p.evaluate(() => { localStorage.removeItem('gabe:allep:moments:v3'); }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready');
   ok(!errs.length, 'R-* · no page error', errs); }
+
+/* 33 · D-081 + L-34 … L-38 (2026-10-02, round 3) — his ruled looks are the defaults, and the bench and the table gained the controls he asked for.
+   Smoke checks (D-037): (1) the looks he ruled open pressed and undashed, the three still my pick dashed; (2) R-11: a table wider than its box opens
+   fitted; (3) the bench's controls are icon squares with a verb-and-object hover, no fold, the copy line never shown and still whole in the clipboard;
+   (4) a column's width: five, dynamic my pick (dashed), kept per viewer, in the copy line; (5) a widened BY MOMENT column's edge dragged by the mouse and
+   moved by the keys inside its floor and its maximum, kept through a reload and in the copy text; (6) a table wider than its box, even fitted, slides
+   with Shift and the wheel, and says so */
+{ const E = 'POST /cooking/sessions', MW = D.words.mo, XW = D.words.ex, fillW = (t, x) => String(t).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
+  await open(PAGE, 'default'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
+  const RULED = ['ipo', 'meta', 'stk', 'gdl', 'gef', 'gic', 'grl', 'fnm', 'std', 'dxc', 'jyb', 'ifl', 'wid', 'fit', 'dfx', 'leg', 'lay', 'cell'], MINE = ['hdr', 'save', 'jy'];
+  const mk = await p.evaluate(() => { const by = {}; document.querySelectorAll('#mobar .opt[data-mopt], #mogrid .mrop .opt[data-mopt]').forEach((o) => { const g = o.getAttribute('data-mopt'); (by[g] = by[g] || []).push([o.getAttribute('data-v'), o.getAttribute('aria-checked'), o.getAttribute('data-ruled'), o.getAttribute('data-pick'), getComputedStyle(o).borderTopStyle]); }); return by; });
+  const looksNow = await p.evaluate(() => window.__allep.mo.looks);
+  const rowOnly = ['gdl', 'gef', 'gic', 'grl', 'fnm', 'std', 'dfx', 'dxc', 'ifl', 'jyb'];   /* these sit in their row's own options slot, closed on a cold open */
+  const ruledOk = RULED.every((g) => MW.opt[g].ruled && looksNow[g] === MW.opt[g].pick && (rowOnly.includes(g) || (mk[g] || []).some(([v, on, r, pk, bs]) => v === MW.opt[g].pick && on === 'true' && r === 'true' && !pk && bs !== 'dashed')));
+  const mineOk = MINE.every((g) => !MW.opt[g].ruled && (mk[g] || []).some(([v, on, r, pk, bs]) => v === MW.opt[g].pick && on === 'true' && !r && pk === 'true' && bs === 'dashed'));
+  ok(ruledOk && mineOk && MW.opt.wid.pick === 'line' && MW.opt.fit.pick === 'bands' && MW.opt.dfx.pick === 'cell' && XW.opt.lay.pick === 'half' && ['lay', 'follow', 'scope'].every((g) => XW.opt[g].ruled === 'D-081') && MW.opt.wid.ruled === 'D-081',
+    'D-081 · the looks he ruled open pressed and undashed — a head puts every item on one line, fit wraps into bands, data effects a small map per moment, the bench an upper and a lower row — and the header, saving and the journeys stay my pick, dashed', { looksNow, mk: Object.fromEntries(Object.entries(mk).filter(([g]) => MINE.includes(g))) });
+  /* (2) R-11: the table is wider than its box at its natural widths, and it opens fitted — no sideways scroll, in bands */
+  const r11 = await p.evaluate(() => { const G = document.getElementById('mogrid'); return { fit: document.getElementById('mofit').getAttribute('aria-pressed'), tables: G.querySelectorAll('table.motab').length, over: G.scrollWidth - G.clientWidth, band: G.getAttribute('data-fit'),
+    copy: document.getElementById('out').value.split('\n').filter((l) => l.indexOf('the columns:') >= 0 && l.indexOf('by moment') === 0).length }; });
+  await p.evaluate(() => { const A = window.__allep; A.mo.cols.fit = false; localStorage.setItem(A.mo.colKey, JSON.stringify(A.mo.cols)); }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
+  const r11off = await p.evaluate(() => { const G = document.getElementById('mogrid'); return { fit: document.getElementById('mofit').getAttribute('aria-pressed'), tables: G.querySelectorAll('table.motab').length, over: G.scrollWidth - G.clientWidth }; });
+  ok(r11.fit === 'true' && r11.tables > 1 && r11.over <= 1 && r11.band === 'bands' && !r11.copy && r11off.fit === 'false' && r11off.tables === 1 && r11off.over > 1,
+    'D-081 · R-11 · ' + E + ' opens fitted: the fit button pressed, ' + r11.tables + ' bands, no sideways scroll, nothing about it in the copy text; with fit off the one table is ' + r11off.over + ' px wider than its box', { r11, r11off });
+  await open(PAGE, 'default'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
+  /* (3) the bench's controls: icon squares, each a verb and its object; no fold; the copy line hidden, whole in the clipboard */
+  await p.evaluate(() => { window.__w81copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (x) => { window.__w81copied = x; return Promise.resolve(); } } }); });
+  const bn = await p.evaluate(() => { const c = document.querySelector('#exgrid .excol[data-k="table"]'), ic = [...c.querySelectorAll('.exscope .opt, .exwidth .opt, .exstep, .exreset, .excopy')];
+    const line = c.querySelector('.exline'); return { n: ic.length, textless: ic.every((b) => !b.textContent.trim() && b.querySelector('svg')), verbs: ic.map((b) => b.getAttribute('data-verb') + ' ' + b.getAttribute('data-obj')),
+      lineHidden: !!line && line.hidden && line.offsetParent === null && line.textContent.length > 40, folds: c.querySelectorAll('.exfold, details, [aria-expanded]').length,
+      sections: [...c.querySelectorAll('.exctl .exsh')].map((h) => h.textContent), vis: [...c.querySelectorAll('.exctl .exsec')].every((x) => x.getBoundingClientRect().height > 10), line: line.textContent }; });
+  await p.$eval('#exgrid .excol[data-k="table"] .excopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#exgrid .excol[data-k="table"] .excopy'); await p.waitForTimeout(120);
+  const copied = await p.evaluate(() => window.__w81copied);
+  ok(bn.n === 11 && bn.textless && bn.verbs.every((v) => v.length > 8 && !/undefined/.test(v)) && bn.lineHidden && !bn.folds && JSON.stringify(bn.sections) === JSON.stringify([XW.ctl.parts, XW.ctl.size, XW.ctl.colour]) && bn.vis && copied === bn.line,
+    'D-081 · L-36 · the table column\'s controls are ' + bn.n + ' icon squares (no text), each a verb and its object; parts, size and colour are always on the page (no fold); the copy line is not shown and the copy button copies all of it', { bn: { ...bn, line: bn.line.slice(0, 60) }, copied: (copied || '').slice(0, 60) });
+  /* (4) the width of a column */
+  const w0 = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol[data-k="end"] .exwidth .opt')].map((b) => [b.getAttribute('data-v'), b.getAttribute('aria-checked'), b.getAttribute('data-pick'), getComputedStyle(b).borderTopStyle]));
+  await p.$eval('#exgrid .excol[data-k="end"] .exwidth', (e) => e.scrollIntoView({ block: 'center' }));
+  const wOf = (k) => p.$eval('#exgrid .excol[data-k="' + k + '"]', (e) => Math.round(e.getBoundingClientRect().width));
+  const dynW = await wOf('end'), res = {};
+  for (const v of ['compact', 'tight', 'shorter', 'full']) { await p.click('#exgrid .excol[data-k="end"] .exwidth .opt[data-v="' + v + '"]'); await p.waitForTimeout(80); res[v] = await wOf('end'); }
+  const boxW = await p.$eval('#exgrid', (e) => Math.round(e.getBoundingClientRect().width)), cpw = await p.$eval('#exgrid .excol[data-k="end"] .exline', (e) => e.textContent);
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
+  const kept = await p.$eval('#exgrid .excol[data-k="end"]', (e) => e.getAttribute('data-w'));
+  await p.click('#exgrid .excol[data-k="end"] .exwidth .opt[data-v="dynamic"]'); await p.waitForTimeout(80);
+  const cpd = await p.$eval('#exgrid .excol[data-k="end"] .exline', (e) => e.textContent);
+  ok(JSON.stringify(w0.map((x) => x[0])) === JSON.stringify(['dynamic', 'full', 'shorter', 'compact', 'tight']) && w0[0][1] === 'true' && w0[0][2] === 'true' && w0[0][3] === 'dashed' && w0.slice(1).every((x) => !x[2])
+     && res.tight < res.compact && res.compact < res.shorter && res.shorter < res.full && res.full >= boxW - 2 && res.tight >= 200 && dynW >= 264 && cpw.includes(' · ' + XW.ctl.widthIs + ' ' + XW.width.opts.full.name + ' (') && kept === 'full' && cpd.includes(XW.ctl.widthIs + ' ' + XW.width.opts.dynamic.name + ' (' + D.words.copy.pick + ')'),
+    'D-081 · L-36 · a column has five widths — dynamic (my pick, dashed) · full · shorter · compact · most compact (' + [dynW, res.full, res.shorter, res.compact, res.tight].join(' · ') + ' px); the choice is in the column\'s copy line and kept through a reload', { w0, dynW, res, boxW, kept });
+  /* (5) a widened BY MOMENT column's edge */
+  await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(250);
+  await p.evaluate(() => { const A = window.__allep; A.mo.cols.fit = false; A.mo.looks.wid = 'names'; localStorage.setItem(A.mo.colKey, JSON.stringify(A.mo.cols)); localStorage.setItem(A.mo.key, JSON.stringify(A.mo.looks)); }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
+  const head = '#mogrid th.mom[data-mom="edge"]', st5 = () => p.evaluate(() => { const h = document.querySelector('#mogrid .mowh'); return h ? { id: h.getAttribute('data-wedge'), min: +h.getAttribute('aria-valuemin'), now: +h.getAttribute('aria-valuenow'), max: +h.getAttribute('aria-valuemax'), px: window.__allep.mo.cols.wpx, w: Math.round(h.closest('th').getBoundingClientRect().width) } : null; });
+  const noEdge = await p.evaluate(() => document.querySelectorAll('#mogrid .mowh').length);
+  await p.$eval(head, (e) => e.scrollIntoView({ block: 'center' })); const hb = await (await p.$(head + ' .mh1')).boundingBox(); await p.mouse.click(hb.x + 5, hb.y + 5); await p.waitForTimeout(300);
+  const a5 = await st5(), eb = await (await p.$('#mogrid .mowh')).boundingBox();
+  await p.mouse.move(eb.x + eb.width / 2, eb.y + 12); await p.mouse.down(); await p.mouse.move(eb.x + 70, eb.y + 12, { steps: 5 }); await p.mouse.move(eb.x + 150, eb.y + 12, { steps: 5 }); await p.mouse.up(); await p.waitForTimeout(350);
+  const b5 = await st5();
+  await p.focus('#mogrid .mowh'); await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(250); const c5 = await st5(), foc = await p.evaluate(() => document.activeElement.classList.contains('mowh'));
+  await p.keyboard.press('Home'); await p.waitForTimeout(250); const d5 = await st5(); await p.keyboard.press('End'); await p.waitForTimeout(250); const e5 = await st5();
+  await p.keyboard.press('Shift+Home'); await p.waitForTimeout(250);
+  await p.keyboard.press('ArrowRight'); await p.waitForTimeout(250); await p.keyboard.press('ArrowRight'); await p.waitForTimeout(250);
+  const f5 = await st5(), cp5 = (await p.$eval('#out', (e) => e.value)).split('\n').filter((l) => l.indexOf('by moment · ' + MW.col.copy) === 0)[0] || '';
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
+  const g5 = await st5();
+  await p.$eval(head, (e) => e.scrollIntoView({ block: 'center' })); const hb2 = await (await p.$(head + ' .mh1')).boundingBox(); await p.mouse.click(hb2.x + 5, hb2.y + 5); await p.waitForTimeout(300);
+  const h5 = await p.evaluate(() => [document.querySelectorAll('#mogrid .mowh').length, Object.keys(window.__allep.mo.cols.wpx).length]);
+  ok(!noEdge && a5 && b5 && b5.now > a5.now + 100 && b5.px[b5.id] === b5.now && Math.abs(b5.w - b5.now) <= 2 && c5.now === b5.now - 16 && foc && d5.now === d5.min && e5.now === e5.max && e5.max > e5.min && f5.now === f5.min + 32
+     && cp5.includes(fillW(MW.col.cPx, { w: f5.now })) && g5 && g5.now === f5.now && h5[0] === 0 && h5[1] === 0,
+    'D-081 · L-37 · a widened column has an edge: dragged by the mouse it goes ' + (a5 && b5 ? a5.now + ' → ' + b5.now : '?') + ' px; the arrow keys move it by a step (focus stays), Home and End stop it at its floor (' + (d5 && d5.min) + ') and its maximum (' + (e5 && e5.max) + '); the width is in the copy text, kept through a reload, and a click on the head gives it back', { a5, b5, c5, d5, e5, f5, g5, h5, cp5 });
+  /* (6) Shift and the wheel */
+  await p.setViewportSize({ width: 760, height: 1000 }); await p.waitForTimeout(300);
+  await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(200);
+  await p.$eval(head, (e) => e.scrollIntoView({ block: 'center' })); const hb3 = await (await p.$(head + ' .mh1')).boundingBox(); await p.mouse.click(hb3.x + 5, hb3.y + 5); await p.waitForTimeout(300);
+  await p.focus('#mogrid .mowh'); await p.keyboard.press('End'); await p.waitForTimeout(300);
+  const ov = await p.evaluate(() => { const G = document.getElementById('mogrid'), m = document.getElementById('moscroll'); G.scrollIntoView({ block: 'start' }); return { over: G.scrollWidth - G.clientWidth, left: G.scrollLeft, hint: !m.hidden, hintText: m.textContent }; });
+  const gb = await (await p.$('#mogrid')).boundingBox(); await p.mouse.move(gb.x + 200, Math.max(gb.y, 120) + 100);
+  await p.mouse.wheel(0, 200); await p.waitForTimeout(200); const plain = await p.evaluate(() => document.getElementById('mogrid').scrollLeft);
+  await p.keyboard.down('Shift'); await p.mouse.wheel(0, 300); await p.keyboard.up('Shift'); await p.waitForTimeout(250);
+  const sh = await p.evaluate(() => document.getElementById('mogrid').scrollLeft);
+  ok(ov.over > 1 && ov.hint && ov.hintText === MW.scrolls && /Shift/.test(ov.hintText) && plain === 0 && sh > 0,
+    'D-081 · L-38 · a table still wider than its box (' + ov.over + ' px) says so, naming Shift and the wheel; the plain wheel leaves it, Shift and the wheel slide it ' + sh + ' px', { ov, plain, sh });
+  await p.setViewportSize({ width: 1920, height: 1080 }); await p.waitForTimeout(250);
+  ok(!errs.length, 'D-081 · no page error', errs); }
 
 await b.close();
 console.log((fail ? 'FAIL ✗' : 'PASS ✓') + ` probe-all-endpoints · ${pass} passed · ${fail} failed · ${FEED.length} endpoints · sample ${SAMPLE.length} · page ${path.basename(PAGE)}`);
