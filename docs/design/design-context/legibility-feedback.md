@@ -412,3 +412,16 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
   saying so in the bar's hover, where the saved voice is a Piper one.
 - **tag:** `player-without-a-place`
 - **status:** built (D-074)
+
+### L-28
+- **words:** "in the legibility review element, we have the voice mode, but what I would like to have is that when we scroll down, we still
+  show the bar with the reproduction of the audio and some hashtags or markers to transport to the different sections of the artifact
+  page. This is especially where we have to make some decisions and change the audio that we are reproducing."
+- **where:** the review page · the player bar (D-074) and the decision points (the calls, the proposals, the patterns' land-it choices)
+- **could not tell:** where the decisions are while reading — the bar showed only while a voice played, and it marked sections, never the
+  places where a choice waits; the audio could not be moved to a decision.
+- **fix:** the bar stays in view once the page scrolls, carries a marker per section and per decision point; a jump to a decision moves
+  the page there and switches the audio to that decision. Narrowed by his next message ("the bar appeared, and it's perfect. The only
+  thing is that I would like to see that bar all the time on this kind of artifacts"): the bar shows all the time, as built.
+- **tag:** `controls-only-while-playing`
+- **status:** logged

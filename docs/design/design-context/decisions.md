@@ -1135,3 +1135,16 @@ says so; a "my pick" is never a ruling): volume 1.0 · pause between sections 90
 his four values filled ("yours") and "back to the default" returns to it; the review page reads in his voice when the browser holds no
 saved setting (before, it had no pause and speed 1). His voice is one of Chrome's online Google voices: where it is missing (Edge, another
 browser) the pages fall back to a British Google voice, then an English Natural or Google voice, then the browser's default, and say so.
+
+## D-076 — The player bar shows all the time on pages that read aloud; every future artifact gets it
+Date: 2026-10-01 · Input: his two messages after D-075, logged as legibility-feedback.md L-28.
+Decision, his: "when we scroll down, we still show the bar with the reproduction of the audio and some hashtags or markers to transport
+to the different sections of the artifact page. This is especially where we have to make some decisions and change the audio that we
+are reproducing. Also, I would like to save this for any future artifact that we create, especially with the GabeArtifact skill." —
+then, having played it: "I just started reproducing the audio, and the bar appeared, and it's perfect. The only thing is that I would
+like to see that bar all the time on this kind of artifacts."
+Consequence: (1) the bar as built (D-074: play/pause, stop, previous and next, the section chips that move the reading and the page, the
+speed) is kept as it is; its default becomes "always" — his ruling, on the review page and on the voice lab — and D-074's "only while a
+voice plays" becomes the other option. No decision markers are added: his second message says the bar is right as it stands. (2) "save
+this for any future artifact": recorded as his standing preference at once; the gabe-artifact change (the read-aloud bar + the spoken
+summary rules as a reusable part) is a suite change, so it is drafted first and lands on his "land it" (iterate-before-implement).
