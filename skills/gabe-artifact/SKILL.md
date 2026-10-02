@@ -113,6 +113,8 @@ Charts in both follow the `dataviz` skill's validated palette — load that skil
 6. **Publish** with the Artifact tool: `file_path`, a one-sentence `description`, a `favicon` (1–2 emoji, **stable across redeploys**), and a `<title>` in the file. Same file path → same URL.
 7. **Report (E7 + founder preference).** End with the published URL **and** the absolute source path. Both, every time — the founder reviews artifacts by opening the file as often as the page.
 
+**A page a person will read** also follows `references/legibility.md` — one hover per item, the item's own facts first, a kind's meaning once in a legend, the code last — and runs `node <skill>/tools/legibility-audit.mjs <page>`: report-only counts, each a lead for a look, never a gate.
+
 ## Platform constraints (do not relearn these the hard way)
 
 - **Strict CSP.** No CDN scripts, external stylesheets, webfonts, remote images, `fetch`, or WebSockets. Inline everything; embed images as `data:` URIs. A webfont must be a `@font-face` data URI or it silently falls back — which is why the roster is built from locally-resolvable stacks.
