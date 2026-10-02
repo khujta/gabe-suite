@@ -500,3 +500,80 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
   each new mark once.
 - **tag:** `weight-told-not-shown`
 - **status:** built (D-080)
+
+---
+
+Round 3 — source: his REVIEW text from `legibility/legibility-review.html` (2026-10-02), the notes he wrote on its lines.
+
+### L-33
+- **words:** "We should improve the hover display using the layout and practices we use in the frontend. On the left, in the endpoint, we have
+  some hovers that are beautiful, informative, and easier to read. We should follow that format for all the hovers in general" — and "We
+  should track down how we ended up with that kind of hover information but those are the ones I would like to have everywhere, including
+  these kinds of pages. That's something that should be present in the gates when we design hover notices and hover windows"
+- **where:** every hover on all-endpoints.html and the review page, against the endpoint lab's hover cards
+- **could not tell:** a hover at a glance — the pages' hovers are lines of text, the lab's are laid-out cards.
+- **fix:** trace how the lab's hover cards came about; make that card the one hover format on these pages; a gate checks a new hover follows it.
+- **tag:** `two-hover-formats`
+- **status:** logged
+
+### L-34
+- **words:** "I can't see the difference between this and the screenshot … both have the same header … At least in the screenshots, they show
+  the same thing." — "These are the same screenshots we had in the previous point on the header … it's very important to me to be able to see
+  this."
+- **where:** the review page · the header and saving choices' pictures
+- **could not tell:** what each option changes — the pictures of the different options look the same.
+- **fix:** each option's picture shows the region that changes, side by side, the difference visible at a glance.
+- **tag:** `picture-shows-no-difference`
+- **status:** logged
+
+### L-35
+- **words:** "I will need a better depiction of what would happen on the different options on this. I don't get what is happening here."
+  (on every bench kind's look, on F24, the L-19 recommendation and EX-5)
+- **where:** the review page · those choice cards
+- **could not tell:** what happens if he picks an option.
+- **fix:** each option shows what he would see after picking it (a before/after or a drawn example) and one line of what changes.
+- **tag:** `option-without-its-outcome`
+- **status:** logged
+
+### L-36
+- **words:** "let's simplify them. The options at the top of each container should be more icon-based. We don't need to show the string we are
+  going to copy; we just need the button to copy the configuration. The controls for configuring each one should always be visible, along
+  with all the controls for modifying what is inside. There should also be a control for the width … Dynamic width - Full width - A shorter
+  width - A compact width - The most compact version"
+- **where:** all-endpoints.html · the EXAMPLES bench columns
+- **could not tell:** the bench's controls at a glance — options were words, the copy string took space, the controls hid in folds.
+- **fix:** icon options, a copy button with no string shown, every control always visible, a width control per column.
+- **tag:** `controls-hidden-or-wordy`
+- **status:** logged
+
+### L-37
+- **words:** "Ideally the selected column that is widened should be adjustable. I should be able to go to the edges of the column and move left
+  or right, with some limits as the maximum and minimum width."
+- **where:** all-endpoints.html · BY MOMENT · a widened column
+- **could not tell:** — (a control he wants)
+- **fix:** a widened column's edge can be dragged, within a minimum and a maximum.
+- **tag:** `fixed-width-only`
+- **status:** logged
+
+### L-38
+- **words:** "If we don't have enough room, we can make the table bigger than they allow, so we can slide it to the right or left using Shift and
+  the mouse wheel"
+- **where:** all-endpoints.html · BY MOMENT, when even fitted it is wider than the box
+- **could not tell:** — (a way he wants to move)
+- **fix:** the table may be wider than the box; Shift and the wheel slide it sideways.
+- **tag:** `wide-table-without-a-way-across`
+- **status:** logged
+
+### L-39
+- **words:** "We would need a dedicated section to show the layout for representing this with all the different dimensions and draggable
+  objects inside the cards" (the gate card) · "a dedicated section to figure out the layout … depict the stage in a better, more intuitive way
+  … dots … or maybe a time-encoded circle with the progress bar" (the stage) · "a dedicated section … I can modify, sort, trigger, move
+  things, and show or encode different information using icons, words, colors … and then give you back the copy of the configuration" (gate
+  roles, function marks, standard or specialist) · "show all the metadata in just one big element … add controls to show different layouts
+  for the metadata" (the metadata)
+- **where:** all-endpoints.html · the EXAMPLES bench (new sections)
+- **could not tell:** — (the next design pass)
+- **fix:** bench sections for the gate card, the stage encoding, gate roles, function marks, the standard-or-specialist split and the metadata
+  layout, each with draggable parts, encoding controls and a copy button. Later — trigger: the round-3 page pass lands.
+- **tag:** `element-without-a-bench`
+- **status:** deferred — trigger: the round-3 page pass lands

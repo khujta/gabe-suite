@@ -1195,3 +1195,40 @@ process; the cost a small/medium/large meter beside the "if not" mark, a cost-ve
 pattern's steps become numbered chips joined by arrows with the failing step marked; its box reads as does / does not / decides-when marks;
 each option's impact is marked as a gain, a cost or neutral. Every icon's hover says what it communicates there (D-078's rules: one hover
 per item, the item's own fact, a kind's meaning once in the legend, controls a verb and its object). Sizes come from the page's data.
+
+## D-081 — His review of round 1: the looks he ruled, the suite proposals he lands, the ones he changes or defers
+Date: 2026-10-02 · Input: his REVIEW text from legibility-review.html (head "REVIEW · legibility r1 · 8d02cb1a · gustify @05007957 ·
+7bb7b1b", "41 yours · 12 left as my pick"). A line "my pick, not ruled" is NOT a ruling and stays my pick.
+Decision, his (each line as he gave it):
+- LOOKS RULED (all-endpoints.html): legend on the row's name (already D-067) · hovers as labelled lines · metadata after the table · a head's
+  click puts every item on one line (over my "names whole") · fit wraps into bands (over my "narrow the rest") · heads ride under the pinned
+  row · gates as the function with its gates under it · the effect in the ending's colour with its stage lit · an icon per gate kind · gate
+  roles "where it decides" · function marks "what it decides and touches" · standard or specialist split into the gates · data effects as a
+  small map per moment (over my "one map for the endpoint") · the page's colours for writes · a test's earlier requests get their own moment
+  · in-flight values as a lifeline each · bench columns as an upper and a lower row (over my "one row") · a click elsewhere: follow it ·
+  bench scope: this endpoint · open fitted when it is wider than the box (R-11) · player: the bar always (D-076), follow the reading on.
+- STILL MY PICK, NOT RULED: the header (stages over moments) and saving (under EFFECTS) — "I can't see the difference … in the screenshots,
+  they show the same thing"; every bench kind's look except the table's (D-027); F24 (rename "screen"), the L-19 Security recommendation and
+  EX-5 — "I will need a better depiction of what would happen on the different options on this. I don't get what is happening here";
+  after a decision: stop there.
+- SUITE PROPOSALS — LAND IT: A1 (the legibility audit) · P1.1 · P1.2 · P2.2 · P3.1 · P4.1 · P4.2 · P5.2 · P7.1 · P7.2 · P8.1 · P8.2 · P9.1 ·
+  P10.1 · P10.2.
+- CHANGE IT: P3.2 — "For new kinds of elements, the idea is not to create them dynamically … put them with a generic label, like 'unknown'
+  maybe, and then be able to check all the unknowns … a skill or tool to evaluate which ones deserve to be considered included in the kinds";
+  P2.1 — "I would like to be able to produce a better corpus that has these rules embedded, rather than generating something, then correcting
+  everything … label different parts, such as hovers related to endings, databases, schemas, functions … and then check those dynamically …
+  one final pass, something like that, but I don't want to have n passes by the n points of view".
+- NOT YET: P5.1 — "too much for now … we might end up solving this during the consolidation of our navigation bar … a very shallow version,
+  like a very quick check or a use case"; P6.1 and P6.2 — "Our work should lean more toward how to structure the data better instead of trying
+  to identify confusion among different definitions … I prefer to focus on encoding, structuring, grouping, movement, coloring, shapes, icons".
+- On P1.1 he adds: "we can repeat some information in the hover, but only a small part … if they are going to contain similar content, it
+  should be a label or a very short note … The majority of the hover information should be used for the content that is actually changing …
+  if we have to explain something complicated regarding the label or the concept … put it in a separate appendix, like in the legend section".
+Consequence: (1) the ruled looks become the pages' defaults, marked ruled; (2) the landed proposals are carried into the suite (skills,
+references, the audit tool with its battery, the execution contract, the page generators' build checks), each with fixtures that fire and
+stay silent, install and a clean doctor; (3) P3.2 and P2.1 are redrafted to his words and shown again before they land; (4) P5.1, P6.1 and
+P6.2 wait — trigger: the navigation bar's consolidation; P5.1 may become a shallow quick check then; (5) his other notes are logged as
+legibility items L-33 … L-39 and worked: the frontend lab's hover format for every hover (L-33), the identical pictures (L-34), clearer
+depictions of unclear options (L-35), a simpler bench (L-36), a resizable widened column (L-37), sliding a wide table with Shift and the wheel
+(L-38), and dedicated bench sections for the gate card, the stage encoding, gate roles, function marks, the standard-or-specialist split and
+the metadata layouts (L-39, a later design pass — trigger: this pass lands).
