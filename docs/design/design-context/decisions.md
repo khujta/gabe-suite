@@ -1184,3 +1184,14 @@ and its count; ONE ANALOGY — a process he knows (a recipe, an assembly line, a
 takes (work, his time, run time, what it adds or bends) and what not solving it costs; a ONE-LINE HANDLE. The patterns also get the suit's
 box, DOES / DOES NOT / DECIDES WHEN. They are read aloud in that order, before the options. Numbers are generated; the words are authored with
 the gabe-lens method and checked for jargon.
+
+## D-080 — The decision and situation blocks wear icons and visual encodings; each icon's hover explains it
+Date: 2026-10-02 · Input: his message during the D-079 build, logged as legibility-feedback.md L-32.
+Decision, his: "in all these blocks where we are trying to communicate something that needs to be decided or a situation, let's use more
+icons and more visual encoding of the meaning that we are trying to communicate. Remember that the icons, when we hover on top of them,
+should give a little explanation of what they are trying to communicate."
+Consequence: built in the same pass as D-079: the pain gets an icon and a meter of its real size; the analogy an icon for its kind of
+process; the cost a small/medium/large meter beside the "if not" mark, a cost-versus-pain balance where it fits; the handle a pin; a
+pattern's steps become numbered chips joined by arrows with the failing step marked; its box reads as does / does not / decides-when marks;
+each option's impact is marked as a gain, a cost or neutral. Every icon's hover says what it communicates there (D-078's rules: one hover
+per item, the item's own fact, a kind's meaning once in the legend, controls a verb and its object). Sizes come from the page's data.

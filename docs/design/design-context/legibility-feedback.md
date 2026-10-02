@@ -477,3 +477,15 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
   suit (a process he knows), the cost of solving it (and of not solving it), and a one-line handle; read aloud in that order.
 - **tag:** `mechanism-without-its-pain`
 - **status:** logged
+
+### L-32
+- **words:** "in all these blocks where we are trying to communicate something that needs to be decided or a situation, let's use more icons
+  and more visual encoding of the meaning that we are trying to communicate. Remember that the icons, when we hover on top of them, should
+  give a little explanation of what they are trying to communicate."
+- **where:** the review page · the pain, analogy, cost, handle, steps, box and options blocks of every pattern and decision (D-079)
+- **could not tell:** the weight of a situation at a glance — sizes, costs and gains were sentences to read, not marks to see.
+- **fix:** each block wears icons and small visual encodings (a pain meter, the analogy's process icon, a cost meter and balance, numbered
+  steps with the failing one marked, the box as does / does not / decides-when marks, gains and costs on each option); every icon's hover
+  says what it communicates there, by the D-078 rules.
+- **tag:** `weight-told-not-shown`
+- **status:** logged
