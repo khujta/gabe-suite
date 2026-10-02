@@ -1102,3 +1102,24 @@ sit as the last 3 cards of Your items, built and not yet reviewed, and wear no p
 page's work head counts the reviewed work and no longer the two logs (the ledger and this file), which are written in the same
 commit as the page and could never name their own commit. Page-only: D-037's light checks (generator --check, the probe once: 42
 passed, a picture of each section's top at 1920 and at 1600).
+
+## D-073 — A voice lab: one text read by every voice, every setting tunable, one copy button
+Date: 2026-10-01 · Input: his message after the text-to-speech exploration (D-072).
+Decision, his: "I would like to dedicate one iteration to creating an artifact, maybe dedicated to just voices, different kinds of voices
+in a given text, with things that I can tune out, like options, if it's possible. I can decide on the voice with a copy button, so I end
+up copying back the configuration that I want for the voices."
+Consequence: a voice lab page in `legibility/voices/`: a text he can edit (it opens on the review page's spoken summaries); every voice
+his browser offers, played live, with its settings tunable (voice, speed, pitch, volume, the pauses between sentences and between
+sections, whether section names are read); the free local voices (Piper) rendered on this machine as samples at three speeds; what
+ElevenLabs and Kokoro would need, said plainly; one copy button that writes his configuration as a line to paste back. The pick is kept
+in one saved voice setting (`gabe:voice:v1`) that the review page reads too. The defaults are the agent's picks, dashed (D-025.2); his
+pasted configuration becomes the ruled default. Published as a private Artifact when built.
+
+## D-074 — While a voice plays, the review page's contents bar freezes at the top and steers the reading
+Date: 2026-10-01 · Input: his message, logged as legibility-feedback.md L-27.
+Decision, his: "when we put a voice, I would like it so that when I scroll down, the header navigation bar gets frozen on the top section.
+That way, I can stop or skip to a later section of the transcript, and it will also take me to that section on the page."
+Consequence: on the review page, while a voice plays the contents bar sticks to the top with play/pause, stop, the previous and next
+section and the sections themselves, the one being read lit; a skip moves the reading AND scrolls the page there. "Only while a voice
+plays" is his reading and the default; "always" is an option (the agent's, dashed). The page reads the saved voice setting the voice lab
+writes (D-073). The voice lab uses the same bar.

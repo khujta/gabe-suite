@@ -395,3 +395,14 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
   browser has no speech.
 - **tag:** `no-spoken-channel`
 - **status:** built (D-072)
+
+### L-27
+- **words:** "when we put a voice, I would like it so that when I scroll down, the header navigation bar gets frozen on the top
+  section. That way, I can stop or skip to a later section of the transcript, and it will also take me to that section on the page."
+- **where:** the review page · the listen buttons (D-072) and the contents strip at the top
+- **could not tell:** where the voice was, or how to move it — once the page scrolled, the controls stayed behind, and the reading had
+  no tie to the place on the page.
+- **fix:** while a voice plays, the contents bar freezes at the top with stop, the previous and next section, and the sections; a skip
+  moves the reading and scrolls the page to that section.
+- **tag:** `player-without-a-place`
+- **status:** logged
