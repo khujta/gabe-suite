@@ -420,11 +420,10 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
 - **where:** the review page · the player bar (D-074) and the decision points (the calls, the proposals, the patterns' land-it choices)
 - **could not tell:** where the decisions are while reading — the bar showed only while a voice played, and it marked sections, never the
   places where a choice waits; the audio could not be moved to a decision.
-- **fix:** the bar stays in view once the page scrolls, carries a marker per section and per decision point; a jump to a decision moves
-  the page there and switches the audio to that decision. Narrowed by his next message ("the bar appeared, and it's perfect. The only
-  thing is that I would like to see that bar all the time on this kind of artifacts"): the bar shows all the time, as built.
+- **fix:** built: the player bar is in view all the time on the review page and the voice lab ("always" is the default, ruled;
+  "only while a voice plays" is the other option); the bar itself unchanged, as he asked (D-076, `85022b1`).
 - **tag:** `controls-only-while-playing`
-- **status:** logged
+- **status:** built (D-076)
 
 ### L-29
 - **words:** "when we reproduce audio, the menu right now is showing different sections in the artifact page (which is fine) or the HTML
