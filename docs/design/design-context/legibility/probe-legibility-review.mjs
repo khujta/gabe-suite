@@ -14,9 +14,19 @@
    bar go · "always" keeps it frozen with no voice, is remembered, and rides the copy text · a saved gabe:voice:v1 reaches the utterance (voice,
    rate, pitch, volume, pauses, titles) · a Piper voice falls back and says so in the hover · the bar fits at 390 px.
 
-     node docs/design/design-context/legibility/probe-legibility-review.mjs [--html <file>] [--shots <dir>] [--bar <dir>]   # browser-gated; run it ALONE
+   Round 4 (D-077): the bar's chips that hold decisions are dropdowns — a caret on the chip, the section's count of open ones on it, every
+   decision listed under its group with an icon for its state; a section with none stays a plain chip · Enter and Space open it, the arrows
+   move, Escape closes (focus back on the caret), one is open at a time, an outside click closes it · picking one scrolls its card just under
+   the bar, lights it and moves the reading there (starting it when nothing played): the first thing spoken is that decision's summary, its
+   plain line comes after it · every decision has a summary (2 to 3 sentences in the data, one more once you have picked, no id, path, symbol,
+   number or {token}) and a plain line (one sentence, at most one dash) · "next open decision" skips the decided ones · the option "after a
+   decision" (stop · next open · section) does what it says, is kept, and rides the copy text · a card has its plain line and a listen button
+   · the dropdown opens as a full-width sheet at 390 px with no sideways scroll.
+
+     node docs/design/design-context/legibility/probe-legibility-review.mjs [--html <file>] [--shots <dir>] [--bar <dir>] [--dec <dir>]   # browser-gated; run it ALONE
        --shots <dir>   also save a picture of the top of each section there, at 1920 and at 1600 px wide (for looking, never committed)
-       --bar <dir>     also save one picture at 1920 px of the frozen bar mid-page while the (mocked) reading is on it (never committed) */
+       --bar <dir>     also save one picture at 1920 px of the frozen bar mid-page while the (mocked) reading is on it (never committed)
+       --dec <dir>     also save two pictures at 1920 px: the bar with a dropdown open, and a decision card lit with its plain line (never committed) */
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -25,7 +35,7 @@ const require = createRequire(import.meta.url);
 const HERE = path.dirname(new URL(import.meta.url).pathname), REPO = path.resolve(HERE, '../../../..');
 const PW = path.join(REPO, 'docs/design/graft-adoption/spike/_build/node_modules/playwright-core'), CHROME = '/usr/bin/google-chrome-stable';
 const args = process.argv.slice(2), opt = (k) => (args.indexOf(k) >= 0 ? args[args.indexOf(k) + 1] : null);
-const SRC = path.resolve(opt('--html') || path.join(HERE, 'legibility-review.html')), SHOTS = opt('--shots'), BARSHOT = opt('--bar');
+const SRC = path.resolve(opt('--html') || path.join(HERE, 'legibility-review.html')), SHOTS = opt('--shots'), BARSHOT = opt('--bar'), DECSHOT = opt('--dec');
 if (!fs.existsSync(CHROME) || !fs.existsSync(PW)) { console.log('SKIP ⚠ — no system chrome / playwright-core on this host (RENDER COVERAGE DID NOT RUN)'); process.exit(0); }
 const { chromium } = require(PW);
 let pass = 0, fail = 0; const ok = (c, m, extra) => { if (c) { pass++; console.log('  ok   ' + m + (extra ? ' — ' + extra : '')); } else { fail++; console.log('  FAIL ' + m + (extra ? ' — ' + extra : '')); } };
@@ -117,7 +127,7 @@ try {
     const ctx = await b.newContext({ viewport: { width: 1500, height: 1000 } });
     const none = await ctx.newPage(); await none.addInitScript(() => { try { delete window.speechSynthesis; } catch (e) {} Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: undefined }); });
     await none.goto('file://' + page); await none.waitForFunction('window.__leg && window.__leg.ready', { timeout: 20000 }).catch(() => {});
-    const hid = await none.evaluate(() => ({ n: document.querySelectorAll('[data-listen]').length, shown: [...document.querySelectorAll('[data-listen], [data-listen-rate]')].filter((b) => b.getBoundingClientRect().width > 0).length }));
+    const hid = await none.evaluate(() => ({ n: document.querySelectorAll('[data-listen], [data-dec-listen]').length, shown: [...document.querySelectorAll('[data-listen], [data-listen-rate], [data-dec-listen]')].filter((b) => b.getBoundingClientRect().width > 0).length }));
     ok(hid.n > 0 && hid.shown === 0, 'where speechSynthesis is missing, every listen button and the speed control hide', `${hid.n} buttons · ${hid.shown} shown`); await none.close();
     const fake = await ctx.newPage(); await fake.addInitScript(() => { window.__said = []; window.__cancels = 0; const ss = { speak: (u) => { window.__said.push({ text: u.text, rate: u.rate }); }, cancel: () => { window.__cancels++; }, getVoices: () => [], addEventListener: () => {} }; Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: ss }); });
     await fake.goto('file://' + page); await fake.waitForFunction('window.__leg && window.__leg.ready', { timeout: 20000 }).catch(() => {});
@@ -279,6 +289,176 @@ try {
       ok(s.top === 0 && s.h <= 190 && side <= 1 && box.right <= box.vw && box.inside, 'at 390px the frozen bar sits at the top, takes under a fifth of the screen, holds its controls, and the page does not scroll sideways', `${s.h}px high · chips ${box.chipsScroll ? 'scroll inside' : 'fit'} · sideways ${side}px`);
       await PH.click('[data-act="stop"]'); });
     await PH.__ctx.close();
+
+    /* ── round 4 (L-29, D-077): the bar's menu nests by section; every decision has a spoken summary and a plain line ── */
+    const DEC = D.decide.entries, RULED = new Set(D.choices.filter((c) => c.ruled).map((c) => c.id));
+    const SAYBAD = [[/[·→/×|#{}\\“”"`<>]/, 'a symbol'], [/\b(?:L|R|D|EX|CR|N3|S4)-\d+/, 'an id'], [/\b[PGFA]\d{1,2}\b/, 'an id'], [/(^|\s)[xg]:/i, 'an id'], [/\b[\w-]+\.(?:py|mjs|js|json|md|html|tsx?|css)\b/i, 'a file'],
+      [/\bundefined\b|\bNaN\b|\{[^}]*\}|\{\{/, 'a missing value or token'], [/\b(?:he|him|his|himself)\b/i, 'he · him · his'], [/\d/, 'a number']];
+    const nSent = (s) => (s.match(/[^.!?]+[.!?]+(\s|$)/g) || []).length;
+    const decOpen = (sec) => DEC.filter((e) => e.sec === sec && !RULED.has(e.id));
+    const heard = (pg) => pg.evaluate(() => window.__ss.said.map((x) => x.text));
+    {
+      const ids = new Set(DEC.map((e) => e.id)), want = new Set(D.choices.map((c) => c.id));
+      ok(ids.size === want.size && [...want].every((x) => ids.has(x)) && DEC.length === want.size + 1 && DEC.filter((e) => e.key.endsWith(':gap')).length === 1,
+        'every choice on the page is a decision with an entry (the L-19 recommendation stands in the gap analysis too)', `${ids.size} decisions · ${DEC.length} entries`);
+      const hits = []; for (const e of DEC) { const base = e.parts.join(' '), n = nSent(base); if (n < 2 || n > 3) hits.push(e.key + ': base of ' + n + ' sentences');
+        for (const [rx, w] of SAYBAD) { const m = rx.exec(base + ' ' + e.plain); if (m) hits.push(e.key + ': ' + w + ' “' + m[0] + '”'); } }
+      ok(hits.length === 0, 'every decision has a spoken summary of 2 to 3 sentences (one more once you have picked, so 4 at most) with no id, path, symbol, number or {token}', hits.slice(0, 3).join(' | ') || DEC.length + ' summaries');
+      const bp = DEC.filter((e) => !e.plain || nSent(e.plain) !== 1 || (e.plain.match(/—/g) || []).length > 1 || /[;:]/.test(e.plain) || e.plain.split(/\s+/).length > 34 || /^[a-z]/.test(e.plain));
+      ok(bp.length === 0, 'every decision has a plain line: one sentence, at most one dash, no colon chain, short enough to say in one breath', bp.map((e) => e.key).join(',') || DEC.length + ' plain lines');
+      const dup = DEC.filter((e, i) => DEC.findIndex((x) => x.key === e.key) !== i); ok(dup.length === 0, 'no two entries share a key');
+    }
+    const P4 = await open({ ms: 60 });
+    await run('the nested menu', async () => {
+      const st = await P4.evaluate(() => { const n = document.getElementById('bar'); return { dd: [...n.querySelectorAll('.dd')].map((d) => ({ key: d.querySelector('button.car').dataset.dd, link: d.querySelector('a.tc').dataset.toc, open: d.querySelector('.oc').textContent, hasCaret: !!d.querySelector('button.car svg'),
+          items: [...d.querySelectorAll('.ddi')].map((i) => i.dataset.decItem), icons: [...d.querySelectorAll('.ddi')].map((i) => i.querySelector('.slot .mk').dataset.o), groups: [...d.querySelectorAll('.ddg')].map((g) => g.querySelector('.ddgh').textContent.trim()), hidden: d.querySelector('.ddm').hidden })),
+          plain: [...n.querySelectorAll('.tcs > a.tc')].map((a) => a.dataset.toc), all: n.querySelectorAll('a.tc').length }; });
+      const secs = st.dd.map((d) => d.key).sort().join();
+      ok(secs === 'calls,gap,pat' && st.dd.every((d) => d.hasCaret && d.hidden) && st.plain.join() === 'sec-glance,sec-rem,sec-items,sec-qs,sec-copy' && st.all === 8,
+        'the sections that hold decisions draw as a chip with a caret (closed), and the others stay plain chips', secs + ' · plain: ' + st.plain.length);
+      const bad = st.dd.filter((d) => d.items.join() !== DEC.filter((e) => e.sec === d.key).map((e) => e.key).join());
+      ok(bad.length === 0, 'each dropdown lists every one of its decisions, in the page\'s order', st.dd.map((d) => d.key + ' ' + d.items.length).join(' · '));
+      const cnt = st.dd.filter((d) => Number(d.open) !== decOpen(d.key).length);
+      ok(cnt.length === 0, 'the count of open ones on each chip is the section\'s decisions nobody has picked or ruled', st.dd.map((d) => d.key + ' ' + d.open).join(' · '));
+      const ic = st.dd.filter((d) => d.items.some((k, i) => d.icons[i] !== (RULED.has(DEC.find((e) => e.key === k).id) ? 'ruled' : 'mine')));
+      ok(ic.length === 0, 'untouched, each entry wears its state icon: the dashed mark for an open one, the ruled mark for a ruled one', ic.map((d) => d.key).join(',') || DEC.length + ' icons');
+      const ca = st.dd.find((d) => d.key === 'calls');
+      ok(ca.groups.length === 5 && /table/i.test(ca.groups[0]) && /row/i.test(ca.groups[1]) && /bench/i.test(ca.groups[2]) && /kind/i.test(ca.groups[3]) && /proposal/i.test(ca.groups[4]), 'Your calls groups its decisions as the page does: the table, each row, the bench, each kind, the proposals', ca.groups.join(' · '));
+      const pt = st.dd.find((d) => d.key === 'pat'); ok(pt.groups.length === 11, 'The patterns lists the audit and each pattern\'s draft proposals under the pattern', pt.groups.length + ' groups');
+    });
+    await run('keyboard', async () => {
+      const first = decOpen('calls')[0].key, second = decOpen('calls')[1].key, all = DEC.filter((e) => e.sec === 'calls');
+      const snap = () => P4.evaluate(() => ({ exp: document.querySelector('[data-dd="calls"]').getAttribute('aria-expanded'), hidden: document.querySelector('[data-dd-menu="calls"]').hidden, active: document.activeElement.dataset.decItem || document.activeElement.dataset.dd || null, open: window.__leg.dd().open }));
+      await P4.focus('[data-dd="calls"]'); await P4.keyboard.press('Enter'); const a = await snap();
+      ok(a.exp === 'true' && !a.hidden && a.open === 'calls' && a.active === first, 'Enter on the caret opens the menu and puts the focus on the first decision still open', a.active);
+      await P4.keyboard.press('ArrowDown'); const b2 = await snap(); await P4.keyboard.press('End'); const c2 = await snap(); await P4.keyboard.press('Home'); const d2 = await snap(); await P4.keyboard.press('ArrowUp'); const u2 = await snap();
+      ok(b2.active === second && c2.active === all[all.length - 1].key && d2.active === all[0].key && u2.active === all[all.length - 1].key, 'the arrows move through the decisions, Home and End go to the ends, and the arrows wrap', `${b2.active} · ${c2.active} · ${d2.active} · ${u2.active}`);
+      await P4.keyboard.press('Escape'); const e2 = await snap(); ok(e2.exp === 'false' && e2.hidden && e2.open === null && e2.active === 'calls', 'Escape closes it and the focus is back on the caret', JSON.stringify(e2));
+      await P4.keyboard.press('Space'); const f2 = await snap(); ok(f2.exp === 'true' && !f2.hidden, 'Space on the caret opens it too'); await P4.keyboard.press('Escape');
+      await P4.keyboard.press('ArrowDown'); const g2 = await snap(); ok(g2.exp === 'true' && g2.active === all[0].key, 'the Down arrow on the caret opens it on the first entry', g2.active); await P4.keyboard.press('Escape');
+      await P4.click('[data-dd="calls"]'); await P4.click('[data-dd="pat"]'); const h = await P4.evaluate(() => ({ open: window.__leg.dd().open, calls: document.querySelector('[data-dd-menu="calls"]').hidden, pat: document.querySelector('[data-dd-menu="pat"]').hidden }));
+      ok(h.open === 'pat' && h.calls && !h.pat, 'only one dropdown is open at a time', JSON.stringify(h));
+      await P4.click('#title'); const o = await P4.evaluate(() => ({ open: window.__leg.dd().open, pat: document.querySelector('[data-dd-menu="pat"]').hidden }));
+      ok(o.open === null && o.pat, 'a click outside closes it', JSON.stringify(o));
+    });
+    await run('a pick', async () => {
+      const e = DEC.find((x) => x.key === 'mo.hdr'); await scrollInto(P4, IDS[4], 300); await P4.waitForTimeout(100);
+      const idle = await barOf(P4); ok(!idle.reading.on, 'before the pick nothing is playing');
+      await P4.click('[data-dd="calls"]'); await P4.click('[data-dec-item="mo.hdr"]'); await P4.waitForTimeout(150);
+      const s = await barOf(P4), card = await P4.evaluate(() => { const c = document.querySelector('[data-dec-card="mo.hdr"]'), r = c.getBoundingClientRect(); return { top: Math.round(r.top), hot: c.dataset.hot, hots: document.querySelectorAll('[data-dec-card][data-hot="true"]').length, menuHidden: document.querySelector('[data-dd-menu="calls"]').hidden, litItem: document.querySelector('[data-dec-item="mo.hdr"]').getAttribute('aria-current') }; });
+      ok(near(card.top, s) && card.hot === 'true' && card.hots === 1, 'picking a decision scrolls the page to its card just under the bar and lights that one card', `card top ${card.top} · bar bottom ${s.bottom} · lit ${card.hots}`);
+      ok(s.reading.on && s.reading.dec === 'mo.hdr' && s.lit === 3 && card.menuHidden && card.litItem === 'true', 'with nothing playing the pick starts the reading at that decision: the menu closes, its section\'s chip and its entry are lit', `dec ${s.reading.dec} · chip ${s.lit}`);
+      await waitFor(P4, () => window.__ss.said.length >= 4); const said = await heard(P4);
+      ok(said[0] === e.parts[0] && said[1] === e.parts[1] && said[2] === e.parts[2], 'the first thing spoken is the decision\'s own summary, sentence by sentence', said[0].slice(0, 60));
+      ok(said[3] === e.plain, 'its plain line is read right after the summary', said[3].slice(0, 60));
+      await waitFor(P4, () => !window.__leg.reading().on); const end = await P4.evaluate(() => ({ on: window.__leg.reading().on, said: window.__ss.said.length, hot: document.querySelector('[data-dec-card="mo.hdr"]').dataset.hot, reading: document.querySelector('[data-dec-card="mo.hdr"]').dataset.reading }));
+      ok(!end.on && end.said === 4 && end.hot === 'true' && end.reading === 'false', 'by default the reading stops after the decision (my pick, dashed); the card stays lit where you are', `${end.said} sentences`);
+    });
+    await run('the card', async () => {
+      const e = DEC.find((x) => x.key === 'mo.fit'), c = await P4.evaluate(() => { const k = document.querySelector('[data-dec-card="mo.fit"]'); const pl = k.querySelector('.plainline'); return { plain: pl && pl.querySelector('.pl-text').textContent, lab: pl && pl.querySelector('.lab').textContent, listen: !!k.querySelector('[data-dec-listen="mo.fit"]'), shown: k.querySelector('[data-dec-listen]').getBoundingClientRect().width > 0, fold: k.querySelector('details.spk summary').textContent, text: k.querySelector('[data-dec-text]').textContent, n: document.querySelectorAll('[data-dec-card]').length, pls: document.querySelectorAll('.plainline').length }; });
+      ok(c.plain === e.plain && c.lab === D.ui.decide.menu.plainHead && c.listen && c.shown, 'a decision card shows its plain line under "in plain words" and a listen button', c.lab);
+      ok(c.n === DEC.length && c.pls === DEC.length, 'every decision card, the gap analysis\'s too, has its plain line', c.n + ' cards · ' + c.pls + ' lines');
+      ok(c.text === e.parts.concat(e.plain).join(' ') && c.fold === D.ui.decide.menu.fold, 'what is read aloud is shown on the card, folded: the summary and then the plain line', c.text.slice(0, 50));
+      await scrollInto(P4, 'call-mo.fit', -40); await P4.waitForTimeout(80); const y0 = await P4.evaluate(() => window.scrollY); await P4.evaluate(() => { window.__ss.said.length = 0; });
+      await P4.click('[data-dec-listen="mo.fit"]'); await P4.waitForTimeout(250); const y1 = await P4.evaluate(() => window.scrollY), sd = await heard(P4), rd = await P4.evaluate(() => ({ r: window.__leg.reading(), pressed: document.querySelector('[data-dec-listen="mo.fit"]').getAttribute('aria-pressed'), label: document.querySelector('[data-dec-listen="mo.fit"]').textContent.trim() }));
+      ok(rd.r.dec === 'mo.fit' && sd[0] === e.parts[0] && rd.pressed === 'true' && rd.label === D.ui.say.stop && Math.abs(y1 - y0) <= 2, 'the card\'s listen button reads its summary from the first sentence, turns to stop, and moves nothing on the page', `${rd.label} · scroll ${y0} → ${y1}`);
+      await P4.click('[data-dec-listen="mo.fit"]'); await P4.waitForTimeout(100); const off = await P4.evaluate(() => ({ on: window.__leg.reading().on, label: document.querySelector('[data-dec-listen="mo.fit"]').textContent.trim() }));
+      ok(!off.on && off.label === D.ui.decide.menu.listen, 'a second click stops it and the button is listen again', off.label);
+    });
+    await run('your pick joins the summary', async () => {
+      const e = DEC.find((x) => x.key === 'mo.ipo'); await P4.click('[data-choice="mo.ipo"][data-v="sent"]'); await P4.evaluate(() => { window.__ss.said.length = 0; });
+      const txt = await P4.$eval('[data-dec-text="mo.ipo"]', (n) => n.textContent), want = e.parts.concat([D.ui.decide.run.yours.replace('{{name}}', e.opts.sent), e.plain]);
+      ok(txt === want.join(' ') && nSent(want.slice(0, 4).join(' ')) === 4, 'once you have picked, the summary adds one sentence about your pick (4 in all) before the plain line', want[3]);
+      await P4.click('[data-dd="calls"]'); await P4.click('[data-dec-item="mo.ipo"]'); await waitFor(P4, () => window.__ss.said.length >= 5); const sd = await heard(P4);
+      ok(JSON.stringify(sd.slice(0, 5)) === JSON.stringify(want), 'and that sentence is read after the base summary and before the plain line', sd[3]);
+      await P4.click('[data-choice="mo.hdr"][data-v="band"]'); const k = await P4.$eval('[data-dec-text="mo.hdr"]', (n) => n.textContent); ok(k.includes(D.ui.decide.run.kept.replace('{{name}}', DEC.find((x) => x.key === 'mo.hdr').opts.band)), 'picking my own pick is said as keeping it', k.slice(-90, -40));
+      const ic = await P4.evaluate(() => ({ yours: document.querySelector('[data-dec-item="mo.ipo"] .slot .mk').dataset.o, kept: document.querySelector('[data-dec-item="mo.hdr"] .slot .mk').dataset.o, open: document.querySelector('[data-dd="calls"]').closest('.dd').querySelector('.oc').textContent }));
+      ok(ic.yours === 'yours' && ic.kept === 'check' && Number(ic.open) === decOpen('calls').length - 2, 'a decided entry changes its icon (yours, or kept my pick) and the chip\'s count of open ones goes down', JSON.stringify(ic));
+      await P4.click('#reset'); await P4.waitForTimeout(80); await P4.click('[data-act="stop"]').catch(() => {});
+    });
+    ok(P4.__errs.length === 0, 'the menu runs with no page error', P4.__errs.slice(0, 2).join(' | ')); await P4.__ctx.close();
+
+    /* a pick while a section is being read moves the reading to the decision */
+    const P5 = await open({ ms: 600 });
+    await run('a pick during a reading', async () => { await scrollInto(P5, IDS[4], 120); await P5.click('[data-say="items"] [data-listen]'); await P5.waitForTimeout(200); const was = await barOf(P5);
+      await P5.click('[data-dd="calls"]'); await P5.click('[data-dec-item="mo.fit"]'); await P5.waitForTimeout(250); const s = await barOf(P5), sd = await heard(P5), e = DEC.find((x) => x.key === 'mo.fit');
+      ok(was.reading.on && was.hot.join() === 'items' && s.reading.dec === 'mo.fit' && s.reading.on && s.hot.length === 0 && sd[sd.length - 1] === e.parts[0], 'a pick while a section is read moves the reading to that decision: the summary stops being lit and the decision\'s first sentence is next', `${was.hot.join()} → ${s.reading.dec}`);
+      /* previous and next keep moving by section: next goes to the section after the decision's, previous to the start of the decision's own section */
+      await P5.click('[data-act="next"]'); await P5.waitForTimeout(250); const n1 = await barOf(P5), tn = await secTop(P5, IDS[4]);
+      ok(n1.reading.dec === null && n1.reading.i === 4 && n1.hot.join() === 'items' && near(tn, n1), 'next, from inside a decision, moves to the next section\'s summary and scrolls the page there', `index ${n1.reading.i} · section top ${tn}`);
+      await P5.click('[data-dd="calls"]'); await P5.click('[data-dec-item="mo.fit"]'); await P5.waitForTimeout(200); await P5.click('[data-act="prev"]'); await P5.waitForTimeout(250); const n2 = await barOf(P5), tp = await secTop(P5, IDS[3]);
+      ok(n2.reading.dec === null && n2.reading.i === 3 && n2.hot.join() === 'calls' && near(tp, n2), 'previous, from inside a decision, goes back to the start of its own section', `index ${n2.reading.i} · section top ${tp}`);
+      await P5.click('[data-act="stop"]'); });
+    await P5.__ctx.close();
+
+    /* next open decision, and the option after a decision */
+    const P6 = await open({ ms: 30 });
+    await run('next open decision', async () => {
+      const pat = DEC.filter((e) => e.sec === 'pat'), ix = (k) => pat.findIndex((e) => e.key === k), i41 = ix('P4.1');
+      ok(pat[i41 + 1].key === 'P4.2', 'the next entry after the first proposal of the first pattern is its second (the test relies on it)');
+      await P6.click('[data-choice="P4.2"][data-v="land"]');   /* decide P4.2: I picked land it, so this keeps my pick */
+      await P6.click('[data-dd="pat"]'); await P6.click('[data-dec-item="P4.1"]'); await waitFor(P6, () => !window.__leg.reading().on); await P6.waitForTimeout(100);
+      await P6.click('[data-act="nextopen"]'); await P6.waitForTimeout(200); const a = await barOf(P6);
+      ok(a.reading.on && a.reading.dec === pat[i41 + 2].key, '"next open decision" skips the decided ones: after the first proposal it goes past the one you decided', `${a.reading.dec} (skipped P4.2)`);
+      const sd = await heard(P6); ok(!sd.includes(pat[i41 + 1].parts[0]), 'the decided one is not read');
+      await P6.click('[data-act="stop"]');
+      const dis = await P6.evaluate(() => ({ lab: document.querySelector('[data-act="nextopen"]').getAttribute('aria-label'), disabled: document.querySelector('[data-act="nextopen"]').disabled })); ok(dis.lab === D.ui.player.nextOpen && !dis.disabled, 'the bar has the "next open decision" button', dis.lab);
+    });
+    await run('after a decision', async () => {
+      const pat = DEC.filter((e) => e.sec === 'pat'), cal = DEC.filter((e) => e.sec === 'calls'), P41 = pat.findIndex((e) => e.key === 'P4.1');
+      await P6.evaluate(() => { window.__ss.ms = 30; });
+      /* stop (the default): the reading ends after the decision */
+      await P6.evaluate(() => { window.__ss.said.length = 0; }); await P6.click('[data-dd="pat"]'); await P6.click('[data-dec-item="P4.1"]'); await waitFor(P6, () => !window.__leg.reading().on); const n1 = await P6.evaluate(() => window.__ss.said.length);
+      ok(n1 === 4, 'after a decision: stop there (the default) reads the summary and the plain line and ends', n1 + ' sentences');
+      /* next open: the decided one (P4.2) is skipped, the reading goes on by itself */
+      await P6.click('[data-pref="after"][data-v="next"]'); await P6.evaluate(() => { window.__ss.said.length = 0; });
+      await P6.click('[data-dd="pat"]'); await P6.click('[data-dec-item="P4.1"]'); const ok2 = await waitFor(P6, (k) => window.__leg.reading().dec === k, pat[P41 + 2].key); await waitFor(P6, (x) => window.__ss.said.some((s) => s.text === x), pat[P41 + 2].parts[0]); const sd2 = await heard(P6);   /* the section pause comes first */
+      ok(ok2 && !sd2.includes(pat[P41 + 1].parts[0]) && sd2.includes(pat[P41 + 2].parts[0]), 'after a decision: go on to the next open decision reads on by itself and skips the one you decided', pat[P41 + 2].key);
+      await P6.click('[data-act="stop"]');
+      /* section: the next decision in the section, decided or not */
+      await P6.click('[data-pref="after"][data-v="section"]'); await P6.evaluate(() => { window.__ss.said.length = 0; });
+      await P6.click('[data-dd="pat"]'); await P6.click('[data-dec-item="P4.1"]'); const ok3 = await waitFor(P6, (k) => window.__leg.reading().dec === k, pat[P41 + 1].key); await waitFor(P6, (x) => window.__ss.said.some((s) => s.text === x), pat[P41 + 1].parts[0]); const sd3 = await heard(P6);
+      ok(ok3 && sd3.includes(pat[P41 + 1].parts[0]), 'after a decision: go on with the section reads the next decision of that section, decided or not', pat[P41 + 1].key);
+      await P6.click('[data-act="stop"]');
+      /* and when the section\'s decisions run out, the run of summaries goes on from the next section */
+      await P6.evaluate(() => { window.__ss.said.length = 0; }); const last = cal[cal.length - 1];
+      await P6.click('[data-dd="calls"]'); await P6.click('[data-dec-item="' + last.key + '"]'); const ok4 = await waitFor(P6, () => window.__leg.reading().dec === null && window.__leg.reading().on && window.__leg.reading().key === 'items');
+      ok(ok4, 'after the last decision of a section, the section option goes on with the next section\'s summary', last.key + ' → items'); await P6.click('[data-act="stop"]');
+      /* the option is kept in the browser and rides the copy text */
+      const lines = (await P6.$eval('#out', (x) => x.value)).split('\n'), la = lines.find((l) => l.startsWith('pl.after: ')), stored = await P6.evaluate((k) => { try { return JSON.parse(localStorage.getItem(k)).p; } catch (e) { return null; } }, 'gabe:legibility:r1');
+      ok(la === 'pl.after: ' + D.ui.player.optAfterSection + ' (yours, I picked ' + D.ui.player.optAfterStop + ')' && stored && stored.after === 'section', 'the option is kept in the browser and rides the copy text, with my pick named', la);
+      await P6.reload(); await P6.waitForFunction('window.__leg && window.__leg.ready', { timeout: 20000 }).catch(() => {}); const pr = await P6.$eval('[data-pref="after"][data-v="section"]', (x) => x.getAttribute('aria-pressed'));
+      ok(pr === 'true', 'and it is still there after a reload');
+      await P6.click('#reset'); await P6.waitForTimeout(80); const l2 = (await P6.$eval('#out', (x) => x.value)).split('\n').find((l) => l.startsWith('pl.after: ')), dash = await P6.$eval('[data-pref="after"][data-v="stop"]', (x) => x.dataset.mine);
+      ok(l2 === 'pl.after: ' + D.ui.player.optAfterStop + ' (my pick, not ruled)' && dash === 'true', 'clearing gives it back: stop there, my pick, dashed', l2);
+    });
+    ok(P6.__errs.length === 0, 'next open and after run with no page error', P6.__errs.slice(0, 2).join(' | ')); await P6.__ctx.close();
+
+    /* the dropdown at 390 px: a full-width sheet under the bar, no sideways scroll; and the 12px floor with it open */
+    const P7 = await open({ ms: 500 }, 390);
+    await run('the dropdown on a phone', async () => { await scrollInto(P7, IDS[4], 200); await P7.waitForTimeout(100); await P7.click('[data-dd="calls"]'); await P7.waitForTimeout(150);
+      const m = await P7.evaluate(() => { const mn = document.querySelector('[data-dd-menu="calls"]'), r = mn.getBoundingClientRect(), bar = document.getElementById('bar').getBoundingClientRect(), small = [];
+        const w = document.createTreeWalker(mn, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (!n.nodeValue.trim()) continue; const f = parseFloat(getComputedStyle(n.parentElement).fontSize); if (f < 12) small.push(f + 'px ' + n.nodeValue.trim().slice(0, 20)); }
+        const act = document.activeElement; return { left: Math.round(r.left), right: Math.round(r.right), top: Math.round(r.top), bottom: Math.round(r.bottom), barBottom: Math.round(bar.bottom), vw: window.innerWidth, vh: window.innerHeight, sheet: mn.dataset.sheet, side: document.documentElement.scrollWidth - window.innerWidth, small, items: mn.querySelectorAll('.ddi').length, scrolls: mn.scrollHeight > mn.clientHeight, overItem: [...mn.querySelectorAll('.ddi')].filter((i) => i.scrollWidth > i.clientWidth + 1).length }; });
+      ok(m.sheet === 'true' && m.left === 0 && m.right === m.vw && m.top >= m.barBottom - 1 && m.bottom <= m.vh + 1 && m.side <= 1 && m.overItem === 0, 'at 390px the dropdown opens as a full-width sheet under the bar, inside the screen, with no sideways scroll', `left ${m.left} · right ${m.right}/${m.vw} · top ${m.top} (bar ${m.barBottom}) · bottom ${m.bottom}/${m.vh} · sideways ${m.side}px`);
+      ok(m.small.length === 0 && m.items > 20 && m.scrolls, 'its entries keep the 12px floor and the list scrolls inside the sheet', `${m.items} entries · ${m.small.slice(0, 2).join(' | ')}`);
+      await P7.click('[data-dec-item="mo.hdr"]'); await P7.waitForTimeout(250); const s = await barOf(P7), side = await P7.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      ok(s.reading.dec === 'mo.hdr' && near(await P7.evaluate(() => Math.round(document.querySelector('[data-dec-card="mo.hdr"]').getBoundingClientRect().top)), s) && side <= 1, 'a pick in the sheet closes it, lights the card under the bar and starts the reading', `dec ${s.reading.dec} · sideways ${side}px`);
+      await P7.click('[data-act="stop"]'); });
+    await P7.__ctx.close();
+    { const ctx = await b.newContext({ viewport: { width: 1500, height: 1000 } }), pg = await ctx.newPage(), er = []; pg.on('pageerror', (e) => er.push(e.message));
+      await pg.addInitScript(() => { try { delete window.speechSynthesis; } catch (e) {} Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: undefined }); });
+      await pg.goto('file://' + page); await pg.waitForFunction('window.__leg && window.__leg.ready', { timeout: 20000 }).catch(() => {});
+      await run('no speech', async () => { await pg.click('[data-dd="calls"]'); await pg.click('[data-dec-item="mo.hdr"]'); await pg.waitForTimeout(150);
+        const r = await pg.evaluate(() => { const c = document.querySelector('[data-dec-card="mo.hdr"]'), bar = document.getElementById('bar').getBoundingClientRect(); return { hot: c.dataset.hot, top: Math.round(c.getBoundingClientRect().top), barBottom: Math.round(bar.bottom), hidden: document.querySelector('[data-dd-menu="calls"]').hidden, nextOpen: !!document.querySelector('[data-act="nextopen"]') }; });
+        ok(r.hot === 'true' && near(r.top, { bottom: r.barBottom }) && r.hidden && er.length === 0, 'where the browser cannot speak the menu still works: a pick scrolls to the card and lights it', `card top ${r.top} · bar ${r.barBottom} · errors ${er.length}`); });
+      await ctx.close(); }
+    { const hasKept = await p.evaluate(() => [...document.querySelectorAll('#legend .lg')].some((x) => x.textContent.trim() === window.LEG_DATA.ui.mark.kept));
+      ok(hasKept, 'the legend says the mark for "decided by you, my pick kept" once', D.ui.mark.kept); }
+    if (DECSHOT) { fs.mkdirSync(DECSHOT, { recursive: true }); const PD = await open({ ms: 600000 }, 1920); await PD.setViewportSize({ width: 1920, height: 1000 });
+      await scrollInto(PD, IDS[3], 400); await PD.click('[data-choice="mo.ipo"][data-v="sent"]'); await PD.click('[data-choice="mo.hdr"][data-v="band"]'); await scrollInto(PD, IDS[3], 400); await PD.waitForTimeout(100);
+      await PD.click('[data-dd="calls"]'); await PD.waitForTimeout(150); await PD.screenshot({ path: path.join(DECSHOT, 'dropdown-open-1920.png') });
+      await PD.click('[data-dec-item="mo.gdl"]'); await PD.waitForTimeout(400); await PD.screenshot({ path: path.join(DECSHOT, 'decision-card-1920.png') }); console.log('  the dropdown and a lit decision card at 1920 px in ' + DECSHOT); await PD.__ctx.close(); }
     if (BARSHOT) { const PB = await open({ ms: 600000 }, 1920); await PB.setViewportSize({ width: 1920, height: 1000 }); await scrollInto(PB, IDS[4], 40); await PB.click('[data-say="items"] [data-listen]'); await PB.waitForTimeout(300);
       fs.mkdirSync(BARSHOT, { recursive: true }); await PB.screenshot({ path: path.join(BARSHOT, 'frozen-bar-1920.png') }); console.log('  the frozen bar at 1920 px in ' + BARSHOT); await PB.__ctx.close(); } }
   if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true });

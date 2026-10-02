@@ -434,7 +434,14 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
   land-it choices, the L-19 recommendation)
 - **could not tell:** what a decision is about by ear — the bar reached sections only, and a decision had no summary of its own and no
   plain line saying what it means.
-- **fix:** the bar's menu nests: each section a dropdown of its decision points; each decision gets a short spoken summary and one plain
-  line (gabe-lens plain); picking one moves the page and the reading there.
+- **fix:** built: the bar's section chips that hold decisions are dropdowns (a caret on the chip, the section's count of open
+  ones on it), each listing its decision points indented under their group: the looks to pick (the table, each row, the bench and its
+  kinds), the proposals, each pattern's draft suite proposals and the L-19 recommendation, every entry with an icon for its state
+  (open, decided by you, ruled, my pick kept); a section with none stays a plain chip. Each decision has a spoken summary of two to
+  four sentences, generated from the page's data (what it decides and its options, what choosing sets in motion, my pick or your
+  earlier ruling, your pick once you have made one), and one plain line in the gabe-lens plain voice on its card, read right after the
+  summary. Picking one scrolls the page to its card just under the bar, highlights it and moves the reading there (starting it if no
+  voice played); each card has a listen button. My proposals, drawn dashed: the option "after a decision" (stop there, go on to the
+  next open decision, go on with the section) and a "next open decision" button in the bar.
 - **tag:** `decision-without-its-own-summary`
-- **status:** logged
+- **status:** built (D-077)

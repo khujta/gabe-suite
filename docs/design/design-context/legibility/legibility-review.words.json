@@ -367,7 +367,8 @@
       "L-25": "icons in place of words",
       "L-26": "a summary to copy for reading aloud",
       "L-27": "a player bar that stays in view",
-      "L-28": "the player bar all the time"
+      "L-28": "the player bar all the time",
+      "L-29": "a nested menu with a summary per decision"
     },
     "round2Head": "Raised on reading this page",
     "round2Note": "You raised these after you read this page, so the review has not read them yet. They are built on this page itself: the page you are reading is their picture.",
@@ -753,7 +754,8 @@
     "page": "about the page",
     "map": "about the map",
     "countOf": "{{n}} {{word}}",
-    "notyet": "my pick: not yet"
+    "notyet": "my pick: not yet",
+    "kept": "yours, my pick kept"
   },
   "say": {
     "head": "To read aloud",
@@ -765,7 +767,7 @@
     "copyAll": "copy every summary",
     "listenAll": "listen to every summary",
     "tip": "my proposal: your browser reads this aloud in its own voice",
-    "mineNote": "Each section opens with a summary written to be read aloud, from the numbers on this page. Copy one with its button, or every summary at once. The dashed buttons are my proposal, not something you asked for: they read a summary aloud with your browser's own voice, free, with nothing sent anywhere. While a voice plays, the contents bar freezes at the top and carries the player, as you asked: stop it, skip to another section, and the page goes there too. The speed you pick and the options beside it are kept in this browser. When you have saved a voice in the voice lab, this page reads with it.",
+    "mineNote": "Each section opens with a summary written to be read aloud, from the numbers on this page. Copy one with its button, or every summary at once. The dashed buttons are my proposal, not something you asked for: they read a summary aloud with your browser's own voice, free, with nothing sent anywhere. While a voice plays, the contents bar freezes at the top and carries the player, as you asked: stop it, skip to another section, and the page goes there too. The speed you pick and the options beside it are kept in this browser. When you have saved a voice in the voice lab, this page reads with it. The section chips with a caret open a menu of that section's decisions: pick one and the page and the reading go to it, with a short summary and a plain line, and the option after a decision says what happens next.",
     "rateLabel": "reading speed",
     "rateTip": "slower, normal or faster, around the speed of the voice you saved in the voice lab",
     "rates": [
@@ -800,7 +802,16 @@
     "optFollowTip": "When the reading moves on to the next section by itself, the page scrolls to that section. A skip always scrolls.",
     "ruledBy": "D-076",
     "lineBar": "pl.bar",
-    "lineFollow": "pl.follow"
+    "lineFollow": "pl.follow",
+    "optAfter": "after a decision",
+    "optAfterStop": "stop there",
+    "optAfterNext": "go on to the next open decision",
+    "optAfterSection": "go on with the section",
+    "optAfterTip": "When a decision has been read: stop there, go on to the next decision still open, or go on with its section: the next decision in the same section, then the next section.",
+    "lineAfter": "pl.after",
+    "nextOpen": "next open decision",
+    "nextOpenShort": "next open",
+    "nextOpenTip": "Jumps to the next decision nobody has picked, skipping the ones you have decided or ruled, and reads it."
   },
   "ov": {
     "items": {
@@ -911,5 +922,232 @@
       "Press copy and paste the text back to me.",
       "A line that says my pick is never a ruling."
     ]
+  },
+  "decide": {
+    "_about": "The nested menu and the decisions it lists (L-29, D-077). Every decision on the page (a look to pick, a proposal, a draft suite proposal, the audit) gets a SPOKEN SUMMARY generated from the page's data by gen-legibility-review.mjs out of the sentence templates in s (what it decides and its options, what choosing sets in motion, my pick, or your earlier ruling), and one PLAIN LINE authored here, keyed by the decision's id, in the voice of the gabe-lens plain mode: one sentence, a concrete noun first, at most one dash, from your side of the screen, no id, path, code or number. A decision with no plain line stops the build, and so does a line that is two sentences. name is the short name a proposal wears in the menu (a look wears its own label); say holds the few words the data cannot give in plain speech (an option or a motion that holds an id or a quote, and what landing a suite proposal does). When you have picked, the page adds one sentence to the base summary (run); the base is at most three sentences so the whole stays within four.",
+    "menu": {
+      "caret": "the decisions in {{title}}",
+      "head": "{{title}}: {{n}} decisions, {{open}} still open",
+      "openCount": "{{n}} still open",
+      "state": {
+        "open": "open: my pick stands, not a ruling",
+        "yours": "decided by you",
+        "ruled": "ruled by you",
+        "kept": "decided by you: my pick kept"
+      },
+      "plainHead": "in plain words",
+      "listen": "listen",
+      "listenTip": "Reads this decision's summary and then its plain line, in your voice.",
+      "fold": "what is read aloud",
+      "copy": "copy to read aloud"
+    },
+    "run": {
+      "yours": "You picked {{name}}.",
+      "kept": "You kept my pick, {{name}}.",
+      "changedRuled": "You changed your ruling to {{name}}."
+    },
+    "s": {
+      "table": "For {name}, in the BY MOMENT table, you choose between {opts}.",
+      "row": "For {name}, in the options of {rows}, you choose between {opts}.",
+      "bench": "For {name}, on the bench, you choose between {opts}.",
+      "kind": "For the {name} column on the bench, you choose between {opts}.",
+      "proposal": "On the question of {name}, you choose between {opts}.",
+      "suite": "{name}: a {kind} for the suite, from the pattern called {pattern}.",
+      "audit": "{name}: the one script the check proposals share.",
+      "decides": "This decides {rest}",
+      "pickMine": "My pick is {pick}, and it is not a ruling.",
+      "pickRuled": "You already ruled it, as {pick}.",
+      "pickSuite": "My pick is {pick}; nothing lands in the suite until you say land it."
+    },
+    "kindWord": {
+      "check": "check",
+      "words": "rule in words",
+      "reference": "written reference",
+      "method": "method step"
+    },
+    "name": {
+      "F24": "the pinned row's screen column",
+      "L-19": "where the security facts go",
+      "R-11": "opening the table fitted",
+      "EX-5": "the bench's looks in the table's chips",
+      "P1.1": "repeated and nested hovers",
+      "P1.2": "a hover opens with the item",
+      "P2.1": "words about the page",
+      "P2.2": "show the code, not the map",
+      "P3.1": "bare items without an icon",
+      "P3.2": "a page mark for every kind",
+      "P4.1": "both ends of a link",
+      "P4.2": "a role names its object",
+      "P5.1": "broken words and cut text",
+      "P5.2": "a mark carries its key",
+      "P6.1": "one word per idea",
+      "P6.2": "one term, also in the words",
+      "P7.1": "raw code words on a face",
+      "P7.2": "meaning first, code last",
+      "P8.1": "a label held to its rule",
+      "P8.2": "the state words",
+      "P9.1": "a bench step first",
+      "P10.1": "every rule gets a check",
+      "P10.2": "a rule names its check",
+      "A1": "the legibility audit"
+    },
+    "say": {
+      "F24": {
+        "opts": {
+          "sends": "rename it to sends it",
+          "keep": "keep the word screen"
+        }
+      },
+      "L-19": {
+        "opts": {
+          "G1": "a security control over the rows and no ninth row",
+          "G2": "a ninth row of its own for security",
+          "G3": "nothing new and everything in the gates"
+        },
+        "motion": "The choice decides where the security facts live, and whether anything new is built."
+      },
+      "mo.hdr": {
+        "motion": "Both headers show the same stages, and only the row of roads differs.",
+        "opts": {
+          "road": "stages with the roads and the moments"
+        }
+      },
+      "mo.gdl": {
+        "motion": "This sets the shape of every gate in the Gates and decisions row.",
+        "opts": {
+          "head": "the function with its gates under it",
+          "cols": "a row of parts side by side"
+        }
+      },
+      "mo.gic": {
+        "motion": "This sets the icon every gate wears in BY MOMENT."
+      },
+      "mo.grl": {
+        "motion": "This sets the label at a gate's end, the question you asked about roles for gates."
+      },
+      "mo.dxc": {
+        "motion": "This sets the read and write colours in Data effects and its map."
+      },
+      "P1.1": {
+        "does": "Landing it adds counts to the audit for hovers inside a hover, for a line many hovers repeat, and for twins in one cell."
+      },
+      "P1.2": {
+        "does": "Landing it writes one rule into the plain mode of the lens and one into the artifact rules."
+      },
+      "P2.1": {
+        "does": "Landing it adds a count of hovers about the page to the audit, and a stop list to each page generator's word check."
+      },
+      "P2.2": {
+        "does": "Landing it writes one rule into the artifact rules, and later into the execution contract."
+      },
+      "P3.1": {
+        "does": "Landing it adds a count of bare items to the audit, with a case that fires and a case that stays silent."
+      },
+      "P3.2": {
+        "does": "Landing it writes one rule into the artifact rules."
+      },
+      "P4.1": {
+        "does": "Landing it adds a check to the build of each page generator, next to its word check."
+      },
+      "P4.2": {
+        "does": "Landing it writes one rule into the plain mode of the lens."
+      },
+      "P5.1": {
+        "does": "Landing it adds these checks to the artifact render gate, which runs before a publish, with a case for each."
+      },
+      "P5.2": {
+        "does": "Landing it writes one rule into the artifact rules."
+      },
+      "P6.1": {
+        "does": "Landing it adds a count to the audit that reads a page's words for one word on several ideas, or several words on one."
+      },
+      "P6.2": {
+        "does": "Landing it adds one line to the register and one to the docs standard."
+      },
+      "P7.1": {
+        "does": "Landing it adds a count of raw code words on faces and hovers to the audit."
+      },
+      "P7.2": {
+        "does": "Landing it writes one rule into the plain mode of the lens."
+      },
+      "P8.1": {
+        "does": "Landing it adds a check to the build of each page generator, so a label is held to the rule that computes it."
+      },
+      "P8.2": {
+        "does": "Landing it adds one clause to the execution contract, which reaches every skill at once."
+      },
+      "P9.1": {
+        "does": "Landing it adds a bench step to the spike of the mockup skill, and the method note says it too."
+      },
+      "P10.1": {
+        "does": "Landing it adds checks to the build and the probe of each generator, and to the audit."
+      },
+      "P10.2": {
+        "does": "Landing it adds one clause to the execution contract."
+      },
+      "A1": {
+        "does": "Landing it moves the audit script into the artifact skill, adds a battery that proves each count can fire and stay silent, and makes the suite doctor run longer."
+      },
+      "mo.gef": {
+        "opts": {
+          "end": "the ending colour with the stage lit"
+        }
+      }
+    },
+    "plain": {
+      "mo.leg": "The key to a row's marks — it opens when you point at the row's name, or stands in a strip above the table.",
+      "mo.ipo": "The small box that opens when you point at an item — it lists what comes before, what it checks and what it gives, or says it all in one line.",
+      "mo.hdr": "The strip of stage names above the table — with or without a line saying whether the moments below come one after another or are ways a request can go.",
+      "mo.save": "The moment the handler saves its work — it stands among what the handler leaves behind, or beside the handler's own code.",
+      "mo.meta": "The facts about the endpoint itself — they sit under the table or above it.",
+      "mo.wid": "What a click on a column's heading does — it widens the column until no name breaks, or until every item sits on one line.",
+      "mo.fit": "The fit button that squeezes a wide table into its box — it can shrink the thin columns to a strip, or wrap the table into bands.",
+      "mo.stk": "The headings above the table when you scroll down — they can follow you down the screen or stay at the top.",
+      "mo.gdl": "The shape of a gate — one chip each, a function with its gates listed under it, or a row of side-by-side parts.",
+      "mo.gef": "The colour on the end of a gate — the colour of the answer it gives, or the colour of the stage it leaves from.",
+      "mo.gic": "The little picture on each gate — one for every kind of gate, the same one for all, or none.",
+      "mo.grl": "The short label at a gate's end — it says where the gate decides, what it does or what it guards, or nothing at all.",
+      "mo.fnm": "The marks on a function's chip — they show the answers it decides and the tables it touches, or only its name and role.",
+      "mo.std": "The row that shows what every endpoint has and what only this one has — it can split into the gates, merge into them, or stay a row.",
+      "mo.dfx": "How the data row shows which function touches which table — as chips, as a small map in each moment, or as one map for the endpoint.",
+      "mo.dxc": "The colours for reading and writing data — the page's own, or the ones you named, with red for a write.",
+      "mo.jyb": "Where a test's earlier requests stand in the proof row — as a moment of their own, or up in the row's heading.",
+      "mo.ifl": "How a value that lives while the request runs is drawn — as a chip where it is set, as a lifeline across the moments, or as echoes where it is read.",
+      "ex.lay": "How the bench's columns sit on the page — in one row across, wrapped, or in an upper and a lower row.",
+      "ex.follow": "Whether the bench follows your clicks elsewhere on the page — it shows the element you click, or keeps the one you picked.",
+      "ex.scope": "Which elements the bench offers when it opens — the ones on this endpoint, or the ones on every endpoint.",
+      "ex.kind.end": "The ending column on the bench, one way a request ends — keep it as drawn, or change how it looks.",
+      "ex.kind.table": "The table column on the bench, a database table with its fields — keep it as drawn, or change how it looks.",
+      "ex.kind.schema": "The schema column on the bench, the shape a request or a reply must have — keep it as drawn, or change how it looks.",
+      "ex.kind.fn": "The function column on the bench, the handler or a function it calls — keep it as drawn, or change how it looks.",
+      "ex.kind.test": "The test column on the bench, a test that sends this request — keep it as drawn, or change how it looks.",
+      "ex.kind.gate": "The gate column on the bench, a place that checks something and decides what happens next — keep it as drawn, or change how it looks.",
+      "ex.kind.hook": "The client hook column on the bench, the piece of the web app that calls this endpoint — keep it as drawn, or change how it looks.",
+      "ex.kind.inf": "The in-flight value column on the bench, a value that is alive while the request runs — keep it as drawn, or change how it looks.",
+      "F24": "The name over the pinned row's column — it counts the hook that sends the request, so you can rename it to say so or keep your own word.",
+      "L-19": "Where the security facts live — in a control that lights them across the rows, in a row of their own, or folded into the gates.",
+      "R-11": "How a wide table opens — already fitted to its box, or full width with a sideways scroll.",
+      "EX-5": "Whether the bench's looks become the look of the chips in the table — built now, or only once you rule a look on the bench.",
+      "P1.1": "A count that tells you where hovers pile up or say the same thing twice — it reports and stops nothing.",
+      "P1.2": "A writing rule for hovers — start with what makes this item itself, and say what its kind means once, in a legend.",
+      "P2.1": "A check that catches sentences about the page or the map instead of the code — the audit counts them and each generator's word check stops the build.",
+      "P2.2": "A written rule that a page shows what the code does and never how the map found it.",
+      "P3.1": "A count of items that show a bare word where an icon belongs — it reports, and your gate-icon pick decides what it counts.",
+      "P3.2": "A written rule that a kind the station does not draw wears a mark of the page's own, never a plain word.",
+      "P4.1": "A build check that stops a page from showing half of a link — a function without its condition, a refresh without what it fetches.",
+      "P4.2": "A writing rule that a role word names its object — a fetcher of what, a check in which function.",
+      "P5.1": "A check in the render gate that catches words broken in the middle and text cut off — a page that fails it is held back from publishing.",
+      "P5.2": "A written rule that every mark has a visible key and every number its noun.",
+      "P6.1": "A count that flags one idea with several names, or several ideas sharing one name — each flag needs your look.",
+      "P6.2": "A written rule that one term per idea holds for the words a page shows, not only for prose.",
+      "P7.1": "A count of places where a face shows the code's own spelling instead of words — each one needs your look.",
+      "P7.2": "A writing rule that a face gives the meaning first, in words, and the code last, as written.",
+      "P8.1": "A build check that a count's label is the very rule that computes it, and that unknown never shows as none.",
+      "P8.2": "A written rule that unknown, absent and beyond one level show as such, never as a bare zero or an empty list.",
+      "P9.1": "A step before any dense view — one element alone on a bench, so you decide its look before it is drawn many times.",
+      "P10.1": "Checks that put each standing rule of a page on a rail that already runs — the build, the probe or the commit gate.",
+      "P10.2": "A written rule that a page rule without a check is no rule, so its check is named in the same change.",
+      "A1": "One script that opens any page in a browser and counts the defects this round found — today a prototype, and once landed a tool of the suite."
+    }
   }
 }

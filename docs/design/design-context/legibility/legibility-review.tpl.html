@@ -153,8 +153,9 @@
   .vox .ico { width: 1.3em; height: 1.3em; color: var(--accent); flex: 0 0 auto; }
   .vox .vn { max-width: 18ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tcs { position: relative; }
+  nav.toc .tcs { gap: 6px 7px; }
   nav.toc .tcs > * { flex: 0 0 auto; white-space: nowrap; }
-  nav.toc a.tc { color: var(--ink-soft); text-decoration: none; border: 1px solid var(--rule); border-radius: 10px; padding: 0 10px; line-height: 1.8; background: var(--card); white-space: nowrap; }
+  nav.toc a.tc { color: var(--ink-soft); text-decoration: none; border: 1px solid var(--rule); border-radius: 10px; padding: 0 8px; line-height: 1.8; background: var(--card); white-space: nowrap; }
   nav.toc a.tc:hover { border-color: var(--accent); color: var(--accent); }
   nav.toc a.tc[data-lit="true"] { background: var(--accent); border-color: var(--accent); color: var(--ground); }
   @media (max-width: 720px) { nav.toc[data-frozen="true"] { padding-right: 28px; } nav.toc .tcs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; } nav.toc .player { gap: 6px; } .vox, .pb .fw { display: none; } .pb { padding: 0 6px; } .bar-rate .sel { padding: 0 3px; } }   /* a phone: clear of the fixed cog, one row of controls, the chips scroll inside their own row */
@@ -213,6 +214,48 @@
   .say-text { margin: 0; max-width: 112ch; font-size: 1em; line-height: 1.55; color: var(--ink); }
   .sec-head .st { white-space: normal; }
   .ovh { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+
+  /* the nested menu (L-29, D-077): a section chip that holds decisions is the chip plus a caret; the caret opens its decisions, indented
+     under their group. The panel is fixed (the chips scroll inside their own row on a phone, which would clip it) and opens as a full-width
+     sheet under the bar at 720px and below. No motion, no transition. */
+  .dd { display: inline-flex; align-items: stretch; }
+  nav.toc .dd > a.tc { display: inline-flex; align-items: center; gap: 6px; border-radius: 10px 0 0 10px; }
+  nav.toc .dd > button.car { display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; font: inherit; color: var(--ink-soft); background: var(--card); border: 1px solid var(--rule); border-left: 0; border-radius: 0 10px 10px 0; cursor: pointer; }
+  nav.toc .dd > button.car:hover, nav.toc .dd[data-open="true"] > button.car { border-color: var(--accent); color: var(--accent); }
+  nav.toc .dd > a.tc[data-lit="true"] + button.car { background: var(--accent); border-color: var(--accent); color: var(--ground); }
+  .car .ico { width: 1.1em; height: 1.1em; }
+  .dd[data-open="true"] .car .ico { transform: rotate(180deg); }
+  .oc { font-size: var(--fs-min); font-variant-numeric: tabular-nums; border: 1px solid currentColor; border-radius: 8px; padding: 0 6px; line-height: 1.5; }
+  .oc[data-zero="true"] { opacity: .6; }
+  .ddm { position: fixed; z-index: 120; box-sizing: border-box; width: 34rem; max-width: calc(100vw - 16px); overflow-y: auto; overscroll-behavior: contain; background: var(--card); border: 1.5px solid var(--accent); border-radius: 10px; box-shadow: 0 18px 38px -12px rgba(0, 0, 0, .6); padding: 8px 6px 10px; white-space: normal; text-align: left; font-size: var(--fs-sm); font-weight: 400; letter-spacing: normal; color: var(--ink); }
+  .ddm[hidden] { display: none; }
+  .ddm[data-sheet="true"] { max-width: 100vw; border-radius: 0 0 10px 10px; border-left: 0; border-right: 0; }
+  .dd-head { margin: 2px 8px 6px; font-size: var(--fs-min); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .ddg { margin: 8px 0 2px; }
+  .ddgh { display: flex; align-items: center; gap: 6px; margin: 0 8px 3px; font-size: var(--fs-min); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+  .ddgh .mk { color: var(--accent); }
+  .ddl { display: flex; flex-direction: column; gap: 1px; margin: 0 0 0 14px; padding: 0 0 0 8px; border-left: 1px solid var(--rule); }   /* the decisions stand indented under their group */
+  .ddi { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 32px; box-sizing: border-box; padding: 4px 8px; font: inherit; text-align: left; color: var(--ink); background: transparent; border: 0; border-radius: 6px; cursor: pointer; }
+  .ddi:hover { background: var(--accent-soft); }
+  .ddi:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; background: var(--accent-soft); }
+  .ddi[aria-current="true"] { background: var(--accent); color: var(--ground); }
+  .ddi[aria-current="true"] .mk, .ddi[aria-current="true"] .tg, .ddi[aria-current="true"] .did { color: var(--ground); }
+  .ddi .slot { display: inline-flex; flex: 0 0 auto; }
+  .ddi .did { flex: 0 0 auto; font-size: var(--fs-min); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .ddi .nm { min-width: 0; overflow-wrap: anywhere; }
+  .ddi .tg { margin-left: auto; padding-left: 8px; font-size: var(--fs-min); color: var(--muted); text-align: right; }
+  .mk[data-o="check"] { color: var(--accent); }
+
+  /* a decision's card (L-29): its plain line, its listen button and what is read aloud; the one you are at is lit */
+  .decb { display: flex; flex-direction: column; gap: 6px; }
+  .decrow { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 12px; }
+  .decrow .acts { flex: 0 0 auto; }
+  .plainline { flex: 1 1 24rem; min-width: 0; margin: 0; padding: 6px 10px; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: var(--raised); font-size: var(--fs-sm); color: var(--ink); max-width: 112ch; }
+  .plainline .lab { display: block; margin-bottom: 2px; }
+  .decb .acts { gap: 8px 12px; }
+  details.spk > .say-text { margin: 4px 0 6px; font-size: var(--fs-sm); color: var(--ink-soft); }
+  [data-dec-card][data-hot="true"], [data-dec-card][data-reading="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+  .pb .fw { font-size: var(--fs-min); }
 </style>
 
 <div class="artifact-page">
@@ -301,7 +344,7 @@
   var MK = { built: ["built", U.statusWord.built], option: ["option", U.statusWord.option], question: ["question", U.statusWord.question], logged: ["logged", U.statusWord.logged], deferred: ["deferred", U.statusWord.deferred],
     fixed: ["fixed", U.outcome.fixed], partly: ["partly", U.outcome.partly], left: ["left", U.outcome.left], his: ["his", U.outcome.his], open: ["open", U.rem.open],
     surface: ["surface", U.rem.kind.surface], feed: ["feed", U.rem.kind.feed], process: ["process", U.rem.kind.process], yoursRem: ["his", U.rem.kind.yours],
-    mine: ["mine", U.mark.mine], yours: ["yours", U.mark.yours], ruled: ["ruled", U.mark.ruled], land: ["land", U.mark.land], notyet: ["notyet", U.mark.notyet],
+    mine: ["mine", U.mark.mine], yours: ["yours", U.mark.yours], kept: ["check", U.mark.kept], ruled: ["ruled", U.mark.ruled], land: ["land", U.mark.land], notyet: ["notyet", U.mark.notyet],
     down: ["down", U.mark.down], same: ["same", U.mark.same], up: ["up", U.mark.up], code: ["code", U.mark.code], page: ["page", U.mark.page], map: ["map", U.mark.map],
     answered: ["fixed", U.verdict.answered], vpartly: ["partly", U.verdict.partly], vnot: ["left", U.verdict.not] };
   var VKEY = { answered: "answered", partly: "vpartly", not: "vnot" }, RKEY = { surface: "surface", feed: "feed", yours: "yoursRem", process: "process" };
@@ -335,6 +378,18 @@
     rows.forEach(function (r) { var x = el("tr"); r.forEach(function (c, i) { var td = el("td", cl(spec[i])); if (c && c.nodeType) td.appendChild(c); else td.textContent = c == null ? "" : String(c); x.appendChild(td); }); t.appendChild(x); });
     w.appendChild(t); return w; }
 
+  /* ── the decisions (L-29, D-077): every choice on the page, in the page's order; a card, a menu entry and a reading each ──
+     An entry carries the base summary (what it decides, what choosing sets in motion, my pick: generated), the plain line (authored) and the
+     spoken names of its options. Your own pick adds one sentence at run time; the plain line is read last. */
+  var DEC = (D.decide && D.decide.entries) || [], DECBY = {}, DECARD = {}, HOT = -1;
+  DEC.forEach(function (e, i) { e.ix = i; DECBY[e.key] = e; });
+  var STATEICON = { open: "mine", yours: "yours", ruled: "ruled", kept: "check" };
+  /* open = nobody has picked and it is not ruled; yours = you picked another; kept = you picked my pick; ruled = ruled earlier and left */
+  function decState(e) { var c = CH[e.id], s = state.v[e.id]; if (s && s.v) return c && s.v === c.mine ? "kept" : "yours"; return c && c.ruled ? "ruled" : "open"; }
+  function decParts(e) { var c = CH[e.id], s = state.v[e.id], R2 = U.decide.run, out = e.parts.slice();
+    if (s && s.v) out.push(rt(s.v === c.mine ? R2.kept : c.ruled ? R2.changedRuled : R2.yours, { name: e.opts[s.v] }));
+    out.push(e.plain); return out; }
+
   /* ── copy a text, and read one aloud (L-26) ── */
   function copyText(text, said) { LEG.lastCopy = text;
     var done = function () { said.textContent = U.say.copied; }, fail = function () { said.textContent = U.say.failed; };
@@ -347,7 +402,7 @@
   var speech = (function () {
     var DV = D.voice || {};   /* D-075: his pasted voice pick, the default when this browser has no saved setting */
     var SS = window.speechSynthesis, ok = !!(SS && window.SpeechSynthesisUtterance), X = U.say, P = U.player, RATES = [0.8, 1, 1.25], idx = 1, VK = "gabe:voice:v1", N = D.say.length;
-    var R = { on: false, paused: false, i: 0, s: 0, all: false, gen: 0, timer: 0, parts: [] }, btns = [], sels = [], bar = null, c = {}, chips = [], tcs = null, voxEl = null, voxName = null;
+    var R = { on: false, paused: false, i: 0, s: 0, d: -1, all: false, gen: 0, timer: 0, parts: [] }, btns = [], sels = [], bar = null, c = {}, chips = [], tcs = null, voxEl = null, voxName = null, DD = {}, OPEN = null;
     try { var r = window.localStorage.getItem(KEY + ":rate"); if (r !== null && /^[0-2]$/.test(r)) idx = Number(r); } catch (e) {}
     function num(v, d, lo, hi) { var n = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" ? Number(v) : NaN; return isFinite(n) && n >= lo && n <= hi ? n : d; }
     function saved() { try { var s = JSON.parse(window.localStorage.getItem(VK) || "null"); return s && typeof s === "object" && !Array.isArray(s) ? s : null; } catch (e) { return null; } }
@@ -375,20 +430,33 @@
     function cancelTalk() { if (ok) { try { SS.cancel(); } catch (e) {} } }
     function clearTimer() { if (R.timer) { clearTimeout(R.timer); R.timer = 0; } }
     function setBarH() { var f = !!bar && bar.getAttribute("data-frozen") === "true"; document.documentElement.style.setProperty("--bar-h", f ? Math.ceil(bar.getBoundingClientRect().height) + "px" : "0px"); }
+    /* a listen button is lit while ITS reading is on: every summary, one section's summary, or one decision */
+    function isLit(b) { return R.on && (b.kind === "all" ? R.all && R.d < 0 : b.kind === "dec" ? R.d === b.at : R.d < 0 && R.i === b.at); }
+    /* the decisions: the card being read or last picked is lit; each menu entry wears its state; a chip carries its count of open ones */
+    function paintDec(on) {
+      DEC.forEach(function (e, i) { var cd = DECARD[e.key]; if (cd) { cd.setAttribute("data-reading", String(on && R.d === i)); cd.setAttribute("data-hot", String(HOT === i || (on && R.d === i))); } });
+      var M2 = U.decide.menu;
+      Object.keys(DD).forEach(function (k) { var d = DD[k], n = 0;
+        d.items.forEach(function (it) { var st = decState(it.e); if (st === "open") n++;
+          if (it.st !== st) { it.st = st; it.slot.textContent = ""; it.slot.appendChild(mk(STATEICON[st], M2.state[st])); } it.btn.setAttribute("aria-current", String(on && R.d === it.e.ix)); });
+        var w = rt(M2.openCount, { n: n }); d.oc.textContent = String(n); d.oc.title = w; d.oc.setAttribute("data-zero", String(n === 0)); d.link.setAttribute("aria-label", d.title + ", " + w);
+        d.head.textContent = rt(M2.head, { title: d.title, n: d.items.length, open: n }); });
+      if (c.nopen) c.nopen.disabled = !DEC.some(function (e) { return decState(e) === "open"; }); }
     function paint() { var on = R.on;
-      btns.forEach(function (b) { var lit = on && (b.kind === "all" ? R.all : R.i === b.at); b.el.setAttribute("data-on", String(lit)); b.el.setAttribute("aria-pressed", String(lit)); b.lab.textContent = lit ? X.stop : b.word; b.slot.textContent = ""; b.slot.appendChild(ico(lit ? "stop" : "play")); });
-      [].forEach.call(document.querySelectorAll("[data-say]"), function (b) { b.setAttribute("data-reading", String(on && b.getAttribute("data-say") === D.say[R.i].key)); });
+      btns.forEach(function (b) { var lit = isLit(b); b.el.setAttribute("data-on", String(lit)); b.el.setAttribute("aria-pressed", String(lit)); b.lab.textContent = lit ? X.stop : b.word; b.slot.textContent = ""; b.slot.appendChild(ico(lit ? "stop" : "play")); });
+      [].forEach.call(document.querySelectorAll("[data-say]"), function (b) { b.setAttribute("data-reading", String(on && R.d < 0 && b.getAttribute("data-say") === D.say[R.i].key)); });
+      paintDec(on);
       if (!bar) return;
       var frozen = on || pref("bar") === "always";   /* D-076: in view all the time, even where this browser cannot speak (the chips still move the page) */
       bar.setAttribute("data-frozen", String(frozen)); bar.setAttribute("data-player", String(ok && frozen));
       if (ok) { var playing = on && !R.paused, pw = playing ? P.pause : P.play;
         c.pp.setAttribute("aria-label", pw); c.pp.title = pw; c.pp.setAttribute("data-state", playing ? "playing" : on ? "paused" : "idle"); c.pp.textContent = ""; c.pp.appendChild(ico(playing ? "pause" : "play"));
-        c.stop.disabled = !on; c.prev.disabled = !on || R.i <= 0; c.next.disabled = !on || R.i >= N - 1; c.follow.setAttribute("aria-pressed", String(followOn()));
+        c.stop.disabled = !on; c.prev.disabled = !on || (R.d < 0 && R.i <= 0); c.next.disabled = !on || R.i >= N - 1; c.follow.setAttribute("aria-pressed", String(followOn()));
         var rs = resolve(); voxName.textContent = rs.name; voxEl.title = rs.note; voxEl.setAttribute("aria-label", rs.note); }
       chips.forEach(function (a, k) { var lit = on && k === R.i; a.setAttribute("data-lit", String(lit)); if (lit) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current"); });
       if (on && tcs && tcs.scrollWidth > tcs.clientWidth + 1) { var a = chips[R.i]; tcs.scrollLeft = Math.max(0, a.offsetLeft - (tcs.clientWidth - a.offsetWidth) / 2); }
       setBarH(); }
-    function enter(i, how) { R.i = i; R.s = 0; R.parts = partsOf(i); paint();
+    function enter(i, how) { R.i = i; R.s = 0; R.d = -1; R.parts = partsOf(i); paint();
       if (how === "skip" || (how === "auto" && followOn()) || (how === "start-all" && followOn())) reveal(i, how !== "start-all"); }
     function later(g, ms) { if (ms > 0) R.timer = setTimeout(function () { R.timer = 0; speakNow(g); }, ms); else speakNow(g); }
     function stop() { clearTimer(); R.gen++; cancelTalk(); R.on = false; R.paused = false; paint(); }
@@ -402,21 +470,79 @@
     /* a sentence ended: the next one, after its pause; at the end of a section the next section, after its pause; at the end of the last, stop */
     function step(g) { if (R.gen !== g || !R.on) return;
       if (R.s + 1 < R.parts.length) { R.s++; later(g, pauseMs("s")); return; }
+      if (R.d >= 0) { afterDec(g); return; }
       if (R.all && R.i < N - 1) { enter(R.i + 1, "auto"); later(g, pauseMs("sec")); return; }
       stop(); }
+    /* ── the decisions (L-29, D-077): a pick moves the page to the card and the reading to its summary, then its plain line ──
+       After one is read the option "after a decision" says what next: stop there · the next decision still open (any section, skipping
+       the ones decided, kept or ruled, and the same decision shown twice) · go on with the section: the next decision in the same section,
+       decided or not, and when its decisions run out the run of summaries goes on from the next section. */
+    function nextOpen(from, wrap) { var id = from >= 0 ? DEC[from].id : null, j;
+      for (j = from + 1; j < DEC.length; j++) if (DEC[j].id !== id && decState(DEC[j]) === "open") return j;
+      if (wrap) for (j = 0; j <= from; j++) if (DEC[j].id !== id && decState(DEC[j]) === "open") return j;
+      return -1; }
+    function viewDecision() { var y = barBottom() + 80, k = -1; DEC.forEach(function (e, i) { var cd = DECARD[e.key]; if (cd && cd.getBoundingClientRect().top <= y) k = i; }); return k; }
+    function revealDec(ix, force) { var cd = DECARD[DEC[ix].key]; if (!cd) return;
+      if (!force) { var r = cd.getBoundingClientRect(); if (r.bottom > barBottom() && r.top < window.innerHeight) return; }
+      try { cd.scrollIntoView({ block: "start" }); } catch (e) { cd.scrollIntoView(); } }
+    function enterDec(ix, how) { var e = DEC[ix]; R.d = ix; R.i = e.si; R.s = 0; R.parts = decParts(e); HOT = ix; paint();
+      if (how === "pick" || (how === "auto" && followOn())) revealDec(ix, true); else if (how === "start") revealDec(ix, false); }
+    function beginDecision(ix, how) { clearTimer(); R.gen++; cancelTalk(); R.on = true; R.paused = false; R.all = false; enterDec(ix, how); later(R.gen, 80); }
+    function afterDec(g) { var a = pref("after"), e = DEC[R.d], nx = -1;
+      if (a === "next") nx = nextOpen(R.d, false);
+      else if (a === "section") { if (DEC[R.d + 1] && DEC[R.d + 1].sec === e.sec) nx = R.d + 1; else if (R.i < N - 1) { R.all = true; enter(R.i + 1, "auto"); later(g, pauseMs("sec")); return; } }
+      if (nx >= 0) { enterDec(nx, "auto"); later(g, pauseMs("sec")); return; }
+      stop(); }
+    function pickDecision(ix) { HOT = ix; if (ok) beginDecision(ix, "pick"); else { revealDec(ix, true); paint(); } }
+    function nextOpenGo() { var ix = nextOpen(R.on && R.d >= 0 ? R.d : viewDecision(), true); if (ix >= 0) pickDecision(ix); }
     function begin(i, all, how) { clearTimer(); R.gen++; cancelTalk(); R.on = true; R.paused = false; R.all = all; enter(i, how); later(R.gen, 80); }   /* a beat after a cancel: some engines drop what they are given at once */
     function pause() { if (!R.on || R.paused) return; R.paused = true; clearTimer(); R.gen++; cancelTalk(); paint(); }
     function resume() { if (!R.on || !R.paused) return; R.paused = false; R.gen++; paint(); later(R.gen, 80); }
     /* a skip moves the reading to a section's summary AND the page to the section; from then on the reading goes on through the rest */
     function skipTo(i) { if (!R.on) return; i = Math.max(0, Math.min(N - 1, i)); clearTimer(); R.gen++; cancelTalk(); R.all = true; enter(i, "skip"); if (!R.paused) later(R.gen, 80); }
     function pbtn(act, icon, word, fn) { var b = el("button", "pb"); b.type = "button"; b.setAttribute("data-act", act); b.setAttribute("aria-label", word); b.title = word; b.appendChild(ico(icon)); b.addEventListener("click", fn); return b; }
+    /* ── the nested menu (L-29): a chip's caret opens its decisions, grouped as the page groups them, indented under their group ── */
+    function place(d) { var m = d.menu, w = d.wrap.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight, bb = bar ? bar.getBoundingClientRect() : { bottom: 0 }, sheet = vw <= 720;
+      var top = Math.max(0, sheet ? bb.bottom : w.bottom + 6); m.style.top = Math.round(top) + "px"; m.style.maxHeight = Math.max(140, Math.floor(vh - top - 8)) + "px";
+      if (sheet) { m.style.left = "0px"; m.style.width = vw + "px"; m.setAttribute("data-sheet", "true"); }
+      else { var wd = Math.min(544, vw - 16); m.style.width = wd + "px"; m.style.left = Math.round(Math.min(Math.max(8, w.left), vw - wd - 8)) + "px"; m.removeAttribute("data-sheet"); } }
+    function closeMenus(except) { Object.keys(DD).forEach(function (k) { var d = DD[k]; if (k === except || d.menu.hidden) return; d.menu.hidden = true; d.wrap.setAttribute("data-open", "false"); d.btn.setAttribute("aria-expanded", "false"); });
+      if (OPEN && OPEN !== except) OPEN = null; }
+    function openMenu(key, which) { closeMenus(key); var d = DD[key], its = d.items, t; d.menu.hidden = false; d.wrap.setAttribute("data-open", "true"); d.btn.setAttribute("aria-expanded", "true"); OPEN = key; paintDec(R.on); place(d);
+      t = which === "last" ? its[its.length - 1] : which === "first" ? its[0] : (its.filter(function (x) { return R.on && R.d === x.e.ix; })[0] || its.filter(function (x) { return x.st === "open"; })[0] || its[0]);
+      if (t) t.btn.focus(); }
+    function makeDD(s, a, ents) { var M2 = U.decide.menu, wrap = el("span", "dd"), oc = el("span", "oc"), btn = el("button", "car"), menu = el("div", "ddm"), head = el("p", "dd-head"), cap = rt(M2.caret, { title: s.title });
+      var d = { wrap: wrap, link: a, btn: btn, menu: menu, oc: oc, head: head, items: [], title: s.title, key: s.key }, gk = null, list = null;
+      a.appendChild(oc);
+      btn.type = "button"; btn.setAttribute("aria-haspopup", "menu"); btn.setAttribute("aria-expanded", "false"); btn.setAttribute("data-dd", s.key); btn.setAttribute("aria-label", cap); btn.title = cap; btn.appendChild(ico("caret"));
+      menu.hidden = true; menu.id = "ddm-" + s.key; menu.setAttribute("role", "menu"); menu.setAttribute("aria-label", cap); menu.setAttribute("data-dd-menu", s.key); btn.setAttribute("aria-controls", menu.id); menu.appendChild(head);
+      ents.forEach(function (e) { if (e.gk !== gk) { gk = e.gk; var g = el("div", "ddg"), gh = el("p", "ddgh"); g.setAttribute("role", "group"); g.setAttribute("aria-label", e.gn);
+          if (e.gp) gh.appendChild(pmark(e.gp, "icon")); gh.appendChild(el("span", null, e.gn)); g.appendChild(gh); list = el("div", "ddl"); g.appendChild(list); menu.appendChild(g); }
+        var it = el("button", "ddi"), slot = el("span", "slot"); it.type = "button"; it.tabIndex = -1; it.setAttribute("role", "menuitem"); it.setAttribute("data-dec-item", e.key); it.appendChild(slot);
+        if (!/^(mo|ex)\./.test(e.id)) it.appendChild(el("span", "did", e.id));   /* a look is named by its label; a proposal wears its id beside its name */
+        it.appendChild(el("span", "nm", e.name)); if (e.tag) it.appendChild(el("span", "tg", e.tag));
+        it.addEventListener("click", function () { closeMenus(); pickDecision(e.ix); }); list.appendChild(it); d.items.push({ e: e, btn: it, slot: slot, st: null }); });
+      btn.addEventListener("click", function () { if (menu.hidden) openMenu(s.key, "pick"); else closeMenus(); });
+      btn.addEventListener("keydown", function (ev) { if (ev.key === "ArrowDown" || ev.key === "ArrowUp") { ev.preventDefault(); openMenu(s.key, ev.key === "ArrowDown" ? "first" : "last"); } });
+      menu.addEventListener("keydown", function (ev) { var its = d.items.map(function (x) { return x.btn; }), i = its.indexOf(document.activeElement), k = ev.key;
+        if (k === "ArrowDown") { ev.preventDefault(); its[(i + 1) % its.length].focus(); } else if (k === "ArrowUp") { ev.preventDefault(); its[(i - 1 + its.length) % its.length].focus(); }
+        else if (k === "Home") { ev.preventDefault(); its[0].focus(); } else if (k === "End") { ev.preventDefault(); its[its.length - 1].focus(); } else if (k === "Tab") closeMenus(); });
+      wrap.appendChild(a); wrap.appendChild(btn); wrap.appendChild(menu); DD[s.key] = d; return d; }
+    document.addEventListener("pointerdown", function (ev) { var d = OPEN && DD[OPEN]; if (d && !d.wrap.contains(ev.target)) closeMenus(); }, true);   /* an outside click closes it */
+    document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && OPEN) { var d = DD[OPEN]; closeMenus(); d.btn.focus(); } });
+    window.addEventListener("resize", function () { if (OPEN) place(DD[OPEN]); }); window.addEventListener("scroll", function () { if (OPEN) place(DD[OPEN]); }, { passive: true });
     function bindVoices() { if (!ok) return; try { SS.addEventListener("voiceschanged", paint); } catch (e) { SS.onvoiceschanged = paint; } }
     bindVoices();
-    LEG.reading = function () { return { on: R.on, paused: R.paused, i: R.i, s: R.s, all: R.all, key: D.say[R.i].key }; };
+    LEG.dd = function () { return { open: OPEN }; };
+    LEG.reading = function () { return { on: R.on, paused: R.paused, i: R.i, s: R.s, all: R.all, key: D.say[R.i].key, dec: R.on && R.d >= 0 ? DEC[R.d].key : null }; };
     return { ok: ok, refresh: paint,
       button: function (kind, at, word) { var b = el("button", "btn ic ls"), slot = el("span"), lab = el("span", null, word); b.type = "button"; b.setAttribute("data-mine", "true"); b.title = X.tip; b.setAttribute("data-listen", "");
         slot.appendChild(ico("play")); b.appendChild(slot); b.appendChild(lab); btns.push({ el: b, lab: lab, slot: slot, word: word, kind: kind, at: at }); if (!ok) b.hidden = true;
-        b.addEventListener("click", function () { var lit = R.on && (kind === "all" ? R.all : R.i === at); if (lit) stop(); else if (kind === "all") begin(0, true, "start-all"); else begin(at, false, "start"); }); return b; },
+        b.addEventListener("click", function () { var lit = isLit({ kind: kind, at: at }); if (lit) stop(); else if (kind === "all") begin(0, true, "start-all"); else begin(at, false, "start"); }); return b; },
+      /* a decision card's listen button: its summary and then its plain line; the same reading as picking it in the menu, without moving the page when the card is in view */
+      decButton: function (ix, word) { var e = DEC[ix], b = el("button", "btn ic ls"), slot = el("span"), lab = el("span", null, word); b.type = "button"; b.setAttribute("data-mine", "true"); b.title = U.decide.menu.listenTip; b.setAttribute("data-dec-listen", e.key);
+        slot.appendChild(ico("play")); b.appendChild(slot); b.appendChild(lab); btns.push({ el: b, lab: lab, slot: slot, word: word, kind: "dec", at: ix }); if (!ok) b.hidden = true;
+        b.addEventListener("click", function () { if (isLit({ kind: "dec", at: ix })) stop(); else if (ok) beginDecision(ix, "start"); }); return b; },
       rate: function (inBar) { var w = el("label", inBar ? "bar-rate" : "rate"), sel = el("select", "sel");
         if (inBar) { sel.setAttribute("aria-label", X.rateLabel); w.setAttribute("data-bar-rate", ""); } else { w.appendChild(document.createTextNode(X.rateLabel)); w.setAttribute("data-listen-rate", ""); }
         X.rates.forEach(function (t, i) { var o = el("option", null, t); o.value = String(i); sel.appendChild(o); }); sel.value = String(idx); sel.title = X.rateTip; sels.push(sel);
@@ -426,12 +552,15 @@
       mount: function (nav, head, secs) { bar = nav;
         if (ok) { var pl = el("div", "row player"); pl.setAttribute("data-player-box", "");
           c.pp = pbtn("playpause", "play", P.play, function () { if (!R.on) begin(viewSection(), true, "bar"); else if (R.paused) resume(); else pause(); }); c.pp.classList.add("go");
-          c.stop = pbtn("stop", "stop", P.stop, stop); c.prev = pbtn("prev", "prev", P.prev, function () { skipTo(R.i - 1); }); c.next = pbtn("next", "next", P.next, function () { skipTo(R.i + 1); });
+          c.stop = pbtn("stop", "stop", P.stop, stop); c.prev = pbtn("prev", "prev", P.prev, function () { skipTo(R.d >= 0 ? R.i : R.i - 1); });   /* inside a decision, previous goes to the start of its section */ c.next = pbtn("next", "next", P.next, function () { skipTo(R.i + 1); });
+          c.nopen = pbtn("nextopen", "nextopen", P.nextOpen, nextOpenGo); c.nopen.title = P.nextOpenTip; c.nopen.appendChild(el("span", "fw", P.nextOpenShort));
           voxEl = el("span", "vox"); voxEl.setAttribute("role", "img"); voxEl.appendChild(ico("speaker")); voxName = el("span", "vn"); voxEl.appendChild(voxName);
           c.follow = pbtn("follow", "follow", P.followTip, function () { setPref("follow", followOn() ? "off" : "on"); }); c.follow.appendChild(el("span", "fw", P.follow));
-          [c.pp, c.stop, c.prev, c.next, voxEl, this.rate(true), c.follow].forEach(function (x) { pl.appendChild(x); }); nav.appendChild(pl); }
+          [c.pp, c.stop, c.prev, c.next, c.nopen, voxEl, this.rate(true), c.follow].forEach(function (x) { pl.appendChild(x); }); nav.appendChild(pl); }
         tcs = el("div", "row tcs"); tcs.appendChild(el("span", "lab", head));
-        secs.forEach(function (s, k) { var a = el("a", "tc", s.title); a.href = "#" + s.id; a.setAttribute("data-toc", s.id); a.addEventListener("click", function (e) { if (R.on) { e.preventDefault(); skipTo(k); } }); chips.push(a); tcs.appendChild(a); });
+        secs.forEach(function (s, k) { var a = el("a", "tc", s.title); a.href = "#" + s.id; a.setAttribute("data-toc", s.id); a.addEventListener("click", function (e) { if (R.on) { e.preventDefault(); skipTo(k); } }); chips.push(a);
+          var ents = DEC.filter(function (e) { return e.sec === s.key; });
+          if (ents.length) tcs.appendChild(makeDD(s, a, ents).wrap); else tcs.appendChild(a); });   /* a section that holds decisions is a chip with a caret; one with none stays a plain chip */
         nav.appendChild(tcs);
         if (typeof ResizeObserver === "function") { try { new ResizeObserver(setBarH).observe(nav); } catch (e) {} }
         paint(); } };
@@ -465,14 +594,14 @@
     var gs = group(Lg.state); ["built", "option", "question", "logged", "deferred"].filter(function (k) { return kinds[k]; }).concat(["open"]).forEach(function (k) { var p = plain(k); entry(gs, p[0], p[1]); });
     var go = group(Lg.outcome); ["fixed", "partly", "left"].forEach(function (k) { var p = plain(k); entry(go, p[0], p[1]); }); var ph = plain("his", Lg.hisBoth); entry(go, ph[0], ph[1]); go.appendChild(el("p", "cap", Lg.verdictNote));
     var gw = group(Lg.why); ["surface", "feed", "process"].forEach(function (k) { var p = plain(k); entry(gw, p[0], p[1]); });
-    var gc = group(Lg.choice); ["mine", "yours", "ruled", "land", "notyet"].forEach(function (k) { var p = plain(k); entry(gc, p[0], p[1]); });
+    var gc = group(Lg.choice); ["mine", "yours", "kept", "ruled", "land", "notyet"].forEach(function (k) { var p = plain(k); entry(gc, p[0], p[1]); });
     var gh = group(Lg.change); ["down", "same", "up"].forEach(function (k) { var p = plain(k); entry(gh, p[0], p[1]); });
     var gj = group(Lg.subject); ["code", "page", "map"].forEach(function (k) { var p = plain(k); entry(gj, p[0], p[1]); });
     var gp = group(Lg.pattern, true); D.patterns.slice().sort(function (a, b) { return Number(a.id.slice(1)) - Number(b.id.slice(1)); }).forEach(function (p) { var m = el("span", "mk pm"); m.setAttribute("data-o", "pat"); m.appendChild(ico(D.patIcon[p.id])); entry(gp, m, p.id + " · " + p.name); }); })();
 
   /* ── state: one value + one note per choice id; nothing is saved at boot ── */
   var CH = {}; D.choices.forEach(function (c) { CH[c.id] = c; });
-  var PREFS = { bar: ["always", "playing"], follow: ["on", "off"] };   /* D-076: the bar shows all the time by default (his ruling); only-while-playing is the other option */
+  var PREFS = { bar: ["always", "playing"], follow: ["on", "off"], after: ["stop", "next", "section"] };   /* D-076: the bar shows all the time by default (his ruling); only-while-playing is the other option */
   var state = (function () { try { var s = JSON.parse(window.localStorage.getItem(KEY) || "null"); if (s && s.v) { Object.keys(s.v).forEach(function (k) { var c = CH[k], x = s.v[k];
           if (!c || !x || (x.v && !c.opts.some(function (o) { return o[0] === x.v; }))) delete s.v[k]; });
         if (s.p && typeof s.p === "object") Object.keys(s.p).forEach(function (k) { if (!PREFS[k] || PREFS[k].indexOf(s.p[k]) < 0) delete s.p[k]; }); else delete s.p; return s; } } catch (e) {} return { v: {} }; })();
@@ -508,7 +637,7 @@
 
   /* ── the contents bar and the player's two options (L-27), mounted now that the state is there ── */
   (function () { var P = U.player, host = $("topacts"), after = $("said-all");
-    $("bar").setAttribute("aria-label", P.bar); speech.mount($("bar"), U.toc.head, ["sec-glance", "sec-rem", "sec-pat", "sec-calls", "sec-items", "sec-qs", "sec-gap", "sec-copy"].map(function (id) { return { id: id, title: U.sec[id.slice(4)].title }; }));
+    $("bar").setAttribute("aria-label", P.bar); speech.mount($("bar"), U.toc.head, ["sec-glance", "sec-rem", "sec-pat", "sec-calls", "sec-items", "sec-qs", "sec-gap", "sec-copy"].map(function (id) { return { id: id, key: id.slice(4), title: U.sec[id.slice(4)].title }; }));
     function group(k, label, tip, opts) { var g = el("span", "opt"); g.setAttribute("data-opt", k); g.title = tip; if (!speech.ok) g.hidden = true; g.appendChild(el("span", null, label));
       opts.forEach(function (o) { var b = el("button", "btn ic"); b.type = "button"; b.setAttribute("data-v", o.v); b.setAttribute("data-pref", k); if (o.ruled) b.title = U.mark.ruled; if (o.icon) b.appendChild(ico(o.icon)); b.appendChild(el("span", null, o.name));
         b.addEventListener("click", function () { setPref(k, o.v); });
@@ -516,7 +645,17 @@
       host.insertBefore(g, after); }
     group("bar", P.optBar, P.optBarTip, [{ v: "always", name: P.optBarAlways, ruled: true, icon: "ruled" }, { v: "playing", name: P.optBarPlaying, icon: "pin" }]);
     group("follow", P.optFollow, P.optFollowTip, [{ v: "on", name: P.optOn, mine: true }, { v: "off", name: P.optOff }]);
+    group("after", P.optAfter, P.optAfterTip, [{ v: "stop", name: P.optAfterStop, mine: true }, { v: "next", name: P.optAfterNext }, { v: "section", name: P.optAfterSection }]);   /* L-29: what follows a decision that has been read; my pick (dashed) is to stop there */
     painters.push(function () { speech.refresh(); }); })();
+
+  /* a decision's block on its card (L-29): the plain line, a listen button, and what is read aloud (its summary then its plain line, with a copy button) */
+  function decBlock(key, card) { var e = DECBY[key], M3 = U.decide.menu, box = el("div", "decb"), pl = el("p", "plainline"), acts = el("div", "acts"), said = el("span", "said"), d = el("details", "spk"), tx = el("p", "say-text"), cp = el("button", "btn ic nb");
+    card.setAttribute("data-dec-card", key); DECARD[key] = card;
+    pl.setAttribute("data-plain", key); pl.appendChild(el("span", "lab", M3.plainHead)); pl.appendChild(el("span", "pl-text", e.plain));
+    acts.appendChild(speech.decButton(e.ix, M3.listen)); acts.appendChild(said); var row = el("div", "decrow"); row.appendChild(pl); row.appendChild(acts); box.appendChild(row);
+    d.appendChild(el("summary", null, M3.fold)); tx.setAttribute("data-dec-text", key); d.appendChild(tx);
+    cp.type = "button"; cp.setAttribute("data-dec-copy", key); cp.appendChild(ico("copy")); cp.appendChild(el("span", null, M3.copy)); cp.addEventListener("click", function () { copyText(tx.textContent, said); }); d.appendChild(cp); box.appendChild(d);
+    painters.push(function () { tx.textContent = decParts(e).join(" "); }); return box; }
 
   /* ── 1 · at a glance ── */
   (function () { var G = D.glance, W = U.sec.glance, B = sec("sec-glance", W), cols = el("div", "grid2");
@@ -550,10 +689,10 @@
 
   /* ── 3 · the patterns ── */
   function pchip(cid) { var m = /^(P\d+)\./.exec(cid), c = el("span", "chip ic"); if (m && D.patIcon[m[1]]) { var k = el("span", "mk pm"); k.setAttribute("data-o", "pat"); k.title = m[1] + " · " + PAT[m[1]].name; k.appendChild(ico(D.patIcon[m[1]])); c.appendChild(k); } c.appendChild(document.createTextNode(cid)); return c; }
-  function suiteCard(s, ch) { var pr = el("div", "prop"); pr.setAttribute("data-choice-card", s.cid); var X = U.pat, c2 = el("div", "chips");
+  function suiteCard(s, ch) { var pr = el("div", "prop"); pr.setAttribute("data-choice-card", s.cid); pr.id = "prop-" + s.cid; var X = U.pat, c2 = el("div", "chips");
     c2.appendChild(pchip(s.cid)); if (s.kind) c2.appendChild(chip(X.kind + " · " + s.kind)); if (s.partOf) c2.appendChild(chip(X.partOf + " " + s.partOf, null, null, "acc"));
     (s.waits || []).forEach(function (w) { c2.appendChild(chip(X.waits + " " + w.label, null, null, "acc")); }); pr.appendChild(c2);
-    if (s.name) pr.appendChild(el("h4", null, s.name)); if (s.target) pr.appendChild(el("p", "cap", X.target + ": " + s.target)); pr.appendChild(el("p", "what", s.what));
+    if (s.name) pr.appendChild(el("h4", null, s.name)); if (s.target) pr.appendChild(el("p", "cap", X.target + ": " + s.target)); pr.appendChild(el("p", "what", s.what)); pr.appendChild(decBlock(s.cid, pr));
     var cl = el("p", "costl"); cl.appendChild(el("b", null, X.cost)); cl.appendChild(document.createTextNode(X.lands + " " + s.lands + ". " + s.gate + (s.battery ? " " + s.battery : "") + (s.lines ? " " + s.lines : "") + (s.flags ? " " + s.flags : ""))); pr.appendChild(cl);
     var ag = el("p", "against"); ag.appendChild(el("b", null, X.against)); ag.appendChild(document.createTextNode(s.against)); pr.appendChild(ag);
     optButtons(pr, pr, ch); return pr; }
@@ -594,7 +733,7 @@
         if (c.kind && !(list[ci - 1] || {}).kind) { B.appendChild(el("h4", "sub2", C.kindsHead)); B.appendChild(el("p", "cap", C.kindsNote)); }
         var hd = el("div", "hd"); hd.appendChild(el("h4", null, c.label)); if (c.about) hd.appendChild(el("p", "cap", c.about)); var cs = el("div", "chips");
         c.rows.forEach(function (r) { cs.appendChild(chip(C.inRow + " " + r, null, null, "acc")); });
-        cs.appendChild(refChip(c.from, c.fromName, null, C.from)); c.answers.forEach(function (a) { cs.appendChild(refChip(a.id, a.name, null, C.answers)); }); hd.appendChild(cs); card.appendChild(hd);
+        cs.appendChild(refChip(c.from, c.fromName, null, C.from)); c.answers.forEach(function (a) { cs.appendChild(refChip(a.id, a.name, null, C.answers)); }); hd.appendChild(cs); card.appendChild(hd); card.appendChild(decBlock(c.id, card));
         var looks = el("div", "looks"); c.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
           if (o.shot) t.appendChild(pic(o.shot)); else t.appendChild(el("div", "noshot", o.note || C.noShot));
           var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); looks.appendChild(t); });
@@ -603,8 +742,8 @@
         tail(card, card, ch); B.appendChild(card); }); });
     B.appendChild(el("h3", null, C.propsHead)); B.appendChild(el("p", "cap", C.propsNote));
     D.proposals.forEach(function (p) { B.appendChild(proposalCard(p)); }); })();
-  function proposalCard(p, inGap) { var C = U.calls, ch = CH[p.id], card = el("div", "panel call"); card.setAttribute("data-call", p.id); if (!inGap) card.id = "call-" + p.id;
-    var hd = el("div", "hd"); hd.appendChild(el("h4", null, p.id + " · " + p.title)); card.appendChild(hd); card.appendChild(el("p", "cap", p.what));
+  function proposalCard(p, inGap) { var C = U.calls, ch = CH[p.id], card = el("div", "panel call"); card.setAttribute("data-call", p.id); card.id = (inGap ? "gcall-" : "call-") + p.id;
+    var hd = el("div", "hd"); hd.appendChild(el("h4", null, p.id + " · " + p.title)); card.appendChild(hd); card.appendChild(el("p", "cap", p.what)); card.appendChild(decBlock(inGap ? p.id + ":gap" : p.id, card));
     if (p.facts.length) { card.appendChild(el("p", "lab", C.factsHead)); var ul = el("ul", "facts"); p.facts.forEach(function (f) { var li = el("li"); li.appendChild(el("b", null, f.id)); li.appendChild(document.createTextNode(f.text)); ul.appendChild(li); }); card.appendChild(ul); }
     if (p.shots.length) card.appendChild(pics(p.shots, 2));
     var looks = el("div", "looks"); p.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
@@ -680,9 +819,9 @@
       D.choices.filter(function (c) { return c.group === g; }).forEach(function (c) { var e = eff(c), s = state.v[c.id] || {}, how, val;
         if (e) { yours++; val = nameOf(c, e); how = c.ruled ? (e === c.ruled ? rt(CW.ruled, { by: c.ruledBy }) : rt(CW.changedRuled, { ruled: nameOf(c, c.ruled), by: c.ruledBy })) : e === c.mine ? CW.same : rt(CW.differs, { mine: nameOf(c, c.mine) }); } else { mine++; val = nameOf(c, c.mine); how = CW.minePick; }
         body.push(c.id + ": " + val + " (" + how + ")" + (s.n ? " · " + rt(CW.note, { note: s.n.replace(/\s+/g, " ").trim() }) : "")); }); });
-    /* the player's two options ride the copy text too (L-27): bar = ruled by default, follow = my pick by default */
+    /* the player's options ride the copy text too (L-27, L-29): bar = ruled by default, follow and after = my pick by default */
     var PL = U.player; body.push(""); body.push(CW.groups.PLAYER);
-    [["bar", PL.lineBar, { playing: PL.optBarPlaying, always: PL.optBarAlways }, "always", null], ["follow", PL.lineFollow, { on: PL.optOn, off: PL.optOff }, null, "on"]].forEach(function (g) {
+    [["bar", PL.lineBar, { playing: PL.optBarPlaying, always: PL.optBarAlways }, "always", null], ["follow", PL.lineFollow, { on: PL.optOn, off: PL.optOff }, null, "on"], ["after", PL.lineAfter, { stop: PL.optAfterStop, next: PL.optAfterNext, section: PL.optAfterSection }, null, "stop"]].forEach(function (g) {
       var k = g[0], nm = g[2], ruled = g[3], mine = g[4], st = state.p && state.p[k], e = st || ruled, val, how;
       if (ruled) { val = nm[e]; how = e === ruled ? rt(CW.ruled, { by: PL.ruledBy }) : rt(CW.changedRuled, { ruled: nm[ruled], by: PL.ruledBy }); }
       else if (st) { val = nm[st]; how = st === mine ? CW.same : rt(CW.differs, { mine: nm[mine] }); } else { val = nm[mine]; how = CW.minePick; }

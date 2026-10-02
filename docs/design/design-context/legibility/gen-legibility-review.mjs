@@ -31,6 +31,12 @@
    templates, this generator fills every number, and the build stops on an id, a path, a symbol or a {token} left in one.
    THE PLAYER (L-27, D-074): the contents bar freezes at the top while a voice plays and carries the player; its words are words.player,
    its marks are the icons file's (pause · prev · next · follow · pin). The page reads the voice lab's saved setting (gabe:voice:v1) at run time.
+   THE DECISIONS (L-29, D-077): the bar's chips that hold decisions are dropdowns. A decision is a choice you pick on this page (a look, a
+   proposal, a draft suite proposal, the audit); every one gets a SPOKEN SUMMARY generated here from the page's data (the sentence
+   templates are words.decide.s: what it decides and its options, what choosing sets in motion, my pick or your earlier ruling; at run
+   time the page adds the sentence about your own pick) and one PLAIN LINE authored in words.decide.plain, keyed by the decision's id.
+   A decision with no plain line stops the build; so does a summary outside 2 to 3 sentences, a plain line that is not one sentence,
+   and any id, path, symbol, number or {token} in what a voice reads (the section summaries' checks, extended).
    No wallclock: same inputs, same bytes. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -544,7 +550,7 @@ for (const c of calls) c.motion = fill(c.motion, T, 'calls.motion.' + c.id);
 T.nPics = used.size;
 const fillTree = (o, at) => (typeof o === 'string' ? fill(o, T, at) : Array.isArray(o) ? o.map((v, i) => fillTree(v, at + '[' + i + ']')) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => k[0] !== '_').map(([k, v]) => [k, fillTree(v, at + '.' + k)])) : o);
 const omit = (o, ks) => Object.fromEntries(Object.entries(o).filter(([k]) => !ks.includes(k)));
-const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov }, 'ui');
+const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord']) }, 'ui');
 
 /* ── 14 · the data, the hash, the page ─────────────────────────────────────────────────────────────────────────────── */
 const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, opts: c.opts.map((o) => [o.v, o.name]) })),
@@ -557,7 +563,7 @@ if (new Set(choices.map((c) => c.id)).size !== choices.length) die('two choices 
    The icons file holds geometry only; every mark's word is read from the words file, so a concept has one word. A pattern with no
    mark of its own, a mark two patterns share, or a mark the page needs and the file lacks stops the build. */
 const IC = rj(path.join(HERE, 'legibility-review.icons.json'));
-{ const NEED = ['built', 'option', 'question', 'logged', 'deferred', 'fixed', 'partly', 'left', 'open', 'his', 'mine', 'yours', 'ruled', 'land', 'notyet', 'surface', 'feed', 'process', 'down', 'same', 'up', 'code', 'page', 'map', 'copy', 'play', 'stop', 'speaker', 'check', 'pause', 'prev', 'next', 'follow', 'pin'];
+{ const NEED = ['built', 'option', 'question', 'logged', 'deferred', 'fixed', 'partly', 'left', 'open', 'his', 'mine', 'yours', 'ruled', 'land', 'notyet', 'surface', 'feed', 'process', 'down', 'same', 'up', 'code', 'page', 'map', 'copy', 'play', 'stop', 'speaker', 'check', 'pause', 'prev', 'next', 'follow', 'pin', 'caret', 'nextopen'];
   for (const k of NEED) if (!IC.marks[k]) die('icons: the page needs a mark named ' + k);
   for (const [k, v] of Object.entries(IC.marks)) if (/<(script|style|a|foreignObject|image)\b|\bon\w+\s*=|javascript:/i.test(v)) die('icons: a mark that is not plain shapes: ' + k);
   for (const p of PATS) { const n = IC.pattern[p.id]; if (!n) die(`icons: pattern ${p.id} wears no mark of its own`); if (!IC.marks[n]) die(`icons: pattern ${p.id} wears “${n}”, which is not in marks`); }
@@ -581,9 +587,69 @@ const say = SEC_ORDER.map((k) => {
   if (text.split(/(?<=[.!?])\s+/).some((x) => !/[.!?]$/.test(x))) die(`the spoken summary of ${k} has a sentence that does not end`);
   return { key: k, id: 'sec-' + k, title, text }; });
 for (const k of Object.keys(SPK)) if (k[0] !== '_' && !SEC_ORDER.includes(k)) die('words.spoken names a section the page does not draw: ' + k);
+/* ── 13c · the decisions (L-29, D-077): every choice on the page gets a spoken summary and a plain line ─────────────────────
+   A decision is a choice you pick here: a look, a proposal, a draft suite proposal, the audit. The summary is generated from the
+   page's data through the sentence templates (words.decide.s): the first sentence says what it decides and its options, the second
+   what choosing sets in motion (the first sentence of the card's own line, said aloud), the third my pick, or your earlier ruling.
+   Where the data holds an id, a quote or a code word that a voice cannot say, words.decide.say gives the words for that one thing and
+   the build says which. At run time the page adds a fourth sentence once you have picked, so the base is 2 to 3 sentences.
+   The plain line is authored, one per decision (words.decide.plain); a decision without one stops the build. */
+const DW = need(W, 'decide', ''), DS = need(DW, 's', 'decide'), DSAY = DW.say || {}, DNAME = need(DW, 'name', 'decide'), DPLAIN = need(DW, 'plain', 'decide'), KINDW = need(DW, 'kindWord', 'decide');
+const CHOICE_NAME = Object.fromEntries(W.pat.choice.map((x) => [x[0], x[1]]));
+const ID_PAREN = /\s*\((?:D|L|R|EX|CR|N3|S4)-\d+[^)]*\)/g;
+const speakWords = (s) => String(s).replace(ID_PAREN, '').replace(/^[A-Z]{1,2}\d{1,2}\s*·\s*/, '').replace(/\s*·\s*/g, ', ').replace(/[“”]/g, '').replace(/\s+/g, ' ').trim();
+const unparen = (s) => String(s).replace(/\s*\([^)]*\)/g, '').trim();
+const lcFirst = (s) => s.charAt(0).toLowerCase() + s.slice(1), ucFirst = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const orList = (a) => (a.length < 2 ? a.join('') : a.some((x) => x.includes(',')) ? a.join(' or ') : a.slice(0, -1).join(', ') + ' or ' + a[a.length - 1]);
+/* what a voice reads of a decision: the section summaries' checks (SAY_BAD), and no digit — a number is generated, never typed */
+const checkSay = (text, at, lo, hi) => {
+  for (const [rx, what] of SAY_BAD) { const m = rx.exec(text); if (m) die(`${at} holds ${what}: “${m[0]}” in “${text.slice(Math.max(0, m.index - 30), m.index + 30)}”`); }
+  if (/\d/.test(text)) die(`${at} holds a typed number: “${text.slice(0, 80)}”`);
+  const n = (text.match(/[^.!?]+[.!?]+(?:\s|$)/g) || []).length; if (n < lo || n > hi) die(`${at} has ${n} sentences; it is ${lo} to ${hi}: “${text.slice(0, 90)}”`);
+  if (text.split(/(?<=[.!?])\s+/).some((x) => !/[.!?]$/.test(x))) die(`${at} has a sentence that does not end`); };
+/* the plain line (gabe-lens plain): ONE sentence, at most one dash, no colon or semicolon chain, short enough to read in one breath */
+const checkPlain = (id, t) => { checkSay(t, 'the plain line of ' + id, 1, 1);
+  if ((t.match(/—/g) || []).length > 1) die(`the plain line of ${id} has two dashes — the plain voice allows one`);
+  if (/[;:]/.test(t)) die(`the plain line of ${id} chains clauses with a colon or a semicolon`);
+  if (t.split(/\s+/).length > 34) die(`the plain line of ${id} is longer than one breath (34 words)`); };
+const motionLine = (c, ov) => {
+  if (ov.motion) return ov.motion;
+  const ss = String(c.motion).split(/(?<=[.!?])\s+/).map((s) => s.replace(ID_PAREN, '').split(';')[0].trim()).map((s) => (/[.!?]$/.test(s) ? s : s + '.')).filter((s) => !/^Already yours\b/.test(s));
+  const s = ss.find((x) => !SAY_BAD.some(([rx]) => rx.test(x)) && !/\d/.test(x)) || die('decide: no sentence of what ' + c.id + ' sets in motion can be said aloud — give it words.decide.say.' + c.id + '.motion');
+  return /^(What|Where|How|Whether|Which)\b/.test(s) ? fill(DS.decides, { rest: lcFirst(s) }, 'decide.s.decides') : s; };
+const spokenOpts = (id, opts) => Object.fromEntries(opts.map((o) => [o.v, ((DSAY[id] || {}).opts || {})[o.v] || speakWords(o.name)]));
+const DECS = [], DECIDS = new Set();
+const addDec = (e) => { if (DECS.some((x) => x.key === e.key)) die('two decisions share the key ' + e.key);
+  checkSay(e.parts.join(' '), 'the summary of ' + e.key, 2, 3);
+  e.plain = DPLAIN[e.id] || die('words.decide.plain has no line for the decision ' + e.id + ' — what it means for you, in the plain voice');
+  checkPlain(e.id, e.plain); e.si = SEC_ORDER.indexOf(e.sec); DECIDS.add(e.id); DECS.push(e); };
+const decPick = (pk, ruled, opts, nm) => fill(ruled ? DS.pickRuled : DS.pickMine, { pick: opts[pk] }, nm);
+/* in the page's order: the audit and the patterns' draft proposals, then the looks and the proposals, then the L-19 recommendation again in the gap analysis */
+{ const sg = (k) => (k ? 'decide.s.' + k : 'decide');
+  const suiteEntry = (s, gk, gn, gp, name, sentence1, pick, id) => { const ov = DSAY[s] || {};
+    addDec({ key: s, id, sec: 'pat', gk, gn, gp, name, tag: null, parts: [sentence1, ov.does || die('words.decide.say.' + id + '.does: what landing it does'), fill(DS.pickSuite, { pick: CHOICE_NAME[pick] }, 'decide.s.pickSuite')], opts: CHOICE_NAME }); };
+  { const nm = DNAME[audit.id] || die('words.decide.name has no name for ' + audit.id);
+    suiteEntry(audit.id, audit.id, UI.sec.pat.auditHead, null, nm, fill(DS.audit, { name: ucFirst(nm) }, sg('audit')), audit.pick, audit.id); }
+  for (const p of patterns) for (const s of p.suite) { const nm = DNAME[s.cid] || die('words.decide.name has no name for ' + s.cid);
+    suiteEntry(s.cid, p.id, p.name, p.id, nm, fill(DS.suite, { name: ucFirst(nm), kind: KINDW[s.kind] || die('words.decide.kindWord has no ' + s.kind), pattern: lcFirst(unparen(p.name)) }, sg('suite')), s.pick, s.cid);
+    DECS[DECS.length - 1].tag = s.kind; }
+  for (const c of calls) { const ov = DSAY[c.id] || {}, op = spokenOpts(c.id, c.opts), name = ov.name || c.label;
+    const tpl = c.kind ? DS.kind : DS[c.where] || die('decide.s has no template for the place ' + c.where);
+    addDec({ key: c.id, id: c.id, sec: 'calls', gk: c.kind ? 'kinds' : c.where, gn: c.kind ? UI.calls.kindsHead : UI.calls.where[c.where], gp: null, name: c.label, tag: c.rows.length ? c.rows.join(' · ') : null,
+      parts: [fill(tpl, { name, rows: c.rows.join(', and also '), opts: orList(c.opts.map((o) => op[o.v])) }, sg(c.kind ? 'kind' : c.where)), motionLine(c, ov), decPick(c.pick, !!c.ruled, op, sg(c.ruled ? 'pickRuled' : 'pickMine'))], opts: op }); }
+  for (const p of proposals) { const ov = DSAY[p.id] || {}, op = spokenOpts(p.id, p.opts), nm = DNAME[p.id] || die('words.decide.name has no name for ' + p.id);
+    const parts = [fill(DS.proposal, { name: nm, opts: orList(p.opts.map((o) => op[o.v])) }, sg('proposal')), motionLine(p, ov), decPick(p.pick, false, op, sg('pickMine'))];
+    addDec({ key: p.id, id: p.id, sec: 'calls', gk: 'props', gn: UI.calls.propsHead, gp: null, name: nm, tag: null, parts, opts: op });
+    if (p.alsoIn === 'gap') addDec({ key: p.id + ':gap', id: p.id, sec: 'gap', gk: 'gap', gn: UI.gap.recHead, gp: null, name: nm, tag: null, parts, opts: op }); } }
+for (const c of choices) if (!DECIDS.has(c.id)) die('a choice with no decision entry: ' + c.id);
+for (const k of Object.keys(DPLAIN)) if (k[0] !== '_' && !DECIDS.has(k)) die('words.decide.plain names no decision: ' + k);
+for (const k of Object.keys(DNAME)) if (k[0] !== '_' && !DECIDS.has(k)) die('words.decide.name names no decision: ' + k);
+for (const k of Object.keys(DSAY)) if (k[0] !== '_' && !DECIDS.has(k)) die('words.decide.say names no decision: ' + k);
+for (const [k, v] of Object.entries(UI.decide.run)) checkSay(v.replace('{{name}}', 'the look as drawn'), 'the run sentence ' + k, 1, 1);
+for (const e of DECS) { const w = [e.name, e.gn, e.tag, ...Object.values(e.opts)].filter(Boolean); for (const x of w) if (/\{|\bundefined\b/.test(x)) die('a decision word holds a token or a missing value: ' + e.key + ' “' + x + '”'); }
 /* D-075: his pasted voice pick is the default reading voice — the same file the voice lab reads (voices/voice.ruled.json) */
 const VOICE = (({ _about, ruled, ...v }) => v)(rj(path.join(HERE, 'voices', 'voice.ruled.json')));
-const DATA = { ep: EP, app: T.app, voice: VOICE, feedHead: T.feedHead, workHead, ui: UI, glance, calls, proposals, items: itemCards, itemNames: Object.fromEntries(items.map((it) => [it.id, it.name])), questions, gap, audit, patterns, remaining, choices, say, icons: IC.marks, patIcon: IC.pattern };
+const DATA = { ep: EP, app: T.app, voice: VOICE, feedHead: T.feedHead, workHead, ui: UI, glance, calls, proposals, items: itemCards, itemNames: Object.fromEntries(items.map((it) => [it.id, it.name])), questions, gap, audit, patterns, remaining, choices, say, icons: IC.marks, patIcon: IC.pattern, decide: { entries: DECS } };
 /* the page speaks to you (L17): no he · him · his in anything drawn — his own quoted words aside, and an option's key is not drawn */
 { const SKIP = new Set(['f', 'v', 'mine', 'pick', 'ruled', 'outcome', 'words', 'first', 'rest', 'readAs', 'q', 'icons', 'patIcon']); const hits = [];
   const walk = (o, at) => { if (typeof o === 'string') { if (/\b(he|him|his|himself)\b/i.test(o)) hits.push(at + ': “' + o.slice(0, 80) + '”'); return; }
