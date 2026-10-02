@@ -425,3 +425,16 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
   thing is that I would like to see that bar all the time on this kind of artifacts"): the bar shows all the time, as built.
 - **tag:** `controls-only-while-playing`
 - **status:** logged
+
+### L-29
+- **words:** "when we reproduce audio, the menu right now is showing different sections in the artifact page (which is fine) or the HTML
+  file (which is fine). I would like to have a more indented way, like with dropdowns, maybe by sections, because I also want to
+  implement summaries, especially in the parts where we have to make decisions, including some explanation using gabe-lens plain."
+- **where:** the review page · the player bar's section chips, and the decision points (the looks to pick, the proposals, the patterns'
+  land-it choices, the L-19 recommendation)
+- **could not tell:** what a decision is about by ear — the bar reached sections only, and a decision had no summary of its own and no
+  plain line saying what it means.
+- **fix:** the bar's menu nests: each section a dropdown of its decision points; each decision gets a short spoken summary and one plain
+  line (gabe-lens plain); picking one moves the page and the reading there.
+- **tag:** `decision-without-its-own-summary`
+- **status:** logged

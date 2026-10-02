@@ -1148,3 +1148,14 @@ speed) is kept as it is; its default becomes "always" — his ruling, on the rev
 voice plays" becomes the other option. No decision markers are added: his second message says the bar is right as it stands. (2) "save
 this for any future artifact": recorded as his standing preference at once; the gabe-artifact change (the read-aloud bar + the spoken
 summary rules as a reusable part) is a suite change, so it is drafted first and lands on his "land it" (iterate-before-implement).
+
+## D-077 — The bar's menu nests by section; every decision gets its own spoken summary and a plain line
+Date: 2026-10-01 · Input: his message after D-076, logged as legibility-feedback.md L-29.
+Decision, his: "I would like to have a more indented way, like with dropdowns, maybe by sections, because I also want to implement
+summaries, especially in the parts where we have to make decisions, including some explanation using gabe-lens plain."
+Consequence: on the review page the bar's section chips become dropdowns, each listing its decision points indented under it (the looks
+to pick, the proposals, each pattern's land-it choices, the L-19 recommendation); a section with no decision stays a plain chip. Each
+decision gets a short spoken summary (what it decides, its options and what each sets in motion, my pick, his pick when made — generated
+from the page's data) and one sentence in the gabe-lens plain voice saying what it means for him; picking a decision scrolls the page
+there and moves the reading to it. Scoping the summaries to decision points is the agent's reading of "especially in the parts where we
+have to make decisions", his to widen. The read-aloud draft for gabe-artifact (D-076) takes the same nested shape.
