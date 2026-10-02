@@ -393,7 +393,7 @@
    "like": {
     "process": "line",
     "analogy": "It is like a factory that paints a safety rule on the wall and fits no sensor on the machine, so the wall asks and the machine runs on.",
-    "stops": "It stops being true where a sensor is cheap, because a check per rule grows each generator, and a rule that is easy to keep by eye may not be worth one."
+    "stops": "It stops being true where a sensor is cheap, because a check per rule grows each page generator, and a rule that is easy to keep by eye may not be worth one."
    },
    "steps": [
     {
@@ -778,7 +778,7 @@
    "like": {
     "process": "line",
     "analogy": "It is like a factory that writes a safety rule on the wall and also fits a sensor on the machine, where the sensor stops the line and the wall only asks.",
-    "stops": "It stops being true where a sensor is cheap, because a check per rule grows each generator, and a rule that is easy to keep by eye may not be worth one."
+    "stops": "It stops being true where a sensor is cheap, because a check per rule grows each page generator, and a rule that is easy to keep by eye may not be worth one."
    },
    "cost": {
     "toSolve": "Checks added to each generator's build and test run and to the audit script, one pass per rule, where the build checks stop the build and the audit only reports.",
