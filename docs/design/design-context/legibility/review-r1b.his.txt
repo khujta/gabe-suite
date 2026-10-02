@@ -1,0 +1,66 @@
+REVIEW · legibility r1 · bff9244a · gustify @05007957 · fcd1063
+45 yours · 0 left as my pick · 8 deferred to the bench
+
+CALLS
+mo.leg: legend on the row's name (ruled, D-067) · note: We should improve the hover display using the layout and practices we use in the frontend. On the left, in the endpoint, we have some hovers that are beautiful, informative, and easier to read. We should follow that format for all the hovers in general, depending on the type of hover we are doing everywhere
+mo.ipo: labelled lines (ruled, D-081) · note: Just to reinforce, we should use the kind of hover information that we are using in the frontend lab. We should track down how we ended up with that kind of hover information but those are the ones I would like to have everywhere, including these kinds of pages. That's something that should be present in the gates when we design hover notices and hover windows
+mo.hdr: stages over moments (yours, same as my pick) · note: I can't see the difference between this and the screenshot. To be honest, both have the same header in the column with moments and stages below. They have the same moments and everything seems the same. At least in the screenshots, they show the same thing.
+mo.save: saving under EFFECTS (yours, same as my pick) · note: These are the same screenshots we had in the previous point on the header. Again, both are showing the same header. I cannot see what the difference is between one approach and the other, and it's very important to me to be able to see this.
+mo.meta: metadata after the table (ruled, D-081) · note: This is something else we will work on. We will probably show all the metadata in just one big element instead of different columns. For now you can keep it that way or maybe add controls to show different layouts for the metadata, like we did for the cards and the different elements before the table. This section is okay after the table.
+mo.wid: every item on one line (ruled, D-081) · note: Ideally the selected column that is widened should be adjustable. I should be able to go to the edges of the column and move left or right, with some limits as the maximum and minimum width.
+mo.fit: wrap into bands (ruled, D-081)
+mo.stk: ride under the pinned row (ruled, D-081)
+mo.gdl: function, gates under it (ruled, D-081) · note: This is a tricky one. We would need a dedicated section to show the layout for representing this with all the different dimensions and draggable objects inside the cards. Again, this is another card we want to represent somehow, which is important to figure out, but it needs dedicated work .
+mo.gef: ending's colour, stage lit (ruled, D-081) · note: This is another thing that needs a dedicated section to figure out the layout because we might also use colors and depict the stage in a better, more intuitive way. Maybe in the top line, the bottom line, the border, or every block, we can put dots or similar elements to suggest the stage or maybe a time-encoded circle with the progress bar. We have to figure out different ways to represent the stage in this context
+mo.gic: an icon per kind (ruled, D-081)
+mo.grl: where it decides (ruled, D-081) · note: Again we need a dedicated section to decide about this. This is considered another element that we want to show, so we need to figure this out with the proper controls. I can modify, sort, trigger, move things, and show or encode different information using icons, words, colors, and so on, and then give you back the copy of the configuration that I choose.
+mo.fnm: what it decides and touches (ruled, D-081) · note: Again we need a dedicated section to decide about this. This is considered another element that we want to show, so we need to figure this out with the proper controls. I can modify, sort, trigger, move things, and show or encode different information using icons, words, colors, and so on, and then give you back the copy of the configuration that I choose.
+mo.std: split into the gates (ruled, D-081) · note: Again we need a dedicated section to decide about this. This is considered another element that we want to show, so we need to figure this out with the proper controls. I can modify, sort, trigger, move things, and show or encode different information using icons, words, colors, and so on, and then give you back the copy of the configuration that I choose.
+mo.dfx: a small map per moment (ruled, D-081)
+mo.dxc: the page's colours (ruled, D-081)
+mo.jyb: their own moment (ruled, D-081)
+mo.ifl: a lifeline each (ruled, D-081)
+ex.lay: an upper and a lower row (ruled, D-081) · note: Also let's simplify them. The options at the top of each container should be more icon-based. We don't need to show the string we are going to copy; we just need the button to copy the configuration. The controls for configuring each one should always be visible, along with all the controls for modifying what is inside. There should also be a control for the width. Since this will probably use more width than expected, we might have three widths: - Dynamic width - Full width - A shorter width - A compact width - The most compact version
+ex.follow: follow it (ruled, D-081)
+ex.scope: this endpoint (ruled, D-081)
+ex.kind.end: deferred to the all-endpoints bench (D-083) · note: I will need a better depiction of what would happen on the different options on this. I don't get what is happening here.
+ex.kind.table: the look as drawn (ruled, D-027) · note: I will need a better depiction of what would happen on the different options on this. I don't get what is happening here.
+ex.kind.schema: deferred to the all-endpoints bench (D-083) · note: I will need a better depiction of what would happen on the different options on this. I don't get what is happening here.
+ex.kind.fn: deferred to the all-endpoints bench (D-083) · note: I will need a better depiction of what would happen on the different options on this. I don't get what is happening here.
+ex.kind.test: deferred to the all-endpoints bench (D-083) · note: I will need a better depiction of what would happen on the different options on this. I don't get what is happening here.
+ex.kind.gate: deferred to the all-endpoints bench (D-083) · note: I will need a better depiction of what would happen on the different options on this. I don't get what is happening here.
+ex.kind.hook: deferred to the all-endpoints bench (D-083) · note: I will need a better depiction of what would happen on the different options on this. I don't get what is happening here.
+ex.kind.inf: deferred to the all-endpoints bench (D-083) · note: I will need a better depiction of what would happen on the different options on this. I don't get what is happening here.
+
+PROPOSALS
+F24: rename it “sends it” (yours, same as my pick)
+L-19: G2 · A ninth row, Security (yours, I picked G1 · No ninth row: a Security control over the rows) · note: 9th row because security might grow in the future.
+R-11: open fitted when it is wider than the box (ruled, D-081) · note: If we don't have enough room, we can make the table bigger than they allow, so we can slide it to the right or left using Shift and the mouse wheel
+EX-5: deferred to the all-endpoints bench (D-083) · note: I will need a better depiction of what would happen on the different options on this. I don't get what is happening here.
+
+PATTERNS
+A1: land it (ruled, D-081)
+P4.1: land it (ruled, D-081)
+P4.2: land it (ruled, D-081)
+P3.1: land it (ruled, D-081)
+P3.2: change it (ruled, D-081) · note: For new kinds of elements, the idea is not to create them dynamically. We can somehow accumulate the unknown elements and later decide, using Claude Code, the skills, and the Gabe universe toolbox, how to handle them. The labels will be created in batches, not in real time. I don't know if that makes sense. We will not pick the added labels dynamically as we get new types of elements. Instead we should put them with a generic label, like "unknown" maybe, and then be able to check all the unknowns. We should be able to use a skill or tool to evaluate which ones deserve to be considered included in the kinds of elements that we can map to the Gabe universe .
+P1.1: land it (ruled, D-081) · note: Still, we can repeat some information in the hover, but only a small part of what we show there. The issue with this was that when I hovered over different endings, for example, I ended up with five lines of content in the hover and all five lines were the same. In the elements, only one of those five lines had differences. The idea is that if they are going to contain similar content, it should be a label or a very short note, something like that. For more detail, we can encode that in a legend section if that is necessary. The majority of the hover information should be used for the content that is actually changing. Labels and that kind of content can repeat. The idea is that we don't describe much of the labeling in the hover. Instead, if we have to explain something complicated regarding the label or the concept we are describing, we can put it in a separate appendix, like in the legend section or somewhere else .
+P1.2: land it (ruled, D-081)
+P5.1: not yet (ruled, D-081) · note: This might be too much for now. It's more related to the visual display of information and we might end up solving this during the consolidation of our navigation bar (because we will define how we're going to display the different cards and everything inside). Instead of this we can do a very shallow version, like a very quick check or a use case. I'll try to use layouts. Later, if I find something that is not well presented in the frontend, we might work on it, but heavy tests to verify this might be a little too much .
+P5.2: land it (ruled, D-081)
+P6.1: not yet (ruled, D-081) · note: This, again, might be too much. My appreciation of this is that we are trying to semantically decide what a given repeated word means in different contexts. That should be a given if we structure the data well. Our work should lean more toward how to structure the data better instead of trying to identify confusion among different definitions. As long as we can represent the data and the context around it well in terms of visual aids, forms, movement, and shapes, words may have little to no room to be confused or have different meanings .
+P6.2: not yet (ruled, D-081) · note: Same as above: If we focus on the words themselves, we might end up losing focus on something that is already confusing. I prefer to focus on encoding, structuring, grouping, movement, coloring, shapes, icons, and so on .
+P2.1: change it (ruled, D-081) · note: I agree with this, but I don't like the approach that much because we are making all these checks through all these decisions. We create corpus A with the page and then try to tailor it, little by little, to accommodate it by making these checks one on top of the other. Instead, I would like to be able to produce a better corpus that has these rules embedded, rather than generating something, then correcting everything, and doing several passes on the same data. Is there any way we can generate a better corpus from the start and then label different parts, such as: - hovers related to endings, databases, schemas, functions, and so on and then check those dynamically? That way we only check the hovers related to the functions or whatever we are trying to tailor for, in order to better represent the information. Generating things and then doing passes is going to be very, very, very expensive. Still can have one final pass, something like that, but I don't want to have n passes by the n points of view that we want to correct .
+P2.2: land it (ruled, D-081)
+P9.1: land it (ruled, D-081)
+P8.1: land it (ruled, D-081)
+P8.2: land it (ruled, D-081)
+P7.1: land it (ruled, D-081)
+P7.2: land it (ruled, D-081)
+P10.1: land it (ruled, D-081)
+P10.2: land it (ruled, D-081)
+
+PLAYER
+pl.bar: always (ruled, D-076)
+pl.follow: on (ruled, D-081)
+pl.after: stop there (my pick, not ruled)

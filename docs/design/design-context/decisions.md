@@ -1257,3 +1257,22 @@ leave the count of choices waiting on him and the copy text says where they will
 saving (the table's layout), F24 and L-19. Trigger to take them up: the legibility work is finished; he then configures the cards on the
 all-endpoints bench and pastes the configuration (the bench's copy lines), which becomes the ruled default. His card rulings in D-081 stand,
 and their refinement joins the same bench work (L-39). The agent's sorting of which choices are card layouts is his to correct.
+
+## D-084 — His second paste of round 1: the header, saving, F24 and L-19 ruled; Security becomes a ninth row
+Date: 2026-10-02 · Input: his REVIEW text from the review page (head `bff9244a`), kept as `legibility/review-r1b.his.txt`.
+Decision, his: the header stays **stages over moments** and saving stays **under EFFECTS** (both "yours, same as my pick"); the pinned row's
+Client column is renamed **"sends it"** (F24); L-19 is **G2 · a ninth row, Security**, over my pick G1 — "9th row because security might grow in
+the future." His other lines repeat D-067 · D-076 · D-081 · D-083 unchanged. `pl.after` (what the player does after a decision) stays "my pick,
+not ruled" — open.
+Reading: every note on his lines except L-19's is the text of his round-1 notes, word for word (the page keeps a note in his browser), so they
+are read as carried — already logged as L-33 … L-39 and the D-081 redrafts — not as new feedback. If a note is new (the header and saving
+pictures still showing him no difference), he says so and it is logged.
+Consequence: on all-endpoints.html the Client head reads "sends it" on the pinned row, on BY MOMENT's Client head and in every hover that names
+the column; BY MOMENT gains a ninth row, **Security**, after Gates and decisions. Its home facts — the app-wide middleware in run order, the two
+switches that turn a check on, the CORS allowed origins and the secrets read on the path (the last two read from the feed's settings, "not
+recorded" where the feed lacks them) — sit in the Security row in full. The security facts that already live in other rows (the 401 and 429
+endings, the limiters, the users row the login adds, the login check, the repeat key) are a choice made alone, so it is built as options
+(D-025.2): **a short mark in Security that points to its home row** (my pick, dashed) or **moved into Security**. The review page reads both
+records in order, so a fresh page shows these four ruled.
+Revisit if: a security fact appears on another endpoint that fits neither the home facts nor the marked ones — it is added to the row's roster
+by name, never by guess.
