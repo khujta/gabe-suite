@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-072). Updated 2026-10-01 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-074). Updated 2026-10-01 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -61,6 +61,12 @@ browser's own voice; my proposal, dashed). Text to speech was explored: the in-p
 work now; Piper (local, free) tested fine; Kokoro failed on a packaging bug (needs `sudo apt install espeak-ng`); ElevenLabs
 (`uvx elevenlabs-mcp`, free tier 10,000 credits a month) needs his API key. His pick of a route is open.
 
+Then (D-073, D-074): the **voice lab** `legibility/voices/voice-lab.html` — one text (the 8 summaries) read by every browser voice,
+every setting tunable, 15 Piper samples (5 voices × 3 speeds), one copy line `VOICE · engine … · voice … · speed …` — published
+privately at https://claude.ai/artifact/6aChNSpmewj39KQSsSeH8m; and the review page's contents bar now freezes while a voice reads
+and steers it (skip = the reading AND the page move). Both read one saved setting, `gabe:voice:v1`. Tested only against a mocked
+voice engine: his first listen on Windows is the real test. His pasted VOICE line becomes the ruled default.
+
 ## Open for you — on the review page
 
 1. **The looks added this round** (29 choices on the page): pick or keep each; my picks are dashed.
@@ -82,7 +88,7 @@ secrets a path reads (settings{} has them, unjoined).
 
 ## Next, in order
 
-1. **His REVIEW text** for round 1 → act on each line (a ruling = a D-entry in the same commit); "my pick, not ruled" is never a ruling.
+1. **His VOICE line** from the voice lab, and **his REVIEW text** for round 1 → act on each line (a ruling = a D-entry in the same commit); "my pick, not ruled" is never a ruling.
 2. **The patterns into the Gabe Suite** — only the proposals he marks "land it", as a draft first (iterate-before-implement).
 3. **M3** (the channel budget for the first prism), then **the gallery**.
 4. Generation items above, each under its D-063 regime.
