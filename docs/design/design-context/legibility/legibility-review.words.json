@@ -31,7 +31,7 @@
     "calls": {
       "title": "Your calls",
       "n": "{nCalls} choices · {nLooks} looks · {nProps} proposals",
-      "note": "Every choice of a look added this round, grouped by where it lives on the page: an option group, or a kind's look on the bench. A look shows its picture from the walk where the walk took one; {nNoPic} looks have none, and their card says so. The dashed one is my pick; a filled one is yours. Click a look to make it yours; click it again to give it back.",
+      "note": "Every choice of a look added this round, grouped by where it lives on the page: an option group, or a kind's look on the bench. A look shows its picture from the walk where the walk took one; {nNoPic} looks have none, and their card says so. The dashed one is my pick; a filled one is yours. Click a look to make it yours; click it again to give it back. Under each choice, an example from {ep} and what each option would change.",
       "motionNote": "Choosing a look makes it what all-endpoints shows when it opens, ruled. The other looks stay until you say to drop them.",
       "take": "Take from this: {nCalls} choices wait for you ({nRuled} already ruled) and {nProps} proposals need your yes or no. Pick by the pictures; a look you leave stays my pick, never a ruling.",
       "picsNote": "Click a picture to open it full size in a new tab, or show every picture here at full size, each in its own scroller."
@@ -368,7 +368,8 @@
       "L-26": "a summary to copy for reading aloud",
       "L-27": "a player bar that stays in view",
       "L-28": "the player bar all the time",
-      "L-29": "a nested menu with a summary per decision"
+      "L-29": "a nested menu with a summary per decision",
+      "L-30": "an example and the impact on every decision, a hover for every icon"
     },
     "round2Head": "Raised on reading this page",
     "round2Note": "You raised these after you read this page, so the review has not read them yet. They are built on this page itself: the page you are reading is their picture.",
@@ -731,7 +732,7 @@
   },
   "legend": {
     "head": "The marks on this page, said once",
-    "note": "A mark stands where a word would. Point at a mark to read its word.",
+    "note": "A mark stands where a word would. Point at a mark here to read what its kind means, and at a mark in the page to read what it says about its own item.",
     "state": "Where an item stands",
     "outcome": "What the review found",
     "verdictNote": "The review's verdict on an item or an answer wears the same marks: answered wears fixed's mark, partly wears partly fixed's, and not done wears left's.",
@@ -740,7 +741,34 @@
     "change": "How a measure moved",
     "subject": "What a question is about",
     "pattern": "The patterns",
-    "hisBoth": "yours to rule, or left for your call"
+    "hisBoth": "yours to rule, or left for your call",
+    "def": {
+      "built": "The fix is on this page, with its picture on the card.",
+      "option": "A look is waiting for you to pick, and nothing is built until you do.",
+      "question": "You asked, and the page answers from the data.",
+      "logged": "Your words are on record, and nothing is built yet.",
+      "deferred": "Set aside on purpose, with its trigger written down.",
+      "open": "A row that round 1b left standing.",
+      "fixed": "The finding is closed: round 1b fixed it.",
+      "partly": "Round 1b fixed some of it, and the rest is still there.",
+      "left": "Round 1b left it as it was, and says why.",
+      "his": "It is yours to rule, or left for your call.",
+      "surface": "The same defect showed up on a surface nobody had checked yet.",
+      "feed": "The data or its generator cannot give what the page needs.",
+      "process": "A slip in how the work was done, with nothing wrong on the page.",
+      "mine": "My pick, drawn dashed: it stands until you pick, and it is not a ruling.",
+      "yours": "A choice you made, drawn filled.",
+      "kept": "You made a choice and it is the one I picked.",
+      "ruled": "You ruled it earlier: it stays filled until you change it.",
+      "land": "My pick for a proposal for the suite is to land it, once you say so.",
+      "notyet": "My pick for a proposal for the suite is to leave it for now.",
+      "down": "A count that went down: fewer of that defect than at the start.",
+      "same": "A count that stayed where it was.",
+      "up": "A count that went up: more of that defect than at the start.",
+      "code": "The question asks what the code does.",
+      "page": "The question asks how the page reads.",
+      "map": "The question asks how the map reads."
+    }
   },
   "mark": {
     "mine": "my pick, not a ruling",
@@ -766,32 +794,35 @@
     "stop": "stop",
     "copyAll": "copy every summary",
     "listenAll": "listen to every summary",
-    "tip": "my proposal: your browser reads this aloud in its own voice",
+    "tip": "Read this summary aloud",
     "mineNote": "Each section opens with a summary written to be read aloud, from the numbers on this page. Copy one with its button, or every summary at once. The dashed buttons are my proposal, not something you asked for: they read a summary aloud with your browser's own voice, free, with nothing sent anywhere. While a voice plays, the contents bar freezes at the top and carries the player, as you asked: stop it, skip to another section, and the page goes there too. The speed you pick and the options beside it are kept in this browser. When you have saved a voice in the voice lab, this page reads with it. The section chips with a caret open a menu of that section's decisions: pick one and the page and the reading go to it, with a short summary and a plain line, and the option after a decision says what happens next.",
     "rateLabel": "reading speed",
-    "rateTip": "slower, normal or faster, around the speed of the voice you saved in the voice lab",
+    "rateTip": "Pick the reading speed",
     "rates": [
       "slower",
       "normal",
       "faster"
-    ]
+    ],
+    "tipAll": "Read every summary aloud",
+    "tipCopy": "Copy this summary",
+    "tipCopyAll": "Copy every summary"
   },
   "player": {
     "_about": "The player that rides the contents bar (L-27, D-074): its buttons, its two options, and what the voice's hover says. Icons carry the buttons, so each word here is a hover and a name for a reader.",
     "bar": "contents and player",
-    "play": "play",
-    "pause": "pause",
-    "stop": "stop reading",
-    "prev": "previous section",
-    "next": "next section",
+    "play": "Play the reading",
+    "pause": "Pause the reading",
+    "stop": "Stop the reading",
+    "prev": "Previous section",
+    "next": "Next section",
     "follow": "follow",
-    "followTip": "the page follows the reading when it moves on by itself",
-    "voiceSaved": "Reading with {{name}}, the voice you saved in the voice lab.",
+    "followTip": "Follow the reading",
+    "voiceSaved": "Reading with {{name}}, the voice you saved.",
     "voiceDefault": "Reading with {{name}}, this browser's own voice.",
     "voiceNone": "Reading with this browser's default voice.",
     "voiceMissing": "The voice you saved, {{name}}, is not in this browser, so the default voice reads instead.",
     "defaultName": "default voice",
-    "voicePiper": "The voice you saved, {{name}}, is a Piper voice. Piper has no live voice on this page, so this browser's voice reads instead.",
+    "voicePiper": "The voice you saved, {{name}}, is a Piper voice that this browser cannot play, so its own voice reads instead.",
     "optBar": "the bar stays at the top",
     "optBarPlaying": "only while a voice plays",
     "optBarAlways": "always",
@@ -809,9 +840,11 @@
     "optAfterSection": "go on with the section",
     "optAfterTip": "When a decision has been read: stop there, go on to the next decision still open, or go on with its section: the next decision in the same section, then the next section.",
     "lineAfter": "pl.after",
-    "nextOpen": "next open decision",
+    "nextOpen": "Next open decision",
     "nextOpenShort": "next open",
-    "nextOpenTip": "Jumps to the next decision nobody has picked, skipping the ones you have decided or ruled, and reads it."
+    "nextOpenTip": "Next open decision",
+    "tipAlways": "Always in view, your ruling",
+    "tipPlaying": "Show only while reading"
   },
   "ov": {
     "items": {
@@ -924,7 +957,7 @@
     ]
   },
   "decide": {
-    "_about": "The nested menu and the decisions it lists (L-29, D-077). Every decision on the page (a look to pick, a proposal, a draft suite proposal, the audit) gets a SPOKEN SUMMARY generated from the page's data by gen-legibility-review.mjs out of the sentence templates in s (what it decides and its options, what choosing sets in motion, my pick, or your earlier ruling), and one PLAIN LINE authored here, keyed by the decision's id, in the voice of the gabe-lens plain mode: one sentence, a concrete noun first, at most one dash, from your side of the screen, no id, path, code or number. A decision with no plain line stops the build, and so does a line that is two sentences. name is the short name a proposal wears in the menu (a look wears its own label); say holds the few words the data cannot give in plain speech (an option or a motion that holds an id or a quote, and what landing a suite proposal does). When you have picked, the page adds one sentence to the base summary (run); the base is at most three sentences so the whole stays within four.",
+    "_about": "The nested menu and the decisions it lists (L-29, D-077). Every decision on the page (a look to pick, a proposal, a draft suite proposal, the audit) gets a SPOKEN SUMMARY generated from the page's data by gen-legibility-review.mjs out of the sentence templates in s (what it decides and its options, what choosing sets in motion, my pick, or your earlier ruling), and one PLAIN LINE authored here, keyed by the decision's id, in the voice of the gabe-lens plain mode: one sentence, a concrete noun first, at most one dash, from your side of the screen, no id, path, code or number. A decision with no plain line stops the build, and so does a line that is two sentences. name is the short name a proposal wears in the menu (a look wears its own label); say holds the few words the data cannot give in plain speech (an option or a motion that holds an id or a quote, and what landing a suite proposal does). When you have picked, the page adds one sentence to the base summary (run); the base is at most three sentences so the whole stays within four. The EXAMPLE and the IMPACT of every decision (L-30, D-078) are authored here as templates: ex is one sentence per decision (a look, a proposal, a kind), imp holds one line per option, beginning with the verb that says what picking it changes (the card shows it as written; the voice reads it after the words pick and the option's name); exSuite and impSuite hold the suite proposals' examples and impacts, filled from each pattern's own record. Every number and name is a {token} the generator fills from the feed, once for the card and once for the voice (numbers spelled, code names said as words); a [[clause]] stays on the card only, a ((clause)) is read aloud only. sayWords gives the few words a voice needs where the card shows a code (the request, an HTTP status, what a gate does at run time).",
     "menu": {
       "caret": "the decisions in {{title}}",
       "head": "{{title}}: {{n}} decisions, {{open}} still open",
@@ -937,9 +970,21 @@
       },
       "plainHead": "in plain words",
       "listen": "listen",
-      "listenTip": "Reads this decision's summary and then its plain line, in your voice.",
+      "listenTip": "Read this decision aloud",
       "fold": "what is read aloud",
-      "copy": "copy to read aloud"
+      "copy": "copy to read aloud",
+      "stateTip": {
+        "open": "Open: you have not picked yet. My pick is {{pick}}.",
+        "yours": "Decided by you: {{picked}}. My pick was {{pick}}.",
+        "kept": "Decided by you: you kept my pick, {{pick}}.",
+        "ruled": "Ruled by you: {{ruled}}."
+      },
+      "caretTip": "Open this section's decisions",
+      "ocTip": "Still open here: {{n}} of {{decisions}}.",
+      "groupTip": "{{id}} has {{props}} for the suite.",
+      "copyTip": "Copy this decision's summary",
+      "exampleLab": "Example",
+      "impactLab": "Impact"
     },
     "run": {
       "yours": "You picked {{name}}.",
@@ -1148,6 +1193,271 @@
       "P10.1": "Checks that put each standing rule of a page on a rail that already runs — the build, the probe or the commit gate.",
       "P10.2": "A written rule that a page rule without a check is no rule, so its check is named in the same change.",
       "A1": "One script that opens any page in a browser and counts the defects this round found — today a prototype, and once landed a tool of the suite."
+    },
+    "sayWords": {
+      "ep": "the request that starts a cooking session",
+      "status": {
+        "201": "created",
+        "400": "bad-request",
+        "401": "not-signed-in",
+        "403": "forbidden",
+        "404": "not-found",
+        "409": "conflict",
+        "422": "invalid-input",
+        "429": "too-many-requests",
+        "500": "server-failure"
+      },
+      "gate": {
+        "It stops the build.": "stops the build.",
+        "Words only: nothing runs.": "is words only, so nothing runs.",
+        "It reports; it stops nothing.": "reports and stops nothing.",
+        "It fails the render gate, which runs before a publish.": "fails the render gate that runs before a publish.",
+        "The audit reports; the words sweep stops the build.": "reports in the audit and stops the build in the words sweep.",
+        "A step to follow: nothing runs.": "is a step to follow, so nothing runs.",
+        "The build checks stop the build; the audit reports.": "stops the build through its checks and reports in the audit."
+      }
+    },
+    "ex": {
+      "mo.leg": "On {ep} the Gates and decisions row holds {nChecks} checks, {nForks} forks, {nCatches} catches, {nLimits} rate limits and {nSwitches} switches, and its legend says which chip is which and how many there are.",
+      "mo.ipo": "On {ep} the hover of the {sName} rate limit says what comes before it, a request to one of {sRoutes} routes, what it checks, {sLimit} calls in {sWindow} seconds for one client, and what it gives, a {limStatus} refusal.",
+      "mo.hdr": "On {ep} the header shows the stages from the edge to the answer, and a bracket over the handler's ways to end, among them the failures {exceptList}, says a request takes only one of them.",
+      "mo.save": "On {ep} the commit in {handlerFn} is the handler's own save, and it comes after {workFn} has written the session.",
+      "mo.meta": "On {ep} the metadata holds {nFindings} findings about its refusals, such as the {st409} answer that more than one refusal shares.",
+      "mo.wid": "On {ep} the edge moment holds {mwName}, and a click on its head widens the column until that name stands whole, or until every chip in it fits on one line.",
+      "mo.fit": "On {ep} the moments run past the edge of the box and the handler's last except moments are cut off, so fit has something to narrow or wrap.",
+      "mo.stk": "On {ep} the table is tall, so scrolled down you read cells far below the heads, and the heads either ride along under the pinned row or stay behind at the top.",
+      "mo.gdl": "On {ep} the function {workFn} holds {nWorkChecks} checks and {nWorkForks} forks, and the look decides whether its name repeats on each gate, stands once as a head over them, or sits in a column beside them.",
+      "mo.gef": "On {ep} the {sName} rate limit ends in a {limStatus} refusal, and the look shows that status in its own colour with the edge stage lit, or as a band in the colour of the edge stage.",
+      "mo.gic": "On {ep} the gates are of {nGateKinds} kinds, rate limits, checks, forks, catches and switches, and the look decides whether each kind wears an icon of its own.",
+      "mo.grl": "On {ep} the label at the end of the {sName} rate limit would read app-wide, or refuses, or nothing, and a check like the missing recipe one would read not found only if you choose what it guards.",
+      "mo.fnm": "On {ep} the function {workFn} would show the {st404} and {st409} answers its own code decides, and R or W for each table it reads or writes, or only its name and role.",
+      "mo.std": "On {ep} a setting that turns a check on or off is the norm, on {nFlagEps} of {nEp} endpoints, while reading a repeat key is rare, on {nRepeatEps}, and the look decides where those kinds of piece stand.",
+      "mo.dfx": "On {ep} the data row touches {nTables} tables and the handler's own code writes {nWritten} of them, and the look decides whether you read that as chips, as a small map in each moment, or as one map for the whole endpoint.",
+      "mo.dxc": "On {ep} {workFn} reads the session and then writes it, so its link draws both colours, and the look decides whether a write is orange or red.",
+      "mo.jyb": "On {ep} several tests send requests before they call it, as many as {maxPrior}, and the look decides whether those earlier requests get a moment of their own in the Proof row or sit in its head.",
+      "mo.ifl": "On {ep} {nInf} values are alive while the request runs, {nReq} that go with the answer, such as {inflightKey}, and {nSrv} that the server keeps, such as the rate limit counters, and the look decides how their reads show.",
+      "ex.lay": "On the bench, the {nBenchKinds} kinds[[ (ending, table, schema, function, test, gate, client hook and in-flight value)]]((, ending, table, schema, function, test, gate, client hook and in-flight value,)) show their columns for {ep}, and the look decides whether they stand in one row, wrap, or split into an upper and a lower row.",
+      "ex.follow": "On the bench for {ep}, clicking the {sName} rate limit in the table would show it in the gate column if the bench follows your clicks, and if it stays, the column keeps the element you picked.",
+      "ex.scope": "On the bench, the gate column offers the gates of {ep} alone, or the gates of any of the {nEp} endpoints.",
+      "ex.kind.end": "On {ep} the ending column offers each way a request ends, {nEndings} in all, from the {limStatus} refusal at the edge to the {st404} answer for a missing recipe and the {st500} that nothing catches.",
+      "ex.kind.table": "On {ep} the table column offers the {nTables} tables the request touches, and {sessTable} is the one it writes and the repeat key can race on.",
+      "ex.kind.schema": "On {ep} the schema column offers the reply, {resModel}, with its {nResFields} fields, and the request body that the request reads.",
+      "ex.kind.fn": "On {ep} the function column offers the handler {handlerFn} and the functions it calls, such as {workFn}, which writes the session.",
+      "ex.kind.test": "On {ep} the test column offers the {nAct} tests that send this request[[, such as {caseOk}, which proves the {st201} answer]].",
+      "ex.kind.gate": "On {ep} the gate column offers its {nChecks} checks, {nForks} forks, {nCatches} catches and {nLimits} rate limits, such as the {sName} limit of {sLimit} calls in {sWindow} seconds.",
+      "ex.kind.hook": "On {ep} the client hook column offers {sender}, the piece of the web app that sends this request, with the {screen} screen beside it.",
+      "ex.kind.inf": "On {ep} the in-flight column offers {nInf} values, such as {inflightKey}, which goes with the answer, and the rate limit counters, which the server keeps.",
+      "F24": "On {ep} the head says {oldHead} but counts {sender}, the hook that sends the request, while the {screen} screen stands beside it and is not counted.",
+      "L-19": "On {ep} the login check and its {st401} answer, the {nLimits} rate limits and their {limStatus} refusal, and the users row the login adds sit in several different rows, and {secMissing} security facts are missing from both the lab and the page.",
+      "R-11": "On {ep} the table runs past the box, as it does on {nScroll} of the {nEp} endpoints at that width once every name stays whole.",
+      "EX-5": "On {ep} the bench draws {workFn} as a block while the table draws the same function as a chip, and this choice is whether the chip takes the block's look."
+    },
+    "imp": {
+      "mo.leg": {
+        "hover": "Keeps the table short, because a row's legend opens only when you point at the row's name.",
+        "strip": "Adds one legend line per row above the table, always in view, so the table starts lower on the screen."
+      },
+      "mo.ipo": {
+        "lines": "Shows the hover as labelled lines, before, checks and gives, one under the other.",
+        "sent": "Joins the parts into one line with arrows, so the hover is shorter and reads left to right."
+      },
+      "mo.hdr": {
+        "band": "Draws the stages over the moments and nothing more, so only the bracket says which moments are alternatives.",
+        "road": "Adds a line under the stages that says whether the moments below come in turn or are ways a request can go, so the header is one line taller."
+      },
+      "mo.save": {
+        "eff": "Puts the save under EFFECTS, with the other writes the handler leaves behind, after the handler's other moments.",
+        "hand": "Keeps the save under HANDLER, with the handler's own code, and draws EFFECTS as an empty outline beside it."
+      },
+      "mo.meta": {
+        "after": "Keeps the table first on the screen, with the metadata under it.",
+        "before": "Puts the metadata above the table, under the bar, so the table starts lower on the screen."
+      },
+      "mo.wid": {
+        "names": "Stops widening once no name breaks in the middle of a word, though a long chip may still wrap at a space.",
+        "line": "Keeps widening until every item sits on one line, so the column is wider and the table scrolls sideways sooner."
+      },
+      "mo.fit": {
+        "min": "Narrows the thinnest moments to strips that count their items, so more of the table fits, and a click on a strip widens it.",
+        "bands": "Wraps the moments into bands, one under the other, so nothing scrolls sideways and the table gets taller."
+      },
+      "mo.stk": {
+        "ride": "Keeps the stage band and the moment heads in view under the pinned row while the table scrolls past.",
+        "stay": "Leaves the heads at the table's top, so scrolled down you see only the pinned row's heads."
+      },
+      "mo.gdl": {
+        "chain": "Draws each gate as one chip with its function, condition and effect, so the function's name repeats on every gate.",
+        "head": "Draws the function once as a head with its gates listed under it, so the row is shorter.",
+        "cols": "Draws each gate as a row of function, condition and effect side by side, so the effects line up."
+      },
+      "mo.gef": {
+        "end": "Colours the effect by the ending's status and lights the stage it leaves from on a small spine.",
+        "stage": "Colours the effect by the stage it leaves from, which adds a stage palette to the page."
+      },
+      "mo.gic": {
+        "each": "Gives each of the {nGateKinds} kinds an icon of its own, so a rate limit and a check differ at a glance.",
+        "one": "Gives every gate the same icon, so only the label at its end tells the kinds apart.",
+        "none": "Draws gates with no icon, as before."
+      },
+      "mo.grl": {
+        "where": "Labels each gate by where it decides, app-wide, at login, in a dependency, in the handler or inside a call.",
+        "what": "Labels each gate by what it does, refuses, translates, routes, passes on or swallows.",
+        "guards": "Labels a check by what its refusal means, such as bad input or not found, and leaves other gates without a label.",
+        "off": "Takes the role label off every gate."
+      },
+      "mo.fnm": {
+        "on": "Shows the statuses a function decides and R or W for each table it touches, so a chip is taller and says more.",
+        "off": "Shows only a function's name and role, so the row is lighter."
+      },
+      "mo.std": {
+        "split": "Moves a switch beside what it switches and turns a rare piece into a label on the item it names, and the row leaves the table.",
+        "merge": "Moves every item of the row into Gates and decisions as it is, and the row leaves the table.",
+        "keep": "Keeps the row in lanes, one for what the server's settings switch and one for what is rare here."
+      },
+      "mo.dfx": {
+        "chips": "Draws one chip per read or write at its moment, with the table and R or W, and keeps the function in its hover.",
+        "cell": "Draws a small map inside each moment's cell, from its functions to the tables they touch.",
+        "one": "Draws one map under the row for the whole endpoint, in the order data is first touched, and the cells only count."
+      },
+      "mo.dxc": {
+        "page": "Keeps the page's colours, reads green, writes orange and both amber, beside the station's red for a function that touches the store.",
+        "his": "Switches to your words' colours, writes red, reads green and both orange, so red is also the accessor label's colour beside a function."
+      },
+      "mo.jyb": {
+        "prior": "Gives the earlier requests a moment of their own before the request is sent, apart from the server starting.",
+        "head": "Moves them into the Proof row's head, out of the moments, since a test's earlier requests are no time of this request."
+      },
+      "mo.ifl": {
+        "chips": "Draws one chip per value at the moment it is set, and nothing for its reads.",
+        "lane": "Draws one lane per value across the moments, with a dot where it is read and a cross at the answer, and folds values set and read alike into one lane.",
+        "echo": "Keeps the chip where the value is set and adds a small echo at each moment that reads it, with what that read can decide."
+      },
+      "ex.lay": {
+        "row": "Puts all {nBenchKinds} columns side by side, each as wide as its names need, and the row scrolls sideways when the page is narrow.",
+        "wrap": "Wraps the columns onto a new row when the page runs out of width, so nothing scrolls sideways and the bench is taller.",
+        "half": "Puts the first half of the kinds on top and the second half below."
+      },
+      "ex.follow": {
+        "on": "Shows the element you click in the table or in one endpoint in its kind's column, when that column holds it.",
+        "off": "Keeps the elements you picked on the bench, whatever you click elsewhere on the page."
+      },
+      "ex.scope": {
+        "here": "Offers only the elements of the endpoint the table has open, so a column stays short.",
+        "all": "Offers every element of the kind from any endpoint, so a column gets long, and one the open endpoint lacks is drawn as on the first endpoint that has it."
+      },
+      "kind": {
+        "drawn": "Makes the column as drawn the look the bench opens with for this kind.",
+        "change": "Leaves the look open until you set its parts, size and colour on the bench and paste its copy line here."
+      },
+      "F24": {
+        "sends": "Renames the head to sends it on the pinned row, on the table's Client head and in every hover that says counted in.",
+        "keep": "Keeps the word {oldHead}, and the head's hover says it counts the hook that sends the request."
+      },
+      "L-19": {
+        "G1": "Builds one Security control over the rows, moves the {nSecItems} middleware and switches into Gates and decisions, and reads {secMissing} missing facts from the feed's settings.",
+        "G2": "Adds a ninth row, Security, that repeats or tears out the {st401} and {limStatus} endings, the in-flight limiters and the users row from their own rows.",
+        "G3": "Builds nothing new, so the pairing stays as ruled and the {secMissing} missing facts stay missing."
+      },
+      "R-11": {
+        "fit": "Opens the table fitted on the {nScroll} endpoints that would scroll sideways, as if you had pressed fit, and leaves the other endpoints as they are.",
+        "scroll": "Keeps names whole and the table scrolling sideways on those endpoints, with fit one click away."
+      },
+      "EX-5": {
+        "wait": "Builds nothing until you rule a kind's look, and then that look becomes what the bench opens with and a cell option that borrows the bench's blocks is built to decide by seeing.",
+        "now": "Builds that cell option now from the bench's looks as they stand, my picks, before any look is ruled, so the table gains one more cell option."
+      }
+    },
+    "exSuite": {
+      "measured": "Measured on the endpoints page, the count of {checkName} reads {checkNow} now and read {checkBefore} at the start, and it would have caught what you raised about [[“]]{firstItem}[[”]].[[{openNote}]]",
+      "measuredFind": "Measured on the endpoints page, the count of {checkName} reads {checkNow} now and read {checkBefore} at the start, and it would have caught {nFind} of the review's findings.[[{openNote}]]",
+      "measuredNew": "Measured on the endpoints page, the count of {checkName} reads {checkNow} now, and it would have caught what you raised about [[“]]{firstItem}[[”]].[[{openNote}]]",
+      "measuredNewFind": "Measured on the endpoints page, the count of {checkName} reads {checkNow} now, and it would have caught {nFind} of the review's findings.[[{openNote}]]",
+      "unmeasured": "No measure counts it yet, so it would have caught what you raised about [[“]]{firstItem}[[”]], and {openClause}.[[{openNote}]]",
+      "unmeasuredFind": "No measure counts it yet, so it would have caught {nFind} of the review's findings, and {openClause}.[[{openNote}]]",
+      "rule": "Written down, the rule would have governed what you raised about [[“]]{firstItem}[[”]], and {openClause}.[[{openNote}]]",
+      "ruleFind": "Written down, the rule would have governed {nFind} of the review's findings, and {openClause}.[[{openNote}]]",
+      "audit": "Run on the endpoints page, it reports {nCounts} counts, and {nDown} of the {nCompared} it can compare with the start went down."
+    },
+    "impSuite": {
+      "land": "[[{doesCap} {gate}]](({gateClause}))",
+      "notyet": "Changes nothing in the suite, so what {r1b} left open in this pattern, {openRows}, still has nothing standing behind it.",
+      "notyet0": "Changes nothing in the suite, and no row of this pattern is open now.",
+      "notyetAudit": "Leaves the script in this folder, run by hand, and the {nAuditParts} check proposals that belong to it stay without a home.",
+      "change": "Waits for you to say what to change, and nothing is written until you do."
+    }
+  },
+  "tip": {
+    "_about": "The hovers of this page (L-30, D-078), by the rules this round named (D-067, D-009, D-017; the patterns P1, P2, P7). ONE hover per item: a mark inside a chip, a cell, a row or a card adds its fact to that item's hover and has none of its own; a mark that stands alone is its own item. A hover says the item's OWN fact in plain words (before, checks, gives where it fits), never only the mark's word; what a KIND of mark means is said once, in the legend (legend.def). A control's hover is a verb and its object. No hover talks about the page or the map, and none spells code. The {{tokens}} are the page's own, filled in the browser from its data.",
+    "status": {
+      "built": "Built: {{n}} of your {{all}} items, each with its fix on this page.",
+      "option": "Waiting on your pick: {{n}} of your {{all}} items, with nothing built for them.",
+      "question": "Questions answered: {{n}} of your {{all}} items.",
+      "logged": "On record, not built: {{n}} of your {{all}} items.",
+      "deferred": "Set aside on purpose: {{n}} of your {{all}} items."
+    },
+    "outcomeN": {
+      "fixed": "Fixed in round 1b: {{n}} of {{whose}} {{findings}}.",
+      "partly": "Fixed only partly in round 1b: {{n}} of {{whose}} {{findings}}.",
+      "left": "Left as they were in round 1b, each with its reason: {{n}} of {{whose}} {{findings}}.",
+      "his": "Yours to rule: {{n}} of {{whose}} {{findings}}."
+    },
+    "outcomeOne": {
+      "fixed": "{{id}} was fixed in round 1b.",
+      "partly": "{{id}} was fixed only partly in round 1b.",
+      "left": "{{id}} was left as it was in round 1b, with its reason.",
+      "his": "{{id}} is yours to rule."
+    },
+    "subject": {
+      "glanceItems": "Your items",
+      "glanceFind": "The review's findings",
+      "item": "The review's findings on {{id}}",
+      "pat": "The findings in {{id}}",
+      "q": "The findings on {{q}}"
+    },
+    "stack": "{{subject}}: {{list}}.",
+    "change": {
+      "down": "{{name}} went from {{before}} at the start to {{now}} now, so it counts fewer.",
+      "same": "{{name}} stands at {{now}}, as it did at the start.",
+      "up": "{{name}} went from {{before}} at the start to {{now}} now, so it counts more."
+    },
+    "whyN": "Open rows of {{id}} with this reason, {{why}}: {{n}}.",
+    "remN": {
+      "open": "Still open in {{id}}: {{rows}}.",
+      "partly": "Fixed only partly or left in {{id}}: {{findings}}.",
+      "fixed": "Fixed by the small pass in {{id}}: {{rows}}."
+    },
+    "remRow": {
+      "open": "{{id}} is still open: {{why}}.",
+      "fixed": "{{id}} was fixed by the small pass."
+    },
+    "pat": "{{id}}: {{items}} of yours, {{findings}} from the review, and {{still}} left standing by round 1b.",
+    "patStill": "Left standing by round 1b in {{id}}: {{open}} and {{left}} fixed only partly or left.",
+    "patPick": {
+      "land": "My pick for {{id}}: land {{props}}, once you say so.",
+      "notyet": "My pick for {{id}}: leave {{props}} for now."
+    },
+    "patOne": "{{cid}} is {{kind}} for the suite, from {{id}}, {{name}}.",
+    "partOf": "{{cid}} counts toward the audit and comes from {{id}}, {{name}}.",
+    "itemStatus": "{{id}} stands as {{status}}.",
+    "itemPat": "{{id}} belongs to {{pid}}, {{pname}}, which holds {{items}} of yours.",
+    "verdict": "{{lens}}: {{word}}. {{remains}}",
+    "qSubject": {
+      "code": "{{short}}: your question is about the code.",
+      "page": "{{short}}: your question is about the page.",
+      "map": "{{short}}: your question is about the map."
+    },
+    "qVerdict": "{{short}}: the review calls the answer {{word}}.",
+    "pickWord": {
+      "land": "My pick for {{id}}: land it, once you say so.",
+      "notyet": "My pick for {{id}}: not yet."
+    },
+    "stackNone": "{{subject}}: none.",
+    "patStillNone": "Nothing in {{id}} is left standing by round 1b.",
+    "kindWord": {
+      "check": "a check",
+      "words": "a rule in words",
+      "reference": "a written reference",
+      "method": "a method step"
     }
   }
 }

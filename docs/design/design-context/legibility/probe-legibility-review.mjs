@@ -23,6 +23,12 @@
    decision" (stop · next open · section) does what it says, is kept, and rides the copy text · a card has its plain line and a listen button
    · the dropdown opens as a full-width sheet at 390 px with no sideways scroll.
 
+   Round 5 (D-078): every decision shows an EXAMPLE and the IMPACT of each option on its card (the text the generator wrote), and both are in its spoken
+   summary after what choosing sets in motion and before my pick (2 to 5 sentences; no id, path, symbol, number, code name or {token}); and every icon
+   follows the hover rules: ONE hover per item (no hover inside a hover; no icon outside a hover), every icon has a non-empty hover, no icon hover on the
+   page equals the legend's definition of its kind (the legend says what a kind means, once), a control's hover is six words or fewer, a state mark on a
+   decision says that decision's own fact, and a mark's hover is never only its kind's word.
+
      node docs/design/design-context/legibility/probe-legibility-review.mjs [--html <file>] [--shots <dir>] [--bar <dir>] [--dec <dir>]   # browser-gated; run it ALONE
        --shots <dir>   also save a picture of the top of each section there, at 1920 and at 1600 px wide (for looking, never committed)
        --bar <dir>     also save one picture at 1920 px of the frozen bar mid-page while the (mocked) reading is on it (never committed)
@@ -147,7 +153,7 @@ try {
   { const m = await p.evaluate(() => { const pm = [...document.querySelectorAll('#legend .lgg.wide .mk.pm')].map((x) => x.querySelector('svg').innerHTML);
       const marks = [...document.querySelectorAll('.artifact-page .mk[title]')]; return { pm: pm.length, distinct: new Set(pm).size, marks: marks.length, noWord: marks.filter((x) => !x.title.trim()).length, groups: document.querySelectorAll('#legend .lgg').length }; });
     ok(m.pm === D.patterns.length && m.distinct === m.pm, 'the legend gives each pattern its own mark, and says the marks once', `${m.pm} patterns · ${m.distinct} distinct marks · ${m.groups} legend groups`);
-    ok(m.marks > 50 && m.noWord === 0, 'every mark on the page carries its word in the hover', m.marks + ' marks'); }
+    ok(m.noWord === 0, 'no hover on a mark is empty (the hover rules proper are round 5\'s, below)', m.marks + ' marks with a hover of their own'); }
   /* the width (L-24): the column takes the screen, no cell of a short-value column wraps, no table spills out of its box — at 1920 and at 1600 */
   const widthCheck = (W) => p.evaluate((W) => { for (const d of document.querySelectorAll('details')) d.open = true;
     const col = document.querySelector('.artifact-page').getBoundingClientRect().width; let n = 0; const wrapped = [], spill = [];
@@ -292,7 +298,7 @@ try {
 
     /* ── round 4 (L-29, D-077): the bar's menu nests by section; every decision has a spoken summary and a plain line ── */
     const DEC = D.decide.entries, RULED = new Set(D.choices.filter((c) => c.ruled).map((c) => c.id));
-    const SAYBAD = [[/[·→/×|#{}\\“”"`<>]/, 'a symbol'], [/\b(?:L|R|D|EX|CR|N3|S4)-\d+/, 'an id'], [/\b[PGFA]\d{1,2}\b/, 'an id'], [/(^|\s)[xg]:/i, 'an id'], [/\b[\w-]+\.(?:py|mjs|js|json|md|html|tsx?|css)\b/i, 'a file'],
+    const SAYBAD = [[/[A-Za-z]_[A-Za-z]/, 'a code name'], [/\b[a-z]+[A-Z][A-Za-z]*\b/, 'a code name'], [/\b[A-Z][a-z]+[A-Z][A-Za-z]*\b/, 'a code name'], [/[·→/×|#{}\\“”"`<>]/, 'a symbol'], [/\b(?:L|R|D|EX|CR|N3|S4)-\d+/, 'an id'], [/\b[PGFA]\d{1,2}\b/, 'an id'], [/(^|\s)[xg]:/i, 'an id'], [/\b[\w-]+\.(?:py|mjs|js|json|md|html|tsx?|css)\b/i, 'a file'],
       [/\bundefined\b|\bNaN\b|\{[^}]*\}|\{\{/, 'a missing value or token'], [/\b(?:he|him|his|himself)\b/i, 'he · him · his'], [/\d/, 'a number']];
     const nSent = (s) => (s.match(/[^.!?]+[.!?]+(\s|$)/g) || []).length;
     const decOpen = (sec) => DEC.filter((e) => e.sec === sec && !RULED.has(e.id));
@@ -301,9 +307,19 @@ try {
       const ids = new Set(DEC.map((e) => e.id)), want = new Set(D.choices.map((c) => c.id));
       ok(ids.size === want.size && [...want].every((x) => ids.has(x)) && DEC.length === want.size + 1 && DEC.filter((e) => e.key.endsWith(':gap')).length === 1,
         'every choice on the page is a decision with an entry (the L-19 recommendation stands in the gap analysis too)', `${ids.size} decisions · ${DEC.length} entries`);
-      const hits = []; for (const e of DEC) { const base = e.parts.join(' '), n = nSent(base); if (n < 2 || n > 3) hits.push(e.key + ': base of ' + n + ' sentences');
+      const hits = []; for (const e of DEC) { const base = e.parts.join(' '), n = nSent(base); if (n < 2 || n > 5) hits.push(e.key + ': base of ' + n + ' sentences');
         for (const [rx, w] of SAYBAD) { const m = rx.exec(base + ' ' + e.plain); if (m) hits.push(e.key + ': ' + w + ' “' + m[0] + '”'); } }
-      ok(hits.length === 0, 'every decision has a spoken summary of 2 to 3 sentences (one more once you have picked, so 4 at most) with no id, path, symbol, number or {token}', hits.slice(0, 3).join(' | ') || DEC.length + ' summaries');
+      ok(hits.length === 0, 'every decision has a spoken summary of 2 to 5 sentences (one more once you have picked, so 6 at most) with no id, path, symbol, number, code name or {token}', hits.slice(0, 3).join(' | ') || DEC.length + ' summaries');
+      /* round 5 (D-078): the example and the impact stand in the summary, after what choosing sets in motion and before my pick */
+      { const bad = []; for (const e of DEC) { const opts = Object.keys(e.opts);
+          if (!e.ex || !e.exSay || !e.impSay) { bad.push(e.key + ': no example or impact'); continue; }
+          if (e.parts[2] !== e.exSay || e.parts[3] !== e.impSay) bad.push(e.key + ': the example and the impact are not the third and fourth sentences of the summary');
+          if (nSent(e.exSay) !== 1 || nSent(e.impSay) !== 1) bad.push(e.key + ': the example or the impact is not one sentence');
+          if (JSON.stringify(Object.keys(e.imp).sort()) !== JSON.stringify(opts.sort())) bad.push(e.key + ': an option has no impact line');
+          if (/\d/.test(e.exSay + e.impSay) || Object.values(e.imp).some((x) => !x || /\{|undefined/.test(x))) bad.push(e.key + ': a number or a token in the impact'); }
+        ok(bad.length === 0, 'every decision has an example and an impact for each option, and the summary reads them third and fourth, one sentence each', bad.slice(0, 3).join(' | ') || DEC.length + ' decisions · ' + DEC.reduce((a, e) => a + Object.keys(e.imp).length, 0) + ' impact lines');
+        const named = DEC.filter((e) => (/^(mo|ex)\./.test(e.key) || ['F24', 'L-19', 'R-11', 'EX-5'].includes(e.id)) && !e.ex.includes(D.ep));
+        ok(named.length === 0, 'the example of every look and proposal is a case on the endpoint the page pictures', named.map((e) => e.key).join(',') || D.ep); }
       const bp = DEC.filter((e) => !e.plain || nSent(e.plain) !== 1 || (e.plain.match(/—/g) || []).length > 1 || /[;:]/.test(e.plain) || e.plain.split(/\s+/).length > 34 || /^[a-z]/.test(e.plain));
       ok(bp.length === 0, 'every decision has a plain line: one sentence, at most one dash, no colon chain, short enough to say in one breath', bp.map((e) => e.key).join(',') || DEC.length + ' plain lines');
       const dup = DEC.filter((e, i) => DEC.findIndex((x) => x.key === e.key) !== i); ok(dup.length === 0, 'no two entries share a key');
@@ -348,11 +364,11 @@ try {
       const s = await barOf(P4), card = await P4.evaluate(() => { const c = document.querySelector('[data-dec-card="mo.hdr"]'), r = c.getBoundingClientRect(); return { top: Math.round(r.top), hot: c.dataset.hot, hots: document.querySelectorAll('[data-dec-card][data-hot="true"]').length, menuHidden: document.querySelector('[data-dd-menu="calls"]').hidden, litItem: document.querySelector('[data-dec-item="mo.hdr"]').getAttribute('aria-current') }; });
       ok(near(card.top, s) && card.hot === 'true' && card.hots === 1, 'picking a decision scrolls the page to its card just under the bar and lights that one card', `card top ${card.top} · bar bottom ${s.bottom} · lit ${card.hots}`);
       ok(s.reading.on && s.reading.dec === 'mo.hdr' && s.lit === 3 && card.menuHidden && card.litItem === 'true', 'with nothing playing the pick starts the reading at that decision: the menu closes, its section\'s chip and its entry are lit', `dec ${s.reading.dec} · chip ${s.lit}`);
-      await waitFor(P4, () => window.__ss.said.length >= 4); const said = await heard(P4);
-      ok(said[0] === e.parts[0] && said[1] === e.parts[1] && said[2] === e.parts[2], 'the first thing spoken is the decision\'s own summary, sentence by sentence', said[0].slice(0, 60));
-      ok(said[3] === e.plain, 'its plain line is read right after the summary', said[3].slice(0, 60));
+      await waitFor(P4, (n) => window.__ss.said.length >= n, e.parts.length + 1); const said = await heard(P4);
+      ok(e.parts.every((x, i) => said[i] === x), 'the first thing spoken is the decision\'s own summary, sentence by sentence: what it decides, what choosing sets in motion, the example, the impact, my pick', said[0].slice(0, 60));
+      ok(said[e.parts.length] === e.plain, 'its plain line is read right after the summary', (said[e.parts.length] || '').slice(0, 60));
       await waitFor(P4, () => !window.__leg.reading().on); const end = await P4.evaluate(() => ({ on: window.__leg.reading().on, said: window.__ss.said.length, hot: document.querySelector('[data-dec-card="mo.hdr"]').dataset.hot, reading: document.querySelector('[data-dec-card="mo.hdr"]').dataset.reading }));
-      ok(!end.on && end.said === 4 && end.hot === 'true' && end.reading === 'false', 'by default the reading stops after the decision (my pick, dashed); the card stays lit where you are', `${end.said} sentences`);
+      ok(!end.on && end.said === e.parts.length + 1 && end.hot === 'true' && end.reading === 'false', 'by default the reading stops after the decision (my pick, dashed); the card stays lit where you are', `${end.said} sentences`);
     });
     await run('the card', async () => {
       const e = DEC.find((x) => x.key === 'mo.fit'), c = await P4.evaluate(() => { const k = document.querySelector('[data-dec-card="mo.fit"]'); const pl = k.querySelector('.plainline'); return { plain: pl && pl.querySelector('.pl-text').textContent, lab: pl && pl.querySelector('.lab').textContent, listen: !!k.querySelector('[data-dec-listen="mo.fit"]'), shown: k.querySelector('[data-dec-listen]').getBoundingClientRect().width > 0, fold: k.querySelector('details.spk summary').textContent, text: k.querySelector('[data-dec-text]').textContent, n: document.querySelectorAll('[data-dec-card]').length, pls: document.querySelectorAll('.plainline').length }; });
@@ -368,9 +384,9 @@ try {
     await run('your pick joins the summary', async () => {
       const e = DEC.find((x) => x.key === 'mo.ipo'); await P4.click('[data-choice="mo.ipo"][data-v="sent"]'); await P4.evaluate(() => { window.__ss.said.length = 0; });
       const txt = await P4.$eval('[data-dec-text="mo.ipo"]', (n) => n.textContent), want = e.parts.concat([D.ui.decide.run.yours.replace('{{name}}', e.opts.sent), e.plain]);
-      ok(txt === want.join(' ') && nSent(want.slice(0, 4).join(' ')) === 4, 'once you have picked, the summary adds one sentence about your pick (4 in all) before the plain line', want[3]);
-      await P4.click('[data-dd="calls"]'); await P4.click('[data-dec-item="mo.ipo"]'); await waitFor(P4, () => window.__ss.said.length >= 5); const sd = await heard(P4);
-      ok(JSON.stringify(sd.slice(0, 5)) === JSON.stringify(want), 'and that sentence is read after the base summary and before the plain line', sd[3]);
+      ok(txt === want.join(' ') && nSent(want.slice(0, e.parts.length + 1).join(' ')) === e.parts.length + 1, 'once you have picked, the summary adds one sentence about your pick (one more than the base) before the plain line', want[e.parts.length]);
+      await P4.click('[data-dd="calls"]'); await P4.click('[data-dec-item="mo.ipo"]'); await waitFor(P4, (n) => window.__ss.said.length >= n, want.length); const sd = await heard(P4);
+      ok(JSON.stringify(sd.slice(0, want.length)) === JSON.stringify(want), 'and that sentence is read after the base summary and before the plain line', sd[e.parts.length]);
       await P4.click('[data-choice="mo.hdr"][data-v="band"]'); const k = await P4.$eval('[data-dec-text="mo.hdr"]', (n) => n.textContent); ok(k.includes(D.ui.decide.run.kept.replace('{{name}}', DEC.find((x) => x.key === 'mo.hdr').opts.band)), 'picking my own pick is said as keeping it', k.slice(-90, -40));
       const ic = await P4.evaluate(() => ({ yours: document.querySelector('[data-dec-item="mo.ipo"] .slot .mk').dataset.o, kept: document.querySelector('[data-dec-item="mo.hdr"] .slot .mk').dataset.o, open: document.querySelector('[data-dd="calls"]').closest('.dd').querySelector('.oc').textContent }));
       ok(ic.yours === 'yours' && ic.kept === 'check' && Number(ic.open) === decOpen('calls').length - 2, 'a decided entry changes its icon (yours, or kept my pick) and the chip\'s count of open ones goes down', JSON.stringify(ic));
@@ -409,7 +425,7 @@ try {
       await P6.evaluate(() => { window.__ss.ms = 30; });
       /* stop (the default): the reading ends after the decision */
       await P6.evaluate(() => { window.__ss.said.length = 0; }); await P6.click('[data-dd="pat"]'); await P6.click('[data-dec-item="P4.1"]'); await waitFor(P6, () => !window.__leg.reading().on); const n1 = await P6.evaluate(() => window.__ss.said.length);
-      ok(n1 === 4, 'after a decision: stop there (the default) reads the summary and the plain line and ends', n1 + ' sentences');
+      ok(n1 === pat[P41].parts.length + 1, 'after a decision: stop there (the default) reads the summary and the plain line and ends', n1 + ' sentences');
       /* next open: the decided one (P4.2) is skipped, the reading goes on by itself */
       await P6.click('[data-pref="after"][data-v="next"]'); await P6.evaluate(() => { window.__ss.said.length = 0; });
       await P6.click('[data-dd="pat"]'); await P6.click('[data-dec-item="P4.1"]'); const ok2 = await waitFor(P6, (k) => window.__leg.reading().dec === k, pat[P41 + 2].key); await waitFor(P6, (x) => window.__ss.said.some((s) => s.text === x), pat[P41 + 2].parts[0]); const sd2 = await heard(P6);   /* the section pause comes first */
@@ -455,6 +471,37 @@ try {
       await ctx.close(); }
     { const hasKept = await p.evaluate(() => [...document.querySelectorAll('#legend .lg')].some((x) => x.textContent.trim() === window.LEG_DATA.ui.mark.kept));
       ok(hasKept, 'the legend says the mark for "decided by you, my pick kept" once', D.ui.mark.kept); }
+    /* ── round 5 (L-30, D-078): the example and the impact on every card; the hover rules ── */
+    { const card = await p.evaluate(() => window.LEG_DATA.decide.entries.map((e) => { const c = document.querySelector('[data-dec-card="' + CSS.escape(e.key) + '"]'); if (!c) return { key: e.key, missing: true };
+        const ex = c.querySelector('[data-example="' + CSS.escape(e.key) + '"]'), imps = [...c.querySelectorAll('[data-impact]')].map((n) => [n.getAttribute('data-impact'), n.textContent.replace(/^\s*Impact\s*/i, '').replace(/^.*?:\s(?=[A-Z])/, '')]);
+        return { key: e.key, ex: ex ? ex.textContent.replace(/^Example/, '') : null, imps, n: c.querySelectorAll('[data-impact]').length }; }));
+      const bad = []; for (const x of card) { const e = DEC.find((y) => y.key === x.key); if (x.missing) { bad.push(x.key + ': no card'); continue; }
+        if (x.ex !== e.ex) bad.push(x.key + ': the example on the card is not the generator\'s'); if (x.n !== Object.keys(e.imp).length) bad.push(x.key + ': ' + x.n + ' impact lines for ' + Object.keys(e.imp).length + ' options');
+        for (const [v, t] of x.imps) if (!t.endsWith(e.imp[v])) bad.push(x.key + ' · ' + v + ': the impact on the card is not the generator\'s'); }
+      ok(bad.length === 0, 'every decision card shows its example and, for each option, its impact, as the generator wrote them (the L-19 recommendation too, where it stands twice)', bad.slice(0, 3).join(' | ') || card.length + ' cards · ' + card.reduce((a, x) => a + x.n, 0) + ' impact lines');
+      const kinds = await p.evaluate(() => ({ looks: [...document.querySelectorAll('#sec-calls .look')].filter((l) => !l.querySelector('[data-impact]')).length, suites: [...document.querySelectorAll('#sec-pat .prop')].filter((q) => !q.querySelector('ul.imps')).length }));
+      ok(kinds.looks === 0 && kinds.suites === 0, 'each look carries its own impact line, and each draft suite proposal an impact list before its options', `${kinds.looks} looks and ${kinds.suites} proposals without`); }
+    /* the hover rules: one hover per item; every icon inside one; the legend says what a kind means, once; a control's hover is short */
+    { const R = await p.evaluate(() => { const root = document.querySelector('.artifact-page'), all = [...root.querySelectorAll('[title]')];
+        const nested = all.filter((e) => e.querySelector('[title]')).map((e) => (e.className || e.tagName) + ' holds ' + (e.querySelector('[title]').className || e.querySelector('[title]').tagName));
+        const skip = (i) => i.closest('h2') || i.closest('.say-hd');   /* a section title's icon and the summary label's speaker are part of a heading, not an item */
+        const icons = [...root.querySelectorAll('svg.ico')].filter((i) => !skip(i)), bare = icons.filter((i) => !i.closest('[title]')).map((i) => { const h = i.closest('button, .mk, .chip, .lg, .pb, .vox') || i.parentElement; return (h.className || h.tagName) + ' · ' + (h.textContent || '').trim().slice(0, 24); });
+        const empty = all.filter((e) => !e.title.trim()).length, lg = [...root.querySelectorAll('#legend .lg')], defs = lg.map((e) => e.title), dset = new Set(defs);
+        const same = all.filter((e) => !e.closest('#legend') && dset.has(e.title)).map((e) => e.title.slice(0, 50));
+        const ctrl = all.filter((e) => e.matches('button, select, summary') && !e.classList.contains('ddi')), long = ctrl.filter((e) => e.title.trim().split(/\s+/).length > 6).map((e) => e.title);
+        const word = [...root.querySelectorAll('.mk[title]')].filter((e) => e.title.trim().split(/\s+/).length < 4).map((e) => e.title);
+        return { n: all.length, nested: nested.slice(0, 3), nNested: nested.length, nIcons: icons.length, bare: bare.slice(0, 3), nBare: bare.length, empty, nLg: lg.length, lgEmpty: defs.filter((d) => !d || !d.trim()).length, lgDup: defs.length - dset.size, same, nCtrl: ctrl.length, long, word }; });
+      ok(R.nNested === 0, 'no hover target sits inside another: one hover per item, nothing nested under an icon', R.nested.join(' | ') || R.n + ' hovers');
+      ok(R.nBare === 0 && R.empty === 0 && R.nIcons > 150, 'every icon sits inside a hover with words: a standalone icon is its own item with its own hover, and none is empty', R.bare.join(' | ') || R.nIcons + ' icons');
+      ok(R.nLg === D.patterns.length + 24 && R.lgEmpty === 0 && R.lgDup === 0 && R.same.length === 0, 'the legend says what each kind means once, and no hover on the page repeats a legend definition word for word', R.same.join(' | ') || R.nLg + ' legend entries, each with its meaning');
+      ok(R.long.length === 0 && R.nCtrl > 100, 'a control\'s hover is six words or fewer: a verb and its object', R.long.slice(0, 3).join(' | ') || R.nCtrl + ' controls');
+      ok(R.word.length === 0, 'a mark\'s hover says its item\'s own fact, never only the mark\'s word', R.word.slice(0, 3).join(' | ')); }
+    { const T = D.ui.decide.menu.stateTip, nm = (id, v) => D.choices.find((c) => c.id === id).opts.find((o) => o[0] === v)[1], want0 = T.open.replace('{{pick}}', nm('mo.hdr', 'band'));
+      const h0 = await p.$eval('[data-dec-item="mo.hdr"]', (e) => e.title), o0 = await p.$eval('#sec-calls table.t', (t) => [...t.querySelectorAll('tr')].find((r) => r.textContent.includes('the header')).querySelector('.mk').title);
+      await p.click('[data-choice="mo.hdr"][data-v="road"]'); const h1 = await p.$eval('[data-dec-item="mo.hdr"]', (e) => e.title), o1 = await p.$eval('#sec-calls table.t', (t) => [...t.querySelectorAll('tr')].find((r) => r.textContent.includes('the header')).querySelector('.mk').title);
+      await p.click('[data-choice="mo.hdr"][data-v="band"]'); const h2 = await p.$eval('[data-dec-item="mo.hdr"]', (e) => e.title); await p.click('#reset');
+      const want1 = T.yours.replace('{{picked}}', nm('mo.hdr', 'road')).replace('{{pick}}', nm('mo.hdr', 'band')), want2 = T.kept.replace('{{pick}}', nm('mo.hdr', 'band'));
+      ok(h0 === want0 && o0 === want0 && h1 === want1 && o1 === want1 && h2 === want2, 'a state mark on a decision says that decision\'s own fact, in the menu and in the table of choices, and follows the pick (open, yours, my pick kept)', h0 + ' → ' + h1 + ' → ' + h2); }
     if (DECSHOT) { fs.mkdirSync(DECSHOT, { recursive: true }); const PD = await open({ ms: 600000 }, 1920); await PD.setViewportSize({ width: 1920, height: 1000 });
       await scrollInto(PD, IDS[3], 400); await PD.click('[data-choice="mo.ipo"][data-v="sent"]'); await PD.click('[data-choice="mo.hdr"][data-v="band"]'); await scrollInto(PD, IDS[3], 400); await PD.waitForTimeout(100);
       await PD.click('[data-dd="calls"]'); await PD.waitForTimeout(150); await PD.screenshot({ path: path.join(DECSHOT, 'dropdown-open-1920.png') });

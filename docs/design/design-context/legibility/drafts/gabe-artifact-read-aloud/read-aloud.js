@@ -1,8 +1,9 @@
-/* gabe-artifact · read-aloud module (DRAFT, D-076/D-077) — a spoken summary per section and per item, a copy button on each, and a player bar
+/* gabe-artifact · read-aloud module (DRAFT, D-076/D-077/D-078) — a spoken summary per section and per item, a copy button on each, and a player bar
    that is in view all the time. Dependency-free; the page's own words, icons and ruled voice come in as arguments. Pair with read-aloud.css.
 
    ReadAloud.mount({
-     sections: [{ id, title, say, items: [{ id, title, say, plain }] }],   // every id names an element that is already in the page, in page order
+     sections: [{ id, title, say, items: [{ id, title, say, example, impact, plain }] }],   // every id names an element that is already in the page, in page order
+                                                                                // example, impact (optional, an item with a say): ONE sentence each, read after say — a concrete case, and what each option changes
      voice:    { voice, lang, rate, pitch, volume, pauseSentence, pauseSection, readTitles },   // the project's ruled voice; inlined (an Artifact cannot fetch)
      words:    { … }, icons: { name: "inner svg markup" },   // partial overrides of WORDS / ICONS below
      storageKey: "gabe:artifact:readaloud",   // this page-kit's own prefs: speed, follow
@@ -11,18 +12,19 @@
      host, topHost                            // optional elements or selectors; the module makes them when absent
    }) → { play(id), pause(), stop(), skipTo(id), state() }
 
-   A "unit" is one thing the reading can stand on: a section's summary, then each of its items' summaries, in page order. An item with no
-   summary but a plain line is read by its plain line; an item with neither is a menu entry that only moves the page. */
+   A "unit" is one thing the reading can stand on: a section's summary, then each of its items' summaries, in page order. An item's summary is its
+   say, then its example, then its impact (D-078); with no say it is read by its plain line, and an item with neither is a menu entry that only
+   moves the page. */
 (function (root) {
   "use strict";
 
   var WORDS = {
     head: "To read aloud", copy: "copy to read aloud", copied: "Copied. Paste it into the chat that reads aloud.",
-    failed: "Copy was blocked here: select the summary and copy it.", listen: "listen", stop: "stop", copyAll: "copy every summary",
+    failed: "Copy was blocked here: select the summary and copy it.", listen: "listen", stop: "stop", copyAll: "copy every summary", example: "Example", impact: "Impact",
     noSpeech: "This browser cannot speak, so nothing can be read aloud here. You can still copy the summaries.",
-    bar: "contents and player", contents: "contents", play: "play", pause: "pause", stopReading: "stop reading",
-    prev: "previous summary", next: "next summary", follow: "follow", followTip: "the page follows the reading when it moves on by itself",
-    rateLabel: "reading speed", rates: ["slower", "normal", "faster"], itemsOf: "show what is inside {{title}}",
+    bar: "contents and player", contents: "contents", play: "Play the reading", pause: "Pause the reading", stopReading: "Stop the reading",
+    prev: "Previous summary", next: "Next summary", follow: "follow", followTip: "Follow the reading",
+    rateLabel: "reading speed", rateTip: "Pick the reading speed", rates: ["slower", "normal", "faster"], itemsOf: "Open this section's items",
     voiceSaved: "Reading with {{name}}, the voice you saved.",
     voiceRuled: "Reading with {{name}}, the voice this page was built with.",
     voiceMissing: "The voice {{want}} is not in this browser, so {{name}} reads instead.",
@@ -72,8 +74,10 @@
     /* ── the units: a section, then its items, in page order ── */
     var units = [], order = [], navs = [], missing = [], blocks = [], lastCopy = null;
     function entry(D, node, kind, nav) {
-      var say = D.say ? String(D.say).trim() : "", plain = kind === "item" && D.plain ? String(D.plain).trim() : "", text = say || plain;
-      var en = { id: D.id, title: String(D.title || D.id), el: node, kind: kind, nav: nav, say: say, plain: plain, text: text, unit: null, own: !!text };
+      var say = D.say ? String(D.say).trim() : "", plain = kind === "item" && D.plain ? String(D.plain).trim() : "";
+      var example = kind === "item" && say && D.example ? String(D.example).trim() : "", impact = kind === "item" && say && D.impact ? String(D.impact).trim() : "";   /* D-078: they ride on an item that has a say */
+      var text = [say, example, impact].filter(Boolean).join(" ") || plain;   /* what is read, copied and shown: say, then example, then impact */
+      var en = { id: D.id, title: String(D.title || D.id), el: node, kind: kind, nav: nav, say: say, example: example, impact: impact, plain: plain, text: text, unit: null, own: !!text };
       node.setAttribute("data-ra-unit", D.id);
       if (text) { en.unit = units.length; units.push(en); }
       order.push(en); return en;
@@ -179,7 +183,8 @@
       var box = el("div", "ra-say" + (en.kind === "item" ? " ra-sub" : "")), hd = el("p", "ra-lab"), acts = el("div", "ra-acts"), cp = el("button", "ra-btn"), ls = el("button", "ra-btn"), said = el("span", "ra-said"), slot = el("span"), lab = el("span", null, W.listen);
       box.setAttribute("data-ra-say", en.id); hd.appendChild(ico("speaker")); hd.appendChild(el("span", null, W.head)); box.appendChild(hd);
       if (en.say && en.plain) { var pl = el("p", "ra-plain", en.plain); pl.setAttribute("data-ra-plain", en.id); box.appendChild(pl); }
-      var tx = el("p", "ra-text", en.text); tx.setAttribute("data-ra-text", en.id); box.appendChild(tx);
+      var tx = el("p", "ra-text", en.say || en.text); tx.setAttribute("data-ra-text", en.id); box.appendChild(tx);
+      [["example", W.example, "ra-ex"], ["impact", W.impact, "ra-im"]].forEach(function (f) { if (!en[f[0]]) return; var q = el("p", f[2]); q.setAttribute("data-ra-" + f[0], en.id); q.appendChild(el("b", null, f[1])); q.appendChild(document.createTextNode(" " + en[f[0]])); box.appendChild(q); });
       cp.type = "button"; cp.setAttribute("data-ra-copy", en.id); cp.appendChild(ico("copy")); cp.appendChild(el("span", null, W.copy)); cp.addEventListener("click", function () { copyText(en.text, said); });
       ls.type = "button"; ls.setAttribute("data-ra-listen", en.id); slot.appendChild(ico("play")); ls.appendChild(slot); ls.appendChild(lab); if (!ok) ls.hidden = true;
       ls.addEventListener("click", function () { if (R.on && R.i === en.unit) stop(); else begin(en.unit, false, "start"); });
@@ -203,7 +208,7 @@
       c.pp = pbtn("playpause", "play", W.play, function () { if (!R.on) begin(viewUnit(), true, "bar"); else if (R.paused) resume(); else pause(); }); c.pp.classList.add("ra-go");
       c.stop = pbtn("stop", "stop", W.stopReading, stop); c.prev = pbtn("prev", "prev", W.prev, function () { skipTo(R.i - 1); }); c.next = pbtn("next", "next", W.next, function () { skipTo(R.i + 1); });
       vox = el("span", "ra-vox"); vox.setAttribute("role", "img"); vox.appendChild(ico("speaker")); voxName = el("span", "ra-vn"); vox.appendChild(voxName);
-      var rw = el("label", "ra-rate"), sel = el("select", "ra-sel"); sel.setAttribute("aria-label", W.rateLabel); sel.title = W.rateLabel; sel.setAttribute("data-act", "rate");
+      var rw = el("label", "ra-rate"), sel = el("select", "ra-sel"); sel.setAttribute("aria-label", W.rateLabel); sel.title = W.rateTip; sel.setAttribute("data-act", "rate");
       W.rates.forEach(function (t, i) { var o = el("option", null, t); o.value = String(i); sel.appendChild(o); }); sel.value = String(prefs.speed);
       sel.addEventListener("change", function () { prefs.speed = Number(sel.value); savePrefs(); }); rw.appendChild(sel);
       c.follow = pbtn("follow", "follow", W.followTip, function () { prefs.follow = followOn() ? "off" : "on"; savePrefs(); paint(); }); c.follow.appendChild(el("span", "ra-fw", W.follow));
@@ -211,7 +216,7 @@
     tcs = el("div", "ra-row ra-tcs"); tcs.appendChild(el("span", "ra-lab", W.contents));
     navs.forEach(function (nv) { var tc = el("span", "ra-tc"), a = el("a", "ra-chip", nv.title), rec = { tc: tc, chip: a, caret: null, nv: nv }; a.href = "#" + nv.id; a.setAttribute("data-ra-chip", nv.id);
       a.addEventListener("click", function (e) { closeMenu(false); if (R.on && nv.entry.unit != null) { e.preventDefault(); skipTo(nv.entry.unit, nv.el); } }); tc.appendChild(a);
-      if (nv.items.length) { var cr = el("button", "ra-caret"); cr.type = "button"; cr.setAttribute("aria-expanded", "false"); cr.setAttribute("aria-label", fmt(W.itemsOf, { title: nv.title })); cr.title = fmt(W.itemsOf, { title: nv.title });
+      if (nv.items.length) { var cr = el("button", "ra-caret"); cr.type = "button"; cr.setAttribute("aria-expanded", "false"); cr.setAttribute("aria-label", fmt(W.itemsOf, { title: nv.title }) + ", " + nv.title); cr.title = fmt(W.itemsOf, { title: nv.title });   /* the hover is a verb and its object; a reader's label names the section too */
         cr.setAttribute("data-ra-caret", nv.id); cr.appendChild(ico("down")); rec.caret = cr; tc.setAttribute("data-items", "true"); tc.appendChild(cr);
         cr.addEventListener("click", function (e) { e.stopPropagation(); if (menuFor === rec) { closeMenu(false); return; } closeMenu(false); openMenu(rec); if (e.detail === 0) { var f = menu.querySelector("a"); if (f) f.focus(); } }); }   /* a keyboard open lands on the first item */
       chips.push(rec); tcs.appendChild(tc); });
@@ -234,9 +239,9 @@
     var api = { play: function (id) { var en = unitOf(id); if (en && en.unit != null) begin(en.unit, true, "start"); }, pause: pause, stop: stop, skipTo: function (id) { var en = unitOf(id); if (en) skipTo(en.unit, en.el); },
       state: function () { var rs = resolve(); return { ok: ok, on: R.on, paused: R.paused, i: R.i, s: R.s, all: R.all, id: N ? units[R.i].id : null, source: rs.source, voice: rs.voice ? rs.voice.name : null, note: rs.note,
         missing: missing.slice(), orderOk: orderOk, mode: MODE, ruled: RV.voice || null, ruledTitles: typeof RV.readTitles === "boolean" ? RV.readTitles : null, speed: prefs.speed, follow: prefs.follow, lastCopy: lastCopy,
-        units: units.map(function (u) { return { id: u.id, title: u.title, kind: u.kind, text: u.text, plain: u.plain }; }), sections: navs.map(function (n) { return { id: n.id, items: n.items.map(function (x) { return x.id; }) }; }) }; } };
+        units: units.map(function (u) { return { id: u.id, title: u.title, kind: u.kind, text: u.text, say: u.say, example: u.example, impact: u.impact, plain: u.plain }; }), sections: navs.map(function (n) { return { id: n.id, items: n.items.map(function (x) { return x.id; }) }; }) }; } };
     last = api; return api;
   }
 
-  root.ReadAloud = { mount: mount, sentences: sentences, state: function () { return last ? last.state() : null; }, version: "0.2-draft" };
+  root.ReadAloud = { mount: mount, sentences: sentences, state: function () { return last ? last.state() : null; }, version: "0.3-draft" };
 })(window);

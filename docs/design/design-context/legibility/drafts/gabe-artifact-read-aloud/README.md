@@ -1,19 +1,20 @@
-# gabe-artifact · read-aloud — DRAFT, do not land (D-076, D-077)
+# gabe-artifact · read-aloud — DRAFT, do not land (D-076, D-077, D-078)
 
 His words (D-076): *"I would like to save this for any future artifact that we create, especially with the GabeArtifact skill"* and *"the bar appeared, and it's perfect. The only thing is that I would like to see that bar all the time on this kind of artifacts."*
 D-077 nests the bar's menu: each section a dropdown of its items, each item with its own spoken summary and a gabe-lens plain line.
+D-078 (his dictation, read as: *"include examples and impact on the decision items, and for icons use the rules we identified to put text to show about the icons when we hover them"*) gives an item an optional `example` and `impact`, read after its summary, and states the icon-hover rule for the bar's icons.
 This folder is the whole proposal as files. **Nothing outside it was touched** (no `skills/`, `templates/`, `tests/`, `install.sh`, `CLAUDE.md`, `README.md`, and not the review page or the voice lab). It lands only on his "land it".
 
 ## What it is
 
-A dependency-free module (`ReadAloud.mount({ sections: [{ id, title, say, items: [{ id, title, say, plain }] }], voice })`) extracted from the reference build (`legibility-review.tpl.html`, `voices/voice-lab.tpl.html`, D-072/D-074/D-075): a spoken summary opening each section and each item, a copy button on each, "copy every summary" on top, and a sticky player bar in view all the time — play/pause, stop, previous/next, speed, follow, a chip per section (a dropdown of its items where it has any), the one being read lit, a skip that moves the reading and the page, the voice chain with the fallback named in words.
+A dependency-free module (`ReadAloud.mount({ sections: [{ id, title, say, items: [{ id, title, say, example, impact, plain }] }], voice })`) extracted from the reference build (`legibility-review.tpl.html`, `voices/voice-lab.tpl.html`, D-072/D-074/D-075): a spoken summary opening each section and each item, a copy button on each, "copy every summary" on top, and a sticky player bar in view all the time — play/pause, stop, previous/next, speed, follow, a chip per section (a dropdown of its items where it has any), the one being read lit, a skip that moves the reading and the page, the voice chain with the fallback named in words.
 
 ## What lands where, if he says "land it"
 
 | Draft file | Suite destination | Note |
 |---|---|---|
 | `SKILL-clause.md` | `skills/gabe-artifact/SKILL.md` — H7 after H6, plus five one-line edits | 140 → ~149 lines (cap 200); version 1.3.1 → 1.4.0 |
-| `read-aloud.md` | `skills/gabe-artifact/references/read-aloud.md` (the skill has no `references/` yet — the suite convention for a deep spec) | the binding spec, 114 lines |
+| `read-aloud.md` | `skills/gabe-artifact/references/read-aloud.md` (the skill has no `references/` yet — the suite convention for a deep spec) | the binding spec, 116 lines |
 | `read-aloud.js`, `read-aloud.css` | `skills/gabe-artifact/assets/` | pasted into each Artifact as kit blocks 4 and 5 (CSP: no sibling files) |
 | `demo.html` | `skills/gabe-artifact/assets/read-aloud-demo.html` | standalone proof and the retrofit starting point; wears the kit verbatim |
 | `verify-read-aloud.mjs` | `skills/gabe-artifact/tools/` | resolves Playwright like the chrome gate (`PLAYWRIGHT_DIR`, then the docsite helper); no machine path in it |
@@ -26,18 +27,18 @@ A dependency-free module (`ReadAloud.mount({ sections: [{ id, title, say, items:
 | | |
 |---|---|
 | New files in the suite | 7 (module 2 · demo · gate · battery · fixture · reference) + 1 directory (`references/`) |
-| Lines | module 242 + 98 · gate 310 · battery 110 · demo 539 · fixture 534 · spec 114 — every file under the 800 budget; the module and gate are dense, like the reference build |
-| Weight in every Artifact | 26.8 KB JS + 9.0 KB CSS pasted in (about 11.7 KB gzipped); the kit itself is 26 KB |
-| New battery | `tests/read-aloud` — 37 assertions, **34.6 s** wall (12.5 s CPU), one headless Chrome. The doctor (46 batteries, about 5½ min) grows by one battery, ≈ +10% |
+| Lines | module 247 + 100 · gate 310 · battery 118 · demo 545 · fixture 534 · spec 116 — every file under the 800 budget; the module and gate are dense, like the reference build |
+| Weight in every Artifact | 28.0 KB JS + 9.3 KB CSS pasted in (about 12.1 KB gzipped); the kit itself is 26 KB |
+| New battery | `tests/read-aloud` — 42 assertions, **33.7 s** wall (11.1 s CPU), one headless Chrome. The doctor (46 batteries, about 5½ min) grows by one battery, ≈ +10% |
 | The gate on a page | 44 checks, **8.2 s**; `--only` runs one group (the battery uses it so a mutant pays for what it proves) |
 | Facts record | `docs/center/generators/write_facts.py --only read-aloud` records the new battery in seconds; the full sweep picks it up by itself (batteries are discovered, not listed) |
 | Every future artifact | a summary per section (and per item) to author or generate, a `plain` line per item, and the voice inlined at build — real work on every page, not just wiring |
 
 ## Proved here (run, not read)
 
-- Gate on `demo.html`: **44/44**, three runs in a row. A first run failed 5 of 42: a favicon 404 the page did not cause, three measures split in time by a fast mock, and a cog test that ignored the chip row's own scroll clipping; a later battery run showed a pause check that depended on timing. All fixed in how the gate measures — no threshold was loosened.
+- Gate on `demo.html`: **44/44** (D-078: the demo's three decision items now carry an `example` and an `impact`, so the lint reads them; the gate stayed at 44 checks, the sentence check and the lint grew), three runs in a row before that. A first run failed 5 of 42: a favicon 404 the page did not cause, three measures split in time by a fast mock, and a cog test that ignored the chip row's own scroll clipping; a later battery run showed a pause check that depended on timing. All fixed in how the gate measures — no threshold was loosened.
 - Gate on `fixtures/without-bar.html`: **FIRES — 27 of 31 checks fail**, exit 1.
-- `bash run.sh`: **37 passed, 0 failed.** Besides the two above: a page with no sections SKIPs loudly; a summary with an id, a path, a symbol, a `{token}`, `undefined` and 8 sentences fails the five summary checks; CSS defects (bar static, copy hidden, a transition, 10px text) fail their four; five one-line module mutants (skip does not scroll, saved voice ignored, speed absolute, a whole-paragraph utterance, default not "always") fail the checks that name them; a page that does not name its fallback voice fails the three fallback rungs; a bar under the cog and a menu wider than the phone fail theirs; unguarded storage fails.
+- `bash run.sh`: **42 passed, 0 failed** (D-078 added five: an example holding an id and a path, and an impact of two sentences, fail the lint and the sentence count, and nothing else goes red). Besides the two above: a page with no sections SKIPs loudly; a summary with an id, a path, a symbol, a `{token}`, `undefined` and 8 sentences fails the five summary checks; CSS defects (bar static, copy hidden, a transition, 10px text) fail their four; five one-line module mutants (skip does not scroll, saved voice ignored, speed absolute, a whole-paragraph utterance, default not "always") fail the checks that name them; a page that does not name its fallback voice fails the three fallback rungs; a bar under the cog and a menu wider than the phone fail theirs; unguarded storage fails.
 - Looked at (screenshots, 1280 and 390): the bar at rest, mid-reading with a lit chip and a marked summary, the open menu, in Catalog and Mission Console.
 - Also run once by hand, outside the battery: the options `host`, `topHost`, `icons`, `words`, `bar: "playing"`, an item with only a plain line (read by it), an item with nothing (menu only).
 
@@ -79,5 +80,5 @@ export PLAYWRIGHT_DIR=<a node_modules/playwright-core>        # on this machine:
 # WSL2 rule: one heavy job at a time
 flock <heavy.lock> node verify-read-aloud.mjs demo.html                 # 44/44, ~8 s
 flock <heavy.lock> node verify-read-aloud.mjs fixtures/without-bar.html # exit 1, FAILs
-flock <heavy.lock> bash run.sh                                          # 37 assertions, ~35 s
+flock <heavy.lock> bash run.sh                                          # 42 assertions, ~34 s
 ```

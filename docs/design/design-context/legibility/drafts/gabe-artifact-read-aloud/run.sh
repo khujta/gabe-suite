@@ -2,7 +2,7 @@
 # Read-aloud fixture battery — the executable contract of verify-read-aloud.mjs (DRAFT; it would land as tests/read-aloud/run.sh).
 #
 # A gate that cannot fail is non-evidence (CLAUDE.md conventions). This proves the gate stays SILENT on the demo and FIRES on a page with no
-# bar (fixtures/without-bar.html) and on each way a page that reads aloud can break: a summary a voice cannot say, a bar that leaves the top
+# bar (fixtures/without-bar.html) and on each way a page that reads aloud can break: a summary (or an item's example or impact) a voice cannot say, a bar that leaves the top
 # of the screen, hidden copy buttons, motion, text under 12px, a skip that moves the reading but not the page, a saved voice that is ignored,
 # a speed that is not relative to the voice, an utterance that is a whole paragraph, a default that is not "always", a fallback voice the page
 # does not name, a bar under the cog on a phone, a menu wider than the phone, storage that throws, a page with nothing to read.
@@ -64,6 +64,14 @@ mutate "$DEMO" "$TMP/summary/page.html" '"Press play and the page reads from the
 if fires "$TMP/summary/page.html" --only 1; then ok "a bad summary fails the page"; else bad "a bad summary must fail"; fi
 expect "no summary holds an id or a code identifier"; expect "no summary holds a path or a file name"; expect "no summary holds a symbol a voice cannot say"
 expect "no summary holds a {token} or a missing value left in"; expect "a section's summary is 3 to 6 sentences"
+quiet "every section opens with a spoken summary and a copy button"
+
+# ── 4b · an item's example and impact are read by the same lint: an id and a path in an example, two sentences in an impact (D-078) ──
+casedir exim
+mutate "$DEMO" "$TMP/exim/page.html" 'example: "For example, with a voice saved in the voice lab' 'example: "See D-077 in docs/design/read-aloud.json. For example, with a voice saved in the voice lab' \
+  'gives that strip back when nothing reads." }' 'gives that strip back. Nothing more is read." }'
+if fires "$TMP/exim/page.html" --only 1; then ok "an example or an impact a voice cannot say fails the page"; else bad "a bad example or impact must fail"; fi
+expect "no summary holds an id or a code identifier"; expect "no summary holds a path or a file name"; expect "a section's summary is 3 to 6 sentences"
 quiet "every section opens with a spoken summary and a copy button"
 
 # ── 5 · CSS defects: the bar does not stay (static), copy hidden, a transition, text at 10px ──

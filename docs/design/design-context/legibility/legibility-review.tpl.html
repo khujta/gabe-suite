@@ -256,6 +256,12 @@
   details.spk > .say-text { margin: 4px 0 6px; font-size: var(--fs-sm); color: var(--ink-soft); }
   [data-dec-card][data-hot="true"], [data-dec-card][data-reading="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
   .pb .fw { font-size: var(--fs-min); }
+  /* the example and the impact of a decision (L-30, D-078) */
+  .example { font-size: var(--fs-sm); color: var(--ink); margin: 2px 0 0; padding: 6px 10px; border-left: 3px solid var(--accent); background: var(--raised); border-radius: 0 8px 8px 0; max-width: 112ch; }
+  .example b, .impact b { color: var(--muted); font-weight: 400; font-size: var(--fs-min); letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; }
+  .look .impact { font-size: var(--fs-sm); color: var(--ink); margin: 0; padding-top: 4px; border-top: 1px dashed var(--rule); }
+  ul.imps { list-style: none; margin: 0; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--raised); display: flex; flex-direction: column; gap: 5px; font-size: var(--fs-sm); color: var(--ink); }
+  ul.imps > li > .on { color: var(--accent); font-weight: 650; margin-right: 4px; }
 </style>
 
 <div class="artifact-page">
@@ -339,7 +345,8 @@
 
   /* ── the marks (L-25): an icon, its word in the hover and for a reader; the legend says each word once ── */
   function ico(name) { var t = document.createElement("span"); t.innerHTML = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + (D.icons[name] || "") + "</svg>"; return t.firstChild; }
-  function mk(icon, word, n, extra) { var s = el("span", "mk" + (extra ? " " + extra : "")), w = n != null ? n + " " + word : word; s.setAttribute("data-o", icon); s.title = w; s.setAttribute("role", "img"); s.setAttribute("aria-label", w);
+  var TP = U.tip;   /* the hovers (L-30, D-078): ONE per item. A mark that stands alone is its own item and carries its own fact; a mark inside a chip, a cell, a row or a card adds its fact to that item's hover and has none. What a kind of mark means is said once, in the legend. */
+  function mk(icon, word, n, extra, tip) { var s = el("span", "mk" + (extra ? " " + extra : "")), w = n != null ? n + " " + word : word; s.setAttribute("data-o", icon); if (tip) s.title = tip; s.setAttribute("role", "img"); s.setAttribute("aria-label", tip || w);
     s.appendChild(ico(icon)); if (n != null) s.appendChild(el("span", "n", String(n))); return s; }
   var MK = { built: ["built", U.statusWord.built], option: ["option", U.statusWord.option], question: ["question", U.statusWord.question], logged: ["logged", U.statusWord.logged], deferred: ["deferred", U.statusWord.deferred],
     fixed: ["fixed", U.outcome.fixed], partly: ["partly", U.outcome.partly], left: ["left", U.outcome.left], his: ["his", U.outcome.his], open: ["open", U.rem.open],
@@ -348,16 +355,23 @@
     down: ["down", U.mark.down], same: ["same", U.mark.same], up: ["up", U.mark.up], code: ["code", U.mark.code], page: ["page", U.mark.page], map: ["map", U.mark.map],
     answered: ["fixed", U.verdict.answered], vpartly: ["partly", U.verdict.partly], vnot: ["left", U.verdict.not] };
   var VKEY = { answered: "answered", partly: "vpartly", not: "vnot" }, RKEY = { surface: "surface", feed: "feed", yours: "yoursRem", process: "process" };
-  function M(kind, n, extra) { var m = MK[kind]; return mk(m[0], m[1], n, extra); }
+  function M(kind, n, extra, tip) { var m = MK[kind]; return mk(m[0], m[1], n, extra, tip); }
   function wordOf(kind) { return MK[kind][1]; }
   /* a pattern wears its own mark everywhere it appears (L-25); its name is in the hover */
   var PAT = {}; D.patterns.forEach(function (p) { PAT[p.id] = p; });
-  function pmark(pid, mode) { var p = PAT[pid], s = mk(D.patIcon[pid], pid + (p ? " · " + p.name : ""), null, "pm"); s.setAttribute("data-o", "pat"); if (mode !== "icon") s.appendChild(el("span", "n", pid)); return s; }
+  function pmark(pid, mode, tip) { var p = PAT[pid], s = mk(D.patIcon[pid], pid + (p ? " · " + p.name : ""), null, "pm", tip); s.setAttribute("data-o", "pat"); if (mode !== "icon") s.appendChild(el("span", "n", pid)); return s; }
   /* a stacked bar: one segment per outcome, widths by count; its words are the hover */
-  function stack(parts, cls) { var b = el("span", "stk" + (cls ? " " + cls : "")), ti = []; b.setAttribute("role", "img");
+  function stack(parts, cls, subject) { var b = el("span", "stk" + (cls ? " " + cls : "")), ti = []; b.setAttribute("role", "img");
     parts.forEach(function (x) { if (!x[1]) return; var sp = el("span"); sp.setAttribute("data-o", MK[x[0]][0]); sp.style.flexGrow = String(x[1]); b.appendChild(sp); ti.push(x[1] + " " + MK[x[0]][1]); });
-    b.title = ti.join(" · "); b.setAttribute("aria-label", ti.join(", ")); return b; }
+    var tw = rt(ti.length ? TP.stack : TP.stackNone, { subject: subject || "", list: ti.join(" · ") }); b.title = tw; b.setAttribute("aria-label", tw); return b; }
   function outParts(o) { return [["fixed", o.fixed], ["partly", o.partly], ["left", o.left], ["his", o.his]]; }
+  /* the facts a hover states, said in the page's own words (words.tip) */
+  function pl(n, one, many) { return n === 0 ? "no " + (many || one + "s") : n + " " + (n === 1 ? one : (many || one + "s")); }
+  function outN(k, n, all, whose) { return rt(TP.outcomeN[k], { n: n, whose: whose, findings: pl(all, "finding") }); }
+  function stillTip(p) { return p.stillThere ? rt(TP.patStill, { id: p.id, open: pl(p.nOpen, "open row"), left: pl(p.stillThere - p.nOpen, "finding") }) : rt(TP.patStillNone, { id: p.id }); }
+  function patTip(pid) { var p = PAT[pid]; return rt(TP.pat, { id: pid, items: pl(p.items.length, "item"), findings: pl(p.nFind, "finding"), still: pl(p.stillThere, "row or finding", "rows or findings") }); }
+  function statusTip(it) { return rt(TP.itemStatus, { id: it.id, status: it.status }); }
+  function itemPatTip(it) { var p = PAT[it.pattern]; return rt(TP.itemPat, { id: it.id, pid: it.pattern, pname: p.name, items: pl(p.items.length, "item") }); }
   function cell() { var c = el("span", "chips nw"); Array.prototype.slice.call(arguments).forEach(function (x) { if (x) c.appendChild(x); }); return c; }
   function link(text, href) { var a = el("a", "ref", text); a.href = href; return a; }
 
@@ -386,6 +400,9 @@
   var STATEICON = { open: "mine", yours: "yours", ruled: "ruled", kept: "check" };
   /* open = nobody has picked and it is not ruled; yours = you picked another; kept = you picked my pick; ruled = ruled earlier and left */
   function decState(e) { var c = CH[e.id], s = state.v[e.id]; if (s && s.v) return c && s.v === c.mine ? "kept" : "yours"; return c && c.ruled ? "ruled" : "open"; }
+  /* the state of a decision, said as its own fact: what is open and what I picked, or what you decided (the state mark adds this to its item's hover) */
+  function stateTipOf(e) { var c = CH[e.id], s = state.v[e.id], st = decState(e);
+    return rt(U.decide.menu.stateTip[st], { pick: nameOf(c, c.mine), picked: s && s.v ? nameOf(c, s.v) : "", ruled: c.ruled ? nameOf(c, c.ruled) : "" }); }
   function decParts(e) { var c = CH[e.id], s = state.v[e.id], R2 = U.decide.run, out = e.parts.slice();
     if (s && s.v) out.push(rt(s.v === c.mine ? R2.kept : c.ruled ? R2.changedRuled : R2.yours, { name: e.opts[s.v] }));
     out.push(e.plain); return out; }
@@ -438,8 +455,8 @@
       var M2 = U.decide.menu;
       Object.keys(DD).forEach(function (k) { var d = DD[k], n = 0;
         d.items.forEach(function (it) { var st = decState(it.e); if (st === "open") n++;
-          if (it.st !== st) { it.st = st; it.slot.textContent = ""; it.slot.appendChild(mk(STATEICON[st], M2.state[st])); } it.btn.setAttribute("aria-current", String(on && R.d === it.e.ix)); });
-        var w = rt(M2.openCount, { n: n }); d.oc.textContent = String(n); d.oc.title = w; d.oc.setAttribute("data-zero", String(n === 0)); d.link.setAttribute("aria-label", d.title + ", " + w);
+          if (it.st !== st) { it.st = st; it.slot.textContent = ""; it.slot.appendChild(mk(STATEICON[st], M2.state[st])); } it.btn.title = stateTipOf(it.e); it.btn.setAttribute("aria-current", String(on && R.d === it.e.ix)); });
+        var w = rt(M2.openCount, { n: n }); d.oc.textContent = String(n); d.oc.title = rt(M2.ocTip, { n: n, decisions: pl(d.items.length, "decision") }); d.oc.setAttribute("data-zero", String(n === 0)); d.link.setAttribute("aria-label", d.title + ", " + w);
         d.head.textContent = rt(M2.head, { title: d.title, n: d.items.length, open: n }); });
       if (c.nopen) c.nopen.disabled = !DEC.some(function (e) { return decState(e) === "open"; }); }
     function paint() { var on = R.on;
@@ -514,10 +531,10 @@
     function makeDD(s, a, ents) { var M2 = U.decide.menu, wrap = el("span", "dd"), oc = el("span", "oc"), btn = el("button", "car"), menu = el("div", "ddm"), head = el("p", "dd-head"), cap = rt(M2.caret, { title: s.title });
       var d = { wrap: wrap, link: a, btn: btn, menu: menu, oc: oc, head: head, items: [], title: s.title, key: s.key }, gk = null, list = null;
       a.appendChild(oc);
-      btn.type = "button"; btn.setAttribute("aria-haspopup", "menu"); btn.setAttribute("aria-expanded", "false"); btn.setAttribute("data-dd", s.key); btn.setAttribute("aria-label", cap); btn.title = cap; btn.appendChild(ico("caret"));
+      btn.type = "button"; btn.setAttribute("aria-haspopup", "menu"); btn.setAttribute("aria-expanded", "false"); btn.setAttribute("data-dd", s.key); btn.setAttribute("aria-label", cap); btn.title = M2.caretTip; btn.appendChild(ico("caret"));
       menu.hidden = true; menu.id = "ddm-" + s.key; menu.setAttribute("role", "menu"); menu.setAttribute("aria-label", cap); menu.setAttribute("data-dd-menu", s.key); btn.setAttribute("aria-controls", menu.id); menu.appendChild(head);
       ents.forEach(function (e) { if (e.gk !== gk) { gk = e.gk; var g = el("div", "ddg"), gh = el("p", "ddgh"); g.setAttribute("role", "group"); g.setAttribute("aria-label", e.gn);
-          if (e.gp) gh.appendChild(pmark(e.gp, "icon")); gh.appendChild(el("span", null, e.gn)); g.appendChild(gh); list = el("div", "ddl"); g.appendChild(list); menu.appendChild(g); }
+          if (e.gp) gh.appendChild(pmark(e.gp, "icon", rt(M2.groupTip, { id: e.gp, props: pl(PAT[e.gp].suite.length, "draft proposal") }))); gh.appendChild(el("span", null, e.gn)); g.appendChild(gh); list = el("div", "ddl"); g.appendChild(list); menu.appendChild(g); }
         var it = el("button", "ddi"), slot = el("span", "slot"); it.type = "button"; it.tabIndex = -1; it.setAttribute("role", "menuitem"); it.setAttribute("data-dec-item", e.key); it.appendChild(slot);
         if (!/^(mo|ex)\./.test(e.id)) it.appendChild(el("span", "did", e.id));   /* a look is named by its label; a proposal wears its id beside its name */
         it.appendChild(el("span", "nm", e.name)); if (e.tag) it.appendChild(el("span", "tg", e.tag));
@@ -536,7 +553,7 @@
     LEG.dd = function () { return { open: OPEN }; };
     LEG.reading = function () { return { on: R.on, paused: R.paused, i: R.i, s: R.s, all: R.all, key: D.say[R.i].key, dec: R.on && R.d >= 0 ? DEC[R.d].key : null }; };
     return { ok: ok, refresh: paint,
-      button: function (kind, at, word) { var b = el("button", "btn ic ls"), slot = el("span"), lab = el("span", null, word); b.type = "button"; b.setAttribute("data-mine", "true"); b.title = X.tip; b.setAttribute("data-listen", "");
+      button: function (kind, at, word) { var b = el("button", "btn ic ls"), slot = el("span"), lab = el("span", null, word); b.type = "button"; b.setAttribute("data-mine", "true"); b.title = kind === "all" ? X.tipAll : X.tip; b.setAttribute("data-listen", "");
         slot.appendChild(ico("play")); b.appendChild(slot); b.appendChild(lab); btns.push({ el: b, lab: lab, slot: slot, word: word, kind: kind, at: at }); if (!ok) b.hidden = true;
         b.addEventListener("click", function () { var lit = isLit({ kind: kind, at: at }); if (lit) stop(); else if (kind === "all") begin(0, true, "start-all"); else begin(at, false, "start"); }); return b; },
       /* a decision card's listen button: its summary and then its plain line; the same reading as picking it in the menu, without moving the page when the card is in view */
@@ -571,7 +588,7 @@
   function sayBlock(key) { var S = SAYS[key], X = U.say, box = el("div", "panel say"), hd = el("p", "lab say-hd"), acts = el("div", "acts"), cp = el("button", "btn ic"), said = el("span", "said");
     box.setAttribute("data-say", key); hd.appendChild(ico("speaker")); hd.appendChild(el("span", null, X.head)); box.appendChild(hd);
     var tx = el("p", "say-text", S.text); tx.setAttribute("data-say-text", key); box.appendChild(tx);
-    cp.type = "button"; cp.setAttribute("data-say-copy", key); cp.appendChild(ico("copy")); cp.appendChild(el("span", null, X.copy));
+    cp.type = "button"; cp.title = X.tipCopy; cp.setAttribute("data-say-copy", key); cp.appendChild(ico("copy")); cp.appendChild(el("span", null, X.copy));
     cp.addEventListener("click", function () { copyText(S.text, said); }); said.setAttribute("aria-live", "polite");
     acts.appendChild(cp); acts.appendChild(speech.button("sec", D.say.indexOf(S), X.listen)); acts.appendChild(said); box.appendChild(acts); return box; }
 
@@ -580,7 +597,7 @@
   $("key-mine").textContent = U.page.keyMine; $("key-yours").textContent = U.page.keyYours; $("key-dashed").textContent = U.page.keyDashed; $("key-filled").textContent = U.page.keyFilled;
   $("out").setAttribute("aria-label", U.copy.aria);
   (function () { var X = U.say, host = $("topacts"), said = el("span", "said"), ca = el("button", "btn pri ic");
-    ca.type = "button"; ca.id = "copyall"; ca.appendChild(ico("copy")); ca.appendChild(el("span", null, X.copyAll)); said.id = "said-all"; said.setAttribute("aria-live", "polite");
+    ca.type = "button"; ca.id = "copyall"; ca.title = X.tipCopyAll; ca.appendChild(ico("copy")); ca.appendChild(el("span", null, X.copyAll)); said.id = "said-all"; said.setAttribute("aria-live", "polite");
     ca.addEventListener("click", function () { copyText(D.say.map(function (x) { return x.title + "\n" + x.text; }).join("\n\n"), said); });
     host.appendChild(ca); var la = speech.button("all", 0, X.listenAll); la.id = "listenall"; host.appendChild(la); host.appendChild(speech.rate()); host.appendChild(said);
     $("mine-note").textContent = X.mineNote; })();
@@ -588,16 +605,16 @@
   /* ── the legend: every mark's word, said once (L-25) ── */
   (function () { var Lg = U.legend, g = $("lg-groups"); $("legend-h").textContent = Lg.head; $("legend-note").textContent = Lg.note;
     function group(head, wide) { var x = el("div", "lgg" + (wide ? " wide" : "")), l = el("div", "lgl"); x.appendChild(el("p", "lab", head)); x.appendChild(l); g.appendChild(x); return l; }
-    function entry(host, node, word) { var e = el("span", "lg"), m = node; e.appendChild(m); e.appendChild(el("span", null, word)); host.appendChild(e); }
-    function plain(kind, word) { var m = MK[kind]; var s = el("span", "mk"); s.setAttribute("data-o", m[0]); s.appendChild(ico(m[0])); return [s, word || m[1]]; }
+    function entry(host, node, word, def) { var e = el("span", "lg"), m = node; e.appendChild(m); e.appendChild(el("span", null, word)); if (def) e.title = def; host.appendChild(e); }
+    function plain(kind, word) { var m = MK[kind]; var s = el("span", "mk"); s.setAttribute("data-o", m[0]); s.appendChild(ico(m[0])); return [s, word || m[1], Lg.def[kind === "yoursRem" ? "yours" : kind]]; }
     var kinds = {}; D.items.forEach(function (i) { kinds[i.kind] = 1; });
-    var gs = group(Lg.state); ["built", "option", "question", "logged", "deferred"].filter(function (k) { return kinds[k]; }).concat(["open"]).forEach(function (k) { var p = plain(k); entry(gs, p[0], p[1]); });
-    var go = group(Lg.outcome); ["fixed", "partly", "left"].forEach(function (k) { var p = plain(k); entry(go, p[0], p[1]); }); var ph = plain("his", Lg.hisBoth); entry(go, ph[0], ph[1]); go.appendChild(el("p", "cap", Lg.verdictNote));
-    var gw = group(Lg.why); ["surface", "feed", "process"].forEach(function (k) { var p = plain(k); entry(gw, p[0], p[1]); });
-    var gc = group(Lg.choice); ["mine", "yours", "kept", "ruled", "land", "notyet"].forEach(function (k) { var p = plain(k); entry(gc, p[0], p[1]); });
-    var gh = group(Lg.change); ["down", "same", "up"].forEach(function (k) { var p = plain(k); entry(gh, p[0], p[1]); });
-    var gj = group(Lg.subject); ["code", "page", "map"].forEach(function (k) { var p = plain(k); entry(gj, p[0], p[1]); });
-    var gp = group(Lg.pattern, true); D.patterns.slice().sort(function (a, b) { return Number(a.id.slice(1)) - Number(b.id.slice(1)); }).forEach(function (p) { var m = el("span", "mk pm"); m.setAttribute("data-o", "pat"); m.appendChild(ico(D.patIcon[p.id])); entry(gp, m, p.id + " · " + p.name); }); })();
+    var gs = group(Lg.state); ["built", "option", "question", "logged", "deferred"].filter(function (k) { return kinds[k]; }).concat(["open"]).forEach(function (k) { var p = plain(k); entry(gs, p[0], p[1], p[2]); });
+    var go = group(Lg.outcome); ["fixed", "partly", "left"].forEach(function (k) { var p = plain(k); entry(go, p[0], p[1], p[2]); }); var ph = plain("his", Lg.hisBoth); entry(go, ph[0], ph[1], ph[2]); go.appendChild(el("p", "cap", Lg.verdictNote));
+    var gw = group(Lg.why); ["surface", "feed", "process"].forEach(function (k) { var p = plain(k); entry(gw, p[0], p[1], p[2]); });
+    var gc = group(Lg.choice); ["mine", "yours", "kept", "ruled", "land", "notyet"].forEach(function (k) { var p = plain(k); entry(gc, p[0], p[1], p[2]); });
+    var gh = group(Lg.change); ["down", "same", "up"].forEach(function (k) { var p = plain(k); entry(gh, p[0], p[1], p[2]); });
+    var gj = group(Lg.subject); ["code", "page", "map"].forEach(function (k) { var p = plain(k); entry(gj, p[0], p[1], p[2]); });
+    var gp = group(Lg.pattern, true); D.patterns.slice().sort(function (a, b) { return Number(a.id.slice(1)) - Number(b.id.slice(1)); }).forEach(function (p) { var m = el("span", "mk pm"); m.setAttribute("data-o", "pat"); m.appendChild(ico(D.patIcon[p.id])); entry(gp, m, p.id + " · " + p.name, p.line); }); })();
 
   /* ── state: one value + one note per choice id; nothing is saved at boot ── */
   var CH = {}; D.choices.forEach(function (c) { CH[c.id] = c; });
@@ -631,39 +648,44 @@
   function measureTable(checks) { var W = U.sec.glance;
     var rows = checks.map(function (c) { var d = c.vals[0] != null && c.vals[2] != null && !c.blind ? (c.vals[2] < c.vals[0] ? "down" : c.vals[2] > c.vals[0] ? "up" : "same") : null;
       var wh = el("span", null, c.plain); if (c.blind) wh.appendChild(el("span", "sub", c.blind));
-      var r = [c.name, wh].concat(c.vals.map(function (v) { return v == null ? W.noSection : v; })); r.push(d ? M(d) : ""); r.down = d; return r; });
+      var r = [c.name, wh].concat(c.vals.map(function (v) { return v == null ? W.noSection : v; })); r.push(d ? M(d, null, null, rt(TP.change[d], { name: c.name, before: c.vals[0], now: c.vals[2] })) : ""); r.down = d; return r; });
     var tw = table([W.colCheck, W.colWhat].concat(D.glance.labels, [W.colChange]), rows, ["sv", "", "num", "num", "num", "sv"]);
     rows.forEach(function (r, i) { if (r.down === "down") tw.querySelectorAll("tr")[i + 1].children[4].classList.add("lower"); }); return tw; }
 
   /* ── the contents bar and the player's two options (L-27), mounted now that the state is there ── */
   (function () { var P = U.player, host = $("topacts"), after = $("said-all");
     $("bar").setAttribute("aria-label", P.bar); speech.mount($("bar"), U.toc.head, ["sec-glance", "sec-rem", "sec-pat", "sec-calls", "sec-items", "sec-qs", "sec-gap", "sec-copy"].map(function (id) { return { id: id, key: id.slice(4), title: U.sec[id.slice(4)].title }; }));
-    function group(k, label, tip, opts) { var g = el("span", "opt"); g.setAttribute("data-opt", k); g.title = tip; if (!speech.ok) g.hidden = true; g.appendChild(el("span", null, label));
-      opts.forEach(function (o) { var b = el("button", "btn ic"); b.type = "button"; b.setAttribute("data-v", o.v); b.setAttribute("data-pref", k); if (o.ruled) b.title = U.mark.ruled; if (o.icon) b.appendChild(ico(o.icon)); b.appendChild(el("span", null, o.name));
+    function group(k, label, tip, opts) { var g = el("span", "opt"), lb = el("span", null, label); g.setAttribute("data-opt", k); lb.title = tip; if (!speech.ok) g.hidden = true; g.appendChild(lb);
+      opts.forEach(function (o) { var b = el("button", "btn ic"); b.type = "button"; b.setAttribute("data-v", o.v); b.setAttribute("data-pref", k); if (o.tip) b.title = o.tip; if (o.icon) b.appendChild(ico(o.icon)); b.appendChild(el("span", null, o.name));
         b.addEventListener("click", function () { setPref(k, o.v); });
         painters.push(function () { var st = state.p && state.p[k]; b.setAttribute("aria-pressed", String(st ? st === o.v : !!o.ruled)); b.setAttribute("data-mine", String(!st && !!o.mine)); }); g.appendChild(b); });
       host.insertBefore(g, after); }
-    group("bar", P.optBar, P.optBarTip, [{ v: "always", name: P.optBarAlways, ruled: true, icon: "ruled" }, { v: "playing", name: P.optBarPlaying, icon: "pin" }]);
+    group("bar", P.optBar, P.optBarTip, [{ v: "always", name: P.optBarAlways, ruled: true, icon: "ruled", tip: P.tipAlways }, { v: "playing", name: P.optBarPlaying, icon: "pin", tip: P.tipPlaying }]);
     group("follow", P.optFollow, P.optFollowTip, [{ v: "on", name: P.optOn, mine: true }, { v: "off", name: P.optOff }]);
     group("after", P.optAfter, P.optAfterTip, [{ v: "stop", name: P.optAfterStop, mine: true }, { v: "next", name: P.optAfterNext }, { v: "section", name: P.optAfterSection }]);   /* L-29: what follows a decision that has been read; my pick (dashed) is to stop there */
     painters.push(function () { speech.refresh(); }); })();
 
+  /* the impact of an option (L-30): what changes on the page, for your reading, or in the suite if you pick it */
+  function impactLine(key, v) { var e = DECBY[key], p = el("p", "impact"); p.setAttribute("data-impact", v); p.appendChild(el("b", null, U.decide.menu.impactLab)); p.appendChild(document.createTextNode(e.imp[v])); return p; }
+  function impactList(key) { var e = DECBY[key], ul = el("ul", "imps"); Object.keys(e.imp).forEach(function (v) { var li = el("li"); li.setAttribute("data-impact", v);
+      li.appendChild(el("span", "on", nameOf(CH[e.id], v) + ":")); li.appendChild(document.createTextNode(" " + e.imp[v])); ul.appendChild(li); }); return ul; }
   /* a decision's block on its card (L-29): the plain line, a listen button, and what is read aloud (its summary then its plain line, with a copy button) */
   function decBlock(key, card) { var e = DECBY[key], M3 = U.decide.menu, box = el("div", "decb"), pl = el("p", "plainline"), acts = el("div", "acts"), said = el("span", "said"), d = el("details", "spk"), tx = el("p", "say-text"), cp = el("button", "btn ic nb");
     card.setAttribute("data-dec-card", key); DECARD[key] = card;
     pl.setAttribute("data-plain", key); pl.appendChild(el("span", "lab", M3.plainHead)); pl.appendChild(el("span", "pl-text", e.plain));
     acts.appendChild(speech.decButton(e.ix, M3.listen)); acts.appendChild(said); var row = el("div", "decrow"); row.appendChild(pl); row.appendChild(acts); box.appendChild(row);
+    var ex = el("p", "example"); ex.setAttribute("data-example", key); ex.appendChild(el("b", null, M3.exampleLab)); ex.appendChild(document.createTextNode(e.ex)); box.appendChild(ex);
     d.appendChild(el("summary", null, M3.fold)); tx.setAttribute("data-dec-text", key); d.appendChild(tx);
-    cp.type = "button"; cp.setAttribute("data-dec-copy", key); cp.appendChild(ico("copy")); cp.appendChild(el("span", null, M3.copy)); cp.addEventListener("click", function () { copyText(tx.textContent, said); }); d.appendChild(cp); box.appendChild(d);
+    cp.type = "button"; cp.title = M3.copyTip; cp.setAttribute("data-dec-copy", key); cp.appendChild(ico("copy")); cp.appendChild(el("span", null, M3.copy)); cp.addEventListener("click", function () { copyText(tx.textContent, said); }); d.appendChild(cp); box.appendChild(d);
     painters.push(function () { tx.textContent = decParts(e).join(" "); }); return box; }
 
   /* ── 1 · at a glance ── */
   (function () { var G = D.glance, W = U.sec.glance, B = sec("sec-glance", W), cols = el("div", "grid2");
     var a = el("div", "panel"); a.appendChild(el("h3", null, W.itemsHead));
-    var ms = el("div", "marks"); G.status.forEach(function (s) { ms.appendChild(M(s.k, s.n)); }); a.appendChild(ms);
-    a.appendChild(stack(G.status.map(function (s) { return [s.k, s.n]; }), "wide")); a.appendChild(el("p", "cap", W.itemsNote)); cols.appendChild(a);
-    var b = el("div", "panel"), R = G.review; b.appendChild(el("h3", null, W.findHead)); b.appendChild(stack(outParts(R), "wide"));
-    var mb = el("div", "marks"); ["fixed", "partly", "left", "his"].forEach(function (k) { mb.appendChild(M(k, R[k])); }); b.appendChild(mb); b.appendChild(el("p", "cap", W.findNote)); cols.appendChild(b);
+    var ms = el("div", "marks"), allI = G.status.reduce(function (t, s) { return t + s.n; }, 0); G.status.forEach(function (s) { ms.appendChild(M(s.k, s.n, null, rt(TP.status[s.k], { n: s.n, all: allI }))); }); a.appendChild(ms);
+    a.appendChild(stack(G.status.map(function (s) { return [s.k, s.n]; }), "wide", TP.subject.glanceItems)); a.appendChild(el("p", "cap", W.itemsNote)); cols.appendChild(a);
+    var b = el("div", "panel"), R = G.review; b.appendChild(el("h3", null, W.findHead)); b.appendChild(stack(outParts(R), "wide", TP.subject.glanceFind));
+    var mb = el("div", "marks"); ["fixed", "partly", "left", "his"].forEach(function (k) { mb.appendChild(M(k, R[k], null, outN(k, R[k], R.total, "the review's"))); }); b.appendChild(mb); b.appendChild(el("p", "cap", W.findNote)); cols.appendChild(b);
     B.appendChild(cols);
     var m = el("div", "panel"); m.appendChild(el("h3", null, W.measHead)); m.appendChild(el("p", "cap", W.measNote)); m.appendChild(measureTable(G.checks)); B.appendChild(m); })();
 
@@ -672,45 +694,47 @@
     var ov = el("div", "panel"); ov.appendChild(el("h3", null, O.head));
     ov.appendChild(table([O.pat, O.name, O.open, O.left, O.fixed, O.why], D.remaining.map(function (g) {
       var kinds = {}; g.open.forEach(function (r) { kinds[r.kind] = (kinds[r.kind] || 0) + 1; });
-      var why = cell.apply(null, ["surface", "feed", "yours", "process"].filter(function (k) { return kinds[k]; }).map(function (k) { return M(RKEY[k], kinds[k]); }));
-      var pl = el("a", "ref"); pl.href = "#rem-" + g.id; pl.appendChild(pmark(g.id));
+      var why = cell.apply(null, ["surface", "feed", "yours", "process"].filter(function (k) { return kinds[k]; }).map(function (k) { return M(RKEY[k], kinds[k], null, rt(TP.whyN, { n: kinds[k], id: g.id, why: X.kind[k] })); }));
+      var pl = el("a", "ref"); pl.href = "#rem-" + g.id; pl.title = patTip(g.id); pl.appendChild(pmark(g.id));
       return [pl, link(g.name, "#rem-" + g.id), g.open.length, g.left.length, g.fixed.length, why]; }), ["sv", "", "num", "num", "num", "sv"]));
     B.appendChild(ov);
     D.remaining.forEach(function (g) { var card = el("div", "panel"); card.setAttribute("data-rem", g.id); card.id = "rem-" + g.id;
-      var hd = el("h3", "hp"); hd.appendChild(pmark(g.id, "icon")); hd.appendChild(el("span", null, g.id + " · " + g.name)); var mh = el("span", "marks"); mh.style.fontSize = "1em";
-      if (g.open.length) mh.appendChild(M("open", g.open.length)); if (g.left.length) mh.appendChild(M("partly", g.left.length)); if (g.fixed.length) mh.appendChild(M("fixed", g.fixed.length)); hd.appendChild(mh); card.appendChild(hd);
+      var hd = el("h3", "hp"); hd.appendChild(pmark(g.id, "icon", patTip(g.id))); hd.appendChild(el("span", null, g.id + " · " + g.name)); var mh = el("span", "marks"); mh.style.fontSize = "1em";
+      if (g.open.length) mh.appendChild(M("open", g.open.length, null, rt(TP.remN.open, { rows: pl(g.open.length, "row"), id: g.id }))); if (g.left.length) mh.appendChild(M("partly", g.left.length, null, rt(TP.remN.partly, { findings: pl(g.left.length, "finding"), id: g.id }))); if (g.fixed.length) mh.appendChild(M("fixed", g.fixed.length, null, rt(TP.remN.fixed, { rows: pl(g.fixed.length, "row"), id: g.id }))); hd.appendChild(mh); card.appendChild(hd);
       if (g.open.length) { card.appendChild(el("p", "lab", X.openHead));
-        card.appendChild(table(["", U.items.where, X.what, X.source, X.status], g.open.map(function (r) { return [r.id, r.where, r.what, r.source, cell(M("open"), M(RKEY[r.kind]))]; }), ["id", "", "", "", "sv"])); }
+        card.appendChild(table(["", U.items.where, X.what, X.source, X.status], g.open.map(function (r) { var sc = cell(M("open"), M(RKEY[r.kind])); sc.title = rt(TP.remRow.open, { id: r.id, why: X.kind[r.kind] }); return [r.id, r.where, r.what, r.source, sc]; }), ["id", "", "", "", "sv"])); }
       if (g.left.length) { card.appendChild(el("p", "lab", X.leftHead)); var ul = el("ul", "fl");
-        g.left.forEach(function (f) { var li = el("li"), cs = el("span", "chips"); cs.appendChild(chip(f.id)); cs.appendChild(M(f.outcome)); li.appendChild(cs); li.appendChild(el("span", null, f.what)); if (f.why) li.appendChild(el("span", "why", X.why + ": " + f.why)); ul.appendChild(li); }); card.appendChild(ul); }
+        g.left.forEach(function (f) { var li = el("li"), cs = el("span", "chips"); cs.appendChild(chip(f.id)); cs.appendChild(M(f.outcome, null, null, rt(TP.outcomeOne[f.outcome], { id: f.id }))); li.appendChild(cs); li.appendChild(el("span", null, f.what)); if (f.why) li.appendChild(el("span", "why", X.why + ": " + f.why)); ul.appendChild(li); }); card.appendChild(ul); }
       if (g.fixed.length) { card.appendChild(el("p", "lab", X.fixedHead));
-        card.appendChild(table(["", U.items.where, X.whatWas, X.source, X.status], g.fixed.map(function (r) { return [r.id, r.where, r.what, r.source, cell(M("fixed"))]; }), ["id", "", "", "", "sv"])); }
+        card.appendChild(table(["", U.items.where, X.whatWas, X.source, X.status], g.fixed.map(function (r) { var sf = cell(M("fixed")); sf.title = rt(TP.remRow.fixed, { id: r.id }); return [r.id, r.where, r.what, r.source, sf]; }), ["id", "", "", "", "sv"])); }
       B.appendChild(card); }); })();
 
   /* ── 3 · the patterns ── */
-  function pchip(cid) { var m = /^(P\d+)\./.exec(cid), c = el("span", "chip ic"); if (m && D.patIcon[m[1]]) { var k = el("span", "mk pm"); k.setAttribute("data-o", "pat"); k.title = m[1] + " · " + PAT[m[1]].name; k.appendChild(ico(D.patIcon[m[1]])); c.appendChild(k); } c.appendChild(document.createTextNode(cid)); return c; }
+  function pchip(cid, part) { var m = /^(P\d+)\./.exec(cid), c = el("span", "chip ic"); if (m && D.patIcon[m[1]]) { var k = el("span", "mk pm"), pp = PAT[m[1]], sx = pp.suite.filter(function (x) { return x.cid === cid; })[0] || {}; k.setAttribute("data-o", "pat"); k.appendChild(ico(D.patIcon[m[1]])); c.appendChild(k);
+      c.title = rt(part ? TP.partOf : TP.patOne, { cid: cid, kind: TP.kindWord[sx.kind] || "", id: m[1], name: pp.name }); } c.appendChild(document.createTextNode(cid)); return c; }
   function suiteCard(s, ch) { var pr = el("div", "prop"); pr.setAttribute("data-choice-card", s.cid); pr.id = "prop-" + s.cid; var X = U.pat, c2 = el("div", "chips");
     c2.appendChild(pchip(s.cid)); if (s.kind) c2.appendChild(chip(X.kind + " · " + s.kind)); if (s.partOf) c2.appendChild(chip(X.partOf + " " + s.partOf, null, null, "acc"));
     (s.waits || []).forEach(function (w) { c2.appendChild(chip(X.waits + " " + w.label, null, null, "acc")); }); pr.appendChild(c2);
     if (s.name) pr.appendChild(el("h4", null, s.name)); if (s.target) pr.appendChild(el("p", "cap", X.target + ": " + s.target)); pr.appendChild(el("p", "what", s.what)); pr.appendChild(decBlock(s.cid, pr));
     var cl = el("p", "costl"); cl.appendChild(el("b", null, X.cost)); cl.appendChild(document.createTextNode(X.lands + " " + s.lands + ". " + s.gate + (s.battery ? " " + s.battery : "") + (s.lines ? " " + s.lines : "") + (s.flags ? " " + s.flags : ""))); pr.appendChild(cl);
     var ag = el("p", "against"); ag.appendChild(el("b", null, X.against)); ag.appendChild(document.createTextNode(s.against)); pr.appendChild(ag);
+    pr.appendChild(el("p", "lab", U.decide.menu.impactLab)); pr.appendChild(impactList(s.cid));
     optButtons(pr, pr, ch); return pr; }
   (function () { var W = U.sec.pat, X = U.pat, O = U.ov.pats, B = sec("sec-pat", W); B.appendChild(el("p", "landnote", W.landNote)); B.appendChild(el("p", "cap", W.note)); B.appendChild(el("p", "cap", W.pickRule));
     var ov = el("div", "panel"); ov.appendChild(el("h3", null, O.head));
-    ov.appendChild(table([O.pat, O.name, O.items, O.find, O.open, O.props, O.pick], D.patterns.map(function (p) { var l = el("a", "ref"); l.href = "#pat-" + p.id; l.appendChild(pmark(p.id));
-      var fb = cell(stack(outParts(p.out)), el("span", "n", String(p.nFind)));
-      var pk = p.suite[0].pick === "land" ? M("land") : M("notyet");
-      return [l, link(p.name, "#pat-" + p.id), p.items.length, fb, M("open", p.stillThere, p.stillThere ? "" : "zero"), p.suite.length, pk]; }), ["sv", "", "num", "sv", "sv", "num", "sv"]));
+    ov.appendChild(table([O.pat, O.name, O.items, O.find, O.open, O.props, O.pick], D.patterns.map(function (p) { var l = el("a", "ref"); l.href = "#pat-" + p.id; l.title = patTip(p.id); l.appendChild(pmark(p.id));
+      var fb = cell(stack(outParts(p.out), null, rt(TP.subject.pat, { id: p.id })), el("span", "n", String(p.nFind)));
+      var pk = p.suite[0].pick === "land" ? M("land", null, null, rt(TP.patPick.land, { id: p.id, props: pl(p.suite.length, "proposal") })) : M("notyet", null, null, rt(TP.patPick.notyet, { id: p.id, props: pl(p.suite.length, "proposal") }));
+      return [l, link(p.name, "#pat-" + p.id), p.items.length, fb, M("open", p.stillThere, p.stillThere ? "" : "zero", stillTip(p)), p.suite.length, pk]; }), ["sv", "", "num", "sv", "sv", "num", "sv"]));
     B.appendChild(ov);
     var A = D.audit, ac = el("div", "panel audit"); ac.setAttribute("data-audit", A.id); ac.appendChild(el("h3", null, W.auditHead)); ac.appendChild(el("p", "cap", W.auditNote));
-    var parts = el("div", "chips"); A.parts.forEach(function (c) { parts.appendChild(pchip(c)); }); ac.appendChild(parts);
+    var parts = el("div", "chips"); A.parts.forEach(function (c) { parts.appendChild(pchip(c, true)); }); ac.appendChild(parts);
     ac.appendChild(suiteCard({ cid: A.id, name: A.name, what: A.what, lands: A.lands, gate: A.gate, battery: A.battery, lines: A.lines, against: A.against }, CH[A.id])); B.appendChild(ac);
     D.patterns.forEach(function (p) { var card = el("div", "panel"); card.setAttribute("data-pattern", p.id); card.id = "pat-" + p.id;
-      var hd = el("h3", "hp"); hd.appendChild(pmark(p.id, "icon")); hd.appendChild(el("span", null, p.id + " · " + p.name)); card.appendChild(hd); card.appendChild(el("p", "cap", p.line));
+      var hd = el("h3", "hp"); hd.appendChild(pmark(p.id, "icon", patTip(p.id))); hd.appendChild(el("span", null, p.id + " · " + p.name)); card.appendChild(hd); card.appendChild(el("p", "cap", p.line));
       var cs = el("div", "chips"); cs.appendChild(chip(p.items.length + " " + X.items, null, null, "acc")); p.items.forEach(function (i) { cs.appendChild(itemChip(i)); }); card.appendChild(cs);
-      var fs = el("div", "chips"); fs.appendChild(chip(p.nFind + " " + X.findings, null, null, "acc")); fs.appendChild(stack(outParts(p.out)));
-      ["fixed", "partly", "left", "his"].forEach(function (k) { if (p.out[k]) fs.appendChild(M(k, p.out[k])); }); fs.appendChild(mk("open", X.still, p.stillThere, p.stillThere ? "" : "zero")); card.appendChild(fs);
+      var fs = el("div", "chips"); fs.appendChild(chip(p.nFind + " " + X.findings, null, null, "acc")); fs.appendChild(stack(outParts(p.out), null, rt(TP.subject.pat, { id: p.id })));
+      ["fixed", "partly", "left", "his"].forEach(function (k) { if (p.out[k]) fs.appendChild(M(k, p.out[k], null, outN(k, p.out[k], p.nFind, p.id + "'s"))); }); fs.appendChild(mk("open", X.still, p.stillThere, p.stillThere ? "" : "zero", stillTip(p))); card.appendChild(fs);
       var w2 = el("div", "why2"), a = el("div"), b = el("div"); a.appendChild(el("p", "lab", X.model)); a.appendChild(el("p", null, p.whyModel)); b.appendChild(el("p", "lab", X.human)); b.appendChild(el("p", null, p.whyHuman)); w2.appendChild(a); w2.appendChild(b); card.appendChild(w2);
       card.appendChild(el("p", "lab", X.checks));
       if (p.checks.length) card.appendChild(measureTable(p.checks)); else card.appendChild(el("p", "cap", X.noChecks));
@@ -723,7 +747,7 @@
     D.calls.concat(D.proposals).forEach(function (c) { var prop = !c.opts[0] || !c.where, pk = c.opts.filter(function (o) { return o.v === c.pick; })[0]; var nm = prop ? c.id + " · " + c.title : c.label;
       var now = el("span"); nows.push({ c: CH[c.id], host: now }); orows.push([link(nm, "#call-" + c.id), prop ? O.proposal : C.where[c.where], pk ? pk.name : "", now]); });
     var ot = table([O.name, O.place, O.pick, O.now], orows, ["", "sv", "sv", "sv"]); ov.appendChild(ot); B.appendChild(ov);
-    painters.push(function () { nows.forEach(function (x) { x.host.textContent = ""; var k = stateKind(x.c), s = M(k); s.title = stateWord(x.c); s.setAttribute("aria-label", stateWord(x.c)); x.host.appendChild(s); }); });
+    painters.push(function () { nows.forEach(function (x) { x.host.textContent = ""; var k = stateKind(x.c), s = M(k, null, null, stateTipOf(DECBY[x.c.id])); x.host.appendChild(s); }); });
     var pn = el("div", "acts"), tg = el("button", "btn", C.fullOn); tg.type = "button"; tg.setAttribute("aria-pressed", "false"); tg.id = "fullsize";
     tg.addEventListener("click", function () { var on = !B.classList.contains("full"); B.classList.toggle("full", on); tg.textContent = on ? C.fullOff : C.fullOn; tg.setAttribute("aria-pressed", String(on)); });
     pn.appendChild(el("span", "cap", W.picsNote)); pn.appendChild(tg); B.appendChild(pn);
@@ -736,7 +760,7 @@
         cs.appendChild(refChip(c.from, c.fromName, null, C.from)); c.answers.forEach(function (a) { cs.appendChild(refChip(a.id, a.name, null, C.answers)); }); hd.appendChild(cs); card.appendChild(hd); card.appendChild(decBlock(c.id, card));
         var looks = el("div", "looks"); c.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
           if (o.shot) t.appendChild(pic(o.shot)); else t.appendChild(el("div", "noshot", o.note || C.noShot));
-          var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); looks.appendChild(t); });
+          var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); t.appendChild(impactLine(c.id, o.v)); looks.appendChild(t); });
         card.appendChild(looks);
         var sets = el("p", "sets"); sets.appendChild(el("b", null, C.sets)); sets.appendChild(document.createTextNode(c.motion)); card.appendChild(sets);
         tail(card, card, ch); B.appendChild(card); }); });
@@ -747,7 +771,7 @@
     if (p.facts.length) { card.appendChild(el("p", "lab", C.factsHead)); var ul = el("ul", "facts"); p.facts.forEach(function (f) { var li = el("li"); li.appendChild(el("b", null, f.id)); li.appendChild(document.createTextNode(f.text)); ul.appendChild(li); }); card.appendChild(ul); }
     if (p.shots.length) card.appendChild(pics(p.shots, 2));
     var looks = el("div", "looks"); p.opts.forEach(function (o) { var t = el("div", "look"); t.setAttribute("data-look", o.v);
-      var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); looks.appendChild(t); });
+      var b = el("button", "btn", o.name); wire(b, ch, o.v); t.appendChild(b); t.appendChild(el("p", "plain", o.plain)); t.appendChild(impactLine(inGap ? p.id + ":gap" : p.id, o.v)); looks.appendChild(t); });
     card.appendChild(looks); var sets = el("p", "sets"); sets.appendChild(el("b", null, C.sets)); sets.appendChild(document.createTextNode(p.motion)); card.appendChild(sets);
     if (p.alsoIn) card.appendChild(el("p", "cap", inGap ? C.alsoInCalls : C.alsoIn)); tail(card, card, ch); return card; }
 
@@ -755,26 +779,26 @@
   (function () { var W = U.sec.items, I = U.items, O = U.ov.items, B = sec("sec-items", W); B.appendChild(el("p", "cap", W.note));
     var ov = el("div", "panel"); ov.appendChild(el("h3", null, O.head));
     ov.appendChild(table([O.id, O.name, O.status, O.pattern, O.find], D.items.map(function (it) { var fo = { fixed: 0, partly: 0, left: 0, his: 0 }; it.findings.forEach(function (f) { fo[f.outcome]++; });
-      var fb = it.findings.length ? cell(stack(outParts(fo)), el("span", "n", String(it.findings.length))) : "";
-      return [link(it.id, "#item-" + it.id), link(it.name, "#item-" + it.id), M(it.kind), it.pattern ? (function () { var a = el("a", "ref"); a.href = "#pat-" + it.pattern; a.appendChild(pmark(it.pattern)); return a; })() : "", fb]; }), ["id", "", "sv", "sv", "sv"]));
+      var fb = it.findings.length ? cell(stack(outParts(fo), null, rt(TP.subject.item, { id: it.id })), el("span", "n", String(it.findings.length))) : "";
+      return [link(it.id, "#item-" + it.id), link(it.name, "#item-" + it.id), M(it.kind, null, null, statusTip(it)), it.pattern ? (function () { var a = el("a", "ref"); a.href = "#pat-" + it.pattern; a.title = itemPatTip(it); a.appendChild(pmark(it.pattern)); return a; })() : "", fb]; }), ["id", "", "sv", "sv", "sv"]));
     B.appendChild(ov);
     D.items.forEach(function (it, ix) { var late = it.round > 1, prev = D.items[ix - 1]; if (late && prev && prev.round === 1) { B.appendChild(el("h3", null, I.round2Head)); B.appendChild(el("p", "cap", I.round2Note)); }
       var card = el("div", "panel item"); card.setAttribute("data-item", it.id); card.id = "item-" + it.id;
       var h = el("h3"); h.appendChild(el("span", null, it.id + " · " + it.name));
-      if (it.pattern) { var pa = el("a", "chip ref acc ic"); pa.href = "#pat-" + it.pattern; pa.appendChild(pmark(it.pattern, "icon")); pa.appendChild(document.createTextNode(I.pattern + " " + it.pattern + (it.patternName ? " · " + it.patternName : ""))); h.appendChild(pa); }
-      h.appendChild(M(it.kind));
-      if (it.findings.length) { var fo2 = { fixed: 0, partly: 0, left: 0, his: 0 }; it.findings.forEach(function (f) { fo2[f.outcome]++; }); h.appendChild(stack(outParts(fo2))); }
+      if (it.pattern) { var pa = el("a", "chip ref acc ic"); pa.href = "#pat-" + it.pattern; pa.title = itemPatTip(it); pa.appendChild(pmark(it.pattern, "icon")); pa.appendChild(document.createTextNode(I.pattern + " " + it.pattern + (it.patternName ? " · " + it.patternName : ""))); h.appendChild(pa); }
+      h.appendChild(M(it.kind, null, null, statusTip(it)));
+      if (it.findings.length) { var fo2 = { fixed: 0, partly: 0, left: 0, his: 0 }; it.findings.forEach(function (f) { fo2[f.outcome]++; }); h.appendChild(stack(outParts(fo2), null, rt(TP.subject.item, { id: it.id }))); }
       card.appendChild(h);
       card.appendChild(el("p", "lab", I.his)); card.appendChild(el("blockquote", null, "“" + it.first + "”"));
       if (it.rest) { var d = el("details"); d.appendChild(el("summary", null, I.more)); d.appendChild(el("p", null, it.rest)); card.appendChild(d); }
       var kv = el("dl", "kv"); [[I.readAs, it.readAs], [I.where, it.where], [I.couldNot, it.couldNot], [I.fix, it.fix], [I.status, it.status]].forEach(function (r) { if (!r[1]) return; kv.appendChild(el("dt", null, r[0])); kv.appendChild(el("dd", null, r[1])); }); card.appendChild(kv);
       if (it.fixRecord) { var rd = el("details"); rd.appendChild(el("summary", null, I.record)); rd.appendChild(el("p", null, it.fixRecord)); card.appendChild(rd); }
       if (late) { card.appendChild(el("p", "cap", I.round2Card)); B.appendChild(card); return; }
-      card.appendChild(el("p", "lab", I.review)); var vc = el("div", "chips"); it.verdicts.forEach(function (v) { var c = el("span", "chip ic"); c.appendChild(document.createTextNode(U.lens[v.lens])); c.appendChild(M(VKEY[v.verdict])); vc.appendChild(c); }); card.appendChild(vc);
+      card.appendChild(el("p", "lab", I.review)); var vc = el("div", "chips"); it.verdicts.forEach(function (v) { var c = el("span", "chip ic"); c.appendChild(document.createTextNode(U.lens[v.lens])); c.appendChild(M(VKEY[v.verdict])); c.title = rt(TP.verdict, { lens: U.lens[v.lens], word: wordOf(VKEY[v.verdict]), remains: v.remains }); vc.appendChild(c); }); card.appendChild(vc);
       if (it.verdicts[0]) { var r0 = el("p", "cap"); r0.appendChild(el("b", null, I.remains + ": ")); r0.appendChild(document.createTextNode(it.verdicts[0].remains)); card.appendChild(r0); }
       if (it.verdicts.length > 1) { var od = el("details"); od.appendChild(el("summary", null, I.otherLenses)); it.verdicts.slice(1).forEach(function (v) { var p = el("p"); p.appendChild(el("b", null, U.lens[v.lens] + ": ")); p.appendChild(document.createTextNode(v.remains)); od.appendChild(p); }); card.appendChild(od); }
       card.appendChild(el("p", "lab", I.found));
-      if (it.findings.length) { var ul = el("ul", "fl"); it.findings.forEach(function (f) { var li = el("li"), cs = el("span", "chips"); cs.appendChild(chip(f.id)); cs.appendChild(M(f.outcome)); li.appendChild(cs);
+      if (it.findings.length) { var ul = el("ul", "fl"); it.findings.forEach(function (f) { var li = el("li"), cs = el("span", "chips"); cs.appendChild(chip(f.id)); cs.appendChild(M(f.outcome, null, null, rt(TP.outcomeOne[f.outcome], { id: f.id }))); li.appendChild(cs);
           li.appendChild(el("span", null, (U.sev[f.sev] || f.sev) + " · " + f.what)); if (f.why) li.appendChild(el("span", "why", f.why)); ul.appendChild(li); }); card.appendChild(ul); }
       else card.appendChild(el("p", "cap", I.noFound));
       card.appendChild(el("p", "lab", I.pics)); if (it.shots.length) card.appendChild(pics(it.shots, 3)); else card.appendChild(el("p", "cap", I.noPics));
@@ -784,13 +808,13 @@
   (function () { var W = U.sec.qs, Q = U.qs, O = U.ov.qs, B = sec("sec-qs", W); B.appendChild(el("p", "cap", W.note));
     var ov = el("div", "panel"); ov.appendChild(el("h3", null, O.head));
     ov.appendChild(table([O.q, O.about, O.verdict, O.find], D.questions.map(function (q) { var fo = { fixed: 0, partly: 0, left: 0, his: 0 }; q.findings.forEach(function (f) { fo[f.outcome]++; });
-      return [link(q.q, "#q-" + q.key), M(q.subject), q.verdict ? M(VKEY[q.verdict.verdict]) : "", q.findings.length ? cell(stack(outParts(fo)), el("span", "n", String(q.findings.length))) : ""]; }), ["", "sv", "sv", "sv"]));
+      return [link(q.q, "#q-" + q.key), M(q.subject, null, null, rt(TP.qSubject[q.subject], { short: q.short })), q.verdict ? M(VKEY[q.verdict.verdict], null, null, rt(TP.qVerdict, { short: q.short, word: wordOf(VKEY[q.verdict.verdict]) })) : "", q.findings.length ? cell(stack(outParts(fo), null, rt(TP.subject.q, { q: q.short })), el("span", "n", String(q.findings.length))) : ""]; }), ["", "sv", "sv", "sv"]));
     B.appendChild(ov);
     D.questions.forEach(function (q) { var card = el("div", "panel"); card.setAttribute("data-q", q.key); card.id = "q-" + q.key;
-      card.appendChild(el("p", "lab", Q.his)); var qi = el("div", "chips"); q.items.forEach(function (i) { qi.appendChild(itemChip(i)); }); qi.appendChild(M(q.subject)); card.appendChild(qi); card.appendChild(el("p", "q", "“" + q.q + "”")); if (q.about) card.appendChild(el("p", "cap", q.about));
+      card.appendChild(el("p", "lab", Q.his)); var qi = el("div", "chips"); q.items.forEach(function (i) { qi.appendChild(itemChip(i)); }); qi.appendChild(M(q.subject, null, null, rt(TP.qSubject[q.subject], { short: q.short }))); card.appendChild(qi); card.appendChild(el("p", "q", "“" + q.q + "”")); if (q.about) card.appendChild(el("p", "cap", q.about));
       var ol = el("ol", "ans"); q.lines.forEach(function (l) { ol.appendChild(el("li", null, l)); }); card.appendChild(ol);
-      if (q.verdict) { card.appendChild(el("p", "lab", Q.verdict)); var cs = el("div", "chips"); cs.appendChild(M(VKEY[q.verdict.verdict])); card.appendChild(cs); card.appendChild(el("p", "cap", q.verdict.remains)); }
-      if (q.findings.length) { card.appendChild(el("p", "lab", Q.findings)); var ul = el("ul", "fl"); q.findings.forEach(function (f) { var li = el("li"), cs = el("span", "chips"); cs.appendChild(chip(f.id)); cs.appendChild(M(f.outcome)); li.appendChild(cs); li.appendChild(el("span", null, f.what)); if (f.why) li.appendChild(el("span", "why", f.why)); ul.appendChild(li); }); card.appendChild(ul); }
+      if (q.verdict) { card.appendChild(el("p", "lab", Q.verdict)); var cs = el("div", "chips"); cs.appendChild(M(VKEY[q.verdict.verdict], null, null, rt(TP.qVerdict, { short: q.short, word: wordOf(VKEY[q.verdict.verdict]) }))); card.appendChild(cs); card.appendChild(el("p", "cap", q.verdict.remains)); }
+      if (q.findings.length) { card.appendChild(el("p", "lab", Q.findings)); var ul = el("ul", "fl"); q.findings.forEach(function (f) { var li = el("li"), cs = el("span", "chips"); cs.appendChild(chip(f.id)); cs.appendChild(M(f.outcome, null, null, rt(TP.outcomeOne[f.outcome], { id: f.id }))); li.appendChild(cs); li.appendChild(el("span", null, f.what)); if (f.why) li.appendChild(el("span", "why", f.why)); ul.appendChild(li); }); card.appendChild(ul); }
       if (q.shots.length) card.appendChild(pics(q.shots, 2));
       B.appendChild(card); }); })();
 

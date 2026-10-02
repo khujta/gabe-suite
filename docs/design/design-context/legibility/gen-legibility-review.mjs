@@ -37,6 +37,10 @@
    time the page adds the sentence about your own pick) and one PLAIN LINE authored in words.decide.plain, keyed by the decision's id.
    A decision with no plain line stops the build; so does a summary outside 2 to 3 sentences, a plain line that is not one sentence,
    and any id, path, symbol, number or {token} in what a voice reads (the section summaries' checks, extended).
+   THE EXAMPLE AND THE IMPACT (L-30, D-078): every decision also gets an EXAMPLE (one concrete case from the page's own data) and the IMPACT of each
+   option, authored as templates in words.decide.ex / imp / exSuite / impSuite with every number and name a {token} filled from the feed, once for
+   the card and once for the voice (section 13d); they join the spoken summary after what choosing sets in motion and before my pick (base 2 to 5
+   sentences). THE HOVERS (words.tip, words.legend.def): one hover per item, written in the page's template (the probe holds the rules).
    No wallclock: same inputs, same bytes. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -325,7 +329,7 @@ QF.statuses = (W.q.statuses || die('words.q.statuses')).map((st) => {
   let o; try { o = JSON.parse(execFileSync('python3', ['-c', py, FORMS, EPID, WP], { encoding: 'utf8', maxBuffer: 64 << 20 })); } catch (e) { die('the lab\'s piece count failed — ' + String(e.message).split('\n')[0]); }
   const cb = o.cb, rare = cb.rows.filter((r) => r.word === 'rare' || r.word === 'only here');
   const kinds = uniq((E.switches || []).map((s) => s.kind));
-  QF.pieces = { nEp: cb.of, nPieces: cb.rows.length, nNorm: cb.by_word['the norm'], nCommon: cb.by_word.common, nRare: cb.by_word.rare, nOnly: cb.by_word['only here'], pieceRule: cb.rule,
+  QF.pieces = { rows: cb.rows, nEp: cb.of, nPieces: cb.rows.length, nNorm: cb.by_word['the norm'], nCommon: cb.by_word.common, nRare: cb.by_word.rare, nOnly: cb.by_word['only here'], pieceRule: cb.rule,
     rareList: listOr(rare.map((r) => fill(W.q.pieceOne, { words: r.words, n: r.n, of: r.of }, 'q.pieceOne')), W.q.none), nLacks: cb.missing_norms.length,
     switchKinds: kinds.join(' and '), switchLine: kinds.map((k) => fill(W.q.switchOne, { kind: k, n: o.t['switch:' + k] || 0, of: cb.of }, 'q.switchOne')).join(', ') }; }
 
@@ -550,7 +554,7 @@ for (const c of calls) c.motion = fill(c.motion, T, 'calls.motion.' + c.id);
 T.nPics = used.size;
 const fillTree = (o, at) => (typeof o === 'string' ? fill(o, T, at) : Array.isArray(o) ? o.map((v, i) => fillTree(v, at + '[' + i + ']')) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => k[0] !== '_').map(([k, v]) => [k, fillTree(v, at + '.' + k)])) : o);
 const omit = (o, ks) => Object.fromEntries(Object.entries(o).filter(([k]) => !ks.includes(k)));
-const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord']) }, 'ui');
+const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, tip: W.tip, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord', 'ex', 'imp', 'sayWords', 'exSuite', 'impSuite']) }, 'ui');
 
 /* ── 14 · the data, the hash, the page ─────────────────────────────────────────────────────────────────────────────── */
 const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, opts: c.opts.map((o) => [o.v, o.name]) })),
@@ -604,7 +608,7 @@ const orList = (a) => (a.length < 2 ? a.join('') : a.some((x) => x.includes(',')
 /* what a voice reads of a decision: the section summaries' checks (SAY_BAD), and no digit — a number is generated, never typed */
 const checkSay = (text, at, lo, hi) => {
   for (const [rx, what] of SAY_BAD) { const m = rx.exec(text); if (m) die(`${at} holds ${what}: “${m[0]}” in “${text.slice(Math.max(0, m.index - 30), m.index + 30)}”`); }
-  if (/\d/.test(text)) die(`${at} holds a typed number: “${text.slice(0, 80)}”`);
+  if (/\d/.test(text)) die(`${at} holds a typed number: “${text.slice(Math.max(0, text.search(/\d/) - 50), text.search(/\d/) + 30)}”`);
   const n = (text.match(/[^.!?]+[.!?]+(?:\s|$)/g) || []).length; if (n < lo || n > hi) die(`${at} has ${n} sentences; it is ${lo} to ${hi}: “${text.slice(0, 90)}”`);
   if (text.split(/(?<=[.!?])\s+/).some((x) => !/[.!?]$/.test(x))) die(`${at} has a sentence that does not end`); };
 /* the plain line (gabe-lens plain): ONE sentence, at most one dash, no colon or semicolon chain, short enough to read in one breath */
@@ -618,29 +622,146 @@ const motionLine = (c, ov) => {
   const s = ss.find((x) => !SAY_BAD.some(([rx]) => rx.test(x)) && !/\d/.test(x)) || die('decide: no sentence of what ' + c.id + ' sets in motion can be said aloud — give it words.decide.say.' + c.id + '.motion');
   return /^(What|Where|How|Whether|Which)\b/.test(s) ? fill(DS.decides, { rest: lcFirst(s) }, 'decide.s.decides') : s; };
 const spokenOpts = (id, opts) => Object.fromEntries(opts.map((o) => [o.v, ((DSAY[id] || {}).opts || {})[o.v] || speakWords(o.name)]));
+/* ── 13d · the example and the impact of every decision (L-30, D-078) ───────────────────────────────────────────────────
+   Each decision shows an EXAMPLE (one concrete case from the real page: POST /cooking/sessions on the frozen feed, or, for a suite
+   proposal, a case this page holds that it would have caught) and the IMPACT of each option (what changes on the page, for your
+   reading, or in the suite if you pick it). Both are authored once in the words file as templates, with every number and name a
+   {token} filled here from the feed. A template is filled TWICE from the same text: for the card (digits, names as written, a
+   [[card-only clause]]) and for the voice (numbers spelled as words, code names spoken as words, a ((say-only clause)), and the
+   [[card-only]] clauses dropped) — so what is read aloud and what is shown never drift. The build stops on a token with no value, an
+   example of more than one sentence, an option with no impact line, and anything a voice cannot say. */
+const XW = need(DW, 'ex', 'decide'), IW = need(DW, 'imp', 'decide'), SWD = need(DW, 'sayWords', 'decide'), EXS = need(DW, 'exSuite', 'decide'), IMS = need(DW, 'impSuite', 'decide');
+const ONES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+const numW = (n) => { n = Math.round(Number(n)); if (!(n >= 0) || n >= 100000) die('numW: a number a voice should not read: ' + n);
+  if (n < 20) return ONES[n]; if (n < 100) return TENS[Math.floor(n / 10)] + (n % 10 ? ' ' + ONES[n % 10] : '');
+  if (n < 1000) return ONES[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + numW(n % 100) : '');
+  return numW(Math.floor(n / 1000)) + ' thousand' + (n % 1000 ? ' ' + numW(n % 1000) : ''); };
+/* a code name spoken as words: RateLimitMiddleware → rate limit middleware, post_start_session → post start session */
+const speakName = (s) => String(s).replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2').replace(/[_.\-/]+/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+const XT = {};
+const tk = (k, c, s) => { XT[k] = { c: String(c), s: String(s === undefined ? c : s) }; };
+const tn = (k, n) => tk(k, n, numW(n)), tName = (k, n) => tk(k, n, speakName(n));
+const stSay = (st) => (SWD.status || {})[String(st)] || die('words.decide.sayWords.status has no spoken word for the status ' + st);
+const num1 = (v, what) => (Number.isFinite(Number(v)) ? Number(v) : die('the feed gives no number for ' + what));
+{ const prod = E.produced || [], fwx = E.framework_exits || [], REFUSE = new Set(['middleware', 'security', 'dependency', 'handler']);
+  tk('ep', EP, need(SWD, 'ep', 'decide.sayWords')); tk('r1b', 'round 1b', 'the last round');
+  const okEnds = (E.returns || []).filter((r) => r.status >= 200 && r.status < 400).length;   /* the success: a literal 2xx or 3xx return */
+  tn('nEndings', prod.length + fwx.length + okEnds); tn('nRefused', prod.filter((x) => REFUSE.has(x.phase)).length);
+  { const bench = Object.entries(AE.ex.cat).filter(([k, v]) => k.startsWith(EP + '|') && v.k === 'end').length;   /* what the bench's ending column holds for this endpoint: the claim above must match the page */
+    if (bench !== prod.length + fwx.length + okEnds) die(`the endings the feed gives (${prod.length + fwx.length + okEnds}) are not the endings the page draws (${bench})`); }
+  tn('nChecks', (E.preconditions || []).length); tn('nForks', (E.branches || []).length); tn('nCatches', ((E.failure || {}).catches || []).length);
+  tn('nLimits', ((E.rate || {}).limits || []).length); tn('nSwitches', (E.switches || []).length);
+  tn('nGateKinds', [XT.nLimits, XT.nChecks, XT.nForks, XT.nCatches, XT.nSwitches].filter((x) => Number(x.c) > 0).length);
+  const stepsAll = (E.paths || []).flatMap((p) => ((p.effects || {}).steps || [])), stOf = (s) => F.steps[s.step] || {};
+  tn('nTables', uniq(stepsAll.map((s) => stOf(s).table).filter(Boolean)).length);
+  tn('nWritten', uniq(stepsAll.filter((s) => !s.dependency && WRITES.has(stOf(s).op)).map((s) => stOf(s).table).filter(Boolean)).length);
+  tn('nCommits', uniq(stepsAll.filter((s) => stOf(s).op === 'commit').map((s) => stOf(s).at)).length);
+  const b0 = (E.branches || [])[0] || die(EP + ' has no deciding branch in the feed'), workFile = b0.fn.split('::')[0];
+  tName('handlerFn', fnName(E.handler)); tName('workFn', fnName(b0.fn));
+  tn('nWorkChecks', (E.preconditions || []).filter((p) => p.at.split(':')[0] === workFile).length); tn('nWorkForks', (E.branches || []).filter((b) => b.fn === b0.fn).length);
+  const exc = ((E.failure || {}).catches || []).filter((c) => c.fn === E.handler).flatMap((c) => c.types);
+  if (!exc.length) die(EP + '\'s handler translates no failure — the examples name them');
+  tk('exceptList', andList(exc), andList(exc.map(speakName))); tn('nExcepts', exc.length);
+  tn('nFindings', (E.findings || []).length);
+  for (const st of [201, 400, 401, 403, 404, 409, 422, 429, 500]) tk('st' + st, st, stSay(st));
+  tk('limStatus', QF.limiter.limStatus, stSay(QF.limiter.limStatus));
+  tk('sName', QF.limiter.sName); tk('gName', QF.limiter.gName);
+  tn('sLimit', num1(QF.limiter.sLimit, 'the sensitive limit')); tn('sWindow', num1(QF.limiter.sWindow, 'the window')); tn('gLimit', num1(QF.limiter.gLimit, 'the global limit')); tn('gWindow', num1(QF.limiter.gWindow, 'the global window'));
+  tn('sRoutes', QF.limiter.sPrefixN); tName('mwName', QF.limiter.mwName);
+  tn('nInf', QF.inflight.nInf); tn('nReq', QF.inflight.nReq); tn('nSrv', QF.inflight.nSrv);
+  tName('inflightKey', ((E.inflight || []).find((r) => r.dies === 'with the answer') || die(EP + ' has no in-flight value that goes with the answer')).name);
+  const T0 = E.tests || die(EP + ' has no tests summary'); tn('nAct', num1(T0.act, 'the acting tests')); tn('nArr', (T0.arranged_by || []).length);
+  { const pr = (T0.arranged_by || []).map((cid) => ((F.test_cases[cid] || {}).calls || []).findIndex((c) => c.endpoint === EPID)).filter((i) => i > 0);
+    if (!pr.length) die('no test sends requests before ' + EP + ' — the proof-row example needs one'); tn('nPriorTests', pr.length); tn('maxPrior', Math.max(...pr)); }
+  tk('caseOk', (((E.returns || [])[0] || {}).tests || [{}])[0].case || die(EP + ' has no test that proves its first return'));
+  tName('resModel', ((E.declared || {}).response_model || {}).name || die(EP + ' declares no response model'));
+  tn('nResFields', (((E.responses || {})[((E.returns || [])[0] || {}).id] || {}).fields || die('no fields for the first reply of ' + EP)).length);
+  tName('sessTable', (((E.repeat || {}).claims || [])[0] || die(EP + ' claims no table with its repeat key')).table);
+  tName('sender', QF.sender); tName('screen', QF.screen); tk('oldHead', AEW.cols.fetched.head);
+  tn('nEp', QF.pieces.nEp);
+  const prow = (k) => QF.pieces.rows.find((r) => r.key === k) || die('the piece count has no row ' + k);
+  tn('nFlagEps', prow('switch:flag').n); tn('nRepeatEps', prow('repeat:key').n);
+  { const m = /(\d+) of (\d+) endpoints scroll sideways/.exec((REM.items.find((r) => r.id === 'R-11') || die('remaining.json has no R-11')).what) || die('R-11 no longer says how many endpoints scroll sideways');
+    if (Number(m[2]) !== Number(XT.nEp.c)) die('R-11 counts ' + m[2] + ' endpoints, the piece count ' + XT.nEp.c); tn('nScroll', m[1]); }
+  tn('nBenchKinds', Object.keys(KINDS).length);
+  tn('secMissing', T.secMissing);
+  { const mws = new Set((E.paths || []).flatMap((p) => (p.chain || []).filter((c) => c.phase === 'middleware' && c.kind === 'step').map((c) => c.call))); for (const l of (E.rate || {}).limits || []) mws.add(l.via);
+    tn('nSecItems', mws.size + (E.switches || []).length); }
+  tn('nCounts', T.nChecks); tn('nCompared', T.nCompared); tn('nDown', T.down); tn('nSame', T.same); tn('nUp', T.up); tn('nAuditParts', T.nAuditParts); tn('auditN', num1(String(audit.lines).replace(/\D+/g, ' ').trim().split(' ')[0], 'the audit script lines')); }
+/* a template filled for the card and for the voice */
+const fill2 = (tpl, tok, at) => { const one = (side) => String(tpl).replace(/\[\[([\s\S]*?)\]\]/g, (m, x) => (side === 'c' ? x : '')).replace(/\(\(([\s\S]*?)\)\)/g, (m, x) => (side === 's' ? x : ''))
+    .replace(/(?<!\{)\{(\w+)\}(?!\})/g, (m, k) => (k in tok ? tok[k][side] : die(`no value for {${k}} in ${at}: “${String(tpl).slice(0, 80)}”`))).replace(/\s+/g, ' ').replace(/\s+([,.;])/g, '$1').trim();
+  const c = one('c'), s = one('s'); if (/\{|\bundefined\b|\bNaN\b/.test(c + s)) die('a token or a missing value is left in ' + at); return { c, s }; };
+const nSent = (t) => (t.match(/[^.!?]+[.!?]+(?:\s|$)/g) || []).length;
+const stripEnd = (t) => t.replace(/[.!?]+$/, '');
+/* the example and the impacts of one decision: the card's lines and the two spoken sentences */
+const exImp = (id, exTpl, impTpls, order, op, tok) => {
+  const ex = fill2(exTpl || die('words.decide.ex has no example for ' + id), tok, 'decide.ex.' + id);
+  if (nSent(ex.s) !== 1) die(`the example of ${id} must be one sentence for a voice (${nSent(ex.s)}): “${ex.s.slice(0, 80)}”`);
+  const imp = {}; for (const v of order) imp[v] = fill2(impTpls[v] || die(`words.decide.imp has no line for ${id} · ${v} — what picking it changes`), tok, `decide.imp.${id}.${v}`);
+  for (const k of Object.keys(impTpls)) if (!order.includes(k)) die(`words.decide.imp.${id} names an option the decision does not hold: ${k}`);
+  for (const v of order) { if (nSent(imp[v].s) !== 1) die(`the impact of ${id} · ${v} must be one sentence (${nSent(imp[v].s)}): “${imp[v].s.slice(0, 80)}”`); if (imp[v].s.split(/\s+/).length > 34) die(`the impact of ${id} · ${v} is longer than 34 words`); }
+  const impSay = ucFirst(order.map((v) => 'pick ' + op[v] + ' and it ' + lcFirst(stripEnd(imp[v].s))).join('; ')) + '.';
+  return { ex, imp, impSay }; };
+
+const SAY_NAMES = [[/[A-Za-z]_[A-Za-z]/, 'a code name'], [/\b[a-z]+[A-Z][A-Za-z]*\b/, 'a code name'], [/\b[A-Z][a-z]+[A-Z][A-Za-z]*\b/, 'a code name']];   /* a decision's voice never reads a code name: it is spoken as words (speakName) */
 const DECS = [], DECIDS = new Set();
 const addDec = (e) => { if (DECS.some((x) => x.key === e.key)) die('two decisions share the key ' + e.key);
-  checkSay(e.parts.join(' '), 'the summary of ' + e.key, 2, 3);
+  checkSay(e.parts.join(' '), 'the summary of ' + e.key, 2, 5);
+  if (SAY_NAMES.some(([rx]) => rx.test(e.parts.join(' ')))) { const r = SAY_NAMES.find(([rx]) => rx.test(e.parts.join(' '))); die(`the summary of ${e.key} holds ${r[1]}: “${r[0].exec(e.parts.join(' '))[0]}”`); }
   e.plain = DPLAIN[e.id] || die('words.decide.plain has no line for the decision ' + e.id + ' — what it means for you, in the plain voice');
   checkPlain(e.id, e.plain); e.si = SEC_ORDER.indexOf(e.sec); DECIDS.add(e.id); DECS.push(e); };
 const decPick = (pk, ruled, opts, nm) => fill(ruled ? DS.pickRuled : DS.pickMine, { pick: opts[pk] }, nm);
+/* what a suite proposal does at run time, in a clause a voice can follow (words.decide.sayWords.gate), and the case its pattern holds on this page */
+const gateClause = (g, at) => ((SWD.gate || {})[g] || die('words.decide.sayWords.gate has no spoken clause for “' + g + '” — ' + at));
+const patEx = (p, s, id) => {
+  const tok = Object.assign({}, XT), chk = ((patById[p.id].suite.find((x, i) => p.id + '.' + (i + 1) === id) || {}).checks || [])[0];
+  const first = p.items[0], nOpen = p.nOpen, rows = (remaining.find((g) => g.id === p.id) || { open: [] }).open;
+  const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's'), pluralS = (n, w) => numW(n) + ' ' + w + (n === 1 ? '' : 's');
+  if (first) tk2(tok, 'firstItem', ITEM_NAME[first]); tk2(tok, 'nFind', p.nFind, numW(p.nFind));
+  tk2(tok, 'openRows', plural(nOpen, 'open row'), pluralS(nOpen, 'open row'));
+  tk2(tok, 'openClause', nOpen ? 'round 1b left ' + plural(nOpen, 'open row') + ' of this pattern' : 'no row of this pattern is open now', nOpen ? 'the last round left ' + pluralS(nOpen, 'open row') + ' of this pattern' : 'no row of this pattern is open now');
+  tk2(tok, 'openNote', rows[0] ? (t => ' Left open: ' + rows[0].id + ' — ' + t + (/[.!?…'")]$/.test(t) ? '' : '.'))(cutText(rows[0].what, 110).replace(/[{}]/g, '')) : '', '');
+  let key;
+  if (s.kind === 'check' && chk) { const r = checkRow(chk); if (r.vals[2] === null) die(`${id}: its check ${chk} has no number on the page`);
+    tk2(tok, 'checkName', r.name); tk2(tok, 'checkNow', r.vals[2], numW(r.vals[2]));
+    if (r.vals[0] !== null) tk2(tok, 'checkBefore', r.vals[0], numW(r.vals[0]));
+    key = (r.vals[0] !== null ? 'measured' : 'measuredNew') + (first ? '' : 'Find'); }
+  else key = (s.kind === 'check' ? 'unmeasured' : 'rule') + (first ? '' : 'Find');
+  if (!first && !p.nFind) die(`${id}: its pattern holds no item of yours and no finding — there is no case to show`);
+  return { tok, ex: EXS[key] || die('words.decide.exSuite has no template ' + key) }; };
+const tk2 = (tok, k, c, s) => { tok[k] = { c: String(c), s: String(s === undefined ? c : s) }; };
+const suiteImpTpls = (does, gate, p, nOpen, id, audit_) => {
+  const dp = String(does).replace(/^Landing it\s+/, ''); if (dp === String(does)) die('words.decide.say.' + id + '.does must start with “Landing it”');
+  return { land: IMS.land, notyet: audit_ ? IMS.notyetAudit : nOpen ? IMS.notyet : IMS.notyet0, change: IMS.change, dp, gate }; };
 /* in the page's order: the audit and the patterns' draft proposals, then the looks and the proposals, then the L-19 recommendation again in the gap analysis */
 { const sg = (k) => (k ? 'decide.s.' + k : 'decide');
-  const suiteEntry = (s, gk, gn, gp, name, sentence1, pick, id) => { const ov = DSAY[s] || {};
-    addDec({ key: s, id, sec: 'pat', gk, gn, gp, name, tag: null, parts: [sentence1, ov.does || die('words.decide.say.' + id + '.does: what landing it does'), fill(DS.pickSuite, { pick: CHOICE_NAME[pick] }, 'decide.s.pickSuite')], opts: CHOICE_NAME }); };
-  { const nm = DNAME[audit.id] || die('words.decide.name has no name for ' + audit.id);
-    suiteEntry(audit.id, audit.id, UI.sec.pat.auditHead, null, nm, fill(DS.audit, { name: ucFirst(nm) }, sg('audit')), audit.pick, audit.id); }
-  for (const p of patterns) for (const s of p.suite) { const nm = DNAME[s.cid] || die('words.decide.name has no name for ' + s.cid);
-    suiteEntry(s.cid, p.id, p.name, p.id, nm, fill(DS.suite, { name: ucFirst(nm), kind: KINDW[s.kind] || die('words.decide.kindWord has no ' + s.kind), pattern: lcFirst(unparen(p.name)) }, sg('suite')), s.pick, s.cid);
+  const suiteEntry = (s, gk, gn, gp, name, sentence1, pick, id, ctx) => { const ov = DSAY[s] || {}, does = ov.does || die('words.decide.say.' + id + '.does: what landing it does');
+    const t = suiteImpTpls(does, ctx.gate, ctx.p, ctx.nOpen, id, !ctx.p), tok = Object.assign({}, ctx.tok);
+    tk2(tok, 'doesCap', ucFirst(t.dp), ''); tk2(tok, 'gate', ctx.gate, ''); tk2(tok, 'gateClause', '', gateClause(ctx.gate, id));
+    const order = Object.keys(CHOICE_NAME), op = CHOICE_NAME, ei = exImp(id, ctx.ex, { land: t.land, notyet: t.notyet, change: t.change }, order, op, tok);
+    addDec({ key: s, id, sec: 'pat', gk, gn, gp, name, tag: null, ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay,
+      parts: [sentence1, does, ei.ex.s, ei.impSay, fill(DS.pickSuite, { pick: CHOICE_NAME[pick] }, 'decide.s.pickSuite')], opts: CHOICE_NAME }); };
+  { const nm = DNAME[audit.id] || die('words.decide.name has no name for ' + audit.id), tok = Object.assign({}, XT);
+    suiteEntry(audit.id, audit.id, UI.sec.pat.auditHead, null, nm, fill(DS.audit, { name: ucFirst(nm) }, sg('audit')), audit.pick, audit.id, { gate: audit.gate, p: null, nOpen: 0, tok, ex: EXS.audit }); }
+  for (const p of patterns) for (const s of p.suite) { const nm = DNAME[s.cid] || die('words.decide.name has no name for ' + s.cid), pe = patEx(p, s, s.cid);
+    suiteEntry(s.cid, p.id, p.name, p.id, nm, fill(DS.suite, { name: ucFirst(nm), kind: KINDW[s.kind] || die('words.decide.kindWord has no ' + s.kind), pattern: lcFirst(unparen(p.name)) }, sg('suite')), s.pick, s.cid, { gate: s.gate, p, nOpen: p.nOpen, tok: pe.tok, ex: pe.ex });
     DECS[DECS.length - 1].tag = s.kind; }
-  for (const c of calls) { const ov = DSAY[c.id] || {}, op = spokenOpts(c.id, c.opts), name = ov.name || c.label;
+  for (const c of calls) { const ov = DSAY[c.id] || {}, op = spokenOpts(c.id, c.opts), name = ov.name || c.label, order = c.opts.map((o) => o.v);
+    const ei = exImp(c.id, XW[c.id], c.kind ? need(IW, 'kind', 'decide.imp') : IW[c.id] || die('words.decide.imp has no entry for ' + c.id), order, op, XT);
     const tpl = c.kind ? DS.kind : DS[c.where] || die('decide.s has no template for the place ' + c.where);
     addDec({ key: c.id, id: c.id, sec: 'calls', gk: c.kind ? 'kinds' : c.where, gn: c.kind ? UI.calls.kindsHead : UI.calls.where[c.where], gp: null, name: c.label, tag: c.rows.length ? c.rows.join(' · ') : null,
-      parts: [fill(tpl, { name, rows: c.rows.join(', and also '), opts: orList(c.opts.map((o) => op[o.v])) }, sg(c.kind ? 'kind' : c.where)), motionLine(c, ov), decPick(c.pick, !!c.ruled, op, sg(c.ruled ? 'pickRuled' : 'pickMine'))], opts: op }); }
-  for (const p of proposals) { const ov = DSAY[p.id] || {}, op = spokenOpts(p.id, p.opts), nm = DNAME[p.id] || die('words.decide.name has no name for ' + p.id);
-    const parts = [fill(DS.proposal, { name: nm, opts: orList(p.opts.map((o) => op[o.v])) }, sg('proposal')), motionLine(p, ov), decPick(p.pick, false, op, sg('pickMine'))];
-    addDec({ key: p.id, id: p.id, sec: 'calls', gk: 'props', gn: UI.calls.propsHead, gp: null, name: nm, tag: null, parts, opts: op });
-    if (p.alsoIn === 'gap') addDec({ key: p.id + ':gap', id: p.id, sec: 'gap', gk: 'gap', gn: UI.gap.recHead, gp: null, name: nm, tag: null, parts, opts: op }); } }
+      ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay,
+      parts: [fill(tpl, { name, rows: c.rows.join(', and also '), opts: orList(c.opts.map((o) => op[o.v])) }, sg(c.kind ? 'kind' : c.where)), motionLine(c, ov), ei.ex.s, ei.impSay, decPick(c.pick, !!c.ruled, op, sg(c.ruled ? 'pickRuled' : 'pickMine'))], opts: op }); }
+  for (const p of proposals) { const ov = DSAY[p.id] || {}, op = spokenOpts(p.id, p.opts), nm = DNAME[p.id] || die('words.decide.name has no name for ' + p.id), order = p.opts.map((o) => o.v);
+    const ei = exImp(p.id, XW[p.id], IW[p.id] || die('words.decide.imp has no entry for ' + p.id), order, op, XT);
+    const parts = [fill(DS.proposal, { name: nm, opts: orList(p.opts.map((o) => op[o.v])) }, sg('proposal')), motionLine(p, ov), ei.ex.s, ei.impSay, decPick(p.pick, false, op, sg('pickMine'))];
+    const extra = { ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay };
+    addDec(Object.assign({ key: p.id, id: p.id, sec: 'calls', gk: 'props', gn: UI.calls.propsHead, gp: null, name: nm, tag: null, parts, opts: op }, extra));
+    if (p.alsoIn === 'gap') addDec(Object.assign({ key: p.id + ':gap', id: p.id, sec: 'gap', gk: 'gap', gn: UI.gap.recHead, gp: null, name: nm, tag: null, parts, opts: op }, extra)); } }
+for (const k of Object.keys(XW)) if (k[0] !== '_' && !DECIDS.has(k)) die('words.decide.ex names no decision: ' + k);
+for (const k of Object.keys(IW)) if (k[0] !== '_' && k !== 'kind' && !DECIDS.has(k)) die('words.decide.imp names no decision: ' + k);
 for (const c of choices) if (!DECIDS.has(c.id)) die('a choice with no decision entry: ' + c.id);
 for (const k of Object.keys(DPLAIN)) if (k[0] !== '_' && !DECIDS.has(k)) die('words.decide.plain names no decision: ' + k);
 for (const k of Object.keys(DNAME)) if (k[0] !== '_' && !DECIDS.has(k)) die('words.decide.name names no decision: ' + k);

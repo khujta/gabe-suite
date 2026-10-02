@@ -468,11 +468,17 @@ var MOTION = { on: true };   /* animations read this before scheduling work */
   ];
   var CALLS = [
     { id: "call-voice", title: "Which voice reads", plain: "A voice choice — who speaks the summaries when you press play.", options: ["your saved voice", "the voice this page was built with", "the browser's own voice"], pick: "the voice this page was built with", ruled: true,
-      body: "The saved voice wins when there is one. Without it the page uses the voice it was built with, then a British Google voice, then an English voice, then the browser's own." },
+      body: "The saved voice wins when there is one. Without it the page uses the voice it was built with, then a British Google voice, then an English voice, then the browser's own.",
+      example: "For example, with a voice saved in the voice lab the page reads in that voice, and without one it falls back to a British Google voice.",
+      impact: "Picking the saved voice makes every page read the way you tuned it, and picking the browser's own voice makes the reading sound different on every machine." },
     { id: "call-bar", title: "Where the bar sits", plain: "A bar position — whether the player stays at the top of the screen or only appears while a voice is playing.", options: ["always at the top", "only while a voice plays"], pick: "always at the top", ruled: true,
-      body: "The bar is a sticky strip in the page, not a floating panel, so the cog stays the only fixed thing on the page." },
+      body: "The bar is a sticky strip in the page, not a floating panel, so the cog stays the only fixed thing on the page.",
+      example: "For example, scroll to the end of this page and the bar is still at the top, ready to play.",
+      impact: "Always at the top costs a strip of screen on every page, and only while a voice plays gives that strip back when nothing reads." },
     { id: "call-speed", title: "How fast it reads", plain: "A speed setting — slower, normal or faster, always measured around the voice's own pace.", options: ["slower", "normal", "faster"], pick: "normal", ruled: false,
-      body: "Normal is the pace of the voice itself. Slower and faster scale that pace, so a voice you tuned in the voice lab keeps its character." }
+      body: "Normal is the pace of the voice itself. Slower and faster scale that pace, so a voice you tuned in the voice lab keeps its character.",
+      example: "For example, at faster this very summary is read a quarter quicker than at normal, in the same voice.",
+      impact: "Slower and faster change only the pace and never the voice, so a tuned voice keeps its character." }
   ];
   var PATTERNS = [
     { id: "pat-summary", title: "Summary first", plain: "A spoken summary — the short text that opens a section so you hear the point before you read the detail.",
@@ -516,7 +522,7 @@ var MOTION = { on: true };   /* animations read this before scheduling work */
         "There are " + n(CALLS.length) + " choices, and " + n(nRuled) + " are already ruled.",
         "Each one has its own summary and a plain line that says what it means.",
         "Pick one from the menu in the bar, and the page and the reading both go there."].join(" "),
-      items: CALLS.map(function (c) { return { id: c.id, title: c.title, plain: c.plain, say: [
+      items: CALLS.map(function (c) { return { id: c.id, title: c.title, plain: c.plain, example: c.example, impact: c.impact, say: [
         "This call decides " + c.title.toLowerCase() + ".",
         "The " + n(c.options.length) + " options are " + andList(c.options) + ".",
         c.ruled ? "It is ruled, and the choice is " + c.pick + "." : "It is not ruled yet, and my pick is " + c.pick + "."].join(" ") }; }) },

@@ -82,6 +82,8 @@
 .ra-text { margin: 0; max-width: 112ch; line-height: 1.55; color: var(--ink, #141a24); }
 .ra-sub .ra-text { font-size: var(--fs-sm, 13px); }
 .ra-plain { margin: 0; font-size: var(--fs-min, 12px); color: var(--ink-soft, #3d4756); max-width: 112ch; }
+.ra-ex, .ra-im { margin: 0; font-size: var(--fs-sm, 13px); line-height: 1.5; color: var(--ink, #141a24); max-width: 112ch; }   /* an item's example and impact (D-078), under its say */
+.ra-ex > b, .ra-im > b { color: var(--muted, #7a8595); font-weight: 400; font-size: var(--fs-min, 12px); letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; }
 .ra-say > .ra-plain { font-size: var(--fs-sm, 13px); }
 .ra-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 

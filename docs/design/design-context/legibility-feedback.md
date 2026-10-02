@@ -454,8 +454,15 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
 - **where:** the review page · every decision card (D-077) and every icon (the state marks, the pattern marks, the bar's buttons)
 - **could not tell:** what a choice would look like or change before choosing it; and what an icon says about THIS item — a hover gave
   the icon's word, not the item's fact.
-- **fix:** each decision shows an example (one concrete case from the real page) and the impact of each option; every icon's hover
-  follows this round's hover rules — the item's own fact in plain words, the meaning of the kind once in the legend, very short on a
-  control.
+- **fix:** built: every decision card (the 29 looks, the 4 proposals, the 19 draft suite proposals, the audit, and the L-19 recommendation
+  where it stands twice) shows an EXAMPLE, one concrete case from the page's own data (POST /cooking/sessions on the frozen feed for a look
+  or a proposal; for a suite proposal, the case on this page it would have caught, with the measured count and the first open row), and the
+  IMPACT of each option (what changes on the page, for your reading, or in the suite if you pick it, the cost included for a suite
+  proposal); both stand in the decision's spoken summary after what choosing sets in motion and before my pick, so the base is now 2 to 5
+  sentences, and every number is filled from the data once for the card and once, spelled out, for the voice. Every icon's hover follows
+  this round's rules: one hover per item (a mark inside a chip, a cell, a row or a card adds its fact to that item's hover; a mark that
+  stands alone has its own), the item's own fact in plain words (a state mark on a decision says "Open: you have not picked yet. My pick is
+  …" and follows your pick), what a kind of mark means said once, in the legend, and a control's hover a verb and its object in six words
+  at most. The read-aloud draft takes an optional `example` and `impact` on an item and states the hover rule for the bar's icons.
 - **tag:** `choice-without-example-or-impact`
-- **status:** logged
+- **status:** built (D-078)
