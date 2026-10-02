@@ -44,7 +44,7 @@ covers the full KDBP lifecycle from project init through ship:
 
 | Command | What it does |
 |---|---|
-| `/gabe-artifact` | House chrome for published Artifacts — left-anchored content, one cog panel top-right, the fixed font roster; design pass → kit → render gate → publish → report |
+| `/gabe-artifact` | House chrome for published Artifacts — left-anchored content, one cog panel top-right, the fixed font roster; design pass → kit → render gate → publish → report; plus the legibility rules and a report-only audit of any built page |
 | `/gabe-cc-init` | Brownfield command-center adoption — archive existing docs (never delete), bootstrap the center, machine-rank the critical entities, ingest one section per run at human speed with checklist + walk-recorded approval |
 | `/gabe-assess` | The direction guard — change impact assessment + values/AP boundary check; auto-triggers on direction steers in KDBP projects (direction-guard.sh) |
 | `/gabe-commit` | Commit quality gate — deterministic checks, interactive triage, defer/accept/fix |

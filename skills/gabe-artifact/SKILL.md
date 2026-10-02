@@ -3,7 +3,7 @@ name: gabe-artifact
 description: "House chrome for published Artifacts — left-anchored content, a cog panel top-right, the fixed font roster, three suite skins, iconed section title pills set in a condensed grotesque, a 12px legibility floor, and motion-first visuals with a gated pause contract. Owns the build loop: design pass → kit → render gate → publish → report, plus two gated pattern libraries."
 when_to_use: "ANY request that ends in a published Artifact (report, dashboard, spec page, comparison, explorer) — not only explicit invocations. Also when an existing artifact is being updated or retrofitted with house chrome."
 metadata:
-  version: 1.3.1
+  version: 1.4.0
   status: suite skill (generic, project-agnostic)
   scope: any project that publishes Artifacts
 ---

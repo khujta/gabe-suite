@@ -3,7 +3,7 @@ name: gabe-lens
 description: "Cognitive translation — analogies, spatial maps, constraint boxes, one-line handles, adapted to your cognitive suit; plus PLAIN, the one-sentence reader-side line that labels a thing on a legend or a hover card."
 when_to_use: "Explain this concept my way, give me a handle / analogy / map for X, annotate this file, calibrate my suit, or write the PLAIN line for a legend row, hover card or icon (`/gabe-lens plain X`, 'in plain-line voice')."
 metadata:
-  version: 2.5.0
+  version: 2.6.0
 ---
 
 # Gabe Lens — Cognitive Translation Skill

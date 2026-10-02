@@ -9,7 +9,7 @@ paths:
   - "**/design-lab/**"
   - "docs/mockups/**"
 metadata:
-  version: 2.1.1
+  version: 2.2.0
 ---
 
 # Gabe Mockup — the lift SOP
