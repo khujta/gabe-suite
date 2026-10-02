@@ -1123,3 +1123,15 @@ Consequence: on the review page, while a voice plays the contents bar sticks to 
 section and the sections themselves, the one being read lit; a skip moves the reading AND scrolls the page there. "Only while a voice
 plays" is his reading and the default; "always" is an option (the agent's, dashed). The page reads the saved voice setting the voice lab
 writes (D-073). The voice lab uses the same bar.
+
+## D-075 — His voice: Google UK English Female, speed 1.15 — the default for every page that reads aloud
+Date: 2026-10-01 · Input: the line he copied from the voice lab (D-073).
+Decision, his: "this is my pick VOICE · engine browser · voice Google UK English Female · lang en-GB · speed 1.15 · pitch 1.0 · volume
+1.0 · pause between sentences 250 ms · between sections 900 ms · section names read · yours: voice, speed, pitch, pause between sentences
+· still my pick: volume, pause between sections, section names"
+Consequence: one file, `legibility/voices/voice.ruled.json`, holds the pick, and both page builders read it. RULED (his): voice Google UK
+English Female (en-GB) · speed 1.15 · pitch 1.0 · pause between sentences 250 ms. Still the agent's picks, at the same values (his line
+says so; a "my pick" is never a ruling): volume 1.0 · pause between sections 900 ms · section names read. The voice lab opens on it with
+his four values filled ("yours") and "back to the default" returns to it; the review page reads in his voice when the browser holds no
+saved setting (before, it had no pause and speed 1). His voice is one of Chrome's online Google voices: where it is missing (Edge, another
+browser) the pages fall back to a British Google voice, then an English Natural or Google voice, then the browser's default, and say so.

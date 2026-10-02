@@ -215,6 +215,7 @@
         </div>
         <div class="sgrid" id="sgrid"></div>
         <p class="cap" id="engnote" hidden data-t="settings.enginePiper"></p>
+        <p class="cap" id="vmiss" hidden></p>
       </div>
       <div class="panel cmp" id="cmp">
         <h3 data-t="compare.head"></h3>
@@ -314,8 +315,10 @@
   (function () { var n = $("toc"); n.appendChild(el("span", "lab", U.toc.head)); ["text", "browser", "local", "notyet", "pick", "bar"].forEach(function (k) { var a = el("a", null, U.sec[k].title); a.href = "#sec-" + k; n.appendChild(a); }); })();
 
   /* ── the state: what you set, and which of it is yours ── */
-  var S = { engine: "browser", bvoice: null, pvoice: null, pspeed: "normal", rate: DEF.rate, pitch: DEF.pitch, volume: DEF.volume, pauseSentence: DEF.pauseSentence, pauseSection: DEF.pauseSection, readTitles: DEF.readTitles };
-  var HIS = {}, BAR = "playing", LANG = "en", VOICES = [], TICK = {}, STORED = true, KEPT = false, SECS = [], VSIG = "";
+  var DEFV = DEF.voice && DEF.voice !== "auto" ? DEF.voice : null;   /* D-075: his pasted voice is the default */
+  var S = { engine: "browser", bvoice: DEFV, pvoice: null, pspeed: "normal", rate: DEF.rate, pitch: DEF.pitch, volume: DEF.volume, pauseSentence: DEF.pauseSentence, pauseSection: DEF.pauseSection, readTitles: DEF.readTitles };
+  var RULED = {}, HIS = {}, BAR = "playing", LANG = "en", VOICES = [], TICK = {}, STORED = true, KEPT = false, SECS = [], VSIG = "";
+  (D.ruled || []).forEach(function (k) { RULED[k] = true; HIS[k] = true; });   /* the values he set (D-075) open as his */
   var PL = {}; D.piper.voices.forEach(function (v) { PL[v.id] = v.lang; });
   var KNOWN = { voice: 1, rate: 1, pspeed: 1, pitch: 1, volume: 1, pauseSentence: 1, pauseSection: 1, readTitles: 1 };
   function nearestSpeed(r) { var best = "normal", d = 9; Object.keys(PR).forEach(function (k) { var x = Math.abs(PR[k] - r); if (x < d) { d = x; best = k; } }); return best; }
@@ -341,14 +344,14 @@
   })();
 
   /* the voice my pick starts on: the first English voice whose name holds Natural, else Google, else the browser's own default (D-025.2) */
-  function autoVoice() { var en = VOICES.filter(isEn); return en.filter(function (v) { return /Natural/i.test(v.name); })[0] || en.filter(function (v) { return /Google/i.test(v.name); })[0] || en.filter(function (v) { return v.default; })[0] || null; }
+  function autoVoice() { var en = VOICES.filter(isEn), gb = en.filter(function (v) { return /^en[-_]GB/i.test(v.lang); }); return (DEFV && byName(DEFV)) || gb.filter(function (v) { return /Google/i.test(v.name); })[0] || en.filter(function (v) { return /Natural/i.test(v.name); })[0] || en.filter(function (v) { return /Google/i.test(v.name); })[0] || en.filter(function (v) { return v.default; })[0] || null; }
   function byName(n) { for (var i = 0; i < VOICES.length; i++) if (VOICES[i].name === n) return VOICES[i]; return null; }
   function curVoice() { return (S.bvoice && byName(S.bvoice)) || autoVoice(); }
 
   /* the one line he pastes back, and the shape the review page reads from localStorage */
   function pickObj() {
     var piper = S.engine === "piper", v = curVoice();
-    return { engine: S.engine, voice: piper ? S.pvoice : (S.bvoice || (v ? v.name : "")), lang: piper ? PL[S.pvoice] : (v ? normLang(v.lang) : DEF.lang), rate: piper ? PR[S.pspeed] : S.rate,
+    return { engine: S.engine, voice: piper ? S.pvoice : (S.bvoice || (v ? v.name : "")), lang: piper ? PL[S.pvoice] : (S.bvoice && !byName(S.bvoice) ? (S.bvoice === DEFV ? DEF.lang : (v ? normLang(v.lang) : DEF.lang)) : (v ? normLang(v.lang) : DEF.lang)),   /* his voice missing here: the line keeps its own language */ rate: piper ? PR[S.pspeed] : S.rate,
       pitch: S.pitch, volume: S.volume, pauseSentence: S.pauseSentence, pauseSection: S.pauseSection, readTitles: S.readTitles };
   }
   function persist() {
@@ -527,7 +530,8 @@
     var dv = el("span", "chip"); dv.appendChild(ico(v.localService ? "monitor" : "wifi")); dv.appendChild(el("span", null, v.localService ? U.browser.local : U.browser.online)); dv.title = v.localService ? U.browser.tipLocal : U.browser.tipOnline; chips.appendChild(dv);
     sm.type = "button"; sm.setAttribute("data-sample", ""); setBtn(sm, "play", U.browser.sample); sm.addEventListener("click", function () { sample(v, c, sm); });
     use.type = "button"; use.setAttribute("data-use", "");
-    if (isCur && S.engine === "browser") { if (HIS.voice) { use.setAttribute("aria-pressed", "true"); use.textContent = U.browser.yours; } else { use.setAttribute("data-mine", "true"); use.textContent = U.browser.mine; } }
+    var stand = !!(S.bvoice && !byName(S.bvoice));   /* his voice is not on this device: the voice reading for it is a stand-in, drawn as my pick */
+    if (isCur && S.engine === "browser") { if (HIS.voice && !stand) { use.setAttribute("aria-pressed", "true"); use.textContent = U.browser.yours; } else { use.setAttribute("data-mine", "true"); use.textContent = U.browser.mine; } }
     else use.textContent = U.browser.use;
     use.addEventListener("click", function () { S.engine = "browser"; S.bvoice = v.name; HIS.voice = true; changed(); renderCards(); renderPiper(); });
     cb.type = "checkbox"; cb.checked = !!TICK[v.name]; cb.addEventListener("change", function () { TICK[v.name] = cb.checked; paint(); });
@@ -561,13 +565,14 @@
   function touch(key, val) { S[key] = val; HIS[key] = true; changed(); }
   function changed() { persist(); render(); }
   function resetKey(key) {
-    if (key === "voice") { S.engine = "browser"; S.bvoice = null; S.pvoice = null; delete HIS.pspeed; S.pspeed = "normal"; }
+    if (key === "voice") { S.engine = "browser"; S.bvoice = DEFV; S.pvoice = null; delete HIS.pspeed; S.pspeed = "normal"; }
     else if (key === "pspeed") S.pspeed = "normal"; else S[key] = DEF[key];
-    delete HIS[key]; changed(); renderCards(); renderPiper();
+    if (RULED[key]) HIS[key] = true; else delete HIS[key];   /* back to the default: a value he ruled stays his (D-075) */
+    changed(); renderCards(); renderPiper();
   }
   function resetAll() {
-    S.engine = "browser"; S.bvoice = null; S.pvoice = null; S.pspeed = "normal"; ["rate", "pitch", "volume", "pauseSentence", "pauseSection", "readTitles"].forEach(function (k) { S[k] = DEF[k]; });
-    HIS = {}; KEPT = false; try { window.localStorage.removeItem(KEY); window.localStorage.removeItem(KEY2); } catch (e) {}
+    S.engine = "browser"; S.bvoice = DEFV; S.pvoice = null; S.pspeed = "normal"; ["rate", "pitch", "volume", "pauseSentence", "pauseSection", "readTitles"].forEach(function (k) { S[k] = DEF[k]; });
+    HIS = {}; Object.keys(RULED).forEach(function (k) { HIS[k] = true; }); KEPT = false; try { window.localStorage.removeItem(KEY); window.localStorage.removeItem(KEY2); } catch (e) {}
     render(); renderCards(); renderPiper();
   }
   function buildSettings() {
@@ -598,6 +603,8 @@
       else { c.inp.setAttribute("data-on", String(S[k])); c.inp.textContent = ""; c.inp.appendChild(ico(S[k] ? "check" : "stop")); c.inp.appendChild(el("span", null, S[k] ? U.settings.readTitles.on : U.settings.readTitles.off)); }
     });
     $("engnote").hidden = S.engine !== "piper";
+    var miss = S.engine === "browser" && S.bvoice && !byName(S.bvoice) && VOICES.length, sub = curVoice();
+    $("vmiss").hidden = !miss; if (miss) $("vmiss").textContent = rt(U.settings.voiceMissing, { name: S.bvoice, used: sub ? sub.name : U.browser.defaultVoice });
     $("vb-rate").textContent = fmt(S.rate);
   }
   $("set-reset").addEventListener("click", resetAll); setBtn($("set-reset"), "reset", U.settings.resetAll);

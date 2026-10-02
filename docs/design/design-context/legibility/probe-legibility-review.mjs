@@ -124,6 +124,8 @@ try {
     const first = D.say[0], btn = '[data-say="' + first.key + '"] [data-listen]';
     await fake.click(btn); await fake.waitForTimeout(250); const on = await fake.evaluate((s) => { const b = document.querySelector(s); return { pressed: b.getAttribute('aria-pressed'), label: b.textContent.trim(), said: window.__said.map((x) => x.text) }; }, btn);
     ok(on.pressed === 'true' && on.label === D.ui.say.stop && on.said[0] === first.text.split(/(?<=[.!?])\s+/)[0], 'a click on listen reads the summary from its first sentence and the button turns to stop', on.label + ' · ' + (on.said[0] || '').slice(0, 40));
+    { const r0 = await fake.evaluate(() => window.__said[0] && window.__said[0].rate);   /* D-075: with nothing saved, his pasted pick is the reading voice */
+      ok(D.voice && Math.abs(r0 - D.voice.rate) < 1e-6 && D.voice.voice === 'Google UK English Female', 'with nothing saved, the reading uses his voice pick (D-075): its speed reaches the utterance', 'rate ' + r0); }
     await fake.click(btn); await fake.waitForTimeout(100); const off = await fake.evaluate((s) => { const b = document.querySelector(s); return { pressed: b.getAttribute('aria-pressed'), label: b.textContent.trim(), cancels: window.__cancels }; }, btn);
     ok(off.pressed === 'false' && off.label === D.ui.say.listen && off.cancels >= 1, 'a second click stops it and the button is listen again', off.label);
     await fake.selectOption('[data-listen-rate] select', '2'); const kept = await fake.evaluate(() => window.localStorage.getItem('gabe:legibility:r1:rate'));

@@ -581,7 +581,9 @@ const say = SEC_ORDER.map((k) => {
   if (text.split(/(?<=[.!?])\s+/).some((x) => !/[.!?]$/.test(x))) die(`the spoken summary of ${k} has a sentence that does not end`);
   return { key: k, id: 'sec-' + k, title, text }; });
 for (const k of Object.keys(SPK)) if (k[0] !== '_' && !SEC_ORDER.includes(k)) die('words.spoken names a section the page does not draw: ' + k);
-const DATA = { ep: EP, app: T.app, feedHead: T.feedHead, workHead, ui: UI, glance, calls, proposals, items: itemCards, itemNames: Object.fromEntries(items.map((it) => [it.id, it.name])), questions, gap, audit, patterns, remaining, choices, say, icons: IC.marks, patIcon: IC.pattern };
+/* D-075: his pasted voice pick is the default reading voice — the same file the voice lab reads (voices/voice.ruled.json) */
+const VOICE = (({ _about, ruled, ...v }) => v)(rj(path.join(HERE, 'voices', 'voice.ruled.json')));
+const DATA = { ep: EP, app: T.app, voice: VOICE, feedHead: T.feedHead, workHead, ui: UI, glance, calls, proposals, items: itemCards, itemNames: Object.fromEntries(items.map((it) => [it.id, it.name])), questions, gap, audit, patterns, remaining, choices, say, icons: IC.marks, patIcon: IC.pattern };
 /* the page speaks to you (L17): no he · him · his in anything drawn — his own quoted words aside, and an option's key is not drawn */
 { const SKIP = new Set(['f', 'v', 'mine', 'pick', 'ruled', 'outcome', 'words', 'first', 'rest', 'readAs', 'q', 'icons', 'patIcon']); const hits = [];
   const walk = (o, at) => { if (typeof o === 'string') { if (/\b(he|him|his|himself)\b/i.test(o)) hits.push(at + ': “' + o.slice(0, 80) + '”'); return; }

@@ -9,7 +9,7 @@
     "keyMine": "my pick, not a ruling",
     "keyFilled": "filled",
     "keyYours": "yours",
-    "mineNote": "A dashed value is my pick. When you change it, it turns filled and counts as yours. The line at the end says which is which."
+    "mineNote": "A dashed value is my pick. A filled value is yours: the voice, speed, pitch and pause between sentences you pasted back are the default now. When you change a dashed value, it turns filled. The line at the end says which is which."
   },
   "toc": {
     "head": "On this page",
@@ -121,9 +121,10 @@
     },
     "mine": "my pick",
     "yours": "yours",
-    "yoursTip": "Press to go back to my pick.",
+    "yoursTip": "Press to go back to the default.",
     "ms": "ms",
-    "resetAll": "Back to all my picks",
+    "resetAll": "Back to the defaults",
+    "voiceMissing":"Your voice, {{name}}, is not offered by this browser, so {{used}} reads for it. Open the page in Chrome to hear yours. Your pick stays as it is.",
     "enginePiper": "Your pick is a Piper voice, so it cannot be read live here. The live reading uses the browser voice shown."
   },
   "compare": {
@@ -191,7 +192,7 @@
     ]
   },
   "pick": {
-    "cap": "This line carries your choice. It changes as you change a setting. Your pick is also kept in this browser, and the review page reads it.",
+    "cap": "This line carries your choice. It opens on the pick you pasted back, and it changes as you change a setting. Your pick is also kept in this browser, and the review page reads it.",
     "head": [
       "Setting",
       "Value",

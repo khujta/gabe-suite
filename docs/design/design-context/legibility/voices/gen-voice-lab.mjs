@@ -85,7 +85,11 @@ for (const v of MAN.voices) for (const s of v.speeds) { const r = Math.round(100
 const nSpeeds = Object.keys(PIPER_RATE).length;
 
 /* ── 4 · the facts the words need, and the page's defaults (my picks, drawn dashed - D-025.2) ──────────────────────────── */
-const DEFAULTS = { engine: 'browser', voice: 'auto', lang: 'en-US', rate: 1, pitch: 1, volume: 1, pauseSentence: 250, pauseSection: 900, readTitles: true };
+/* D-075: his pasted pick is the default — one file, read by this page and by the review page. 'ruled' = the values he set. */
+const RULED = rj(path.join(HERE, 'voice.ruled.json'));
+const DEFAULTS = { engine: RULED.engine, voice: RULED.voice, lang: RULED.lang, rate: RULED.rate, pitch: RULED.pitch, volume: RULED.volume,
+  pauseSentence: RULED.pauseSentence, pauseSection: RULED.pauseSection, readTitles: RULED.readTitles };
+for (const k of RULED.ruled) if (!(k in DEFAULTS)) die('voice.ruled.json rules a value the page does not have: ' + k);
 const RANGES = { rate: [0.5, 2, 0.05], pitch: [0, 2, 0.1], volume: [0, 1, 0.05], pauseSentence: [0, 2000, 50], pauseSection: [0, 3000, 50] };
 const EXTERNAL = { elCredits: '10,000' };   /* ElevenLabs' free plan, as the operator was told: the one outside fact the words state */
 const fmt1 = (n) => (Number.isInteger(n) ? n.toFixed(1) : String(+n.toFixed(2)));
@@ -118,7 +122,7 @@ const ICONS = {
   monitor: '<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>',
   reset: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>', minus: '<path d="M5 12h14"/>', plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
 };
-const DATA = { ui: UI, text: TEXT, defaults: DEFAULTS, ranges: RANGES, icons: ICONS, piper: { dir: 'samples/', rate: PIPER_RATE, voices: piperVoices, text: SAMPLE_TEXT } };
+const DATA = { ui: UI, text: TEXT, defaults: DEFAULTS, ruled: RULED.ruled, ranges: RANGES, icons: ICONS, piper: { dir: 'samples/', rate: PIPER_RATE, voices: piperVoices, text: SAMPLE_TEXT } };
 DATA.pageSha = sha10(JSON.stringify(DATA));
 /* inline JSON that no encoding can break: every non-ASCII character is escaped, and "<" so a "</script>" can never close the tag */
 const inline = (o) => JSON.stringify(o).replace(/</g, '\\u003c').replace(/[\u007f-\uffff]/g, (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));

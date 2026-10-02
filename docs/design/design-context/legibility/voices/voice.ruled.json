@@ -1,0 +1,13 @@
+{
+  "_about": "D-075 — his voice pick, pasted from the voice lab: the default for every page that reads aloud. 'ruled' lists the values he set (yours); the rest stay the agent's picks (dashed) at the values shown. Both gen-voice-lab.mjs and ../gen-legibility-review.mjs read this one file.",
+  "engine": "browser",
+  "voice": "Google UK English Female",
+  "lang": "en-GB",
+  "rate": 1.15,
+  "pitch": 1,
+  "volume": 1,
+  "pauseSentence": 250,
+  "pauseSection": 900,
+  "readTitles": true,
+  "ruled": ["voice", "rate", "pitch", "pauseSentence"]
+}

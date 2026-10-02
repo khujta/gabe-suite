@@ -51,7 +51,8 @@ const NOSPEECH = () => { Object.defineProperty(window, 'speechSynthesis', { valu
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'voicelab-probe-')), wrapped = path.join(tmp, 'page.html');
 fs.writeFileSync(wrapped, '<!doctype html><html><head><meta charset="utf8"><base href="file://' + path.dirname(SRC) + '/"></head><body>' + fs.readFileSync(SRC, 'utf8') + '</body></html>');
 const b = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox', '--disable-gpu-sandbox', '--disable-dev-shm-usage'] });
-const LINE0 = 'VOICE · engine browser · voice Mock Natural Voice · lang en-US · speed 1.0 · pitch 1.0 · volume 1.0 · pause between sentences 250 ms · between sections 900 ms · section names read';
+/* CHANGED 2026-10-01 (D-075): the page opens on HIS pasted pick, not on my first-Natural-voice pick; the mock has no Google UK voice, so it also proves the missing-voice path */
+const LINE0 = 'VOICE · engine browser · voice Google UK English Female · lang en-GB · speed 1.15 · pitch 1.0 · volume 1.0 · pause between sentences 250 ms · between sections 900 ms · section names read';
 try {
   const ctx = await b.newContext({ viewport: { width: 1920, height: 1080 } }); await ctx.addInitScript(MOCK);
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
@@ -81,17 +82,18 @@ try {
 
   /* untouched: my pick, dashed, the default line, nothing saved */
   { const l = await line();
-    ok(l.startsWith(LINE0) && l.includes('yours: nothing yet') && l.includes('still my pick: all'), 'untouched, the line is my pick: first English voice named Natural, speed 1.0, pauses 250 and 900', l);
+    ok(l.startsWith(LINE0) && l.includes('yours: voice, speed, pitch, pause between sentences') && l.includes('still my pick: volume, pause between sections, section names'), 'untouched, the line is his pick (D-075): his four values yours, the other three my pick', l);
     ok((await stored()) === null, 'nothing is saved until you change a value');
-    ok(await p.$eval('.vc[data-voice="Mock Natural Voice"] [data-use]', (e) => e.getAttribute('data-mine') === 'true'), 'the voice in use is drawn dashed (my pick)');
+    ok(await p.$eval('.vc[data-voice="Mock Natural Voice"] [data-use]', (e) => e.getAttribute('data-mine') === 'true'), 'his voice is missing here, so the voice reading for it is drawn dashed, a stand-in');
+    ok(await p.$eval('#vmiss', (e) => !e.hidden && e.textContent.includes('Google UK English Female') && e.textContent.includes('Mock Natural Voice')), 'a note says his voice is not offered here and which voice reads for it');
     if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await p.evaluate(() => window.scrollTo(0, 0)); await p.screenshot({ path: path.join(SHOTS, 'voice-lab-top-1920.png') }); } }
 
   /* a changed setting changes the line and the saved key, in the exact shape */
   { await setRange('rate', 1.5); await setRange('pauseSentence', 50); await setRange('pauseSection', 100);
     const l = await line(), s = await stored();
-    ok(l.includes('speed 1.5') && l.includes('pause between sentences 50 ms') && l.includes('between sections 100 ms') && l.includes('yours: speed, pause between sentences, pause between sections'), 'changing a setting changes the line and names it as yours', l.slice(l.indexOf('speed')));
-    ok(JSON.stringify(Object.keys(s)) === JSON.stringify(['engine', 'voice', 'lang', 'rate', 'pitch', 'volume', 'pauseSentence', 'pauseSection', 'readTitles']) && s.engine === 'browser' && s.voice === 'Mock Natural Voice' && s.lang === 'en-US' && s.rate === 1.5 && s.pauseSentence === 50 && s.pauseSection === 100 && s.readTitles === true, 'the saved key gabe:voice:v1 holds exactly the agreed shape', JSON.stringify(s));
-    ok(await p.$eval('[data-set="rate"] .btn.nb', (e) => e.getAttribute('aria-pressed') === 'true' && e.textContent === 'yours') && await p.$eval('[data-set="pitch"] .btn.nb', (e) => e.getAttribute('data-mine') === 'true' && e.textContent === 'my pick'), 'a value you changed turns filled (yours); one you did not stays dashed (my pick)');
+    ok(l.includes('speed 1.5') && l.includes('pause between sentences 50 ms') && l.includes('between sections 100 ms') && l.includes('yours: voice, speed, pitch, pause between sentences, pause between sections'), 'changing a setting changes the line and names it as yours', l.slice(l.indexOf('speed')));
+    ok(JSON.stringify(Object.keys(s)) === JSON.stringify(['engine', 'voice', 'lang', 'rate', 'pitch', 'volume', 'pauseSentence', 'pauseSection', 'readTitles']) && s.engine === 'browser' && s.voice === 'Google UK English Female' && s.lang === 'en-GB' && s.rate === 1.5 && s.pauseSentence === 50 && s.pauseSection === 100 && s.readTitles === true, 'the saved key gabe:voice:v1 holds exactly the agreed shape', JSON.stringify(s));
+    ok(await p.$eval('[data-set="rate"] .btn.nb', (e) => e.getAttribute('aria-pressed') === 'true' && e.textContent === 'yours') && await p.$eval('[data-set="volume"] .btn.nb', (e) => e.getAttribute('data-mine') === 'true' && e.textContent === 'my pick'), 'a value you changed turns filled (yours); one still my pick stays dashed');
     await p.reload(); await p.waitForFunction('window.__vl && window.__vl.ready', { timeout: 20000 }); await p.waitForTimeout(400);
     ok((await line()).includes('speed 1.5') && (await p.$eval('[data-set="rate"] input', (e) => e.value)) === '1.5', 'a reload keeps the pick (and which values are yours)'); }
   { await p.click('[data-lang="all"]'); await p.click('.vc[data-voice="Mock UK Voice"] [data-use]'); const l = await line(), s = await stored();

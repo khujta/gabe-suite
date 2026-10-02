@@ -345,25 +345,26 @@
      A reading is a section and a sentence in it. Every sentence is its own utterance, so a pause, a skip and a stop all land on a sentence.
      The voice settings are the voice lab's (gabe:voice:v1), read again at every sentence so a change there reaches the next one. */
   var speech = (function () {
+    var DV = D.voice || {};   /* D-075: his pasted voice pick, the default when this browser has no saved setting */
     var SS = window.speechSynthesis, ok = !!(SS && window.SpeechSynthesisUtterance), X = U.say, P = U.player, RATES = [0.8, 1, 1.25], idx = 1, VK = "gabe:voice:v1", N = D.say.length;
     var R = { on: false, paused: false, i: 0, s: 0, all: false, gen: 0, timer: 0, parts: [] }, btns = [], sels = [], bar = null, c = {}, chips = [], tcs = null, voxEl = null, voxName = null;
     try { var r = window.localStorage.getItem(KEY + ":rate"); if (r !== null && /^[0-2]$/.test(r)) idx = Number(r); } catch (e) {}
     function num(v, d, lo, hi) { var n = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" ? Number(v) : NaN; return isFinite(n) && n >= lo && n <= hi ? n : d; }
     function saved() { try { var s = JSON.parse(window.localStorage.getItem(VK) || "null"); return s && typeof s === "object" && !Array.isArray(s) ? s : null; } catch (e) { return null; } }
     function voices() { try { return SS.getVoices() || []; } catch (e) { return []; } }
-    /* the saved voice by its name; else an English voice whose name says Natural or Google; else the browser's own default. A Piper voice has no live voice here. */
-    function resolve() { var s = saved(), vs = ok ? voices() : [], want = s && typeof s.voice === "string" ? s.voice : "", piper = !!s && /piper/i.test(String(s.engine || "")), v = null;
-      if (s && want && !piper) v = vs.filter(function (x) { return x.name === want; })[0] || vs.filter(function (x) { return x.name.toLowerCase() === want.toLowerCase(); })[0] || null;
-      var en = vs.filter(function (x) { return /^en\b/i.test(x.lang); }), d = v || en.filter(function (x) { return /Natural/i.test(x.name); })[0] || en.filter(function (x) { return /Google/i.test(x.name); })[0] || null, note;
+    /* the saved voice by its name; with none saved, his pick (D-075, D.voice); else a British Google voice, an English voice whose name says Natural or Google, or the browser's own default. A Piper voice has no live voice here. */
+    function resolve() { var s = saved(), vs = ok ? voices() : [], mine = !!(s && typeof s.voice === "string" && s.voice), want = mine ? s.voice : (DV.voice || ""), piper = !!s && /piper/i.test(String(s.engine || "")), v = null;
+      if (want && !piper) v = vs.filter(function (x) { return x.name === want; })[0] || vs.filter(function (x) { return x.name.toLowerCase() === want.toLowerCase(); })[0] || null;
+      var en = vs.filter(function (x) { return /^en\b/i.test(x.lang); }), gb = en.filter(function (x) { return /^en[-_]GB/i.test(x.lang); }), d = v || gb.filter(function (x) { return /Google/i.test(x.name); })[0] || en.filter(function (x) { return /Natural/i.test(x.name); })[0] || en.filter(function (x) { return /Google/i.test(x.name); })[0] || null, note;
       if (piper) note = rt(P.voicePiper, { name: want || "Piper" });
-      else if (s && want && !v) note = rt(P.voiceMissing, { name: want });
-      else if (v) note = rt(P.voiceSaved, { name: v.name });
+      else if (mine && !v) note = rt(P.voiceMissing, { name: want });
+      else if (v && mine) note = rt(P.voiceSaved, { name: v.name });
       else if (d) note = rt(P.voiceDefault, { name: d.name });
       else note = P.voiceNone;
-      return { voice: d, name: d ? d.name : P.defaultName, note: note, lang: s && typeof s.lang === "string" ? s.lang : "" }; }
+      return { voice: d, name: d ? d.name : P.defaultName, note: note, lang: s && typeof s.lang === "string" ? s.lang : (DV.lang || "") }; }
     function titlesOn() { var s = saved(); return s && typeof s.readTitles === "boolean" ? s.readTitles : R.all; }   /* no saved setting: the titles are read in a run through every summary, as before */
     function partsOf(i) { var sd = D.say[i], p = sentences(sd.text); return titlesOn() ? [sd.title + "."].concat(p) : p; }
-    function pauseMs(k) { var s = saved() || {}; return num(k === "sec" ? s.pauseSection : s.pauseSentence, 0, 0, 10000); }
+    function pauseMs(k) { var s = saved() || {}; return k === "sec" ? num(s.pauseSection, num(DV.pauseSection, 0, 0, 10000), 0, 10000) : num(s.pauseSentence, num(DV.pauseSentence, 0, 0, 10000), 0, 10000); }
     function followOn() { return pref("follow") === "on"; }
     function barBottom() { return bar && bar.getAttribute("data-frozen") === "true" ? bar.getBoundingClientRect().bottom : 0; }
     function viewSection() { var y = barBottom() + 80, k = 0; D.say.forEach(function (x, i) { var s = $(x.id); if (s && s.getBoundingClientRect().top <= y) k = i; }); return k; }
@@ -393,7 +394,7 @@
     function stop() { clearTimer(); R.gen++; cancelTalk(); R.on = false; R.paused = false; paint(); }
     function speakNow(g) { if (R.gen !== g || !R.on || R.paused) return; var t = R.parts[R.s]; if (t === undefined) { stop(); return; }
       var s = saved() || {}, rs = resolve(), u = new SpeechSynthesisUtterance(t);
-      u.rate = Math.min(10, Math.max(0.1, num(s.rate, 1, 0.1, 10) * RATES[idx])); u.pitch = num(s.pitch, 1, 0, 2); u.volume = num(s.volume, 1, 0, 1);
+      u.rate = Math.min(10, Math.max(0.1, num(s.rate, num(DV.rate, 1, 0.1, 10), 0.1, 10) * RATES[idx])); u.pitch = num(s.pitch, num(DV.pitch, 1, 0, 2), 0, 2); u.volume = num(s.volume, num(DV.volume, 1, 0, 1), 0, 1);
       if (rs.voice) { u.voice = rs.voice; u.lang = rs.voice.lang; } else if (rs.lang) u.lang = rs.lang;
       u.onend = function () { if (R.gen === g) step(g); };
       u.onerror = function (e) { if (R.gen === g && e && e.error !== "interrupted" && e.error !== "canceled") stop(); };
