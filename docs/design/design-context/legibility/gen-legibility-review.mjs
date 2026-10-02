@@ -161,6 +161,40 @@ const DEC = rd(path.join(DC, 'decisions.md'));
 const decs = {}; for (const m of DEC.matchAll(/^## (D-\d{3}) — (.+)$/gm)) decs[m[1]] = { id: m[1], title: m[2], at: m.index };
 const ROUND_D = ['D-066', 'D-067', 'D-068', 'D-069', 'D-070', 'D-071'];
 for (const d of ROUND_D) if (!decs[d]) die('decisions.md has no ' + d);
+/* ── 3b · his round-1 rulings, read from the record (D-081, D-082) ─────────────────────────────────────────────────────
+   His rulings live in his browser's storage, so a fresh page would show them as undecided. His review text is kept as a record,
+   review-r1.his.txt, one line per choice: "<id>: <value> (<how>)", under the group lines CALLS · PROPOSALS · PATTERNS · PLAYER. A line whose
+   how starts "yours" is a ruling of D-081 (he picked it, same as mine or not); "ruled, D-nnn" is a ruling an earlier decision made;
+   "my pick, not ruled" is NOT a ruling and stays open. A choice the words already mark ruled (all-endpoints.words.json) must agree with its
+   line; a choice deferred to the bench (D-083) stays deferred, so a ruling line for one stops the build. The build also stops on a
+   record line that names a choice the page does not have, or a value that is not one of that choice's options. */
+const REC_FILE = path.join(HERE, 'review-r1.his.txt'), REC_BY = 'D-081';
+if (!decs[REC_BY]) die('decisions.md has no ' + REC_BY + ' — the ruling the record carries');
+const REC_GROUPS = ['CALLS', 'PROPOSALS', 'PATTERNS', 'PLAYER'];
+const REC = (() => { const rec = new Map(); let group = null;
+  rd(REC_FILE).split('\n').forEach((raw, i) => { const ln = raw.trim(), at = `review-r1.his.txt:${i + 1}`;
+    if (!ln) return; if (REC_GROUPS.includes(ln)) { group = ln; return; } if (!group) return;   /* the head lines above the first group */
+    const m = /^(\S+): (.+) \(([^()]+)\)$/.exec(ln) || die(`${at}: not a record line “${ln.slice(0, 60)}” (id: value (how))`);
+    const how = m[3]; let kind, by = null, x;
+    if (/^yours(?:, same as my pick|, I picked .+)$/.test(how)) { kind = 'yours'; by = REC_BY; }
+    else if ((x = /^ruled, (D-\d{3})$/.exec(how))) { kind = 'ruled'; by = x[1]; }
+    else if (how === 'my pick, not ruled') kind = 'mine';
+    else die(`${at}: a how this build does not know: “${how}”`);
+    if (by && !decs[by]) die(`${at}: ruled in ${by}, which decisions.md does not hold`);
+    if (rec.has(m[1])) die(`${at}: ${m[1]} is on two lines of the record`);
+    rec.set(m[1], { id: m[1], group, value: m[2], kind, by, at, used: false }); });
+  if (!rec.size) die('the record holds no choices: ' + path.relative(ROOT, REC_FILE));
+  return rec; })();
+/* the ruling the record gives one choice: { v, by } when its line says yours or ruled, else the base (what the page already holds).
+   opts: [{ v, name }]; the value must be one of the names the page draws for it, and an earlier ruling must agree with it. */
+const ruleOf = (id, group, opts, base) => { const r = REC.get(id); if (!r) return base;
+  if (r.group !== group) die(`${r.at}: ${id} is under ${r.group}, but the page holds it under ${group}`);
+  r.used = true;
+  const o = opts.find((x) => x.name === r.value) || die(`${r.at}: “${r.value}” is not one of the options of ${id} (${opts.map((x) => '“' + x.name + '”').join(' · ')})`);
+  if (r.kind === 'mine') return base;
+  if (base && base.v !== o.v) die(`${r.at}: the record says ${id} is “${r.value}”, but the page already holds it ruled as “${(opts.find((x) => x.v === base.v) || {}).name}”`);
+  if (base && r.kind === 'ruled' && base.by !== r.by) die(`${r.at}: the record says ${id} was ruled in ${r.by}, the page says ${base.by}`);
+  return base || { v: o.v, by: r.by }; };
 const decText = (d) => { const ids = Object.keys(decs).sort((a, b) => decs[a].at - decs[b].at), i = ids.indexOf(d); return DEC.slice(decs[d].at, i + 1 < ids.length ? decs[ids[i + 1]].at : DEC.length); };
 
 /* ── 4 · the round's records ─────────────────────────────────────────────────────────────────────────────────────── */
@@ -252,8 +286,8 @@ const calls = ADDED.map((gid) => {
   const v = G_NOW[gid], P0 = placeOf(gid);
   if (!v.opts[v.pick]) die(`${gid}: the pick “${v.pick}” is not one of its looks`);
   const opts = Object.entries(v.opts).map(([k, o]) => ({ v: k, name: you(o.name), plain: you(o.plain), shot: lookPic(gid, v, k) }));
-  const from = decOfGroup(gid, v);
-  return { id: gid, where: P0.where, rows: P0.rows.map(rowName), label: v.label, pick: v.pick, ruled: v.ruled ? v.pick : null, ruledBy: v.ruled || null, from, side: opts.length > 1 && opts.every((o) => o.shot && o.shot.region),
+  const from = decOfGroup(gid, v), rl = ruleOf(gid, 'CALLS', opts, v.ruled ? { v: v.pick, by: v.ruled } : null);
+  return { id: gid, where: P0.where, rows: P0.rows.map(rowName), label: v.label, pick: v.pick, ruled: rl ? rl.v : null, ruledBy: rl ? rl.by : null, from, side: opts.length > 1 && opts.every((o) => o.shot && o.shot.region),
     answers: itemsOfLook(gid, v), motion: MOTION[gid] || die('words.calls.motion has no line for ' + gid + ' — what choosing it sets in motion'), opts };
 });
 /* the bench's kind looks, added this round too (LT-09): one call per kind that is on the bench now and was not before, its column as
@@ -262,8 +296,9 @@ const KINDS = (AEW.ex || {}).kinds || die('all-endpoints words: no ex.kinds'), K
 const KLOOK = (AEW.ex || {}).look || {};
 const kindCalls = Object.entries(KINDS).filter(([k]) => !KINDS0[k]).map(([k, kd]) => {
   const s = R1.find((x) => x.column === kd.name && !isCrop(x)) || null; if (s) used.add(s.file);
-  const ruledBy = (KLOOK[k] || {}).ruled || null;
-  return { id: 'ex.kind.' + k, kind: k, where: 'bench', rows: [], label: you(kd.name), pick: 'drawn', ruled: ruledBy ? 'drawn' : null, ruledBy,
+  const kopts = [{ v: 'drawn', name: W.gen.kindDrawn }, { v: 'change', name: W.gen.kindChange }];
+  const rl = ruleOf('ex.kind.' + k, 'CALLS', kopts, (KLOOK[k] || {}).ruled ? { v: 'drawn', by: KLOOK[k].ruled } : null), ruledBy = rl ? rl.by : null;
+  return { id: 'ex.kind.' + k, kind: k, where: 'bench', rows: [], label: you(kd.name), pick: 'drawn', ruled: rl ? rl.v : null, ruledBy,
     from: ruledBy || decOfGroup('ex.kind', { _about: SEC_ABOUT.ex }), answers: s ? itemsOfShot(s).filter((x) => /^L-\d\d$/.test(x)) : [],
     motion: fill(need(W.gen, 'kindMotion', 'gen'), { kind: kd.name }, 'gen.kindMotion'),
     about: you(kd.plain), opts: [{ v: 'drawn', name: W.gen.kindDrawn, plain: fill(W.gen.kindDrawnPlain, { kind: kd.name }, 'gen.kindDrawnPlain'), shot: s ? { f: s.file, w: s.size[0], h: s.size[1], cap: you(fill(W.gen.kindCap, { kind: kd.name }, 'gen.kindCap')), open: true } : null },
@@ -526,6 +561,10 @@ const audit = { id: AUDIT.id, name: you(AUDIT.name), what: you(AUDIT.what), land
   lines: fill(W.gen.auditLines, { n: rd(AUDIT_SRC).split('\n').filter((l, i, a) => i < a.length - 1 || l).length }, 'gen.auditLines'), parts: auditParts,
   pick: patterns.some((p) => p.suite.some((s) => s.partOf === AUDIT.id && s.pick === 'land')) ? 'land' : 'notyet' };
 
+/* ── 10b · his rulings on the patterns' draft proposals and the audit (D-081): a pattern choice carries his value as `ruled`, my pick stays `pick` ── */
+const PAT_OPTS = need(W.pat, 'choice', 'pat').map((x) => ({ v: x[0], name: x[1] }));
+for (const s of patterns.flatMap((p) => p.suite).concat([audit])) { const id = s.cid || s.id, rl = ruleOf(id, 'PATTERNS', PAT_OPTS, null); s.ruled = rl ? rl.v : null; s.ruledBy = rl ? rl.by : null; }
+
 /* ── 11 · what round 1b left, by pattern: the open rows, the findings it fixed only partly or left, and what the small pass fixed (L4) ── */
 const SMALL = uniq(REM.items.map((r) => (/^fixed (\w+)$/.exec(r.status) || [])[1]).filter(Boolean));
 if (SMALL.length > 1) die('remaining.json: rows fixed by more than one pass (' + SMALL.join(', ') + ') — the page names one small pass');
@@ -587,8 +626,9 @@ const proposals = W.proposals.map((p) => {
   const facts = (p.facts || []).map((k) => (rem[k] ? { id: k, text: you(rem[k].what) } : FIX.left[k] ? { id: k, text: you(FIX.left[k]) } : FIX.his[k] ? { id: k, text: you(FIX.his[k]) } : findings.find((f) => f.id === k) ? { id: k, text: you(findings.find((f) => f.id === k).what) } : die('proposal ' + p.id + ' cites nothing called ' + k)));
   const shots = (p.pics || []).map((q) => { const sh = pic(shotBy(q)); if (q.cap) sh.cap = you(fill(q.cap, PTOK, p.id + '.pics')); return sh; });
   if (p.ruled && !decs[p.ruled]) die(`proposal ${p.id}: ruled in ${p.ruled}, which decisions.md does not hold`);
-  if (!p.ruled) for (const o of opts) o.depict = depictOpt(p.id, o.v, PTOK);   /* a proposal you have ruled needs no depiction: it is built */
-  return { id: p.id, title: fill(p.title, PTOK, p.id), what: fill(p.what, PTOK, p.id), motion: fill(p.motion, PTOK, p.id), opts, pick, facts, shots, alsoIn: p.alsoIn || null, ruled: p.ruled ? pick : null, ruledBy: p.ruled || null };
+  const rl = ruleOf(p.id, 'PROPOSALS', opts, p.ruled ? { v: pick, by: p.ruled } : null);   /* the words file's ruling, or the one his record gives */
+  if (!rl) for (const o of opts) o.depict = depictOpt(p.id, o.v, PTOK);   /* a proposal you have ruled needs no depiction: it is built */
+  return { id: p.id, title: fill(p.title, PTOK, p.id), what: fill(p.what, PTOK, p.id), motion: fill(p.motion, PTOK, p.id), opts, pick, facts, shots, alsoIn: p.alsoIn || null, ruled: rl ? rl.v : null, ruledBy: rl ? rl.by : null };
 });
 T.nProps = proposals.length;
 /* ── 8b · the choices deferred to the all-endpoints bench (D-083) ───────────────────────────────────────────────────────
@@ -605,6 +645,15 @@ const isDeferred = (id) => Object.prototype.hasOwnProperty.call(DEFER, id);
   Object.assign(T, { nDeferred: Object.keys(DEFER).length, nCallsDeferred: calls.filter((c) => isDeferred(c.id)).length, nKindsDeferred: kindCalls.filter((c) => isDeferred(c.id)).length,
     nCallsOpen: calls.filter(waiting).length, nPropsOpen: proposals.filter(waiting).length });
   T.nWait = T.nCallsOpen + T.nPropsOpen; }
+/* the patterns' side of the same count: the draft proposals and the audit, ruled or still waiting (a pattern choice is never deferred) */
+{ const pc = patterns.flatMap((p) => p.suite).concat([audit]), got = (v) => pc.filter((x) => x.ruled === v).length;
+  Object.assign(T, { nPcChoices: pc.length, nPcRuled: pc.filter((x) => x.ruled).length, nPcOpen: pc.filter((x) => !x.ruled).length, nPcLand: got('land'), nPcNotYet: got('notyet'), nPcChange: got('change') }); }
+/* the player's three options are choices too (the page keeps them beside the others): their rulings come from the same record */
+const PLW = need(W, 'player', '');
+const PREFS = Object.fromEntries([['bar', [['always', PLW.optBarAlways], ['playing', PLW.optBarPlaying]]], ['follow', [['on', PLW.optOn], ['off', PLW.optOff]]],
+  ['after', [['stop', PLW.optAfterStop], ['next', PLW.optAfterNext], ['section', PLW.optAfterSection]]]].map(([k, o]) => { const id = need(PLW, 'line' + k[0].toUpperCase() + k.slice(1), 'player'),
+  rl = ruleOf(id, 'PLAYER', o.map(([v, name]) => ({ v, name })), null); return [k, rl ? { id, v: rl.v, by: rl.by } : null]; }));
+for (const r of REC.values()) if (!r.used) die(`${r.at}: the record names ${r.id}, which is not a choice of this page`);
 for (const c of calls) c.motion = fill(c.motion, T, 'calls.motion.' + c.id);
 T.nPics = used.size;
 const fillTree = (o, at) => (typeof o === 'string' ? fill(o, T, at) : Array.isArray(o) ? o.map((v, i) => fillTree(v, at + '[' + i + ']')) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => k[0] !== '_').map(([k, v]) => [k, fillTree(v, at + '.' + k)])) : o);
@@ -614,8 +663,8 @@ const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls,
 /* ── 14 · the data, the hash, the page ─────────────────────────────────────────────────────────────────────────────── */
 const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, deferred: DEFER[c.id] || null, opts: c.opts.map((o) => [o.v, o.name]) })),
   ...proposals.map((p) => ({ id: p.id, group: 'PROPOSALS', mine: p.pick, ruled: p.ruled, ruledBy: p.ruledBy, deferred: DEFER[p.id] || null, opts: p.opts.map((o) => [o.v, o.name]) })),
-  { id: audit.id, group: 'PATTERNS', mine: audit.pick, ruled: null, ruledBy: null, deferred: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) },
-  ...patterns.flatMap((p) => p.suite.map((s) => ({ id: s.cid, group: 'PATTERNS', mine: s.pick, ruled: null, ruledBy: null, deferred: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) })))];
+  { id: audit.id, group: 'PATTERNS', mine: audit.pick, ruled: audit.ruled, ruledBy: audit.ruledBy, deferred: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) },
+  ...patterns.flatMap((p) => p.suite.map((s) => ({ id: s.cid, group: 'PATTERNS', mine: s.pick, ruled: s.ruled, ruledBy: s.ruledBy, deferred: null, opts: W.pat.choice.map((x) => [x[0], x[1]]) })))];
 if (new Set(choices.map((c) => c.id)).size !== choices.length) die('two choices share an id');
 
 /* ── 13b · the marks (L-25) and the spoken summaries (L-26) ──────────────────────────────────────────────────────────────
@@ -908,7 +957,7 @@ for (const p of patterns) {
   Lc.box = Object.fromEntries([['does', 'does'], ['doesNot', 'doesNot'], ['decides', 'decidesWhen']].map(([k, f]) => [k, { text: fill2(lensTxt(fld(S, 'box', at), f, at + '.box', 1, 1), o.tok, at + '.box.' + f).c, tip: fillv(LTPL.boxRow[k], { name: 'this pattern' }, at) }]));
   LENSP[p.id] = Lc;
   const nP = p.suite.length, tok = { props: { c: plural(nP, 'draft proposal'), s: pluralS(nP, 'draft proposal') }, them: { c: nP === 1 ? 'it' : 'them', s: nP === 1 ? 'it' : 'them' } };
-  const say = LTPL.say, pk = p.suite[0].pick === 'land' ? say.patPickLand : say.patPickNot;
+  const say = LTPL.say, nR = p.suite.filter((x) => x.ruled).length, pk = nR === p.suite.length ? say.patRuledAll : nR ? say.patRuledSome : p.suite[0].pick === 'land' ? say.patPickLand : say.patPickNot;
   const parts = [b.say.pain, b.say.like, b.say.toSolve, b.say.ifNot, fill2(say.patOptions, tok, at + '.say').s, fill2(pk, tok, at + '.say').s];
   checkSay(parts.join(' '), 'the summary of ' + p.id, 4, 7);
   { const m = SAY_NAMES.find(([rx]) => rx.test(parts.join(' '))); if (m) die(`the summary of ${p.id} holds ${m[1]}: “${m[0].exec(parts.join(' '))[0]}”`); }
@@ -924,11 +973,11 @@ for (const k of Object.keys(PATTERN_SRC)) if (k[0] !== '_' && !patById[k]) die('
     tk2(tok, 'doesCap', ucFirst(t.dp), ''); tk2(tok, 'gate', ctx.gate, ''); tk2(tok, 'gateClause', '', gateClause(ctx.gate, id));
     const order = Object.keys(CHOICE_NAME), op = CHOICE_NAME, ei = exImp(id, ctx.ex, { land: t.land, notyet: t.notyet, change: t.change }, order, op, tok);
     addDec({ key: s, id, sec: 'pat', gk, gn, gp, name, tag: null, ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay,
-      parts: lensSay(id, need(DS, 'optionsSuite', 'decide.s'), fill(DS.pickSuite, { pick: CHOICE_NAME[pick] }, 'decide.s.pickSuite')), opts: CHOICE_NAME }); };
+      parts: lensSay(id, need(DS, 'optionsSuite', 'decide.s'), ctx.ruled ? fill(DS.pickRuled, { pick: CHOICE_NAME[ctx.ruled] }, 'decide.s.pickRuled') : fill(DS.pickSuite, { pick: CHOICE_NAME[pick] }, 'decide.s.pickSuite')), opts: CHOICE_NAME }); };
   { const nm = DNAME[audit.id] || die('words.decide.name has no name for ' + audit.id), tok = Object.assign({}, XT);
-    suiteEntry(audit.id, audit.id, UI.sec.pat.auditHead, null, nm, fill(DS.audit, { name: ucFirst(nm) }, sg('audit')), audit.pick, audit.id, { gate: audit.gate, p: null, nOpen: 0, tok, ex: EXS.audit }); }
+    suiteEntry(audit.id, audit.id, UI.sec.pat.auditHead, null, nm, fill(DS.audit, { name: ucFirst(nm) }, sg('audit')), audit.pick, audit.id, { gate: audit.gate, p: null, nOpen: 0, tok, ex: EXS.audit, ruled: audit.ruled }); }
   for (const p of patterns) for (const s of p.suite) { const nm = DNAME[s.cid] || die('words.decide.name has no name for ' + s.cid), pe = patEx(p, s, s.cid);
-    suiteEntry(s.cid, p.id, p.name, p.id, nm, fill(DS.suite, { name: ucFirst(nm), kind: KINDW[s.kind] || die('words.decide.kindWord has no ' + s.kind), pattern: lcFirst(unparen(p.name)) }, sg('suite')), s.pick, s.cid, { gate: s.gate, p, nOpen: p.nOpen, tok: pe.tok, ex: pe.ex });
+    suiteEntry(s.cid, p.id, p.name, p.id, nm, fill(DS.suite, { name: ucFirst(nm), kind: KINDW[s.kind] || die('words.decide.kindWord has no ' + s.kind), pattern: lcFirst(unparen(p.name)) }, sg('suite')), s.pick, s.cid, { gate: s.gate, p, nOpen: p.nOpen, tok: pe.tok, ex: pe.ex, ruled: s.ruled });
     DECS[DECS.length - 1].tag = s.kind; }
   for (const c of calls) { const ov = DSAY[c.id] || {}, op = spokenOpts(c.id, c.opts), name = ov.name || c.label, order = c.opts.map((o) => o.v);
     const ei = exImp(c.id, XW[c.id], c.kind ? need(IW, 'kind', 'decide.imp') : IW[c.id] || die('words.decide.imp has no entry for ' + c.id), order, op, XT);
@@ -937,12 +986,12 @@ for (const k of Object.keys(PATTERN_SRC)) if (k[0] !== '_' && !patById[k]) die('
     addDec({ key: c.id, id: c.id, sec: 'calls', gk: c.kind ? 'kinds' : c.where, gn: c.kind ? UI.calls.kindsHead : UI.calls.where[c.where], gp: null, name: c.label, tag: c.rows.length ? c.rows.join(' · ') : null,
       ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay,
       parts: lensSay(c.id, fill(need(DS, isDeferred(c.id) ? 'optionsDeferred' : 'options', 'decide.s'), { opts: orList(c.opts.map((o) => op[o.v])) }, sg('options')),
-        isDeferred(c.id) ? need(DS, 'pickDeferred', 'decide.s') : decPick(c.pick, !!c.ruled, op, sg(c.ruled ? 'pickRuled' : 'pickMine'))), opts: op }); }
+        isDeferred(c.id) ? need(DS, 'pickDeferred', 'decide.s') : decPick(c.ruled || c.pick, !!c.ruled, op, sg(c.ruled ? 'pickRuled' : 'pickMine'))), opts: op }); }
   for (const p of proposals) { const ov = DSAY[p.id] || {}, op = spokenOpts(p.id, p.opts), nm = DNAME[p.id] || die('words.decide.name has no name for ' + p.id), order = p.opts.map((o) => o.v);
     const ei = exImp(p.id, XW[p.id], IW[p.id] || die('words.decide.imp has no entry for ' + p.id), order, op, XT);
     lensDecision(p.id, { name: nm, tok: Object.assign({}, XT), opts: p.opts.map((o) => [o.v, o.name]), suite: null });
     const parts = lensSay(p.id, fill(need(DS, isDeferred(p.id) ? 'optionsDeferred' : 'options', 'decide.s'), { opts: orList(p.opts.map((o) => op[o.v])) }, sg('options')),
-      isDeferred(p.id) ? need(DS, 'pickDeferred', 'decide.s') : decPick(p.pick, !!p.ruled, op, sg(p.ruled ? 'pickRuled' : 'pickMine')));
+      isDeferred(p.id) ? need(DS, 'pickDeferred', 'decide.s') : decPick(p.ruled || p.pick, !!p.ruled, op, sg(p.ruled ? 'pickRuled' : 'pickMine')));
     const extra = { ex: ei.ex.c, exSay: ei.ex.s, imp: Object.fromEntries(order.map((v) => [v, ei.imp[v].c])), impSay: ei.impSay };
     addDec(Object.assign({ key: p.id, id: p.id, sec: 'calls', gk: 'props', gn: UI.calls.propsHead, gp: null, name: nm, tag: null, parts, opts: op }, extra));
     if (p.alsoIn === 'gap') addDec(Object.assign({ key: p.id + ':gap', id: p.id, sec: 'gap', gk: 'gap', gn: UI.gap.recHead, gp: null, name: nm, tag: null, parts, opts: op }, extra)); } }
@@ -958,7 +1007,7 @@ for (const [k, v] of Object.entries(UI.decide.run)) checkSay(v.replace('{{name}}
 for (const e of DECS) { const w = [e.name, e.gn, e.tag, ...Object.values(e.opts)].filter(Boolean); for (const x of w) if (/\{|\bundefined\b/.test(x)) die('a decision word holds a token or a missing value: ' + e.key + ' “' + x + '”'); }
 /* D-075: his pasted voice pick is the default reading voice — the same file the voice lab reads (voices/voice.ruled.json) */
 const VOICE = (({ _about, ruled, ...v }) => v)(rj(path.join(HERE, 'voices', 'voice.ruled.json')));
-const DATA = { ep: EP, app: T.app, voice: VOICE, feedHead: T.feedHead, workHead, ui: UI, glance, calls, proposals, items: itemCards, itemNames: Object.fromEntries(items.map((it) => [it.id, it.name])), questions, gap, audit, patterns, remaining, choices, say, icons: IC.marks, patIcon: IC.pattern, decide: { entries: DECS, pats: PATDECS }, lens: { patterns: LENSP, decisions: LENSD, kindIcon: PAINK, procIcon: PROC, used: { pain: Object.keys(PAINK).filter((k) => [...Object.values(LENSP), ...Object.values(LENSD)].some((l) => l.pain.kind === k)), process: Object.keys(PROC).filter((k) => [...Object.values(LENSP), ...Object.values(LENSD)].some((l) => l.like.process === k)) } } };
+const DATA = { ep: EP, app: T.app, voice: VOICE, prefs: PREFS, feedHead: T.feedHead, workHead, ui: UI, glance, calls, proposals, items: itemCards, itemNames: Object.fromEntries(items.map((it) => [it.id, it.name])), questions, gap, audit, patterns, remaining, choices, say, icons: IC.marks, patIcon: IC.pattern, decide: { entries: DECS, pats: PATDECS }, lens: { patterns: LENSP, decisions: LENSD, kindIcon: PAINK, procIcon: PROC, used: { pain: Object.keys(PAINK).filter((k) => [...Object.values(LENSP), ...Object.values(LENSD)].some((l) => l.pain.kind === k)), process: Object.keys(PROC).filter((k) => [...Object.values(LENSP), ...Object.values(LENSD)].some((l) => l.like.process === k)) } } };
 /* the page speaks to you (L17): no he · him · his in anything drawn — his own quoted words aside, and an option's key is not drawn */
 { const SKIP = new Set(['f', 'v', 'mine', 'pick', 'ruled', 'outcome', 'words', 'first', 'rest', 'readAs', 'q', 'icons', 'patIcon']); const hits = [];
   const walk = (o, at) => { if (typeof o === 'string') { if (/\b(he|him|his|himself)\b/i.test(o)) hits.push(at + ': “' + o.slice(0, 80) + '”'); return; }

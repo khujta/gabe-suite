@@ -708,7 +708,8 @@
           else if (c.deferred && x.v) { x.v = null; if (!x.n) delete s.v[k]; } });   /* a pick kept from before the choice was deferred is not a pick now (D-083) */
         if (s.p && typeof s.p === "object") Object.keys(s.p).forEach(function (k) { if (!PREFS[k] || PREFS[k].indexOf(s.p[k]) < 0) delete s.p[k]; }); else delete s.p; return s; } } catch (e) {} return { v: {} }; })();
   /* the player's two options (L-27): kept per viewer beside the choices, in the same store; the first value of each is the default */
-  function pref(k) { var v = state && state.p && state.p[k]; return PREFS[k].indexOf(v) >= 0 ? v : PREFS[k][0]; }
+  function prefRuled(k) { var r = D.prefs && D.prefs[k]; return r && PREFS[k].indexOf(r.v) >= 0 ? r : null; }   /* his ruling of the option (the record, D-081), the default until he picks another */
+  function pref(k) { var v = state && state.p && state.p[k]; return PREFS[k].indexOf(v) >= 0 ? v : prefRuled(k) ? prefRuled(k).v : PREFS[k][0]; }
   function setPref(k, v) { state.p = state.p || {}; if (state.p[k] === v) delete state.p[k]; else state.p[k] = v; if (!Object.keys(state.p).length) delete state.p; save(); repaint(); }
   function save() { try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
   function eff(c) { if (c.deferred) return null; var s = state.v[c.id]; return (s && s.v) || c.ruled || null; }
@@ -742,11 +743,12 @@
   (function () { var P = U.player, host = $("topacts"), after = $("said-all");
     $("bar").setAttribute("aria-label", P.bar); speech.mount($("bar"), U.toc.head, ["sec-glance", "sec-rem", "sec-pat", "sec-calls", "sec-items", "sec-qs", "sec-gap", "sec-copy"].map(function (id) { return { id: id, key: id.slice(4), title: U.sec[id.slice(4)].title }; }));
     function group(k, label, tip, opts) { var g = el("span", "opt"), lb = el("span", null, label); g.setAttribute("data-opt", k); lb.title = tip; if (!speech.ok) g.hidden = true; g.appendChild(lb);
-      opts.forEach(function (o) { var b = el("button", "btn ic"); b.type = "button"; b.setAttribute("data-v", o.v); b.setAttribute("data-pref", k); if (o.tip) b.title = o.tip; if (o.icon) b.appendChild(ico(o.icon)); b.appendChild(el("span", null, o.name));
+      opts.forEach(function (o) { var b = el("button", "btn ic"), rk = prefRuled(k), rv = rk && rk.v === o.v; b.type = "button"; b.setAttribute("data-v", o.v); b.setAttribute("data-pref", k);
+        if (o.tip || rv) b.title = o.tip || rt(P.tipRuled, { by: rk.by }); if (rv) o.icon = "ruled"; if (o.icon) b.appendChild(ico(o.icon)); b.appendChild(el("span", null, o.name));
         b.addEventListener("click", function () { setPref(k, o.v); });
-        painters.push(function () { var st = state.p && state.p[k]; b.setAttribute("aria-pressed", String(st ? st === o.v : !!o.ruled)); b.setAttribute("data-mine", String(!st && !!o.mine)); }); g.appendChild(b); });
+        painters.push(function () { var st = state.p && state.p[k], e = st || (rk && rk.v); b.setAttribute("aria-pressed", String(!!e && e === o.v)); b.setAttribute("data-mine", String(!e && !!o.mine)); }); g.appendChild(b); });
       host.insertBefore(g, after); }
-    group("bar", P.optBar, P.optBarTip, [{ v: "always", name: P.optBarAlways, ruled: true, icon: "ruled", tip: P.tipAlways }, { v: "playing", name: P.optBarPlaying, icon: "pin", tip: P.tipPlaying }]);
+    group("bar", P.optBar, P.optBarTip, [{ v: "always", name: P.optBarAlways, tip: P.tipAlways }, { v: "playing", name: P.optBarPlaying, icon: "pin", tip: P.tipPlaying }]);
     group("follow", P.optFollow, P.optFollowTip, [{ v: "on", name: P.optOn, mine: true }, { v: "off", name: P.optOff }]);
     group("after", P.optAfter, P.optAfterTip, [{ v: "stop", name: P.optAfterStop, mine: true }, { v: "next", name: P.optAfterNext }, { v: "section", name: P.optAfterSection }]);   /* L-29: what follows a decision that has been read; my pick (dashed) is to stop there */
     painters.push(function () { speech.refresh(); }); })();
@@ -874,7 +876,8 @@
     var ov = el("div", "panel"); ov.appendChild(el("h3", null, O.head));
     ov.appendChild(table([O.pat, O.name, O.items, O.find, O.open, O.props, O.pick], D.patterns.map(function (p) { var l = el("a", "ref"); l.href = "#pat-" + p.id; l.title = patTip(p.id); l.appendChild(pmark(p.id));
       var fb = cell(stack(outParts(p.out), null, rt(TP.subject.pat, { id: p.id })), el("span", "n", String(p.nFind)));
-      var pk = p.suite[0].pick === "land" ? M("land", null, null, rt(TP.patPick.land, { id: p.id, props: pl(p.suite.length, "proposal") })) : M("notyet", null, null, rt(TP.patPick.notyet, { id: p.id, props: pl(p.suite.length, "proposal") }));
+      var nR = p.suite.filter(function (x) { return x.ruled; }).length, pw = p.suite[0].pick === "land" ? "land" : "notyet", PK = nR ? TP.patPickRuled : TP.patPick;   /* the column is my pick; once you have ruled on some, its hover says how many */
+      var pk = M(pw, null, null, rt(PK[pw], { id: p.id, props: pl(p.suite.length, "proposal"), ruled: nR }));
       return [l, link(p.name, "#pat-" + p.id), p.items.length, fb, M("open", p.stillThere, p.stillThere ? "" : "zero", stillTip(p)), p.suite.length, pk]; }), ["sv", "", "num", "sv", "sv", "num", "sv"]));
     B.appendChild(ov);
     var A = D.audit, ac = el("div", "panel audit"); ac.setAttribute("data-audit", A.id); ac.appendChild(el("h3", null, W.auditHead)); ac.appendChild(el("p", "cap", W.auditNote));
@@ -1013,11 +1016,11 @@
         if (c.deferred) { benched++; body.push(c.id + ": " + rt(CW.deferred, { by: c.deferred }) + (s.n ? " · " + rt(CW.note, { note: s.n.replace(/\s+/g, " ").trim() }) : "")); return; }   /* D-083: not a pick, not left as mine */
         if (e) { yours++; val = nameOf(c, e); how = c.ruled ? (e === c.ruled ? rt(CW.ruled, { by: c.ruledBy }) : rt(CW.changedRuled, { ruled: nameOf(c, c.ruled), by: c.ruledBy })) : e === c.mine ? CW.same : rt(CW.differs, { mine: nameOf(c, c.mine) }); } else { mine++; val = nameOf(c, c.mine); how = CW.minePick; }
         body.push(c.id + ": " + val + " (" + how + ")" + (s.n ? " · " + rt(CW.note, { note: s.n.replace(/\s+/g, " ").trim() }) : "")); }); });
-    /* the player's options ride the copy text too (L-27, L-29): bar = ruled by default, follow and after = my pick by default */
+    /* the player's options ride the copy text too (L-27, L-29): a ruled one reads as ruled (the record, D-081), the others as my pick */
     var PL = U.player; body.push(""); body.push(CW.groups.PLAYER);
-    [["bar", PL.lineBar, { playing: PL.optBarPlaying, always: PL.optBarAlways }, "always", null], ["follow", PL.lineFollow, { on: PL.optOn, off: PL.optOff }, null, "on"], ["after", PL.lineAfter, { stop: PL.optAfterStop, next: PL.optAfterNext, section: PL.optAfterSection }, null, "stop"]].forEach(function (g) {
-      var k = g[0], nm = g[2], ruled = g[3], mine = g[4], st = state.p && state.p[k], e = st || ruled, val, how;
-      if (ruled) { val = nm[e]; how = e === ruled ? rt(CW.ruled, { by: PL.ruledBy }) : rt(CW.changedRuled, { ruled: nm[ruled], by: PL.ruledBy }); }
+    [["bar", PL.lineBar, { playing: PL.optBarPlaying, always: PL.optBarAlways }, null], ["follow", PL.lineFollow, { on: PL.optOn, off: PL.optOff }, "on"], ["after", PL.lineAfter, { stop: PL.optAfterStop, next: PL.optAfterNext, section: PL.optAfterSection }, "stop"]].forEach(function (g) {
+      var k = g[0], nm = g[2], rk = prefRuled(k), ruled = rk && rk.v, by = rk && rk.by, mine = g[3], st = state.p && state.p[k], e = st || ruled, val, how;
+      if (ruled) { val = nm[e]; how = e === ruled ? rt(CW.ruled, { by: by }) : rt(CW.changedRuled, { ruled: nm[ruled], by: by }); }
       else if (st) { val = nm[st]; how = st === mine ? CW.same : rt(CW.differs, { mine: nm[mine] }); } else { val = nm[mine]; how = CW.minePick; }
       body.push(g[1] + ": " + val + " (" + how + ")"); });
     out.value = [rt(CW.head, { pageSha: D.pageSha }), rt(CW.counts, { yours: yours, mine: mine, deferred: benched })].concat(body).join("\n");

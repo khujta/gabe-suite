@@ -73,7 +73,7 @@
       "note": "Why the page was clear to a model and not to you, grouped. One card per pattern, ordered by how many of your items it holds, then by the review's findings.",
       "landNote": "Nothing here lands in the suite before you say “land it” (D-066). Each proposal is a draft; your choice is the word.",
       "pickRule": "My pick: land it where something of the pattern is still open after the agents had been told the rules (an open row in What round 1b left that is not left for your call: on a new surface, a limit of the feed or the generator, or a slip in the work), or where you raised it yourself; not yet otherwise. Its weakness: it reads one round, and a pattern that did not come back here may still come back on the next page. It does not weigh the cost: each proposal says what it costs and what speaks against it, for you to weigh.",
-      "take": "Take from this: {nPatterns} patterns; the biggest by your items, “{topPattern}”, holds {topItems} of your items and {topFind} of the review's findings. My pick is land it on {nLand} of them, and each waits for your word.",
+      "take": "Take from this: {nPatterns} patterns; the biggest by your items, “{topPattern}”, holds {topItems} of your items and {topFind} of the review's findings. My pick is land it on {nLand} of them. You have ruled on {nPcRuled} of the {nPcChoices} choices here, the audit included: {nPcLand} land it, {nPcChange} change it and {nPcNotYet} not yet. Still waiting for your word: {nPcOpen}.",
       "auditHead": "The audit the check proposals share",
       "auditNote": "{nAuditParts} of the check proposals below are counts of one script, the audit {auditId}. A part lands only with the audit."
     },
@@ -862,7 +862,6 @@
     "optOn": "on",
     "optOff": "off",
     "optFollowTip": "When the reading moves on to the next section by itself, the page scrolls to that section. A skip always scrolls.",
-    "ruledBy": "D-076",
     "lineBar": "pl.bar",
     "lineFollow": "pl.follow",
     "optAfter": "after a decision",
@@ -875,7 +874,8 @@
     "nextOpenShort": "next open",
     "nextOpenTip": "Next open decision",
     "tipAlways": "Always in view, your ruling",
-    "tipPlaying": "Show only while reading"
+    "tipPlaying": "Show only while reading",
+    "tipRuled": "Your ruling, {{by}}"
   },
   "ov": {
     "items": {
@@ -945,7 +945,7 @@
       "The page was clear to a model but not to you in {nPatterns} ways, and each way is one pattern.",
       "The biggest holds {topItems} of your items and {topFind} of the review's findings, and it is called {topPattern}.",
       "Together the patterns have {nSuite} draft proposals for the suite, and {nAuditParts} of those share one audit.",
-      "My pick: land it on {nLand} patterns, and not yet on {nNotYet}.",
+      "You have ruled on {nPcRuled} of the {nPcChoices} choices here, the audit included, and {nPcOpen} still wait for your word.",
       "Nothing lands in the suite until you say land it."
     ],
     "calls": [
@@ -1476,6 +1476,10 @@
       "land": "My pick for {{id}}: land {{props}}, once you say so.",
       "notyet": "My pick for {{id}}: leave {{props}} for now."
     },
+    "patPickRuled": {
+      "land": "My pick for {{id}}: land {{props}}. You have ruled on {{ruled}} of them.",
+      "notyet": "My pick for {{id}}: leave {{props}} for now. You have ruled on {{ruled}} of them."
+    },
     "patOne": "{{cid}} is {{kind}} for the suite, from {{id}}, {{name}}.",
     "partOf": "{{cid}} counts toward the audit and comes from {{id}}, {{name}}.",
     "itemStatus": "{{id}} stands as {{status}}.",
@@ -1729,7 +1733,9 @@
       "say": {
         "patOptions": "This pattern holds {props} for the suite, and each one is yours to land or leave.",
         "patPickLand": "My pick is to land {them}, and nothing lands in the suite until you say land it.",
-        "patPickNot": "My pick is to leave {them} for now, and nothing lands in the suite until you say land it."
+        "patPickNot": "My pick is to leave {them} for now, and nothing lands in the suite until you say land it.",
+        "patRuledAll": "You have already ruled on {them}, and each one's card says what you ruled.",
+        "patRuledSome": "You have ruled on some of {them}, and the rest wait for your word."
       },
       "costTip": "What it takes to solve {name}, and what keeps happening if you do not."
     }
