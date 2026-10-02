@@ -1306,6 +1306,32 @@
     "echo": "both"
    }
   },
+  "mo.secmv": {
+   "pain": {
+    "kind": "missing",
+    "meter": {
+     "n": "nSecHomeRows",
+     "noun": "rows besides Security that hold a security fact"
+    },
+    "text": "On {ep} the Security row holds {nSecMw} middleware, {nSecSw} check switches, {nSecCors} allowed origins and {nSecSecrets} secrets, but {nSecMoved} other security facts, such as the login check and the rate limit, stand in other rows. To see all that guards the request you read the Security row and then walk to those rows."
+   },
+   "like": {
+    "process": "airport",
+    "analogy": "It is like the security checkpoint in an airport, where the rules of check-in and boarding can be pointed to by a sign at the checkpoint, or moved there so every rule is read at one stop.",
+    "stops": "It stops being true where a sign is free, because a mark costs a click to follow and a move leaves each row it came from with less in it."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and marks keep every fact in its own row while moving them makes Security longer and the rows they leave shorter.",
+    "ifNot": "Security keeps its marks that point to the other rows, and you keep following a mark to read the fact it names.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "Mark it where it lives, or move it here.",
+   "marks": {
+    "marks": "both",
+    "moved": "both"
+   }
+  },
   "ex.lay": {
    "pain": {
     "kind": "squeezed",

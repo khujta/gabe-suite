@@ -171,7 +171,9 @@ for (const d of ROUND_D) if (!decs[d]) die('decisions.md has no ' + d);
    all-endpoints bench (D-nnn)" must match the decision words.deferred.choices holds for that choice; "my pick, not ruled" is NOT a ruling
    and stays open. A later record may RULE a choice an earlier one left as my pick; it may never change, or un-rule, an earlier ruling —
    the build stops on it. The build also stops on a record line naming a choice the page does not have, a value that is not one of that
-   choice's options, a how it does not know, a ruling for a deferred choice, and a record whose own head counts differ from its lines. */
+   choice's options, a how it does not know, a ruling for a deferred choice, and a record whose own head counts differ from its lines.
+   A choice the page gained AFTER a record (no line of any record names it, like the Security look mo.secmv, D-084) is no contradiction: it stands
+   open — my pick, "my pick, not ruled" — and the page's copy head counts it as one more left as my pick, though the record's own head does not. */
 const RECORDS = [{ file: 'review-r1.his.txt', by: 'D-081' }, { file: 'review-r1b.his.txt', by: 'D-084' }];
 for (const r of RECORDS) if (!decs[r.by]) die('decisions.md has no ' + r.by + ' — the ruling ' + r.file + ' carries');
 const REC_GROUPS = ['CALLS', 'PROPOSALS', 'PATTERNS', 'PLAYER'];
@@ -228,7 +230,18 @@ for (const r of REM.items) if (!patById[r.pattern]) die('remaining.json names no
 if (W.lens.length !== REV.length) die(`words.lens names ${W.lens.length} lenses; the review has ${REV.length}`);
 
 /* pictures: the walk's round-1 shots, each checked on disk */
-const R1 = WALK.round1 || die('walk.json has no round1');
+/* the walk's last stage (the Security row, D-084) logs its steps but tags none of them in round1, and the walk is another file's: the pictures of
+   it that show a look are tagged in walk-extra.json, each checked on disk, absent from round1 and, when it names a click, against the walk's log */
+const R1 = (() => { const base = WALK.round1 || die('walk.json has no round1'), out = base.slice(), X = rj(path.join(HERE, 'walk-extra.json'));
+  const pngSize = (f) => { const fd = fs.openSync(path.join(SHOTS, f), 'r'), b = Buffer.alloc(24); try { fs.readSync(fd, b, 0, 24, 0); } finally { fs.closeSync(fd); }
+    return b.readUInt32BE(0) === 0x89504e47 ? [b.readUInt32BE(16), b.readUInt32BE(20)] : die('walk-extra.json: ' + f + ' is not a PNG'); };
+  for (const x of need(X, 'shots', 'walk-extra')) { const at = 'walk-extra.json ' + x.file;
+    if (!fs.existsSync(path.join(SHOTS, x.file))) die(at + ' is not on disk');
+    if (base.some((s) => s.file === x.file)) die(at + ' is tagged in round1 now — drop it from walk-extra.json');
+    if (x.click && !(WALK.log || []).some((e) => Array.isArray(e) && e[1] && e[1].click === x.click)) die(`${at}: the walk's log holds no click on “${x.click}”`);
+    if (!x.option || !x.value) die(at + ' names no option and value');
+    out.push(Object.assign({ n: Number((/^(\d+)-/.exec(x.file) || die(at + ' does not start with its step number'))[1]), size: pngSize(x.file) }, x)); }
+  return out; })();
 for (const s of R1) if (!fs.existsSync(path.join(SHOTS, s.file))) die('the walk names a picture that is not on disk: ' + s.file);
 const VERB = need(W, 'shotVerb', ''), VERB_KEYS = ['hover', 'click', 'look', 'scrolled', 'wheeled', 'column', 'drag', 'shows'];
 const used = new Set();
@@ -263,7 +276,8 @@ const AEH = rd(path.join(WP, 'all-endpoints.html'));
 const AE = (() => { const a = AEH.indexOf('window.AE_DATA = '), b = AEH.indexOf(';</script>', a); if (a < 0 || b < 0) die('all-endpoints.html carries no AE_DATA'); return JSON.parse(AEH.slice(a + 17, b)); })();
 TWIN = path.resolve(TWIN || path.join(os.homedir(), 'projects/apps', String(AE.tok.app || '')));
 const BLKNAME = Object.fromEntries(AE.blocks.map((b) => [b.key, b.name]));
-const rowName = (f) => BLKNAME[AE.mo.fam[f]] || die('AE_DATA names no block for the BY MOMENT row ' + f);
+/* a BY MOMENT row is a block, except a row of its own with no block (Security, D-084), named by the all-endpoints words */
+const rowName = (f) => BLKNAME[AE.mo.fam[f]] || ((AEW.mo || {})[f] || {}).name || die('AE_DATA names no block for the BY MOMENT row ' + f);
 const bareId = (gid) => gid.split('.')[1];
 { const ids = ADDED.map(bareId); const dup = ids.filter((x, i) => ids.indexOf(x) !== i); if (dup.length) die('two added groups share the walk id ' + dup.join(',') + ' — the walk cannot tell their pictures apart'); }
 const SEC_ABOUT = { mo: AEW.mo._about || '', ex: AEW.ex._about || '' };
@@ -631,7 +645,7 @@ const T = { ep: EP, nItems: items1.length, nAllItems: items.length, nRound2: ite
 
 /* ── 8 · the proposals that need his word (after the tokens: their sentences may count) ────────────────────────────── */
 const rem = Object.fromEntries(REM.items.map((r) => [r.id, r]));
-const PTOK = Object.assign({}, T, { oldHead: (AEW.cols.fetched || die('all-endpoints words: no cols.fetched')).head, sender: QF.sender, screen: QF.screen, hisIds: Object.keys(FIX.his).join(' · ') });
+const PTOK = Object.assign({}, T, { oldHead: need(W.gen, 'oldHeadF24', 'gen'), newHead: (AEW.cols.fetched || die('all-endpoints words: no cols.fetched')).head, sender: QF.sender, screen: QF.screen, hisIds: Object.keys(FIX.his).join(' · ') });
 const shotBy = (q) => { const keys = Object.keys(q).filter((k) => k !== 'cap'); return R1.find((s) => keys.every((k) => s[k] === q[k]) && !isCrop(s)) || die('no walk picture for ' + JSON.stringify(q)); };
 const proposals = W.proposals.map((p) => {
   const opts = p.opts === '@gap' ? GAP.recommend.map((g) => ({ v: g.id, name: g.id + ' · ' + you(g.name), plain: you(g.what + (g.cost ? ' ' + g.cost : '')) })) : p.opts.map((o) => ({ v: o.v, name: fill(o.name, PTOK, p.id), plain: fill(o.plain, PTOK, p.id) }));
@@ -667,7 +681,8 @@ let gapRuled = false;
     o = rp.opts.find((x) => x.v === v) || die('the gap proposal has no option ' + v), spoken = (((W.decide || {}).say || {})[rp.id] || {}).opts || {};
   T.gapTake = fill(need(RW, rp.ruled ? 'gapTakeRuled' : 'gapTakeMine', 'ruling'), { name: o.name, by: rp.ruledBy }, 'ruling.gapTake');
   T.gapSay = fill(need(RW, rp.ruled ? 'gapSayRuled' : 'gapSayMine', 'ruling'), { name: spoken[v] || die(`words.decide.say.${rp.id}.opts has no spoken name for ${v} — the gap summary says it aloud`) }, 'ruling.gapSay');
-  T.callsLead = need(RW, T.nWait ? 'callsLeadOpen' : 'callsLeadNone', 'ruling'); gapRuled = !!rp.ruled; }
+  T.callsLead = need(RW, T.nWait ? 'callsLeadOpen' : 'callsLeadNone', 'ruling'); gapRuled = !!rp.ruled;
+  T.waitHere = fill(need(RW, T.nWait === 1 ? 'waitOne' : 'waitMany', 'ruling'), T, 'ruling.wait'); }   /* one choice waits, many wait: the count never reads "1 choices" */
 /* the patterns' side of the same count: the draft proposals and the audit, ruled or still waiting (a pattern choice is never deferred) */
 { const pc = patterns.flatMap((p) => p.suite).concat([audit]), got = (v) => pc.filter((x) => x.ruled === v).length;
   Object.assign(T, { nPcChoices: pc.length, nPcRuled: pc.filter((x) => x.ruled).length, nPcOpen: pc.filter((x) => !x.ruled).length, nPcLand: got('land'), nPcNotYet: got('notyet'), nPcChange: got('change') }); }
@@ -685,7 +700,9 @@ for (const c of calls) c.motion = fill(c.motion, c.ruledBy ? { ...T, by: c.ruled
 T.nPics = used.size;
 const fillTree = (o, at) => (typeof o === 'string' ? fill(o, T, at) : Array.isArray(o) ? o.map((v, i) => fillTree(v, at + '[' + i + ']')) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => k[0] !== '_').map(([k, v]) => [k, fillTree(v, at + '.' + k)])) : o);
 const omit = (o, ks) => Object.fromEntries(Object.entries(o).filter(([k]) => !ks.includes(k)));
-const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: Object.assign(omit(W.calls, ['motion', 'propsHeadNone']), T.nPropsOpen ? {} : { propsHead: W.calls.propsHeadNone }),  statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: Object.assign(omit(W.gap, ['recHeadRuled']), gapRuled ? { recHead: W.gap.recHeadRuled } : {}), pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, tip: W.tip, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, depict: need(DP, 'ui', 'depict'), decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord', 'ex', 'imp', 'sayWords', 'exSuite', 'impSuite']), gl: need(need(W, 'gabeLens', ''), 'ui', 'gabeLens') }, 'ui');
+/* every look ruled → the glance says so instead of counting zeros (D-084) */
+const SECW = Object.assign({}, W.sec, { glance: Object.assign(omit(W.sec.glance, ['itemsNoteNone', 'sayItemsNone', 'takeNone']), T.opts ? {} : { itemsNote: need(W.sec.glance, 'itemsNoteNone', 'sec.glance'), take: need(W.sec.glance, 'takeNone', 'sec.glance') }) });
+const UI = fillTree({ page: W.page, toc: W.toc, sec: SECW, calls: Object.assign(omit(W.calls, ['motion', 'propsHeadNone', 'sayPropsNone']), T.nPropsOpen ? {} : { propsHead: W.calls.propsHeadNone }),  statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: Object.assign(omit(W.gap, ['recHeadRuled']), gapRuled ? { recHead: W.gap.recHeadRuled } : {}), pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, tip: W.tip, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov, depict: need(DP, 'ui', 'depict'), decide: omit(need(W, 'decide', ''), ['name', 'say', 'plain', 's', 'kindWord', 'ex', 'imp', 'sayWords', 'exSuite', 'impSuite']), gl: need(need(W, 'gabeLens', ''), 'ui', 'gabeLens') }, 'ui');
 
 /* ── 14 · the data, the hash, the page ─────────────────────────────────────────────────────────────────────────────── */
 const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, deferred: DEFER[c.id] || null, opts: c.opts.map((o) => [o.v, o.name]) })),
@@ -715,7 +732,8 @@ Object.assign(T, { nAnswered: items1.filter((it) => statusKind(it.status) === 'q
 /* a spoken summary: 3 to 6 sentences a voice can read — no id, path, symbol, quote, code or token left in it */
 const SAY_BAD = [[/[·→/×|#{}\\“”"`<>]/, 'a symbol a voice cannot say'], [/\b(?:L|R|D|EX|CR|N3|S4)-\d+/, 'an id'], [/\b[PGFA]\d{1,2}\b/, 'an id'], [/(^|\s)[xg]:/i, 'an id'], [/\b[\w-]+\.(?:py|mjs|js|json|md|html|tsx?|css)\b/i, 'a file name'],
   [/\bundefined\b|\bNaN\b/, 'a missing value'], [/\b(?:he|him|his|himself)\b/i, 'he · him · his']];
-const SPK = need(W, 'spoken', '');
+const SPK = need(W, 'spoken', ''); if (!T.nPropsOpen) SPK.calls = SPK.calls.map((x) => /\{nPropsOpen\}/.test(x) ? need(W.calls, 'sayPropsNone', 'calls') : x);
+if (!T.opts) SPK.glance = SPK.glance.map((x) => /\{optOnly\}/.test(x) ? need(W.sec.glance, 'sayItemsNone', 'sec.glance') : x);
 const say = SEC_ORDER.map((k) => {
   const sents = SPK[k] || die('words.spoken has no ' + k), title = need(need(UI.sec, k, 'sec'), 'title', 'sec.' + k);
   const text = sents.map((x, i) => fill(x, T, 'spoken.' + k + '[' + i + ']')).join(' ').replace(/\s+/g, ' ').trim();
@@ -811,7 +829,7 @@ const num1 = (v, what) => (Number.isFinite(Number(v)) ? Number(v) : die('the fee
   tName('resModel', ((E.declared || {}).response_model || {}).name || die(EP + ' declares no response model'));
   tn('nResFields', (((E.responses || {})[((E.returns || [])[0] || {}).id] || {}).fields || die('no fields for the first reply of ' + EP)).length);
   tName('sessTable', (((E.repeat || {}).claims || [])[0] || die(EP + ' claims no table with its repeat key')).table);
-  tName('sender', QF.sender); tName('screen', QF.screen); tk('oldHead', AEW.cols.fetched.head);
+  tName('sender', QF.sender); tName('screen', QF.screen); tk('oldHead', W.gen.oldHeadF24);
   tn('nEp', QF.pieces.nEp);
   const prow = (k) => QF.pieces.rows.find((r) => r.key === k) || die('the piece count has no row ' + k);
   tn('nFlagEps', prow('switch:flag').n); tn('nRepeatEps', prow('repeat:key').n);
@@ -821,6 +839,17 @@ const num1 = (v, what) => (Number.isFinite(Number(v)) ? Number(v) : die('the fee
   tn('secMissing', T.secMissing);
   { const mws = new Set((E.paths || []).flatMap((p) => (p.chain || []).filter((c) => c.phase === 'middleware' && c.kind === 'step').map((c) => c.call))); for (const l of (E.rate || {}).limits || []) mws.add(l.via);
     tn('nSecItems', mws.size + (E.switches || []).length); }
+  /* the Security row of this endpoint as the all-endpoints page draws it (D-084, mo.secmv): its home facts and its marks, counted from the page's own data
+     (AE_DATA rows[].mo — the head states and the placed elements), and a count the page does not hold stops the build rather than reading as none */
+  { const mo = (AE.rows.find((r) => r.id === EP) || die('AE_DATA has no row ' + EP)).mo || die('AE_DATA holds no BY MOMENT data for ' + EP);
+    const hd = Object.fromEntries(((mo.sec || die('AE_DATA: ' + EP + ' has no Security row')).hd || die('AE_DATA: the Security row of ' + EP + ' has no head')).map(([k, n, st]) => [k, { n, st }]));
+    const head = (k) => { const h = hd[k] || die(`AE_DATA: the Security head of ${EP} has no ${k}`); if (h.st !== 'ok' || !(h.n > 0)) die(`AE_DATA: the Security row of ${EP} says “${h.st}” for ${k}, so the example has no count`); return h.n; };
+    tn('nSecMw', head('mw')); tn('nSecSw', head('sw')); tn('nSecCors', head('cors')); tn('nSecSecrets', head('sec'));
+    const marks = (mo.el || []).filter((e) => e[0] === 'sec' && Array.isArray(e[4]) && e[4][0] === 'mark').map((e) => ((e[7] || {}).mk || die('AE_DATA: a Security mark of ' + EP + ' carries no mk')));
+    const moved = (mo.el || []).filter((e) => (e[7] || {}).sx).length, standFor = marks.reduce((a, m) => a + m[2], 0);
+    if (!marks.length) die('AE_DATA: the Security row of ' + EP + ' holds no mark'); if (standFor !== moved) die(`the Security marks of ${EP} stand for ${standFor} facts, the page's elements flagged as living elsewhere are ${moved}`);
+    for (const m of marks) rowName(m[1]);   /* every home row a mark points to is a row of the page */
+    tn('nSecMarks', marks.length); tn('nSecMoved', moved); tn('nSecHomeRows', uniq(marks.map((m) => m[1])).length); }
   tn('nCounts', T.nChecks); tn('nCompared', T.nCompared); tn('nDown', T.down); tn('nSame', T.same); tn('nUp', T.up); tn('nAuditParts', T.nAuditParts); tn('auditN', num1(String(audit.lines).replace(/\D+/g, ' ').trim().split(' ')[0], 'the audit script lines')); }
 /* a template filled for the card and for the voice */
 const fill2 = (tpl, tok, at) => { const one = (side) => String(tpl).replace(/\[\[([\s\S]*?)\]\]/g, (m, x) => (side === 'c' ? x : '')).replace(/\(\(([\s\S]*?)\)\)/g, (m, x) => (side === 's' ? x : ''))

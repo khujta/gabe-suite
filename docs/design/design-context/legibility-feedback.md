@@ -70,7 +70,7 @@ deferred + trigger).
 - **fix:** BUILT — pointing at a row's name ("Endings") shows its legend: the kinds and labels it draws, cloned, with what each means
   and how many are here (his placement, ruled); the legend above the table, one line per row, is the other option (mo.opt.leg).
 - **tag:** `static-text-repeated-in-hovers`
-- **status:** built (D-067); the external legend — option, his to pick (D-067)
+- **status:** built (D-067); the legend ruled — on the row's name (D-067)
 
 ### L-05
 - **words:** "by moment is kind of confusing, because some moments show with this progressive bar, like at the edge, then
@@ -87,7 +87,7 @@ deferred + trigger).
   the request in a cell of their own, each stage counting the endings that leave it); the excepts of one try and where it goes on under
   one bracket, "one of 4", proven per path by gen-all-endpoints.py; the stage mark left the heads (all-endpoints.tpl.html `moRuns`/`moForks`).
 - **tag:** `mark-without-its-meaning`
-- **status:** built (D-068); the header's form and the stage saving stands in — option, his to pick (D-068)
+- **status:** built (D-068); ruled — stages over moments, saving under EFFECTS (D-084)
 
 ### L-06
 - **words:** "the final column, the one that says "no moment", in that column we might just remove it. I mean, not remove it
@@ -99,7 +99,7 @@ deferred + trigger).
 - **fix:** BUILT — the column left the table for the ENDPOINT METADATA inside BY MOMENT: one card per block, its mark and name on top;
   what sums it up in the pinned row's own cells and head words, what it is as chips (all-endpoints.tpl.html `renderMeta`).
 - **tag:** `timeless-facts-inside-a-timeline`
-- **status:** built (D-068); after the table or before it — option, his to pick (D-068)
+- **status:** built (D-068); ruled — metadata after the table (D-081); one big element with layout controls later (L-39)
 
 ### L-07
 - **words:** "Same thing for "overview" and "risk". That is also metadata information. So this is metadata for the whole API
@@ -130,7 +130,7 @@ deferred + trigger).
 - **fix:** built: the TEST column of the examples bench (`sec-ex`) — a strip of its requests, and a click that opens the ordered
   chain (request → checks passed → branch → functions → tables, saved or not → ending) with what the test does not tell.
 - **tag:** `context-without-meaning`
-- **status:** option — his to pick (D-071)
+- **status:** built (D-071); its look is decided on the all-endpoints bench (D-083)
 
 ### L-09
 - **words:** "For this one we have many columns with items that have no icon. And I would like to know why. For example, at
@@ -145,7 +145,7 @@ deferred + trigger).
 - **fix:** BUILT — every gate and switch names the function (or middleware) it runs in, a station element with its glyph and role
   (`_ae_els.gates` · all-endpoints.tpl.html `gdHost`/`moCell`); a gate wears the page's own icon per kind (my pick, dashed).
 - **tag:** `element-without-identity`
-- **status:** built (D-069); the gate icons — option, his to pick (D-069)
+- **status:** built (D-069); the gate icons ruled — an icon per kind (D-081)
 
 ### L-10
 - **words:** "Then we have some in the column checks. We have some return codes like 409, 400, then in the next column
@@ -162,7 +162,7 @@ deferred + trigger).
 - **fix:** BUILT — each gate is function → condition → what happens (the ending's status with its stage lit, or "returns" · "passes
   the error on" · "goes on"); three looks and two effect colours in the Gates row's options slot (`gdChip`, `gdEff`).
 - **tag:** `condition-without-actor-or-effect`
-- **status:** option — his to pick (D-069)
+- **status:** built — ruled: function, gates under it · the ending's colour, stage lit (D-081); refined on the bench (L-39)
 
 ### L-11
 - **words:** "by the way, in gates and decisions, in gates and decisions, we might have, okay, we will have the functions
@@ -176,7 +176,7 @@ deferred + trigger).
   DECISION column's role filter — nine roles from the feed's own groups, each block naming the function it runs in (glyph + role), its
   condition and its effect (D-071).
 - **tag:** `kind-without-subcategory`
-- **status:** option — his to pick (D-069, D-071)
+- **status:** built — ruled: where it decides (D-081); the bench's gate look is decided on the all-endpoints bench (D-083)
 
 ### L-12
 - **words:** "Data effects the same thing for gates and decisions. We are doing things on tables basically. That's what we
@@ -193,7 +193,7 @@ deferred + trigger).
 - **fix:** BUILT — Data effects' options slot: one map for the endpoint under the row (my pick): functions left, tables right, the moments
   as bands, green reads, orange writes, a tick a flush, a rule a commit naming who commits, the race on its link · a small map per cell · chips.
 - **tag:** `relation-flattened-into-a-list`
-- **status:** option — his to pick (D-070); the R/W colour built (D-069)
+- **status:** built — ruled: a small map per moment (D-081); the R/W colour built (D-069)
 
 ### L-13
 - **words:** "in functions again, we will have to do kind of the same thing that we did on the endpoint lab for the tables for
@@ -204,7 +204,7 @@ deferred + trigger).
 - **fix:** built: the FUNCTION column of the examples bench on the lab's function look — a strip of the tables it touches; a
   click lists its raises (and what each becomes here), tables, calls and what it does. Its use in BY MOMENT waits on EX-5.
 - **tag:** `name-only-chip`
-- **status:** option — his to pick (D-071)
+- **status:** built (D-071); its look is decided on the all-endpoints bench (D-083)
 
 ### L-14
 - **words:** "there is some functions that do not have the function icon or their role. For example, in the column for
@@ -253,7 +253,7 @@ deferred + trigger).
 - **fix:** BUILT — the icon and look (D-069); In-flight's options slot: a lifeline each (my pick) — set · read, with the ending each read
   can decide · a cross at the answer or an arrow past it; alike values fold ("rate limiter · 7") · echoes where read · chips.
 - **tag:** `role-without-its-object`
-- **status:** built (D-069) — the icon and look; the lifelines — option, his to pick (D-070)
+- **status:** built (D-069) — the icon and look; the lifelines ruled — a lifeline each (D-081)
 
 ### L-18
 - **words:** "Then standard of specialists, let's give it an icon also. We have here flags, binding, and different things um.
@@ -267,7 +267,7 @@ deferred + trigger).
 - **fix:** BUILT — a puzzle mark (my pick, dashed); the row's question on its head's hover, answered in D-069; split into the gates (my
   pick) · merged · kept as its row, in the options slot; a switch shows the endings it can change, a piece how rare it is.
 - **tag:** `concept-never-explained`
-- **status:** question — answered on the review page (D-069); split · merge · keep — option, his to pick (D-069)
+- **status:** question — answered on the review page (D-069); ruled: split into the gates (D-081)
 
 ### L-19
 - **words:** "I think that we are about to consolidate the sections so we might have endings proof case and decisions data and
@@ -309,7 +309,7 @@ deferred + trigger).
 - **fix:** BUILT — a click on a head widens its column to what it holds; its × hides it and the bar brings it back; "fit to the box"
   narrows the columns that do not fit to strips of counts; kept through a resize and a reload, said in the copy text.
 - **tag:** `cramped-columns`
-- **status:** built (D-068); what a head's click gives and what fit does — option, his to pick (D-068)
+- **status:** built (D-068); ruled — every item on one line, wrap into bands, open fitted (D-081)
 
 ### L-22
 - **words:** "we were basically missing okay we have too many hovers too many repetitive hovers describing things that were
@@ -325,7 +325,7 @@ deferred + trigger).
   extend); labelled lines (my pick, dashed) or one sentence (mo.opt.ipo); a column's words sit on its head only. The code map's
   items are one hover each (their name, kind and labels), not yet in the three parts.
 - **tag:** `hover-describes-the-kind-not-the-item`
-- **status:** built (D-067); the hover's form — option, his to pick (D-067)
+- **status:** built (D-067); ruled — labelled lines (D-081); the one hover format follows the frontend lab's cards (L-33)
 
 ### L-23
 - **words:** "You know what no let's put the section before the buy moment between buy moment and the one endpoint section I want
