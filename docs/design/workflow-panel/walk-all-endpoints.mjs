@@ -16,7 +16,12 @@ const b = await chromium.launch({ executablePath: CHROME, args: ['--use-angle=sw
 const p = await b.newPage({ viewport: { width: W, height: H } });
 const errs = []; p.on('pageerror', (e) => errs.push(e.message));
 await p.goto('file://' + path.join(HERE, 'all-endpoints.html')); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });
-await p.evaluate(() => { try { for (const k of Object.keys(localStorage)) if (/^gabe:allep/.test(k)) localStorage.removeItem(k); } catch (e) {} });
+/* D-081: the page opens on the looks he ruled; the sections before D-066 are older work, photographed on the looks they were built against (Data effects as
+   one map under its row, names whole, fit narrowing the rest, fit off) — a setup, like the cleared storage; the D-066 section below starts again from the
+   page's own defaults */
+const BASELINE = () => { try { for (const k of Object.keys(localStorage)) if (/^gabe:allep/.test(k)) localStorage.removeItem(k);
+  localStorage.setItem('gabe:allep:moments:v3', JSON.stringify({ dfx: 'one', wid: 'names', fit: 'min' })); localStorage.setItem('gabe:allep:moments:cols:v2', JSON.stringify({ fit: false })); } catch (e) {} };
+await p.evaluate(BASELINE);
 await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });
 const wait = (ms) => p.waitForTimeout(ms), log = [], say = (k, v) => { log.push([k, v]); console.log(k + ': ' + (typeof v === 'string' ? v : JSON.stringify(v))); };
 // an option is an icon square (D-034): its words are its aria-label, so a control's words are read from there first
@@ -871,6 +876,10 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
   // bench column), never the whole page. Every step is tagged in walk.json ("round1": item · option · value) so a picture is found by the
   // item it answers. An option is put back to its default by a click once it is photographed; that click is a step too, photographed small
   const E = 'POST /cooking/sessions', R1 = [];
+  /* D-081: from here the page is on its own defaults — the looks he ruled (a head's click puts every item on one line, fit wraps into bands, Data effects a
+     small map per moment, the bench an upper and a lower row) and a table wider than its box opening fitted (R-11): the storage cleared, the page loaded again */
+  await p.evaluate(() => { try { for (const k of Object.keys(localStorage)) if (/^gabe:allep/.test(k)) localStorage.removeItem(k); } catch (e) {} });
+  await p.goto('file://' + path.join(HERE, 'all-endpoints.html')); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await wait(300);
   if (n < 292) n = 292;                                                     /* the new pictures are numbered after his earlier ones (… 292) */
   const VH = () => (p.viewportSize() || { height: H }).height;
   const clear = async () => { await p.mouse.move(5, VH() - 10); await p.evaluate(() => window.hoverHide && window.hoverHide()); await wait(120); };
@@ -959,6 +968,20 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
     if (!(await lands(cx, cy, sel))) say('COVERED ' + name, sel);
     await p.mouse.click(cx, cy); await wait(450);
     await shoot(name, t, Object.assign({ click: w0, at: [Math.round(cx), Math.round(cy)] }, what || {})); return true; };
+  // L-34: a TIGHT crop of the region that changes — from one head to another across the table that holds them, the head rows and the body rows down to
+  // `row` (never the whole table); the box wheeled until both heads are inside; the entry is marked `region` so the review page never takes it for a crop of the options
+  const cropShot = async (name, t, what, spec) => {
+    const ok0 = await p.evaluate((sp) => { document.querySelectorAll('[data-wcrop]').forEach((x) => x.removeAttribute('data-wcrop'));
+      const pick = (root, s0, at) => { const l = root.querySelectorAll(s0); return l.length ? (at === 'last' ? l[l.length - 1] : l[0]) : null; }, z0 = pick(document, sp.to, sp.toAt), a0 = z0 && pick(z0.closest('table'), sp.from, sp.fromAt);   /* `from` is looked for in the table that holds `to` (the bands split the heads) */
+      if (!a0 || !z0) return false; a0.setAttribute('data-wcrop', 'from'); z0.setAttribute('data-wcrop', 'to'); return true; }, spec);
+    if (!ok0) { say('MISSING ' + name, spec.from + ' … ' + spec.to); return; } await clear();
+    await p.evaluate(() => { const T = document.querySelector('[data-wcrop="from"]').closest('table'), pin = document.getElementById('pin'), ph = pin && pin.offsetHeight ? pin.offsetHeight : 0;
+      window.scrollTo(0, Math.max(0, T.getBoundingClientRect().top + scrollY - ph - 12)); }); await wait(300);
+    await wheelBox('[data-wcrop="from"]', '#mogrid'); await wheelBox('[data-wcrop="to"]', '#mogrid'); await clear();
+    const r = await p.evaluate((sp) => { const a = document.querySelector('[data-wcrop="from"]'), z = document.querySelector('[data-wcrop="to"]'), T = a.closest('table'), rw = T.querySelector(sp.row) || T.tBodies[0].rows[0];
+      const ar = a.getBoundingClientRect(), zr = z.getBoundingClientRect(), hd = T.tHead.getBoundingClientRect(), rb = rw.getBoundingClientRect();
+      const x0 = sp.w ? (sp.at === 'to' ? zr.left : ar.left) + (sp.dx || 0) : ar.left - 4; return { x: x0, y: hd.top - 6, width: sp.w || zr.right - ar.left + 8, height: rb.bottom - hd.top + 12 }; }, spec);
+    await clipShot(name, r, t, Object.assign({ region: true }, what || {})); };
   const S = { el: (sels, o) => (nm, t, w) => elShot(nm, sels, t, w, o), row: (rows, o) => (nm, t, w) => rowShot(nm, rows, t, w, o), top: (rows, o) => (nm, t, w) => topShot(nm, rows, t, w, o),
     page: (sels) => (nm, t, w) => pageShot(nm, sels, t, w) };
   const sq = (g, v) => '#mobar .opt[data-mopt="' + g + '"][data-v="' + v + '"]', grp = (g) => '#mobar .mgrp[data-mopt="' + g + '"]';
@@ -990,16 +1013,22 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
   await press('legend-above-the-table', sq('leg', 'strip'), ['L-04', 'leg', 'strip'], S.page([grp('leg'), '#moleg']));   /* taller than the window */
   await press('legend-back-on-the-row-name', sq('leg', 'hover'), ['L-04', 'leg', 'hover'], S.el([grp('leg')]));
 
-  /* L-05: the stages over the moments, the fork bracketed "one of 4" (the box wheeled to the fork) · the header's other value · saving's */
-  const FK = '#mogrid th.mom .mfk[data-fkp="last"]';
-  await topShot('the-stage-band-and-the-fork', [ROW('end')], ['L-05', 'hdr', 'band'], null, { wheel: FK });
-  await press('header-stages-roads-moments', sq('hdr', 'road'), ['L-05', 'hdr', 'road'], S.top([], { above: grp('hdr'), wheel: '#mogrid thead th.mord.fk' }));
+  /* L-05 · L-34: the header and saving — his words "I can't see the difference … they show the same thing", so each option's picture is only the region that
+     changes, a tight crop taken after the click: the stage band over the moment heads from the work to the saving (stages over moments: the bracket "one of 4
+     ways" sits on the heads · stages, roads, moments: a row of roads between them), and the commit column under its stage (saving under EFFECTS: its own cell ·
+     under HANDLER: an outline beside it) with the rows below it as far as Data effects */
+  const HDR = { from: 'thead th.mom[data-mom="fail"]', to: '#mogrid th.mom[data-face^="saving"]', w: 560, dx: -4, at: 'from', row: 'tbody tr[data-f="end"]' };
+  const SAVE = { from: 'thead th.mom[data-mom="fail"]', fromAt: 'last', to: '#mogrid th.mom[data-face^="saving"]', w: 480, dx: -250, at: 'to', row: 'tbody tr[data-f="end"]' };
+  const at2 = (spec) => (nm, t, w) => cropShot(nm, t, w, spec);
+  await cropShot('header-stages-over-moments', ['L-05 L-34', 'hdr', 'band'], null, HDR);
+  await press('header-stages-roads-moments', sq('hdr', 'road'), ['L-05 L-34', 'hdr', 'road'], at2(HDR));
   await press('header-back-to-the-band', sq('hdr', 'band'), ['L-05', 'hdr', 'band'], S.el([grp('hdr')]));
-  await press('saving-under-handler', sq('save', 'hand'), ['L-05', 'save', 'hand'], S.top([], { above: grp('save'), wheel: '#mogrid th.mosb .moseff' }));
+  await cropShot('saving-under-effects', ['L-05 L-34', 'save', 'eff'], null, SAVE);
+  await press('saving-under-handler', sq('save', 'hand'), ['L-05 L-34', 'save', 'hand'], at2(SAVE));
   await press('saving-back-under-effects', sq('save', 'eff'), ['L-05', 'save', 'eff'], S.el([grp('save')]));
 
   /* L-06 · L-07: the endpoint metadata out of the table, after it (my pick) · before it */
-  await pageShot('the-endpoint-metadata-after-the-table', [ROW('stage'), '#mometa'], ['L-06 L-07', 'meta', 'after']);   /* the table's last row above it */
+  await pageShot('the-endpoint-metadata-after-the-table', ['#mogrid table.motab:last-of-type tbody tr[data-f="stage"]', '#mometa'], ['L-06 L-07', 'meta', 'after']);   /* the last band's last row above it (D-081: the table opens fitted into bands) */
   await press('metadata-before-the-table', sq('meta', 'before'), ['L-06 L-07', 'meta', 'before'], S.page([grp('meta'), '#mometa', '#mogrid table.motab thead']));
   await press('metadata-back-after-the-table', sq('meta', 'after'), ['L-06 L-07', 'meta', 'after'], S.el([grp('meta')]));
 
@@ -1009,25 +1038,28 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
   say('D-066 · deciders lit', await p.evaluate(() => ({ chips: [...document.querySelectorAll('#mogrid .colon[data-keys]')].map((e) => (e.querySelector('.mt') || e).textContent.trim().slice(0, 40)), pin: !!document.querySelector('#pin td[data-mocol]') })));
   await press('deciders-put-out', HEAD('fn') + ' .msc[data-mcol="deciders"]', ['L-20'], S.el([HEAD('fn') + ' .msub']));
 
-  /* L-21: a click on a head widens its column; its × hides it, the bar lists it; fit; the other values of "a head's click" and "fit";
-     the heads ride under the pinned row when the page scrolls (and the other value, they stay at the top) */
-  await press('widen-at-the-edge', '#mogrid th.mom[data-mom="edge"] .mh1', ['L-21', 'wid', 'names'], S.top([ROW('end'), ROW('proof')]));
-  await press('widen-every-item-on-one-line', sq('wid', 'line'), ['L-21', 'wid', 'line'], S.top([ROW('end'), ROW('proof')], { above: grp('wid') }));
-  await press('widen-back-to-names-whole', sq('wid', 'names'), ['L-21', 'wid', 'names'], S.el([grp('wid')]));
+  /* L-21 · R-11: a click on a head widens its column (every item on one line, his ruling); its × hides it, the bar lists it; the table opens FITTED into bands (his
+     ruling, R-11) and the fit button turns that off and on; the other values of "a head's click" and "fit"; the heads ride under the pinned row when the page
+     scrolls (and the other value, they stay at the top) */
+  await press('widen-at-the-edge', '#mogrid th.mom[data-mom="edge"] .mh1', ['L-21', 'wid', 'line'], S.top([ROW('end'), ROW('proof')]));
+  await press('widen-names-whole', sq('wid', 'names'), ['L-21', 'wid', 'names'], S.top([ROW('end'), ROW('proof')], { above: grp('wid') }));
+  await press('widen-back-to-one-line', sq('wid', 'line'), ['L-21', 'wid', 'line'], S.el([grp('wid')]));
   { const hx = '#mogrid th.mom[data-mom="start"] .mohx', h0 = await p.$('#mogrid th.mom[data-mom="start"]');   /* the × shows when the mouse is on the head */
     if (h0) { await h0.evaluate((x) => x.scrollIntoView({ block: 'center' })); await wait(120); await wheelBox('start', '#mogrid'); const hb = await h0.boundingBox(); await p.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2, { steps: 3 }); await wait(200); }
     await press('hide-before-any-request', hx, ['L-21'], S.top([], { above: '#mobar .mohid' })); }
-  await press('fit-to-the-box', '#mofit', ['L-21', 'fit', 'min'], S.top([ROW('end'), ROW('proof')], { above: grp('fit') }));
-  say('D-066 · fit', await p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, strips: G.querySelectorAll('th.mom.mmin').length }; }));
-  await press('fit-wrap-into-bands', sq('fit', 'bands'), ['L-21', 'fit', 'bands'], S.top([ROW('end')], { above: grp('fit') }));
+  await topShot('the-table-opens-fitted', [ROW('end'), ROW('proof')], ['L-21 R-11', 'fit', 'bands'], null, { above: grp('fit') });
+  say('D-066 · fit', await p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, tables: G.querySelectorAll('table.motab').length, strips: G.querySelectorAll('th.mom.mmin').length }; }));
   { const t2 = await p.$$('#mogrid table.motab'); say('D-066 · fit, wrapped into bands', { tables: t2.length });   /* the second band: its own heads, further down */
     if (t2.length > 1) { await clear(); await p.evaluate(() => { const T = document.querySelectorAll('#mogrid table.motab')[1], pin = document.getElementById('pin'), ph = pin && pin.offsetHeight ? pin.offsetHeight : 0;
         window.scrollTo(0, Math.max(0, T.getBoundingClientRect().top + scrollY - ph - 12)); }); await wait(300);
       const r = await p.evaluate(() => { const T = document.querySelectorAll('#mogrid table.motab')[1], G = document.getElementById('mogrid').getBoundingClientRect(), tb = T.getBoundingClientRect(), rws = T.querySelectorAll('tbody tr[data-f]');
         const b = rws[1] ? rws[1].getBoundingClientRect().bottom : tb.top + 400; return { x: G.left - 4, y: tb.top - 6, width: G.width + 8, height: b - tb.top + 12 }; });
       await clipShot('fit-the-second-band', r, ['L-21', 'fit', 'bands'], { look: 'the second band, further down' }); } else say('MISSING the second band', '#mogrid table.motab'); }
-  await press('fit-back-to-narrow-the-rest', sq('fit', 'min'), ['L-21', 'fit', 'min'], S.el([grp('fit')]));
-  await press('fit-off', '#mofit', ['L-21'], S.el([grp('fit')]));
+  await press('fit-off', '#mofit', ['L-21 R-11'], S.top([ROW('end'), ROW('proof')], { above: grp('fit') }));
+  say('D-066 · fit off', await p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, hint: !document.getElementById('moscroll').hidden }; }));
+  await press('fit-on-again', '#mofit', ['L-21 R-11'], S.el([grp('fit')]));
+  await press('fit-narrow-the-rest', sq('fit', 'min'), ['L-21', 'fit', 'min'], S.top([ROW('end'), ROW('proof')], { above: grp('fit') }));
+  await press('fit-back-to-bands', sq('fit', 'bands'), ['L-21', 'fit', 'bands'], S.el([grp('fit')]));
   await press('show-all-columns', '#mobar .mohall', ['L-21'], S.el(['#mobar .mset[data-set="cols"]']));
   await press('widen-given-back', '#mogrid th.mom[data-mom="edge"] .mh1', ['L-21'], S.top([ROW('end')]));
   // the page scrolled by the wheel until Functions stands under the pinned row: the heads ride with it (my pick) · stay at the top
@@ -1061,13 +1093,13 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
   await hoverShot('hover-ratelimitmiddleware', CELL('edge', 'gate') + ' .mgh .mgh0[data-key="middleware:RateLimitMiddleware"]', ['L-09']);
   await hoverShot('hover-the-sensitive-limit', CELL('edge', 'gate') + ' .mc[data-key="limiter:sensitive"]', ['L-09 L-10']);
 
-  /* L-12: Data effects — the map (my pick), a small map per moment, the chips; the write colour, his words' colours */
-  await rowShot('data-effects-the-map', [ROW('data'), MAP], ['L-12', 'dfx', 'one']);
+  /* L-12: Data effects — a small map per moment (his ruling), one map for the endpoint under the row, the chips; the write colour, his words' colours */
+  await rowShot('data-effects-a-small-map-per-moment', [ROW('data')], ['L-12', 'dfx', 'cell']);
   await press('open-the-data-row-options', HEAD('data') + ' .mro', ['L-12'], S.el([HEAD('data') + ' .mbh', HEAD('data') + ' .mrop']));
-  await press('data-effects-a-map-per-moment', rsq('data', 'dfx', 'cell'), ['L-12', 'dfx', 'cell'], S.row([ROW('data')]));
+  await press('data-effects-one-map-for-the-endpoint', rsq('data', 'dfx', 'one'), ['L-12', 'dfx', 'one'], S.row([ROW('data'), MAP]));
   await press('data-effects-as-chips', rsq('data', 'dfx', 'chips'), ['L-12', 'dfx', 'chips'], S.row([ROW('data')]));
-  await press('data-effects-back-to-the-map', rsq('data', 'dfx', 'one'), ['L-12', 'dfx', 'one'], S.el([rgrp('data', 'dfx')]));
-  await press('write-colour-his-words', rsq('data', 'dxc', 'his'), ['L-12', 'dxc', 'his'], S.row([ROW('data'), MAP]));
+  await press('data-effects-back-to-a-map-per-moment', rsq('data', 'dfx', 'cell'), ['L-12', 'dfx', 'cell'], S.el([rgrp('data', 'dfx')]));
+  await press('write-colour-his-words', rsq('data', 'dxc', 'his'), ['L-12', 'dxc', 'his'], S.row([ROW('data')]));
   await press('write-colour-back-to-the-page', rsq('data', 'dxc', 'page'), ['L-12', 'dxc', 'page'], S.el([rgrp('data', 'dxc')]));
   await press('close-the-data-row-options', HEAD('data') + ' .mro', ['L-12'], S.el([HEAD('data') + ' .mbh']));
 
@@ -1110,10 +1142,10 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
      opened, then C250; a REAL drag of a part into "not drawn"; the size and colour controls; a role chip; a column on every endpoint;
      the copy line; the bench's two other layouts */
   const XC = (k) => '#exgrid .excol[data-k="' + k + '"]';
-  await pageShot('the-examples-bench', '#sec-ex', ['L-23', 'lay', 'row']);
+  await pageShot('the-examples-bench', '#sec-ex', ['L-23 L-36', 'lay', 'half']);
   for (const k of await p.$$eval('#exgrid .excol', (cs) => cs.map((c) => c.getAttribute('data-k')))) {
     await clear(); await p.$eval(XC(k), (e) => e.scrollIntoView({ block: 'nearest' })).catch(() => {}); await wheelBox(XC(k), '#exgrid');
-    await pageShot('bench-column-' + k, XC(k), [{ test: 'L-23 L-08', fn: 'L-23 L-13', gate: 'L-23 L-11' }[k] || 'L-23'], { column: await p.$eval(XC(k) + ' h3', (h) => h.textContent).catch(() => k) }); }
+    await pageShot('bench-column-' + k, XC(k), [{ test: 'L-23 L-08 L-36', fn: 'L-23 L-13 L-36', gate: 'L-23 L-11 L-36' }[k] || 'L-23 L-36'], { column: await p.$eval(XC(k) + ' h3', (h) => h.textContent).catch(() => k) }); }
   // the test column: its own arrows until it shows C267 (each click read off the arrow); one picture of where they land
   const stepTo = async (want) => { const clicks = []; for (let k = 0; k < 16; k++) {
       const at = await p.evaluate(([c0, w]) => { const s0 = document.querySelector(c0 + ' .exselect'); if (!s0) return null; const vs = [...s0.options].map((o) => o.value); return { i: vs.indexOf(s0.value), j: vs.indexOf(w) }; }, [XC('test'), want]);
@@ -1133,7 +1165,6 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
   { const c2 = await stepTo('case:C250'); await pageShot('test-column-on-c250', XC('test'), ['L-23 L-08'], { clicks: c2.length, arrow: c2[0] || null, shows: await p.$eval(XC('test') + ' .exselect', (s0) => s0.value) }); }
   await press('test-block-closed-again', XC('test') + ' .blk .bkhd', ['L-23'], S.page(XC('test')));
   // the table column: its parts, then a REAL drag — the mouse down on the part "model", moved over "not drawn", up
-  await press('table-parts-opened', XC('table') + ' .exfold[data-fold="parts"]', ['L-23'], S.page(XC('table')));
   { const from = XC('table') + ' .exz[data-line="2"] .expc[data-part="model"]', to = XC('table') + ' .exz.exoff';
     if ((await p.$(from)) && (await p.$(to))) { await clear(); await p.$eval(from, (e) => e.scrollIntoView({ block: 'center' })); await wait(150); await wheelBox(from, '#exgrid');
       const a = await (await p.$(from)).boundingBox(), z = await (await p.$(to)).boundingBox(), fw = await words(await p.$(from));
@@ -1143,10 +1174,8 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
       if (after.drawn || after.tray.indexOf('model') < 0) say('DRAG DID NOT LAND', after);
       await pageShot('drag-model-into-not-drawn', XC('table'), ['L-23'], { drag: fw, from: [Math.round(a.x + a.width / 2), Math.round(a.y + a.height / 2)], to: [Math.round(z.x + Math.min(40, z.width / 2)), Math.round(z.y + z.height / 2)], after }); }
     else say('MISSING the part "model" or "not drawn"', from); }
-  await press('table-size-of-name', XC('table') + ' .exz .expc[data-part="name"]', ['L-23'], S.page(XC('table')));
-  await press('table-colour-opened', XC('table') + ' .exfold[data-fold="colour"]', ['L-23'], S.page(XC('table')));
+  await press('table-size-of-name', XC('table') + ' .exz .expc[data-part="name"]', ['L-23 L-36'], S.page(XC('table')));
   await press('table-back-to-the-default', XC('table') + ' .exreset', ['L-23'], S.page(XC('table')));
-  await press('table-colour-closed', XC('table') + ' .exfold[data-fold="colour"]', ['L-23'], S.el([XC('table') + ' .exfolds'], { box: '#exgrid' }));
   // the gate column: a role chip, then every endpoint
   await press('gate-column-role-field-rule', XC('gate') + ' .exrc[data-role="rule"]', ['L-23 L-11'], S.page(XC('gate')));
   await press('gate-column-every-role-again', XC('gate') + ' .exrc[data-role=""]', ['L-23 L-11'], S.el([XC('gate') + ' .exroles'], { box: '#exgrid' }));
@@ -1156,10 +1185,68 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
   await p.evaluate(() => { window.__w66copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (s1) => { window.__w66copied = s1; return Promise.resolve(); } } }); });
   await press('table-copy-line', XC('table') + ' .excopy', ['L-23'], S.el([XC('table') + ' .excp'], { box: '#exgrid' }));
   say('D-066 · the table\'s copy line, as copied', await p.evaluate(() => window.__w66copied));
-  // the bench's layouts: wrapped rows · an upper and a lower row · back to one row across the page
+  // the bench's layouts: wrapped rows · one row across the page · back to an upper and a lower row (his ruling)
   await press('bench-wrapped-rows', '#exbar .opt[data-xopt="lay"][data-v="wrap"]', ['L-23', 'lay', 'wrap'], S.page('#sec-ex'));
-  await press('bench-an-upper-and-a-lower-row', '#exbar .opt[data-xopt="lay"][data-v="half"]', ['L-23', 'lay', 'half'], S.page('#sec-ex'));
-  await press('bench-back-to-one-row', '#exbar .opt[data-xopt="lay"][data-v="row"]', ['L-23', 'lay', 'row'], S.el(['#exbar']));
+  await press('bench-one-row-across-the-page', '#exbar .opt[data-xopt="lay"][data-v="row"]', ['L-23', 'lay', 'row'], S.page('#sec-ex'));
+  await press('bench-back-to-an-upper-and-a-lower-row', '#exbar .opt[data-xopt="lay"][data-v="half"]', ['L-23', 'lay', 'half'], S.el(['#exbar']));
+
+  /* L-36 · the bench's icon squares: a hover is a verb and its object; each column's width — compact, most compact, full — and back to dynamic (my pick) */
+  await hoverShot('hover-an-icon-square-every-endpoint', XC('gate') + ' .exscope .opt[data-v="all"]', ['L-36']);
+  await hoverShot('hover-an-icon-square-the-copy-button', XC('table') + ' .excopy', ['L-36']);
+  for (const v of ['compact', 'tight', 'full']) await press('width-' + v, XC('end') + ' .exwidth .opt[data-v="' + v + '"]', ['L-36'], S.page(XC('end')));
+  await press('width-back-to-dynamic', XC('end') + ' .exwidth .opt[data-v="dynamic"]', ['L-36'], S.el([XC('end') + ' .extop'], { box: '#exgrid' }));
+
+  /* L-35 · what each bench look would show after it is picked: the column as drawn (the look "as drawn" keeps it), then — by a real drag of one title-line part
+     into "not drawn" — the same column changed (the look "change it" is made with exactly these controls); each pair is tagged for the review page */
+  const dragPart = async (k) => { const part = await p.evaluate((c0) => { const z = [...document.querySelectorAll(c0 + ' .exz:not(.exoff) .expc')].filter((x) => !['icon', 'name'].includes(x.getAttribute('data-part'))); return z.length ? z[z.length - 1].getAttribute('data-part') : null; }, XC(k));
+    if (!part) return null; const from = XC(k) + ' .exz:not(.exoff) .expc[data-part="' + part + '"]', to = XC(k) + ' .exz.exoff';
+    await clear(); await p.$eval(from, (e) => e.scrollIntoView({ block: 'center' })); await wait(150);
+    const a = await (await p.$(from)).boundingBox(), z = await (await p.$(to)).boundingBox();
+    await p.mouse.move(a.x + a.width / 2, a.y + a.height / 2); await p.mouse.down(); await p.mouse.move(a.x + a.width / 2 + 6, a.y + a.height / 2 + 6, { steps: 2 });
+    await p.mouse.move(z.x + Math.min(40, z.width / 2), z.y + z.height / 2, { steps: 12 }); await wait(120); await p.mouse.up(); await wait(400);
+    const left = await p.evaluate(([c0, q]) => !!document.querySelector(c0 + ' .blk [data-part="' + q + '"]'), [XC(k), part]);
+    if (left) say('DRAG DID NOT LAND', k + ' · ' + part); return part; };
+  for (const k of ['end', 'schema', 'fn', 'test', 'gate', 'hook', 'inf']) {
+    if (!(await p.$(XC(k) + ' .blk'))) { say('MISSING depict ' + k, XC(k)); continue; }
+    await pageShot('depict-' + k + '-as-drawn', XC(k), ['L-35'], { depict: ['ex.kind.' + k + ':drawn:after', 'ex.kind.' + k + ':change:before'], kind: k, column: await p.$eval(XC(k) + ' h3', (h) => h.textContent) });
+    const part = await dragPart(k);
+    if (part) await pageShot('depict-' + k + '-one-part-dragged-out', XC(k), ['L-35'], { depict: ['ex.kind.' + k + ':change:after'], kind: k, column: await p.$eval(XC(k) + ' h3', (h) => h.textContent), dragged: part });
+    await press('depict-' + k + '-back-to-the-default', XC(k) + ' .exreset', ['L-35'], S.el([XC(k) + ' .excp'], { box: '#exgrid' })); }
+  /* EX-5 · the function chip in BY MOMENT today, and the bench's function block it would take the look of */
+  await elShot('ex5-a-function-chip-in-by-moment', [CELL('work', 'fn') + ' .mc'], ['EX-5'], { depict: ['EX-5:wait:after', 'EX-5:now:before'] });
+  await pageShot('ex5-the-benchs-function-block', XC('fn') + ' .exw', ['EX-5'], { depict: ['EX-5:now:after'] });
+
+  /* L-37 · the edge of a widened BY MOMENT column: widen it by its head, drag the edge with the mouse, move it by the arrow keys, give the width back */
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await press('l37-widen-the-edge-column', '#mogrid th.mom[data-mom="edge"] .mh1', ['L-37'], S.top([ROW('end')]));
+  { const eg = await p.$('#mogrid .mowh');
+    if (eg) { await eg.evaluate((e) => e.scrollIntoView({ block: 'center' })); await wait(150); const b0 = await eg.boundingBox();
+      await p.mouse.move(b0.x + b0.width / 2, b0.y + 14); await p.mouse.down(); await p.mouse.move(b0.x + 60, b0.y + 14, { steps: 6 }); await p.mouse.move(b0.x + 170, b0.y + 14, { steps: 8 }); await wait(100);
+      await p.mouse.up(); await wait(400);
+      say('D-081 · the edge after the drag', await p.evaluate(() => { const h = document.querySelector('#mogrid .mowh'); return h ? [h.getAttribute('aria-valuemin'), h.getAttribute('aria-valuenow'), h.getAttribute('aria-valuemax')] : null; }));
+      await topShot('l37-the-edge-dragged-right', [ROW('end')], ['L-37'], { dragged: 'to the right' }, { wheel: '[data-wedge]' });
+      await p.focus('#mogrid .mowh'); await p.keyboard.press('ArrowLeft'); await p.keyboard.press('ArrowLeft'); await wait(400);
+      await topShot('l37-the-edge-moved-left-by-the-keys', [ROW('end')], ['L-37'], { keys: 'ArrowLeft twice' }, { wheel: '[data-wedge]' }); }
+    else say('MISSING the column edge', '#mogrid .mowh'); }
+  await press('l37-click-the-head-to-give-the-width-back', '#mogrid th.mom[data-mom="edge"] .mh1', ['L-37'], S.top([ROW('end')]));
+
+  /* L-38 · a table wider than its box, even fitted: a narrow window, the edge column at its largest, the hint line, then Shift and the mouse wheel */
+  await p.setViewportSize({ width: 900, height: 1000 }); await wait(500);
+  await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await press('l38-widen-the-edge-column', '#mogrid th.mom[data-mom="edge"] .mh1', ['L-38'], S.top([ROW('end')]));
+  await p.focus('#mogrid .mowh'); await p.keyboard.press('End'); await wait(500);
+  say('D-081 · the table wider than its box', await p.evaluate(() => { const G = document.getElementById('mogrid'); return { box: G.clientWidth, table: G.scrollWidth, hint: !document.getElementById('moscroll').hidden, text: document.getElementById('moscroll').textContent }; }));
+  const hintShot = async (name, what) => { await clear(); await p.evaluate(() => { const m = document.getElementById('moscroll'), pin = document.getElementById('pin'), ph = pin && pin.offsetHeight ? pin.offsetHeight : 0;
+      window.scrollTo(0, Math.max(0, m.getBoundingClientRect().top + scrollY - ph - 40)); }); await wait(300);
+    const r2 = await p.evaluate(() => { const G = document.getElementById('mogrid'), m = document.getElementById('moscroll'), g = G.getBoundingClientRect(), m2 = m.getBoundingClientRect(), rw = G.querySelector('tbody tr[data-f]').getBoundingClientRect();
+      return { x: g.left - 4, y: m2.top - 6, width: g.width + 8, height: rw.bottom - m2.top + 12 }; });
+    await clipShot(name, r2, ['L-38'], Object.assign({ region: true }, what)); };
+  await hintShot('l38-the-table-wider-than-its-box', { scrolled: 'not yet' });
+  { const gb = await (await p.$('#mogrid')).boundingBox(); await p.mouse.move(gb.x + 300, Math.max(gb.y, 160) + 90); await p.keyboard.down('Shift'); await p.mouse.wheel(0, 400); await p.keyboard.up('Shift'); await wait(400);
+    say('D-081 · after Shift and the wheel', await p.evaluate(() => document.getElementById('mogrid').scrollLeft)); }
+  await hintShot('l38-slid-sideways-by-shift-and-the-wheel', { scrolled: 'by Shift and the wheel' });
+  await p.setViewportSize({ width: W, height: H }); await wait(500); await p.evaluate(() => window.scrollTo(0, 0)); await wait(150);
+  await press('l38-click-the-head-to-give-the-width-back', '#mogrid th.mom[data-mom="edge"] .mh1', ['L-38'], S.top([ROW('end')]));
   ROUND1 = R1; say('D-066 · round 1 · steps', R1.length); }
 say('rows at the end', await rows());
 say('page errors', errs);

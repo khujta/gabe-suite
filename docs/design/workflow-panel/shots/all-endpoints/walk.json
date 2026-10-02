@@ -4183,7 +4183,7 @@
     "value": "strip",
     "size": [
      1872,
-     1475
+     1438
     ],
     "click": "legend above the table",
     "at": [
@@ -4212,17 +4212,18 @@
    }
   ],
   [
-   "D-066 · 304 · the-stage-band-and-the-fork",
+   "D-066 · 304 · header-stages-over-moments",
    {
     "n": 304,
-    "file": "304-d066-the-stage-band-and-the-fork.png",
-    "item": "L-05",
+    "file": "304-d066-header-stages-over-moments.png",
+    "item": "L-05 L-34",
     "option": "hdr",
     "value": "band",
     "size": [
-     1864,
-     258
-    ]
+     560,
+     242
+    ],
+    "region": true
    }
   ],
   [
@@ -4230,13 +4231,14 @@
    {
     "n": 305,
     "file": "305-d066-header-stages-roads-moments.png",
-    "item": "L-05",
+    "item": "L-05 L-34",
     "option": "hdr",
     "value": "road",
     "size": [
-     1864,
-     309
+     560,
+     242
     ],
+    "region": true,
     "click": "stages, roads, moments",
     "at": [
      1163,
@@ -4264,17 +4266,33 @@
    }
   ],
   [
-   "D-066 · 307 · saving-under-handler",
+   "D-066 · 307 · saving-under-effects",
    {
     "n": 307,
-    "file": "307-d066-saving-under-handler.png",
-    "item": "L-05",
+    "file": "307-d066-saving-under-effects.png",
+    "item": "L-05 L-34",
+    "option": "save",
+    "value": "eff",
+    "size": [
+     480,
+     242
+    ],
+    "region": true
+   }
+  ],
+  [
+   "D-066 · 308 · saving-under-handler",
+   {
+    "n": 308,
+    "file": "308-d066-saving-under-handler.png",
+    "item": "L-05 L-34",
     "option": "save",
     "value": "hand",
     "size": [
-     1864,
-     309
+     480,
+     242
     ],
+    "region": true,
     "click": "saving under HANDLER",
     "at": [
      1265,
@@ -4283,10 +4301,10 @@
    }
   ],
   [
-   "D-066 · 308 · saving-back-under-effects",
+   "D-066 · 309 · saving-back-under-effects",
    {
-    "n": 308,
-    "file": "308-d066-saving-back-under-effects.png",
+    "n": 309,
+    "file": "309-d066-saving-back-under-effects.png",
     "item": "L-05",
     "option": "save",
     "value": "eff",
@@ -4302,30 +4320,30 @@
    }
   ],
   [
-   "D-066 · 309 · the-endpoint-metadata-after-the-table",
+   "D-066 · 310 · the-endpoint-metadata-after-the-table",
    {
-    "n": 309,
-    "file": "309-d066-the-endpoint-metadata-after-the-table.png",
+    "n": 310,
+    "file": "310-d066-the-endpoint-metadata-after-the-table.png",
     "item": "L-06 L-07",
     "option": "meta",
     "value": "after",
     "size": [
      1872,
-     834
+     724
     ]
    }
   ],
   [
-   "D-066 · 310 · metadata-before-the-table",
+   "D-066 · 311 · metadata-before-the-table",
    {
-    "n": 310,
-    "file": "310-d066-metadata-before-the-table.png",
+    "n": 311,
+    "file": "311-d066-metadata-before-the-table.png",
     "item": "L-06 L-07",
     "option": "meta",
     "value": "before",
     "size": [
      1872,
-     902
+     865
     ],
     "click": "metadata before the table",
     "at": [
@@ -4335,10 +4353,10 @@
    }
   ],
   [
-   "D-066 · 311 · metadata-back-after-the-table",
+   "D-066 · 312 · metadata-back-after-the-table",
    {
-    "n": 311,
-    "file": "311-d066-metadata-back-after-the-table.png",
+    "n": 312,
+    "file": "312-d066-metadata-back-after-the-table.png",
     "item": "L-06 L-07",
     "option": "meta",
     "value": "after",
@@ -4354,10 +4372,10 @@
    }
   ],
   [
-   "D-066 · 312 · the-functions-row-head-columns",
+   "D-066 · 313 · the-functions-row-head-columns",
    {
-    "n": 312,
-    "file": "312-d066-the-functions-row-head-columns.png",
+    "n": 313,
+    "file": "313-d066-the-functions-row-head-columns.png",
     "item": "L-20",
     "size": [
      120,
@@ -4366,14 +4384,14 @@
    }
   ],
   [
-   "D-066 · 313 · light-the-deciders",
+   "D-066 · 314 · light-the-deciders",
    {
-    "n": 313,
-    "file": "313-d066-light-the-deciders.png",
+    "n": 314,
+    "file": "314-d066-light-the-deciders.png",
     "item": "L-20",
     "size": [
      1864,
-     1080
+     804
     ],
     "click": "deciders 4",
     "at": [
@@ -4391,26 +4409,24 @@
      "start_sessionaccessor",
      "post_start_sessioncaller",
      "post_start_sessioncaller",
-     "post_start_sessioncaller",
-     "14 · in the map belowrare · claims its k",
-     "1 · in the map below",
-     "post_start_sessioncaller",
      "start_sessionaccessor",
      "assert_recipe_allergen_safegate",
-     "post_start_sessioncaller",
      "post_start_session",
      "AuthContext.require_household",
      "start_session",
-     "assert_recipe_allergen_safe"
+     "assert_recipe_allergen_safe",
+     "post_start_sessioncaller",
+     "post_start_sessioncaller",
+     "post_start_sessioncaller"
     ],
     "pin": true
    }
   ],
   [
-   "D-066 · 314 · deciders-put-out",
+   "D-066 · 315 · deciders-put-out",
    {
-    "n": 314,
-    "file": "314-d066-deciders-put-out.png",
+    "n": 315,
+    "file": "315-d066-deciders-put-out.png",
     "item": "L-20",
     "size": [
      120,
@@ -4424,54 +4440,35 @@
    }
   ],
   [
-   "D-066 · 315 · widen-at-the-edge",
-   {
-    "n": 315,
-    "file": "315-d066-widen-at-the-edge.png",
-    "item": "L-21",
-    "option": "wid",
-    "value": "names",
-    "size": [
-     1864,
-     439
-    ],
-    "click": "at the edge",
-    "at": [
-     616,
-     202
-    ]
-   }
-  ],
-  [
-   "D-066 · 316 · widen-every-item-on-one-line",
+   "D-066 · 316 · widen-at-the-edge",
    {
     "n": 316,
-    "file": "316-d066-widen-every-item-on-one-line.png",
+    "file": "316-d066-widen-at-the-edge.png",
     "item": "L-21",
     "option": "wid",
     "value": "line",
     "size": [
      1864,
-     555
+     421
     ],
-    "click": "every item on one line",
+    "click": "at the edge",
     "at": [
-     439,
-     540
+     625,
+     202
     ]
    }
   ],
   [
-   "D-066 · 317 · widen-back-to-names-whole",
+   "D-066 · 317 · widen-names-whole",
    {
     "n": 317,
-    "file": "317-d066-widen-back-to-names-whole.png",
+    "file": "317-d066-widen-names-whole.png",
     "item": "L-21",
     "option": "wid",
     "value": "names",
     "size": [
-     137,
-     72
+     1864,
+     518
     ],
     "click": "names whole",
     "at": [
@@ -4481,14 +4478,33 @@
    }
   ],
   [
-   "D-066 · 318 · hide-before-any-request",
+   "D-066 · 318 · widen-back-to-one-line",
    {
     "n": 318,
-    "file": "318-d066-hide-before-any-request.png",
+    "file": "318-d066-widen-back-to-one-line.png",
+    "item": "L-21",
+    "option": "wid",
+    "value": "line",
+    "size": [
+     137,
+     72
+    ],
+    "click": "every item on one line",
+    "at": [
+     439,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 319 · hide-before-any-request",
+   {
+    "n": 319,
+    "file": "319-d066-hide-before-any-request.png",
     "item": "L-21",
     "size": [
      1864,
-     222
+     185
     ],
     "click": "hide before any request",
     "at": [
@@ -4498,21 +4514,16 @@
    }
   ],
   [
-   "D-066 · 319 · fit-to-the-box",
+   "D-066 · 320 · the-table-opens-fitted",
    {
-    "n": 319,
-    "file": "319-d066-fit-to-the-box.png",
-    "item": "L-21",
+    "n": 320,
+    "file": "320-d066-the-table-opens-fitted.png",
+    "item": "L-21 R-11",
     "option": "fit",
-    "value": "min",
+    "value": "bands",
     "size": [
      1864,
      464
-    ],
-    "click": "fit to the box",
-    "at": [
-     666,
-     540
     ]
    }
   ],
@@ -4521,26 +4532,8 @@
    {
     "box": 1854,
     "table": 1854,
-    "strips": 6
-   }
-  ],
-  [
-   "D-066 · 320 · fit-wrap-into-bands",
-   {
-    "n": 320,
-    "file": "320-d066-fit-wrap-into-bands.png",
-    "item": "L-21",
-    "option": "fit",
-    "value": "bands",
-    "size": [
-     1864,
-     337
-    ],
-    "click": "wrap into bands",
-    "at": [
-     576,
-     540
-    ]
+    "tables": 2,
+    "strips": 0
    }
   ],
   [
@@ -4559,36 +4552,42 @@
     "value": "bands",
     "size": [
      1864,
-     316
+     317
     ],
     "look": "the second band, further down"
    }
   ],
   [
-   "D-066 · 322 · fit-back-to-narrow-the-rest",
+   "D-066 · 322 · fit-off",
    {
     "n": 322,
-    "file": "322-d066-fit-back-to-narrow-the-rest.png",
-    "item": "L-21",
-    "option": "fit",
-    "value": "min",
+    "file": "322-d066-fit-off.png",
+    "item": "L-21 R-11",
     "size": [
-     222,
-     72
+     1864,
+     501
     ],
-    "click": "narrow the rest",
+    "click": "fit to the box",
     "at": [
-     539,
+     666,
      540
     ]
    }
   ],
   [
-   "D-066 · 323 · fit-off",
+   "D-066 · fit off",
+   {
+    "box": 1854,
+    "table": 3090,
+    "hint": true
+   }
+  ],
+  [
+   "D-066 · 323 · fit-on-again",
    {
     "n": 323,
-    "file": "323-d066-fit-off.png",
-    "item": "L-21",
+    "file": "323-d066-fit-on-again.png",
+    "item": "L-21 R-11",
     "size": [
      222,
      72
@@ -4601,10 +4600,48 @@
    }
   ],
   [
-   "D-066 · 324 · show-all-columns",
+   "D-066 · 324 · fit-narrow-the-rest",
    {
     "n": 324,
-    "file": "324-d066-show-all-columns.png",
+    "file": "324-d066-fit-narrow-the-rest.png",
+    "item": "L-21",
+    "option": "fit",
+    "value": "min",
+    "size": [
+     1864,
+     425
+    ],
+    "click": "narrow the rest",
+    "at": [
+     539,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 325 · fit-back-to-bands",
+   {
+    "n": 325,
+    "file": "325-d066-fit-back-to-bands.png",
+    "item": "L-21",
+    "option": "fit",
+    "value": "bands",
+    "size": [
+     222,
+     72
+    ],
+    "click": "wrap into bands",
+    "at": [
+     576,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 326 · show-all-columns",
+   {
+    "n": 326,
+    "file": "326-d066-show-all-columns.png",
     "item": "L-21",
     "size": [
      371,
@@ -4618,10 +4655,10 @@
    }
   ],
   [
-   "D-066 · 325 · widen-given-back",
+   "D-066 · 327 · widen-given-back",
    {
-    "n": 325,
-    "file": "325-d066-widen-given-back.png",
+    "n": 327,
+    "file": "327-d066-widen-given-back.png",
     "item": "L-21",
     "size": [
      1864,
@@ -4629,16 +4666,16 @@
     ],
     "click": "at the edge",
     "at": [
-     616,
+     702,
      540
     ]
    }
   ],
   [
-   "D-066 · 326 · heads-ride-when-scrolled",
+   "D-066 · 328 · heads-ride-when-scrolled",
    {
-    "n": 326,
-    "file": "326-d066-heads-ride-when-scrolled.png",
+    "n": 328,
+    "file": "328-d066-heads-ride-when-scrolled.png",
     "item": "L-21",
     "option": "stk",
     "value": "ride",
@@ -4650,10 +4687,10 @@
    }
   ],
   [
-   "D-066 · 327 · heads-stay-at-the-top",
+   "D-066 · 329 · heads-stay-at-the-top",
    {
-    "n": 327,
-    "file": "327-d066-heads-stay-at-the-top.png",
+    "n": 329,
+    "file": "329-d066-heads-stay-at-the-top.png",
     "item": "L-21",
     "option": "stk",
     "value": "stay",
@@ -4669,10 +4706,10 @@
    }
   ],
   [
-   "D-066 · 328 · heads-stay-when-scrolled",
+   "D-066 · 330 · heads-stay-when-scrolled",
    {
-    "n": 328,
-    "file": "328-d066-heads-stay-when-scrolled.png",
+    "n": 330,
+    "file": "330-d066-heads-stay-when-scrolled.png",
     "item": "L-21",
     "option": "stk",
     "value": "stay",
@@ -4684,10 +4721,10 @@
    }
   ],
   [
-   "D-066 · 329 · heads-back-to-ride",
+   "D-066 · 331 · heads-back-to-ride",
    {
-    "n": 329,
-    "file": "329-d066-heads-back-to-ride.png",
+    "n": 331,
+    "file": "331-d066-heads-back-to-ride.png",
     "item": "L-21",
     "option": "stk",
     "value": "ride",
@@ -4703,24 +4740,24 @@
    }
   ],
   [
-   "D-066 · 330 · the-gates-row",
+   "D-066 · 332 · the-gates-row",
    {
-    "n": 330,
-    "file": "330-d066-the-gates-row.png",
+    "n": 332,
+    "file": "332-d066-the-gates-row.png",
     "item": "L-09 L-10 L-11",
     "option": "gdl",
     "value": "head",
     "size": [
      1864,
-     611
+     509
     ]
    }
   ],
   [
-   "D-066 · 331 · open-the-gates-row-options",
+   "D-066 · 333 · open-the-gates-row-options",
    {
-    "n": 331,
-    "file": "331-d066-open-the-gates-row-options.png",
+    "n": 333,
+    "file": "333-d066-open-the-gates-row-options.png",
     "item": "L-09 L-10 L-11",
     "size": [
      120,
@@ -4734,10 +4771,10 @@
    }
   ],
   [
-   "D-066 · 332 · gates-look-a-one-chain-per-gate",
+   "D-066 · 334 · gates-look-a-one-chain-per-gate",
    {
-    "n": 332,
-    "file": "332-d066-gates-look-a-one-chain-per-gate.png",
+    "n": 334,
+    "file": "334-d066-gates-look-a-one-chain-per-gate.png",
     "item": "L-09 L-10",
     "option": "gdl",
     "value": "chain",
@@ -4753,16 +4790,16 @@
    }
   ],
   [
-   "D-066 · 333 · gates-look-c-side-by-side",
+   "D-066 · 335 · gates-look-c-side-by-side",
    {
-    "n": 333,
-    "file": "333-d066-gates-look-c-side-by-side.png",
+    "n": 335,
+    "file": "335-d066-gates-look-c-side-by-side.png",
     "item": "L-09 L-10",
     "option": "gdl",
     "value": "cols",
     "size": [
      1864,
-     846
+     814
     ],
     "click": "function · condition · effect",
     "at": [
@@ -4772,10 +4809,10 @@
    }
   ],
   [
-   "D-066 · 334 · gdl-back-to-head",
+   "D-066 · 336 · gdl-back-to-head",
    {
-    "n": 334,
-    "file": "334-d066-gdl-back-to-head.png",
+    "n": 336,
+    "file": "336-d066-gdl-back-to-head.png",
     "item": "L-09 L-10",
     "option": "gdl",
     "value": "head",
@@ -4791,10 +4828,10 @@
    }
   ],
   [
-   "D-066 · 335 · effect-e2-a-colour-per-stage",
+   "D-066 · 337 · effect-e2-a-colour-per-stage",
    {
-    "n": 335,
-    "file": "335-d066-effect-e2-a-colour-per-stage.png",
+    "n": 337,
+    "file": "337-d066-effect-e2-a-colour-per-stage.png",
     "item": "L-10",
     "option": "gef",
     "value": "stage",
@@ -4810,10 +4847,10 @@
    }
   ],
   [
-   "D-066 · 336 · gef-back-to-end",
+   "D-066 · 338 · gef-back-to-end",
    {
-    "n": 336,
-    "file": "336-d066-gef-back-to-end.png",
+    "n": 338,
+    "file": "338-d066-gef-back-to-end.png",
     "item": "L-10",
     "option": "gef",
     "value": "end",
@@ -4829,11 +4866,11 @@
    }
   ],
   [
-   "D-066 · 337 · gate-icons-one",
+   "D-066 · 339 · gate-icons-one",
    {
-    "n": 337,
-    "file": "337-d066-gate-icons-one.png",
-    "item": "L-11",
+    "n": 339,
+    "file": "339-d066-gate-icons-one.png",
+    "item": "L-09",
     "option": "gic",
     "value": "one",
     "size": [
@@ -4848,11 +4885,11 @@
    }
   ],
   [
-   "D-066 · 338 · gate-icons-none",
+   "D-066 · 340 · gate-icons-none",
    {
-    "n": 338,
-    "file": "338-d066-gate-icons-none.png",
-    "item": "L-11",
+    "n": 340,
+    "file": "340-d066-gate-icons-none.png",
+    "item": "L-09",
     "option": "gic",
     "value": "none",
     "size": [
@@ -4867,11 +4904,11 @@
    }
   ],
   [
-   "D-066 · 339 · gic-back-to-each",
+   "D-066 · 341 · gic-back-to-each",
    {
-    "n": 339,
-    "file": "339-d066-gic-back-to-each.png",
-    "item": "L-11",
+    "n": 341,
+    "file": "341-d066-gic-back-to-each.png",
+    "item": "L-09",
     "option": "gic",
     "value": "each",
     "size": [
@@ -4886,10 +4923,10 @@
    }
   ],
   [
-   "D-066 · 340 · gate-roles-r1-what-it-does",
+   "D-066 · 342 · gate-roles-r1-what-it-does",
    {
-    "n": 340,
-    "file": "340-d066-gate-roles-r1-what-it-does.png",
+    "n": 342,
+    "file": "342-d066-gate-roles-r1-what-it-does.png",
     "item": "L-11",
     "option": "grl",
     "value": "what",
@@ -4905,10 +4942,10 @@
    }
   ],
   [
-   "D-066 · 341 · gate-roles-r3-what-it-guards",
+   "D-066 · 343 · gate-roles-r3-what-it-guards",
    {
-    "n": 341,
-    "file": "341-d066-gate-roles-r3-what-it-guards.png",
+    "n": 343,
+    "file": "343-d066-gate-roles-r3-what-it-guards.png",
     "item": "L-11",
     "option": "grl",
     "value": "guards",
@@ -4924,10 +4961,10 @@
    }
   ],
   [
-   "D-066 · 342 · gate-roles-off",
+   "D-066 · 344 · gate-roles-off",
    {
-    "n": 342,
-    "file": "342-d066-gate-roles-off.png",
+    "n": 344,
+    "file": "344-d066-gate-roles-off.png",
     "item": "L-11",
     "option": "grl",
     "value": "off",
@@ -4943,10 +4980,10 @@
    }
   ],
   [
-   "D-066 · 343 · grl-back-to-where",
+   "D-066 · 345 · grl-back-to-where",
    {
-    "n": 343,
-    "file": "343-d066-grl-back-to-where.png",
+    "n": 345,
+    "file": "345-d066-grl-back-to-where.png",
     "item": "L-11",
     "option": "grl",
     "value": "where",
@@ -4962,10 +4999,10 @@
    }
   ],
   [
-   "D-066 · 344 · standard-m1-split-into-the-gates",
+   "D-066 · 346 · standard-m1-split-into-the-gates",
    {
-    "n": 344,
-    "file": "344-d066-standard-m1-split-into-the-gates.png",
+    "n": 346,
+    "file": "346-d066-standard-m1-split-into-the-gates.png",
     "item": "L-18",
     "option": "std",
     "value": "split",
@@ -4976,10 +5013,10 @@
    }
   ],
   [
-   "D-066 · 345 · standard-m2-merged-into-the-gates",
+   "D-066 · 347 · standard-m2-merged-into-the-gates",
    {
-    "n": 345,
-    "file": "345-d066-standard-m2-merged-into-the-gates.png",
+    "n": 347,
+    "file": "347-d066-standard-m2-merged-into-the-gates.png",
     "item": "L-18",
     "option": "std",
     "value": "merge",
@@ -4995,16 +5032,16 @@
    }
   ],
   [
-   "D-066 · 346 · standard-m3-kept-as-its-row",
+   "D-066 · 348 · standard-m3-kept-as-its-row",
    {
-    "n": 346,
-    "file": "346-d066-standard-m3-kept-as-its-row.png",
+    "n": 348,
+    "file": "348-d066-standard-m3-kept-as-its-row.png",
     "item": "L-18",
     "option": "std",
     "value": "keep",
     "size": [
      1864,
-     242
+     241
     ],
     "click": "keep the row",
     "at": [
@@ -5014,10 +5051,10 @@
    }
   ],
   [
-   "D-066 · 347 · standard-back-to-split",
+   "D-066 · 349 · standard-back-to-split",
    {
-    "n": 347,
-    "file": "347-d066-standard-back-to-split.png",
+    "n": 349,
+    "file": "349-d066-standard-back-to-split.png",
     "item": "L-18",
     "option": "std",
     "value": "split",
@@ -5033,10 +5070,10 @@
    }
   ],
   [
-   "D-066 · 348 · close-the-gates-row-options",
+   "D-066 · 350 · close-the-gates-row-options",
    {
-    "n": 348,
-    "file": "348-d066-close-the-gates-row-options.png",
+    "n": 350,
+    "file": "350-d066-close-the-gates-row-options.png",
     "item": "L-09 L-10 L-11 L-18",
     "size": [
      120,
@@ -5050,10 +5087,10 @@
    }
   ],
   [
-   "D-066 · 349 · hover-the-gates-row-head",
+   "D-066 · 351 · hover-the-gates-row-head",
    {
-    "n": 349,
-    "file": "349-d066-hover-the-gates-row-head.png",
+    "n": 351,
+    "file": "351-d066-hover-the-gates-row-head.png",
     "item": "L-18",
     "size": [
      520,
@@ -5064,10 +5101,10 @@
    }
   ],
   [
-   "D-066 · 350 · hover-ratelimitmiddleware",
+   "D-066 · 352 · hover-ratelimitmiddleware",
    {
-    "n": 350,
-    "file": "350-d066-hover-ratelimitmiddleware.png",
+    "n": 352,
+    "file": "352-d066-hover-ratelimitmiddleware.png",
     "item": "L-09",
     "size": [
      520,
@@ -5078,10 +5115,10 @@
    }
   ],
   [
-   "D-066 · 351 · hover-the-sensitive-limit",
+   "D-066 · 353 · hover-the-sensitive-limit",
    {
-    "n": 351,
-    "file": "351-d066-hover-the-sensitive-limit.png",
+    "n": 353,
+    "file": "353-d066-hover-the-sensitive-limit.png",
     "item": "L-09 L-10",
     "size": [
      520,
@@ -5092,24 +5129,24 @@
    }
   ],
   [
-   "D-066 · 352 · data-effects-the-map",
+   "D-066 · 354 · data-effects-a-small-map-per-moment",
    {
-    "n": 352,
-    "file": "352-d066-data-effects-the-map.png",
+    "n": 354,
+    "file": "354-d066-data-effects-a-small-map-per-moment.png",
     "item": "L-12",
     "option": "dfx",
-    "value": "one",
+    "value": "cell",
     "size": [
      1864,
-     762
+     649
     ]
    }
   ],
   [
-   "D-066 · 353 · open-the-data-row-options",
+   "D-066 · 355 · open-the-data-row-options",
    {
-    "n": 353,
-    "file": "353-d066-open-the-data-row-options.png",
+    "n": 355,
+    "file": "355-d066-open-the-data-row-options.png",
     "item": "L-12",
     "size": [
      120,
@@ -5123,54 +5160,16 @@
    }
   ],
   [
-   "D-066 · 354 · data-effects-a-map-per-moment",
-   {
-    "n": 354,
-    "file": "354-d066-data-effects-a-map-per-moment.png",
-    "item": "L-12",
-    "option": "dfx",
-    "value": "cell",
-    "size": [
-     1864,
-     649
-    ],
-    "click": "a small map per moment",
-    "at": [
-     98,
-     540
-    ]
-   }
-  ],
-  [
-   "D-066 · 355 · data-effects-as-chips",
-   {
-    "n": 355,
-    "file": "355-d066-data-effects-as-chips.png",
-    "item": "L-12",
-    "option": "dfx",
-    "value": "chips",
-    "size": [
-     1864,
-     767
-    ],
-    "click": "chips",
-    "at": [
-     61,
-     540
-    ]
-   }
-  ],
-  [
-   "D-066 · 356 · data-effects-back-to-the-map",
+   "D-066 · 356 · data-effects-one-map-for-the-endpoint",
    {
     "n": 356,
-    "file": "356-d066-data-effects-back-to-the-map.png",
+    "file": "356-d066-data-effects-one-map-for-the-endpoint.png",
     "item": "L-12",
     "option": "dfx",
     "value": "one",
     "size": [
-     110,
-     118
+     1864,
+     959
     ],
     "click": "one map for the endpoint",
     "at": [
@@ -5180,16 +5179,54 @@
    }
   ],
   [
-   "D-066 · 357 · write-colour-his-words",
+   "D-066 · 357 · data-effects-as-chips",
    {
     "n": 357,
-    "file": "357-d066-write-colour-his-words.png",
+    "file": "357-d066-data-effects-as-chips.png",
+    "item": "L-12",
+    "option": "dfx",
+    "value": "chips",
+    "size": [
+     1864,
+     622
+    ],
+    "click": "chips",
+    "at": [
+     61,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 358 · data-effects-back-to-a-map-per-moment",
+   {
+    "n": 358,
+    "file": "358-d066-data-effects-back-to-a-map-per-moment.png",
+    "item": "L-12",
+    "option": "dfx",
+    "value": "cell",
+    "size": [
+     110,
+     118
+    ],
+    "click": "a small map per moment",
+    "at": [
+     98,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 359 · write-colour-his-words",
+   {
+    "n": 359,
+    "file": "359-d066-write-colour-his-words.png",
     "item": "L-12",
     "option": "dxc",
     "value": "his",
     "size": [
      1864,
-     959
+     649
     ],
     "click": "his words' colours",
     "at": [
@@ -5199,10 +5236,10 @@
    }
   ],
   [
-   "D-066 · 358 · write-colour-back-to-the-page",
+   "D-066 · 360 · write-colour-back-to-the-page",
    {
-    "n": 358,
-    "file": "358-d066-write-colour-back-to-the-page.png",
+    "n": 360,
+    "file": "360-d066-write-colour-back-to-the-page.png",
     "item": "L-12",
     "option": "dxc",
     "value": "page",
@@ -5218,10 +5255,10 @@
    }
   ],
   [
-   "D-066 · 359 · close-the-data-row-options",
+   "D-066 · 361 · close-the-data-row-options",
    {
-    "n": 359,
-    "file": "359-d066-close-the-data-row-options.png",
+    "n": 361,
+    "file": "361-d066-close-the-data-row-options.png",
     "item": "L-12",
     "size": [
      120,
@@ -5235,24 +5272,24 @@
    }
   ],
   [
-   "D-066 · 360 · the-functions-row-with-marks",
+   "D-066 · 362 · the-functions-row-with-marks",
    {
-    "n": 360,
-    "file": "360-d066-the-functions-row-with-marks.png",
+    "n": 362,
+    "file": "362-d066-the-functions-row-with-marks.png",
     "item": "L-13 L-14",
     "option": "fnm",
     "value": "on",
     "size": [
      1864,
-     959
+     682
     ]
    }
   ],
   [
-   "D-066 · 361 · open-the-functions-row-options",
+   "D-066 · 363 · open-the-functions-row-options",
    {
-    "n": 361,
-    "file": "361-d066-open-the-functions-row-options.png",
+    "n": 363,
+    "file": "363-d066-open-the-functions-row-options.png",
     "item": "L-13",
     "size": [
      120,
@@ -5266,16 +5303,16 @@
    }
   ],
   [
-   "D-066 · 362 · functions-marks-off",
+   "D-066 · 364 · functions-marks-off",
    {
-    "n": 362,
-    "file": "362-d066-functions-marks-off.png",
+    "n": 364,
+    "file": "364-d066-functions-marks-off.png",
     "item": "L-13",
     "option": "fnm",
     "value": "off",
     "size": [
      1864,
-     749
+     438
     ],
     "click": "name and role only",
     "at": [
@@ -5285,10 +5322,10 @@
    }
   ],
   [
-   "D-066 · 363 · functions-marks-back-on",
+   "D-066 · 365 · functions-marks-back-on",
    {
-    "n": 363,
-    "file": "363-d066-functions-marks-back-on.png",
+    "n": 365,
+    "file": "365-d066-functions-marks-back-on.png",
     "item": "L-13",
     "option": "fnm",
     "value": "on",
@@ -5304,10 +5341,10 @@
    }
   ],
   [
-   "D-066 · 364 · close-the-functions-row-options",
+   "D-066 · 366 · close-the-functions-row-options",
    {
-    "n": 364,
-    "file": "364-d066-close-the-functions-row-options.png",
+    "n": 366,
+    "file": "366-d066-close-the-functions-row-options.png",
     "item": "L-13",
     "size": [
      120,
@@ -5321,24 +5358,24 @@
    }
   ],
   [
-   "D-066 · 365 · hover-resolutionsnapshot-violations-for",
+   "D-066 · 367 · hover-resolutionsnapshot-violations-for",
    {
-    "n": 365,
-    "file": "365-d066-hover-resolutionsnapshot-violations-for.png",
+    "n": 367,
+    "file": "367-d066-hover-resolutionsnapshot-violations-for.png",
     "item": "L-14",
     "size": [
-     520,
-     201
+     518,
+     169
     ],
     "hover": "ResolutionSnapshot.violations_for",
     "tip": "ResolutionSnapshot.violations_for · function ┆ BEFORE ┆ runs under assert_recipe_allergen_safe ┆ under the handler's call at api/cooking.py:150 ┆ assert_recipe_allergen_safe can end partway, before it calls this: a check that fires, or an error"
    }
   ],
   [
-   "D-066 · 366 · hover-the-refresh-chip",
+   "D-066 · 368 · hover-the-refresh-chip",
    {
-    "n": 366,
-    "file": "366-d066-hover-the-refresh-chip.png",
+    "n": 368,
+    "file": "368-d066-hover-the-refresh-chip.png",
     "item": "L-15",
     "size": [
      518,
@@ -5349,10 +5386,10 @@
    }
   ],
   [
-   "D-066 · 367 · hover-the-reads-403-line",
+   "D-066 · 369 · hover-the-reads-403-line",
    {
-    "n": 367,
-    "file": "367-d066-hover-the-reads-403-line.png",
+    "n": 369,
+    "file": "369-d066-hover-the-reads-403-line.png",
     "item": "L-16",
     "size": [
      498,
@@ -5363,60 +5400,60 @@
    }
   ],
   [
-   "D-066 · 368 · in-flight-lifelines",
+   "D-066 · 370 · in-flight-lifelines",
    {
-    "n": 368,
-    "file": "368-d066-in-flight-lifelines.png",
+    "n": 370,
+    "file": "370-d066-in-flight-lifelines.png",
     "item": "L-17",
     "option": "ifl",
     "value": "lane",
     "size": [
      1864,
-     408
+     355
     ]
    }
   ],
   [
-   "D-066 · 369 · in-flight-lifelines-to-the-end",
+   "D-066 · 371 · in-flight-lifelines-to-the-end",
    {
-    "n": 369,
-    "file": "369-d066-in-flight-lifelines-to-the-end.png",
+    "n": 371,
+    "file": "371-d066-in-flight-lifelines-to-the-end.png",
     "item": "L-17",
     "option": "ifl",
     "value": "lane",
     "size": [
      1864,
-     408
+     355
     ],
     "wheeled": "the box to its end"
    }
   ],
   [
-   "D-066 · 370 · open-the-rate-limiter-lane",
+   "D-066 · 372 · open-the-rate-limiter-lane",
    {
-    "n": 370,
-    "file": "370-d066-open-the-rate-limiter-lane.png",
+    "n": 372,
+    "file": "372-d066-open-the-rate-limiter-lane.png",
     "item": "L-17",
     "size": [
      1864,
-     951
+     898
     ],
     "click": "▸ rate limit · 7 values kept by the server",
     "at": [
-     124,
+     235,
      540
     ]
    }
   ],
   [
-   "D-066 · 371 · fold-the-rate-limiter-lane",
+   "D-066 · 373 · fold-the-rate-limiter-lane",
    {
-    "n": 371,
-    "file": "371-d066-fold-the-rate-limiter-lane.png",
+    "n": 373,
+    "file": "373-d066-fold-the-rate-limiter-lane.png",
     "item": "L-17",
     "size": [
      179,
-     320
+     268
     ],
     "click": "▾rate limit · 7 values",
     "at": [
@@ -5426,10 +5463,10 @@
    }
   ],
   [
-   "D-066 · 372 · hover-a-read-dot",
+   "D-066 · 374 · hover-a-read-dot",
    {
-    "n": 372,
-    "file": "372-d066-hover-a-read-dot.png",
+    "n": 374,
+    "file": "374-d066-hover-a-read-dot.png",
     "item": "L-17",
     "size": [
      349,
@@ -5440,10 +5477,10 @@
    }
   ],
   [
-   "D-066 · 373 · open-the-in-flight-row-options",
+   "D-066 · 375 · open-the-in-flight-row-options",
    {
-    "n": 373,
-    "file": "373-d066-open-the-in-flight-row-options.png",
+    "n": 375,
+    "file": "375-d066-open-the-in-flight-row-options.png",
     "item": "L-17",
     "size": [
      120,
@@ -5457,16 +5494,16 @@
    }
   ],
   [
-   "D-066 · 374 · in-flight-echoes-where-read",
+   "D-066 · 376 · in-flight-echoes-where-read",
    {
-    "n": 374,
-    "file": "374-d066-in-flight-echoes-where-read.png",
+    "n": 376,
+    "file": "376-d066-in-flight-echoes-where-read.png",
     "item": "L-17",
     "option": "ifl",
     "value": "echo",
     "size": [
      1864,
-     649
+     648
     ],
     "click": "echoes where read",
     "at": [
@@ -5476,16 +5513,16 @@
    }
   ],
   [
-   "D-066 · 375 · in-flight-chips-where-set",
+   "D-066 · 377 · in-flight-chips-where-set",
    {
-    "n": 375,
-    "file": "375-d066-in-flight-chips-where-set.png",
+    "n": 377,
+    "file": "377-d066-in-flight-chips-where-set.png",
     "item": "L-17",
     "option": "ifl",
     "value": "chips",
     "size": [
      1864,
-     649
+     648
     ],
     "click": "chips where set",
     "at": [
@@ -5495,10 +5532,10 @@
    }
   ],
   [
-   "D-066 · 376 · in-flight-back-to-lifelines",
+   "D-066 · 378 · in-flight-back-to-lifelines",
    {
-    "n": 376,
-    "file": "376-d066-in-flight-back-to-lifelines.png",
+    "n": 378,
+    "file": "378-d066-in-flight-back-to-lifelines.png",
     "item": "L-17",
     "option": "ifl",
     "value": "lane",
@@ -5514,10 +5551,10 @@
    }
   ],
   [
-   "D-066 · 377 · close-the-in-flight-row-options",
+   "D-066 · 379 · close-the-in-flight-row-options",
    {
-    "n": 377,
-    "file": "377-d066-close-the-in-flight-row-options.png",
+    "n": 379,
+    "file": "379-d066-close-the-in-flight-row-options.png",
     "item": "L-17",
     "size": [
      120,
@@ -5531,10 +5568,10 @@
    }
   ],
   [
-   "D-066 · 378 · open-the-proof-row-options",
+   "D-066 · 380 · open-the-proof-row-options",
    {
-    "n": 378,
-    "file": "378-d066-open-the-proof-row-options.png",
+    "n": 380,
+    "file": "380-d066-open-the-proof-row-options.png",
     "item": "CR-20",
     "size": [
      1864,
@@ -5548,10 +5585,10 @@
    }
   ],
   [
-   "D-066 · 379 · earlier-requests-in-proofs-head",
+   "D-066 · 381 · earlier-requests-in-proofs-head",
    {
-    "n": 379,
-    "file": "379-d066-earlier-requests-in-proofs-head.png",
+    "n": 381,
+    "file": "381-d066-earlier-requests-in-proofs-head.png",
     "item": "CR-20",
     "option": "jyb",
     "value": "head",
@@ -5567,10 +5604,10 @@
    }
   ],
   [
-   "D-066 · 380 · earlier-requests-back-to-their-moment",
+   "D-066 · 382 · earlier-requests-back-to-their-moment",
    {
-    "n": 380,
-    "file": "380-d066-earlier-requests-back-to-their-moment.png",
+    "n": 382,
+    "file": "382-d066-earlier-requests-back-to-their-moment.png",
     "item": "CR-20",
     "option": "jyb",
     "value": "prior",
@@ -5586,10 +5623,10 @@
    }
   ],
   [
-   "D-066 · 381 · close-the-proof-row-options",
+   "D-066 · 383 · close-the-proof-row-options",
    {
-    "n": 381,
-    "file": "381-d066-close-the-proof-row-options.png",
+    "n": 383,
+    "file": "383-d066-close-the-proof-row-options.png",
     "item": "CR-20",
     "size": [
      120,
@@ -5603,132 +5640,132 @@
    }
   ],
   [
-   "D-066 · 382 · the-examples-bench",
+   "D-066 · 384 · the-examples-bench",
    {
-    "n": 382,
-    "file": "382-d066-the-examples-bench.png",
-    "item": "L-23",
+    "n": 384,
+    "file": "384-d066-the-examples-bench.png",
+    "item": "L-23 L-36",
     "option": "lay",
-    "value": "row",
+    "value": "half",
     "size": [
      1872,
-     1121
+     2073
     ]
    }
   ],
   [
-   "D-066 · 383 · bench-column-end",
+   "D-066 · 385 · bench-column-end",
    {
-    "n": 383,
-    "file": "383-d066-bench-column-end.png",
-    "item": "L-23",
+    "n": 385,
+    "file": "385-d066-bench-column-end.png",
+    "item": "L-23 L-36",
     "size": [
-     280,
-     784
+     471,
+     926
     ],
     "column": "ending"
    }
   ],
   [
-   "D-066 · 384 · bench-column-table",
+   "D-066 · 386 · bench-column-table",
    {
-    "n": 384,
-    "file": "384-d066-bench-column-table.png",
-    "item": "L-23",
+    "n": 386,
+    "file": "386-d066-bench-column-table.png",
+    "item": "L-23 L-36",
     "size": [
-     280,
-     652
+     471,
+     881
     ],
     "column": "table"
    }
   ],
   [
-   "D-066 · 385 · bench-column-schema",
+   "D-066 · 387 · bench-column-schema",
    {
-    "n": 385,
-    "file": "385-d066-bench-column-schema.png",
-    "item": "L-23",
+    "n": 387,
+    "file": "387-d066-bench-column-schema.png",
+    "item": "L-23 L-36",
     "size": [
-     280,
-     706
+     471,
+     906
     ],
     "column": "schema"
    }
   ],
   [
-   "D-066 · 386 · bench-column-fn",
+   "D-066 · 388 · bench-column-fn",
    {
-    "n": 386,
-    "file": "386-d066-bench-column-fn.png",
-    "item": "L-23 L-13",
+    "n": 388,
+    "file": "388-d066-bench-column-fn.png",
+    "item": "L-23 L-13 L-36",
     "size": [
-     280,
-     716
+     471,
+     893
     ],
     "column": "function"
    }
   ],
   [
-   "D-066 · 387 · bench-column-test",
+   "D-066 · 389 · bench-column-test",
    {
-    "n": 387,
-    "file": "387-d066-bench-column-test.png",
-    "item": "L-23 L-08",
+    "n": 389,
+    "file": "389-d066-bench-column-test.png",
+    "item": "L-23 L-08 L-36",
     "size": [
-     280,
-     869
+     471,
+     978
     ],
     "column": "test"
    }
   ],
   [
-   "D-066 · 388 · bench-column-gate",
+   "D-066 · 390 · bench-column-gate",
    {
-    "n": 388,
-    "file": "388-d066-bench-column-gate.png",
-    "item": "L-23 L-11",
+    "n": 390,
+    "file": "390-d066-bench-column-gate.png",
+    "item": "L-23 L-11 L-36",
     "size": [
-     280,
-     994
+     471,
+     1016
     ],
     "column": "gate or decision"
    }
   ],
   [
-   "D-066 · 389 · bench-column-hook",
+   "D-066 · 391 · bench-column-hook",
    {
-    "n": 389,
-    "file": "389-d066-bench-column-hook.png",
-    "item": "L-23",
+    "n": 391,
+    "file": "391-d066-bench-column-hook.png",
+    "item": "L-23 L-36",
     "size": [
-     280,
-     667
+     471,
+     854
     ],
     "column": "client hook"
    }
   ],
   [
-   "D-066 · 390 · bench-column-inf",
+   "D-066 · 392 · bench-column-inf",
    {
-    "n": 390,
-    "file": "390-d066-bench-column-inf.png",
-    "item": "L-23",
+    "n": 392,
+    "file": "392-d066-bench-column-inf.png",
+    "item": "L-23 L-36",
     "size": [
-     280,
-     762
+     471,
+     927
     ],
     "column": "in-flight value"
    }
   ],
   [
-   "D-066 · 391 · test-column-on-c267",
+   "D-066 · 393 · test-column-on-c267",
    {
-    "n": 391,
-    "file": "391-d066-test-column-on-c267.png",
+    "n": 393,
+    "file": "393-d066-test-column-on-c267.png",
     "item": "L-23 L-08",
     "size": [
-     280,
-     869
+     471,
+     978
     ],
     "clicks": 0,
     "arrow": null,
@@ -5736,106 +5773,89 @@
    }
   ],
   [
-   "D-066 · 392 · test-c267-open-its-chain",
+   "D-066 · 394 · test-c267-open-its-chain",
    {
-    "n": 392,
-    "file": "392-d066-test-c267-open-its-chain.png",
+    "n": 394,
+    "file": "394-d066-test-c267-open-its-chain.png",
     "item": "L-23 L-08",
     "size": [
-     280,
-     1263
+     471,
+     1372
     ],
     "click": "C267 201 pass start session response carries recipe title tests it Authorization Idempotency-Key 201 · recipe_title",
     "at": [
-     929,
+     260,
      540
     ]
    }
   ],
   [
-   "D-066 · 393 · test-c267-the-chain-wheeled-to-its-end",
+   "D-066 · 395 · test-c267-the-chain-wheeled-to-its-end",
    {
-    "n": 393,
-    "file": "393-d066-test-c267-the-chain-wheeled-to-its-end.png",
+    "n": 395,
+    "file": "395-d066-test-c267-the-chain-wheeled-to-its-end.png",
     "item": "L-23 L-08",
     "size": [
-     258,
-     573
+     449,
+     518
     ],
     "wheeled": "inside the open block, to its end",
     "list": {
-     "max": 4943,
+     "max": 3878,
      "h": 393,
-     "all": 5336
+     "all": 4271
     }
    }
   ],
   [
-   "D-066 · 394 · test-column-on-c250",
+   "D-066 · 396 · test-column-on-c250",
    {
-    "n": 394,
-    "file": "394-d066-test-column-on-c250.png",
+    "n": 396,
+    "file": "396-d066-test-column-on-c250.png",
     "item": "L-23 L-08",
     "size": [
-     280,
-     1245
+     471,
+     1349
     ],
     "clicks": 1,
-    "arrow": "the element before",
+    "arrow": "show the element before",
     "shows": "case:C250"
    }
   ],
   [
-   "D-066 · 395 · test-block-closed-again",
+   "D-066 · 397 · test-block-closed-again",
    {
-    "n": 395,
-    "file": "395-d066-test-block-closed-again.png",
+    "n": 397,
+    "file": "397-d066-test-block-closed-again.png",
     "item": "L-23",
     "size": [
-     280,
-     851
+     471,
+     955
     ],
     "click": "C250 pass cook complete history pantry loop sets up and checks Authorization Idempotency-Key 201",
     "at": [
-     929,
+     260,
      540
     ]
    }
   ],
   [
-   "D-066 · 396 · table-parts-opened",
+   "D-066 · 398 · drag-model-into-not-drawn",
    {
-    "n": 396,
-    "file": "396-d066-table-parts-opened.png",
+    "n": 398,
+    "file": "398-d066-drag-model-into-not-drawn.png",
     "item": "L-23",
     "size": [
-     280,
-     938
-    ],
-    "click": "parts",
-    "at": [
-     73,
-     540
-    ]
-   }
-  ],
-  [
-   "D-066 · 397 · drag-model-into-not-drawn",
-   {
-    "n": 397,
-    "file": "397-d066-drag-model-into-not-drawn.png",
-    "item": "L-23",
-    "size": [
-     280,
-     919
+     471,
+     887
     ],
     "drag": "class",
     "from": [
-     146,
+     612,
      540
     ],
     "to": [
-     148,
+     614,
      587
     ],
     "after": {
@@ -5847,35 +5867,18 @@
    }
   ],
   [
-   "D-066 · 398 · table-size-of-name",
+   "D-066 · 399 · table-size-of-name",
    {
-    "n": 398,
-    "file": "398-d066-table-size-of-name.png",
-    "item": "L-23",
+    "n": 399,
+    "file": "399-d066-table-size-of-name.png",
+    "item": "L-23 L-36",
     "size": [
-     280,
-     729
+     471,
+     863
     ],
     "click": "name",
     "at": [
-     142,
-     540
-    ]
-   }
-  ],
-  [
-   "D-066 · 399 · table-colour-opened",
-   {
-    "n": 399,
-    "file": "399-d066-table-colour-opened.png",
-    "item": "L-23",
-    "size": [
-     280,
-     927
-    ],
-    "click": "colour",
-    "at": [
-     195,
+     679,
      540
     ]
    }
@@ -5887,186 +5890,810 @@
     "file": "400-d066-table-back-to-the-default.png",
     "item": "L-23",
     "size": [
-     280,
-     946
+     471,
+     881
     ],
-    "click": "back to the default",
+    "click": "put back this column's first look",
     "at": [
-     125,
+     525,
      540
     ]
    }
   ],
   [
-   "D-066 · 401 · table-colour-closed",
+   "D-066 · 401 · gate-column-role-field-rule",
    {
     "n": 401,
-    "file": "401-d066-table-colour-closed.png",
-    "item": "L-23",
-    "size": [
-     258,
-     80
-    ],
-    "click": "colour",
-    "at": [
-     195,
-     540
-    ]
-   }
-  ],
-  [
-   "D-066 · 402 · gate-column-role-field-rule",
-   {
-    "n": 402,
-    "file": "402-d066-gate-column-role-field-rule.png",
+    "file": "401-d066-gate-column-role-field-rule.png",
     "item": "L-23 L-11",
     "size": [
-     280,
-     926
+     471,
+     1016
     ],
     "click": "field rule 4",
     "at": [
-     1201,
+     707,
      540
     ]
    }
   ],
   [
-   "D-066 · 403 · gate-column-every-role-again",
+   "D-066 · 402 · gate-column-every-role-again",
    {
-    "n": 403,
-    "file": "403-d066-gate-column-every-role-again.png",
+    "n": 402,
+    "file": "402-d066-gate-column-every-role-again.png",
     "item": "L-23 L-11",
     "size": [
-     258,
-     174
+     449,
+     147
     ],
     "click": "all 21",
     "at": [
-     1179,
+     541,
      540
     ]
    }
   ],
   [
-   "D-066 · 404 · gate-column-every-endpoint",
+   "D-066 · 403 · gate-column-every-endpoint",
    {
-    "n": 404,
-    "file": "404-d066-gate-column-every-endpoint.png",
+    "n": 403,
+    "file": "403-d066-gate-column-every-endpoint.png",
     "item": "L-23",
     "option": "scope",
     "value": "all",
     "size": [
-     280,
-     1178
+     471,
+     1016
     ],
-    "click": "every endpoint",
+    "click": "show the elements of every endpoint",
     "at": [
-     1293,
+     559,
      540
     ]
    }
   ],
   [
-   "D-066 · 405 · gate-column-back-to-this-endpoint",
+   "D-066 · 404 · gate-column-back-to-this-endpoint",
    {
-    "n": 405,
-    "file": "405-d066-gate-column-back-to-this-endpoint.png",
+    "n": 404,
+    "file": "404-d066-gate-column-back-to-this-endpoint.png",
     "item": "L-23",
     "option": "scope",
     "value": "here",
     "size": [
-     258,
-     266
+     449,
+     219
     ],
-    "click": "this endpoint",
+    "click": "show the elements of this endpoint",
     "at": [
-     1193,
+     525,
      540
     ]
    }
   ],
   [
-   "D-066 · 406 · table-copy-line",
+   "D-066 · 405 · table-copy-line",
    {
-    "n": 406,
-    "file": "406-d066-table-copy-line.png",
+    "n": 405,
+    "file": "405-d066-table-copy-line.png",
     "item": "L-23",
     "size": [
-     258,
-     280
+     449,
+     53
     ],
-    "click": "copy",
+    "click": "copy this column's settings as one line",
     "at": [
-     70,
+     561,
      540
     ]
    }
   ],
   [
    "D-066 · the table's copy line, as copied",
-   "examples · table · households · on POST /cooking/sessions · block block (icon on model, chip on, name on, entity both, count badge, model both) · edge left solid 2px · chips count pill 100%, channel pill 90% · lines icon name | — / ent | count rw / model | — · sizes icon 13 rw 11 name 13 ent 12 count 11 model 12 · squares 14px gap 4 round as symbol by type · not drawn — (your DATA line, D-027)"
+   "examples · table · cooking_sessions · on POST /cooking/sessions · block block (icon on model, chip on, name on, entity both, count badge, model both) · edge left solid 2px · chips count pill 100%, channel pill 90% · lines icon name | — / ent | count rw / model | — · sizes icon 13 rw 11 name 13 ent 12 count 11 model 12 · squares 14px gap 4 round as symbol by type · not drawn — · width dynamic (your DATA line, D-027)"
   ],
   [
-   "D-066 · 407 · bench-wrapped-rows",
+   "D-066 · 406 · bench-wrapped-rows",
    {
-    "n": 407,
-    "file": "407-d066-bench-wrapped-rows.png",
+    "n": 406,
+    "file": "406-d066-bench-wrapped-rows.png",
     "item": "L-23",
     "option": "lay",
     "value": "wrap",
     "size": [
      1872,
-     1737
+     2225
     ],
     "click": "wrapped rows",
     "at": [
-     240,
+     82,
      540
     ]
    }
   ],
   [
-   "D-066 · 408 · bench-an-upper-and-a-lower-row",
+   "D-066 · 407 · bench-one-row-across-the-page",
    {
-    "n": 408,
-    "file": "408-d066-bench-an-upper-and-a-lower-row.png",
-    "item": "L-23",
-    "option": "lay",
-    "value": "half",
-    "size": [
-     1872,
-     1291
-    ],
-    "click": "an upper and a lower row",
-    "at": [
-     373,
-     540
-    ]
-   }
-  ],
-  [
-   "D-066 · 409 · bench-back-to-one-row",
-   {
-    "n": 409,
-    "file": "409-d066-bench-back-to-one-row.png",
+    "n": 407,
+    "file": "407-d066-bench-one-row-across-the-page.png",
     "item": "L-23",
     "option": "lay",
     "value": "row",
     "size": [
      1872,
-     62
+     1653
     ],
     "click": "one row across the page",
     "at": [
-     109,
+     47,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 408 · bench-back-to-an-upper-and-a-lower-row",
+   {
+    "n": 408,
+    "file": "408-d066-bench-back-to-an-upper-and-a-lower-row.png",
+    "item": "L-23",
+    "option": "lay",
+    "value": "half",
+    "size": [
+     1872,
+     70
+    ],
+    "click": "an upper and a lower row",
+    "at": [
+     117,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 409 · hover-an-icon-square-every-endpoint",
+   {
+    "n": 409,
+    "file": "409-d066-hover-an-icon-square-every-endpoint.png",
+    "item": "L-36",
+    "size": [
+     286,
+     88
+    ],
+    "hover": "show the elements of every endpoint",
+    "tip": "show the elements of every endpoint"
+   }
+  ],
+  [
+   "D-066 · 410 · hover-an-icon-square-the-copy-button",
+   {
+    "n": 410,
+    "file": "410-d066-hover-an-icon-square-the-copy-button.png",
+    "item": "L-36",
+    "size": [
+     314,
+     88
+    ],
+    "hover": "copy this column's settings as one line",
+    "tip": "copy this column's settings as one line"
+   }
+  ],
+  [
+   "D-066 · 411 · width-compact",
+   {
+    "n": 411,
+    "file": "411-d066-width-compact.png",
+    "item": "L-36",
+    "size": [
+     316,
+     1155
+    ],
+    "click": "set the width to compact",
+    "at": [
+     252,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 412 · width-tight",
+   {
+    "n": 412,
+    "file": "412-d066-width-tight.png",
+    "item": "L-36",
+    "size": [
+     248,
+     1299
+    ],
+    "click": "set the width to most compact",
+    "at": [
+     286,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 413 · width-full",
+   {
+    "n": 413,
+    "file": "413-d066-width-full.png",
+    "item": "L-36",
+    "size": [
+     1872,
+     763
+    ],
+    "click": "set the width to full",
+    "at": [
+     106,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 414 · width-back-to-dynamic",
+   {
+    "n": 414,
+    "file": "414-d066-width-back-to-dynamic.png",
+    "item": "L-36",
+    "size": [
+     449,
+     46
+    ],
+    "click": "set the width to dynamic",
+    "at": [
+     150,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 415 · depict-end-as-drawn",
+   {
+    "n": 415,
+    "file": "415-d066-depict-end-as-drawn.png",
+    "item": "L-35",
+    "size": [
+     471,
+     926
+    ],
+    "depict": [
+     "ex.kind.end:drawn:after",
+     "ex.kind.end:change:before"
+    ],
+    "kind": "end",
+    "column": "ending"
+   }
+  ],
+  [
+   "D-066 · 416 · depict-end-one-part-dragged-out",
+   {
+    "n": 416,
+    "file": "416-d066-depict-end-one-part-dragged-out.png",
+    "item": "L-35",
+    "size": [
+     471,
+     932
+    ],
+    "depict": [
+     "ex.kind.end:change:after"
+    ],
+    "kind": "end",
+    "column": "ending",
+    "dragged": "via"
+   }
+  ],
+  [
+   "D-066 · 417 · depict-end-back-to-the-default",
+   {
+    "n": 417,
+    "file": "417-d066-depict-end-back-to-the-default.png",
+    "item": "L-35",
+    "size": [
+     449,
+     53
+    ],
+    "click": "put back this column's first look",
+    "at": [
+     58,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 418 · depict-schema-as-drawn",
+   {
+    "n": 418,
+    "file": "418-d066-depict-schema-as-drawn.png",
+    "item": "L-35",
+    "size": [
+     471,
+     906
+    ],
+    "depict": [
+     "ex.kind.schema:drawn:after",
+     "ex.kind.schema:change:before"
+    ],
+    "kind": "schema",
+    "column": "schema"
+   }
+  ],
+  [
+   "D-066 · 419 · depict-schema-one-part-dragged-out",
+   {
+    "n": 419,
+    "file": "419-d066-depict-schema-one-part-dragged-out.png",
+    "item": "L-35",
+    "size": [
+     471,
+     912
+    ],
+    "depict": [
+     "ex.kind.schema:change:after"
+    ],
+    "kind": "schema",
+    "column": "schema",
+    "dragged": "via"
+   }
+  ],
+  [
+   "D-066 · 420 · depict-schema-back-to-the-default",
+   {
+    "n": 420,
+    "file": "420-d066-depict-schema-back-to-the-default.png",
+    "item": "L-35",
+    "size": [
+     449,
+     53
+    ],
+    "click": "put back this column's first look",
+    "at": [
+     992,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 421 · depict-fn-as-drawn",
+   {
+    "n": 421,
+    "file": "421-d066-depict-fn-as-drawn.png",
+    "item": "L-35",
+    "size": [
+     471,
+     893
+    ],
+    "depict": [
+     "ex.kind.fn:drawn:after",
+     "ex.kind.fn:change:before"
+    ],
+    "kind": "fn",
+    "column": "function"
+   }
+  ],
+  [
+   "D-066 · 422 · depict-fn-one-part-dragged-out",
+   {
+    "n": 422,
+    "file": "422-d066-depict-fn-one-part-dragged-out.png",
+    "item": "L-35",
+    "size": [
+     471,
+     899
+    ],
+    "depict": [
+     "ex.kind.fn:change:after"
+    ],
+    "kind": "fn",
+    "column": "function",
+    "dragged": "via"
+   }
+  ],
+  [
+   "D-066 · 423 · depict-fn-back-to-the-default",
+   {
+    "n": 423,
+    "file": "423-d066-depict-fn-back-to-the-default.png",
+    "item": "L-35",
+    "size": [
+     449,
+     53
+    ],
+    "click": "put back this column's first look",
+    "at": [
+     1459,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 424 · depict-test-as-drawn",
+   {
+    "n": 424,
+    "file": "424-d066-depict-test-as-drawn.png",
+    "item": "L-35",
+    "size": [
+     471,
+     955
+    ],
+    "depict": [
+     "ex.kind.test:drawn:after",
+     "ex.kind.test:change:before"
+    ],
+    "kind": "test",
+    "column": "test"
+   }
+  ],
+  [
+   "D-066 · 425 · depict-test-one-part-dragged-out",
+   {
+    "n": 425,
+    "file": "425-d066-depict-test-one-part-dragged-out.png",
+    "item": "L-35",
+    "size": [
+     471,
+     955
+    ],
+    "depict": [
+     "ex.kind.test:change:after"
+    ],
+    "kind": "test",
+    "column": "test",
+    "dragged": "asserts"
+   }
+  ],
+  [
+   "D-066 · 426 · depict-test-back-to-the-default",
+   {
+    "n": 426,
+    "file": "426-d066-depict-test-back-to-the-default.png",
+    "item": "L-35",
+    "size": [
+     449,
+     53
+    ],
+    "click": "put back this column's first look",
+    "at": [
+     58,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 427 · depict-gate-as-drawn",
+   {
+    "n": 427,
+    "file": "427-d066-depict-gate-as-drawn.png",
+    "item": "L-35",
+    "size": [
+     471,
+     1016
+    ],
+    "depict": [
+     "ex.kind.gate:drawn:after",
+     "ex.kind.gate:change:before"
+    ],
+    "kind": "gate",
+    "column": "gate or decision"
+   }
+  ],
+  [
+   "D-066 · 428 · depict-gate-one-part-dragged-out",
+   {
+    "n": 428,
+    "file": "428-d066-depict-gate-one-part-dragged-out.png",
+    "item": "L-35",
+    "size": [
+     471,
+     1037
+    ],
+    "depict": [
+     "ex.kind.gate:change:after"
+    ],
+    "kind": "gate",
+    "column": "gate or decision",
+    "dragged": "count"
+   }
+  ],
+  [
+   "D-066 · 429 · depict-gate-back-to-the-default",
+   {
+    "n": 429,
+    "file": "429-d066-depict-gate-back-to-the-default.png",
+    "item": "L-35",
+    "size": [
+     449,
+     53
+    ],
+    "click": "put back this column's first look",
+    "at": [
+     525,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 430 · depict-hook-as-drawn",
+   {
+    "n": 430,
+    "file": "430-d066-depict-hook-as-drawn.png",
+    "item": "L-35",
+    "size": [
+     471,
+     854
+    ],
+    "depict": [
+     "ex.kind.hook:drawn:after",
+     "ex.kind.hook:change:before"
+    ],
+    "kind": "hook",
+    "column": "client hook"
+   }
+  ],
+  [
+   "D-066 · 431 · depict-hook-one-part-dragged-out",
+   {
+    "n": 431,
+    "file": "431-d066-depict-hook-one-part-dragged-out.png",
+    "item": "L-35",
+    "size": [
+     471,
+     854
+    ],
+    "depict": [
+     "ex.kind.hook:change:after"
+    ],
+    "kind": "hook",
+    "column": "client hook",
+    "dragged": "fkind"
+   }
+  ],
+  [
+   "D-066 · 432 · depict-hook-back-to-the-default",
+   {
+    "n": 432,
+    "file": "432-d066-depict-hook-back-to-the-default.png",
+    "item": "L-35",
+    "size": [
+     449,
+     53
+    ],
+    "click": "put back this column's first look",
+    "at": [
+     992,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 433 · depict-inf-as-drawn",
+   {
+    "n": 433,
+    "file": "433-d066-depict-inf-as-drawn.png",
+    "item": "L-35",
+    "size": [
+     471,
+     927
+    ],
+    "depict": [
+     "ex.kind.inf:drawn:after",
+     "ex.kind.inf:change:before"
+    ],
+    "kind": "inf",
+    "column": "in-flight value"
+   }
+  ],
+  [
+   "D-066 · 434 · depict-inf-one-part-dragged-out",
+   {
+    "n": 434,
+    "file": "434-d066-depict-inf-one-part-dragged-out.png",
+    "item": "L-35",
+    "size": [
+     471,
+     891
+    ],
+    "depict": [
+     "ex.kind.inf:change:after"
+    ],
+    "kind": "inf",
+    "column": "in-flight value",
+    "dragged": "set"
+   }
+  ],
+  [
+   "D-066 · 435 · depict-inf-back-to-the-default",
+   {
+    "n": 435,
+    "file": "435-d066-depict-inf-back-to-the-default.png",
+    "item": "L-35",
+    "size": [
+     449,
+     53
+    ],
+    "click": "put back this column's first look",
+    "at": [
+     1459,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 436 · ex5-a-function-chip-in-by-moment",
+   {
+    "n": 436,
+    "file": "436-d066-ex5-a-function-chip-in-by-moment.png",
+    "item": "EX-5",
+    "size": [
+     306,
+     70
+    ],
+    "depict": [
+     "EX-5:wait:after",
+     "EX-5:now:before"
+    ]
+   }
+  ],
+  [
+   "D-066 · 437 · ex5-the-benchs-function-block",
+   {
+    "n": 437,
+    "file": "437-d066-ex5-the-benchs-function-block.png",
+    "item": "EX-5",
+    "size": [
+     449,
+     85
+    ],
+    "depict": [
+     "EX-5:now:after"
+    ]
+   }
+  ],
+  [
+   "D-066 · 438 · l37-widen-the-edge-column",
+   {
+    "n": 438,
+    "file": "438-d066-l37-widen-the-edge-column.png",
+    "item": "L-37",
+    "size": [
+     1864,
+     240
+    ],
+    "click": "at the edge",
+    "at": [
+     625,
+     540
+    ]
+   }
+  ],
+  [
+   "D-081 · the edge after the drag",
+   [
+    "149",
+    "376",
+    "1668"
+   ]
+  ],
+  [
+   "D-066 · 439 · l37-the-edge-dragged-right",
+   {
+    "n": 439,
+    "file": "439-d066-l37-the-edge-dragged-right.png",
+    "item": "L-37",
+    "size": [
+     1864,
+     240
+    ],
+    "dragged": "to the right"
+   }
+  ],
+  [
+   "D-066 · 440 · l37-the-edge-moved-left-by-the-keys",
+   {
+    "n": 440,
+    "file": "440-d066-l37-the-edge-moved-left-by-the-keys.png",
+    "item": "L-37",
+    "size": [
+     1864,
+     240
+    ],
+    "keys": "ArrowLeft twice"
+   }
+  ],
+  [
+   "D-066 · 441 · l37-click-the-head-to-give-the-width-back",
+   {
+    "n": 441,
+    "file": "441-d066-l37-click-the-head-to-give-the-width-back.png",
+    "item": "L-37",
+    "size": [
+     1864,
+     258
+    ],
+    "click": "at the edge",
+    "at": [
+     714,
+     540
+    ]
+   }
+  ],
+  [
+   "D-066 · 442 · l38-widen-the-edge-column",
+   {
+    "n": 442,
+    "file": "442-d066-l38-widen-the-edge-column.png",
+    "item": "L-38",
+    "size": [
+     844,
+     224
+    ],
+    "click": "at the edge",
+    "at": [
+     657,
+     500
+    ]
+   }
+  ],
+  [
+   "D-081 · the table wider than its box",
+   {
+    "box": 834,
+    "table": 867,
+    "hint": true,
+    "text": "The table is wider than its box: slide it sideways with Shift and the mouse wheel, or with the scroll bar."
+   }
+  ],
+  [
+   "D-066 · 443 · l38-the-table-wider-than-its-box",
+   {
+    "n": 443,
+    "file": "443-d066-l38-the-table-wider-than-its-box.png",
+    "item": "L-38",
+    "size": [
+     844,
+     248
+    ],
+    "region": true,
+    "scrolled": "not yet"
+   }
+  ],
+  [
+   "D-081 · after Shift and the wheel",
+   33
+  ],
+  [
+   "D-066 · 444 · l38-slid-sideways-by-shift-and-the-wheel",
+   {
+    "n": 444,
+    "file": "444-d066-l38-slid-sideways-by-shift-and-the-wheel.png",
+    "item": "L-38",
+    "size": [
+     844,
+     248
+    ],
+    "region": true,
+    "scrolled": "by Shift and the wheel"
+   }
+  ],
+  [
+   "D-066 · 445 · l38-click-the-head-to-give-the-width-back",
+   {
+    "n": 445,
+    "file": "445-d066-l38-click-the-head-to-give-the-width-back.png",
+    "item": "L-38",
+    "size": [
+     1864,
+     258
+    ],
+    "click": "at the edge",
+    "at": [
+     946,
      540
     ]
    }
   ],
   [
    "D-066 · round 1 · steps",
-   116
+   152
   ],
   [
    "rows at the end",
@@ -6197,7 +6824,7 @@
    "value": "strip",
    "size": [
     1872,
-    1475
+    1438
    ],
    "click": "legend above the table",
    "at": [
@@ -6223,25 +6850,27 @@
   },
   {
    "n": 304,
-   "file": "304-d066-the-stage-band-and-the-fork.png",
-   "item": "L-05",
+   "file": "304-d066-header-stages-over-moments.png",
+   "item": "L-05 L-34",
    "option": "hdr",
    "value": "band",
    "size": [
-    1864,
-    258
-   ]
+    560,
+    242
+   ],
+   "region": true
   },
   {
    "n": 305,
    "file": "305-d066-header-stages-roads-moments.png",
-   "item": "L-05",
+   "item": "L-05 L-34",
    "option": "hdr",
    "value": "road",
    "size": [
-    1864,
-    309
+    560,
+    242
    ],
+   "region": true,
    "click": "stages, roads, moments",
    "at": [
     1163,
@@ -6266,14 +6895,27 @@
   },
   {
    "n": 307,
-   "file": "307-d066-saving-under-handler.png",
-   "item": "L-05",
+   "file": "307-d066-saving-under-effects.png",
+   "item": "L-05 L-34",
+   "option": "save",
+   "value": "eff",
+   "size": [
+    480,
+    242
+   ],
+   "region": true
+  },
+  {
+   "n": 308,
+   "file": "308-d066-saving-under-handler.png",
+   "item": "L-05 L-34",
    "option": "save",
    "value": "hand",
    "size": [
-    1864,
-    309
+    480,
+    242
    ],
+   "region": true,
    "click": "saving under HANDLER",
    "at": [
     1265,
@@ -6281,8 +6923,8 @@
    ]
   },
   {
-   "n": 308,
-   "file": "308-d066-saving-back-under-effects.png",
+   "n": 309,
+   "file": "309-d066-saving-back-under-effects.png",
    "item": "L-05",
    "option": "save",
    "value": "eff",
@@ -6297,25 +6939,25 @@
    ]
   },
   {
-   "n": 309,
-   "file": "309-d066-the-endpoint-metadata-after-the-table.png",
+   "n": 310,
+   "file": "310-d066-the-endpoint-metadata-after-the-table.png",
    "item": "L-06 L-07",
    "option": "meta",
    "value": "after",
    "size": [
     1872,
-    834
+    724
    ]
   },
   {
-   "n": 310,
-   "file": "310-d066-metadata-before-the-table.png",
+   "n": 311,
+   "file": "311-d066-metadata-before-the-table.png",
    "item": "L-06 L-07",
    "option": "meta",
    "value": "before",
    "size": [
     1872,
-    902
+    865
    ],
    "click": "metadata before the table",
    "at": [
@@ -6324,8 +6966,8 @@
    ]
   },
   {
-   "n": 311,
-   "file": "311-d066-metadata-back-after-the-table.png",
+   "n": 312,
+   "file": "312-d066-metadata-back-after-the-table.png",
    "item": "L-06 L-07",
    "option": "meta",
    "value": "after",
@@ -6340,8 +6982,8 @@
    ]
   },
   {
-   "n": 312,
-   "file": "312-d066-the-functions-row-head-columns.png",
+   "n": 313,
+   "file": "313-d066-the-functions-row-head-columns.png",
    "item": "L-20",
    "size": [
     120,
@@ -6349,12 +6991,12 @@
    ]
   },
   {
-   "n": 313,
-   "file": "313-d066-light-the-deciders.png",
+   "n": 314,
+   "file": "314-d066-light-the-deciders.png",
    "item": "L-20",
    "size": [
     1864,
-    1080
+    804
    ],
    "click": "deciders 4",
    "at": [
@@ -6363,8 +7005,8 @@
    ]
   },
   {
-   "n": 314,
-   "file": "314-d066-deciders-put-out.png",
+   "n": 315,
+   "file": "315-d066-deciders-put-out.png",
    "item": "L-20",
    "size": [
     120,
@@ -6377,46 +7019,30 @@
    ]
   },
   {
-   "n": 315,
-   "file": "315-d066-widen-at-the-edge.png",
-   "item": "L-21",
-   "option": "wid",
-   "value": "names",
-   "size": [
-    1864,
-    439
-   ],
-   "click": "at the edge",
-   "at": [
-    616,
-    202
-   ]
-  },
-  {
    "n": 316,
-   "file": "316-d066-widen-every-item-on-one-line.png",
+   "file": "316-d066-widen-at-the-edge.png",
    "item": "L-21",
    "option": "wid",
    "value": "line",
    "size": [
     1864,
-    555
+    421
    ],
-   "click": "every item on one line",
+   "click": "at the edge",
    "at": [
-    439,
-    540
+    625,
+    202
    ]
   },
   {
    "n": 317,
-   "file": "317-d066-widen-back-to-names-whole.png",
+   "file": "317-d066-widen-names-whole.png",
    "item": "L-21",
    "option": "wid",
    "value": "names",
    "size": [
-    137,
-    72
+    1864,
+    518
    ],
    "click": "names whole",
    "at": [
@@ -6426,11 +7052,27 @@
   },
   {
    "n": 318,
-   "file": "318-d066-hide-before-any-request.png",
+   "file": "318-d066-widen-back-to-one-line.png",
+   "item": "L-21",
+   "option": "wid",
+   "value": "line",
+   "size": [
+    137,
+    72
+   ],
+   "click": "every item on one line",
+   "at": [
+    439,
+    540
+   ]
+  },
+  {
+   "n": 319,
+   "file": "319-d066-hide-before-any-request.png",
    "item": "L-21",
    "size": [
     1864,
-    222
+    185
    ],
    "click": "hide before any request",
    "at": [
@@ -6439,35 +7081,14 @@
    ]
   },
   {
-   "n": 319,
-   "file": "319-d066-fit-to-the-box.png",
-   "item": "L-21",
-   "option": "fit",
-   "value": "min",
-   "size": [
-    1864,
-    464
-   ],
-   "click": "fit to the box",
-   "at": [
-    666,
-    540
-   ]
-  },
-  {
    "n": 320,
-   "file": "320-d066-fit-wrap-into-bands.png",
-   "item": "L-21",
+   "file": "320-d066-the-table-opens-fitted.png",
+   "item": "L-21 R-11",
    "option": "fit",
    "value": "bands",
    "size": [
     1864,
-    337
-   ],
-   "click": "wrap into bands",
-   "at": [
-    576,
-    540
+    464
    ]
   },
   {
@@ -6478,30 +7099,28 @@
    "value": "bands",
    "size": [
     1864,
-    316
+    317
    ],
    "look": "the second band, further down"
   },
   {
    "n": 322,
-   "file": "322-d066-fit-back-to-narrow-the-rest.png",
-   "item": "L-21",
-   "option": "fit",
-   "value": "min",
+   "file": "322-d066-fit-off.png",
+   "item": "L-21 R-11",
    "size": [
-    222,
-    72
+    1864,
+    501
    ],
-   "click": "narrow the rest",
+   "click": "fit to the box",
    "at": [
-    539,
+    666,
     540
    ]
   },
   {
    "n": 323,
-   "file": "323-d066-fit-off.png",
-   "item": "L-21",
+   "file": "323-d066-fit-on-again.png",
+   "item": "L-21 R-11",
    "size": [
     222,
     72
@@ -6514,7 +7133,39 @@
   },
   {
    "n": 324,
-   "file": "324-d066-show-all-columns.png",
+   "file": "324-d066-fit-narrow-the-rest.png",
+   "item": "L-21",
+   "option": "fit",
+   "value": "min",
+   "size": [
+    1864,
+    425
+   ],
+   "click": "narrow the rest",
+   "at": [
+    539,
+    540
+   ]
+  },
+  {
+   "n": 325,
+   "file": "325-d066-fit-back-to-bands.png",
+   "item": "L-21",
+   "option": "fit",
+   "value": "bands",
+   "size": [
+    222,
+    72
+   ],
+   "click": "wrap into bands",
+   "at": [
+    576,
+    540
+   ]
+  },
+  {
+   "n": 326,
+   "file": "326-d066-show-all-columns.png",
    "item": "L-21",
    "size": [
     371,
@@ -6527,8 +7178,8 @@
    ]
   },
   {
-   "n": 325,
-   "file": "325-d066-widen-given-back.png",
+   "n": 327,
+   "file": "327-d066-widen-given-back.png",
    "item": "L-21",
    "size": [
     1864,
@@ -6536,13 +7187,13 @@
    ],
    "click": "at the edge",
    "at": [
-    616,
+    702,
     540
    ]
   },
   {
-   "n": 326,
-   "file": "326-d066-heads-ride-when-scrolled.png",
+   "n": 328,
+   "file": "328-d066-heads-ride-when-scrolled.png",
    "item": "L-21",
    "option": "stk",
    "value": "ride",
@@ -6553,8 +7204,8 @@
    "scrolled": "by the wheel, to Functions"
   },
   {
-   "n": 327,
-   "file": "327-d066-heads-stay-at-the-top.png",
+   "n": 329,
+   "file": "329-d066-heads-stay-at-the-top.png",
    "item": "L-21",
    "option": "stk",
    "value": "stay",
@@ -6569,8 +7220,8 @@
    ]
   },
   {
-   "n": 328,
-   "file": "328-d066-heads-stay-when-scrolled.png",
+   "n": 330,
+   "file": "330-d066-heads-stay-when-scrolled.png",
    "item": "L-21",
    "option": "stk",
    "value": "stay",
@@ -6581,8 +7232,8 @@
    "scrolled": "by the wheel, to Functions"
   },
   {
-   "n": 329,
-   "file": "329-d066-heads-back-to-ride.png",
+   "n": 331,
+   "file": "331-d066-heads-back-to-ride.png",
    "item": "L-21",
    "option": "stk",
    "value": "ride",
@@ -6597,19 +7248,19 @@
    ]
   },
   {
-   "n": 330,
-   "file": "330-d066-the-gates-row.png",
+   "n": 332,
+   "file": "332-d066-the-gates-row.png",
    "item": "L-09 L-10 L-11",
    "option": "gdl",
    "value": "head",
    "size": [
     1864,
-    611
+    509
    ]
   },
   {
-   "n": 331,
-   "file": "331-d066-open-the-gates-row-options.png",
+   "n": 333,
+   "file": "333-d066-open-the-gates-row-options.png",
    "item": "L-09 L-10 L-11",
    "size": [
     120,
@@ -6622,8 +7273,8 @@
    ]
   },
   {
-   "n": 332,
-   "file": "332-d066-gates-look-a-one-chain-per-gate.png",
+   "n": 334,
+   "file": "334-d066-gates-look-a-one-chain-per-gate.png",
    "item": "L-09 L-10",
    "option": "gdl",
    "value": "chain",
@@ -6638,14 +7289,14 @@
    ]
   },
   {
-   "n": 333,
-   "file": "333-d066-gates-look-c-side-by-side.png",
+   "n": 335,
+   "file": "335-d066-gates-look-c-side-by-side.png",
    "item": "L-09 L-10",
    "option": "gdl",
    "value": "cols",
    "size": [
     1864,
-    846
+    814
    ],
    "click": "function · condition · effect",
    "at": [
@@ -6654,8 +7305,8 @@
    ]
   },
   {
-   "n": 334,
-   "file": "334-d066-gdl-back-to-head.png",
+   "n": 336,
+   "file": "336-d066-gdl-back-to-head.png",
    "item": "L-09 L-10",
    "option": "gdl",
    "value": "head",
@@ -6670,8 +7321,8 @@
    ]
   },
   {
-   "n": 335,
-   "file": "335-d066-effect-e2-a-colour-per-stage.png",
+   "n": 337,
+   "file": "337-d066-effect-e2-a-colour-per-stage.png",
    "item": "L-10",
    "option": "gef",
    "value": "stage",
@@ -6686,8 +7337,8 @@
    ]
   },
   {
-   "n": 336,
-   "file": "336-d066-gef-back-to-end.png",
+   "n": 338,
+   "file": "338-d066-gef-back-to-end.png",
    "item": "L-10",
    "option": "gef",
    "value": "end",
@@ -6702,8 +7353,8 @@
    ]
   },
   {
-   "n": 337,
-   "file": "337-d066-gate-icons-one.png",
+   "n": 339,
+   "file": "339-d066-gate-icons-one.png",
    "item": "L-09",
    "option": "gic",
    "value": "one",
@@ -6718,8 +7369,8 @@
    ]
   },
   {
-   "n": 338,
-   "file": "338-d066-gate-icons-none.png",
+   "n": 340,
+   "file": "340-d066-gate-icons-none.png",
    "item": "L-09",
    "option": "gic",
    "value": "none",
@@ -6734,8 +7385,8 @@
    ]
   },
   {
-   "n": 339,
-   "file": "339-d066-gic-back-to-each.png",
+   "n": 341,
+   "file": "341-d066-gic-back-to-each.png",
    "item": "L-09",
    "option": "gic",
    "value": "each",
@@ -6750,8 +7401,8 @@
    ]
   },
   {
-   "n": 340,
-   "file": "340-d066-gate-roles-r1-what-it-does.png",
+   "n": 342,
+   "file": "342-d066-gate-roles-r1-what-it-does.png",
    "item": "L-11",
    "option": "grl",
    "value": "what",
@@ -6766,8 +7417,8 @@
    ]
   },
   {
-   "n": 341,
-   "file": "341-d066-gate-roles-r3-what-it-guards.png",
+   "n": 343,
+   "file": "343-d066-gate-roles-r3-what-it-guards.png",
    "item": "L-11",
    "option": "grl",
    "value": "guards",
@@ -6782,8 +7433,8 @@
    ]
   },
   {
-   "n": 342,
-   "file": "342-d066-gate-roles-off.png",
+   "n": 344,
+   "file": "344-d066-gate-roles-off.png",
    "item": "L-11",
    "option": "grl",
    "value": "off",
@@ -6798,8 +7449,8 @@
    ]
   },
   {
-   "n": 343,
-   "file": "343-d066-grl-back-to-where.png",
+   "n": 345,
+   "file": "345-d066-grl-back-to-where.png",
    "item": "L-11",
    "option": "grl",
    "value": "where",
@@ -6814,8 +7465,8 @@
    ]
   },
   {
-   "n": 344,
-   "file": "344-d066-standard-m1-split-into-the-gates.png",
+   "n": 346,
+   "file": "346-d066-standard-m1-split-into-the-gates.png",
    "item": "L-18",
    "option": "std",
    "value": "split",
@@ -6825,8 +7476,8 @@
    ]
   },
   {
-   "n": 345,
-   "file": "345-d066-standard-m2-merged-into-the-gates.png",
+   "n": 347,
+   "file": "347-d066-standard-m2-merged-into-the-gates.png",
    "item": "L-18",
    "option": "std",
    "value": "merge",
@@ -6841,14 +7492,14 @@
    ]
   },
   {
-   "n": 346,
-   "file": "346-d066-standard-m3-kept-as-its-row.png",
+   "n": 348,
+   "file": "348-d066-standard-m3-kept-as-its-row.png",
    "item": "L-18",
    "option": "std",
    "value": "keep",
    "size": [
     1864,
-    242
+    241
    ],
    "click": "keep the row",
    "at": [
@@ -6857,8 +7508,8 @@
    ]
   },
   {
-   "n": 347,
-   "file": "347-d066-standard-back-to-split.png",
+   "n": 349,
+   "file": "349-d066-standard-back-to-split.png",
    "item": "L-18",
    "option": "std",
    "value": "split",
@@ -6873,8 +7524,8 @@
    ]
   },
   {
-   "n": 348,
-   "file": "348-d066-close-the-gates-row-options.png",
+   "n": 350,
+   "file": "350-d066-close-the-gates-row-options.png",
    "item": "L-09 L-10 L-11 L-18",
    "size": [
     120,
@@ -6887,8 +7538,8 @@
    ]
   },
   {
-   "n": 349,
-   "file": "349-d066-hover-the-gates-row-head.png",
+   "n": 351,
+   "file": "351-d066-hover-the-gates-row-head.png",
    "item": "L-18",
    "size": [
     520,
@@ -6898,8 +7549,8 @@
    "tip": "Gates and decisions ┆ Where can the request be stopped or sent another way: in which function, on what condition, and what happens then? ┆ also here — Standard or specialist: Is this endpoint built like the others, and what is unusual about it? A switch is set by the server's settings and changes a way the request can go; a rare piece is something few other endpoints have. ┆ The checks that stop a request and the forks that decide its ending. ┆ KINDS ┆ middleware — Code that runs on every request before the endpoint, in the order the app registers it. 1 here ┆ rate limit ┆ — A rate limit: it counts a caller's requests over a window and refuses the one past the limit. 2 here ┆ switch ┆ — A setting or a binding that changes what the request does. 2 here ┆ login check — The dependency that reads the caller's credential and decides who the caller is. 1 here ┆ catch ┆ — An except: an error raised below is caught here and turned into an answer, or let through. 4 here ┆ function — A function the request runs through. 3 here ┆ check ┆ — A check the endpoint's own code makes; when it holds, the request ends. 5 here ┆ handler — The endpoint's own function. 4 here ┆ fork ┆ — A branch whose arms lead the request different ways. 2 here ┆ LABELS ┆ 429 ┆ ×3  ┆ 401 ┆ ×3  ┆ 409 ┆ ×3  ┆ 400 ┆ ×1  ┆ 404 ┆ ×3  ┆ 403 ┆ ×1 — a client error status — The request is refused; the caller can change it and try again. ┆ 201 ┆ ×2 — a success status — The request went right. ┆ stage — the app band, before the endpoint is reached 3 here ┆ app-wide ┆ where it decides — In the app's middleware, before any endpoint's own code runs. 2 here ┆ stage — the login check 3 here ┆ at login ┆ where it decides — In the login check, while FastAPI works out who the caller is. 2 here ┆ caller ┆ function role — orchestrates — calls other functions, no store of its own 6 here ┆ gate ┆ function role — guards — auth / consent / idempotency before the work runs 1 here ┆ stage — the endpoint's own code decides 8 here ┆ inside a call ┆ where it decides — In a function the handler calls. 6 here ┆ in the handler ┆ where it decides — In the endpoint's own function. 4 here ┆ accessor ┆ function role — touches the store — reads/writes a DB table or a durable sink 1 here ┆ stage — the answer goes back; every success leaves here 2 here"
   },
   {
-   "n": 350,
-   "file": "350-d066-hover-ratelimitmiddleware.png",
+   "n": 352,
+   "file": "352-d066-hover-ratelimitmiddleware.png",
    "item": "L-09",
    "size": [
     520,
@@ -6909,8 +7560,8 @@
    "tip": "RateLimitMiddleware · middleware ┆ BEFORE ┆ runs 2 of 3 ┆ CHECKS ┆ RateLimitMiddleware.dispatch, registered at main.py:127 ┆ does nothing when not (settings.rate_limit_enabled or settings.is_production) ┆ lets these paths through without its check: /healthz ┆ GIVES ┆ can end the request with 429 sensitive · 429 global"
   },
   {
-   "n": 351,
-   "file": "351-d066-hover-the-sensitive-limit.png",
+   "n": 353,
+   "file": "353-d066-hover-the-sensitive-limit.png",
    "item": "L-09 L-10",
    "size": [
     520,
@@ -6920,19 +7571,19 @@
    "tip": "sensitive · rate limit ┆ BEFORE ┆ runs in RateLimitMiddleware ┆ on paths that start with one of 7 prefixes: /api/v1/cooking/sessions · /api/v1/pantry/items/batch · /api/v1/pantry/reset/apply · +4 ┆ 23 endpoints share this limit ┆ only while settings.rate_limit_enabled or settings.is_production ┆ CHECKS ┆ RateLimitMiddleware keeps each caller's count for its sensitive limit, and answers when the count is over, at rate_limit.py:117 ┆ 20 per 60 seconds, counted per caller IP, apart for the sensitive limit ┆ the limit is the setting rate_limit_sensitive_per_minute (env GUSTIFY_RATE_LIMIT_SENSITIVE_PER_MINUTE) ┆ GIVES ┆ ends the request with 429: Rate limit exceeded. Try again shortly. ┆ sends a Retry-After header, its value worked out as it answers ┆ counted in: rate"
   },
   {
-   "n": 352,
-   "file": "352-d066-data-effects-the-map.png",
+   "n": 354,
+   "file": "354-d066-data-effects-a-small-map-per-moment.png",
    "item": "L-12",
    "option": "dfx",
-   "value": "one",
+   "value": "cell",
    "size": [
     1864,
-    762
+    649
    ]
   },
   {
-   "n": 353,
-   "file": "353-d066-open-the-data-row-options.png",
+   "n": 355,
+   "file": "355-d066-open-the-data-row-options.png",
    "item": "L-12",
    "size": [
     120,
@@ -6945,46 +7596,14 @@
    ]
   },
   {
-   "n": 354,
-   "file": "354-d066-data-effects-a-map-per-moment.png",
-   "item": "L-12",
-   "option": "dfx",
-   "value": "cell",
-   "size": [
-    1864,
-    649
-   ],
-   "click": "a small map per moment",
-   "at": [
-    98,
-    540
-   ]
-  },
-  {
-   "n": 355,
-   "file": "355-d066-data-effects-as-chips.png",
-   "item": "L-12",
-   "option": "dfx",
-   "value": "chips",
-   "size": [
-    1864,
-    767
-   ],
-   "click": "chips",
-   "at": [
-    61,
-    540
-   ]
-  },
-  {
    "n": 356,
-   "file": "356-d066-data-effects-back-to-the-map.png",
+   "file": "356-d066-data-effects-one-map-for-the-endpoint.png",
    "item": "L-12",
    "option": "dfx",
    "value": "one",
    "size": [
-    110,
-    118
+    1864,
+    959
    ],
    "click": "one map for the endpoint",
    "at": [
@@ -6994,13 +7613,45 @@
   },
   {
    "n": 357,
-   "file": "357-d066-write-colour-his-words.png",
+   "file": "357-d066-data-effects-as-chips.png",
+   "item": "L-12",
+   "option": "dfx",
+   "value": "chips",
+   "size": [
+    1864,
+    622
+   ],
+   "click": "chips",
+   "at": [
+    61,
+    540
+   ]
+  },
+  {
+   "n": 358,
+   "file": "358-d066-data-effects-back-to-a-map-per-moment.png",
+   "item": "L-12",
+   "option": "dfx",
+   "value": "cell",
+   "size": [
+    110,
+    118
+   ],
+   "click": "a small map per moment",
+   "at": [
+    98,
+    540
+   ]
+  },
+  {
+   "n": 359,
+   "file": "359-d066-write-colour-his-words.png",
    "item": "L-12",
    "option": "dxc",
    "value": "his",
    "size": [
     1864,
-    959
+    649
    ],
    "click": "his words' colours",
    "at": [
@@ -7009,8 +7660,8 @@
    ]
   },
   {
-   "n": 358,
-   "file": "358-d066-write-colour-back-to-the-page.png",
+   "n": 360,
+   "file": "360-d066-write-colour-back-to-the-page.png",
    "item": "L-12",
    "option": "dxc",
    "value": "page",
@@ -7025,8 +7676,8 @@
    ]
   },
   {
-   "n": 359,
-   "file": "359-d066-close-the-data-row-options.png",
+   "n": 361,
+   "file": "361-d066-close-the-data-row-options.png",
    "item": "L-12",
    "size": [
     120,
@@ -7039,19 +7690,19 @@
    ]
   },
   {
-   "n": 360,
-   "file": "360-d066-the-functions-row-with-marks.png",
+   "n": 362,
+   "file": "362-d066-the-functions-row-with-marks.png",
    "item": "L-13 L-14",
    "option": "fnm",
    "value": "on",
    "size": [
     1864,
-    959
+    682
    ]
   },
   {
-   "n": 361,
-   "file": "361-d066-open-the-functions-row-options.png",
+   "n": 363,
+   "file": "363-d066-open-the-functions-row-options.png",
    "item": "L-13",
    "size": [
     120,
@@ -7064,14 +7715,14 @@
    ]
   },
   {
-   "n": 362,
-   "file": "362-d066-functions-marks-off.png",
+   "n": 364,
+   "file": "364-d066-functions-marks-off.png",
    "item": "L-13",
    "option": "fnm",
    "value": "off",
    "size": [
     1864,
-    749
+    438
    ],
    "click": "name and role only",
    "at": [
@@ -7080,8 +7731,8 @@
    ]
   },
   {
-   "n": 363,
-   "file": "363-d066-functions-marks-back-on.png",
+   "n": 365,
+   "file": "365-d066-functions-marks-back-on.png",
    "item": "L-13",
    "option": "fnm",
    "value": "on",
@@ -7096,8 +7747,8 @@
    ]
   },
   {
-   "n": 364,
-   "file": "364-d066-close-the-functions-row-options.png",
+   "n": 366,
+   "file": "366-d066-close-the-functions-row-options.png",
    "item": "L-13",
    "size": [
     120,
@@ -7110,19 +7761,19 @@
    ]
   },
   {
-   "n": 365,
-   "file": "365-d066-hover-resolutionsnapshot-violations-for.png",
+   "n": 367,
+   "file": "367-d066-hover-resolutionsnapshot-violations-for.png",
    "item": "L-14",
    "size": [
-    520,
-    201
+    518,
+    169
    ],
    "hover": "ResolutionSnapshot.violations_for",
    "tip": "ResolutionSnapshot.violations_for · function ┆ BEFORE ┆ runs under assert_recipe_allergen_safe ┆ under the handler's call at api/cooking.py:150 ┆ assert_recipe_allergen_safe can end partway, before it calls this: a check that fires, or an error"
   },
   {
-   "n": 366,
-   "file": "366-d066-hover-the-refresh-chip.png",
+   "n": 368,
+   "file": "368-d066-hover-the-refresh-chip.png",
    "item": "L-15",
    "size": [
     518,
@@ -7132,8 +7783,8 @@
    "tip": "refresh · cache write ┆ BEFORE ┆ only while onSuccess ┆ CHECKS ┆ at useCookingSessions.ts:99 ┆ GIVES ┆ refreshes the cached [\"cooking\"] ┆ useActiveCooking fetches again: GET /cooking/active ┆ useActiveCooking gets back ActiveCookingResponse, read from cooking_photos · cooking_sessions · cooking_step_progress · +1 ┆ this request wrote cooking_sessions, which useActiveCooking reads ┆ useRemindersDue fetches again: GET /cooking/reminders/due ┆ useRemindersDue gets back DueRemindersResponse, read from cooking_stage_reminders ┆ this request wrote cooking_stage_reminders, which useRemindersDue reads ┆ counted in: screen"
   },
   {
-   "n": 367,
-   "file": "367-d066-hover-the-reads-403-line.png",
+   "n": 369,
+   "file": "369-d066-hover-the-reads-403-line.png",
    "item": "L-16",
    "size": [
     498,
@@ -7143,49 +7794,49 @@
    "tip": "reads 403 · in describeStartCookingError · reason site ┆ BEFORE ┆ in describeStartCookingError ┆ reached by 403 Recipe contains your allergen restrictions ┆ the error comes from useCookingLoopActions (303, 386) ┆ CHECKS ┆ reads the status: === 403, at cookingSessionModel.ts:381 ┆ GIVES ┆ what it does: hands back the text “cooking.error.start_allergen” ┆ counted in: reads"
   },
   {
-   "n": 368,
-   "file": "368-d066-in-flight-lifelines.png",
-   "item": "L-17",
-   "option": "ifl",
-   "value": "lane",
-   "size": [
-    1864,
-    408
-   ]
-  },
-  {
-   "n": 369,
-   "file": "369-d066-in-flight-lifelines-to-the-end.png",
-   "item": "L-17",
-   "option": "ifl",
-   "value": "lane",
-   "size": [
-    1864,
-    408
-   ],
-   "wheeled": "the box to its end"
-  },
-  {
    "n": 370,
-   "file": "370-d066-open-the-rate-limiter-lane.png",
+   "file": "370-d066-in-flight-lifelines.png",
    "item": "L-17",
+   "option": "ifl",
+   "value": "lane",
    "size": [
     1864,
-    951
-   ],
-   "click": "▸ rate limit · 7 values kept by the server",
-   "at": [
-    124,
-    540
+    355
    ]
   },
   {
    "n": 371,
-   "file": "371-d066-fold-the-rate-limiter-lane.png",
+   "file": "371-d066-in-flight-lifelines-to-the-end.png",
+   "item": "L-17",
+   "option": "ifl",
+   "value": "lane",
+   "size": [
+    1864,
+    355
+   ],
+   "wheeled": "the box to its end"
+  },
+  {
+   "n": 372,
+   "file": "372-d066-open-the-rate-limiter-lane.png",
+   "item": "L-17",
+   "size": [
+    1864,
+    898
+   ],
+   "click": "▸ rate limit · 7 values kept by the server",
+   "at": [
+    235,
+    540
+   ]
+  },
+  {
+   "n": 373,
+   "file": "373-d066-fold-the-rate-limiter-lane.png",
    "item": "L-17",
    "size": [
     179,
-    320
+    268
    ],
    "click": "▾rate limit · 7 values",
    "at": [
@@ -7194,8 +7845,8 @@
    ]
   },
   {
-   "n": 372,
-   "file": "372-d066-hover-a-read-dot.png",
+   "n": 374,
+   "file": "374-d066-hover-a-read-dot.png",
    "item": "L-17",
    "size": [
     349,
@@ -7205,8 +7856,8 @@
    "tip": "ctx · checks ┆ read at api/cooking.py:125 ┆ handed to AuthContext.require_household ┆ can end the request with 409: setup required"
   },
   {
-   "n": 373,
-   "file": "373-d066-open-the-in-flight-row-options.png",
+   "n": 375,
+   "file": "375-d066-open-the-in-flight-row-options.png",
    "item": "L-17",
    "size": [
     120,
@@ -7219,14 +7870,14 @@
    ]
   },
   {
-   "n": 374,
-   "file": "374-d066-in-flight-echoes-where-read.png",
+   "n": 376,
+   "file": "376-d066-in-flight-echoes-where-read.png",
    "item": "L-17",
    "option": "ifl",
    "value": "echo",
    "size": [
     1864,
-    649
+    648
    ],
    "click": "echoes where read",
    "at": [
@@ -7235,14 +7886,14 @@
    ]
   },
   {
-   "n": 375,
-   "file": "375-d066-in-flight-chips-where-set.png",
+   "n": 377,
+   "file": "377-d066-in-flight-chips-where-set.png",
    "item": "L-17",
    "option": "ifl",
    "value": "chips",
    "size": [
     1864,
-    649
+    648
    ],
    "click": "chips where set",
    "at": [
@@ -7251,8 +7902,8 @@
    ]
   },
   {
-   "n": 376,
-   "file": "376-d066-in-flight-back-to-lifelines.png",
+   "n": 378,
+   "file": "378-d066-in-flight-back-to-lifelines.png",
    "item": "L-17",
    "option": "ifl",
    "value": "lane",
@@ -7267,8 +7918,8 @@
    ]
   },
   {
-   "n": 377,
-   "file": "377-d066-close-the-in-flight-row-options.png",
+   "n": 379,
+   "file": "379-d066-close-the-in-flight-row-options.png",
    "item": "L-17",
    "size": [
     120,
@@ -7281,8 +7932,8 @@
    ]
   },
   {
-   "n": 378,
-   "file": "378-d066-open-the-proof-row-options.png",
+   "n": 380,
+   "file": "380-d066-open-the-proof-row-options.png",
    "item": "CR-20",
    "size": [
     1864,
@@ -7295,8 +7946,8 @@
    ]
   },
   {
-   "n": 379,
-   "file": "379-d066-earlier-requests-in-proofs-head.png",
+   "n": 381,
+   "file": "381-d066-earlier-requests-in-proofs-head.png",
    "item": "CR-20",
    "option": "jyb",
    "value": "head",
@@ -7311,8 +7962,8 @@
    ]
   },
   {
-   "n": 380,
-   "file": "380-d066-earlier-requests-back-to-their-moment.png",
+   "n": 382,
+   "file": "382-d066-earlier-requests-back-to-their-moment.png",
    "item": "CR-20",
    "option": "jyb",
    "value": "prior",
@@ -7327,8 +7978,8 @@
    ]
   },
   {
-   "n": 381,
-   "file": "381-d066-close-the-proof-row-options.png",
+   "n": 383,
+   "file": "383-d066-close-the-proof-row-options.png",
    "item": "CR-20",
    "size": [
     120,
@@ -7341,192 +7992,178 @@
    ]
   },
   {
-   "n": 382,
-   "file": "382-d066-the-examples-bench.png",
-   "item": "L-23",
+   "n": 384,
+   "file": "384-d066-the-examples-bench.png",
+   "item": "L-23 L-36",
    "option": "lay",
-   "value": "row",
+   "value": "half",
    "size": [
     1872,
-    1121
+    2073
    ]
   },
   {
-   "n": 383,
-   "file": "383-d066-bench-column-end.png",
-   "item": "L-23",
+   "n": 385,
+   "file": "385-d066-bench-column-end.png",
+   "item": "L-23 L-36",
    "size": [
-    280,
-    784
+    471,
+    926
    ],
    "column": "ending"
   },
   {
-   "n": 384,
-   "file": "384-d066-bench-column-table.png",
-   "item": "L-23",
+   "n": 386,
+   "file": "386-d066-bench-column-table.png",
+   "item": "L-23 L-36",
    "size": [
-    280,
-    652
+    471,
+    881
    ],
    "column": "table"
   },
   {
-   "n": 385,
-   "file": "385-d066-bench-column-schema.png",
-   "item": "L-23",
+   "n": 387,
+   "file": "387-d066-bench-column-schema.png",
+   "item": "L-23 L-36",
    "size": [
-    280,
-    706
+    471,
+    906
    ],
    "column": "schema"
   },
   {
-   "n": 386,
-   "file": "386-d066-bench-column-fn.png",
-   "item": "L-23 L-13",
+   "n": 388,
+   "file": "388-d066-bench-column-fn.png",
+   "item": "L-23 L-13 L-36",
    "size": [
-    280,
-    716
+    471,
+    893
    ],
    "column": "function"
   },
   {
-   "n": 387,
-   "file": "387-d066-bench-column-test.png",
-   "item": "L-23 L-08",
+   "n": 389,
+   "file": "389-d066-bench-column-test.png",
+   "item": "L-23 L-08 L-36",
    "size": [
-    280,
-    869
+    471,
+    978
    ],
    "column": "test"
   },
   {
-   "n": 388,
-   "file": "388-d066-bench-column-gate.png",
-   "item": "L-23 L-11",
+   "n": 390,
+   "file": "390-d066-bench-column-gate.png",
+   "item": "L-23 L-11 L-36",
    "size": [
-    280,
-    994
+    471,
+    1016
    ],
    "column": "gate or decision"
   },
   {
-   "n": 389,
-   "file": "389-d066-bench-column-hook.png",
-   "item": "L-23",
+   "n": 391,
+   "file": "391-d066-bench-column-hook.png",
+   "item": "L-23 L-36",
    "size": [
-    280,
-    667
+    471,
+    854
    ],
    "column": "client hook"
   },
   {
-   "n": 390,
-   "file": "390-d066-bench-column-inf.png",
-   "item": "L-23",
+   "n": 392,
+   "file": "392-d066-bench-column-inf.png",
+   "item": "L-23 L-36",
    "size": [
-    280,
-    762
+    471,
+    927
    ],
    "column": "in-flight value"
   },
   {
-   "n": 391,
-   "file": "391-d066-test-column-on-c267.png",
+   "n": 393,
+   "file": "393-d066-test-column-on-c267.png",
    "item": "L-23 L-08",
    "size": [
-    280,
-    869
+    471,
+    978
    ],
    "clicks": 0,
    "arrow": null,
    "shows": "case:C267"
   },
   {
-   "n": 392,
-   "file": "392-d066-test-c267-open-its-chain.png",
+   "n": 394,
+   "file": "394-d066-test-c267-open-its-chain.png",
    "item": "L-23 L-08",
    "size": [
-    280,
-    1263
+    471,
+    1372
    ],
    "click": "C267 201 pass start session response carries recipe title tests it Authorization Idempotency-Key 201 · recipe_title",
    "at": [
-    929,
+    260,
     540
    ]
-  },
-  {
-   "n": 393,
-   "file": "393-d066-test-c267-the-chain-wheeled-to-its-end.png",
-   "item": "L-23 L-08",
-   "size": [
-    258,
-    573
-   ],
-   "wheeled": "inside the open block, to its end",
-   "list": {
-    "max": 4943,
-    "h": 393,
-    "all": 5336
-   }
-  },
-  {
-   "n": 394,
-   "file": "394-d066-test-column-on-c250.png",
-   "item": "L-23 L-08",
-   "size": [
-    280,
-    1245
-   ],
-   "clicks": 1,
-   "arrow": "the element before",
-   "shows": "case:C250"
   },
   {
    "n": 395,
-   "file": "395-d066-test-block-closed-again.png",
-   "item": "L-23",
+   "file": "395-d066-test-c267-the-chain-wheeled-to-its-end.png",
+   "item": "L-23 L-08",
    "size": [
-    280,
-    851
+    449,
+    518
    ],
-   "click": "C250 pass cook complete history pantry loop sets up and checks Authorization Idempotency-Key 201",
-   "at": [
-    929,
-    540
-   ]
+   "wheeled": "inside the open block, to its end",
+   "list": {
+    "max": 3878,
+    "h": 393,
+    "all": 4271
+   }
   },
   {
    "n": 396,
-   "file": "396-d066-table-parts-opened.png",
+   "file": "396-d066-test-column-on-c250.png",
+   "item": "L-23 L-08",
+   "size": [
+    471,
+    1349
+   ],
+   "clicks": 1,
+   "arrow": "show the element before",
+   "shows": "case:C250"
+  },
+  {
+   "n": 397,
+   "file": "397-d066-test-block-closed-again.png",
    "item": "L-23",
    "size": [
-    280,
-    938
+    471,
+    955
    ],
-   "click": "parts",
+   "click": "C250 pass cook complete history pantry loop sets up and checks Authorization Idempotency-Key 201",
    "at": [
-    73,
+    260,
     540
    ]
   },
   {
-   "n": 397,
-   "file": "397-d066-drag-model-into-not-drawn.png",
+   "n": 398,
+   "file": "398-d066-drag-model-into-not-drawn.png",
    "item": "L-23",
    "size": [
-    280,
-    919
+    471,
+    887
    ],
    "drag": "class",
    "from": [
-    146,
+    612,
     540
    ],
    "to": [
-    148,
+    614,
     587
    ],
    "after": {
@@ -7537,30 +8174,16 @@
    }
   },
   {
-   "n": 398,
-   "file": "398-d066-table-size-of-name.png",
-   "item": "L-23",
+   "n": 399,
+   "file": "399-d066-table-size-of-name.png",
+   "item": "L-23 L-36",
    "size": [
-    280,
-    729
+    471,
+    863
    ],
    "click": "name",
    "at": [
-    142,
-    540
-   ]
-  },
-  {
-   "n": 399,
-   "file": "399-d066-table-colour-opened.png",
-   "item": "L-23",
-   "size": [
-    280,
-    927
-   ],
-   "click": "colour",
-   "at": [
-    195,
+    679,
     540
    ]
   },
@@ -7569,148 +8192,643 @@
    "file": "400-d066-table-back-to-the-default.png",
    "item": "L-23",
    "size": [
-    280,
-    946
+    471,
+    881
    ],
-   "click": "back to the default",
+   "click": "put back this column's first look",
    "at": [
-    125,
+    525,
     540
    ]
   },
   {
    "n": 401,
-   "file": "401-d066-table-colour-closed.png",
-   "item": "L-23",
+   "file": "401-d066-gate-column-role-field-rule.png",
+   "item": "L-23 L-11",
    "size": [
-    258,
-    80
+    471,
+    1016
    ],
-   "click": "colour",
+   "click": "field rule 4",
    "at": [
-    195,
+    707,
     540
    ]
   },
   {
    "n": 402,
-   "file": "402-d066-gate-column-role-field-rule.png",
+   "file": "402-d066-gate-column-every-role-again.png",
    "item": "L-23 L-11",
    "size": [
-    280,
-    926
+    449,
+    147
    ],
-   "click": "field rule 4",
+   "click": "all 21",
    "at": [
-    1201,
+    541,
     540
    ]
   },
   {
    "n": 403,
-   "file": "403-d066-gate-column-every-role-again.png",
-   "item": "L-23 L-11",
+   "file": "403-d066-gate-column-every-endpoint.png",
+   "item": "L-23",
+   "option": "scope",
+   "value": "all",
    "size": [
-    258,
-    174
+    471,
+    1016
    ],
-   "click": "all 21",
+   "click": "show the elements of every endpoint",
    "at": [
-    1179,
+    559,
     540
    ]
   },
   {
    "n": 404,
-   "file": "404-d066-gate-column-every-endpoint.png",
+   "file": "404-d066-gate-column-back-to-this-endpoint.png",
    "item": "L-23",
    "option": "scope",
-   "value": "all",
+   "value": "here",
    "size": [
-    280,
-    1178
+    449,
+    219
    ],
-   "click": "every endpoint",
+   "click": "show the elements of this endpoint",
    "at": [
-    1293,
+    525,
     540
    ]
   },
   {
    "n": 405,
-   "file": "405-d066-gate-column-back-to-this-endpoint.png",
+   "file": "405-d066-table-copy-line.png",
    "item": "L-23",
-   "option": "scope",
-   "value": "here",
    "size": [
-    258,
-    266
+    449,
+    53
    ],
-   "click": "this endpoint",
+   "click": "copy this column's settings as one line",
    "at": [
-    1193,
+    561,
     540
    ]
   },
   {
    "n": 406,
-   "file": "406-d066-table-copy-line.png",
-   "item": "L-23",
-   "size": [
-    258,
-    280
-   ],
-   "click": "copy",
-   "at": [
-    70,
-    540
-   ]
-  },
-  {
-   "n": 407,
-   "file": "407-d066-bench-wrapped-rows.png",
+   "file": "406-d066-bench-wrapped-rows.png",
    "item": "L-23",
    "option": "lay",
    "value": "wrap",
    "size": [
     1872,
-    1737
+    2225
    ],
    "click": "wrapped rows",
    "at": [
-    240,
+    82,
     540
    ]
   },
   {
-   "n": 408,
-   "file": "408-d066-bench-an-upper-and-a-lower-row.png",
-   "item": "L-23",
-   "option": "lay",
-   "value": "half",
-   "size": [
-    1872,
-    1291
-   ],
-   "click": "an upper and a lower row",
-   "at": [
-    373,
-    540
-   ]
-  },
-  {
-   "n": 409,
-   "file": "409-d066-bench-back-to-one-row.png",
+   "n": 407,
+   "file": "407-d066-bench-one-row-across-the-page.png",
    "item": "L-23",
    "option": "lay",
    "value": "row",
    "size": [
     1872,
-    62
+    1653
    ],
    "click": "one row across the page",
    "at": [
-    109,
+    47,
+    540
+   ]
+  },
+  {
+   "n": 408,
+   "file": "408-d066-bench-back-to-an-upper-and-a-lower-row.png",
+   "item": "L-23",
+   "option": "lay",
+   "value": "half",
+   "size": [
+    1872,
+    70
+   ],
+   "click": "an upper and a lower row",
+   "at": [
+    117,
+    540
+   ]
+  },
+  {
+   "n": 409,
+   "file": "409-d066-hover-an-icon-square-every-endpoint.png",
+   "item": "L-36",
+   "size": [
+    286,
+    88
+   ],
+   "hover": "show the elements of every endpoint",
+   "tip": "show the elements of every endpoint"
+  },
+  {
+   "n": 410,
+   "file": "410-d066-hover-an-icon-square-the-copy-button.png",
+   "item": "L-36",
+   "size": [
+    314,
+    88
+   ],
+   "hover": "copy this column's settings as one line",
+   "tip": "copy this column's settings as one line"
+  },
+  {
+   "n": 411,
+   "file": "411-d066-width-compact.png",
+   "item": "L-36",
+   "size": [
+    316,
+    1155
+   ],
+   "click": "set the width to compact",
+   "at": [
+    252,
+    540
+   ]
+  },
+  {
+   "n": 412,
+   "file": "412-d066-width-tight.png",
+   "item": "L-36",
+   "size": [
+    248,
+    1299
+   ],
+   "click": "set the width to most compact",
+   "at": [
+    286,
+    540
+   ]
+  },
+  {
+   "n": 413,
+   "file": "413-d066-width-full.png",
+   "item": "L-36",
+   "size": [
+    1872,
+    763
+   ],
+   "click": "set the width to full",
+   "at": [
+    106,
+    540
+   ]
+  },
+  {
+   "n": 414,
+   "file": "414-d066-width-back-to-dynamic.png",
+   "item": "L-36",
+   "size": [
+    449,
+    46
+   ],
+   "click": "set the width to dynamic",
+   "at": [
+    150,
+    540
+   ]
+  },
+  {
+   "n": 415,
+   "file": "415-d066-depict-end-as-drawn.png",
+   "item": "L-35",
+   "size": [
+    471,
+    926
+   ],
+   "depict": [
+    "ex.kind.end:drawn:after",
+    "ex.kind.end:change:before"
+   ],
+   "kind": "end",
+   "column": "ending"
+  },
+  {
+   "n": 416,
+   "file": "416-d066-depict-end-one-part-dragged-out.png",
+   "item": "L-35",
+   "size": [
+    471,
+    932
+   ],
+   "depict": [
+    "ex.kind.end:change:after"
+   ],
+   "kind": "end",
+   "column": "ending",
+   "dragged": "via"
+  },
+  {
+   "n": 417,
+   "file": "417-d066-depict-end-back-to-the-default.png",
+   "item": "L-35",
+   "size": [
+    449,
+    53
+   ],
+   "click": "put back this column's first look",
+   "at": [
+    58,
+    540
+   ]
+  },
+  {
+   "n": 418,
+   "file": "418-d066-depict-schema-as-drawn.png",
+   "item": "L-35",
+   "size": [
+    471,
+    906
+   ],
+   "depict": [
+    "ex.kind.schema:drawn:after",
+    "ex.kind.schema:change:before"
+   ],
+   "kind": "schema",
+   "column": "schema"
+  },
+  {
+   "n": 419,
+   "file": "419-d066-depict-schema-one-part-dragged-out.png",
+   "item": "L-35",
+   "size": [
+    471,
+    912
+   ],
+   "depict": [
+    "ex.kind.schema:change:after"
+   ],
+   "kind": "schema",
+   "column": "schema",
+   "dragged": "via"
+  },
+  {
+   "n": 420,
+   "file": "420-d066-depict-schema-back-to-the-default.png",
+   "item": "L-35",
+   "size": [
+    449,
+    53
+   ],
+   "click": "put back this column's first look",
+   "at": [
+    992,
+    540
+   ]
+  },
+  {
+   "n": 421,
+   "file": "421-d066-depict-fn-as-drawn.png",
+   "item": "L-35",
+   "size": [
+    471,
+    893
+   ],
+   "depict": [
+    "ex.kind.fn:drawn:after",
+    "ex.kind.fn:change:before"
+   ],
+   "kind": "fn",
+   "column": "function"
+  },
+  {
+   "n": 422,
+   "file": "422-d066-depict-fn-one-part-dragged-out.png",
+   "item": "L-35",
+   "size": [
+    471,
+    899
+   ],
+   "depict": [
+    "ex.kind.fn:change:after"
+   ],
+   "kind": "fn",
+   "column": "function",
+   "dragged": "via"
+  },
+  {
+   "n": 423,
+   "file": "423-d066-depict-fn-back-to-the-default.png",
+   "item": "L-35",
+   "size": [
+    449,
+    53
+   ],
+   "click": "put back this column's first look",
+   "at": [
+    1459,
+    540
+   ]
+  },
+  {
+   "n": 424,
+   "file": "424-d066-depict-test-as-drawn.png",
+   "item": "L-35",
+   "size": [
+    471,
+    955
+   ],
+   "depict": [
+    "ex.kind.test:drawn:after",
+    "ex.kind.test:change:before"
+   ],
+   "kind": "test",
+   "column": "test"
+  },
+  {
+   "n": 425,
+   "file": "425-d066-depict-test-one-part-dragged-out.png",
+   "item": "L-35",
+   "size": [
+    471,
+    955
+   ],
+   "depict": [
+    "ex.kind.test:change:after"
+   ],
+   "kind": "test",
+   "column": "test",
+   "dragged": "asserts"
+  },
+  {
+   "n": 426,
+   "file": "426-d066-depict-test-back-to-the-default.png",
+   "item": "L-35",
+   "size": [
+    449,
+    53
+   ],
+   "click": "put back this column's first look",
+   "at": [
+    58,
+    540
+   ]
+  },
+  {
+   "n": 427,
+   "file": "427-d066-depict-gate-as-drawn.png",
+   "item": "L-35",
+   "size": [
+    471,
+    1016
+   ],
+   "depict": [
+    "ex.kind.gate:drawn:after",
+    "ex.kind.gate:change:before"
+   ],
+   "kind": "gate",
+   "column": "gate or decision"
+  },
+  {
+   "n": 428,
+   "file": "428-d066-depict-gate-one-part-dragged-out.png",
+   "item": "L-35",
+   "size": [
+    471,
+    1037
+   ],
+   "depict": [
+    "ex.kind.gate:change:after"
+   ],
+   "kind": "gate",
+   "column": "gate or decision",
+   "dragged": "count"
+  },
+  {
+   "n": 429,
+   "file": "429-d066-depict-gate-back-to-the-default.png",
+   "item": "L-35",
+   "size": [
+    449,
+    53
+   ],
+   "click": "put back this column's first look",
+   "at": [
+    525,
+    540
+   ]
+  },
+  {
+   "n": 430,
+   "file": "430-d066-depict-hook-as-drawn.png",
+   "item": "L-35",
+   "size": [
+    471,
+    854
+   ],
+   "depict": [
+    "ex.kind.hook:drawn:after",
+    "ex.kind.hook:change:before"
+   ],
+   "kind": "hook",
+   "column": "client hook"
+  },
+  {
+   "n": 431,
+   "file": "431-d066-depict-hook-one-part-dragged-out.png",
+   "item": "L-35",
+   "size": [
+    471,
+    854
+   ],
+   "depict": [
+    "ex.kind.hook:change:after"
+   ],
+   "kind": "hook",
+   "column": "client hook",
+   "dragged": "fkind"
+  },
+  {
+   "n": 432,
+   "file": "432-d066-depict-hook-back-to-the-default.png",
+   "item": "L-35",
+   "size": [
+    449,
+    53
+   ],
+   "click": "put back this column's first look",
+   "at": [
+    992,
+    540
+   ]
+  },
+  {
+   "n": 433,
+   "file": "433-d066-depict-inf-as-drawn.png",
+   "item": "L-35",
+   "size": [
+    471,
+    927
+   ],
+   "depict": [
+    "ex.kind.inf:drawn:after",
+    "ex.kind.inf:change:before"
+   ],
+   "kind": "inf",
+   "column": "in-flight value"
+  },
+  {
+   "n": 434,
+   "file": "434-d066-depict-inf-one-part-dragged-out.png",
+   "item": "L-35",
+   "size": [
+    471,
+    891
+   ],
+   "depict": [
+    "ex.kind.inf:change:after"
+   ],
+   "kind": "inf",
+   "column": "in-flight value",
+   "dragged": "set"
+  },
+  {
+   "n": 435,
+   "file": "435-d066-depict-inf-back-to-the-default.png",
+   "item": "L-35",
+   "size": [
+    449,
+    53
+   ],
+   "click": "put back this column's first look",
+   "at": [
+    1459,
+    540
+   ]
+  },
+  {
+   "n": 436,
+   "file": "436-d066-ex5-a-function-chip-in-by-moment.png",
+   "item": "EX-5",
+   "size": [
+    306,
+    70
+   ],
+   "depict": [
+    "EX-5:wait:after",
+    "EX-5:now:before"
+   ]
+  },
+  {
+   "n": 437,
+   "file": "437-d066-ex5-the-benchs-function-block.png",
+   "item": "EX-5",
+   "size": [
+    449,
+    85
+   ],
+   "depict": [
+    "EX-5:now:after"
+   ]
+  },
+  {
+   "n": 438,
+   "file": "438-d066-l37-widen-the-edge-column.png",
+   "item": "L-37",
+   "size": [
+    1864,
+    240
+   ],
+   "click": "at the edge",
+   "at": [
+    625,
+    540
+   ]
+  },
+  {
+   "n": 439,
+   "file": "439-d066-l37-the-edge-dragged-right.png",
+   "item": "L-37",
+   "size": [
+    1864,
+    240
+   ],
+   "dragged": "to the right"
+  },
+  {
+   "n": 440,
+   "file": "440-d066-l37-the-edge-moved-left-by-the-keys.png",
+   "item": "L-37",
+   "size": [
+    1864,
+    240
+   ],
+   "keys": "ArrowLeft twice"
+  },
+  {
+   "n": 441,
+   "file": "441-d066-l37-click-the-head-to-give-the-width-back.png",
+   "item": "L-37",
+   "size": [
+    1864,
+    258
+   ],
+   "click": "at the edge",
+   "at": [
+    714,
+    540
+   ]
+  },
+  {
+   "n": 442,
+   "file": "442-d066-l38-widen-the-edge-column.png",
+   "item": "L-38",
+   "size": [
+    844,
+    224
+   ],
+   "click": "at the edge",
+   "at": [
+    657,
+    500
+   ]
+  },
+  {
+   "n": 443,
+   "file": "443-d066-l38-the-table-wider-than-its-box.png",
+   "item": "L-38",
+   "size": [
+    844,
+    248
+   ],
+   "region": true,
+   "scrolled": "not yet"
+  },
+  {
+   "n": 444,
+   "file": "444-d066-l38-slid-sideways-by-shift-and-the-wheel.png",
+   "item": "L-38",
+   "size": [
+    844,
+    248
+   ],
+   "region": true,
+   "scrolled": "by Shift and the wheel"
+  },
+  {
+   "n": 445,
+   "file": "445-d066-l38-click-the-head-to-give-the-width-back.png",
+   "item": "L-38",
+   "size": [
+    1864,
+    258
+   ],
+   "click": "at the edge",
+   "at": [
+    946,
     540
    ]
   }
