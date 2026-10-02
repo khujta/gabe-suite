@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-071). Updated 2026-10-01 · on `graft-adoption`, 63 commits ahead of origin, **committed
+`decisions.md` (every ruling, D-001 … D-072). Updated 2026-10-01 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -52,6 +52,14 @@ same patterns on the surfaces the agents had just built, and two merged lanes br
 | Facts about the code are shown; how the map knows them is hidden | D-017 |
 | One hover per item, in before · checks · gives; a kind's meaning lives in the row's legend | D-067 |
 | Every element named wears the station's glyph and colour, its subcategory as a label at the end | D-052 |
+
+## Round 2 (D-072) — the review page, read by a human
+
+He found the review page dense (L-24..L-26): it now takes the screen's width (1800 px at 1920), short values stay on one line, states
+and patterns wear icons with one legend, and every section opens with a spoken summary — copy to read aloud, or listen (the
+browser's own voice; my proposal, dashed). Text to speech was explored: the in-page listen button and Edge's Read aloud are free and
+work now; Piper (local, free) tested fine; Kokoro failed on a packaging bug (needs `sudo apt install espeak-ng`); ElevenLabs
+(`uvx elevenlabs-mcp`, free tier 10,000 credits a month) needs his API key. His pick of a route is open.
 
 ## Open for you — on the review page
 
