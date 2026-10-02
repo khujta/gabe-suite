@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-080). Updated 2026-10-01 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-081). Updated 2026-10-01 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -77,6 +77,17 @@ pattern and decision opens with THE PAIN (with a meter), LIKE (a gabe-lens analo
 all authored in `legibility/legibility-review.lens.json` (numbers generated), read aloud in that order. **Draft for the suite, awaiting his "land it":** `legibility/drafts/gabe-artifact-read-aloud/` —
 the read-aloud bar as a reusable gabe-artifact part (H7 clause, reference, module, demo, a gate that fires without the bar and
 stays silent with it, a battery); its README says what lands where and the cost (+1 browser battery ≈ 35 s on the doctor).
+
+## His review of round 1 is in (D-081, 2026-10-02)
+
+41 lines his, 12 left as my pick. In progress: (a) the page pass — his ruled looks as defaults, the header/saving pictures that showed no
+difference (L-34), clearer depictions where he wrote "I don't get what is happening here" (L-35), a simpler bench with a width control
+(L-36), a resizable widened column (L-37), Shift+wheel across a wide table (L-38); (b) the suite landing of A1 · P1.1 · P1.2 · P2.2 ·
+P3.1 · P4.2 · P5.2 · P7.1 · P7.2 · P8.2 · P9.1 · P10.2 (the audit into gabe-artifact with its battery, the references, the contract
+clauses), install + a clean doctor. Queued after: P4.1 · P8.1 · P10.1 (build checks in the page generators); P3.2 and P2.1 redrafted to
+his words for a new "land it"; L-33 (the frontend lab's hover cards as the one hover format — trace its origin first); L-39 (bench
+sections: the gate card, stage encoding, gate roles, function marks, the standard-or-specialist split, the metadata layout). Not yet:
+P5.1, P6.1, P6.2 — trigger: the navigation bar's consolidation. The read-aloud draft (D-076) still waits on its own "land it".
 
 ## Open for you — on the review page
 
