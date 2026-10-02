@@ -366,7 +366,8 @@
       "L-24": "wider tables with each row on one line",
       "L-25": "icons in place of words",
       "L-26": "a summary to copy for reading aloud",
-      "L-27": "a player bar that stays in view"
+      "L-27": "a player bar that stays in view",
+      "L-28": "the player bar all the time"
     },
     "round2Head": "Raised on reading this page",
     "round2Note": "You raised these after you read this page, so the review has not read them yet. They are built on this page itself: the page you are reading is their picture.",
@@ -792,12 +793,12 @@
     "optBar": "the bar stays at the top",
     "optBarPlaying": "only while a voice plays",
     "optBarAlways": "always",
-    "optBarTip": "While a voice plays the contents bar stays at the top of the screen. Pick always to keep it there with no voice too.",
+    "optBarTip": "The contents bar stays at the top of the screen all the time, with or without a voice. Pick only while a voice plays to hide it when nothing reads.",
     "optFollow": "follow the reading",
     "optOn": "on",
     "optOff": "off",
     "optFollowTip": "When the reading moves on to the next section by itself, the page scrolls to that section. A skip always scrolls.",
-    "ruledBy": "D-074",
+    "ruledBy": "D-076",
     "lineBar": "pl.bar",
     "lineFollow": "pl.follow"
   },

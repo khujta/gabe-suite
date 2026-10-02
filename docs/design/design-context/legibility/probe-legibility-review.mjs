@@ -187,8 +187,8 @@ try {
     const A = await open({ ms: 500 });
     await run('the default and the reading', async () => { const s0 = await barOf(A); const opt = await A.evaluate(() => { const g = (k) => [...document.querySelectorAll('[data-pref="' + k + '"]')].map((x) => x.dataset.v + ':' + x.getAttribute('aria-pressed') + ':' + x.dataset.mine);
         return { bar: g('bar'), follow: g('follow'), nav: document.getElementById('bar').parentElement.className }; });
-      ok(s0.frozen === 'false' && s0.pos === 'static' && !s0.playerShown && s0.player === 'false', 'with no voice the contents bar is a plain strip in the page: not frozen, no player showing', `${s0.pos} · player ${s0.player}`);
-      ok(JSON.stringify(opt.bar) === '["playing:true:false","always:false:true"]' && JSON.stringify(opt.follow) === '["on:false:true","off:false:false"]', 'the two options stand beside the speed: the bar stays at the top only while a voice plays (ruled, filled) or always (my alternative, dashed); follow the reading on (my pick, dashed) or off', opt.bar.join(' ') + ' | ' + opt.follow.join(' '));
+      ok(s0.frozen === 'true' && s0.playerShown, 'with no voice the bar is already at the top with its player (D-076: all the time is his default)', `${s0.pos} · player ${s0.player}`);   /* CHANGED 2026-10-01 (D-076) */
+      ok(JSON.stringify(opt.bar) === '["always:true:false","playing:false:false"]' && JSON.stringify(opt.follow) === '["on:false:true","off:false:false"]', 'the two options stand beside the speed: the bar stays at the top always (ruled D-076, filled) or only while a voice plays; follow the reading on (my pick, dashed) or off', opt.bar.join(' ') + ' | ' + opt.follow.join(' '));
       await A.evaluate(() => { for (const e of document.querySelectorAll('[data-listen-rate]')) e.querySelector('select').value = '1'; });
       await scrollInto(A, IDS[3], 120); await A.waitForTimeout(150);
       const before = await A.evaluate(() => Math.round(document.querySelector('[data-say="calls"]').getBoundingClientRect().top));
@@ -224,7 +224,7 @@ try {
       ok(st1 === 'paused' && p2.n === p1.n && p3.n > p2.n && p3.frozen === 'true', 'pause holds the reading (nothing more is spoken, the bar stays frozen) and play goes on', `${p1.n} → ${p2.n} → ${p3.n} sentences`);
       /* stop ends it and the bar lets go */
       await A.click('[data-act="stop"]'); await A.waitForTimeout(150); const e1 = await barOf(A); await A.evaluate(() => window.scrollBy(0, 1800)); await A.waitForTimeout(100); const e2 = await barOf(A);
-      ok(e1.frozen === 'false' && e1.pos === 'static' && !e1.reading.on && !e1.playerShown && e1.hot.length === 0 && e1.lit === -1 && e2.top < 0, 'stop ends the reading, clears the highlight, and the bar lets go: it scrolls away with the page', `${e1.pos} · top ${e2.top}`);
+      ok(e1.frozen === 'true' && !e1.reading.on && e1.hot.length === 0 && e1.lit === -1 && e2.top === 0, 'stop ends the reading and clears the highlight; the bar stays at the top as you scroll (D-076)', `${e1.pos} · top ${e2.top}`);   /* CHANGED 2026-10-01 (D-076) */
       /* the 12px floor with the bar frozen and playing */
       await A.click('[data-say="calls"] [data-listen]'); await A.waitForTimeout(200);
       const small = await A.evaluate(() => { const out = [], w = document.createTreeWalker(document.getElementById('bar'), NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (!n.nodeValue.trim()) continue; const e = n.parentElement; if (!e.getClientRects().length) continue; const fs = parseFloat(getComputedStyle(e).fontSize); if (fs < 12) out.push(fs + 'px ' + n.nodeValue.trim().slice(0, 20)); } return out; });
@@ -233,21 +233,24 @@ try {
       ok(A.__errs.length === 0, 'the player runs with no page error', A.__errs.slice(0, 2).join(' | ')); });
     await A.__ctx.close();
 
-    /* "always": the bar stays frozen with no voice, the choice is kept, and it rides the copy text */
+    /* CHANGED 2026-10-01 (D-076): "always" is now the default; this block proves the other option, "only while a voice plays",
+       then goes back to always for the idle player */
     const B = await open({ ms: 400 });
-    await run('always', async () => { await B.click('[data-pref="bar"][data-v="always"]'); await B.waitForTimeout(100); await scrollInto(B, IDS[4], 300); await B.waitForTimeout(100); const s = await barOf(B);
-      const idle = await B.evaluate(() => ({ st: document.querySelector('[data-act="playpause"]').dataset.state, stopOff: document.querySelector('[data-act="stop"]').disabled }));
-      ok(s.frozen === 'true' && s.top === 0 && s.shown && s.playerShown && !s.reading.on && idle.st === 'idle' && idle.stopOff, 'with "always" the bar stays frozen at the top with no voice, its player idle (play ready, stop off)', `top ${s.top} · ${idle.st}`);
+    await run('only while a voice plays', async () => { await B.click('[data-pref="bar"][data-v="playing"]'); await B.waitForTimeout(100); await scrollInto(B, IDS[4], 300); await B.waitForTimeout(100); const s = await barOf(B);
+      ok(s.frozen === 'false' && !s.reading.on, 'with "only while a voice plays" the bar lets go when no voice reads', `frozen ${s.frozen}`);
       const stored = await B.evaluate((k) => { try { return JSON.parse(localStorage.getItem(k)).p; } catch (e) { return null; } }, 'gabe:legibility:r1'), lines = (await B.$eval('#out', (x) => x.value)).split('\n');
       const bi = lines.indexOf('PLAYER'), lb = lines.find((l) => l.startsWith('pl.bar: ')), lf = lines.find((l) => l.startsWith('pl.follow: '));
-      ok(stored && stored.bar === 'always' && bi > 0 && lb === 'pl.bar: always (yours, you ruled only while a voice plays in D-074)' && lf === 'pl.follow: on (my pick, not ruled)', 'the choice is kept in the browser and the copy text carries both options', (lb || '') + ' | ' + (lf || ''));
-      await B.reload(); await B.waitForFunction('window.__leg && window.__leg.ready', { timeout: 20000 }).catch(() => {}); const again = await barOf(B), pr = await B.$eval('[data-pref="bar"][data-v="always"]', (x) => x.getAttribute('aria-pressed'));
-      ok(again.frozen === 'true' && pr === 'true', 'and it is still "always" after a reload', again.frozen);
-      await scrollInto(B, IDS[5], 200); await B.waitForTimeout(100); await B.click('[data-act="playpause"]'); await B.waitForTimeout(200); const g = await barOf(B);
+      ok(stored && stored.bar === 'playing' && bi > 0 && lb === 'pl.bar: only while a voice plays (yours, you ruled always in D-076)' && lf === 'pl.follow: on (my pick, not ruled)', 'the choice is kept in the browser and the copy text carries both options', (lb || '') + ' | ' + (lf || ''));
+      await B.reload(); await B.waitForFunction('window.__leg && window.__leg.ready', { timeout: 20000 }).catch(() => {}); const again = await barOf(B), pr = await B.$eval('[data-pref="bar"][data-v="playing"]', (x) => x.getAttribute('aria-pressed'));
+      ok(again.frozen === 'false' && pr === 'true', 'and it is still "only while a voice plays" after a reload', again.frozen);
+      await B.click('[data-pref="bar"][data-v="always"]'); await B.waitForTimeout(100); await scrollInto(B, IDS[5], 200); await B.waitForTimeout(100);
+      const idle = await B.evaluate(() => ({ st: document.querySelector('[data-act="playpause"]').dataset.state, stopOff: document.querySelector('[data-act="stop"]').disabled })), s2 = await barOf(B);
+      ok(s2.frozen === 'true' && s2.top === 0 && s2.playerShown && !s2.reading.on && idle.st === 'idle' && idle.stopOff, 'with "always" the bar stays at the top with no voice, its player idle (play ready, stop off)', `top ${s2.top} · ${idle.st}`);
+      await B.click('[data-act="playpause"]'); await B.waitForTimeout(200); const g = await barOf(B);
       ok(g.reading.on && g.reading.all && g.reading.i === 5 && g.lit === 5, 'play on the idle bar reads on from the section in view, through every summary', `index ${g.reading.i}`);
       await B.click('[data-act="stop"]'); await B.waitForTimeout(100); const g2 = await barOf(B); ok(g2.frozen === 'true', 'stop under "always" keeps the bar frozen', g2.frozen);
-      await B.click('#reset'); await B.waitForTimeout(100); const g3 = await barOf(B);
-      ok(g3.frozen === 'false', 'clearing the choices gives the options back to their defaults', g3.frozen); });
+      await B.click('[data-pref="bar"][data-v="playing"]'); await B.waitForTimeout(100); await B.click('#reset'); await B.waitForTimeout(100); const g3 = await barOf(B);
+      ok(g3.frozen === 'true', 'clearing the choices gives the options back to their defaults (always)', g3.frozen); });
     await B.__ctx.close();
 
     /* the voice lab's saved setting reaches the utterance: voice, rate, pitch, volume, the pauses, whether section names are read */

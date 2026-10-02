@@ -255,6 +255,6 @@
     "modeLab": "Show the bar",
     "modeOn": "while a voice reads",
     "modeAlways": "always",
-    "modeNote": "While a voice reads is the default. Always is my addition, drawn dashed."
+    "modeNote":"Always is the default: you asked to see the bar all the time. While a voice reads hides it when nothing is read."
   }
 }

@@ -274,7 +274,7 @@
         <span class="lab" data-t="bar.modeLab"></span>
         <div class="seg" id="bar-mode" role="group" data-aria="bar.modeLab">
           <button class="btn tog" type="button" data-bar="playing" data-t="bar.modeOn"></button>
-          <button class="btn tog" type="button" data-bar="always" data-mine="true" data-t="bar.modeAlways"></button>
+          <button class="btn tog" type="button" data-bar="always" data-t="bar.modeAlways"></button>
         </div>
       </div>
       <p class="cap" data-t="bar.modeNote"></p>
@@ -317,7 +317,7 @@
   /* ── the state: what you set, and which of it is yours ── */
   var DEFV = DEF.voice && DEF.voice !== "auto" ? DEF.voice : null;   /* D-075: his pasted voice is the default */
   var S = { engine: "browser", bvoice: DEFV, pvoice: null, pspeed: "normal", rate: DEF.rate, pitch: DEF.pitch, volume: DEF.volume, pauseSentence: DEF.pauseSentence, pauseSection: DEF.pauseSection, readTitles: DEF.readTitles };
-  var RULED = {}, HIS = {}, BAR = "playing", LANG = "en", VOICES = [], TICK = {}, STORED = true, KEPT = false, SECS = [], VSIG = "";
+  var RULED = {}, HIS = {}, BAR = "always", LANG = "en", VOICES = [], TICK = {}, STORED = true, KEPT = false, SECS = [], VSIG = "";
   (D.ruled || []).forEach(function (k) { RULED[k] = true; HIS[k] = true; });   /* the values he set (D-075) open as his */
   var PL = {}; D.piper.voices.forEach(function (v) { PL[v.id] = v.lang; });
   var KNOWN = { voice: 1, rate: 1, pspeed: 1, pitch: 1, volume: 1, pauseSentence: 1, pauseSection: 1, readTitles: 1 };

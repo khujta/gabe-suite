@@ -107,7 +107,7 @@ try {
   /* play: the frozen bar after a scroll */
   await p.evaluate(() => { window.__mockMs = 2000; });
   await p.evaluate(() => window.scrollTo(0, 1500)); const y0 = await p.evaluate(() => window.scrollY);
-  ok((await bar()).hidden === true, 'before anything is read the bar is hidden');
+  ok((await bar()).hidden === false, 'before anything is read the bar is in view (D-076: all the time is his default)');   /* CHANGED 2026-10-01 (D-076) */
   await p.evaluate(() => document.querySelector('#sec-browser .js-read').click()); await p.waitForTimeout(250);
   { const bb = await bar(), y1 = await p.evaluate(() => window.scrollY), sp = await spoken();
     ok(bb.shown && bb.top === 0 && bb.pos === 'fixed' && y1 > 1000, 'play shows the bar fixed at the top, after a scroll', `top ${bb.top} · ${bb.pos} · scrollY ${y1}`);
@@ -142,7 +142,9 @@ try {
   if (SHOTS) { await p.evaluate(() => { window.__mockMs = 600000; }); await p.click('#vb-next'); await p.waitForTimeout(250); await p.evaluate(() => window.scrollBy(0, 40)); await p.waitForTimeout(100); await p.screenshot({ path: path.join(SHOTS, 'voice-lab-frozen-bar-1920.png') }); await p.evaluate(() => { window.__mockMs = 2000; }); }
   /* stop */
   { await p.click('#vb-stop'); await p.waitForTimeout(100); const bb = await bar(), lit = await p.$$eval('.vt-sec[data-on="true"], .vt-s[data-on="true"]', (n) => n.length);
-    ok(bb.hidden === true && !bb.shown && (await player()).mode === null && lit === 0, 'stop hides the bar and clears the highlight'); }
+    ok(bb.hidden === false && (await player()).mode === null && lit === 0, 'stop ends the reading and clears the highlight; the bar stays in view (D-076)');   /* CHANGED 2026-10-01 (D-076) */
+    await p.click('[data-bar="playing"]'); await p.waitForTimeout(100);
+    ok((await bar()).hidden === true, 'with "while a voice reads" picked, the bar hides when nothing is read'); await p.click('[data-bar="always"]'); await p.waitForTimeout(100); }
   /* the bar's own option */
   { await p.evaluate(() => document.querySelector('[data-bar="always"]').click()); const bb = await bar();
     ok(bb.shown && bb.top === 0, 'the always option shows the bar with nothing playing');
