@@ -2,7 +2,7 @@
   "_about": "Every sentence the legibility review page draws (D-066, D-025.8). A number is a {token} gen-legibility-review.mjs fills from the inputs; a {{token}} is filled by the page itself when it runs (counts of your choices, the page's sha). A typed number stops the build, a JSON number too. The spoken summaries (spoken) are templates too: a voice reads them, so each is plain sentences with every number a {token}. Ids that carry a number (L-01, R-11, D-066, P1, G1, EX-5, a review finding id, r1) and HTTP statuses are labels, not counts.",
   "_before": "6170519",
   "page": {
-    "eyebrow": "Legibility · round 1 and your reading of it · D-066 · D-072",
+    "eyebrow": "Legibility · round 1 and your reading of it · D-066 · D-072 · D-074",
     "h1": "Round 1 of your human reading: what changed, what you choose, and the patterns behind it",
     "lede": "You read all-endpoints on {ep} as a person, one hover at a time, and raised {nItems} items. Each was logged in your words, worked on, then reviewed. This page shows what round 1b left, the patterns behind it with their suite proposals, the looks you pick by seeing, what changed on each item, your questions answered and the gap analysis you asked for. Then you read this page and raised {nRound2} more items: they are built here, and they are the last cards of Your items.",
     "source": "Pictures are real clicks on the page (the walk). Facts are read from {app} @{feedHead}. The work reviewed is at {workHead}.",
@@ -73,7 +73,7 @@
     "copy": {
       "title": "Copy",
       "n": "paste this back to me",
-      "note": "One line per choice, grouped calls · proposals · patterns. A note you write rides on its choice's line.",
+      "note": "One line per choice, grouped calls · proposals · patterns, then the player options. A note you write rides on its choice's line.",
       "take": "Take from this: paste the text back to me. A line that says my pick is never a ruling."
     }
   },
@@ -365,7 +365,8 @@
       "L-23": "a bench to decide one element's look",
       "L-24": "wider tables with each row on one line",
       "L-25": "icons in place of words",
-      "L-26": "a summary to copy for reading aloud"
+      "L-26": "a summary to copy for reading aloud",
+      "L-27": "a player bar that stays in view"
     },
     "round2Head": "Raised on reading this page",
     "round2Note": "You raised these after you read this page, so the review has not read them yet. They are built on this page itself: the page you are reading is their picture.",
@@ -633,7 +634,8 @@
     "groups": {
       "CALLS": "CALLS",
       "PROPOSALS": "PROPOSALS",
-      "PATTERNS": "PATTERNS"
+      "PATTERNS": "PATTERNS",
+      "PLAYER": "PLAYER"
     },
     "aria": "Your review as text",
     "button": "Copy my review",
@@ -762,13 +764,42 @@
     "copyAll": "copy every summary",
     "listenAll": "listen to every summary",
     "tip": "my proposal: your browser reads this aloud in its own voice",
-    "mineNote": "Each section opens with a summary written to be read aloud, from the numbers on this page. Copy one with its button, or every summary at once. The dashed buttons are my proposal, not something you asked for: they read a summary aloud with your browser's own voice, free, with nothing sent anywhere. The speed you pick is kept in this browser.",
+    "mineNote": "Each section opens with a summary written to be read aloud, from the numbers on this page. Copy one with its button, or every summary at once. The dashed buttons are my proposal, not something you asked for: they read a summary aloud with your browser's own voice, free, with nothing sent anywhere. While a voice plays, the contents bar freezes at the top and carries the player, as you asked: stop it, skip to another section, and the page goes there too. The speed you pick and the options beside it are kept in this browser. When you have saved a voice in the voice lab, this page reads with it.",
     "rateLabel": "reading speed",
+    "rateTip": "slower, normal or faster, around the speed of the voice you saved in the voice lab",
     "rates": [
       "slower",
       "normal",
       "faster"
     ]
+  },
+  "player": {
+    "_about": "The player that rides the contents bar (L-27, D-074): its buttons, its two options, and what the voice's hover says. Icons carry the buttons, so each word here is a hover and a name for a reader.",
+    "bar": "contents and player",
+    "play": "play",
+    "pause": "pause",
+    "stop": "stop reading",
+    "prev": "previous section",
+    "next": "next section",
+    "follow": "follow",
+    "followTip": "the page follows the reading when it moves on by itself",
+    "voiceSaved": "Reading with {{name}}, the voice you saved in the voice lab.",
+    "voiceDefault": "Reading with {{name}}, this browser's own voice.",
+    "voiceNone": "Reading with this browser's default voice.",
+    "voiceMissing": "The voice you saved, {{name}}, is not in this browser, so the default voice reads instead.",
+    "defaultName": "default voice",
+    "voicePiper": "The voice you saved, {{name}}, is a Piper voice. Piper has no live voice on this page, so this browser's voice reads instead.",
+    "optBar": "the bar stays at the top",
+    "optBarPlaying": "only while a voice plays",
+    "optBarAlways": "always",
+    "optBarTip": "While a voice plays the contents bar stays at the top of the screen. Pick always to keep it there with no voice too.",
+    "optFollow": "follow the reading",
+    "optOn": "on",
+    "optOff": "off",
+    "optFollowTip": "When the reading moves on to the next section by itself, the page scrolls to that section. A skip always scrolls.",
+    "ruledBy": "D-074",
+    "lineBar": "pl.bar",
+    "lineFollow": "pl.follow"
   },
   "ov": {
     "items": {
@@ -874,6 +905,7 @@
     "copy": [
       "Here is where you copy your review.",
       "The review is one line per choice, {nChoices} lines in all, grouped as calls, proposals and patterns.",
+      "It ends with the player options, one line each.",
       "A note you write rides on its choice's line.",
       "Press copy and paste the text back to me.",
       "A line that says my pick is never a ruling."

@@ -402,7 +402,13 @@ Round 2 — source: his message of 2026-10-01 after reading `legibility/legibili
 - **where:** the review page · the listen buttons (D-072) and the contents strip at the top
 - **could not tell:** where the voice was, or how to move it — once the page scrolled, the controls stayed behind, and the reading had
   no tie to the place on the page.
-- **fix:** while a voice plays, the contents bar freezes at the top with stop, the previous and next section, and the sections; a skip
-  moves the reading and scrolls the page to that section.
+- **fix:** built: while a voice plays, the contents bar freezes at the top of the screen and carries the player: play and pause, stop,
+  the previous and next section, the sections with the one being read lit, and the speed. A skip (previous, next, or a section)
+  moves the reading to that section's summary and scrolls the page there, and the summary being read is highlighted; stop ends
+  the reading and the bar lets go. My proposals, drawn dashed: "follow the reading" (when the reading moves on by itself the page
+  follows it; on unless you turn it off) and "the bar stays at the top" (only while a voice plays is your reading and the default;
+  always is the alternative). Both are kept in this browser and ride the copy text. The page reads the voice you saved in the
+  voice lab (voice, speed, pitch, volume, the pauses, whether section names are read) and falls back to the browser's voice,
+  saying so in the bar's hover, where the saved voice is a Piper one.
 - **tag:** `player-without-a-place`
-- **status:** logged
+- **status:** built (D-074)

@@ -14,7 +14,7 @@
 
    READS   legibility-review.words.json (every authored sentence; a typed number stops the build — numbers are {tokens}) ·
            legibility-review.icons.json (the inline-svg marks, and which mark each pattern wears — no words in it) ·
-           ../legibility-feedback.md (the ledger: round 1 L-01..L-23, round 2 from L-24) · ../decisions.md (D-066..D-072) · patterns.json · review-r1.raw.json ·
+           ../legibility-feedback.md (the ledger: round 1 L-01..L-23, round 2 from L-24) · ../decisions.md (D-066..D-074) · patterns.json · review-r1.raw.json ·
            fix-1b.json · remaining.json · gap-l19.json · measures.{before,r1,r1b}.json ·
            ../../workflow-panel/shots/all-endpoints/walk.json (the walk's pictures, tagged by item and option) ·
            ../../workflow-panel/all-endpoints.words.json NOW and at 6170519 (git show — the options ADDED this round are the option
@@ -29,6 +29,8 @@
    page they feed, and a head that counted them could never equal its own commit.
    SPOKEN SUMMARIES (L-26): each section opens with a few sentences written to be read aloud — the words file holds the sentences as
    templates, this generator fills every number, and the build stops on an id, a path, a symbol or a {token} left in one.
+   THE PLAYER (L-27, D-074): the contents bar freezes at the top while a voice plays and carries the player; its words are words.player,
+   its marks are the icons file's (pause · prev · next · follow · pin). The page reads the voice lab's saved setting (gabe:voice:v1) at run time.
    No wallclock: same inputs, same bytes. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -542,7 +544,7 @@ for (const c of calls) c.motion = fill(c.motion, T, 'calls.motion.' + c.id);
 T.nPics = used.size;
 const fillTree = (o, at) => (typeof o === 'string' ? fill(o, T, at) : Array.isArray(o) ? o.map((v, i) => fillTree(v, at + '[' + i + ']')) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => k[0] !== '_').map(([k, v]) => [k, fillTree(v, at + '.' + k)])) : o);
 const omit = (o, ks) => Object.fromEntries(Object.entries(o).filter(([k]) => !ks.includes(k)));
-const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, mark: W.mark, say: W.say, ov: W.ov }, 'ui');
+const UI = fillTree({ page: W.page, toc: W.toc, sec: W.sec, calls: omit(W.calls, ['motion']), statusWord: W.statusWord, outcome: W.outcome, verdict: W.verdict, sev: W.sev, lens: W.lens, items: omit(W.items, ['names']), qs: W.qs, gap: W.gap, pat: W.pat, rem: W.rem, copy: W.copy, legend: W.legend, mark: W.mark, say: W.say, player: need(W, 'player', ''), ov: W.ov }, 'ui');
 
 /* ── 14 · the data, the hash, the page ─────────────────────────────────────────────────────────────────────────────── */
 const choices = [...calls.map((c) => ({ id: c.id, group: 'CALLS', mine: c.pick, ruled: c.ruled, ruledBy: c.ruledBy, opts: c.opts.map((o) => [o.v, o.name]) })),
@@ -555,7 +557,7 @@ if (new Set(choices.map((c) => c.id)).size !== choices.length) die('two choices 
    The icons file holds geometry only; every mark's word is read from the words file, so a concept has one word. A pattern with no
    mark of its own, a mark two patterns share, or a mark the page needs and the file lacks stops the build. */
 const IC = rj(path.join(HERE, 'legibility-review.icons.json'));
-{ const NEED = ['built', 'option', 'question', 'logged', 'deferred', 'fixed', 'partly', 'left', 'open', 'his', 'mine', 'yours', 'ruled', 'land', 'notyet', 'surface', 'feed', 'process', 'down', 'same', 'up', 'code', 'page', 'map', 'copy', 'play', 'stop', 'speaker', 'check'];
+{ const NEED = ['built', 'option', 'question', 'logged', 'deferred', 'fixed', 'partly', 'left', 'open', 'his', 'mine', 'yours', 'ruled', 'land', 'notyet', 'surface', 'feed', 'process', 'down', 'same', 'up', 'code', 'page', 'map', 'copy', 'play', 'stop', 'speaker', 'check', 'pause', 'prev', 'next', 'follow', 'pin'];
   for (const k of NEED) if (!IC.marks[k]) die('icons: the page needs a mark named ' + k);
   for (const [k, v] of Object.entries(IC.marks)) if (/<(script|style|a|foreignObject|image)\b|\bon\w+\s*=|javascript:/i.test(v)) die('icons: a mark that is not plain shapes: ' + k);
   for (const p of PATS) { const n = IC.pattern[p.id]; if (!n) die(`icons: pattern ${p.id} wears no mark of its own`); if (!IC.marks[n]) die(`icons: pattern ${p.id} wears “${n}”, which is not in marks`); }

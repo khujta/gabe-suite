@@ -132,14 +132,39 @@
   .prop .what { font-size: var(--fs-sm); color: var(--ink); margin: 0; }
   .landnote { font-size: 1em; color: var(--ink); margin: 0; border: 1.5px solid var(--accent); border-radius: 8px; padding: 8px 12px; }
 
-  /* the contents strip (L21, L11): every section one jump away, and a way back from each */
-  nav.toc { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; font-size: var(--fs-sm); }
-  nav.toc .lab { margin-right: 4px; }
-  nav.toc a, a.up, a.ref { color: var(--accent); text-decoration: none; }
-  nav.toc a:hover, a.up:hover, a.ref:hover { text-decoration: underline; }
+  /* the contents bar (L21, L11, L-27): every section one jump away, and a way back from each. While a voice plays (or always, if you pick it) it
+     freezes at the top of the screen and carries the player. It is one box either way: freezing moves nothing, it only holds the bar in place. */
+  :root { --bar-h: 0px; }
+  nav.toc { display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-sm); position: static; z-index: 100; background: var(--ground); padding: 8px 0; margin: -22px 0 -8px; }
+  nav.toc[data-frozen="true"] { position: sticky; top: 0; box-shadow: 0 1px 0 var(--rule), 0 12px 14px -12px rgba(0, 0, 0, .5); }
+  nav.toc .row { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; min-width: 0; }
+  nav.toc .lab { margin-right: 2px; }
+  nav.toc .player { display: none; }
+  nav.toc[data-player="true"] .player { display: flex; }
+  .pb { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 34px; height: 32px; padding: 0 9px; box-sizing: border-box; font: inherit; font-size: var(--fs-sm); letter-spacing: inherit; color: var(--ink); background: var(--raised); border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; }
+  .pb:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .pb:disabled { opacity: .45; cursor: default; }
+  .pb .ico { width: 1.2em; height: 1.2em; }
+  .pb.go { background: var(--accent); border-color: var(--accent); color: var(--ground); }
+  .pb.go:hover:not(:disabled) { color: var(--ground); filter: brightness(1.08); }
+  .pb[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+  .pb[aria-pressed="false"] .ico { opacity: .7; }
+  .vox { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-min); color: var(--ink-soft); min-width: 0; }
+  .vox .ico { width: 1.3em; height: 1.3em; color: var(--accent); flex: 0 0 auto; }
+  .vox .vn { max-width: 18ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tcs { position: relative; }
+  nav.toc .tcs > * { flex: 0 0 auto; white-space: nowrap; }
+  nav.toc a.tc { color: var(--ink-soft); text-decoration: none; border: 1px solid var(--rule); border-radius: 10px; padding: 0 10px; line-height: 1.8; background: var(--card); white-space: nowrap; }
+  nav.toc a.tc:hover { border-color: var(--accent); color: var(--accent); }
+  nav.toc a.tc[data-lit="true"] { background: var(--accent); border-color: var(--accent); color: var(--ground); }
+  @media (max-width: 720px) { nav.toc[data-frozen="true"] { padding-right: 28px; } nav.toc .tcs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; } nav.toc .player { gap: 6px; } .vox, .pb .fw { display: none; } .pb { padding: 0 6px; } .bar-rate .sel { padding: 0 3px; } }   /* a phone: clear of the fixed cog, one row of controls, the chips scroll inside their own row */
+  nav.toc a.up, a.up, a.ref { color: var(--accent); text-decoration: none; }
+  a.up:hover, a.ref:hover { text-decoration: underline; }
   a.up { font-size: var(--fs-min); letter-spacing: .04em; }
   a.chip.ref { display: inline-block; }
-  [id^="item-"] { scroll-margin-top: 16px; }
+  .artifact-page [id] { scroll-margin-top: calc(var(--bar-h, 0px) + 14px); }   /* a jump lands below the frozen bar */
+  .artifact-page #toc { scroll-margin-top: 0; }
+  .say[data-reading="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }   /* the summary being read */
   .sub2 { font-size: var(--fs-sm); color: var(--muted); margin: 6px 0 0; letter-spacing: .06em; text-transform: uppercase; }
   .costl { font-size: var(--fs-sm); color: var(--ink); margin: 0; }
   .costl b, .against b, .because b { color: var(--muted); font-weight: 400; font-size: var(--fs-min); letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; }
@@ -158,7 +183,7 @@
   h3.hp .mk.pm .ico { width: 1.5em; height: 1.5em; }
   .btn.ic { display: inline-flex; align-items: center; gap: 7px; }
   .btn.ic .ico { width: 1.1em; height: 1.1em; }
-  .btn.ls[data-on="true"] { border-style: solid; background: var(--accent-soft); }
+  .btn.ls[data-on="true"] { border-style: solid; background: var(--accent-soft); color: var(--accent); }
   .btn[hidden], .rate[hidden], .ls[hidden] { display: none; }
   .btn.ls { border-width: 1.5px; }
 
@@ -175,6 +200,11 @@
   .topacts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 14px; }
   .rate { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-sm); color: var(--ink-soft); }
   .sel { font: inherit; font-size: var(--fs-sm); color: var(--ink); background: var(--raised); border: 1.5px dashed var(--accent); border-radius: 8px; padding: 4px 8px; }
+  .opt { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: var(--fs-sm); color: var(--ink-soft); }
+  .opt[hidden] { display: none; }
+  .opt .btn.ic .ico { width: 1.1em; height: 1.1em; }
+  .bar-rate { display: inline-flex; align-items: center; }
+  .bar-rate .sel { height: 32px; box-sizing: border-box; padding: 0 8px; }
 
   /* the spoken summary that opens every section (L-26) */
   .say { gap: 8px; background: var(--raised); }
@@ -199,8 +229,9 @@
       <div class="key"><span><button class="btn" data-mine="true" type="button" tabindex="-1" id="key-dashed"></button><span id="key-mine"></span></span><span><button class="btn" aria-pressed="true" type="button" tabindex="-1" id="key-filled"></button><span id="key-yours"></span></span><span id="count" class="state"></span></div>
       <div class="lg-groups" id="lg-groups"></div>
     </section>
-    <nav class="toc" id="toc" aria-label="contents"></nav>
+    <div id="toc"></div>
   </header>
+  <nav class="toc" id="bar" aria-label="contents" data-frozen="false" data-player="false"></nav>
 
   <section class="sec" data-sec="1" id="sec-glance">
     <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg><span class="st"></span></h2><span class="n"></span></div>
@@ -310,28 +341,99 @@
     function legacy() { try { var t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select();
         var ok = document.execCommand("copy"); document.body.removeChild(t); ok ? done() : fail(); } catch (e) { fail(); } }
     try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, legacy); else legacy(); } catch (e) { legacy(); } }
+  /* ── the player (L-27, D-074): one reading, a run of the summaries; the contents bar freezes at the top while it plays and steers it ──
+     A reading is a section and a sentence in it. Every sentence is its own utterance, so a pause, a skip and a stop all land on a sentence.
+     The voice settings are the voice lab's (gabe:voice:v1), read again at every sentence so a change there reaches the next one. */
   var speech = (function () {
-    var SS = window.speechSynthesis, ok = !!(SS && window.SpeechSynthesisUtterance), X = U.say, RATES = [0.8, 1, 1.25], idx = 1, btns = [], cur = null, voice = null;
+    var SS = window.speechSynthesis, ok = !!(SS && window.SpeechSynthesisUtterance), X = U.say, P = U.player, RATES = [0.8, 1, 1.25], idx = 1, VK = "gabe:voice:v1", N = D.say.length;
+    var R = { on: false, paused: false, i: 0, s: 0, all: false, gen: 0, timer: 0, parts: [] }, btns = [], sels = [], bar = null, c = {}, chips = [], tcs = null, voxEl = null, voxName = null;
     try { var r = window.localStorage.getItem(KEY + ":rate"); if (r !== null && /^[0-2]$/.test(r)) idx = Number(r); } catch (e) {}
-    /* an English voice whose name says Natural or Google, else the browser's own default */
-    function pick() { try { var vs = SS.getVoices().filter(function (v) { return /^en\b/i.test(v.lang); }); voice = vs.filter(function (v) { return /Natural/i.test(v.name); })[0] || vs.filter(function (v) { return /Google/i.test(v.name); })[0] || null; } catch (e) { voice = null; } }
-    if (ok) { pick(); try { SS.addEventListener("voiceschanged", pick); } catch (e) { SS.onvoiceschanged = pick; } }
-    function paint() { btns.forEach(function (b) { var on = !!cur && cur.btn === b.el; b.el.setAttribute("data-on", String(on)); b.el.setAttribute("aria-pressed", String(on)); b.lab.textContent = on ? X.stop : b.word; b.slot.textContent = ""; b.slot.appendChild(ico(on ? "stop" : "play")); }); }
-    function stop() { cur = null; try { SS.cancel(); } catch (e) {} paint(); }
-    function run(btn, parts) { stop(); var token = { btn: btn }, i = 0; cur = token; paint();
-      function next() { if (cur !== token) return; if (i >= parts.length) { cur = null; paint(); return; }
-        var u = new SpeechSynthesisUtterance(parts[i++]); u.rate = RATES[idx]; if (voice) { u.voice = voice; u.lang = voice.lang; }
-        u.onend = next; u.onerror = function (e) { if (cur === token && e && e.error !== "interrupted" && e.error !== "canceled") { cur = null; paint(); } };
-        try { SS.speak(u); } catch (e) { cur = null; paint(); } }
-      setTimeout(next, 80); }
-    return { ok: ok,
-      button: function (getParts, word) { var b = el("button", "btn ic ls"), slot = el("span"), lab = el("span", null, word); b.type = "button"; b.setAttribute("data-mine", "true"); b.title = X.tip; b.setAttribute("data-listen", "");
-        slot.appendChild(ico("play")); b.appendChild(slot); b.appendChild(lab); btns.push({ el: b, lab: lab, slot: slot, word: word }); if (!ok) b.hidden = true;
-        b.addEventListener("click", function () { if (cur && cur.btn === b) stop(); else run(b, getParts()); }); return b; },
-      rate: function () { var w = el("label", "rate"), sel = el("select", "sel"); w.appendChild(document.createTextNode(X.rateLabel)); w.setAttribute("data-listen-rate", "");
-        X.rates.forEach(function (t, i) { var o = el("option", null, t); o.value = String(i); sel.appendChild(o); }); sel.value = String(idx); sel.title = X.tip;
-        sel.addEventListener("change", function () { idx = Number(sel.value); try { window.localStorage.setItem(KEY + ":rate", String(idx)); } catch (e) {} });
-        w.appendChild(sel); if (!ok) w.hidden = true; return w; } };
+    function num(v, d, lo, hi) { var n = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" ? Number(v) : NaN; return isFinite(n) && n >= lo && n <= hi ? n : d; }
+    function saved() { try { var s = JSON.parse(window.localStorage.getItem(VK) || "null"); return s && typeof s === "object" && !Array.isArray(s) ? s : null; } catch (e) { return null; } }
+    function voices() { try { return SS.getVoices() || []; } catch (e) { return []; } }
+    /* the saved voice by its name; else an English voice whose name says Natural or Google; else the browser's own default. A Piper voice has no live voice here. */
+    function resolve() { var s = saved(), vs = ok ? voices() : [], want = s && typeof s.voice === "string" ? s.voice : "", piper = !!s && /piper/i.test(String(s.engine || "")), v = null;
+      if (s && want && !piper) v = vs.filter(function (x) { return x.name === want; })[0] || vs.filter(function (x) { return x.name.toLowerCase() === want.toLowerCase(); })[0] || null;
+      var en = vs.filter(function (x) { return /^en\b/i.test(x.lang); }), d = v || en.filter(function (x) { return /Natural/i.test(x.name); })[0] || en.filter(function (x) { return /Google/i.test(x.name); })[0] || null, note;
+      if (piper) note = rt(P.voicePiper, { name: want || "Piper" });
+      else if (s && want && !v) note = rt(P.voiceMissing, { name: want });
+      else if (v) note = rt(P.voiceSaved, { name: v.name });
+      else if (d) note = rt(P.voiceDefault, { name: d.name });
+      else note = P.voiceNone;
+      return { voice: d, name: d ? d.name : P.defaultName, note: note, lang: s && typeof s.lang === "string" ? s.lang : "" }; }
+    function titlesOn() { var s = saved(); return s && typeof s.readTitles === "boolean" ? s.readTitles : R.all; }   /* no saved setting: the titles are read in a run through every summary, as before */
+    function partsOf(i) { var sd = D.say[i], p = sentences(sd.text); return titlesOn() ? [sd.title + "."].concat(p) : p; }
+    function pauseMs(k) { var s = saved() || {}; return num(k === "sec" ? s.pauseSection : s.pauseSentence, 0, 0, 10000); }
+    function followOn() { return pref("follow") === "on"; }
+    function barBottom() { return bar && bar.getAttribute("data-frozen") === "true" ? bar.getBoundingClientRect().bottom : 0; }
+    function viewSection() { var y = barBottom() + 80, k = 0; D.say.forEach(function (x, i) { var s = $(x.id); if (s && s.getBoundingClientRect().top <= y) k = i; }); return k; }
+    /* the page goes to a section: always for a skip, only when the summary is out of sight for a start */
+    function reveal(i, force) { var s = $(D.say[i].id), b = s && s.querySelector("[data-say]"); if (!s) return;
+      if (!force && b) { var r = b.getBoundingClientRect(); if (r.bottom > barBottom() && r.top < window.innerHeight) return; }
+      try { s.scrollIntoView({ block: "start" }); } catch (e) { s.scrollIntoView(); } }
+    function cancelTalk() { if (ok) { try { SS.cancel(); } catch (e) {} } }
+    function clearTimer() { if (R.timer) { clearTimeout(R.timer); R.timer = 0; } }
+    function setBarH() { var f = !!bar && bar.getAttribute("data-frozen") === "true"; document.documentElement.style.setProperty("--bar-h", f ? Math.ceil(bar.getBoundingClientRect().height) + "px" : "0px"); }
+    function paint() { var on = R.on;
+      btns.forEach(function (b) { var lit = on && (b.kind === "all" ? R.all : R.i === b.at); b.el.setAttribute("data-on", String(lit)); b.el.setAttribute("aria-pressed", String(lit)); b.lab.textContent = lit ? X.stop : b.word; b.slot.textContent = ""; b.slot.appendChild(ico(lit ? "stop" : "play")); });
+      [].forEach.call(document.querySelectorAll("[data-say]"), function (b) { b.setAttribute("data-reading", String(on && b.getAttribute("data-say") === D.say[R.i].key)); });
+      if (!bar) return;
+      var frozen = on || (ok && pref("bar") === "always");
+      bar.setAttribute("data-frozen", String(frozen)); bar.setAttribute("data-player", String(ok && frozen));
+      if (ok) { var playing = on && !R.paused, pw = playing ? P.pause : P.play;
+        c.pp.setAttribute("aria-label", pw); c.pp.title = pw; c.pp.setAttribute("data-state", playing ? "playing" : on ? "paused" : "idle"); c.pp.textContent = ""; c.pp.appendChild(ico(playing ? "pause" : "play"));
+        c.stop.disabled = !on; c.prev.disabled = !on || R.i <= 0; c.next.disabled = !on || R.i >= N - 1; c.follow.setAttribute("aria-pressed", String(followOn()));
+        var rs = resolve(); voxName.textContent = rs.name; voxEl.title = rs.note; voxEl.setAttribute("aria-label", rs.note); }
+      chips.forEach(function (a, k) { var lit = on && k === R.i; a.setAttribute("data-lit", String(lit)); if (lit) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current"); });
+      if (on && tcs && tcs.scrollWidth > tcs.clientWidth + 1) { var a = chips[R.i]; tcs.scrollLeft = Math.max(0, a.offsetLeft - (tcs.clientWidth - a.offsetWidth) / 2); }
+      setBarH(); }
+    function enter(i, how) { R.i = i; R.s = 0; R.parts = partsOf(i); paint();
+      if (how === "skip" || (how === "auto" && followOn()) || (how === "start-all" && followOn())) reveal(i, how !== "start-all"); }
+    function later(g, ms) { if (ms > 0) R.timer = setTimeout(function () { R.timer = 0; speakNow(g); }, ms); else speakNow(g); }
+    function stop() { clearTimer(); R.gen++; cancelTalk(); R.on = false; R.paused = false; paint(); }
+    function speakNow(g) { if (R.gen !== g || !R.on || R.paused) return; var t = R.parts[R.s]; if (t === undefined) { stop(); return; }
+      var s = saved() || {}, rs = resolve(), u = new SpeechSynthesisUtterance(t);
+      u.rate = Math.min(10, Math.max(0.1, num(s.rate, 1, 0.1, 10) * RATES[idx])); u.pitch = num(s.pitch, 1, 0, 2); u.volume = num(s.volume, 1, 0, 1);
+      if (rs.voice) { u.voice = rs.voice; u.lang = rs.voice.lang; } else if (rs.lang) u.lang = rs.lang;
+      u.onend = function () { if (R.gen === g) step(g); };
+      u.onerror = function (e) { if (R.gen === g && e && e.error !== "interrupted" && e.error !== "canceled") stop(); };
+      try { SS.speak(u); } catch (e) { stop(); } }
+    /* a sentence ended: the next one, after its pause; at the end of a section the next section, after its pause; at the end of the last, stop */
+    function step(g) { if (R.gen !== g || !R.on) return;
+      if (R.s + 1 < R.parts.length) { R.s++; later(g, pauseMs("s")); return; }
+      if (R.all && R.i < N - 1) { enter(R.i + 1, "auto"); later(g, pauseMs("sec")); return; }
+      stop(); }
+    function begin(i, all, how) { clearTimer(); R.gen++; cancelTalk(); R.on = true; R.paused = false; R.all = all; enter(i, how); later(R.gen, 80); }   /* a beat after a cancel: some engines drop what they are given at once */
+    function pause() { if (!R.on || R.paused) return; R.paused = true; clearTimer(); R.gen++; cancelTalk(); paint(); }
+    function resume() { if (!R.on || !R.paused) return; R.paused = false; R.gen++; paint(); later(R.gen, 80); }
+    /* a skip moves the reading to a section's summary AND the page to the section; from then on the reading goes on through the rest */
+    function skipTo(i) { if (!R.on) return; i = Math.max(0, Math.min(N - 1, i)); clearTimer(); R.gen++; cancelTalk(); R.all = true; enter(i, "skip"); if (!R.paused) later(R.gen, 80); }
+    function pbtn(act, icon, word, fn) { var b = el("button", "pb"); b.type = "button"; b.setAttribute("data-act", act); b.setAttribute("aria-label", word); b.title = word; b.appendChild(ico(icon)); b.addEventListener("click", fn); return b; }
+    function bindVoices() { if (!ok) return; try { SS.addEventListener("voiceschanged", paint); } catch (e) { SS.onvoiceschanged = paint; } }
+    bindVoices();
+    LEG.reading = function () { return { on: R.on, paused: R.paused, i: R.i, s: R.s, all: R.all, key: D.say[R.i].key }; };
+    return { ok: ok, refresh: paint,
+      button: function (kind, at, word) { var b = el("button", "btn ic ls"), slot = el("span"), lab = el("span", null, word); b.type = "button"; b.setAttribute("data-mine", "true"); b.title = X.tip; b.setAttribute("data-listen", "");
+        slot.appendChild(ico("play")); b.appendChild(slot); b.appendChild(lab); btns.push({ el: b, lab: lab, slot: slot, word: word, kind: kind, at: at }); if (!ok) b.hidden = true;
+        b.addEventListener("click", function () { var lit = R.on && (kind === "all" ? R.all : R.i === at); if (lit) stop(); else if (kind === "all") begin(0, true, "start-all"); else begin(at, false, "start"); }); return b; },
+      rate: function (inBar) { var w = el("label", inBar ? "bar-rate" : "rate"), sel = el("select", "sel");
+        if (inBar) { sel.setAttribute("aria-label", X.rateLabel); w.setAttribute("data-bar-rate", ""); } else { w.appendChild(document.createTextNode(X.rateLabel)); w.setAttribute("data-listen-rate", ""); }
+        X.rates.forEach(function (t, i) { var o = el("option", null, t); o.value = String(i); sel.appendChild(o); }); sel.value = String(idx); sel.title = X.rateTip; sels.push(sel);
+        sel.addEventListener("change", function () { idx = Number(sel.value); sels.forEach(function (x) { x.value = String(idx); }); try { window.localStorage.setItem(KEY + ":rate", String(idx)); } catch (e) {} });
+        w.appendChild(sel); if (!ok) w.hidden = true; return w; },
+      /* the contents bar: the player (where the browser speaks) over the sections, one chip each */
+      mount: function (nav, head, secs) { bar = nav;
+        if (ok) { var pl = el("div", "row player"); pl.setAttribute("data-player-box", "");
+          c.pp = pbtn("playpause", "play", P.play, function () { if (!R.on) begin(viewSection(), true, "bar"); else if (R.paused) resume(); else pause(); }); c.pp.classList.add("go");
+          c.stop = pbtn("stop", "stop", P.stop, stop); c.prev = pbtn("prev", "prev", P.prev, function () { skipTo(R.i - 1); }); c.next = pbtn("next", "next", P.next, function () { skipTo(R.i + 1); });
+          voxEl = el("span", "vox"); voxEl.setAttribute("role", "img"); voxEl.appendChild(ico("speaker")); voxName = el("span", "vn"); voxEl.appendChild(voxName);
+          c.follow = pbtn("follow", "follow", P.followTip, function () { setPref("follow", followOn() ? "off" : "on"); }); c.follow.appendChild(el("span", "fw", P.follow));
+          [c.pp, c.stop, c.prev, c.next, voxEl, this.rate(true), c.follow].forEach(function (x) { pl.appendChild(x); }); nav.appendChild(pl); }
+        tcs = el("div", "row tcs"); tcs.appendChild(el("span", "lab", head));
+        secs.forEach(function (s, k) { var a = el("a", "tc", s.title); a.href = "#" + s.id; a.setAttribute("data-toc", s.id); a.addEventListener("click", function (e) { if (R.on) { e.preventDefault(); skipTo(k); } }); chips.push(a); tcs.appendChild(a); });
+        nav.appendChild(tcs);
+        if (typeof ResizeObserver === "function") { try { new ResizeObserver(setBarH).observe(nav); } catch (e) {} }
+        paint(); } };
   })();
   var SAYS = {}; D.say.forEach(function (x) { SAYS[x.key] = x; });
   function sentences(t) { return t.split(/(?<=[.!?])\s+/); }
@@ -341,7 +443,7 @@
     var tx = el("p", "say-text", S.text); tx.setAttribute("data-say-text", key); box.appendChild(tx);
     cp.type = "button"; cp.setAttribute("data-say-copy", key); cp.appendChild(ico("copy")); cp.appendChild(el("span", null, X.copy));
     cp.addEventListener("click", function () { copyText(S.text, said); }); said.setAttribute("aria-live", "polite");
-    acts.appendChild(cp); acts.appendChild(speech.button(function () { return sentences(S.text); }, X.listen)); acts.appendChild(said); box.appendChild(acts); return box; }
+    acts.appendChild(cp); acts.appendChild(speech.button("sec", D.say.indexOf(S), X.listen)); acts.appendChild(said); box.appendChild(acts); return box; }
 
   /* ── header ── */
   $("eyebrow").textContent = U.page.eyebrow; $("title").textContent = U.page.h1; $("lede").textContent = U.page.lede; $("source").textContent = U.page.source;
@@ -350,10 +452,8 @@
   (function () { var X = U.say, host = $("topacts"), said = el("span", "said"), ca = el("button", "btn pri ic");
     ca.type = "button"; ca.id = "copyall"; ca.appendChild(ico("copy")); ca.appendChild(el("span", null, X.copyAll)); said.id = "said-all"; said.setAttribute("aria-live", "polite");
     ca.addEventListener("click", function () { copyText(D.say.map(function (x) { return x.title + "\n" + x.text; }).join("\n\n"), said); });
-    host.appendChild(ca); var la = speech.button(function () { return [].concat.apply([], D.say.map(function (x) { return [x.title + "."].concat(sentences(x.text)); })); }, X.listenAll); la.id = "listenall"; host.appendChild(la); host.appendChild(speech.rate()); host.appendChild(said);
+    host.appendChild(ca); var la = speech.button("all", 0, X.listenAll); la.id = "listenall"; host.appendChild(la); host.appendChild(speech.rate()); host.appendChild(said);
     $("mine-note").textContent = X.mineNote; })();
-  (function () { var n = $("toc"); n.appendChild(el("span", "lab", U.toc.head)); ["sec-glance", "sec-rem", "sec-pat", "sec-calls", "sec-items", "sec-qs", "sec-gap", "sec-copy"].forEach(function (id) {
-      var k = id.slice(4), w = U.sec[k], a = el("a", null, w.title); a.href = "#" + id; n.appendChild(a); }); })();
 
   /* ── the legend: every mark's word, said once (L-25) ── */
   (function () { var Lg = U.legend, g = $("lg-groups"); $("legend-h").textContent = Lg.head; $("legend-note").textContent = Lg.note;
@@ -371,8 +471,13 @@
 
   /* ── state: one value + one note per choice id; nothing is saved at boot ── */
   var CH = {}; D.choices.forEach(function (c) { CH[c.id] = c; });
+  var PREFS = { bar: ["playing", "always"], follow: ["on", "off"] };
   var state = (function () { try { var s = JSON.parse(window.localStorage.getItem(KEY) || "null"); if (s && s.v) { Object.keys(s.v).forEach(function (k) { var c = CH[k], x = s.v[k];
-          if (!c || !x || (x.v && !c.opts.some(function (o) { return o[0] === x.v; }))) delete s.v[k]; }); return s; } } catch (e) {} return { v: {} }; })();
+          if (!c || !x || (x.v && !c.opts.some(function (o) { return o[0] === x.v; }))) delete s.v[k]; });
+        if (s.p && typeof s.p === "object") Object.keys(s.p).forEach(function (k) { if (!PREFS[k] || PREFS[k].indexOf(s.p[k]) < 0) delete s.p[k]; }); else delete s.p; return s; } } catch (e) {} return { v: {} }; })();
+  /* the player's two options (L-27): kept per viewer beside the choices, in the same store; the first value of each is the default */
+  function pref(k) { var v = state && state.p && state.p[k]; return PREFS[k].indexOf(v) >= 0 ? v : PREFS[k][0]; }
+  function setPref(k, v) { state.p = state.p || {}; if (state.p[k] === v) delete state.p[k]; else state.p[k] = v; if (!Object.keys(state.p).length) delete state.p; save(); repaint(); }
   function save() { try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
   function eff(c) { var s = state.v[c.id]; return (s && s.v) || c.ruled || null; }
   var painters = [];
@@ -399,6 +504,18 @@
       var r = [c.name, wh].concat(c.vals.map(function (v) { return v == null ? W.noSection : v; })); r.push(d ? M(d) : ""); r.down = d; return r; });
     var tw = table([W.colCheck, W.colWhat].concat(D.glance.labels, [W.colChange]), rows, ["sv", "", "num", "num", "num", "sv"]);
     rows.forEach(function (r, i) { if (r.down === "down") tw.querySelectorAll("tr")[i + 1].children[4].classList.add("lower"); }); return tw; }
+
+  /* ── the contents bar and the player's two options (L-27), mounted now that the state is there ── */
+  (function () { var P = U.player, host = $("topacts"), after = $("said-all");
+    $("bar").setAttribute("aria-label", P.bar); speech.mount($("bar"), U.toc.head, ["sec-glance", "sec-rem", "sec-pat", "sec-calls", "sec-items", "sec-qs", "sec-gap", "sec-copy"].map(function (id) { return { id: id, title: U.sec[id.slice(4)].title }; }));
+    function group(k, label, tip, opts) { var g = el("span", "opt"); g.setAttribute("data-opt", k); g.title = tip; if (!speech.ok) g.hidden = true; g.appendChild(el("span", null, label));
+      opts.forEach(function (o) { var b = el("button", "btn ic"); b.type = "button"; b.setAttribute("data-v", o.v); b.setAttribute("data-pref", k); if (o.ruled) b.title = U.mark.ruled; if (o.icon) b.appendChild(ico(o.icon)); b.appendChild(el("span", null, o.name));
+        b.addEventListener("click", function () { setPref(k, o.v); });
+        painters.push(function () { var st = state.p && state.p[k]; b.setAttribute("aria-pressed", String(st ? st === o.v : !!o.ruled)); b.setAttribute("data-mine", String(!st && !!o.mine)); }); g.appendChild(b); });
+      host.insertBefore(g, after); }
+    group("bar", P.optBar, P.optBarTip, [{ v: "playing", name: P.optBarPlaying, ruled: true, icon: "ruled" }, { v: "always", name: P.optBarAlways, mine: true, icon: "pin" }]);
+    group("follow", P.optFollow, P.optFollowTip, [{ v: "on", name: P.optOn, mine: true }, { v: "off", name: P.optOff }]);
+    painters.push(function () { speech.refresh(); }); })();
 
   /* ── 1 · at a glance ── */
   (function () { var G = D.glance, W = U.sec.glance, B = sec("sec-glance", W), cols = el("div", "grid2");
@@ -562,6 +679,13 @@
       D.choices.filter(function (c) { return c.group === g; }).forEach(function (c) { var e = eff(c), s = state.v[c.id] || {}, how, val;
         if (e) { yours++; val = nameOf(c, e); how = c.ruled ? (e === c.ruled ? rt(CW.ruled, { by: c.ruledBy }) : rt(CW.changedRuled, { ruled: nameOf(c, c.ruled), by: c.ruledBy })) : e === c.mine ? CW.same : rt(CW.differs, { mine: nameOf(c, c.mine) }); } else { mine++; val = nameOf(c, c.mine); how = CW.minePick; }
         body.push(c.id + ": " + val + " (" + how + ")" + (s.n ? " · " + rt(CW.note, { note: s.n.replace(/\s+/g, " ").trim() }) : "")); }); });
+    /* the player's two options ride the copy text too (L-27): bar = ruled by default, follow = my pick by default */
+    var PL = U.player; body.push(""); body.push(CW.groups.PLAYER);
+    [["bar", PL.lineBar, { playing: PL.optBarPlaying, always: PL.optBarAlways }, "playing", "always"], ["follow", PL.lineFollow, { on: PL.optOn, off: PL.optOff }, null, "on"]].forEach(function (g) {
+      var k = g[0], nm = g[2], ruled = g[3], mine = g[4], st = state.p && state.p[k], e = st || ruled, val, how;
+      if (ruled) { val = nm[e]; how = e === ruled ? rt(CW.ruled, { by: PL.ruledBy }) : rt(CW.changedRuled, { ruled: nm[ruled], by: PL.ruledBy }); }
+      else if (st) { val = nm[st]; how = st === mine ? CW.same : rt(CW.differs, { mine: nm[mine] }); } else { val = nm[mine]; how = CW.minePick; }
+      body.push(g[1] + ": " + val + " (" + how + ")"); });
     out.value = [rt(CW.head, { pageSha: D.pageSha }), rt(CW.counts, { yours: yours, mine: mine })].concat(body).join("\n");
     $("count").textContent = rt(U.page.count, { yours: yours, mine: mine }); }
   $("copy").addEventListener("click", function () { var said = $("said"); out.select();
