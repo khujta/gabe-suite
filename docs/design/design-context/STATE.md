@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-074). Updated 2026-10-01 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-075). Updated 2026-10-01 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -65,7 +65,9 @@ Then (D-073, D-074): the **voice lab** `legibility/voices/voice-lab.html` — on
 every setting tunable, 15 Piper samples (5 voices × 3 speeds), one copy line `VOICE · engine … · voice … · speed …` — published
 privately at https://claude.ai/artifact/6aChNSpmewj39KQSsSeH8m; and the review page's contents bar now freezes while a voice reads
 and steers it (skip = the reading AND the page move). Both read one saved setting, `gabe:voice:v1`. Tested only against a mocked
-voice engine: his first listen on Windows is the real test. His pasted VOICE line becomes the ruled default.
+voice engine: his first listen on Windows is the real test. **His pick is ruled (D-075):** Google UK English Female (en-GB),
+speed 1.15, pitch 1.0, pause between sentences 250 ms — the default on both pages, from `legibility/voices/voice.ruled.json`
+(volume, pause between sections and section names stay my picks). It is a Chrome online voice; elsewhere the pages fall back and say so.
 
 ## Open for you — on the review page
 
@@ -88,7 +90,7 @@ secrets a path reads (settings{} has them, unjoined).
 
 ## Next, in order
 
-1. **His VOICE line** from the voice lab, and **his REVIEW text** for round 1 → act on each line (a ruling = a D-entry in the same commit); "my pick, not ruled" is never a ruling.
+1. **His REVIEW text** for round 1 → act on each line (a ruling = a D-entry in the same commit); "my pick, not ruled" is never a ruling.
 2. **The patterns into the Gabe Suite** — only the proposals he marks "land it", as a draft first (iterate-before-implement).
 3. **M3** (the channel budget for the first prism), then **the gallery**.
 4. Generation items above, each under its D-063 regime.
