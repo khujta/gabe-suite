@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-075). Updated 2026-10-01 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-077). Updated 2026-10-01 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -68,6 +68,11 @@ and steers it (skip = the reading AND the page move). Both read one saved settin
 voice engine: his first listen on Windows is the real test. **His pick is ruled (D-075):** Google UK English Female (en-GB),
 speed 1.15, pitch 1.0, pause between sentences 250 ms — the default on both pages, from `legibility/voices/voice.ruled.json`
 (volume, pause between sections and section names stay my picks). It is a Chrome online voice; elsewhere the pages fall back and say so.
+Then D-076/D-077: the bar shows ALL THE TIME on both pages (his ruling, having played it); its menu nests — The patterns,
+Your calls and The gap analysis are dropdowns of their 53 decisions, each with a spoken summary and a gabe-lens plain line, a
+"next open decision" button. **Draft for the suite, awaiting his "land it":** `legibility/drafts/gabe-artifact-read-aloud/` —
+the read-aloud bar as a reusable gabe-artifact part (H7 clause, reference, module, demo, a gate that fires without the bar and
+stays silent with it, a battery); its README says what lands where and the cost (+1 browser battery ≈ 35 s on the doctor).
 
 ## Open for you — on the review page
 
@@ -90,7 +95,7 @@ secrets a path reads (settings{} has them, unjoined).
 
 ## Next, in order
 
-1. **His REVIEW text** for round 1 → act on each line (a ruling = a D-entry in the same commit); "my pick, not ruled" is never a ruling.
+1. **His "land it" (or not) on the read-aloud draft**, and **his REVIEW text** for round 1 → act on each line (a ruling = a D-entry in the same commit); "my pick, not ruled" is never a ruling.
 2. **The patterns into the Gabe Suite** — only the proposals he marks "land it", as a draft first (iterate-before-implement).
 3. **M3** (the channel budget for the first prism), then **the gallery**.
 4. Generation items above, each under its D-063 regime.
