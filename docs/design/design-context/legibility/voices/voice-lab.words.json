@@ -1,0 +1,259 @@
+{
+  "_about": "Every sentence the voice lab draws (D-073, D-074). A number is never typed here: it is a {token} the generator fills (gen-voice-lab.mjs), or a {{token}} the page fills while it runs. The build stops on a typed number, a word D-018 took out, a he, him or his, and a {token} left unfilled. Words are short and plain: what a thing is and does.",
+  "page": {
+    "eyebrow": "Voice lab · D-073 · D-074",
+    "h1": "Which voice should read your summaries aloud?",
+    "lede": "This page reads one text in many voices. You change a setting, listen, and decide. A button then copies your pick as one line to paste back to me. The text starts as the {nSections} spoken summaries of the review page. You can edit it.",
+    "source": "The text was read from the review page when this page was built. Your browser's voices are listed live. The local voices were made on this machine with Piper.",
+    "keyDashed": "dashed",
+    "keyMine": "my pick, not a ruling",
+    "keyFilled": "filled",
+    "keyYours": "yours",
+    "mineNote": "A dashed value is my pick. When you change it, it turns filled and counts as yours. The line at the end says which is which."
+  },
+  "toc": {
+    "head": "On this page",
+    "up": "back to the contents"
+  },
+  "sec": {
+    "text": {
+      "title": "The text",
+      "n": "{{sections}} sections · {{sentences}} sentences",
+      "take": "Every voice below reads this text. Edit it, paste your own, or keep the review's summaries."
+    },
+    "browser": {
+      "title": "Your browser's voices",
+      "n": "{{shown}} of {{all}} voices shown",
+      "take": "These are the voices your browser offers. They differ on every device. A voice marked online sends the text away to be read."
+    },
+    "local": {
+      "title": "Local voices (Piper)",
+      "n": "{nVoices} voices · {nSpeeds} speeds",
+      "take": "These voices are free and run on this machine. The samples are already made, so they play anywhere and need no internet."
+    },
+    "notyet": {
+      "title": "Not here yet",
+      "n": "ElevenLabs · Kokoro",
+      "take": "More routes exist, and neither is set up yet. Each card says what it needs."
+    },
+    "pick": {
+      "title": "Your pick",
+      "n": "{{yours}} of {{all}} are yours",
+      "take": "Press copy and paste the line back to me. A value marked my pick is not a ruling."
+    },
+    "bar": {
+      "title": "The bar at the top",
+      "n": "moves the reading and the page",
+      "take": "A skip moves the reading and takes the page to that section's text."
+    }
+  },
+  "text": {
+    "cap": "A section is a heading line with no full stop, then its text. A blank line starts a new section.",
+    "boxLab": "Edit the text",
+    "boxAria": "The text to read aloud",
+    "viewLab": "The text as it will be read",
+    "read": "Read it",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop",
+    "reset": "Back to the review's summaries",
+    "copy": "Copy the text",
+    "copied": "Copied.",
+    "failed": "Copy was blocked here. Select the text and copy it.",
+    "fromHere": "read from here",
+    "untitled": "Part {{n}}",
+    "none": "There is no text yet. Type some in the box.",
+    "noSpeech": "This browser cannot speak. Open the page in Chrome or Edge to read the text aloud. The rest of the page still works."
+  },
+  "browser": {
+    "cap": "The list is read live from your browser. A voice marked on this device works offline. A voice marked online needs the internet and sends the text to its maker.",
+    "filterLab": "Languages",
+    "langEn": "English only",
+    "langAll": "All languages",
+    "loading": "Waiting for your browser to list its voices...",
+    "none": "Your browser offers no voices here. Open this page in Chrome or Edge on your own computer to hear them.",
+    "noneEn": "No English voice here. Press All languages to see the rest.",
+    "local": "on this device",
+    "online": "online",
+    "tipLocal": "Works offline. Nothing leaves your computer.",
+    "tipOnline": "Needs the internet. The text is sent to the voice's maker.",
+    "sample": "hear it",
+    "sampleStop": "stop",
+    "sampleLine": "This is how I would read your summary, one short sentence after another.",
+    "use": "use this voice",
+    "mine": "my pick",
+    "yours": "yours",
+    "tick": "compare",
+    "defaultVoice": "the browser's own default"
+  },
+  "settings": {
+    "head": "Settings",
+    "note": "Each change applies from the next sentence. The text is read sentence by sentence, so a pause or a skip lands exactly.",
+    "voice": {
+      "label": "Voice",
+      "what": "Who reads."
+    },
+    "rate": {
+      "label": "Speed",
+      "what": "How fast the voice talks. {rateNormal} is normal."
+    },
+    "pitch": {
+      "label": "Pitch",
+      "what": "How high the voice sounds. {pitchNormal} is normal."
+    },
+    "volume": {
+      "label": "Volume",
+      "what": "How loud. {volFull} is full."
+    },
+    "pauseSentence": {
+      "label": "Pause between sentences",
+      "what": "The silence after each sentence."
+    },
+    "pauseSection": {
+      "label": "Pause between sections",
+      "what": "The silence before the next section starts."
+    },
+    "readTitles": {
+      "label": "Read the section names",
+      "what": "Say each section's name before its text.",
+      "on": "on",
+      "off": "off"
+    },
+    "mine": "my pick",
+    "yours": "yours",
+    "yoursTip": "Press to go back to my pick.",
+    "ms": "ms",
+    "resetAll": "Back to all my picks",
+    "enginePiper": "Your pick is a Piper voice, so it cannot be read live here. The live reading uses the browser voice shown."
+  },
+  "compare": {
+    "head": "Compare voices",
+    "cap": "Tick the voices you want to compare on the cards above, choose a sentence, and press compare. Each voice reads that one sentence, one after another, with the settings above.",
+    "sentenceLab": "Sentence",
+    "button": "Compare {{n}} voices",
+    "stop": "Stop",
+    "none": "Tick at least one voice first.",
+    "now": "Reading with {{voice}}"
+  },
+  "local": {
+    "cap": "Piper makes speech on this computer, and nothing is sent anywhere. Each voice below reads the first summary, called {sampleTitle}, at {nSpeeds} speeds. Press play, then pick the one you like.",
+    "speedHelp": "A speed is Piper's own setting. It stretches or squeezes the sounds without changing the voice.",
+    "speed": {
+      "slower": "slower",
+      "normal": "normal",
+      "faster": "faster"
+    },
+    "quality": {
+      "medium": "medium quality",
+      "high": "high quality"
+    },
+    "accent": {
+      "en-US": "American English",
+      "en-GB": "British English"
+    },
+    "voice": {
+      "en_US-lessac-medium": "Lessac",
+      "en_US-amy-medium": "Amy",
+      "en_US-ryan-high": "Ryan",
+      "en_GB-alan-medium": "Alan",
+      "en_GB-jenny_dioco-medium": "Jenny"
+    },
+    "pick": "pick this",
+    "picked": "your pick",
+    "len": "{{sec}} s · {{mb}} MB",
+    "audioAria": "{{voice}} at {{speed}} speed",
+    "missing": "this sample file is missing",
+    "textHead": "The words these samples read"
+  },
+  "notyet": {
+    "cmdLab": "Setup command",
+    "copy": "copy the command",
+    "copied": "Copied.",
+    "failed": "Copy was blocked here. Select the command and copy it.",
+    "state": "not set up",
+    "cards": [
+      {
+        "id": "elevenlabs",
+        "name": "ElevenLabs",
+        "tag": "best voices",
+        "what": "The most natural voices of all. It runs on their servers, so the text leaves this machine. The free plan gives {elCredits} credits a month.",
+        "need": "It needs your API key from your ElevenLabs account. Give it to me when you want to try it. I would then run the command with your key in place.",
+        "cmd": "ELEVENLABS_API_KEY=<your key> uvx elevenlabs-mcp"
+      },
+      {
+        "id": "kokoro",
+        "name": "Kokoro",
+        "tag": "best free local voice",
+        "what": "The best free voice that runs on this machine. It makes the speech here, so nothing is sent away.",
+        "need": "It fails here until one system package is installed. That package turns words into sounds. You run the command once in your terminal, and it asks for your password.",
+        "cmd": "sudo apt install espeak-ng"
+      }
+    ]
+  },
+  "pick": {
+    "cap": "This line carries your choice. It changes as you change a setting. Your pick is also kept in this browser, and the review page reads it.",
+    "head": [
+      "Setting",
+      "Value",
+      "Whose"
+    ],
+    "lineLab": "The line to paste back",
+    "lineAria": "Your pick as one line",
+    "copy": "Copy my pick",
+    "copied": "Copied. Paste it back to me.",
+    "failed": "Copy was blocked here. Select the line and copy it.",
+    "saved": "Kept in this browser.",
+    "notYet": "Nothing is kept until you change a value.",
+    "notSaved": "This browser would not keep it. Copy the line.",
+    "mine": "my pick",
+    "yours": "yours",
+    "naPiper": "not used by a local voice"
+  },
+  "line": {
+    "head": "VOICE",
+    "engine": "engine {{engine}}",
+    "voice": "voice {{voice}}",
+    "voiceDefault": "the browser's default",
+    "lang": "lang {{lang}}",
+    "speed": "speed {{speed}}",
+    "speedWord": "speed {{speed}}",
+    "pitch": "pitch {{pitch}}",
+    "volume": "volume {{volume}}",
+    "pauseSentence": "pause between sentences {{ms}} ms",
+    "pauseSection": "between sections {{ms}} ms",
+    "titlesOn": "section names read",
+    "titlesOff": "section names skipped",
+    "yours": "yours: {{list}}",
+    "mine": "still my pick: {{list}}",
+    "nothing": "nothing yet",
+    "all": "all",
+    "names": {
+      "voice": "voice",
+      "rate": "speed",
+      "pspeed": "speed",
+      "pitch": "pitch",
+      "volume": "volume",
+      "pauseSentence": "pause between sentences",
+      "pauseSection": "pause between sections",
+      "readTitles": "section names"
+    }
+  },
+  "bar": {
+    "aria": "Reading controls",
+    "play": "Play",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop",
+    "prev": "Previous section",
+    "next": "Next section",
+    "slower": "Slower",
+    "faster": "Faster",
+    "speed": "speed",
+    "chips": "Sections",
+    "cap": "While a voice reads, a bar sticks to the top of the page. It has play and pause, stop, the previous and next section, every section as a chip with the one being read lit, and the speed. A skip moves the reading and takes the page to that section's text, which is highlighted while it is read.",
+    "modeLab": "Show the bar",
+    "modeOn": "while a voice reads",
+    "modeAlways": "always",
+    "modeNote": "While a voice reads is the default. Always is my addition, drawn dashed."
+  }
+}

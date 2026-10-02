@@ -1,0 +1,152 @@
+{
+ "about": "Made by render-samples.py from the review page's first spoken summary; read by gen-voice-lab.mjs. Do not edit by hand.",
+ "text": {
+  "key": "glance",
+  "title": "Round 1 at a glance",
+  "body": "Here is round 1 at a glance. You raised 23 items: 16 are built, 5 wait on your pick with nothing built, and 2 were questions that now have an answer. The review read the work through 4 lenses and wrote 136 findings. After round 1b, 117 are fixed, 13 are partly fixed, 4 are left with a reason, and 2 are yours to rule. The same 14 checks ran before the work, after round 1, and after the small pass. Of those, 12 can be compared: 12 went down, 0 stayed the same and 0 went up, and a check that went down found fewer of the defect it counts.",
+  "sha": "3797f3bf00"
+ },
+ "bitrate": "96k",
+ "voices": [
+  {
+   "id": "en_US-lessac-medium",
+   "lang": "en-US",
+   "quality": "medium",
+   "speeds": [
+    {
+     "id": "slower",
+     "factor": 1.25,
+     "file": "en_US-lessac-medium-slower.mp3",
+     "bytes": 521344,
+     "seconds": 43.4
+    },
+    {
+     "id": "normal",
+     "factor": 1.0,
+     "file": "en_US-lessac-medium-normal.mp3",
+     "bytes": 435454,
+     "seconds": 36.3
+    },
+    {
+     "id": "faster",
+     "factor": 0.8,
+     "file": "en_US-lessac-medium-faster.mp3",
+     "bytes": 383104,
+     "seconds": 31.9
+    }
+   ]
+  },
+  {
+   "id": "en_US-amy-medium",
+   "lang": "en-US",
+   "quality": "medium",
+   "speeds": [
+    {
+     "id": "slower",
+     "factor": 1.25,
+     "file": "en_US-amy-medium-slower.mp3",
+     "bytes": 608802,
+     "seconds": 50.7
+    },
+    {
+     "id": "normal",
+     "factor": 1.0,
+     "file": "en_US-amy-medium-normal.mp3",
+     "bytes": 517896,
+     "seconds": 43.1
+    },
+    {
+     "id": "faster",
+     "factor": 0.8,
+     "file": "en_US-amy-medium-faster.mp3",
+     "bytes": 449560,
+     "seconds": 37.4
+    }
+   ]
+  },
+  {
+   "id": "en_US-ryan-high",
+   "lang": "en-US",
+   "quality": "high",
+   "speeds": [
+    {
+     "id": "slower",
+     "factor": 1.25,
+     "file": "en_US-ryan-high-slower.mp3",
+     "bytes": 515388,
+     "seconds": 42.9
+    },
+    {
+     "id": "normal",
+     "factor": 1.0,
+     "file": "en_US-ryan-high-normal.mp3",
+     "bytes": 440469,
+     "seconds": 36.7
+    },
+    {
+     "id": "faster",
+     "factor": 0.8,
+     "file": "en_US-ryan-high-faster.mp3",
+     "bytes": 391254,
+     "seconds": 32.6
+    }
+   ]
+  },
+  {
+   "id": "en_GB-alan-medium",
+   "lang": "en-GB",
+   "quality": "medium",
+   "speeds": [
+    {
+     "id": "slower",
+     "factor": 1.25,
+     "file": "en_GB-alan-medium-slower.mp3",
+     "bytes": 625729,
+     "seconds": 52.1
+    },
+    {
+     "id": "normal",
+     "factor": 1.0,
+     "file": "en_GB-alan-medium-normal.mp3",
+     "bytes": 524792,
+     "seconds": 43.7
+    },
+    {
+     "id": "faster",
+     "factor": 0.8,
+     "file": "en_GB-alan-medium-faster.mp3",
+     "bytes": 455516,
+     "seconds": 37.9
+    }
+   ]
+  },
+  {
+   "id": "en_GB-jenny_dioco-medium",
+   "lang": "en-GB",
+   "quality": "medium",
+   "speeds": [
+    {
+     "id": "slower",
+     "factor": 1.25,
+     "file": "en_GB-jenny_dioco-medium-slower.mp3",
+     "bytes": 546108,
+     "seconds": 45.5
+    },
+    {
+     "id": "normal",
+     "factor": 1.0,
+     "file": "en_GB-jenny_dioco-medium-normal.mp3",
+     "bytes": 480280,
+     "seconds": 40.0
+    },
+    {
+     "id": "faster",
+     "factor": 0.8,
+     "file": "en_GB-jenny_dioco-medium-faster.mp3",
+     "bytes": 416018,
+     "seconds": 34.6
+    }
+   ]
+  }
+ ]
+}
