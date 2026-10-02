@@ -589,3 +589,14 @@ Round 3 — source: his REVIEW text from `legibility/legibility-review.html` (20
   layout, each with draggable parts, encoding controls and a copy button. Later — trigger: the round-3 page pass lands.
 - **tag:** `element-without-a-bench`
 - **status:** deferred — trigger: the round-3 page pass lands
+
+### L-40
+- **words:** "On the legibility review, can I get a section or a button for the pending decisions where we updated the content for me to make the
+  decision?"
+- **where:** the review page · the 12 choices he left as my pick in his review (D-081) whose content round 3 updated (L-34 crops, L-35
+  depictions)
+- **could not tell:** which decisions wait on him now — they sit among 53 cards across three sections.
+- **fix:** none needed — the bar's menu already gathers them: every dashed circle is a pending choice, and the "Your calls" chip counts them
+  (12). He confirmed and goes through them from there (D-082).
+- **tag:** `pending-scattered`
+- **status:** answered — already on the page (D-082)

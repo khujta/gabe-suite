@@ -1232,3 +1232,14 @@ legibility items L-33 … L-39 and worked: the frontend lab's hover format for e
 depictions of unclear options (L-35), a simpler bench (L-36), a resizable widened column (L-37), sliding a wide table with Shift and the wheel
 (L-38), and dedicated bench sections for the gate card, the stage encoding, gate roles, function marks, the standard-or-specialist split and
 the metadata layouts (L-39, a later design pass — trigger: this pass lands).
+
+## D-082 — The pending choices are already gathered: the dashed circles in the bar's menu (no new section)
+Date: 2026-10-02 · Input: his message after the round-3 page pass, logged as legibility-feedback.md L-40, and his follow-up with a screenshot
+of the "Your calls" menu.
+Decision, his: "On the legibility review, can I get a section or a button for the pending decisions where we updated the content for me to make
+the decision?" — then: "Seems like I can't see them in the circles that are not with the checkmark in this table, right? If that is the case,
+just tell me, and I will go through them."
+Consequence: confirmed — in the bar's menu every dashed circle is a choice still waiting on him and the count on the "Your calls" chip (12) is
+exactly those: the header, saving, the seven bench kind looks, F24, L-19, EX-5 (the "after a decision" option sits in the bar's player
+options). He goes through them from there; no "decide now" section is built. His round-1 review text is kept as a record
+(`legibility/review-r1.his.txt`) for when a page has to know what still waits on him.
