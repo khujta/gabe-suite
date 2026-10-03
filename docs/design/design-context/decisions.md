@@ -1363,3 +1363,14 @@ status → a card about the glyph and the status only (the kind of ending and wh
 parts wherever he places them on the bench (a part carries its region), so the same mechanism serves the other kinds when he configures
 them. His bench configuration in his browser (saved settings, the copy line) is kept as it is. Assumed (his to correct): the stage and the
 ways count belong to the title region.
+
+## D-090 — Every element kind hovers by region, as the ending does
+Date: 2026-10-03 · Input: his message after D-089 ("endpoints" read as "endings" — dictation).
+Decision, his: "Let's apply this not only to the [endings], but to all the other elements that have a similar structure, which I think are
+all the elements."
+Consequence: the three hover regions of D-089 go on every kind of the EXAMPLES bench — table, schema, function, test, gate or decision, client
+hook, in-flight value — and wherever the bench's look of a kind is drawn. The same rule picks each kind's parts (a choice made alone, his to
+correct by one table entry): **glyph and status** = the glyph plus the coloured pill that classifies the element (a table's reads/writes, a
+schema's in/out, a function's role, a test's state, a gate's role, a hook's role, an in-flight value's lifetime); **title** = the name and every
+other part (today's full card); **each item** = every location part (file, where, class, set by) and each mark of the strip, one card per item.
+His bench configurations stay as saved (keys, part ids, copy lines unchanged).
