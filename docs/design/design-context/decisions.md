@@ -1348,3 +1348,18 @@ file) · a rule · the element's own pills and marks with counts · a rule · a 
 element's own block (same glyph, colour and marks, as the lab's block card mirrors its block) and adds the detail. The rules of P1.1 · P2.1 ·
 P4.1 · P8.1 are checked as each card is made (D-085). The kind-level plain line stays only on control and head cards (my pick, not ruled —
 the research flagged that a kind's line repeated on every item is what P1.1 forbids). The review page joins later.
+
+## D-089 — An element's block has hover REGIONS: the glyph and status, the title, and each item of the last row
+Date: 2026-10-03 · Input: his message while configuring the ending on the all-endpoints bench (dictated; "52 elements" read as "the two
+elements", "reference titles" as the block's title words).
+Decision, his: "for the ending, I am working on the configuration. The configuration so far is super good. The only thing that I would
+change is the hover. In general, the hover should work as it is today. For example, if we hover over any of the [two] elements, which is the
+icon of the glyph and the status, it should give a different hover only regarding the glyph and the status. For the items at the end in the
+last row, each item should have its own hover notice about what it is. That way, we will have three regions for hovering: the first section
+for the two items, for the [title], and then for each one of the where sections."
+Consequence: on the ending block (the bench, and wherever the bench's ending look is drawn) hovering is split by part: (1) the glyph and the
+status → a card about the glyph and the status only (the kind of ending and what the status means); (2) the title and the block's other parts
+→ today's full card (D-088); (3) each item of the last row (the where line) → its own card saying what that item is. The regions follow the
+parts wherever he places them on the bench (a part carries its region), so the same mechanism serves the other kinds when he configures
+them. His bench configuration in his browser (saved settings, the copy line) is kept as it is. Assumed (his to correct): the stage and the
+ways count belong to the title region.
