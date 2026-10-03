@@ -1,6 +1,9 @@
 {
   "_about": "Authored words for all-endpoints.html — the only strings on the page that are not facts. gen-all-endpoints.py refuses to build when a line here types a number (a {token} the generator or the page fills instead) or says a word D-018 took out. Tokens the generator fills are listed in its `tok`; the ones the page fills while it runs are listed in _runtime.",
   "_runtime": [
+    "check",
+    "fork",
+    "switch",
     "b",
     "r",
     "f",
@@ -2811,7 +2814,7 @@
     "_about": "D-071 (his L-23 · L-08 · L-13 · L-11): the examples bench — one column per kind of element, in his order, each an example drawn as a block with its controls below it. The table's look is his DATA line (D-027); the schema's and the function's boot on the lab's looks, which is my choice (dashed); the other five kinds' parts and looks are my picks, dashed. Where BY MOMENT already has words for a thing (an in-flight value's kind, how long it lives, a gate's kind and where it decides, a race, the three parts of a hover, the reply), the bench reads those words, never a copy.",
     "title": "examples",
     "lede": "One example of each kind of element this page draws, a column each, in the order a request meets them: an ending, a table, a schema, a function, a test, a gate or decision, a client hook, an in-flight value. Pick the element at the top of a column, narrow it by its role, set the column's width, and change what its block shows with the controls under it.",
-    "how": "A block reads top to bottom: its title lines, then a strip of marks — a table's or a schema's fields, the tables a function touches, the requests a test makes, the checks on an ending's way, what a gate waits for, the endings a hook answers, the places a value is read — then a list that opens when you click the block. Its hover says what comes before it, what it checks and what it gives, in the form BY MOMENT's hovers option picks. Above each block, icon squares (point at one for what it does): the elements of this endpoint or of every endpoint (one not on the open endpoint is drawn as it is on the first endpoint that has it), and the width of the element drawn there — dynamic, shorter, compact, most compact, the column's box keeping its size; the chips narrow the column to one role and the arrows step through the elements. Under each block, always in view: the parts to drag between the lines or into not drawn, their sizes and the colours; the squares at the bottom put the block back on its first look and copy its settings as one line, to paste back with your words.",
+    "how": "A block reads top to bottom: its title lines, then a strip of marks — a table's or a schema's fields, the tables a function touches, the requests a test makes, the checks on an ending's way, what a gate waits for, the endings a hook answers, the places a value is read — then a list that opens when you click the block. Its hover says what comes before it, what it checks and what it gives, in the form BY MOMENT's hovers option picks. An ending's block hovers by part: its glyph and its status give one card about what the ending is and what the status means, its title gives the whole card, and its where line and each mark of the strip give a card of their own. Above each block, icon squares (point at one for what it does): the elements of this endpoint or of every endpoint (one not on the open endpoint is drawn as it is on the first endpoint that has it), and the width of the element drawn there — dynamic, shorter, compact, most compact, the column's box keeping its size; the chips narrow the column to one role and the arrows step through the elements. Under each block, always in view: the parts to drag between the lines or into not drawn, their sizes and the colours; the squares at the bottom put the block back on its first look and copy its settings as one line, to paste back with your words.",
     "whoseTitle": "whose look",
     "whose": {
       "his": { "name": "your DATA line", "plain": "The table block boots on the DATA line you pasted in the endpoint lab, word for word ({v}). Its chip and its count stand at {lo}px, under the page's {hi}px floor, as your line sets them; every other part of the bench keeps the floor." },
@@ -3019,6 +3022,45 @@
       "which": "which of the {n} ways to {status} it takes",
       "step": "what one step hands the next",
       "loop": "checks written inside a loop"
+    },
+    "region": {
+      "_about": "D-089, his words on the ending's hover (\"the hover should work as it is today … if we hover over the icon of the glyph and the status, it should give a different hover only regarding the glyph and the status. For the items at the end in the last row, each item should have its own hover notice about what it is\"): the words the REGION cards (_ae-card.js, CDREG) speak that no other line already says. A part of a block carries a region by data (EX.regions: head · title · items); the title region is the block's own card (D-088), the head region one short card about the glyph and the status, the items region one card per item of the row. `status` names every status an ending of the feed gives (the build stops on one it does not name): the HTTP reason phrase, and a plain line only where the page's own table of refusals (enc.fam.gdc) has none. `way` names a mark of the strip by what it is, its words taken from `terms` (one word per concept); a card never says where on the page it is (P2.1).",
+      "status": {
+        "200": { "name": "OK", "plain": "The request worked and the answer carries the result." },
+        "201": { "name": "Created", "plain": "The request worked and something new was created." },
+        "202": { "name": "Accepted", "plain": "The request was taken and its work goes on after the answer." },
+        "204": { "name": "No Content", "plain": "The request worked and the answer carries no body." },
+        "304": { "name": "Not Modified", "plain": "What the caller already holds is still current, so no body is sent." },
+        "400": { "name": "Bad Request" },
+        "401": { "name": "Unauthorized" },
+        "402": { "name": "Payment Required" },
+        "403": { "name": "Forbidden" },
+        "404": { "name": "Not Found" },
+        "409": { "name": "Conflict" },
+        "413": { "name": "Content Too Large" },
+        "415": { "name": "Unsupported Media Type" },
+        "422": { "name": "Unprocessable Content" },
+        "429": { "name": "Too Many Requests" },
+        "500": { "name": "Internal Server Error", "plain": "Nothing in the code turned the error into an answer." },
+        "502": { "name": "Bad Gateway" },
+        "503": { "name": "Service Unavailable" }
+      },
+      "shared": "shared with",
+      "line": "line {v}",
+      "lines": "lines {v}",
+      "way": {
+        "way-switch": "{switch}",
+        "way-stop": "{check} that stops it",
+        "way-pass": "{check} it passes",
+        "way-call": "call",
+        "way-branch": "{fork}",
+        "way-exit": "the way out"
+      },
+      "part": { "marks": "mark" },
+      "ends": "stops it",
+      "fails": "if it fails",
+      "taken": "this way takes it",
+      "notTaken": "this way does not take it"
     },
     "copy": { "where": "examples", "on": "on {ep}", "all": "every endpoint", "role": "role {v}" }
   }

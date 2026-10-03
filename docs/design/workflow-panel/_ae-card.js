@@ -181,7 +181,7 @@
     if (!box.childNodes.length) return null; if (![].some.call(box.children, function (c) { return !c.hidden; })) box.hidden = true; return box; }
 
   /* ══ the facts of each kind of card: F = { glyph, name, kind, ident[], chips[], count, marks[], joins[], foot } ══ */
-  function cdBase(S0) { return { name: S0.P.name || (S0.c || {}).n || "", kind: S0.P.kind || "", ident: [], chips: [], count: null, marks: [], joins: [], foot: S0.foot, countIcon: "layers" }; }
+  function cdBase(S0) { return { name: S0.P.name || (S0.c || {}).n || "", kind: S0.P.kind || "", ident: [], chips: [], count: null, marks: [], joins: [], facts: [], foot: S0.foot, countIcon: "layers" }; }
   var CDSPEC = {
     table: function (S0) { var c = S0.c, it = S0.it, L = cdLook("table"), F = cdBase(S0), ec = c.ec || "var(--muted)", fns = {};
       F.glyph = XPART.table("icon", c, it, L, 16).firstChild; F.name = S0.P.name || c.n;
@@ -269,7 +269,9 @@
     step: function (S0) { var io = S0.X.io, op = cdTok(io, "opw", "op"), at = cdTok(io, "opw", "at"), fn = cdTok(io, "inFn", "fn") || cdTok(io, "inFnCond", "fn"), F = cdBase(S0), col = EX.col.opc.write;
       F.glyph = cdChipGlyph(S0.t, "model", col); if (fn) { F.ident.push(cdLine("host", "function", fn, EX.col.kind["function"])); F.joins.push({ end: "function", want: [fn] }); } if (at) F.ident.push(cdLine("file", "file", at));
       if (op) F.chips = [cdPill(op, col, cdLook("table"))]; var rc = S0.X.rc; if (rc) F.chips.push(cdStatusPill(rc[3])); return F; },
-    other: function (S0) { var F = cdBase(S0); F.glyph = cdChipGlyph(S0.t, CDICON[S0.ik] || "info", "var(--cd-muted)"); return F; }
+    other: function (S0) { var F = cdBase(S0); F.glyph = cdChipGlyph(S0.t, CDICON[S0.ik] || "info", "var(--cd-muted)"); return F; },
+    /* D-089: a REGION of a block — the provider (CDREG, below) of the kind and the region or part it serves */
+    reg: function (S0) { return cdProvider(S0.bk, S0.region, S0.rp)(S0); }
   };
 
   /* ══ the subject: what the pointer is on → its card kind, its bench binding, its three parts ══ */
@@ -331,6 +333,58 @@
     if (s0 === "f") Z0.K.filter(function (o) { return o.q[0] === i0; }).forEach(function (o) { var sent = fill(C2.dx.tick, { op: o.q[2], at: o.q[4], mom: moName(r0, r0.mo.sp[o.q[3]]) }); lines.push(sent); L.push({ k: "@tick", op: o.q[2], at: o.q[4], s: sent }); });
     return { K: K0, lines: lines, L: L, ends: ends }; }
 
+  /* ══ D-089 · THE REGION CARDS. A part of a block that carries a region (EX.regions, the generator's REGIONS) hovers as that region, not as the block: `head` — one short card about
+     the parts that share it, `items` — one card for each item of the part. Each goes through card() and its guard like any other (P1.1 · P2.1 · P4.1 · P8.1); the card's own facts are rows,
+     led by an icon or a pill, as the lab draws them (F.facts). A kind adopts regions by an entry in REGIONS and a provider here, keyed `head` or by the part it serves; a kind with no
+     provider keeps the block's card. The ending's three, on the bench: its glyph and status (the kind in its colour with its glyph, what the status means, who shares it) · where
+     (the file and the line) · each mark of the strip (what the mark is, and this ending's fact for it). ══ */
+  function cdProvider(k, reg, rp) { return (CDREG[k] || {})[reg === "head" ? "head" : rp]; }
+  function cdTextCol(col) { return col && /^(#|var\()/.test(col) ? "color-mix(in srgb, " + col + " 68%, #fff)" : col; }   /* a colour as TEXT on the card's dark panel */
+  /* the label at the head's right: the parts a head region joins (glyph · status), or the one part an item belongs to — short, shared (P1.1) */
+  function cdRegionLabel(S0) { var k = S0.bk, R = XREG[k] || {}, PW = XW.parts[k] || {};
+    if (S0.region === "head") return Object.keys(R).filter(function (p) { return R[p] === "head" && PW[p]; }).map(function (p) { return PW[p].name; }).join(" · ");
+    return XW.region.part[S0.rp] || (PW[S0.rp] || {}).name || S0.rp; }
+  function cdFact(key, line, lead, kids, tail) { var m = el("span", "cdwm"); kids.forEach(function (n) { if (n) m.appendChild(n); }); return cdRowEl(key, line, lead, m, tail); }
+  /* what a status means: its HTTP name, and a plain line (its own, or the page's table of refusals); the build proves every status an ending gives is named */
+  function cdStatusWords(st) { var R = (XW.region.status || {})[String(st)] || {}, g = XF.gdc.vals[String(st)] || {}; return { name: R.name || W.unknown, plain: R.plain || g.plain || null }; }
+  function cdMates(c) { var r = BYID[c.ep]; return ((r && r.ex.end) || []).map(function (e) { return EX.cat[e[0]]; }).filter(function (q) { return q && q !== c && q.st === c.st; }); }
+  function cdOneLine(v) { return String(v).replace(/\s+/g, " ").trim(); }
+  var CDREG = { end: {
+    head: function (S0) { var c = S0.c, it = S0.it, L = cdLook("end"), F = cdBase(S0), R = XW.region, sw = cdStatusWords(c.st), mates = cdMates(c);
+      F.glyph = XPART.end("icon", c, it, L, 16).firstChild; F.name = xRoleName("end", c.kd); F.nameCol = cdTextCol(xKindCol("end", c)); F.kind = cdRegionLabel(S0);
+      F.ident.push(cdLine("status", "bubble", sw.name, null, "var(--cd-ink)")); if (sw.plain) F.ident.push(cdLine("meaning", "info", sw.plain));
+      F.chips = [cdStatusPill(c.st)];
+      if (mates.length) { var nm = mates.map(function (q) { return cdOneLine(xEndWords(q)); }); F.joins.push({ end: "ending", want: nm });                    /* another ending of this endpoint that gives the same status: the join names its other end */
+        F.facts.push(cdFact("shared", R.shared + " " + nm.join(" · "), cdIco("layers"), [el("span", "cdwd", R.shared)].concat(mates.map(function (q, i) { return cdChName(nm[i], (EN.kind[q.kd] || {}).icon || XW.icons.end, xKindCol("end", q)); })), null)); }
+      if (c.decl != null) { var dw = c.decl ? XW.tip.end.decl : XW.tip.end.undecl; F.facts.push(cdFact("decl", dw, cdIco("flag"), [el("span", "cdwv", dw)], null)); }       /* not recorded (the 500 no route declares) says nothing, never a no */
+      return F; },
+    via: function (S0) { var c = S0.c, F = cdBase(S0), R = XW.region, at = String(c.at || ""), m = /^(.+?):(\d+)(?:-(\d+))?$/.exec(at), file = m ? m[1] : at;
+      F.glyph = cdSvg("file", null, 16); F.name = xShort(at); F.kind = cdRegionLabel(S0);
+      F.ident.push(cdLine("file", "file", file)); if (m) F.ident.push(cdLine("line", "target", fill(m[3] ? R.lines : R.line, { v: m[3] ? m[2] + "-" + m[3] : m[2] })));
+      if (c.via) F.ident.push(cdLine("via", "link", cdOneLine(c.via)));
+      F.chips = [cdStatusPill(c.st)]; F.joins.push({ end: "raiser", want: [file.split("/").pop()] }); return F; },
+    marks: function (S0) { var c = S0.c, q = xWayList(c)[S0.ri], w = xWay(c, q), R = XW.region, T = W.terms.gate, L = cdLook("end"), F = cdBase(S0), at = xT(q[4]), t = q[0];
+      F.glyph = xSvg(w.sym, 16, w.col); F.name = fill(R.way[w.mk], { "switch": T["switch"], check: T.check, fork: T.fork }); F.nameCol = cdTextCol(w.col); F.kind = cdRegionLabel(S0);
+      if (t === "switch") { var sub = xT(q[5]); F.ident.push(cdLine("switch", "cog", fill(XW.face.sw[xT(q[1])] || "{v}", { v: sub || W.unknown }), null, "var(--cd-ink)")); }   /* the setting that turns the way on */
+      else if (t === "gate") { var ck = xChk(q), stop = q[2] === 1, own = stop && xT(q[3]) === S0.it.id.slice(c.ep.length + 1), pl = own ? xEndIn(c)[0] : ck[0], say = cdOneLine(String(xT(q[1]) || "").replace(/^\d{3}\s*/, ""));
+        F.facts.push(cdFact("check", pl, cdIco("shield", w.col), [el("span", "cdwv", pl)], at));                                                       /* the gate that decides it: what it checks, and where */
+        if (ck[1]) F.facts.push(cdFact("asWritten", fill(XW.tip.asWritten, { v: ck[1] }), cdIco("merge"), [el("span", "cdcode", cdClip(ck[1]))], null));
+        var kids = [el("span", "cdwd", stop ? R.ends : R.fails)]; if (say && say.length <= 40) kids.push(el("span", "cdq", "“" + say + "”"));
+        F.facts.push(cdFact("refuses", (stop ? R.ends : R.fails) + " " + q[6], cdStatusPill(q[6]), kids, null)); }
+      else if (t === "call") { var fk = xT(q[3]), nm2 = fk ? xFnName(fk) : xT(q[1]), rl = fk ? xFnRole(fk) : null;
+        F.facts.push(cdFact("calls", nm2, cdIco("function", w.col), [cdChFn(nm2)], at)); if (rl && EN.role[rl]) F.chips = [cdPill(xRoleName("fn", rl), EN.role[rl].col, cdLook("fn"))]; F.joins.push({ end: "function", want: [nm2] }); }
+      else if (t === "branch") { var lb = cdOneLine(xT(q[1]));
+        F.facts.push(cdFact("fork", lb, cdIco("merge", w.col), [el("span", "cdcode", cdClip(lb))], at)); F.facts.push(cdFact("arm", q[2] ? R.taken : R.notTaken, cdIco("target"), [el("span", "cdwv", q[2] ? R.taken : R.notTaken)], null)); }
+      else { F.ident.push(cdLine("stage", "target", c.sg)); F.chips = [cdStatusPill(c.st), cdPill(xRoleName("end", c.kd), xKindCol("end", c), L)]; }                     /* the way out: the stage it ends at, its status and kind */
+      return F; } } };
+  /* what a pointer on a region node is: the block it sits in, the region, the part, the item — or the block's own card when no provider serves it */
+  function cdRegionOf(k, it, reg, rp, ri, blk) { var c = EX.cat[it.id]; if (!c || !cdProvider(k, reg, rp)) return null; if (rp === "marks" && !xWayList(c)[ri]) return null;
+    return { t: blk || null, ik: null, key: c.key || null, ck: "reg", bk: k, c: c, it: it, X: {}, P: { name: "", kind: "", b: [], c: [], g: [], n: "" }, foot: blk ? cdFoot(blk) : null, bench: true, region: reg, rp: rp, ri: ri }; }
+  function cdRegion(t) { var blk = t.closest('[data-tip="exblk"]'), S0 = null; if (!blk) return null; var k = blk.getAttribute("data-exk"), id = blk.getAttribute("data-exid"), ep = blk.getAttribute("data-exep"), r = BYID[ep],
+      e = ((r && r.ex[k]) || []).filter(function (x) { return x[0] === id; })[0];
+    if (e) S0 = cdRegionOf(k, { k: k, id: id, role: e[1], ep: ep, o: e[2] }, t.getAttribute("data-reg"), t.getAttribute("data-rp"), +t.getAttribute("data-ri") || 0, blk);
+    return S0 || cdBlock(blk); }
+
   /* ══ the guard: the four rules, checked on the card as it is made ══ */
   function cdGuard(root, F) { var is = [], txt = function (n) { return n.textContent.replace(/\s+/g, " ").trim(); }, foot = root.querySelector(".cdfoot");
     var shared = 0; [].forEach.call(root.querySelectorAll("[data-shared]"), function (n) { if (n.closest("[hidden]")) return; var s = txt(n); shared += s.length; if (s.length > 24) is.push("p1.1 label “" + s.slice(0, 30) + "” is longer than a short label"); });
@@ -352,7 +406,9 @@
   function card(ck, S0) { var spec = CDSPEC[ck] || CDSPEC.other, F = spec(S0), root = el("div", "cdc"), h = el("div", "cdh"), g = el("span", "cdg");
     if (!F.ident.length && S0.X && S0.X.io) { var at = cdAts(S0.X.io)[0]; if (at) F.ident.push(cdLine("file", "file", at)); }               /* a kind with no host of its own: where it is, as its facts say */
     root.setAttribute("data-card", ck); if (S0.ik) root.setAttribute("data-ik", S0.ik); if (S0.c) root.setAttribute("data-bound", S0.bk); if (S0.bench) root.setAttribute("data-bench", S0.bk);
-    g.appendChild(F.glyph); h.appendChild(g); h.appendChild(xWrap(el("b"), F.name));
+    if (S0.region) { root.setAttribute("data-reg", S0.region); root.setAttribute("data-rp", S0.rp); root.setAttribute("data-ri", String(S0.ri || 0)); }   /* D-089: the region this card speaks for */
+    var nb = xWrap(el("b"), F.name); if (F.nameCol) nb.style.color = F.nameCol;
+    g.appendChild(F.glyph); h.appendChild(g); h.appendChild(nb);
     if (F.kind) { var v = el("span", "cdv", F.kind); v.setAttribute("data-shared", "1"); h.appendChild(v); } root.appendChild(h);
     F.ident.forEach(function (l) { root.appendChild(l); });
     F.chips = F.chips.filter(function (c) { return String(c.textContent).toLowerCase() !== String(F.kind).toLowerCase(); });   /* a pill that only repeats the kind at the right of the head says nothing new */
@@ -361,7 +417,8 @@
     if (F.count || F.marks.length) { var r2 = el("div", "cdr"), i2 = el("span", "cdi"), mix = el("span", "cdmix"); r2.setAttribute("data-row", "count"); i2.appendChild(cdSvg(F.countIcon || "layers")); r2.appendChild(i2);
       if (F.count) r2.appendChild(F.count); F.marks.forEach(function (m) { mix.appendChild(m); }); if (F.marks.length) r2.appendChild(mix); root.appendChild(r2); }
     CDSEEN = F.ident.map(function (l) { return l.textContent; });
-    var dups = S0.dup || S0.P.dup || {}, d = cdDetail(S0.P, function (L) { return !!dups[L.k] || (/^(chk|expr|if)$/.test(L.k) && L.t && L.t.v === F.name); }); if (d) root.appendChild(d);   /* a line the card says elsewhere (or the head's own condition) is kept hidden, not drawn */
+    var dups = S0.dup || S0.P.dup || {}, d = cdDetail(S0.P, function (L) { return !!dups[L.k] || (/^(chk|expr|if)$/.test(L.k) && L.t && L.t.v === F.name); }); if (d) root.appendChild(d);
+    if (F.facts && F.facts.length) { var fb = el("div", "cdd"); F.facts.forEach(function (r) { fb.appendChild(r); }); root.appendChild(fb); }               /* D-089: a region card's own facts, as rows */   /* a line the card says elsewhere (or the head's own condition) is kept hidden, not drawn */
     if (F.foot) { var ft = el("div", "cdfoot"), fi = el("span", "cdi"); fi.appendChild(cdSvg("info", "currentColor", 13)); ft.appendChild(fi); ft.appendChild(el("span", null, F.foot)); root.appendChild(ft); }
     var is = cdGuard(root, F); root.setAttribute("data-card-issues", String(is.length)); if (is.length) root.setAttribute("data-card-issue", is.join(" | "));
     if (is.length) CDLOG.push({ ck: ck, ik: S0.ik || null, name: F.name, issues: is });
@@ -370,8 +427,9 @@
 
   /* the hover handler's one door: a card for what is hovered, or null (the page's other hovers stay as they are) */
   function cardFor(t) { var k = t.getAttribute("data-tip"), S0 = null;
-    try { S0 = k === "mochip" ? cdChip(t) : k === "modxn" ? cdNode(t) : k === "exblk" ? cdBlock(t) : k === "mojy" ? cdJourney(t) : k === "moilf" ? cdLane(t) : null; } catch (e) { CDLOG.push({ ck: "error", ik: k, name: t.textContent.slice(0, 40), issues: ["error: " + e.message] }); if (window.console) console.warn("card:", e); return null; }
+    try { S0 = k === "mochip" ? cdChip(t) : k === "modxn" ? cdNode(t) : k === "exblk" ? cdBlock(t) : k === "exreg" ? cdRegion(t) : k === "mojy" ? cdJourney(t) : k === "moilf" ? cdLane(t) : null; } catch (e) { CDLOG.push({ ck: "error", ik: k, name: t.textContent.slice(0, 40), issues: ["error: " + e.message] }); if (window.console) console.warn("card:", e); return null; }
     return S0 ? card(S0.ck, S0) : null; }
   function hoverFor(t) { var h = cardFor(t); tip.classList.toggle("cd", !!h); return h || tipFor(t); }
-  window.__allepCard = { make: card, spec: CDSPEC, subject: function (t) { var k = t.getAttribute("data-tip"); return k === "mochip" ? cdChip(t) : k === "modxn" ? cdNode(t) : k === "exblk" ? cdBlock(t) : k === "mojy" ? cdJourney(t) : k === "moilf" ? cdLane(t) : null; },
+  window.__allepCard = { make: card, spec: CDSPEC, subject: function (t) { var k = t.getAttribute("data-tip"); return k === "mochip" ? cdChip(t) : k === "modxn" ? cdNode(t) : k === "exblk" ? cdBlock(t) : k === "exreg" ? cdRegion(t) : k === "mojy" ? cdJourney(t) : k === "moilf" ? cdLane(t) : null; },
+    region: cdRegionOf, providers: CDREG,
     guard: cdGuard, log: CDLOG, kinds: CDIK, words: CDW, stop: CDSTOP };

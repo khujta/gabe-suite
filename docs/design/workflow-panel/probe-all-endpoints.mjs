@@ -2825,7 +2825,9 @@ ok(!errs.length, 'no page error on the fixture', errs);
     'review N3-13 · CR-08 · the checks a test passes name what they check (each limit apart), a check inside a call among them, the refusal avoided after it');
   /* ONE hover per block (L-02 · L-22): nothing inside the title lines carries a hover of its own; the card reads in BY MOMENT's three
      parts — before · checks · gives (CHANGED 2026-09-30, review S4-20: the bench's own in · does · out labels are gone) */
-  const inner = await p.$$eval('#exgrid .blk .bkhd [data-tip]', (n) => n.length), IOP = D.words.mo.io.parts;
+  /* CHANGED 2026-10-03 (D-089): the ending's block has hover REGIONS — its glyph, its status, its where line and each mark of its strip carry a hover of their own (data-tip="exreg", tagged by the part's declared region, section 37);
+     every other node of a title line, and every other kind's block, still carries none */
+  const inner = await p.$$eval('#exgrid .blk .bkhd [data-tip]:not([data-tip="exreg"])', (n) => n.length), IOP = D.words.mo.io.parts;
   await p.hover(CX + '[data-k="table"] .blk .bkhd [data-part="name"]'); await p.waitForTimeout(120);
   const tp = await p.$eval('#tip', (e) => ({ show: e.getAttribute('data-show'), io: [...e.querySelectorAll('.io > i')].map((i) => i.textContent), txt: e.innerText }));
   /* CHANGED 2026-10-03 (D-088): the table's functions are rows of its checks (each function with its R or W), so the table's card has no "before" part — its parts are the generator's, in order, and a part with nothing to say is not drawn */
@@ -3409,6 +3411,129 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(ROWIDS.length === FEED.length && allN.cards > 5000 && !allN.issues.length && !allN.unknown.length && !allN.errors.length, 'D-088 · all ' + ROWIDS.length + ' endpoints: ' + allN.cards + ' element cards made, none with a renderer issue (P1.1 · P2.1 · P4.1 · P8.1), none of a kind it does not know, none that fails to draw',
     { issues: allN.issues.slice(0, 3), unknown: allN.unknown.slice(0, 3), errors: allN.errors.slice(0, 3) });
   ok(!errs.length, 'D-088 · no page error over all endpoints', errs.slice(0, 3)); }
+
+/* 37 · D-089 (his, configuring the ending on the examples bench: "the hover should work as it is today … if we hover over the icon of the glyph and the status, it should give a different hover only
+   regarding the glyph and the status. For the items at the end in the last row, each item should have its own hover notice about what it is … three regions for hovering: the first section for
+   the two items, for the title, and then for each one of the where sections"). By REAL hovers on POST /cooking/sessions' ending (429 · the sensitive limit), the bench's default layout:
+   (1) his configuration is untouched — the copy line of the default ending column is byte-identical to the one the page gave before this change, its storage key, part ids and defaults are as they were,
+       and hovering writes nothing to storage;
+   (2) each part carries its region by data (EX.regions): glyph and status → head · title, stage, ways → the block's own card · where and each mark of the strip → items; no other node of the block, and
+       no other kind's block, carries a hover of its own;
+   (3) the glyph and the status each give the ONE glyph-and-status card — the kind in its colour with its glyph, what the status means, who else gives the status — and it holds no title row, no where row and no part;
+   (4) the title (and the stage and the ways) give the block's full card, byte-for-byte the D-088 card;
+   (5) the where line and each mark give a card of their own, distinct per item, each saying what the item is and this ending's fact for it; the gap between two marks is no item (the block's card);
+   (6) the regions follow a part moved to another line, a hidden part has no region, and moving everything back restores the copy line byte-for-byte;
+   (7) every ending of every endpoint: its head, where and mark cards are made through card() and its guard — none with an issue (P1.1 · P2.1 · P4.1 · P8.1), and the guard fires on a region card made to break a rule */
+{ const E = 'POST /cooking/sessions', CEND = '#exgrid .excol[data-k="end"]', BLK = CEND + ' .blk';
+  /* the default ending column's copy line, as the page gave it BEFORE this change (commit 7c2bcc1) — pinned, never recomputed */
+  const BASE_COPY = 'examples · ending · 429 · sensitive limit: 20 per 60 seconds · Rate limit exceeded. Try again shortly. · on POST /cooking/sessions · block block (glyph on, its kind\'s colour, status on, words on, stage on, ways badge, where both) · edge left solid 2px · chips count pill 100%, status pill 90% · lines glyph · status | stage / words | ways / where | — · sizes glyph 13, status 12, words 13, stage 12, ways 12, where 12 · squares 14px gap 4 round as symbol by type · not drawn — · width dynamic (my pick)';
+  const BASE_LOOK = { rows: [{ l: ['icon', 'status'], r: ['stage'] }, { l: ['name'], r: ['count'] }, { l: ['via'], r: [] }], size: { icon: 13, status: 12, name: 13, stage: 12, count: 12, via: 12 }, iconCol: 'kind' };
+  const hoverAt = async (h) => { await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const bx = await h.boundingBox(); await p.mouse.move(5, 5); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(80); };
+  const card = () => p.evaluate(() => { const t = document.getElementById('tip'), c = t.querySelector('.cdc'); if (!c) return null;
+    const small = [...c.querySelectorAll('*')].filter((e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).map((e) => e.className);
+    return { card: c.getAttribute('data-card'), reg: c.getAttribute('data-reg'), rp: c.getAttribute('data-rp'), ri: c.getAttribute('data-ri'), bench: c.getAttribute('data-bench'), issues: +c.getAttribute('data-card-issues'), issue: c.getAttribute('data-card-issue'),
+      name: ((c.querySelector('.cdh b') || {}).textContent || '').trim(), label: ((c.querySelector('.cdh .cdv') || {}).textContent || '').trim(), glyph: !!c.querySelector('.cdh .cdg svg'), nameCol: (c.querySelector('.cdh b') || {}).style ? c.querySelector('.cdh b').style.color : '',
+      lines: [...c.querySelectorAll('.cdl')].map((l) => l.getAttribute('data-ln')), parts: c.querySelectorAll('.cdd .io').length, rows: c.querySelectorAll('.cdd .cdw:not(.cdmore)').length, pills: [...c.querySelectorAll('.cdpill')].map((q) => q.textContent),
+      text: c.textContent.replace(/\s+/g, ' ').trim(), html: t.innerHTML, small, cd: t.classList.contains('cd'), show: t.getAttribute('data-show'), w: Math.round(t.getBoundingClientRect().width), h: Math.round(t.getBoundingClientRect().height), foot: ((c.querySelector('.cdfoot') || {}).textContent || '').trim() }; });
+  const hoverCard = async (css, i = 0) => { const hs = await p.$$(css); if (!hs[i]) return null; await hoverAt(hs[i]); return card(); };
+  const WR = D.words.ex.region, WX = D.words.ex, GDC = D.words.enc.fam.gdc.vals;
+  await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(500);
+  const store0 = await p.evaluate(() => { try { return window.localStorage.getItem('gabe:allep:bench:v3'); } catch (e) { return 'no storage'; } });
+  /* (1) his configuration is untouched */
+  const cp0 = await p.evaluate(() => window.__allepEx.copy('end'));
+  ok(cp0 === BASE_COPY, 'D-089 · his configuration: the copy line of the default ending column is byte-identical to the one before the change', { now: cp0.slice(0, 160) });
+  const keys = await p.evaluate(() => ({ key: window.__allepEx.key, look: window.__allep.data.ex.look.end, lookKeys: Object.keys(window.__allep.data.ex.look.end), regions: window.__allep.data.ex.regions, parts: Object.keys(window.__allep.data.words.ex.parts.end), cur: window.__allepEx.current('end').id }));
+  ok(keys.key === 'gabe:allep:bench:v3' && JSON.stringify(keys.parts) === JSON.stringify(['icon', 'status', 'name', 'stage', 'count', 'via']) && JSON.stringify(keys.look.rows) === JSON.stringify(BASE_LOOK.rows) && JSON.stringify(keys.look.size) === JSON.stringify(BASE_LOOK.size) && keys.look.iconCol === BASE_LOOK.iconCol
+    && !keys.lookKeys.includes('regions') && !keys.lookKeys.some((q) => /reg/i.test(q)), 'D-089 · his configuration: the storage key, the six part ids and the default look of the ending are exactly as they were — the regions are a table of their own, never part of the saved look', keys);
+  ok(JSON.stringify(keys.regions) === JSON.stringify({ end: { icon: 'head', status: 'head', name: 'title', stage: 'title', count: 'title', via: 'items', marks: 'items' } }), 'D-089 · the regions are data: only the ending declares them — the glyph and the status → head, the where line and the strip of marks → items, the rest → title', keys.regions);
+  ok(keys.cur === E + '|x:8437446a6c', 'D-089 · the ending drawn first is the 429 of the sensitive limit', keys.cur);
+  /* (2) the tags: each part carries its region, nothing else carries a hover of its own */
+  const tags = await p.evaluate((b) => { const blk = document.querySelector(b), o = [...blk.querySelectorAll('[data-tip="exreg"]')].map((n) => ({ reg: n.dataset.reg, rp: n.dataset.rp, ri: n.dataset.ri, part: n.getAttribute('data-part'), sq: n.classList.contains('sq') }));
+    const other = {}; ['table', 'schema', 'fn', 'test', 'gate', 'hook', 'inf'].forEach((k) => { const bk = document.querySelector('#exgrid .excol[data-k="' + k + '"] .blk'); other[k] = bk ? bk.querySelectorAll('.bkhd [data-tip]').length : -1; });
+    const titleParts = ['name', 'stage', 'count'].map((q) => { const n = blk.querySelector('[data-part="' + q + '"]'); return n ? n.hasAttribute('data-tip') || !!n.closest('[data-tip]:not([data-tip="exblk"])') : null; });
+    return { o, other, titleParts, strip: blk.querySelectorAll('.sqs > .sq').length, blkTip: blk.getAttribute('data-tip') }; }, BLK);
+  const wayN = (() => { const r = D.rows.filter((x) => x.id === E)[0], c = D.ex.cat[keys.cur], P = r.ex.paths[c.paths[0]]; return P.ch.filter((q) => q[0] !== 'step').length; })();
+  ok(tags.o.filter((q) => q.reg === 'head').map((q) => q.rp).join() === 'icon,status' && tags.o.filter((q) => q.reg === 'items' && q.rp === 'via').length === 1
+    && tags.o.filter((q) => q.reg === 'items' && q.rp === 'marks').length === wayN && wayN === tags.strip && wayN === 3 && tags.o.length === 2 + 1 + wayN,
+    'D-089 · the ending block\'s hover nodes: the glyph and the status (head), the where line (one item) and each of the ' + wayN + ' marks of the strip (an item each) — and no other', tags);
+  ok(tags.blkTip === 'exblk' && tags.titleParts.every((v) => v === false) && Object.values(tags.other).every((n) => n === 0), 'D-089 · the title, the stage and the ways carry no hover of their own (the block\'s card), and no other kind\'s block carries one', { tags: tags.titleParts, other: tags.other });
+  /* (3) the glyph and the status */
+  const gl = await hoverCard(BLK + ' [data-part="icon"]'), stt = await hoverCard(BLK + ' [data-part="status"]');
+  const st429 = WR.status['429'], plain429 = st429.plain || GDC['429'].plain, kindName = D.words.kinds.refusal.name;
+  const mateWords = WX.face.lim.replace('{name}', 'global').replace('{n}', '120').replace('{w}', '60') + ' · Rate limit exceeded. Try again shortly.';
+  ok(gl && gl.card === 'reg' && gl.reg === 'head' && gl.rp === 'icon' && gl.cd && gl.show === 'true' && gl.glyph && gl.name === kindName && gl.label.toLowerCase() === (WX.parts.end.icon.name + ' · ' + WX.parts.end.status.name) && !gl.issues && gl.bench === 'end',
+    'D-089 · the glyph: its own card — the kind of ending (' + kindName + ') as the bold name, its glyph in the head, the label naming the two parts it speaks for, no renderer issue', gl && { card: gl.card, reg: gl.reg, name: gl.name, label: gl.label, issues: gl.issue });
+  ok(gl && gl.nameCol && /k-refusal/.test(gl.nameCol), 'D-089 · the kind\'s name is in its colour (the page\'s --k-refusal), as its glyph is', gl && gl.nameCol);
+  ok(stt && gl && stt.card === 'reg' && stt.reg === 'head' && stt.rp === 'status' && stt.html.replace(/data-rp="status"/, 'data-rp="icon"') === gl.html, 'D-089 · the status gives the same card as the glyph (one region: hovering either gives the card about both)', stt && { reg: stt.reg, rp: stt.rp });
+  ok(gl && gl.text.includes(st429.name) && gl.text.includes(plain429) && gl.pills.includes('429') && gl.text.includes(mateWords) && gl.text.includes(WX.tip.end.undecl),
+    'D-089 · the glyph card says what the status means (' + st429.name + ' · its plain line · the pill 429), that another ending of this endpoint gives the same status (' + mateWords.slice(0, 40) + '…) and that the route does not declare it', gl && gl.text);
+  ok(gl && !gl.text.includes('sensitive limit') && !gl.text.includes('rate_limit.py') && !gl.lines.includes('file') && !gl.lines.includes('stage') && gl.parts === 0 && gl.rows <= 3 && gl.h <= 300 && !gl.small.length && gl.w >= 210 && gl.w <= 362,
+    'D-089 · the glyph card holds only the glyph and the status — no title words, no file, no stage, none of the three parts — in few rows (' + (gl && gl.rows) + ' rows, ' + (gl && gl.h) + 'px, every text 12px or more)', gl && { rows: gl.rows, h: gl.h, lines: gl.lines, parts: gl.parts, small: gl.small });
+  ok(gl && gl.foot === D.words.mo.card.foot.open, 'D-089 · the card\'s footer says what a click does (it opens the block\'s list), as on every lab card', gl && gl.foot);
+  /* (4) the title: the block's full card, byte-for-byte */
+  const full = await p.evaluate((b) => { const C = window.__allepCard, S0 = C.subject(document.querySelector(b)); return C.make(S0.ck, S0); }, BLK);
+  const tN = await hoverCard(BLK + ' [data-part="name"]'), tS = await hoverCard(BLK + ' [data-part="stage"]'), tC = await hoverCard(BLK + ' [data-part="count"]');
+  ok(tN && tN.card === 'end' && tN.bench === 'end' && !tN.reg && tN.html === full && tS && tS.html === full && tC && tC.html === full && tN.parts >= 2 && tN.text.includes('rate_limit.py:127'),
+    'D-089 · the title, the stage and the ways each give the block\'s full card — byte-for-byte what the block\'s card made on its own is (D-088, unchanged): its identity lines and the parts before · checks · gives', tN && { card: tN.card, reg: tN.reg, same: tN.html === full, parts: tN.parts });
+  /* (5) the where line and each mark */
+  const wh = await hoverCard(BLK + ' [data-part="via"]'), mk = [];
+  for (let i = 0; i < wayN; i++) mk.push(await hoverCard(BLK + ' .sqs > .sq', i));
+  const c0 = D.ex.cat[keys.cur], P0 = D.rows.filter((x) => x.id === E)[0].ex.paths[c0.paths[0]], chain = P0.ch.filter((q) => q[0] !== 'step'), S = D.ex.str;
+  const atShort = c0.at.split('/').slice(-D.ex.dirs).join('/');
+  ok(wh && wh.card === 'reg' && wh.reg === 'items' && wh.rp === 'via' && !wh.issues && wh.name === atShort && wh.label === WX.parts.end.via.name && wh.text.includes(c0.at.split(':')[0]) && wh.text.includes(WR.line.replace('{v}', c0.at.split(':')[1])) && wh.text.includes(c0.via) && wh.pills.includes('429')
+    && !wh.text.includes('sensitive limit') && wh.parts === 0 && !wh.small.length,
+    'D-089 · the where line: its own card — the file and the line it points to (' + atShort + '), the code that produces it (' + c0.via + '), the status it gives; none of the title\'s words', wh && { name: wh.name, label: wh.label, text: wh.text.slice(0, 200), issue: wh.issue });
+  const sw = S[chain[0][5]], gt = chain[1], gw = S[gt[4]];
+  const markOk = mk.every((m, i) => m && m.card === 'reg' && m.reg === 'items' && m.rp === 'marks' && +m.ri === i && !m.issues && !m.small.length && m.glyph && m.label === WR.part.marks && m.parts === 0 && m.rows <= 4);
+  ok(markOk && chain.length === 3 && chain[0][0] === 'switch' && chain[1][0] === 'gate' && chain[1][2] === 1 && chain[2][0] === 'exit', 'D-089 · each of the ' + wayN + ' marks gives a card of its own (the switch, the check that stops it, the way out), each with its glyph, its label, no renderer issue', mk.map((m) => m && { reg: m.reg, ri: m.ri, name: m.name, issue: m.issue }));
+  ok(new Set(mk.map((m) => m.html)).size === wayN && new Set([wh.html, ...mk.map((m) => m.html)]).size === wayN + 1, 'D-089 · one card per item, never one for the whole row: the where line and each mark give cards that differ from one another', mk.map((m) => m.name));
+  ok(mk[0].name === WR.way['way-switch'].replace('{switch}', D.words.terms.gate.switch) && mk[0].text.includes(WX.face.sw.flag.replace('{v}', sw)) && !mk[0].pills.length,
+    'D-089 · the switch\'s card: what it is (' + mk[0].name + ') and the setting that turns it on — ' + sw, mk[0].text);
+  ok(mk[1].name === WR.way['way-stop'].replace('{check}', D.words.terms.gate.check) && mk[1].text.includes(gw) && mk[1].text.includes('sensitive limit') && mk[1].text.includes('20 per 60 seconds') && mk[1].pills.includes('429') && mk[1].text.includes(WR.ends) && mk[1].text.includes('Rate limit exceeded'),
+    'D-089 · the check\'s card: what it is (' + mk[1].name + '), where it sits (' + gw + '), what it checks (the sensitive limit), the status it gives and that it ends the request', mk[1].text);
+  ok(mk[2].name === WR.way['way-exit'] && mk[2].text.includes(c0.sg) && mk[2].pills.includes('429') && mk[2].pills.includes(kindName) && mk[2].lines.join() === 'stage', 'D-089 · the way out\'s card: what it is, the stage it ends at (' + c0.sg + '), its status and its kind', mk[2].text);
+  const gap = await p.evaluate((b) => { const q = [...document.querySelectorAll(b + ' .sqs > .sq')], a = q[0].getBoundingClientRect(), c = q[1].getBoundingClientRect(); return { x: (a.right + c.left) / 2, y: (a.top + a.bottom) / 2 }; }, BLK);
+  await p.mouse.move(5, 5); await p.mouse.move(gap.x, gap.y); await p.waitForTimeout(80); const gp = await card();
+  ok(gp && gp.card === 'end' && gp.html === full, 'D-089 · the gap between two marks is no item: the pointer there gets the block\'s card, never a card for the whole row', gp && { card: gp.card, reg: gp.reg });
+  ok((await p.evaluate(() => window.localStorage.getItem('gabe:allep:bench:v3'))) === store0, 'D-089 · his configuration: hovering the regions wrote nothing to storage');
+  /* (6) the regions follow the parts */
+  const regOf = (rp) => p.evaluate((a) => { const n = document.querySelector(a[0] + ' [data-part="' + a[1] + '"]'); return n ? { tip: n.getAttribute('data-tip'), reg: n.getAttribute('data-reg') } : null; }, [BLK, rp]);
+  await p.evaluate(() => { window.__allepEx.move('end', 'status', 2, 'r', 0); window.__allepEx.move('end', 'via', 0, 'l', 0); window.__allepEx.move('end', 'name', 2, 'l', 0); window.__allepEx.move('end', 'icon', 1, 'l', 0); }); await p.waitForTimeout(150);
+  const mv = { st: await regOf('status'), via: await regOf('via'), name: await regOf('name'), icon: await regOf('icon') };
+  const lineOf = (rp) => p.evaluate((a) => { const n = document.querySelector(a[0] + ' [data-part="' + a[1] + '"]'), ln = n && n.closest('.bkln'); return ln ? [...ln.parentNode.children].indexOf(ln) : -1; }, [BLK, rp]);
+  const lns = { st: await lineOf('status'), via: await lineOf('via'), icon: await lineOf('icon'), name: await lineOf('name') };
+  const gMv = await hoverCard(BLK + ' [data-part="status"]'), vMv = await hoverCard(BLK + ' [data-part="via"]'), nMv = await hoverCard(BLK + ' [data-part="name"]'), iMv = await hoverCard(BLK + ' [data-part="icon"]');
+  ok(lns.st !== 0 && lns.via === 0 && lns.icon === 1 && lns.name === 2 && mv.st && mv.st.reg === 'head' && mv.via && mv.via.reg === 'items' && mv.icon && mv.icon.reg === 'head' && mv.name && mv.name.tip === null && gMv && gMv.reg === 'head' && gMv.rp === 'status' && vMv && vMv.reg === 'items' && vMv.rp === 'via' && iMv && iMv.reg === 'head' && nMv && nMv.card === 'end' && !nMv.reg,
+    'D-089 · the regions follow the parts: with the status on another line, the where line on the first, the glyph on the second and the title on the third, each still gives its own card', { lns, mv, g: gMv && gMv.reg, v: vMv && vMv.reg, n: nMv && nMv.card });
+  await p.evaluate(() => window.__allepEx.move('end', 'icon', 'off')); await p.waitForTimeout(120);
+  const hid = await p.evaluate((b) => ({ icon: !!document.querySelector(b + ' [data-part="icon"]'), head: [...document.querySelectorAll(b + ' [data-tip="exreg"][data-reg="head"]')].map((n) => n.dataset.rp) }), BLK);
+  ok(!hid.icon && hid.head.join() === 'status', 'D-089 · a part he hides has no region: with the glyph not drawn only the status is left of the head region, and it still gives its card', hid);
+  await p.evaluate(() => { window.__allepEx.move('end', 'icon', 0, 'l', 0); window.__allepEx.move('end', 'status', 0, 'l', 1); window.__allepEx.move('end', 'name', 1, 'l', 0); window.__allepEx.move('end', 'via', 2, 'l', 0); }); await p.waitForTimeout(150);
+  const cp1 = await p.evaluate(() => window.__allepEx.copy('end')), cur1 = await p.evaluate(() => window.__allepEx.current('end').id);
+  ok(cp1 === BASE_COPY && cur1 === keys.cur, 'D-089 · his configuration: after the parts are moved about and back, the copy line is byte-identical to the default\'s — the line\'s format and the part ids did not change', { now: cp1.slice(0, 200) });
+  /* every other kind keeps the one card */
+  const oth = {}; for (const k of ['table', 'fn', 'schema', 'test', 'gate', 'hook', 'inf']) { const c2 = await hoverCard(CEND.replace('"end"', '"' + k + '"') + ' .blk [data-part="' + (k === 'test' ? 'cid' : k === 'gate' ? 'cond' : 'name') + '"]'); oth[k] = c2 ? [c2.card, c2.reg || '', c2.bench] : null; }
+  ok(Object.entries(oth).every(([k, v]) => v && v[0] === k && v[1] === '' && v[2] === k), 'D-089 · the other kinds keep the one D-088 card for now: a hover on the name of each is its block\'s full card, bound to its kind', oth);
+  await p.mouse.move(5, 5);
+  /* (7) every ending of every endpoint, through card() and its guard; the guard fires on a region card made to break a rule */
+  const all = await p.evaluate(() => { const C = window.__allepCard, D0 = window.__allep.data, o = { heads: 0, wheres: 0, marks: 0, issues: [], errs: [], names: new Set(), ends: 0, noReg: 0 };
+    D0.rows.forEach((r) => (r.ex.end || []).forEach((e) => { const c = D0.ex.cat[e[0]], it = { k: 'end', id: e[0], role: e[1], ep: r.id, o: e[2] }, P = r.ex.paths[c.paths[0]]; o.ends++;
+      const one = (reg, rp, ri, kind) => { try { const S0 = C.region('end', it, reg, rp, ri, null); if (!S0) { o.noReg++; return; } const d = document.createElement('div'); d.innerHTML = C.make('reg', S0); const cc = d.firstChild; o[kind]++;
+          if (+cc.getAttribute('data-card-issues')) o.issues.push(r.id + ' ' + e[0] + ' ' + rp + ri + ' → ' + cc.getAttribute('data-card-issue')); o.names.add(rp + ':' + (cc.querySelector('.cdh b') || {}).textContent); } catch (x) { o.errs.push(r.id + ' ' + e[0] + ' ' + rp + ' ' + x.message); } };
+      one('head', 'icon', 0, 'heads'); if (c.at) one('items', 'via', 0, 'wheres'); (P ? P.ch.filter((q) => q[0] !== 'step') : []).forEach((q, i) => one('items', 'marks', i, 'marks')); }));
+    o.names = [...o.names].filter((n) => n.startsWith('marks:')).sort(); return o; });
+  const wantMarks = D.rows.reduce((n, r) => n + (r.ex.end || []).reduce((m, e) => { const c = D.ex.cat[e[0]], P = r.ex.paths[c.paths[0]]; return m + (P ? P.ch.filter((q) => q[0] !== 'step').length : 0); }, 0), 0), wantEnds = D.rows.reduce((n, r) => n + (r.ex.end || []).length, 0);
+  console.log('  D-089 every ending: ' + all.ends + ' endings · ' + all.heads + ' head cards · ' + all.wheres + ' where cards · ' + all.marks + ' mark cards · mark names ' + all.names.map((q) => q.slice(6)).join(' | '));
+  ok(all.ends === wantEnds && all.heads === wantEnds && all.wheres === wantEnds && all.marks === wantMarks && wantMarks > 5000 && !all.noReg && !all.errs.length && !all.issues.length,
+    'D-089 · all ' + D.rows.length + ' endpoints: ' + all.ends + ' endings → ' + all.heads + ' glyph-and-status cards, ' + all.wheres + ' where cards and ' + all.marks + ' mark cards, each made through card() and its guard — none with an issue (P1.1 · P2.1 · P4.1 · P8.1), none that fails to draw', { issues: all.issues.slice(0, 3), errs: all.errs.slice(0, 3), noReg: all.noReg });
+  const gd2 = await p.evaluate(() => { const C = window.__allepCard, D0 = window.__allep.data, r = D0.rows.filter((x) => x.id === 'POST /cooking/sessions')[0], e = r.ex.end[0], it = { k: 'end', id: e[0], role: e[1], ep: r.id, o: e[2] }, S0 = C.region('end', it, 'head', 'icon', 0, null), box = document.createElement('div'); box.innerHTML = C.make('reg', S0);
+    const root = () => box.firstChild.cloneNode(true), mk = (c, txt) => { const n = document.createElement('span'); n.className = c; n.textContent = txt; return n; };
+    const run = (mut, F) => { const x = root(); mut(x); return C.guard(x, F || { joins: [] }); };
+    return { clean: run(() => {}), p21: run((x) => x.appendChild(mk('cdt', 'as the map draws it'))), p21b: run((x) => x.appendChild(mk('cdt', 'it stops here'))), p41: run(() => {}, { joins: [{ end: 'ending', want: ['an ending named nowhere on the card'] }] }),
+      p81: run((x) => { const n = mk('cdfp', '0'); n.setAttribute('data-unit', 'ways'); n.setAttribute('data-n', ''); x.appendChild(n); }), p11: run((x) => { const n = mk('cdv', 'a label that runs far past the short limit'); n.setAttribute('data-shared', '1'); x.appendChild(n); }) }; });
+  ok(gd2.clean.length === 0 && gd2.p21.some((q) => q.startsWith('p2.1')) && gd2.p21b.some((q) => q.startsWith('p2.1')) && gd2.p41.some((q) => q.startsWith('p4.1')) && gd2.p81.some((q) => q.startsWith('p8.1')) && gd2.p11.some((q) => q.startsWith('p1.1')),
+    'D-089 · the guard stays silent on a clean region card and fires on one made to break each rule (P2.1 words about the page · P4.1 a join\'s other end not named · P8.1 an unrecorded count · P1.1 a long label)', gd2);
+  ok((await p.evaluate(() => window.__allepCard.log.length)) === 0 && !errs.length, 'D-089 · the renderer\'s log holds no issue and the page raised no error after every region hover', { log: await p.evaluate(() => window.__allepCard.log.slice(0, 2)), errs: errs.slice(0, 3) }); }
 
 await b.close();
 console.log((fail ? 'FAIL ✗' : 'PASS ✓') + ` probe-all-endpoints · ${pass} passed · ${fail} failed · ${FEED.length} endpoints · sample ${SAMPLE.length} · page ${path.basename(PAGE)}`);

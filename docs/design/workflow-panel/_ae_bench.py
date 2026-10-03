@@ -34,6 +34,13 @@ BENCH_JS, BENCH_CSS = HERE / "_ae-bench.js", HERE / "_ae-bench.css"
 KINDS = ("end", "table", "schema", "fn", "test", "gate", "hook", "inf")          # his order (L-23), the columns left to right
 WIDTHS = ["dynamic", "shorter", "compact", "tight"]                     # L-36 → D-087: the default and his three narrower ones, in his order — "full" is gone (the page draws them in _ae-bench.css by data-w, on the element only)
 LAB_KINDS = {"table": "DATACFG", "schema": "SCHCFG", "fn": "FNCFG"}
+# D-089 — HOVER REGIONS, by data. Each PART of a kind's block (and the strip of marks, `marks`, which is no draggable part) carries the region its
+# hover belongs to: `head` — one short card about the parts of that region together (the ending's glyph and status) · `title` — the block's own
+# card (D-088), which is also what a part not named here gives · `items` — one card for each item of the part (the where line, each mark of the strip).
+# The page tags a part's node with its region wherever he drags the part (_ae-bench.js xRegions), so the region follows the part; a kind with no entry
+# here keeps the one card. The card a region draws is _ae-card.js CDREG — a kind adopts regions by an entry here and a provider there.
+REGION_IDS = ("head", "title", "items")
+REGIONS = {"end": {"icon": "head", "status": "head", "name": "title", "stage": "title", "count": "title", "via": "items", "marks": "items"}}
 GATE_ROLES = ("limiter", "scheme", "login", "rule", "own", "down", "branch", "catch", "switch")   # EX-4: the feed's own groups
 TEST_ROLES = ("act", "check", "arrange", "service", "helper")
 SCH_ROLES = ("in", "out", "in-nested", "out-nested")
@@ -850,9 +857,25 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
             M = MINE[k]
             looks[k] = {**base, "form": "block", "rows": M["rows"], "size": M["size"], "iconCol": M["iconCol"], "mode": {"count": "badge", "via": "both", "file": "word"},
                         "on": {}, "off": [p for p in M["parts"] if p not in [q for r0 in M["rows"] for q in r0["l"] + r0["r"]]]}
+    # D-089: a region names a part the kind draws (or the strip), one of the three regions; the card words name every status an ending gives
+    for k, R in REGIONS.items():
+        stray = sorted(set(R) - (set(MINE[k]["parts"]) | {"marks"})) if k in MINE else sorted(R)
+        if stray or not set(R.values()) <= set(REGION_IDS):
+            die(f"REGIONS.{k} names parts the block does not draw {stray} or a region that is none of {REGION_IDS}: {sorted(set(R.values()) - set(REGION_IDS))}")
+    RW = EW.get("region") or die("ex.region: the region cards have no words (D-089)")
+    gdc = W["enc"]["fam"]["gdc"]["vals"]
+    lost = sorted({str(c["st"]) for c in cat.values() if c["k"] == "end"} - set(RW["status"]))
+    if lost:
+        die(f"ex.region.status names no status {lost} that an ending of the feed gives — a status never reads as nothing (D-089)")
+    nopl = sorted(s for s, v in RW["status"].items() if not v.get("name") or not (v.get("plain") or (gdc.get(s) or {}).get("plain")))
+    if nopl:
+        die(f"ex.region.status {nopl}: each status needs its HTTP name and a plain line, its own or the page's refusal table's (enc.fam.gdc)")
+    marks = sorted({"way-" + ("pass" if q[2] == 0 else "stop") if q[0] == "gate" else "way-" + q[0] for r in rows for P in r["ex"]["paths"].values() for q in P["ch"] if q[0] != "step"})
+    if sorted(set(RW["way"]) - set(marks)) or sorted(set(marks) - set(RW["way"])):
+        die(f"ex.region.way names {sorted(RW['way'])}, the strip of marks draws {marks}")
     icons = {p["ico"] for k in LAB_KINDS for p in lk["parts"][k]} | {x["sym"] for x in lk["sq"]} | set(EW["icons"].values())
     D = {"kinds": list(KINDS), "look": looks, "parts": lk["parts"], "icol": lk["icol"], "sq": lk["sq"], "col": lk["col"], "his": lk["his"],
-         "cat": dict(sorted(cat.items())), "modes": MODES, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
+         "cat": dict(sorted(cat.items())), "modes": MODES, "regions": REGIONS, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
          "absent": {k: arm_off(fj, a) for k, a in KIND_ARM.items() if k in KINDS and arm_off(fj, a)}}
     css = _css() + "\n" + BENCH_CSS.read_text(encoding="utf-8")
     js = BENCH_JS.read_text(encoding="utf-8")

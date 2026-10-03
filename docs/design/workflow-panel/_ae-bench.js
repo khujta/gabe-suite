@@ -9,6 +9,7 @@
      decides (enc.fam.gdl), the race (mo.x.race), the reply (mo.io.k), the hover's three parts (mo.io.parts). This file is inlined
      by the generator inside the page's script, so it draws with the page's own helpers. ══ */
   var EX = D.ex, XW = W.ex, XKEY = "gabe:allep:bench:v3", XK = EX.kinds, XF = W.enc.fam, XIO = W.mo.io, XC2 = W.mo.x.c2;
+  var XREG = EX.regions || {};                               /* D-089: the hover regions of each kind's parts (see xRegions) */
   var XS = { lay: XW.opt.lay.pick, follow: XW.opt.follow.pick, col: {} };
   function xClone(o) { return JSON.parse(JSON.stringify(o)); }
   XK.forEach(function (k) { XS.col[k] = { scope: XW.opt.scope.pick, role: null, id: null, look: xClone(EX.look[k]), sel: null, open: false, width: XW.width.pick }; });
@@ -206,6 +207,13 @@
   function xField(f, L, c, it, extra) { var tc = XSQ[f[2]] || XSQ.other, pal = L.sqPal, col = pal === "mono" ? "var(--muted)" : pal === "entity" ? (c.ec || "var(--muted)")
       : pal === "channel" ? xChanCol(it.k, c, it) : tc.col;
     return xMark("e-" + L.sqEnc + " t-" + tc.key + (f[3] ? " opt" : "") + (extra ? " " + extra : ""), col, tc.sym, tc.ch, f[0], "field", tc.word); }
+  /* an ending's strip of marks, one per step of the first way to it (the steps themselves are not marks): the mark's colour, symbol, letter, class and what it counts.
+     ONE source — the strip draws it and, since D-089, the card of each mark reads it, so the two never say a mark differently */
+  function xWayList(c) { var P = c.paths.length ? BYID[c.ep].ex.paths[c.paths[0]] : null; return (P ? P.ch : []).filter(function (q) { return q[0] !== "step"; }); }
+  function xWay(c, q) { var E = EX.col, t = q[0];
+    return { col: t === "gate" ? (q[2] ? xStatusCol(c.st) : E.opc.gate) : t === "call" ? E.kind["function"] : t === "branch" ? E.opc.call : t === "switch" ? E.opc.pure : xStatusCol(c.st),
+      sym: t === "gate" ? "shield" : t === "call" ? "function" : t === "branch" ? "merge" : t === "switch" ? "role" : "target", ch: t === "call" ? "ƒ" : t.charAt(0).toUpperCase(),
+      cls: (t === "gate" && q[2] === 0 ? "expass" : "") + (t === "exit" ? " exhere" : ""), mk: "way-" + (t === "gate" ? (q[2] === 0 ? "pass" : "stop") : t) }; }
   function xStrip(k, c, it, L) { var s = el("div", "sqs"), o = it.o, enc = L.sqEnc === "symbol" || L.sqEnc === "char" ? L.sqEnc : "colour", E = EX.col;
     function m(col, sym, ch, cls, mk) { s.appendChild(xMark("e-" + enc + (cls ? " " + cls : ""), col, sym, ch, null, mk)); }
     if (k === "table") { var fk = {}, uq = {}; (c.fks || []).forEach(function (f) { fk[f[0]] = 1; }); (c.uqs || []).forEach(function (u) { uq[u] = 1; });
@@ -213,10 +221,7 @@
       (c.more || []).forEach(function (f) { s.appendChild(xMark("e-colour exmore", "var(--muted)", null, null, f[0], "more")); }); }
     else if (k === "schema") c.cols.forEach(function (f) { s.appendChild(xField([f[0], f[1], f[2], f[4] ? 0 : 1], L, c, it)); });
     else if (k === "fn") o.ops.forEach(function (q) { m(E.rw[q[0]] || E.opc.pure, "model", q[0] === "w" ? "W" : "R", "", "op-" + (E.rw[q[0]] ? q[0] : "r")); });
-    else if (k === "end") { var P = BYID[c.ep].ex.paths[c.paths[0]]; (P ? P.ch : []).forEach(function (q) { if (q[0] === "step") return;
-        m(q[0] === "gate" ? (q[2] ? xStatusCol(c.st) : E.opc.gate) : q[0] === "call" ? E.kind["function"] : q[0] === "branch" ? E.opc.call : q[0] === "switch" ? E.opc.pure : xStatusCol(c.st),
-          q[0] === "gate" ? "shield" : q[0] === "call" ? "function" : q[0] === "branch" ? "merge" : q[0] === "switch" ? "role" : "target", q[0] === "call" ? "ƒ" : q[0].charAt(0).toUpperCase(),
-          (q[0] === "gate" && q[2] === 0 ? "expass" : "") + (q[0] === "exit" ? " exhere" : ""), "way-" + (q[0] === "gate" ? (q[2] === 0 ? "pass" : "stop") : q[0])); }); }
+    else if (k === "end") xWayList(c).forEach(function (q) { var w = xWay(c, q); m(w.col, w.sym, w.ch, w.cls, w.mk); });
     else if (k === "test") { if (c.calls.length) c.calls.forEach(function (q, i) { m(q[2] === "act" ? E.opc.call : q[2] === "arrange-checked" ? E.opc.gate : E.opc.pure, "endpoint", q[0] ? q[0].charAt(0) : "?", o.here.indexOf(i) >= 0 ? "exhere" : "", "call-" + (q[2] === "act" ? "act" : q[2] === "arrange-checked" ? "check" : "arrange")); });
       else c.raises.forEach(function () { m(E.kind["function"], "function", "ƒ", "exhere", "call-service"); }); }
     else if (k === "gate") { o.after.forEach(function () { m(E.opc.pure, "shield", "·", "expass", "after"); }); m(E.opc.gate, "shield", "!", "exhere", "self"); }
@@ -458,9 +463,22 @@
     hd.appendChild(ti); var sq = xStrip(k, c, it, L); if (sq) hd.appendChild(sq); blk.appendChild(hd); blk.appendChild(xList(k, c, it));
     blk.setAttribute("data-tip", "exblk"); blk.setAttribute("data-exk", k); blk.setAttribute("data-exid", it.id); blk.setAttribute("data-exep", it.ep); if (c.key) blk.setAttribute("data-keys", c.key);
     blk.querySelectorAll("[data-tip]").forEach(function (n) { if (n !== blk && !n.closest(".exfl")) n.removeAttribute("data-tip"); });
+    xRegions(k, blk);
     if (XS.col[k].open) blk.classList.add("open");
     blk.addEventListener("click", function (e) { if (e.target.closest(".exfl")) return; XS.col[k].open = !XS.col[k].open; blk.classList.toggle("open", XS.col[k].open); });
     return blk; }
+
+  /* ══ D-089 · HOVER REGIONS (his: "the hover should work as it is today … if we hover over the glyph and the status, it should give a different hover only regarding the
+     glyph and the status. For the items at the end in the last row, each item should have its own hover notice about what it is. That way, we will have three regions").
+     A part carries its region by DATA — EX.regions[kind][part] (the generator's REGIONS): `head` · `title` · `items`; the strip of marks is named `marks` there, being no
+     draggable part. The tag is put on the part's NODE as the block is drawn, so wherever he drags a part its region goes with it: a node of a `head` or `items` part
+     takes its own hover (data-tip="exreg", data-reg, data-rp = the part, data-ri = its item); a `title` part, and every gap, keeps the block's own card. An item is a
+     `.sq` of the strip, a node of the part marked data-it, or — when the part marks none — the part itself. The card each region draws is _ae-card.js (CDREG). ══ */
+  function xRegionTag(n, reg, part, i) { n.setAttribute("data-tip", "exreg"); n.setAttribute("data-reg", reg); n.setAttribute("data-rp", part); n.setAttribute("data-ri", String(i)); }
+  function xRegions(k, blk) { var R = XREG[k]; if (!R) return;
+    [].forEach.call(blk.querySelectorAll("[data-part]"), function (n) { var p = n.getAttribute("data-part"), g = R[p]; if (!g || g === "title") return;
+      var its = n.querySelectorAll("[data-it]"); if (g === "items" && its.length) [].forEach.call(its, function (q, i) { xRegionTag(q, g, p, i); }); else xRegionTag(n, g, p, 0); });
+    var sq = blk.querySelector(".sqs"), g2 = R.marks; if (sq && g2 && g2 !== "title") [].forEach.call(sq.children, function (q, i) { xRegionTag(q, g2, "marks", i); }); }
 
   /* ── the controls under a block: parts (drag between the lines, or into not drawn) · size · colour, and the copy line ── */
   function xPartWord(k, p) { return (XW.parts[k][p] || {}).name || p; }
