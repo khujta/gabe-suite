@@ -1321,3 +1321,15 @@ before a push. A design page: its check once per batch of edits; a walk only whe
 changed. Every browser run goes through `heavy`.
 Revisit if: a break in an untouched battery reaches a push sweep twice — then the per-change set widens to the batteries that import the
 changed files.
+
+## D-087 — A bench column keeps its size; its width control narrows only the element it draws
+Date: 2026-10-03 · Input: his message with a picture of the EXAMPLES bench (ending · table · schema · function columns at the default width).
+Decision, his: "in the All Endpoints section, where I will test different configurations, I want the size of the squares for each element to
+remain the same. It doesn't matter if I change the width. The full width is something we are not going to use. We are only going to use the
+original one, the default one at the beginning, like in the screenshot, or the last three options. If I select any of the last three options,
+the only thing that should change is the width of the element we are working on, not the width of the entire square for the element's
+configuration".
+Consequence: each bench column's width options (L-36: dynamic · full · shorter · compact · most compact) become **the default (as in his
+picture) · shorter · compact · most compact** — "full" is removed. A column's box — its head, its parts lines, size and colour controls —
+keeps the default size whatever width is picked; the width narrows only the drawn element at the top of the column. A saved "full" reads as
+the default. The width still rides the column's copy line.
