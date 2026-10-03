@@ -1,0 +1,162 @@
+{
+  "_about": "D-085 · the two proposals he put back to be redrafted in his words (D-081: P2.1 and P3.2 were 'change it'). Same shape as a patterns.json suite entry (kind · target · what · lands · gate · against, plus checks / partOf / waitsOn where they apply) with two more fields: `his` — the one line of his words it answers — and `cost`, in numbers measured on 2026-10-02 (the working tree at 9a9bb86; gustify @05007957, 80 endpoints). DRAFT: nothing lands in the suite before his 'land it', and patterns.json is not edited — the review page reads this file when it is next built. The numbers behind `cost` are in `measured`; the rest of the reasoning is in README.md.",
+  "proposals": [
+    {
+      "id": "P2.1",
+      "pattern": "P2",
+      "name": "One hover emitter per page: every hover is made by card(kind, element, fields), and the rules of its kind run as it is made",
+      "replaces": "P2.1 as first drafted: a stop-list pass over hovers that were already made",
+      "kind": "check",
+      "checks": [
+        "pageTalk"
+      ],
+      "target": "each page generator that makes hovers (gen-all-endpoints.py with its _ae_ modules, gen-legibility-review.mjs), through one registry of hover kinds · skills/gabe-artifact (the card renderer and the hover rule)",
+      "what": "Every hover is made by one call, card(kind, element, fields). The kind names its parts (before, checks and gives become labelled rows), its glyph and colour, and the rules that apply to it. The rules run as the card is made, and only on the kinds they concern: no words about the page or the map (a panel that is about the map on purpose is marked on its kind, not in its words); a record that joins two things draws both ends or names the other; a count's label comes from the definition that computes it, and a value nobody read says unknown, absent or beyond one level; what repeats across a kind is a short label and the rest is what changes; every rule has a check that runs. A hover made any other way fails the build. The card is the endpoint lab's (L-33). The audit stays as the one final pass, for what only the finished page shows.",
+      "lands": "(1) a registry of hover kinds as data: parts, glyph, colour, joins, counts, and which kinds are about the map; (2) the emitter in each generator, applying the registry's rules (Python for all-endpoints, a Node port for the review page, one shared fixtures file run through both); (3) one renderer, hover-card.js and hover-card.css, in skills/gabe-artifact/assets, drawing the lab's card; (4) skills/gabe-artifact/references/legibility.md: the card as the hover format, and the rule that only the emitter makes hovers; (5) three new counts in the audit: hover targets the emitter did not make, rendered cards missing a part, unknown kinds; (6) a battery, tests/hover-emitter, with a case that fires and a case that stays silent for each rule.",
+      "gate": "The build stops on a rule that fails for a kind. The audit reports and stops nothing.",
+      "against": "It rewrites the hover code of both generators; it does not add a check beside it. Measured: 8 record sites (5 calls of io_of and 3 records built by hand) and a 568-line builder in Python, 70 hover kinds and 89 attribute sites in the page's script, 185 line templates (79 of them need a hand split), 37 title lines on the review page. A rule that needs the whole page (nested targets, twins in one container, items with no glyph, unfilled tokens) cannot run at emission and stays in the audit. The registry is one more thing to keep current. On one endpoint's view of all-endpoints only 111 of the 4,475 hover targets come from a record the build made; the other 4,364 are composed in the page, so they are checked where they are drawn and by the probe's walk, not at build. Two ports of the same checks (Python and Node) must agree, which the shared fixtures prove.",
+      "his": "\"I would like to be able to produce a better corpus that has these rules embedded, rather than generating something, then correcting everything, and doing several passes on the same data… Still can have one final pass, something like that, but I don't want to have n passes by the n points of view that we want to correct.\"",
+      "cost": "Four labels first (endings, databases, schemas, functions, the four he named) cover 3,882 of the 7,236 item hovers on the 80 endpoints (54%); the other seven families are 3,354. Slices: (1) the renderer, the registry and those four labels; (2) the other seven labels and the 24 element kinds the page composes; (3) the 46 head and control hovers as short cards; (4) the review page. The rules run without a browser, so the new battery costs seconds; one render case for the card adds a browser run (about +35 s, by the read-aloud battery's measure; an estimate). gen-all-endpoints.py is already 4,516 lines, so the emitter and registry go in their own files, and _ae_io.py (826 lines) gets shorter as its sentences become labelled rows.",
+      "open": [
+        "The lab's cards end with the kind's one-sentence definition (the plain line). On an element card that line repeats on every item of the kind, which P1.1 forbids; his block card already dropped it. My pick: keep it on control and head cards only, and on element cards say the kind once in the kind line and once in the legend.",
+        "Each kind's card layout (which rows, in which order) is his, decided on the all-endpoints bench (D-083). The emitter ships the card law's order as the default and reads a kind's layout from data, so his pasted configuration changes the registry, not the code. My pick, not ruled.",
+        "Whether the review page joins now. L-33 says 'including these kinds of pages', so the plan includes it as the last slice; it has no hover system today (1,676 native title lines), so it gains one."
+      ]
+    },
+    {
+      "id": "P3.2",
+      "pattern": "P3",
+      "name": "A kind the registry does not know is kept as 'unknown', counted, and judged later in a batch",
+      "replaces": "P3.2 as first drafted: a page mark for any kind the station does not draw",
+      "kind": "method",
+      "target": "the hover emitter and its registry (P2.1) · a batch tool beside curate-workflows in skills/gabe-cc-update · pulse (one angle) · the gabe-map map census",
+      "what": "A kind of element the registry does not have is never named while a page is built. It is drawn as a card with the generic label unknown (the element's own name and facts, no invented glyph or colour) and written down: one line per distinct kind (its family and the shape of its record), with a count and a few examples, in a file the build writes next to the page's data. The file is a projection of the feed, so the same inputs give the same bytes. Later, in a batch, one tool reads that file (or several, from different projects), groups the unknowns by shape, and proposes for each: fold into a kind that exists, add a new kind (a name, a glyph from the Gabe Universe's roster, a plain line), or leave it unknown. You accept by moving one row into the registry; the next build draws it. Which of those kinds the Gabe Universe can map is ruled in the same batch.",
+      "lands": "(1) the emitter's unknown branch and the file unknown-kinds.json; (2) skills/gabe-cc-update: a curate-kinds mode with scripts/draft-kinds.py, a projection like draft-entities.py, so a draft is committed, loaded by no page, and accepted by moving one row; (3) a pulse angle, S21, that says how many unknown kinds stand, read fresh from the committed file the way S15 reads fe-unknown; (4) a section in the gabe-map map census (a field, not a tool, so the count stays eighteen); (5) one audit count, unknownKinds; (6) for the tool, the angle and the count, a fixture that fires and one that stays silent; (7) a legend row, Unknown, on pages that use the emitter.",
+      "gate": "It reports and stops nothing. Unknown is a legal state of a page, and no build fails on it.",
+      "against": "Unknowns pile up if nobody runs the batch; the pulse line is the only nag. An unknown card says less than a labelled one on the day it appears. Grouping unknowns by the shape of their record is a heuristic, so every proposal needs your look. It adds a script, an angle and a census section to the suite for a state the pages cannot show at all today: io_of falls back to the element's family when it sets no kind (k or f), so a new kind is named without a trace, and the first batch could be the first count anyone sees. A new skill for this was the runner-up; it loses on the suite's diet (30 skills, trimmed once). The map-delta ledger was the other model; it tallies events across commits and lives in .kdbp/, which this repo never carries, so the S15 model (fresh from the feed, nothing stored but the projection) is used instead.",
+      "his": "\"…we can somehow accumulate the unknown elements and later decide, using Claude Code, the skills, and the Gabe universe toolbox, how to handle them. The labels will be created in batches, not in real time.\"",
+      "cost": "Small next to P2.1: one script (a projection, like draft-entities.py), one pulse angle, one census section, one audit count, one battery, a paragraph in the reference. It waits on P2.1, because the unknown branch lives in the emitter. Today's unknown count cannot be measured (no record of one exists); the first batch is the measurement.",
+      "open": [
+        "Where the unknown file lives for the design pages in this repo: beside the page's data and committed (my pick), or only regenerated. It must not go in .kdbp/ (R8).",
+        "Whether the batch tool is a mode of gabe-cc-update (my pick) or its own skill."
+      ]
+    }
+  ],
+  "measured": {
+    "when": "2026-10-02, working tree at 9a9bb86 (all-endpoints files carry another lane's uncommitted edits; every counted item was identical at HEAD and in the tree)",
+    "all_endpoints": {
+      "io_of": {
+        "file": "_ae_io.py",
+        "file_lines": 826,
+        "function_lines": 568,
+        "families_in_function": 10,
+        "line_emissions": 180,
+        "call_sites": 5,
+        "hand_built_io_records_in_ae_sec": 3
+      },
+      "item_hovers_over_80_endpoints": {
+        "hovers": 7236,
+        "lines": 30170,
+        "before": 9859,
+        "checks": 10051,
+        "gives": 10260,
+        "families": 11,
+        "kinds": 35
+      },
+      "hovers_by_family": {
+        "functions": 1505,
+        "databases": 1311,
+        "security": 839,
+        "endings": 727,
+        "in_flight": 696,
+        "gates": 532,
+        "stages": 521,
+        "tests": 358,
+        "schemas": 339,
+        "standard_or_specialist": 223,
+        "client": 185
+      },
+      "line_templates": {
+        "total": 185,
+        "fixed_statement": 21,
+        "label_value_by_rule": 85,
+        "hand_split": 79
+      },
+      "plain_line_strings": {
+        "plain": 398,
+        "of_leaf_strings": 3037
+      },
+      "page_script": {
+        "tipFor_kinds": 70,
+        "tipFor_lines": 176,
+        "controls": 20,
+        "heads_legends_paths": 26,
+        "elements": 24,
+        "bench_exTip_kinds": 6,
+        "bench_xTipBlock_kinds": 8,
+        "data_tip_setter_sites": 89
+      },
+      "one_endpoint_view": {
+        "endpoint": "POST /cooking/sessions",
+        "hover_targets": 4475,
+        "kinds": 61,
+        "table_cells": 2713,
+        "item_chips_from_io_records": 111
+      },
+      "existing_emission_checks": [
+        "IO.twins",
+        "face_twins",
+        "IO.words_check",
+        "sweep (typed numbers, banned words)",
+        "terms (one word per concept)"
+      ],
+      "file_sizes": {
+        "gen-all-endpoints.py": 4516,
+        "all-endpoints.tpl.html": 3288
+      }
+    },
+    "review_page": {
+      "title_sites_in_template": 37,
+      "tip_templates_in_words": 25,
+      "titled_elements_rendered": 1676,
+      "distinct_title_texts": 1085,
+      "by_group": {
+        "marks": 898,
+        "buttons_and_selects": 234,
+        "impact_meter_step_lines": 215,
+        "chips": 133,
+        "legend": 78,
+        "stacks": 68,
+        "links": 42,
+        "other": 8
+      },
+      "cards": 0
+    },
+    "lab": {
+      "card_builders": 3,
+      "card_call_sites": 120,
+      "hcard_call_sites": 94,
+      "blockCard_call_sites": 1,
+      "card_width_px": "273 to 360",
+      "all_endpoints_tip_width_px": 500,
+      "card_heights_px": {
+        "rail_copy": 142,
+        "test_case": 158,
+        "data_block": 200,
+        "function_block": 261
+      },
+      "all_endpoints_tip": {
+        "font": "ui-monospace 12.3px",
+        "bg": "#101726",
+        "radius_px": 8,
+        "max_width_px": 480,
+        "rendered_width_px": 500,
+        "heights_px_on_three_chips": [
+          200,
+          215,
+          235
+        ]
+      }
+    }
+  }
+}
