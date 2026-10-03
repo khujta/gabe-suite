@@ -1332,6 +1332,33 @@
     "moved": "both"
    }
   },
+  "mo.secmw": {
+   "pain": {
+    "kind": "repeat",
+    "meter": {
+     "n": "nHostEps",
+     "of": "nEp",
+     "noun": "endpoints with a middleware that holds a switch, each drawing that middleware twice"
+    },
+    "text": "On {ep} the Security row draws {hostMw} twice at the edge, once as middleware number {hostRn} in the run order and again as the head of the card that holds its switch. You read the same name twice and have to work out that it is one thing."
+   },
+   "like": {
+    "process": "checklist",
+    "analogy": "It is like a checklist that names a step in its numbered list and then names the same step again as the heading of a box under it that holds the tools it uses, so a single step reads as a pair.",
+    "stops": "It stops being true where the box matters, because the card shows the switch while the chip only names the step, so merging them puts the switch under the chip's heading."
+   },
+   "cost": {
+    "toSolve": "One click of yours, since both are built, and merging puts the switch inside its numbered chip while apart leaves the chip and the card as they stood.",
+    "ifNot": "Merged stays my pick and never a ruling, so the page keeps drawing the middleware once until you say otherwise.",
+    "size": "small",
+    "sizeWhy": "one click of yours and nothing in the suite changes"
+   },
+   "handle": "One element, one place.",
+   "marks": {
+    "merged": "both",
+    "apart": "neutral"
+   }
+  },
   "ex.lay": {
    "pain": {
     "kind": "squeezed",

@@ -1156,9 +1156,10 @@
         }
       },
       "secmv": {
-        "_about": "D-084, his L-19 (ruled G2, a row of its own): the security facts that already stand in other rows — the 401 and 429 endings, the limiters, the row the login adds, the login check, the repeat key. Where they stand is a choice made alone, so it is an option; the marks are my pick (dashed) until he rules.",
+        "_about": "D-084, his L-19 (ruled G2, a row of its own): the security facts that already stand in other rows — the 401 and 429 endings, the limiters, the row the login adds, the login check, the repeat key. Where they stand is a choice made alone, so it is an option; the marks were my pick (dashed) until he ruled them in D-085 (\"use recommended approach on pending decision\"): a short mark to the home row.",
         "label": "security facts that live elsewhere",
         "pick": "marks",
+        "ruled": "D-085",
         "opts": {
           "marks": {
             "name": "marks to their home row",
@@ -1167,6 +1168,21 @@
           "moved": {
             "name": "moved into Security",
             "plain": "Each such fact leaves its row and stands here, in full. The row it came from no longer draws it."
+          }
+        }
+      },
+      "secmw": {
+        "_about": "D-085, his L-19 (the Security row): a middleware that hosts a switch stood twice at the edge — as its numbered chip in the run order, and again as the head of the card that holds its switch (the rate limit middleware on POST /cooking/sessions). One element, one place: merged draws the middleware once, its numbered chip with the switch inside it (my pick, dashed: D-085 leaves it his); apart keeps the chip and the card as the row drew them. It holds for any middleware that hosts a switch, on every endpoint.",
+        "label": "a middleware with its switch",
+        "pick": "merged",
+        "opts": {
+          "merged": {
+            "name": "switch inside its middleware",
+            "plain": "A middleware that hosts a switch is drawn once, as its numbered chip in the run order, with the switch inside it."
+          },
+          "apart": {
+            "name": "chip and card apart",
+            "plain": "The numbered chip stands in the run order, and the switch stands in a card headed by the same middleware's name, as the row drew it before."
           }
         }
       }

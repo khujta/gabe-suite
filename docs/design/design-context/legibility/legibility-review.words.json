@@ -249,6 +249,7 @@
       "mo.jyb": "Already yours (D-081). A test's earlier requests stand at a moment of their own in the Proof row.",
       "mo.ifl": "Already yours (D-081). In-flight state is a lifeline per value across the moments.",
       "mo.secmv": "Already yours ({by}). The security facts that already live in other rows show on every endpoint as a short mark in Security that names their home row.",
+      "mo.secmw": "How a middleware that holds a switch is drawn in the Security row on every endpoint: once, as its numbered chip with the switch inside it, or twice, as that chip and a card headed by the same name.",
       "ex.lay": "Already yours (D-081). The bench's columns sit in an upper and a lower row.",
       "ex.follow": "Already yours (D-081). A click elsewhere on the page shows that element in the bench.",
       "ex.scope": "Already yours (D-081). A bench column offers the elements of the open endpoint when the page opens."
@@ -721,6 +722,7 @@
       "mo.leg": "look at where each row's legend stands: on the row's name when you point at it, or in a strip above the table",
       "mo.ipo": "look at the hover box: labelled lines, or one line joined by arrows",
       "mo.secmv": "look at the Security row: short marks that point to each fact's own row, or the facts themselves standing in Security and gone from their rows",
+      "mo.secmw": "look at the edge of the Security row: the middleware once with its switch inside its numbered chip, or twice, as a chip and as the head of the switch's card",
       "mo.hdr": "look at the heads of the handler's moments: a bracket over the ways, or a row of roads between the stage band and the heads",
       "mo.save": "look at the stage over the commit column: the save under EFFECTS in a cell of its own, or under HANDLER with EFFECTS an outline beside it",
       "mo.meta": "look at where the endpoint metadata stands: under the table, or above it",
@@ -1219,6 +1221,7 @@
       "mo.jyb": "Where a test's earlier requests stand in the proof row — as a moment of their own, or up in the row's heading.",
       "mo.ifl": "How a value that lives while the request runs is drawn — as a chip where it is set, as a lifeline across the moments, or as echoes where it is read.",
       "mo.secmv": "How the security facts that already live in other rows show in the Security row — as a short mark that points to their own row, or moved into Security.",
+      "mo.secmw": "Whether a middleware that holds a switch stands once, with its switch inside its numbered chip, or twice, as a chip and again as the head of the switch's card.",
       "ex.lay": "How the bench's columns sit on the page — in one row across, wrapped, or in an upper and a lower row.",
       "ex.follow": "Whether the bench follows your clicks elsewhere on the page — it shows the element you click, or keeps the one you picked.",
       "ex.scope": "Which elements the bench offers when it opens — the ones on this endpoint, or the ones on every endpoint.",
@@ -1298,6 +1301,7 @@
       "mo.jyb": "On {ep} {nPriorTests} tests send requests before they call it, up to {maxPrior} each, and the look decides whether those earlier requests get a moment of their own in the Proof row or sit in its head.",
       "mo.ifl": "On {ep} {nInf} values are alive while the request runs, {nReq} that go with the answer, such as {inflightKey}, and {nSrv} that the server keeps, such as the rate limit counters, and the look decides how their reads show.",
       "mo.secmv": "On {ep} the Security row holds {nSecMw} middleware in the order they run, {nSecSw} check switches, {nSecCors} allowed origins and {nSecSecrets} secrets, and the look decides whether the {nSecMoved} facts that live in other rows, such as the login check and the rate limit, show there as {nSecMarks} short marks or move in.",
+      "mo.secmw": "On {ep} the Security row draws {hostMw} as middleware number {hostRn} in the run order and again as the head of the card that holds its switch, and the look decides whether it stands once or twice, on {nHostEps} of the {nEp} endpoints, each with a middleware that holds a switch.",
       "ex.lay": "On the bench, the {nBenchKinds} kinds[[ (ending, table, schema, function, test, gate, client hook and in-flight value)]]((, ending, table, schema, function, test, gate, client hook and in-flight value,)) show their columns for {ep}, and the look decides whether they stand in one row, wrap, or split into an upper and a lower row.",
       "ex.follow": "On the bench for {ep}, clicking the {sName} rate limit in the table would show it in the gate column if the bench follows your clicks, and if it stays, the column keeps the element you picked.",
       "ex.scope": "On the bench, the gate column offers the gates of {ep} alone, or the gates of any of the {nEp} endpoints.",
@@ -1397,6 +1401,10 @@
       "mo.secmv": {
         "marks": "Draws {nSecMarks} short marks in Security, each naming a fact and the row that holds it, and leaves all {nSecMoved} facts in their own rows, in full.",
         "moved": "Moves all {nSecMoved} facts into Security, in full, and the {nSecHomeRows} rows they came from no longer draw them, so Security grows taller and those rows shorter."
+      },
+      "mo.secmw": {
+        "merged": "Draws {hostMw} once, as its numbered chip with the switch inside it, so the name no longer returns as a card head and the run order of {nSecMw} middleware stays.",
+        "apart": "Keeps {hostMw} twice, as its numbered chip in the run order and as the head of the card that holds its switch, which is how the row drew it before."
       },
       "ex.lay": {
         "row": "Puts all {nBenchKinds} columns side by side, each as wide as its names need, and the row scrolls sideways when the page is narrow.",

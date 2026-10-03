@@ -865,7 +865,15 @@ const num1 = (v, what) => (Number.isFinite(Number(v)) ? Number(v) : die('the fee
     const moved = (mo.el || []).filter((e) => (e[7] || {}).sx).length, standFor = marks.reduce((a, m) => a + m[2], 0);
     if (!marks.length) die('AE_DATA: the Security row of ' + EP + ' holds no mark'); if (standFor !== moved) die(`the Security marks of ${EP} stand for ${standFor} facts, the page's elements flagged as living elsewhere are ${moved}`);
     for (const m of marks) rowName(m[1]);   /* every home row a mark points to is a row of the page */
-    tn('nSecMarks', marks.length); tn('nSecMoved', moved); tn('nSecHomeRows', uniq(marks.map((m) => m[1])).length); }
+    tn('nSecMarks', marks.length); tn('nSecMoved', moved); tn('nSecHomeRows', uniq(marks.map((m) => m[1])).length);
+    /* the middleware that hosts a switch (D-085, mo.secmw): drawn twice at the edge — its numbered chip and the head of the switch's card — or once, merged. Read from the page's data for this endpoint,
+       and the claim the card makes ("on every endpoint") is held to the page's data: each switch a middleware hosts must have that middleware's numbered chip in its own cell, on every row, or the build stops */
+    const hostsOf = (r) => (((r.mo || {}).el) || []).filter((e) => e[0] === 'std' && (e[7] || {}).gk === 'w' && String(((e[7] || {}).gh || [''])[0]).startsWith('middleware:'));
+    const chipOf = (r, h) => ((r.mo || {}).el || []).find((c) => c[0] === 'stage' && (c[7] || {}).rn && 'middleware:' + c[3] === h[7].gh[0] && c[1] === h[1]);
+    const withHost = AE.rows.filter((r) => hostsOf(r).length);
+    for (const r of withHost) for (const h of hostsOf(r)) if (!chipOf(r, h)) die(`AE_DATA: on ${r.id} the switch hosted by ${h[7].gh[1]} stands at a moment where that middleware has no numbered chip — the merged look cannot hold on every endpoint`);
+    const h0 = hostsOf(AE.rows.find((r) => r.id === EP))[0] || die('AE_DATA: ' + EP + ' holds no switch a middleware hosts, so the merged look has no example there');
+    tName('hostMw', h0[7].gh[1]); tn('hostRn', chipOf(AE.rows.find((r) => r.id === EP), h0)[7].rn); tn('nHostEps', withHost.length); }
   tn('nCounts', T.nChecks); tn('nCompared', T.nCompared); tn('nDown', T.down); tn('nSame', T.same); tn('nUp', T.up); tn('nAuditParts', T.nAuditParts); tn('auditN', num1(String(audit.lines).replace(/\D+/g, ' ').trim().split(' ')[0], 'the audit script lines')); }
 /* a template filled for the card and for the voice */
 const fill2 = (tpl, tok, at) => { const one = (side) => String(tpl).replace(/\[\[([\s\S]*?)\]\]/g, (m, x) => (side === 'c' ? x : '')).replace(/\(\(([\s\S]*?)\)\)/g, (m, x) => (side === 's' ? x : ''))

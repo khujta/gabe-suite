@@ -1271,7 +1271,7 @@ if (go('d084')) { // D-084 (his ruling 2026-10-02: F24 — the Client column is 
   say('D-084 · the Security row', await p.$eval(SEC, (tr) => ({ head: tr.querySelector('th').innerText.replace(/\s+/g, ' '), cells: [...tr.querySelectorAll('td')].map((td) => [td.getAttribute('data-mom'), [...td.querySelectorAll('.mc')].map((c) => c.innerText.replace(/\s+/g, ' ').trim())]).filter((c) => c[1].length) })));
   await clear(); await pic('d084-the-security-row-marks-to-their-home-row');
   await step('d084-open-the-security-rows-options', SEC + ' th .mro', 'the options square on the row\'s head');
-  await clear(); await pic('d084-the-option-the-marks-pressed-and-dashed');
+  await clear(); await pic('d084-the-option-the-marks-pressed');
   await step('d084-moved-into-security', mrop('secmv', 'moved'), 'the square "' + (await txt(mrop('secmv', 'moved'))) + '"');
   await center(SEC); await clear(); await pic('d084-the-security-row-with-the-facts-moved-in');
   await center('#mogrid tbody tr[data-f="end"]'); await clear(); await pic('d084-the-endings-row-without-the-401-and-429');
@@ -1281,7 +1281,17 @@ if (go('d084')) { // D-084 (his ruling 2026-10-02: F24 — the Client column is 
   // a mark goes to its fact
   const mk = SEC + ' .mc[data-secmk="login"]';
   await step('d084-a-mark-goes-to-its-fact', mk, 'the mark "' + (await txt(mk)) + '"');
-  await wait(250); await clear(); await pic('d084-the-endings-it-points-to-flash'); }
+  await wait(250); await clear(); await pic('d084-the-endings-it-points-to-flash');
+  // D-085 (his "use recommended approach on pending decision", and the rate limit middleware standing twice at the edge of the Security row): the Security look is ruled (marks,
+  // filled); a middleware that hosts a switch is drawn ONCE with its switch inside its numbered chip (merged — my pick, dashed, not ruled) or twice, chip and host card (apart)
+  await center(SEC); await clear(); await pic('d085-the-middleware-once-with-its-switch-inside');
+  if (await p.$(mrop('secmw', 'apart'))) await p.click(SEC + ' th .mro');           // the options are still open from the steps above: close them, so the next step opens them
+  await step('d085-open-the-security-rows-options', SEC + ' th .mro', 'the options square on the row\'s head');
+  await clear(); await pic('d085-the-two-options-the-look-ruled-merged-dashed');
+  await step('d085-chip-and-card-apart', mrop('secmw', 'apart'), 'the square "' + (await txt(mrop('secmw', 'apart'))) + '"');
+  await center(SEC); await clear(); await pic('d085-the-middleware-and-its-host-card-apart');
+  await step('d085-switch-inside-its-middleware-again', mrop('secmw', 'merged'), 'the square "' + (await txt(mrop('secmw', 'merged'))) + '"');
+  await center(SEC); await clear(); await pic('d085-the-security-row-merged-again'); }
 say('rows at the end', await rows());
 say('page errors', errs);
 // a step that could not be taken (its control or item missing, the mouse meeting something else, no hover, a drag that did not land) fails

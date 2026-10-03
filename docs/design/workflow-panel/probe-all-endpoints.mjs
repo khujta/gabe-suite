@@ -441,9 +441,10 @@ const PRISMS = path.join(REPO, 'docs/design/design-context/prisms-endpoint.json'
   // CHANGED 2026-09-30 (round-1 review CR-20 · CR-07, lane F1b): where a test's earlier requests stand and what the heads do when scrolled — twenty-seven
   // CHANGED 2026-09-30 (review S4-06, lane F2; merged): the bench's two layout options (the columns · a click elsewhere) add their lines before the kinds'
   // CHANGED 2026-10-02 (D-084): the Security row's option adds its line — twenty-eight
-  ok(el0.length === 1 && set0.length === 28 + 2 + D.ex.kinds.length && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-(1 + set0.length))) === JSON.stringify([el0[0]].concat(set0))
-     && set0.slice(28).every((l) => l.startsWith(W8.ex.copy.where + ' · '))
-     && set0[28].startsWith(W8.ex.copy.where + ' · ' + W8.ex.opt.lay.label + ': ') && set0[29].startsWith(W8.ex.copy.where + ' · ' + W8.ex.opt.follow.label + ': '),
+  // CHANGED 2026-10-02 (D-085): the Security row's second option (a middleware with its switch) adds its line — twenty-nine
+  ok(el0.length === 1 && set0.length === 29 + 2 + D.ex.kinds.length && a0.blk.length === paste.length + 2 + set0.length && JSON.stringify(a0.blk.slice(-(1 + set0.length))) === JSON.stringify([el0[0]].concat(set0))
+     && set0.slice(29).every((l) => l.startsWith(W8.ex.copy.where + ' · '))
+     && set0[29].startsWith(W8.ex.copy.where + ' · ' + W8.ex.opt.lay.label + ': ') && set0[30].startsWith(W8.ex.copy.where + ' · ' + W8.ex.opt.follow.label + ': '),
     'the copy text adds the endpoint shown, then the code map\'s, BY MOMENT\'s and the examples\' settings, last', a0.blk);
   ok(c0.sort === null, 'a cold start is in path order', c0.sort);
   /* an old remembered state, from before the ruling, must not override it */
@@ -3088,6 +3089,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
   await p.setViewportSize({ width: 1920, height: 1080 }); await p.waitForTimeout(250);
   ok(!errs.length, 'D-081 · no page error', errs); }
 
+/* CHANGED 2026-10-02 (D-085): the Security look is ruled (marks), so check (4) reads it filled; the new option "a middleware with its switch" has section 35 below. */
 /* 34 · D-084 (his ruling 2026-10-02, L-19 ruled G2 + F24) — smoke checks (D-037): (1) the pinned row's Client column is headed "sends it" there, in BY MOMENT's
    Client head and in the hover that names it; (2) BY MOMENT's Security row on POST /cooking/sessions stands after Gates and decisions and says, from the feed
    alone, its middleware in run order, the switches that turn a check on, the CORS origins and the secrets read on the way (each recomputed HERE from
@@ -3175,8 +3177,8 @@ ok(!errs.length, 'no page error on the fixture', errs);
   const before = await homeCount();
   await p.$eval(SEC + ' .mro', (e) => e.scrollIntoView({ block: 'center' })); await p.click(SEC + ' .mro'); await p.waitForTimeout(150);
   const sq = await p.$$eval('#mogrid .mrop .opt[data-mopt="secmv"]', (os) => os.map((o) => [o.getAttribute('data-v'), o.getAttribute('aria-label'), o.getAttribute('aria-checked'), o.getAttribute('data-pick'), o.getAttribute('data-ruled'), getComputedStyle(o).borderTopStyle]));
-  ok(sq.length === 2 && JSON.stringify(sq.map((q) => q[1])) === JSON.stringify(['marks', 'moved'].map((v) => MW.opt.secmv.opts[v].name)) && sq[0][2] === 'true' && sq[0][3] === 'true' && sq[0][4] === null && sq[0][5] === 'dashed' && sq[1][2] === 'false' && !MW.opt.secmv.ruled && MW.opt.secmv.pick === 'marks',
-    'D-084 · the option "' + MW.opt.secmv.label + '" has two icon squares — ' + sq.map((q) => q[1]).join(' · ') + ' — and my pick, the marks, is pressed and dashed (not ruled until he rules)', { sq });
+  ok(sq.length === 2 && JSON.stringify(sq.map((q) => q[1])) === JSON.stringify(['marks', 'moved'].map((v) => MW.opt.secmv.opts[v].name)) && sq[0][2] === 'true' && sq[0][3] === null && sq[0][4] === 'true' && sq[0][5] !== 'dashed' && sq[1][2] === 'false' && MW.opt.secmv.ruled === 'D-085' && MW.opt.secmv.pick === 'marks',
+    'D-084 · D-085 · the option "' + MW.opt.secmv.label + '" has two icon squares — ' + sq.map((q) => q[1]).join(' · ') + ' — and the marks are pressed and RULED, filled and not dashed (his "use recommended approach", D-085)', { sq });
   await p.click('#mogrid .mrop .opt[data-mopt="secmv"][data-v="moved"]'); await p.waitForTimeout(500);
   const after = await homeCount(), lk = await look(), marksGone = await cnt(SEC + ' .mc[data-secmk]');
   const outv = await p.$eval('#out', (e) => e.value);
@@ -3199,6 +3201,64 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(endMark >= 0 && fl.chips.length === 2 && fl.chips.every(([f, g]) => f === 'end' && /^login\|end\|/.test(g)) && fl.head.includes('end'),
     'D-084 · a click on the "login check → Endings" mark scrolls to the two 401 endings and flashes them and the Endings row', { endMark, fl });
   ok(!errs.length, 'D-084 · no page error', errs); }
+
+/* 35 · D-085 (his "use recommended approach on pending decision", and the rate limit middleware standing twice in the Security row) — smoke checks (D-037):
+   (1) the Security look is RULED, marks, by D-085: filled, not dashed, the hover and the copy line say ruled; (2) the new option "a middleware with its switch": merged (my pick,
+   dashed, not ruled) draws a middleware that hosts a switch ONCE — its numbered chip heads the switch inside it — apart keeps the chip and the host card as before; on POST /cooking/sessions
+   by its drawn faces, and for every endpoint from the page's data against the feed (the host's chip stands in the switch's own cell); (3) it is kept per viewer and rides the copy line;
+   (4) an endpoint with no switch a middleware hosts (GET /healthz) is drawn the same either way */
+{ const E = 'POST /cooking/sessions', E0 = 'GET /healthz', MW = D.words.mo, O = MW.opt.secmw, CL = D.words.copy.lines, RL = 'RateLimitMiddleware', SEC = '#mogrid tr[data-f="sec"]', EDGE = SEC + ' td[data-mom="edge"]';
+  const look = () => p.evaluate(() => window.__allep.mo.looks.secmw);
+  const edge = () => p.evaluate((sel) => { const td = document.querySelector(sel), t = (e) => e.innerText.replace(/\s+/g, ' ').trim();
+    const faces = [...td.querySelectorAll('.mc, .mgh0')].filter((e) => !e.querySelector('.mc, .mgh0')).map((e) => [e.classList.contains('mgh0') ? 'host' : e.getAttribute('data-f'), t(e)]);
+    return { faces, stages: faces.filter((f) => f[0] === 'stage').map((f) => f[1]), blocks: [...td.querySelectorAll('.mgb')].map((g) => ({ head: [...g.querySelectorAll(':scope > .mgh > *')].map((h) => [h.classList.contains('mgh0') ? 'host' : h.getAttribute('data-f'), t(h)]),
+      kids: [...g.querySelectorAll(':scope > .mc')].map((c) => [c.getAttribute('data-ik'), t(c)]) })), nested: td.querySelectorAll('.mc [data-tip], .mgh [data-tip] [data-tip]').length }; }, EDGE);
+  const named = (d) => d.faces.filter((f) => f[1].replace(/^\d+ /, '') === RL).length;
+  /* (2a) every endpoint with a switch a middleware hosts: the feed's own count, and the page's data holds the switch with its host and the host's numbered chip in the same cell */
+  const hostedFeed = FEED.filter((ep) => (FJ.endpoints['endpoint:' + ep].switches || []).some((w) => w.via));
+  const hostedPage = D.rows.map((r) => { const el = (r.mo || {}).el || [], sw = el.filter((e) => e[0] === 'std' && (e[7] || {}).gk === 'w' && String(((e[7] || {}).gh || [''])[0]).startsWith('middleware:'));
+    return { id: r.id, sw: sw.length, apart: sw.filter((e) => !el.some((c) => c[0] === 'stage' && (c[7] || {}).rn && 'middleware:' + c[3] === e[7].gh[0] && c[1] === e[1])).length, hosts: [...new Set(sw.map((e) => e[7].gh[1]))] }; }).filter((x) => x.sw);
+  const viaOf = (ep) => [...new Set((FJ.endpoints['endpoint:' + ep].switches || []).filter((w) => w.via).map((w) => w.via))];
+  ok(hostedFeed.length > 1 && JSON.stringify(hostedPage.map((x) => x.id).sort()) === JSON.stringify(hostedFeed) && hostedPage.every((x) => x.apart === 0 && JSON.stringify(x.hosts) === JSON.stringify(viaOf(x.id))) && !hostedFeed.includes(E0),
+    'D-085 · the feed gives ' + hostedFeed.length + ' endpoints a switch a middleware hosts (' + [...new Set(hostedFeed.flatMap(viaOf))].join(', ') + '); the page draws each switch with its host, and the host\'s numbered chip stands at the same moment on every one, so merging holds on all of them; ' + E0 + ' has none', { hostedFeed: hostedFeed.length, page: hostedPage.length, apart: hostedPage.filter((x) => x.apart).map((x) => x.id) });
+  /* (1) the Security look is ruled; (2) the new option's squares, my pick, merged, dashed (the table in one piece, as section 34 reads it: in bands the row's head would be drawn once per band) */
+  await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400);
+  await p.$eval(SEC + ' .mro', (e) => e.scrollIntoView({ block: 'center' })); await p.click(SEC + ' .mro'); await p.waitForTimeout(150);
+  const sq = (g) => p.$$eval('#mogrid .mrop .opt[data-mopt="' + g + '"]', (os) => os.map((o) => [o.getAttribute('data-v'), o.getAttribute('aria-label'), o.getAttribute('aria-checked'), o.getAttribute('data-pick'), o.getAttribute('data-ruled'), getComputedStyle(o).borderTopStyle]));
+  const sv = await sq('secmv'), sw = await sq('secmw');
+  ok(sv[0][0] === 'marks' && sv[0][2] === 'true' && sv[0][3] === null && sv[0][4] === 'true' && sv[0][5] !== 'dashed' && MW.opt.secmv.ruled === 'D-085',
+    'D-085 · the Security look "' + MW.opt.secmv.label + '" is RULED: "' + MW.opt.secmv.opts.marks.name + '" is pressed, filled and not dashed', { sv });
+  ok(sw.length === 2 && JSON.stringify(sw.map((q) => q[0])) === JSON.stringify(['merged', 'apart']) && JSON.stringify(sw.map((q) => q[1])) === JSON.stringify([O.opts.merged.name, O.opts.apart.name]) && O.pick === 'merged' && !O.ruled
+     && sw[0][2] === 'true' && sw[0][3] === 'true' && sw[0][4] === null && sw[0][5] === 'dashed' && sw[1][2] === 'false' && sw[1][3] === null,
+    'D-085 · the option "' + O.label + '" sits in the Security row\'s own options beside the Security look: two icon squares — ' + sw.map((q) => q[1]).join(' · ') + ' — and my pick, merged, is pressed and DASHED (not ruled: D-085 leaves it his)', { sw });
+  const tip = async (sel) => { const h = await p.$(sel), bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(140); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+  const tS = await tip('#mogrid .mrop .opt[data-mopt="secmv"][data-v="marks"]'), tM = await tip('#mogrid .mrop .opt[data-mopt="secmw"][data-v="merged"]');
+  ok(tS.includes(MW.opt.secmv.opts.marks.name) && tS.includes(D.words.ruledMark) && !tS.includes(D.words.pickMark) && tM.includes(O.opts.merged.name) && tM.includes(D.words.pickMark) && tM.includes(O.opts.merged.plain.slice(0, 40)),
+    'D-085 · the hover of the ruled Security look says ruled, the hover of merged says my pick and what it does', { tS: tS.slice(0, 80), tM: tM.slice(0, 80) });
+  await p.click(SEC + ' .mro'); await p.waitForTimeout(100);
+  /* (2b) merged: the middleware once, its numbered chip heading the switch it hosts, the run order kept */
+  const mg = await edge(), want = Object.entries(FJ.middleware).map(([k, m]) => [k.split(':')[1], m.order.runs]).sort((a, b) => a[1] - b[1]).map((x) => x[0]);
+  ok((await look()) === 'merged' && named(mg) === 1 && mg.blocks.length === 1 && mg.blocks[0].head.length === 1 && mg.blocks[0].head[0][0] === 'stage' && mg.blocks[0].head[0][1] === '2 ' + RL
+     && mg.blocks[0].kids.length === 1 && mg.blocks[0].kids[0][0] === 'switch' && JSON.stringify(mg.stages) === JSON.stringify(want.map((n, i) => (i + 1) + ' ' + n)) && mg.nested === 0,
+    'D-085 · merged: ' + RL + ' stands ONCE at the edge — its numbered chip "2 ' + RL + '" heads the switch it hosts — and the run order is still ' + want.join(' · '), { mg });
+  /* (2c) apart: as the row drew it before — the numbered chip in the run order, and the host card of the switch */
+  await p.click(SEC + ' .mro'); await p.waitForTimeout(150); await p.click('#mogrid .mrop .opt[data-mopt="secmw"][data-v="apart"]'); await p.waitForTimeout(450);
+  const ap = await edge(), outv = await p.$eval('#out', (e) => e.value);
+  ok((await look()) === 'apart' && named(ap) === 2 && ap.blocks.length === 1 && ap.blocks[0].head.length === 1 && ap.blocks[0].head[0][0] === 'host' && ap.blocks[0].head[0][1] === RL && ap.blocks[0].kids.length === 1 && ap.blocks[0].kids[0][0] === 'switch'
+     && ap.stages.includes('2 ' + RL) && JSON.stringify(ap.stages) === JSON.stringify(want.map((n, i) => (i + 1) + ' ' + n)) && ap.nested === 0,
+    'D-085 · apart: as before — "2 ' + RL + '" in the run order and, again, ' + RL + ' as the head of the card that holds its switch', { ap });
+  ok(outv.includes(CL.mo + ' · ' + O.label + ': ' + O.opts.apart.name + ' (' + D.words.copy.his + ')') && !outv.includes(O.opts.merged.name), 'D-085 · the choice rides the copy line: "' + O.label + ': ' + O.opts.apart.name + '" as his', { line: outv.split('\n').find((l) => l.includes(O.label)) });
+  /* (3) kept per viewer through a reload */
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400);
+  ok((await look()) === 'apart' && named(await edge()) === 2, 'D-085 · the choice is kept per viewer through a reload');
+  /* (2d) the same on other endpoints — the first, a middle one and the last that have such a switch — apart then merged; (4) GET /healthz is the same either way */
+  const sample = [hostedFeed[0], hostedFeed[Math.floor(hostedFeed.length / 2)], hostedFeed[hostedFeed.length - 1]], seen = [];
+  for (const look1 of ['apart', 'merged']) { await p.evaluate((l) => { const A = window.__allep; A.mo.looks.secmw = l; localStorage.setItem(A.mo.key, JSON.stringify(A.mo.looks)); }, look1); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready');
+    for (const ep of sample.concat([E0])) { await p.evaluate((e) => window.__allep.pick(e), ep); await p.waitForTimeout(300); const d = await edge(), h = viaOf(ep).length ? viaOf(ep)[0] : null;
+      seen.push([look1, ep, h ? named({ faces: d.faces.map((f) => [f[0], f[1].replace(RL, h)]) }) : d.blocks.length, d.stages.length, d.nested]); } }
+  const okS = seen.every(([l, ep, n, st, ne]) => ne === 0 && st === 3 && (ep === E0 ? n === 0 : n === (l === 'merged' ? 1 : 2)));
+  ok(okS && seen.length === 8, 'D-085 · the same on ' + sample.join(' · ') + ': apart draws each host twice, merged once, the run order of three stands; ' + E0 + ' has no switch a middleware hosts and draws no block either way', { seen });
+  ok(!errs.length, 'D-085 · no page error', errs); }
 
 await b.close();
 console.log((fail ? 'FAIL ✗' : 'PASS ✓') + ` probe-all-endpoints · ${pass} passed · ${fail} failed · ${FEED.length} endpoints · sample ${SAMPLE.length} · page ${path.basename(PAGE)}`);
