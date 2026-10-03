@@ -3,7 +3,7 @@ name: gabe-artifact
 description: "House chrome for published Artifacts — left-anchored content, a cog panel top-right, the fixed font roster, three suite skins, iconed section title pills set in a condensed grotesque, a 12px legibility floor, and motion-first visuals with a gated pause contract. Owns the build loop: design pass → kit → render gate → publish → report, plus two gated pattern libraries."
 when_to_use: "ANY request that ends in a published Artifact (report, dashboard, spec page, comparison, explorer) — not only explicit invocations. Also when an existing artifact is being updated or retrofitted with house chrome."
 metadata:
-  version: 1.4.0
+  version: 1.5.0
   status: suite skill (generic, project-agnostic)
   scope: any project that publishes Artifacts
 ---
@@ -18,13 +18,13 @@ This skill runs under the suite execution contract — E1 EVIDENCE · E2 RUN-BEF
 
 > **One line:** an Artifact is a *product surface*, not a scratch file. Every page this project publishes wears the same chrome — content flush left, one cog top-right, the same font roster behind it — so a reader who has seen one has learned all of them.
 
-## The six house rules
+## The seven house rules
 
 ### H1 · Content is anchored LEFT
 The column sits against the left edge with a gutter, never `margin: 0 auto`, and **nothing is centre-aligned** — not the hero, not section heads, not stat tiles. On a wide screen the right side stays empty; that is the look, not a bug. The kit ships this as `.artifact-page { margin: 0 auto 0 clamp(16px, 4vw, 56px) }`.
 
 ### H2 · One cog, top-right, and nothing else floats
-A single fixed cog button at `top: 14px; right: 14px` opens the options panel. It is the *only* floating affordance on the page — no floating TOCs, no back-to-top, no toasts parked in a corner. The panel is a real `radiogroup`, closes on Escape, closes on outside click, and returns focus to the cog.
+A single fixed cog button at `top: 14px; right: 14px` opens the options panel. It is the *only* floating affordance on the page — no floating TOCs, no back-to-top, no toasts parked in a corner — the read-aloud bar (H7) is *sticky in the flow*, not floating, and clears the cog. The panel is a real `radiogroup`, closes on Escape, closes on outside click, and returns focus to the cog.
 
 **Scrollbars are chrome too, and they wear the skin.** A native bar is the one control the page does not own by default: a grey OS scrollbar with stepper arrows, sitting inside a dark panel, reads as a rendering fault rather than a control (founder, 2026-07-31: *"it's very disruptive in terms of being in line with all the elements around it"*). The kit styles both engines — Firefox's `scrollbar-width`/`scrollbar-color`, WebKit's pseudo-elements — mixes the thumb from `--accent` so it moves with the theme, and **removes the stepper arrows**: a scroll bar is a position indicator, not a pair of buttons anyone clicks. The gate checks the computed value AND re-checks it after a skin switch, because a hardcoded grey passes "is it styled" while still clashing with two skins out of three.
 
@@ -92,6 +92,13 @@ Two rules the gate enforces, both born from reading a shipped page and failing t
 1. **Every section title is led by an icon.** Lucide geometry, inlined into the title's own `<svg>` (the CSP blocks icon CDNs; an icon font falls back to nothing without saying so). The kit carries a starter set — key-round, route, file-text, panel-left, swap, bar-chart, alert, gavel, layers, search — and any Lucide glyph is legal. **Resolve the icon to the section's subject**; a decorative glyph repeated down the page is worse than none, because it teaches the reader the icons carry no information.
 2. **The legibility floor is 12px computed, inside `.artifact-page`.** Secondary content sizes off `--fs-sm` (.92em) / `--fs-xs` (.855em) / `--fs-min` (.82em) and never below. The failure this prevents is specific and was observed: a table whose first column read cleanly while its status column, three steps down the scale, had stopped being readable — the reader skips the column instead of reporting it. Stacked `em` is how it happens (`.855em` heads inside a `.92em` table land at 11.8px while both authored values look safe), so the steps are `calc()` off `--af-size` — absolute, non-compounding — and the gate measures **rendered pixels**: computed size × the SVG's viewBox scale, at the roster's **smallest** base. Measuring authored values, or measuring at the largest base, is how an unreadable column ships green.
 
+### H7 · A page with sections reads itself aloud
+**Founder ruling:** every artifact with sections opens each one with a spoken summary and carries one player bar that is in view **all the time**. Spec: `references/read-aloud.md` · module: `assets/read-aloud.js` + `.css` (pasted as kit blocks 4 and 5 — an Artifact cannot load sibling files; standalone proof `assets/read-aloud-demo.html`) · gate: `tools/verify-read-aloud.mjs`.
+1. **Summary.** 3–6 plain spoken sentences under each `.sec-head` — no ids, paths, code or symbols; every number generated from the page's data, never typed — with "copy to read aloud" on each and "copy every summary" on top. A section made of parts (each decision, each pattern) lists them as **items**, each with its own short summary, one `/gabe-lens plain` sentence, and, where it decides something, an `example` (one sentence, a concrete case from the page's own data) and an `impact` (one sentence: what each option changes), read after the summary.
+2. **Bar.** `ReadAloud.mount({ sections: [{ id, title, say, items: [{ id, title, say, example, impact, plain }] }], voice })`: play/pause · stop · previous/next · speed · a chip per section — a **dropdown of its items** when it has any — the one being read lit. A skip, a chip or a menu item moves the reading **and** the page. It is sticky in the flow, never fixed (the cog stays the only floating thing), and clears the cog. Every icon in it has one hover, a verb and its object in six words at most; what a kind of icon means is said once, in a legend.
+3. **Voice.** The saved `gabe:voice:v1` → the **ruled voice**, inlined at build from the `voice.ruled.json` the builder finds (the project's own, else the operator's in the suite checkout; where it lives and the operator's values are in the reference, §5) → a British Google voice → an English Natural or Google voice → the browser's own; the page says in words which one reads. Speed is relative to the voice's own rate.
+4. **Floors.** No motion, nothing under 12px, reflows at 390px, storage in try/catch. Run `verify-read-aloud.mjs` beside the chrome gate; it fires on a page without the bar.
+
 ## The pattern libraries
 
 Two built, gated and kept as assets — **read them before inventing a form.** Both are self-contained: open in a browser, or lift a single card.
@@ -107,9 +114,9 @@ Charts in both follow the `dataviz` skill's validated palette — load that skil
 
 1. **Design pass — always.** Load the `artifact-design` skill before writing markup. It sets treatment (utilitarian vs editorial); this skill only fixes the chrome, never the palette or the concept. A report and a landing page both wear the cog; they should not look alike otherwise.
 2. **E4 line.** Publishing an update to an existing page? `REUSE <path>` — republish the same file path (same URL) or pass `url:` from a different conversation. Minting a second URL for the same subject is a defect.
-3. **Copy the kit, don't retype it.** `assets/artifact-chrome.html` carries three marked blocks — tokens+CSS, cog markup, roster script. Paste all three; author content inside `.artifact-page`.
+3. **Copy the kit, don't retype it.** `assets/artifact-chrome.html` carries three marked blocks — tokens+CSS, cog markup, roster script. Paste all three; author content inside `.artifact-page`. A page with sections also takes the two read-aloud blocks (H7).
 4. **Write to the session scratchpad**, not the repo, unless the user asked for a file in the project.
-5. **Run the gate** (E2): `node <skill>/tools/verify-artifact-chrome.mjs <file>` — 36 checks covering cog placement, panel behaviour, every roster option actually changing computed type, every skin painting a distinct ground, rails, section blocks, title size, corner radius, reload persistence, left anchoring, no sideways scroll, every section title iconed, pilled, capped and in the title face while every other title stays in the content face, and no content text under the 12px floor. Pages predating the skin system report loud `SKIP` lines rather than passing silently. Publish only on green; paste the count. If the page animates, also run `tools/verify-motion.mjs <file>` (see H4) — motion is never signed off by eye, and a `SKIP` on a page that should move is a failure, not a pass.
+5. **Run the gate** (E2): `node <skill>/tools/verify-artifact-chrome.mjs <file>` — 36 checks covering cog placement, panel behaviour, every roster option actually changing computed type, every skin painting a distinct ground, rails, section blocks, title size, corner radius, reload persistence, left anchoring, no sideways scroll, every section title iconed, pilled, capped and in the title face while every other title stays in the content face, and no content text under the 12px floor. A page with sections also runs `tools/verify-read-aloud.mjs <file>` (44 checks, H7). Pages predating the skin system report loud `SKIP` lines rather than passing silently. Publish only on green; paste the count. If the page animates, also run `tools/verify-motion.mjs <file>` (see H4) — motion is never signed off by eye, and a `SKIP` on a page that should move is a failure, not a pass.
 6. **Publish** with the Artifact tool: `file_path`, a one-sentence `description`, a `favicon` (1–2 emoji, **stable across redeploys**), and a `<title>` in the file. Same file path → same URL.
 7. **Report (E7 + founder preference).** End with the published URL **and** the absolute source path. Both, every time — the founder reviews artifacts by opening the file as often as the page.
 
@@ -140,3 +147,4 @@ Charts in both follow the `dataviz` skill's validated palette — load that skil
 - A section title with no icon, a square title block, lowercase, or set in the body face — all violate H6.
 - Spreading `--af-title` onto `h1`/`h3`/`h4`. The pill is the one distinctive title; everything else reads in the content face.
 - Stacking `em` steps until a column computes under 12px. Size secondary text off `--fs-sm`/`--fs-xs`/`--fs-min`, and let the gate measure it.
+- A page with sections and no read-aloud bar, a bar that shows only while a voice plays, or a summary with an id, a path or a typed number in it (H7).
