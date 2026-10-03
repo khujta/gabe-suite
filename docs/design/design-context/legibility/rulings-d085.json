@@ -1,0 +1,9 @@
+{
+  "_about": "A ruling that came in a chat message, not in a pasted review, kept beside the two records (review-r1.his.txt, review-r1b.his.txt) so the page can read it without a pasted record being made up in his name. The generator reads it after the records, in order. `decision` names the decision that logged the message and must hold it; `words` is his message exactly as that decision quotes it (the build stops when the decision's text does not hold it); `rule` maps a choice id to the KEY of the option he ruled (the key the page draws the option by, not its name). The same checks as a record's \"yours\" line: an id the page does not have, a value that is not one of the choice's options, a ruling that contradicts one already made, and a ruling for a choice deferred to the bench each stop the build.",
+  "decision": "D-085",
+  "words": "I confirm delete the old swaps. also land it use recommended approach on pending esicion. go",
+  "rule": {
+    "mo.secmv": "marks",
+    "pl.after": "stop"
+  }
+}

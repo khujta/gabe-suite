@@ -18,6 +18,7 @@
            ../legibility-feedback.md (the ledger: round 1 L-01..L-23, round 2 from L-24) · ../decisions.md (D-066..D-074) · patterns.json · review-r1.raw.json ·
            fix-1b.json · remaining.json · gap-l19.json · measures.{before,r1,r1b}.json ·
            review-r1.his.txt · review-r1b.his.txt (his pasted reviews, kept verbatim and read IN ORDER: what each "yours" line rules, section 3b) ·
+           rulings-d085.json (a ruling that came in a chat message: read AFTER the records, same checks, its words must be quoted by its decision, section 3b) ·
            ../../workflow-panel/shots/all-endpoints/walk.json (the walk's pictures, tagged by item and option) ·
            ../../workflow-panel/all-endpoints.words.json NOW and at 6170519 (git show — the options ADDED this round are the option
            groups present now and absent then, derived, never typed) · ../../workflow-panel/all-endpoints.tpl.html (ROWOPT: which
@@ -172,8 +173,10 @@ for (const d of ROUND_D) if (!decs[d]) die('decisions.md has no ' + d);
    and stays open. A later record may RULE a choice an earlier one left as my pick; it may never change, or un-rule, an earlier ruling —
    the build stops on it. The build also stops on a record line naming a choice the page does not have, a value that is not one of that
    choice's options, a how it does not know, a ruling for a deferred choice, and a record whose own head counts differ from its lines.
-   A choice the page gained AFTER a record (no line of any record names it, like the Security look mo.secmv, D-084) is no contradiction: it stands
-   open — my pick, "my pick, not ruled" — and the page's copy head counts it as one more left as my pick, though the record's own head does not. */
+   A choice the page gained AFTER a record (no line of any record names it) is no contradiction: it stands open — my pick, "my pick, not ruled" —
+   and the page's copy head counts it as one more left as my pick, though the record's own head does not.
+   A RULING SOURCE (RULINGS below) is a ruling that came in a chat message, not in a pasted record: a small JSON file read after the records, whose
+   `words` are his message as its decision quotes it. It is read as one more record of "yours" lines, keyed by the option's key, with the same stops. */
 const RECORDS = [{ file: 'review-r1.his.txt', by: 'D-081' }, { file: 'review-r1b.his.txt', by: 'D-084' }];
 for (const r of RECORDS) if (!decs[r.by]) die('decisions.md has no ' + r.by + ' — the ruling ' + r.file + ' carries');
 const REC_GROUPS = ['CALLS', 'PROPOSALS', 'PATTERNS', 'PLAYER'];
@@ -199,20 +202,33 @@ const RECS = RECORDS.map((R, ri) => { const rec = new Map(); let group = null, h
 /* the ruling the records give one choice: { v, by } when a line says yours or ruled, else the base (what the page already holds).
    opts: [{ v, name }]; the value must be one of the names the page draws for it, and an earlier ruling must agree with it. */
 const ruleOf = (id, group, opts, base0) => { let base = base0;
-  for (const { file, rec } of RECS) { const r = rec.get(id); if (!r) continue;
-    if (r.group !== group) die(`${r.at}: ${id} is under ${r.group}, but the page holds it under ${group}`);
+  for (const { file, rec, noun } of RECS) { const r = rec.get(id); if (!r) continue; const says = (noun || 'the record') + ' says';
+    if (r.group && r.group !== group) die(`${r.at}: ${id} is under ${r.group}, but the page holds it under ${group}`);
     r.used = true;
-    const o = r.kind === 'deferred' ? null : opts.find((x) => x.name === r.value) || die(`${r.at}: “${r.value}” is not one of the options of ${id} (${opts.map((x) => '“' + x.name + '”').join(' · ')})`);
+    const o = r.kind === 'deferred' ? null : opts.find((x) => (r.byKey ? x.v : x.name) === r.value) || die(`${r.at}: “${r.value}” is not one of the options of ${id} (${opts.map((x) => '“' + (r.byKey ? x.v : x.name) + '”').join(' · ')})`);
     const had = base ? `already holds it ruled as “${(opts.find((x) => x.v === base.v) || {}).name}” (${base.by})` : null;
-    if (r.kind === 'mine') { if (base && r.ri > 0) die(`${r.at}: the record says ${id} is my pick, not ruled, but the page ${had}`); continue; }
-    if (r.kind === 'deferred') { if (DEFER_BY[id] !== r.by) die(`${r.at}: the record says ${id} is deferred to the bench in ${r.by}, but words.deferred.choices holds ${DEFER_BY[id] ? 'it as ' + DEFER_BY[id] : 'no such deferral'}`);
-      if (base) die(`${r.at}: the record says ${id} is deferred to the bench, but the page ${had}`); continue; }
-    if (base && base.v !== o.v) die(`${r.at}: the record says ${id} is “${r.value}”, but the page ${had}`);
-    if (r.kind === 'ruled' && base && base.by !== r.by) die(`${r.at}: the record says ${id} was ruled in ${r.by}, the page says ${base.by}`);
-    if (r.kind === 'ruled' && !base && r.ri > 0) die(`${r.at}: the record says ${id} was ruled in ${r.by}, but nothing the page reads has ruled it`);
+    if (r.kind === 'mine') { if (base && r.ri > 0) die(`${r.at}: ${says} ${id} is my pick, not ruled, but the page ${had}`); continue; }
+    if (r.kind === 'deferred') { if (DEFER_BY[id] !== r.by) die(`${r.at}: ${says} ${id} is deferred to the bench in ${r.by}, but words.deferred.choices holds ${DEFER_BY[id] ? 'it as ' + DEFER_BY[id] : 'no such deferral'}`);
+      if (base) die(`${r.at}: ${says} ${id} is deferred to the bench, but the page ${had}`); continue; }
+    if (base && base.v !== o.v) die(`${r.at}: ${says} ${id} is “${r.value}”, but the page ${had}`);
+    if (r.kind === 'ruled' && base && base.by !== r.by) die(`${r.at}: ${says} ${id} was ruled in ${r.by}, the page says ${base.by}`);
+    if (r.kind === 'ruled' && !base && r.ri > 0) die(`${r.at}: ${says} ${id} was ruled in ${r.by}, but nothing the page reads has ruled it`);
     base = base || { v: o.v, by: r.by }; }
   return base; };
 const decText = (d) => { const ids = Object.keys(decs).sort((a, b) => decs[a].at - decs[b].at), i = ids.indexOf(d); return DEC.slice(decs[d].at, i + 1 < ids.length ? decs[ids[i + 1]].at : DEC.length); };
+/* the rulings that came in a chat message (D-085): each file is read AFTER the records, as one more record whose lines are all "yours" of the decision it names, keyed by the
+   option's KEY. It claims no group (the page knows where each choice stands). Its `words` must be quoted by that decision, so a ruling cannot be written in his name that the
+   decision never logged. */
+const RULINGS = ['rulings-d085.json'];
+for (const file of RULINGS) { const X = rj(path.join(HERE, file));
+  if (!/^D-\d{3}$/.test(X.decision || '') || !decs[X.decision]) die(`${file}: decision “${X.decision}” is not one decisions.md holds`);
+  if (typeof X.words !== 'string' || !X.words.trim()) die(`${file}: no words — a ruling carries the message it was made in`);
+  if (!decText(X.decision).includes(X.words)) die(`${file}: ${X.decision} does not quote these words, so the ruling is not his: “${X.words.slice(0, 60)}”`);
+  if (!X.rule || typeof X.rule !== 'object' || Array.isArray(X.rule) || !Object.keys(X.rule).length) die(`${file}: rule holds no choice`);
+  const rec = new Map(), ri = RECS.length;
+  for (const [id, v] of Object.entries(X.rule)) { if (typeof v !== 'string' || !v) die(`${file}: ${id} names no option key`);
+    rec.set(id, { id, group: null, value: v, kind: 'yours', by: X.decision, at: `${file} ${id}`, ri, used: false, byKey: true }); }
+  RECS.push({ file, by: X.decision, rec, head: null, noun: 'the ruling' }); }
 
 /* ── 4 · the round's records ─────────────────────────────────────────────────────────────────────────────────────── */
 const P = rj(path.join(HERE, 'patterns.json')), REV = rj(path.join(HERE, 'review-r1.raw.json')), FIX = rj(path.join(HERE, 'fix-1b.json'));
@@ -691,7 +707,7 @@ const PLW = need(W, 'player', '');
 const PREFS = Object.fromEntries([['bar', [['always', PLW.optBarAlways], ['playing', PLW.optBarPlaying]]], ['follow', [['on', PLW.optOn], ['off', PLW.optOff]]],
   ['after', [['stop', PLW.optAfterStop], ['next', PLW.optAfterNext], ['section', PLW.optAfterSection]]]].map(([k, o]) => { const id = need(PLW, 'line' + k[0].toUpperCase() + k.slice(1), 'player'),
   rl = ruleOf(id, 'PLAYER', o.map(([v, name]) => ({ v, name })), null); return [k, rl ? { id, v: rl.v, by: rl.by } : null]; }));
-for (const { rec } of RECS) for (const r of rec.values()) if (!r.used) die(`${r.at}: the record names ${r.id}, which is not a choice of this page`);
+for (const { rec, noun } of RECS) for (const r of rec.values()) if (!r.used) die(`${r.at}: ${noun || 'the record'} names ${r.id}, which is not a choice of this page`);
 /* a record's own head is the page's count when he copied it, so a line lost or cut off in the paste shows here, after every line has been read on its own */
 for (const { file, rec, head } of RECS) if (head) { const L = [...rec.values()].filter((r) => r.group !== 'PLAYER'), n = (f) => L.filter(f).length;
   const want = [n((r) => r.kind === 'yours' || r.kind === 'ruled'), n((r) => r.kind === 'mine') + n((r) => r.kind === 'deferred' && head[3] === undefined), n((r) => r.kind === 'deferred')];

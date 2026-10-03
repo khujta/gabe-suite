@@ -69,6 +69,12 @@
    F24 keeps its old word "screen" in its example and quotes the new one, "sends it", in its options; the glance of the items says none of them leaves a look for you to pick. A count of one
    reads "1 choice waits", never "1 choices".
 
+   Round 12 (D-085): two rulings came in a chat message, not a pasted review ("use recommended approach on pending decision"), so they are kept in rulings-d085.json beside the two records, with his
+   words, and the generator reads that file after them: the Security look = marks and the player's "after a decision" = stop there, both ruled by D-085 on a fresh page (filled, "ruled, D-085" in the copy
+   text, the Security card opening "Already yours (D-085)"). The second record's own head still reads 45 yours · none left as my pick · eight deferred (it is checked against its own lines); the page's
+   head adds the ruling, 46 yours · none left as my pick · eight deferred, and nothing is open: "Your calls", the gap analysis and the patterns count none, "next open decision" is off. The fixture that
+   gives a new round's waiting decisions now also takes the Security look and "after a decision" off in memory, so the walks that need a waiting decision still have one.
+
      node docs/design/design-context/legibility/probe-legibility-review.mjs [--html <file>] [--shots <dir>] [--bar <dir>] [--dec <dir>] [--lens <dir>]   # browser-gated; run it ALONE
        --shots <dir>   also save a picture of the top of each section there, at 1920 and at 1600 px wide (for looking, never committed)
        --bar <dir>     also save one picture at 1920 px of the frozen bar mid-page while the (mocked) reading is on it (never committed)
@@ -89,14 +95,12 @@ let pass = 0, fail = 0; const ok = (c, m, extra) => { if (c) { pass++; console.l
 /* the host wraps the page in a document; a <base> keeps its relative picture paths pointing beside the page */
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'legrev-probe-')), page = path.join(tmp, 'page.html');
 fs.writeFileSync(page, '<!doctype html><html><head><meta charset="utf8"><base href="file://' + path.dirname(SRC) + '/"></head><body>' + fs.readFileSync(SRC, 'utf8') + '</body></html>');
-/* the FIXTURE (D-084): the same page with the four rulings of the second record taken off in memory, as a new round's waiting decisions would stand. The mechanics that need a WAITING decision (the next-open walks,
+/* the FIXTURE (D-084, D-085): the same page with the four rulings of the second record, the Security look and the player's "after a decision" (D-085) taken off in memory, as a new round's waiting decisions would stand. The mechanics that need a WAITING decision (the next-open walks,
    the open state mark, a click on a waiting look) are tested on it, because the real page has none left; everything else runs on the real page. */
-const FOUR = ['mo.hdr', 'mo.save', 'F24', 'L-19'], rawHtml = fs.readFileSync(SRC, 'utf8'), d0 = rawHtml.indexOf('window.LEG_DATA = ') + 'window.LEG_DATA = '.length, d1 = rawHtml.indexOf(';</script>', d0), fxPage = path.join(tmp, 'page-open.html');
+const FOUR = ['mo.hdr', 'mo.save', 'F24', 'L-19', 'mo.secmv'], rawHtml = fs.readFileSync(SRC, 'utf8'), d0 = rawHtml.indexOf('window.LEG_DATA = ') + 'window.LEG_DATA = '.length, d1 = rawHtml.indexOf(';</script>', d0), fxPage = path.join(tmp, 'page-open.html');
 const DF = JSON.parse(rawHtml.slice(d0, d1)); for (const c of [...DF.choices, ...DF.calls, ...DF.proposals]) if (FOUR.includes(c.id)) { c.ruled = null; c.ruledBy = null; }
+DF.prefs.after = null;   /* D-085: the player's "after a decision" is ruled on the real page; the fixture waits on it as a new round's would */
 fs.writeFileSync(fxPage, '<!doctype html><html><head><meta charset="utf8"><base href="file://' + path.dirname(SRC) + '/"></head><body>' + rawHtml.slice(0, d0) + JSON.stringify(DF).replace(/</g, '\\u003c') + rawHtml.slice(d1) + '</body></html>');
-/* the second FIXTURE (round 11): the day nothing waits — the choice added after the records (the Security look) ruled in memory, as a third record would rule it. The "next open decision" button is off there. */
-const NONE = ['mo.secmv'], nonePage = path.join(tmp, 'page-none.html'), DN = JSON.parse(rawHtml.slice(d0, d1)); for (const c of [...DN.choices, ...DN.calls]) if (NONE.includes(c.id)) { c.ruled = c.mine; c.ruledBy = 'D-084'; }
-fs.writeFileSync(nonePage, '<!doctype html><html><head><meta charset="utf8"><base href="file://' + path.dirname(SRC) + '/"></head><body>' + rawHtml.slice(0, d0) + JSON.stringify(DN).replace(/</g, '\\u003c') + rawHtml.slice(d1) + '</body></html>');
 const b = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox', '--disable-gpu-sandbox', '--disable-dev-shm-usage'] });
 try {
   const p = await b.newPage({ viewport: { width: 1500, height: 1000 } }); const errs = []; p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
@@ -104,7 +108,7 @@ try {
   const D = await p.evaluate(() => window.LEG_DATA);
   ok(!!D && errs.length === 0, 'the page loads with no page error', errs.slice(0, 2).join(' | '));
   const DEFERRED = new Set(D.choices.filter((c) => c.deferred).map((c) => c.id));   /* D-083: decided on the all-endpoints bench, never waiting here */
-  const ADDED = ['mo.secmv'];   /* round 11 (D-084): the choices added AFTER both records — the Security look. No record line names it, so it is open (my pick, dashed, "my pick, not ruled") until a third record rules it */
+  const ADDED = [];   /* the choices added AFTER every record and ruling the page reads (none since D-085 ruled the Security look): no source names them, so each is open (my pick, dashed, "my pick, not ruled") */
   /* every section draws */
   const SECS = ['sec-glance', 'sec-calls', 'sec-items', 'sec-qs', 'sec-gap', 'sec-pat', 'sec-rem', 'sec-copy'];
   const secs = await p.evaluate((ids) => ids.map((id) => { const s = document.getElementById(id); return s ? { id, title: s.querySelector('.st').textContent.trim(), take: s.querySelector('.take').textContent.trim(), kids: s.querySelector('.body').children.length, h: s.getBoundingClientRect().height, icon: !!s.querySelector('.sec-head h2 svg') } : { id }; }), SECS);
@@ -141,9 +145,10 @@ try {
     ok(['CALLS', 'PROPOSALS', 'PATTERNS'].every((g) => lines.includes(g)), 'the copy text groups calls · proposals · patterns');
     const notRuled = D.choices.filter((c) => !c.ruled && !c.deferred).every((c) => lines.find((l) => l.startsWith(c.id + ': ')).endsWith('(my pick, not ruled)'));
     ok(notRuled, 'untouched, a line at my pick says it is not ruled'); }
-  /* his rulings are read from the records (D-081, D-082, D-084), in order: a fresh page shows every "yours" or "ruled" line of review-r1.his.txt and then review-r1b.his.txt as ruled with his value
-     (a line of the second record that says "yours" rules by D-084; a note after " · note: " is his, never a value), the one choice still open is the player's "after a decision", and a copy head,
-     chip and menu whose counts come from the records — both are parsed here on their own, never from the page's data */
+  /* his rulings are read from the records (D-081, D-082, D-084) and the ruling that came in a chat message (D-085), in order: a fresh page shows every "yours" or "ruled" line of review-r1.his.txt and
+     then review-r1b.his.txt as ruled with his value (a line of the second record that says "yours" rules by D-084; a note after " · note: " is his, never a value), then what rulings-d085.json rules by
+     D-085 (the Security look and the player's "after a decision"), nothing is left open, and a copy head, chip and menu whose counts come from them — all three are parsed here on their own, never
+     from the page's data (only the option's NAME, which the page draws, is read from it, because the ruling file names the option by its key) */
   { const RECS = [['review-r1.his.txt', 'D-081'], ['review-r1b.his.txt', 'D-084']], GROUPS = ['CALLS', 'PROPOSALS', 'PATTERNS', 'PLAYER'], FIN = new Map(), heads = [];
     for (const [file, by] of RECS) { let grp = null;
       for (const l of fs.readFileSync(path.join(HERE, file), 'utf8').split('\n')) { const t = l.trim(); if (GROUPS.includes(t)) { grp = t; continue; } if (!grp) { if (/^\d+ yours · /.test(t)) heads.push(t); continue; }
@@ -151,7 +156,11 @@ try {
         const id = df ? df[1] : m[1], how = df ? null : m[3], f = FIN.get(id) || { id, group: grp, ruled: null, deferred: null };
         if (df) f.deferred = df[2]; else if (/^yours/.test(how)) { if (!f.ruled) f.ruled = { value: m[2], by }; } else if ((how.match(/^ruled, (D-\d+)$/) || [])[1]) { if (!f.ruled) f.ruled = { value: m[2], by: (how.match(/^ruled, (D-\d+)$/))[1] }; }
         FIN.set(id, f); } }
-    const FL = [...FIN.values()], ruledL = FL.filter((f) => f.ruled), openL = FL.filter((f) => !f.ruled && !f.deferred).map((f) => f.id).sort();
+    const FINR = new Map([...FIN].map(([k, f]) => [k, { ...f }]));   /* the two records alone: their own head is checked against these */
+    const RUL = JSON.parse(fs.readFileSync(path.join(HERE, 'rulings-d085.json'), 'utf8')), PLN = { after: { stop: D.ui.player.optAfterStop, next: D.ui.player.optAfterNext, section: D.ui.player.optAfterSection } };
+    for (const [id, key] of Object.entries(RUL.rule)) { const ch = D.choices.find((c) => c.id === id), pl = /^pl\.(\w+)$/.exec(id), nm = pl ? (PLN[pl[1]] || {})[key] : ch && (ch.opts.find((o) => o[0] === key) || [])[1];
+      const f = FIN.get(id) || { id, group: pl ? 'PLAYER' : ch && ch.group, ruled: null, deferred: null }; if (!f.ruled) f.ruled = { value: nm, by: RUL.decision }; FIN.set(id, f); }
+    const FL = [...FIN.values()], ruledL = FL.filter((f) => f.ruled), openL = FL.filter((f) => !f.ruled && !f.deferred).map((f) => f.id).sort(), recOpenL = [...FINR.values()].filter((f) => !f.ruled && !f.deferred).map((f) => f.id).sort();
     const out = (await p.$eval('#out', (t) => t.value)).split('\n'), bad = [];
     const pressed = await p.evaluate(() => Object.fromEntries(['bar', 'follow', 'after'].map((k) => [k, [...document.querySelectorAll('[data-pref="' + k + '"]')].filter((x) => x.getAttribute('aria-pressed') === 'true').map((x) => x.querySelector('span').textContent)])));
     for (const r of ruledL) { const line = out.find((l) => l.startsWith(r.id + ': '));
@@ -161,20 +170,24 @@ try {
       const bs = await p.$$eval('[data-choice="' + r.id + '"]', (els) => els.map((x) => [x.dataset.v, x.getAttribute('aria-pressed'), x.dataset.mine]));
       if (!c || nm !== r.ruled.value || c.ruledBy !== r.ruled.by) bad.push(r.id + ' data ' + (c && c.ruled) + '/' + (c && c.ruledBy));
       else if (!bs.length || bs.some((x) => (x[1] === 'true') !== (x[0] === c.ruled) || x[2] === 'true')) bad.push(r.id + ' buttons ' + JSON.stringify(bs)); }
-    const NEW4 = ['mo.hdr', 'mo.save', 'F24', 'L-19'], byNew = NEW4.filter((id) => (FIN.get(id) || {}).ruled && FIN.get(id).ruled.by === 'D-084');
-    ok(ruledL.length === 47 && bad.length === 0 && byNew.length === 4, 'a fresh page shows every "yours" and "ruled" line of both records as ruled with its value: filled, nothing dashed, the copy line "ruled, <decision>"; the header, saving, F24 and L-19 are ruled by the second record, D-084 (the looks, the proposals, the patterns, the audit and the player)', bad.slice(0, 3).join(' | ') || ruledL.length + ' lines · ' + byNew.join(','));
-    const openLines = out.filter((l) => l.endsWith('(my pick, not ruled)')).map((l) => l.split(':')[0]).sort().join(' '), recOpen = openL.join(' ');
+    const NEW4 = ['mo.hdr', 'mo.save', 'F24', 'L-19'], byNew = NEW4.filter((id) => (FIN.get(id) || {}).ruled && FIN.get(id).ruled.by === 'D-084'), NEW2 = ['mo.secmv', 'pl.after'], byD85 = NEW2.filter((id) => (FIN.get(id) || {}).ruled && FIN.get(id).ruled.by === 'D-085');
+    ok(RUL.decision === 'D-085' && RUL.words === 'I confirm delete the old swaps. also land it use recommended approach on pending esicion. go' && Object.keys(RUL.rule).sort().join() === NEW2.join() && RUL.rule['mo.secmv'] === 'marks' && RUL.rule['pl.after'] === 'stop',
+      'the ruling kept from his chat message (rulings-d085.json) holds his words and rules two choices by their option keys: the Security look = marks, the player\'s "after a decision" = stop', Object.entries(RUL.rule).map(([k, v]) => k + '=' + v).join(' · '));
+    ok(ruledL.length === 49 && bad.length === 0 && byNew.length === 4 && byD85.length === 2, 'a fresh page shows every "yours" and "ruled" line of both records, and what the D-085 ruling rules, as ruled with its value: filled, nothing dashed, the copy line "ruled, <decision>"; the header, saving, F24 and L-19 by D-084, the Security look (marks) and "after a decision" (stop there) by D-085 (the looks, the proposals, the patterns, the audit and the player)', bad.slice(0, 3).join(' | ') || ruledL.length + ' lines · ' + byNew.join(',') + ' · ' + byD85.join(','));
+    const openLines = out.filter((l) => l.endsWith('(my pick, not ruled)')).map((l) => l.split(':')[0]).sort().join(' '), recOpen = recOpenL.join(' ');
     const openBtn = (await p.$$eval('[data-choice]', (els) => [...new Set(els.filter((x) => x.dataset.mine === 'true').map((x) => x.dataset.choice))])).sort().join(' ');
     /* a choice ADDED after the records is no contradiction of them: no line names it, so it stands open; only a record line that disagrees with the page dies (in the generator) */
     const added = D.choices.filter((c) => !FIN.has(c.id)).map((c) => c.id).sort(), addedOpen = D.choices.filter((c) => added.includes(c.id) && !c.ruled && !c.deferred).map((c) => c.id).sort();
-    ok(added.join(' ') === ADDED.join(' ') && addedOpen.join(' ') === ADDED.join(' ') && D.choices.filter((c) => added.includes(c.id)).every((c) => c.group === 'CALLS' && !c.ruled && c.mine), 'the one choice neither record has seen is the Security look (mo.secmv), added after them: a look, open, with my pick', added.join(' ') + ' | open ' + addedOpen.join(' '));
-    ok(recOpen === 'pl.after' && openLines === [...addedOpen, 'pl.after'].sort().join(' ') && openBtn === addedOpen.join(' ') && (pressed.after || []).length === 0 && !!(await p.$('[data-pref="after"][data-mine="true"]')), 'two choices are open after both records and the page: the player\'s "after a decision" (the records leave it as my pick) and the Security look added since (dashed, "my pick, not ruled"); no other look, proposal or pattern choice is dashed', recOpen + ' | ' + openLines + ' | buttons “' + openBtn + '”');
+    ok(added.join(' ') === ADDED.join(' ') && addedOpen.join(' ') === ADDED.join(' ') && D.choices.filter((c) => added.includes(c.id)).every((c) => c.group === 'CALLS' && !c.ruled && c.mine), 'every choice of the page is named by a record or the D-085 ruling: none was added after them', added.join(' ') + ' | open ' + addedOpen.join(' '));
+    ok(recOpen === 'pl.after', 'the two records alone leave one choice as my pick, the player\'s "after a decision" (the Security look is named by neither, and the D-085 ruling takes both)', recOpen);
+    ok(openL.join(' ') === ADDED.join(' ') && openLines === [...addedOpen].sort().join(' ') && openBtn === addedOpen.join(' ') && (pressed.after || []).join() === PLN.after.stop && !(await p.$('[data-pref="after"][data-mine="true"]')), 'with the D-085 ruling nothing is open on the page: no line says "my pick, not ruled", no button is dashed, and the player\'s "after a decision" is pressed on stop there', openL.join(' ') + ' | ' + openLines + ' | buttons “' + openBtn + '” | pressed ' + (pressed.after || []).join());
     const nonP = FL.filter((f) => f.group !== 'PLAYER'), yoursN = nonP.filter((f) => f.ruled).length, mineN = nonP.filter((f) => !f.ruled && !f.deferred).length, defN = nonP.filter((f) => f.deferred && !f.ruled).length;
-    const headRec = yoursN + ' yours · ' + mineN + ' left as my pick · ' + defN + ' deferred to the bench', head = yoursN + ' yours · ' + (mineN + addedOpen.length) + ' left as my pick · ' + defN + ' deferred to the bench';   /* the record's own head, and the page's: the choice added since is one more left as my pick */
+    const nonR = [...FINR.values()].filter((f) => f.group !== 'PLAYER'), headRec = nonR.filter((f) => f.ruled).length + ' yours · ' + nonR.filter((f) => !f.ruled && !f.deferred).length + ' left as my pick · ' + nonR.filter((f) => f.deferred && !f.ruled).length + ' deferred to the bench';
+    const head = yoursN + ' yours · ' + (mineN + addedOpen.length) + ' left as my pick · ' + defN + ' deferred to the bench';   /* the second record's own head, from its lines alone, and the page's, from the records and the D-085 ruling: a choice added since would be one more left as my pick */
     const chip = await p.$eval('#count', (x) => x.textContent), ocs = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('#bar .dd')].map((d) => [d.querySelector('button.car').dataset.dd, d.querySelector('.oc').textContent])));
     const openIn = (gs) => nonP.filter((f) => gs.includes(f.group) && !f.ruled && !f.deferred).length + D.choices.filter((c) => addedOpen.includes(c.id) && gs.includes(c.group)).length, l19f = FIN.get('L-19') || {}, l19Open = !l19f.ruled && !l19f.deferred ? 1 : 0;   /* L-19 stands in the gap analysis too */
-    ok(heads[heads.length - 1] === headRec && out[1] === head && head === '45 yours · 1 left as my pick · 8 deferred to the bench' && chip === yoursN + ' yours · ' + (mineN + addedOpen.length) + ' at my pick · ' + defN + ' deferred to the bench' && ocs.calls === String(openIn(['CALLS', 'PROPOSALS'])) && ocs.gap === String(l19Open) && ocs.pat === String(openIn(['PATTERNS'])) && ocs.calls === '1' && ocs.gap === '0' && ocs.pat === '0',
-      'the copy head, the count chip and the bar\'s menu recount: yours and the bench are the second record\'s own counts, my pick is its own plus the Security look added since (the record\'s head still reads none left as my pick), and Your calls counts that one while the gap analysis and the patterns count none open', out[1] + ' | ' + chip + ' | menu ' + JSON.stringify(ocs) + ' | the record: ' + heads[heads.length - 1]);
+    ok(heads[heads.length - 1] === headRec && headRec === '45 yours · 0 left as my pick · 8 deferred to the bench' && out[1] === head && head === '46 yours · 0 left as my pick · 8 deferred to the bench' && chip === yoursN + ' yours · ' + (mineN + addedOpen.length) + ' at my pick · ' + defN + ' deferred to the bench' && ocs.calls === String(openIn(['CALLS', 'PROPOSALS'])) && ocs.gap === String(l19Open) && ocs.pat === String(openIn(['PATTERNS'])) && ocs.calls === '0' && ocs.gap === '0' && ocs.pat === '0',
+      'the copy head, the count chip and the bar\'s menu recount: the second record\'s own head is unchanged (45 yours, none left, eight deferred), the page\'s adds the D-085 ruling of the Security look (46 yours, none left as my pick), and Your calls, the gap analysis and the patterns each count none open', out[1] + ' | ' + chip + ' | menu ' + JSON.stringify(ocs) + ' | the record: ' + heads[heads.length - 1]);
     /* the gap analysis speaks of L-19 as ruled, from the record's own value: its take and its spoken summary name the ruling, and its recommendation heading says ruled */
     const l19 = (FIN.get('L-19') || {}).ruled || {}, gp = await p.evaluate(() => ({ take: document.querySelector('#sec-gap .take').textContent, say: document.querySelector('#sec-gap [data-say-text]').textContent, head: [...document.querySelectorAll('#sec-gap h3')].map((h) => h.textContent), props: [...document.querySelectorAll('#sec-calls h3')].map((h) => h.textContent) }));
     ok(!!l19.value && gp.take.includes('You ruled ' + l19.value + ' (' + l19.by + ')') && !/My pick/.test(gp.take) && /You ruled /.test(gp.say) && !/My pick/.test(gp.say) && gp.head.includes(D.ui.gap.recHead) && /ruled/.test(D.ui.gap.recHead) && gp.props.includes(D.ui.calls.propsHead) && /none waiting/.test(D.ui.calls.propsHead),
@@ -784,7 +797,7 @@ try {
       await run('the count and the menu', async () => {
         const waiting = DEC.filter((e) => e.sec === 'calls' && !RULED.has(e.id) && !DEFERRED.has(e.id)).map((e) => e.key), nCalls = DEC.filter((e) => e.sec === 'calls').length;
         const C8 = await P8.evaluate(() => { const d = document.querySelector('[data-dd="calls"]').closest('.dd'), oc = d.querySelector('.oc'); return { n: oc.textContent, tip: oc.title, head: d.querySelector('.dd-head').textContent, zero: oc.dataset.zero }; });
-        ok(C8.n === String(waiting.length) && waiting.join(',') === ADDED.join(',') && C8.zero !== 'true', '"Your calls" counts what waits and nothing else: the Security look added after the records (the header, the saving, F24 and L-19 were ruled by D-084, and the deferred ones are not counted; it was twelve, then four, then none)', C8.n + ' · ' + waiting.join(','));
+        ok(C8.n === String(waiting.length) && waiting.join(',') === ADDED.join(',') && (C8.zero === 'true') === (waiting.length === 0), '"Your calls" counts what waits and nothing else: nothing waits since D-085 ruled the Security look (the header, the saving, F24 and L-19 were ruled by D-084, and the deferred ones are not counted; it was twelve, then four, then none, then one, then none)', C8.n + ' · ' + waiting.join(','));
         ok(C8.tip === D.ui.decide.menu.ocTipDeferred.replace('{{n}}', String(waiting.length)).replace('{{decisions}}', nCalls + ' decisions').replace('{{deferred}}', String(dCh.length)) && C8.head.includes(dCh.length + ' deferred to the bench'), 'the chip\'s hover and the menu\'s head say how many are deferred to the bench', C8.tip);
         const M8 = await P8.evaluate((ids) => ids.map((id) => { const it = document.querySelector('[data-dec-item="' + CSS.escape(id) + '"]'), m = it && it.querySelector('.slot .mk'); return { id, icon: m ? m.dataset.o : null, st: it ? it.dataset.st : null, title: it ? it.title : null, mkTitle: m ? m.title : null, word: m ? m.getAttribute('aria-label') : null }; }), WANT8);
         const badM = M8.filter((x) => x.icon !== 'bench' || x.st !== 'deferred' || x.title !== D.ui.decide.menu.stateTip.deferred || x.mkTitle !== '' || x.word !== D.ui.decide.menu.state.deferred);
@@ -793,9 +806,7 @@ try {
         ok(lg.length === 1 && lg[0].word === D.ui.mark.bench && lg[0].title === D.ui.legend.def.bench, 'the legend says the bench mark once, with its meaning', lg.map((x) => x.word).join(' | '));
         /* with nothing waiting the "next open decision" button is off; with decisions waiting (the fixture) it skips the deferred: from the last open look, the seven deferred kind looks stand between it and F24 */
         const noOpen = await P8.$eval('[data-act="nextopen"]', (x) => x.disabled);
-        ok(noOpen === false && waiting.length === 1, 'with the Security look waiting the "next open decision" button is on', 'disabled ' + noOpen);
-        { const PN = await open({ ms: 30 }, 1500, nonePage), off = await PN.$eval('[data-act="nextopen"]', (x) => x.disabled), nWaitN = await PN.evaluate(() => window.LEG_DATA.choices.filter((c) => !c.ruled && !c.deferred && c.group !== 'PLAYER').length);
-          ok(off === true && nWaitN === 0 && PN.__errs.length === 0, 'with nothing waiting (the Security look ruled in memory, the day a third record rules it) the "next open decision" button is off (the player\'s own setting is not a decision; fixture)', 'disabled ' + off + ' · waiting ' + nWaitN); await PN.__ctx.close(); }
+        ok(noOpen === (waiting.length === 0) && waiting.length === ADDED.length, 'with nothing waiting the "next open decision" button is off (the player\'s own setting is not a decision)', 'disabled ' + noOpen);
         const PX = await open({ ms: 30 }, 1500, fxPage), wf = DEC.filter((e) => e.sec === 'calls' && DF.choices.some((c) => c.id === e.id && !c.ruled && !c.deferred)).map((e) => e.key);
         const iF24 = wf.indexOf('F24'), from = wf[iF24 - 1], to = wf[iF24], ixF = DEC.findIndex((e) => e.key === from), ixT = DEC.findIndex((e) => e.key === to), between = DEC.slice(ixF + 1, ixT).filter((e) => DEFERRED.has(e.id));
         ok(from === 'mo.secmv' && to === 'F24' && between.length === dCh.filter((c) => c.group === 'CALLS').length, 'between the last open look (the Security look since D-084 added it) and the next open decision, F24, the seven deferred kind looks stand (the test relies on it; fixture)', between.length + ' between ' + from + ' and ' + to);
@@ -822,7 +833,7 @@ try {
       });
       ok(P8.__errs.length === 0, 'the deferred choices run with no page error', P8.__errs.slice(0, 2).join(' | ')); await P8.__ctx.close();
     }
-    /* ── round 11 (D-084): the Security look joins your calls (open, my pick dashed, both pictures load, its numbers from the all-endpoints page's own data), F24 keeps its old word, and the glance of the items says none waits ── */
+    /* ── round 11 (D-084, D-085): the Security look (a card of your calls: ruled marks since D-085, both pictures load, its numbers from the all-endpoints page's own data), F24 keeps its old word, and the glance of the items says none waits ── */
     {
       const AEH = fs.readFileSync(path.join(REPO, 'docs/design/workflow-panel/all-endpoints.html'), 'utf8'), a0 = AEH.indexOf('window.AE_DATA = ') + 17, AE = JSON.parse(AEH.slice(a0, AEH.indexOf(';</script>', a0)));
       const AEWORDS = JSON.parse(fs.readFileSync(path.join(REPO, 'docs/design/workflow-panel/all-endpoints.words.json'), 'utf8')), mo = AE.rows.find((r) => r.id === D.ep).mo;
@@ -836,10 +847,10 @@ try {
             imgs: [...card.querySelectorAll('img')].map((i) => ({ src: i.getAttribute('src'), ok: i.complete && i.naturalWidth > 0 })), ex: ((card.querySelector('[data-example]') || {}).textContent || '').replace(/^Example/, ''),
             imps: [...card.querySelectorAll('[data-impact]')].map((n) => [n.getAttribute('data-impact'), n.textContent]), lens: !!card.querySelector('.lens'), text: card.textContent }; });
         const c = D.calls.find((x) => x.id === 'mo.secmv'), pk = c && c.opts.find((o) => o.v === c.pick), de = D.decide.entries.find((e) => e.id === 'mo.secmv');
-        ok(!!S && !!c && S.state === 'mine' && S.btns.map((x) => x.v).join() === 'marks,moved' && S.btns.every((x) => !x.pressed && !x.off) && S.btns.filter((x) => x.dashed).map((x) => x.v).join() === 'marks' && c.pick === 'marks' && !c.ruled && c.from === 'D-084',
-          'the Security look is a card of your calls, open: both options on offer, none pressed, my pick (marks to their home row) dashed, not ruled', S ? S.btns.map((x) => x.v + (x.dashed ? ' dashed' : '')).join(' · ') + ' · ' + S.state : 'no card');
+        ok(!!S && !!c && S.state === 'yours' && S.btns.map((x) => x.v).join() === 'marks,moved' && S.btns.every((x) => !x.off && !x.dashed) && S.btns.filter((x) => x.pressed).map((x) => x.v).join() === 'marks' && c.pick === 'marks' && c.ruled === 'marks' && c.ruledBy === 'D-085' && c.from === 'D-084',
+          'the Security look is a card of your calls, ruled by D-085: marks to their home row pressed (filled), nothing dashed, the other option still on offer', S ? S.btns.map((x) => x.v + (x.pressed ? ' pressed' : '') + (x.dashed ? ' dashed' : '')).join(' · ') + ' · ' + S.state : 'no card');
         const line = (await P11.$eval('#out', (t) => t.value)).split('\n').find((l) => l.startsWith('mo.secmv: '));
-        ok(line === 'mo.secmv: ' + pk.name + ' (' + D.ui.copy.minePick + ')', 'the copy line of the Security look says my pick, not ruled', line);
+        ok(line === 'mo.secmv: ' + pk.name + ' (' + D.ui.copy.ruled.replace('{{by}}', 'D-085') + ')' && /^Already yours \(D-085\)\. /.test(c.motion), 'the copy line of the Security look says ruled, D-085, and its card opens "Already yours (D-085)"', line);
         const want = c.opts.map((o) => o.shot && o.shot.f);
         ok(S.imgs.length === 2 && want.every((f) => f && f.includes('d084') && S.imgs.some((i) => i.src.endsWith(f))) && S.imgs.every((i) => i.ok), 'its two pictures, one per look, are the walk\'s Security pictures and both load', S.imgs.map((i) => i.src.split('/').pop().slice(0, 40) + (i.ok ? '' : ' (not loaded)')).join(' | '));
         ok(S.ex.includes(D.ep) && S.ex.includes(hd.mw + ' middleware') && S.ex.includes(hd.sw + ' check switches') && S.ex.includes(hd.cors + ' allowed origins') && S.ex.includes(hd.sec + ' secrets') && S.ex.includes(moved + ' facts') && S.ex.includes(marks.length + ' short marks') && S.ex === de.ex,
@@ -847,9 +858,6 @@ try {
         const im = Object.fromEntries(S.imps.map(([v, t]) => [v, t]));
         ok(S.imps.length === 2 && im.marks.includes('Draws ' + marks.length + ' short marks') && im.marks.includes('all ' + moved + ' facts') && im.moved.includes('Moves all ' + moved + ' facts') && im.moved.includes('the ' + homeRows + ' rows they came from') && S.lens, 'its two impact lines say what each option does, with the same counts, under the lens', S.imps.map(([v, t]) => v + ': ' + t.slice(0, 50)).join(' | '));
         ok(marks.length === 12 && moved === 22 && homeRows === 4, 'the counts the card quotes, read here from the page itself: twelve marks stand for twenty-two facts in four home rows', marks.length + ' marks · ' + moved + ' facts · ' + homeRows + ' rows');
-        await P11.click('[data-act="nextopen"]'); await P11.waitForTimeout(250); const a = await barOf(P11);
-        ok(a.reading.on && a.reading.dec === 'mo.secmv', '"next open decision" lands on the Security look, the only look that waits', String(a.reading.dec));
-        await P11.click('[data-act="stop"]');
       });
       await run('F24 and the glance', async () => {
         const F = await P11.evaluate(() => { const card = document.querySelector('[data-call="F24"]'); return card ? { text: card.textContent, ex: ((card.querySelector('[data-example]') || {}).textContent || '').replace(/^Example/, ''), imps: [...card.querySelectorAll('[data-impact]')].map((n) => [n.getAttribute('data-impact'), n.textContent]) } : null; });
