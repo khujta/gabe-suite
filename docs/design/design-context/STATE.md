@@ -10,15 +10,16 @@ Loop 1 is the API endpoint card. Its display half lives on ONE page, `../workflo
 `05007957`, frozen feed). On 2026-09-30 he read that page as a HUMAN and dictated 23 items of feedback (D-066): much that was clear
 to the model was not clear to him. Round 1 fixed them AND named the patterns behind them, so they can be carried into the Gabe Suite.
 
-**Now: PAUSED ON DISK (2026-10-02 evening).** C: fell 54 → 35 GB in two hours of agent builds with no file growing (WSL vhdx, Docker
-vhdx, swap, pagefile allocation byte-identical; −15 GB/h building, −5 GB/h idle). Suspect: Windows restore points (shadow copies) — confirm with
-an ADMIN `vssadmin list shadowstorage`, cap with `vssadmin resize shadowstorage /for=C: /on=C: /maxsize=15GB` (his call). Nothing heavy runs
-under 40 GB.
+**Now: PAUSED ON DISK, the fix is his (D-086, 2026-10-03).** C: fell 54 → 33 GB while no file grew (writes, not storage: WSL wrote 49 GB in
+37 h). His steps, ready in `C:\Users\Gabe\disk-fix\` (README.txt): (1) `1-restore-points.ps1` — admin, reads, asks before capping restore
+points at 15 GB; (2) `2-compact-wsl.ps1` — every WSL window closed, 15–60 min. Ours (4), done: `~/.local/bin/heavy <cmd>` runs browser jobs
+one at a time with temp in RAM (one check: 222 MB → 2 MB written) and refuses under 40 GB. Testing is lean (D-086): a suite change runs its
+skill's batteries + the parity check, the full sweep before a push; a page check once per batch; a walk only for a click path.
 Round 1 is ruled (D-081, D-084, D-085). D-085 ("land it", "use recommended approach", "go"): Security = marks, after-a-decision = stop there
 (`9a9bb86`); the doubled rate limit middleware as an option, merged (my pick, dashed) or apart (`1790c87`, probe 776/0); L-33 traced + the
 hover emitter designed + P2.1/P3.2 redrafted (`8b7917d`, `legibility/drafts/hover-and-corpus/`).
 OWED, in order, once C: ≥ 40 GB: (1) the read-aloud landing in gabe-artifact 1.5.0 — done in the working tree and on `wip/read-aloud-landing`
-(`ccb96c6`), battery 42/42, install parity CLEAN — needs ONE full doctor, then its commit; (2) the all-endpoints walk (the merged/apart steps
+(`ccb96c6`), battery 42/42, install parity CLEAN — needs gabe-artifact's own batteries (artifact-chrome · artifact-motion · legibility-audit; read-aloud 42/42 done) through `heavy`, then its commit — the full sweep before a push (D-086); (2) the all-endpoints walk (the merged/apart steps
 are written, never run), two `walk-extra.json` tags, the review page regenerated + its probe (both edited, uncommitted, never run) → the third
 commit; (3) phase 2: the hover emitter on both pages (the lab's card, P1.1/P2.1/P4.1/P8.1/P10.1 checked at emission) + the redrafts on the
 review page for his "land it"; (4) phase 3: L-39's bench sections on the emitter.

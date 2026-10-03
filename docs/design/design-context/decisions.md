@@ -1299,3 +1299,25 @@ traced first) is that emitter's one output. P2.1 and P3.2 are redrafted to his w
 kind gets the generic label "unknown", accumulated and judged in batches by a tool, never labelled live). L-39's bench sections follow, on
 the same emitter.
 Revisit if: a rule cannot be checked at emission (it needs the whole page, like twins across sections) — it stays in the audit, by name.
+
+## D-086 — Lean testing and a disk that is not rewritten: restore points, compaction, browsers in memory
+Date: 2026-10-03 · Input: his message "I want to do 1, 2, and 4. Also, what are we gaining with so much testing from the doctor? Since these
+pages are not an actual application, they are just showcases of something, so testing them really isn't a test of the app itself. I don't
+know what we are actually gaining with this."
+Why it came up: C: fell 54 → 33 GB in an evening of agent builds while no file grew (the WSL vhdx, Docker's vhdx, the swap file and the
+pagefile allocation byte-identical; −15 GB/h building, −5 GB/h idle). WSL had WRITTEN 49 GB to its disk in 37 hours while storing little — our
+outputs are small (the endpoints page 8.8 MB, every walk picture 118 MB), the rewriting is not. Suspected sink: Windows restore points copying
+every overwritten block (unconfirmed until his admin check).
+Decision, his: (1) cap restore-point storage — `C:\Users\Gabe\disk-fix\1-restore-points.ps1` (admin; reads first, asks before capping at
+15 GB); (2) compact the WSL disk file (383 GB holding 231 GB) — `2-compact-wsl.ps1` with every WSL window closed; (4) we write less.
+Item 4, measured: one review-page check writes 222 MB to the WSL disk with Chrome's throwaway profile in /tmp, and 2 MB with it in /dev/shm
+(idle noise ≈ 5 MB). Built: `~/.local/bin/heavy <command>` — one heavy job at a time (lock `/dev/shm/heavy.lock`), TMPDIR in RAM, a C: floor
+of 40 GB checked first (exit 3; HEAVY_FORCE=1 overrides).
+The answer to his question, and the testing rule that follows (my proposal under his "4"; his to overrule): the doctor never tests these
+pages — it tests the suite code that runs inside his real apps (hooks, map generators, forms arms, map tools), which is real software. The
+waste was running ALL of it (66 test folders, 11 with a browser, 6–14 min) for a change to one skill. From now on: a suite change runs only
+that skill's batteries plus the parity check (`GABE_DOCTOR_NO_BATTERIES=1 scripts/suite-doctor.sh`, seconds); the full sweep runs once,
+before a push. A design page: its check once per batch of edits; a walk only when a click path is handed to him (D-025.4), re-shooting what
+changed. Every browser run goes through `heavy`.
+Revisit if: a break in an untouched battery reaches a push sweep twice — then the per-change set widens to the batteries that import the
+changed files.
