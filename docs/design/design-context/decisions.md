@@ -1333,3 +1333,18 @@ Consequence: each bench column's width options (L-36: dynamic · full · shorter
 picture) · shorter · compact · most compact** — "full" is removed. A column's box — its head, its parts lines, size and colour controls —
 keeps the default size whatever width is picked; the width narrows only the drawn element at the top of the column. A saved "full" reads as
 the default. The width still rides the column's copy line.
+
+## D-088 — The endpoint lab's hover card is the hover of the endpoints page: the cells and every bench example first
+Date: 2026-10-03 · Input: his message with a picture of the endpoint lab's hover on the `locations` table block (glyph and bold name · the
+entity in its colour · the class · the file · a rule · the channel pill "reads" · the field count and each mark with its count · a footer
+"click to open its whole record in the portrait").
+Decision, his: "I need that for the hover information that we show, especially on these cells. In all the examples, we go and check how we
+did it in the frontend lab. As you can see in the screenshot, the hover that we show there is much more beautiful, better structured, and
+more detailed. It communicates better with symbols and colors what we want to say there in the hover."
+Consequence: L-33 is confirmed and phase 2 (D-085) starts on all-endpoints.html: every element hover — the BY MOMENT cells' element chips and
+every element on the EXAMPLES bench — is drawn by ONE card renderer in the lab's format (traced in `legibility/drafts/hover-and-corpus/`):
+head (the kind's glyph and colour, the bold name, a value at the right) · the identity lines with their icons (entity in its colour, class,
+file) · a rule · the element's own pills and marks with counts · a rule · a quiet footer naming what a click does. The card mirrors the
+element's own block (same glyph, colour and marks, as the lab's block card mirrors its block) and adds the detail. The rules of P1.1 · P2.1 ·
+P4.1 · P8.1 are checked as each card is made (D-085). The kind-level plain line stays only on control and head cards (my pick, not ruled —
+the research flagged that a kind's line repeated on every item is what P1.1 forbids). The review page joins later.
