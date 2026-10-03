@@ -10,12 +10,18 @@ Loop 1 is the API endpoint card. Its display half lives on ONE page, `../workflo
 `05007957`, frozen feed). On 2026-09-30 he read that page as a HUMAN and dictated 23 items of feedback (D-066): much that was clear
 to the model was not clear to him. Round 1 fixed them AND named the patterns behind them, so they can be carried into the Gabe Suite.
 
-**Now: round 1 is ruled (D-081, D-084).** His second paste ruled the header (stages over moments), saving (under EFFECTS), F24 (the
-Client head reads "sends it") and L-19 G2 (a ninth row, Security) — built on all-endpoints.html (`365625d`: the Security row with the
-middleware in run order, the check switches, the CORS origins and the secrets; probe 766/0, walk 462 pictures). The review page reads both
-records (`0f7a6f3`, `abea15b`, probe 202/0): fresh head "45 yours · 1 left as my pick · 8 deferred to the bench". The ONE open call is the
-new Security look — the facts that live in other rows as **marks to their home row** (my pick, dashed) or **moved into Security**; the
-player's "after a decision" is still my pick. Every card's LAYOUT is decided on the all-endpoints bench (D-083).
+**Now: PAUSED ON DISK (2026-10-02 evening).** C: fell 54 → 35 GB in two hours of agent builds with no file growing (WSL vhdx, Docker
+vhdx, swap, pagefile allocation byte-identical; −15 GB/h building, −5 GB/h idle). Suspect: Windows restore points (shadow copies) — confirm with
+an ADMIN `vssadmin list shadowstorage`, cap with `vssadmin resize shadowstorage /for=C: /on=C: /maxsize=15GB` (his call). Nothing heavy runs
+under 40 GB.
+Round 1 is ruled (D-081, D-084, D-085). D-085 ("land it", "use recommended approach", "go"): Security = marks, after-a-decision = stop there
+(`9a9bb86`); the doubled rate limit middleware as an option, merged (my pick, dashed) or apart (`1790c87`, probe 776/0); L-33 traced + the
+hover emitter designed + P2.1/P3.2 redrafted (`8b7917d`, `legibility/drafts/hover-and-corpus/`).
+OWED, in order, once C: ≥ 40 GB: (1) the read-aloud landing in gabe-artifact 1.5.0 — done in the working tree and on `wip/read-aloud-landing`
+(`ccb96c6`), battery 42/42, install parity CLEAN — needs ONE full doctor, then its commit; (2) the all-endpoints walk (the merged/apart steps
+are written, never run), two `walk-extra.json` tags, the review page regenerated + its probe (both edited, uncommitted, never run) → the third
+commit; (3) phase 2: the hover emitter on both pages (the lab's card, P1.1/P2.1/P4.1/P8.1/P10.1 checked at emission) + the redrafts on the
+review page for his "land it"; (4) phase 3: L-39's bench sections on the emitter.
 
 ## Round 1 — what happened (D-066 … D-071)
 
