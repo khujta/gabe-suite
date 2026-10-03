@@ -377,8 +377,156 @@
         F.facts.push(cdFact("fork", lb, cdIco("merge", w.col), [el("span", "cdcode", cdClip(lb))], at)); F.facts.push(cdFact("arm", q[2] ? R.taken : R.notTaken, cdIco("target"), [el("span", "cdwv", q[2] ? R.taken : R.notTaken)], null)); }
       else { F.ident.push(cdLine("stage", "target", c.sg)); F.chips = [cdStatusPill(c.st), cdPill(xRoleName("end", c.kd), xKindCol("end", c), L)]; }                     /* the way out: the stage it ends at, its status and kind */
       return F; } } };
+  /* ══ D-090 · THE OTHER SEVEN KINDS' REGIONS (his: "apply this not only to the endings, but to all the other elements that have a similar structure"). One rule, a table entry each
+     (REGIONS): `head` — the glyph and the pill that classifies the element, one short card: what the glyph is and what the class means for THIS element; `title` — the block's own card;
+     `items` — each LOCATION part (a file · a where · a via · a class · a set-by) and each MARK of the strip, one card each. A mark is read in the order xStrip draws it (cdMarkN). The words
+     are ex.region.head (a line per class) and ex.region.item; a card names its item first and says what it is under the name. Prefix cr: this block's own helpers. ══ */
+  var CRH = XW.region.head, CRI = XW.region.item, CRFNICO = { accessor: "model", caller: "merge", gate: "shield", pure: "target" };
+  function cdMarkN(k, c, it) { var o = it.o || {}; return k === "end" ? xWayList(c).length : k === "table" ? c.cols.length + (c.more || []).length : k === "schema" ? c.cols.length : k === "fn" ? o.ops.length
+    : k === "test" ? (c.calls.length || c.raises.length) : k === "gate" ? o.after.length + 1 : k === "hook" ? o.react.length : k === "inf" ? o.reads.length : 0; }
+  function crV(s) { return el("span", "cdwv", s); }
+  function crD(s) { return el("span", "cdwd", s); }
+  function crK(s) { return el("span", "cdcode", cdClip(s)); }
+  function crQ(s) { return el("span", "cdq", "\u201c" + cdClip(s, 56) + "\u201d"); }
+  function crMore(n) { var w = el("span", "cdmore"), s = el("span", "cdfp", fill(CDU.more.many, { n: n })); s.setAttribute("data-unit", "more"); s.setAttribute("data-n", String(n)); s.setAttribute("data-extra", "{}"); s.setAttribute("aria-label", cdPl("more", n)); w.appendChild(s); return w; }
+  /* the file and the line a "path:line" names, as the card's two identity lines (the ending's where card says them the same way) */
+  function crAt(F, at) { var s = String(at || ""), m = /^(.+?):(\d+)(?:-(\d+))?$/.exec(s), R = XW.region;
+    if (s) F.ident.push(cdLine("file", "file", m ? m[1] : s)); if (m) F.ident.push(cdLine("line", "target", fill(m[3] ? R.lines : R.line, { v: m[3] ? m[2] + "-" + m[3] : m[2] }))); return m ? m[1] : s; }
+  /* at most `cap` names as chips, then "+n more"; the names shown are what the card joins */
+  function crChips(names, mk, cap) { var shown = names.slice(0, cap || 4), kids = shown.map(mk); if (names.length > shown.length) kids.push(crMore(names.length - shown.length)); return { kids: kids, shown: shown }; }
+  function crHead(S0) { var k = S0.bk, c = S0.c, g = XPART[k]("icon", c, S0.it, cdLook(k), 16), F = cdBase(S0);
+    F.glyph = (g && g.firstChild) || cdSvg(xColIco(k), xKindCol(k, c), 16); F.name = XW.kinds[k].name; F.nameCol = cdTextCol(xKindCol(k, c)); F.kind = cdRegionLabel(S0); return F; }
+  function crItem(S0, glyph, name, col) { var F = cdBase(S0); F.glyph = glyph; F.name = name; if (col) F.nameCol = cdTextCol(col); F.kind = cdRegionLabel(S0); return F; }
+  function crFnGlyph(K) { return (K && xStation(K, 16, EX.col.kind["function"])) || cdSvg("function", EX.col.kind["function"], 16); }
+  /* one field of a table or a schema: its type's mark, name and type */
+  function crField(S0, f) { var tc = XSQ[f[2]] || XSQ.other, F = crItem(S0, xSvg(tc.sym, 16, tc.col), f[0], tc.col);
+    F.ident.push(cdLine("mark", tc.sym, fill(CRI.field, { v: tc.word }), tc.col)); F.ident.push(cdLine("type", "doc", f[1] || W.unknown)); return F; }
+  function crEff(F, ef) { if (ef.sts.length) { F.chips = F.chips.concat(ef.sts.map(cdStatusPill)); F.joins.push({ end: "ending", want: ef.sts.map(String) }); } }
+  CDREG.table = {
+    head: function (S0) { var c = S0.c, it = S0.it, F = crHead(S0), by = { r: [], w: [] }, seen = {};                                  /* the channel: which functions read it, which write it, counted */
+      (it.o.ops || []).forEach(function (q) { var ch = q[0] === "read" ? "r" : "w"; if (q[2] && !seen[ch + q[2]]) { seen[ch + q[2]] = 1; by[ch].push(q[2]); } });
+      F.chips = [cdPill(xRoleName("table", it.role), xChanCol("table", c, it), cdLook("table"))];
+      ["r", "w"].forEach(function (ch) { var ns = by[ch]; if (!ns.length) return; var x = crChips(ns, cdChFn);
+        F.facts.push(cdFact(ch === "r" ? "reads" : "writes", xRoleName("table", ch) + " " + ns.join(" \u00b7 "), cdRw(ch), x.kids, xPl("functions", ns.length))); F.joins.push({ end: "function", want: x.shown }); });
+      if (!F.facts.length) F.facts.push(cdFact("untouched", XW.tip.table.inNone, cdIco("show"), [crV(XW.tip.table.inNone)], null));
+      return F; },
+    model: function (S0) { var c = S0.c, F = crItem(S0, cdSvg("doc", EX.col.kind.schema, 16), c.model || W.unknown, EX.col.kind.schema);        /* the class: where it is defined, the table it maps */
+      crAt(F, c.at || c.file); F.ident.push(cdLine("table", "model", c.n, EX.col.kind.model)); F.joins.push({ end: "table", want: [c.n] }); return F; },
+    marks: function (S0) { var c = S0.c, i = S0.ri, nc = c.cols.length, f = i < nc ? c.cols[i] : c.more[i - nc], F, R = CRI;
+      if (i >= nc) { F = crItem(S0, cdSvg("doc", "var(--muted)", 16), f[0], "var(--muted)"); F.ident.push(cdLine("mark", "doc", R.more)); F.ident.push(cdLine("type", "doc", f[1] || W.unknown)); return F; }
+      F = crField(S0, f); F.chips = [cdPill(f[3] ? CDW.optional : CDW.required, f[3] ? EX.col.opc.pure : EX.col.opc.gate, cdLook("table"))];
+      var fk = (c.fks || []).filter(function (x) { return x[0] === f[0]; })[0], uq = (c.uq || []).filter(function (u) { return u[1].indexOf(f[0]) >= 0; })[0];
+      if (fk) { F.facts.push(cdFact("fk", R.fk + " " + fk[1], cdIco("link"), [crD(R.fk), cdChName(fk[1], "model", EX.col.kind.model)], null)); F.joins.push({ end: "table", want: [fk[1]] }); }
+      if (uq || (c.uqs || []).indexOf(f[0]) >= 0) { var rest = uq ? uq[1].filter(function (x) { return x !== f[0]; }) : [];
+        F.facts.push(cdFact("uq", rest.length ? R.uqWith + " " + rest.join(" \u00b7 ") : R.uq, cdIco("key"), rest.length ? [crD(R.uqWith)].concat(rest.map(crK)) : [crV(R.uq)], null)); }
+      return F; } };
+  CDREG.schema = {
+    head: function (S0) { var c = S0.c, it = S0.it, o = it.o, F = crHead(S0), d = it.role.split("-")[0], col = xChanCol("schema", c, it), W0 = CRH.schema;
+      F.chips = [cdPill(xRoleName("schema", it.role), col, cdLook("schema"))];
+      F.facts.push(cdFact("means", W0[it.role], cdIco((EN.dir[d] || {}).icon || "schema", col), [crV(W0[it.role])], null));
+      if (o.parent) { var pl = fill(XW.face.inside, { name: o.parent }); F.facts.push(cdFact("inside", pl, cdIco("link"), [crV(pl)], null)); F.joins.push({ end: "parent", want: [o.parent] }); }
+      if (o.c422) { var cw = fill(W0.c422, { n: o.c422 }); F.facts.push(cdFact("c422", cw, cdStatusPill(422), [crV(cw)], null)); }
+      return F; },
+    via: function (S0) { var c = S0.c, it = S0.it, o = it.o, d = it.role.split("-")[0], D0 = EN.dir[d] || {}, col = D0.col || EX.col.opc.pure,        /* where it sits: the side of the request, the file */
+        F = crItem(S0, cdSvg(D0.icon || "schema", col, 16), o.parent ? fill(XW.face.inside, { name: o.parent }) : xRoleName("schema", d), col);
+      crAt(F, c.at || c.file); if (o.parent) F.joins.push({ end: "parent", want: [o.parent] });
+      if (c.cons) F.facts.push(cdFact("cons", fill(XW.tip.schema.cons, { n: c.cons }), cdIco("layers"), [crV(fill(XW.tip.schema.cons, { n: c.cons }))], null)); return F; },
+    marks: function (S0) { var c = S0.c, f = c.cols[S0.ri], F = crField(S0, f);
+      F.ident.unshift(cdLine("parent", "schema", fill(IOW.l.fieldOf, { v: c.n }), EX.col.kind.schema)); F.joins.push({ end: "schema", want: [c.n] });
+      F.chips = [cdPill(f[4] ? CDW.required : CDW.optional, f[4] ? EX.col.opc.gate : EX.col.opc.pure, cdLook("schema"))]; if (f[5]) F.facts.push(cdFact("rule", f[5], cdIco("shield"), [crK(f[5])], null)); return F; } };
+  CDREG.fn = {
+    head: function (S0) { var c = S0.c, o = S0.it.o, r = S0.it.role, E = EN.role[r], F = crHead(S0), W0 = CRH.fn, x;                                  /* the role: what it means, and where this function decides or touches */
+      if (E) F.chips = [cdPill(xRoleName("fn", r), E.col, cdLook("fn"))]; else if (!c.nokey) F.chips = [cdPill(xRoleName("fn", "none"), "var(--muted)", cdLook("fn"))];
+      if (c.nokey) { F.facts.push(cdFact("nokey", XW.face.noKey, cdIco("info"), [crV(XW.face.noKey)], null)); return F; }
+      F.facts.push(cdFact("means", W0[E ? r : "none"], cdIco(CRFNICO[r] || "info", E ? E.col : null), [crV(W0[E ? r : "none"])], null));
+      var tb = {}, tn = []; o.ops.forEach(function (q) { if (!tb[q[1]]) { tb[q[1]] = []; tn.push(q[1]); } if (tb[q[1]].indexOf(q[0]) < 0) tb[q[1]].push(q[0]); });
+      if (tn.length) { x = crChips(tn, function (n) { var ch = cdChTbl(n, null); tb[n].sort().forEach(function (rw) { ch.appendChild(cdRw(rw)); }); return ch; });
+        F.facts.push(cdFact("tables", tn.join(" \u00b7 "), cdIco("model", EX.col.kind.model), x.kids, null)); x.shown.forEach(function (n) { F.joins.push({ end: "table", want: [n] }); }); }
+      var cn = []; (o.calls || []).forEach(function (q) { var n = xFnName(xT(q[0])); if (n && cn.indexOf(n) < 0) cn.push(n); });
+      if (cn.length) { x = crChips(cn, cdChFn); F.facts.push(cdFact("calls", W0.calls + " " + cn.join(" \u00b7 "), cdIco("function", EX.col.kind["function"]), [crD(W0.calls)].concat(x.kids), cdPl("calls", cn.length))); F.joins.push({ end: "function", want: x.shown }); }
+      (o.chk || []).slice(0, 2).forEach(function (g) { var w = xT(g[1]); F.facts.push(cdFact("refuses", W0.refuses + " " + g[0], cdStatusPill(g[0]), [crD(W0.refuses)].concat(w ? [crV(cdClip(w, 60))] : []), null)); });
+      if (c.commits) F.facts.push(cdFact("commits", XW.tip.fn.commit, cdIco("model", EX.col.opc.write), [crV(XW.tip.fn.commit)], null));
+      return F; },
+    file: function (S0) { var c = S0.c, F = crItem(S0, cdSvg("file", null, 16), xShort(c.file), null); crAt(F, c.at || c.file);                           /* the file: its path, the line it starts at, the function it holds */
+      F.facts.push(cdFact("defines", c.n, cdIco("function", EX.col.kind["function"]), [cdChFn(c.n)], null)); F.joins.push({ end: "function", want: [c.n] }); return F; },
+    via: function (S0) { var c = S0.c, o = S0.it.o, K = XW.tip.fn, nm = o.by ? xT(o.by[0]) : o.lv != null ? o.via : null, at = o.by ? xT(o.by[1]) : null, F;           /* where it is called from */
+      F = crItem(S0, cdSvg(o.h ? "target" : "link", null, 16), c.nokey ? XW.face.noKey : o.h ? XW.face.handler : o.lv != null ? fill(XW.face.level, { i: o.lv, name: o.via }) : o.by ? fill(K["in"], { v: nm }) : W.unknown, null);
+      if (o.h) { F.ident.push(cdLine("route", "target", K.inHandler)); if (c.at) crAt(F, c.at); }
+      if (nm) { F.ident.push(cdLine("caller", "function", nm, EX.col.kind["function"], null, at)); F.joins.push({ end: "caller", want: [nm] }); } return F; },
+    marks: function (S0) { var c = S0.c, q = S0.it.o.ops[S0.ri], tc = EX.cat["table:" + q[1]], col = EX.col.rw[q[0]] || EX.col.opc.pure, F = crItem(S0, xSvg("model", 16, col), q[1], col);   /* a table it touches, read or written */
+      F.chips = [cdPill(xRoleName("table", q[0]), col, cdLook("fn"))];
+      if (tc) { if (tc.ent) F.ident.push(cdLine("entity", "entity", tc.ent, tc.ec, cdLift(tc.ec))); F.ident.push(cdLine("class", "doc", tc.model || W.unknown, EX.col.kind.schema)); }
+      F.facts.push(cdFact("by", c.n, cdRw(q[0]), [cdChFn(c.n)], null)); F.joins.push({ end: "function", want: [c.n] }); return F; } };
+  CDREG.test = {
+    head: function (S0) { var c = S0.c, it = S0.it, F = crHead(S0), W0 = CRH.test, ok = c.state === "pass", col = ok ? EX.col.opc.read : "var(--alert)", E = xTestEnds(it), all = [];   /* its result, and the ending it proves */
+      F.chips = [cdPill(ok ? XW.face.pass : XW.face.fail, col, cdLook("test"))];
+      F.facts.push(cdFact("state", W0[ok ? "pass" : "fail"], cdIco("test", col), [crV(W0[ok ? "pass" : "fail"])], null));
+      var words = function (st) { var e = it.o.ends.filter(function (x) { var ec = EX.cat[it.ep + "|" + x[0]]; return ec && ec.st === st && (x[1] === "refs" || x[1] === "service"); })[0]; return e ? cdClip(xEndWords(EX.cat[it.ep + "|" + e[0]]), 56) : null; };
+      E.proves.concat(E.service.filter(function (s) { return E.proves.indexOf(s) < 0; })).forEach(function (st) { var w = words(st); all.push(String(st));
+        F.facts.push(cdFact("proves", W0.proves + " " + st, cdStatusPill(st), [crD(W0.proves)].concat(w ? [crV(w)] : []), null)); });
+      if (E.fits.length) { E.fits.forEach(function (s) { all.push(String(s)); }); F.facts.push(cdFact("fits", W0.fits + " " + E.fits.join(" \u00b7 "), cdIco("layers"), [crD(W0.fits)].concat(E.fits.map(cdStatusPill)), null)); }
+      if (E.checks.length) { E.checks.forEach(function (s) { all.push(String(s)); }); F.facts.push(cdFact("checks", W0.checks + " " + E.checks.join(" \u00b7 "), cdIco("target"), [crD(W0.checks)].concat(E.checks.map(cdStatusPill)), null)); }
+      if (!all.length) F.facts.push(cdFact("proves", XW.tip.test.provesNone, cdIco("test"), [crV(XW.tip.test.provesNone)], null)); else F.joins.push({ end: "ending", want: all });
+      return F; },
+    file: function (S0) { var c = S0.c, at = c.file + (c.line != null ? ":" + c.line : ""), F = crItem(S0, cdSvg("file", null, 16), xShort(c.file) + (c.line != null ? ":" + c.line : ""), null);   /* the file and the line the test starts at */
+      crAt(F, at); F.facts.push(cdFact("test", c.cid + " " + c.n, cdIco("test", EX.col.opc.read), [cdChTest(c.cid), crQ(c.n)], null)); return F; },
+    marks: function (S0) { var c = S0.c, o = S0.it.o, i = S0.ri, F, K = XW.tip.test;                                                           /* a request it makes, or the code it calls directly */
+      if (c.calls.length) { var q = c.calls[i], rk = q[2] === "act" ? "act" : q[2] === "arrange-checked" ? "check" : "arrange", col = rk === "act" ? EX.col.opc.call : rk === "check" ? EX.col.opc.gate : EX.col.opc.pure;
+        F = crItem(S0, xSvg("endpoint", 16, col), q[1], col); F.chips = [cdPill(xRoleName("test", rk), col, cdLook("test"))].concat((q[6] || []).map(cdStatusPill)); F.joins.push({ end: "endpoint", want: [q[1]] });
+        F.ident.push(cdLine("at", "target", xShort(c.file) + ":" + q[3]));
+        if (q[4]) F.facts.push(cdFact("helper", xRoleName("test", "helper") + " " + q[4], cdIco("function", EX.col.kind["function"]), [crD(xRoleName("test", "helper")), cdChFn(q[4])], null));
+        if ((q[5] || []).length) { var hs = fill(K["in"], { v: q[5].join(" \u00b7 ") }); F.facts.push(cdFact("sends", hs, cdIco("up"), [crV(hs)], null)); }
+        var fl = xAsserts([q]).f; if (fl.length) { var fs0 = fill(K.outFields, { v: fl.join(" \u00b7 ") }); F.facts.push(cdFact("reads", fs0, cdIco("target"), [crV(fs0)], null)); } return F; }
+      var z = c.raises[i]; F = crItem(S0, crFnGlyph(null), z[0], EX.col.kind["function"]); F.chips = [cdPill(xRoleName("test", "service"), EX.col.kind["function"], cdLook("test"))];
+      F.ident.push(cdLine("at", "target", xShort(c.file) + ":" + z[2])); F.facts.push(cdFact("direct", fill(K.doService, { v: z[0] }), cdIco("function", EX.col.kind["function"]), [crV(fill(K.doService, { v: z[0] }))], null));
+      F.facts.push(cdFact("expects", XW.chain.raise + " " + z[1], cdIco("alert", "var(--cd-red)"), [crD(XW.chain.raise), cdChCls(z[1])], null)); F.joins.push({ end: "function", want: [z[0]] }); return F; } };
+  CDREG.gate = {
+    head: function (S0) { var c = S0.c, it = S0.it, o = it.o, F = crHead(S0), ef = xGateEff(it), W0 = CRH.gate;                                  /* its kind of gate and role, and the ending it can give */
+      F.name = (XF.gdk.vals[o.gk] || XF.gdk.vals.one).name; F.chips = [cdPill(xRoleName("gate", it.role), EX.col.opc.gate, cdLook("gate"))];
+      F.facts.push(cdFact("means", W0[it.role], cdIco(xRoleIco("gate", it.role), EX.col.opc.gate), [crV(W0[it.role])], null));
+      if (ef.sts.length) { F.facts.push(cdFact("gives", W0.gives + " " + ef.sts.join(" \u00b7 "), cdIco("target"), [crD(W0.gives)].concat(ef.sts.map(cdStatusPill)), null)); F.joins.push({ end: "ending", want: ef.sts.map(String) }); }
+      else F.facts.push(cdFact("gives", ef.word || XW.tip.gate.outNone, cdIco("target"), [crV(ef.word || XW.tip.gate.outNone)], null));
+      return F; },
+    fn: function (S0) { var o = S0.it.o, K = o.fn != null ? xT(o.fn) : null, nm = K ? xFnName(K) : o.place, kc = K ? EX.cat[K] : null, r = K ? xFnRole(K) : null, T = XW.tip.gate,       /* the function it runs in */
+        F = crItem(S0, crFnGlyph(K), nm || XW.face.noFn, EX.col.kind["function"]), say = nm ? fill(T["do"], { name: nm }) : T.doNone;
+      if (kc && (kc.at || kc.file)) crAt(F, kc.at || kc.file); if (r && EN.role[r]) F.chips = [cdPill(xRoleName("fn", r), EN.role[r].col, cdLook("gate"))];
+      F.facts.push(cdFact("runsIn", say, cdIco("shield", EX.col.opc.gate), [crV(say)], null)); if (nm) F.joins.push({ end: "host", want: [nm] }); return F; },
+    level: function (S0) { var o = S0.it.o, lv = XF.gdl.vals[o.gl], host = o.fn != null ? xFnName(xT(o.fn)) : o.place || null, F = crItem(S0, cdSvg("target", EX.col.opc.gate, 16), lv.name, EX.col.opc.gate);   /* where in the request it decides */
+      F.facts.push(cdFact("means", lv.plain, cdIco("info"), [crV(lv.plain)], null)); if (host) { F.ident.push(cdLine("host", "function", host, EX.col.kind["function"])); F.joins.push({ end: "host", want: [host] }); } return F; },
+    via: function (S0) { var c = S0.c, it = S0.it, at = xT(it.o.at), F = crItem(S0, cdSvg("file", null, 16), xShort(at), null), ef = xGateEff(it);              /* the file and line it decides at, the check as written */
+      crAt(F, at); crEff(F, ef); if (c.raw) F.facts.push(cdFact("asWritten", fill(XW.tip.asWritten, { v: c.raw }), cdIco("merge"), [crK(c.raw)], null)); return F; },
+    marks: function (S0) { var c = S0.c, it = S0.it, o = it.o, i = S0.ri, F, R = CRI;                                                          /* a check it waits for, or the check itself */
+      if (i < o.after.length) { var t = xT(o.after[i]); F = crItem(S0, xSvg("shield", 16, EX.col.opc.pure), R.after, EX.col.opc.pure); F.facts.push(cdFact("after", fill(XW.tip.gate.after, { v: t }), cdIco("merge"), [crK(t)], null)); return F; }
+      F = crItem(S0, xSvg("shield", 16, EX.col.opc.gate), R.self, EX.col.opc.gate); F.facts.push(cdFact("check", c.n, cdIco("shield", EX.col.opc.gate), [crV(c.n)], null));
+      if (c.raw) F.facts.push(cdFact("asWritten", fill(XW.tip.asWritten, { v: c.raw }), cdIco("merge"), [crK(c.raw)], null)); crEff(F, xGateEff(it)); return F; } };
+  CDREG.hook = {
+    head: function (S0) { var c = S0.c, it = S0.it, o = it.o, r = it.role, F = crHead(S0), W0 = CRH.hook, col = EX.col.hrole[r] || "var(--muted)";                  /* its role, and the endpoint it calls */
+      F.chips = [cdPill(xRoleName("hook", r), col, cdLook("hook"))]; F.facts.push(cdFact("means", W0[W0[r] ? r : "none"], cdIco("hook", col), [crV(W0[W0[r] ? r : "none"])], null));
+      (o.send || []).forEach(function (s) { var t = s[0] + " " + s[1]; F.facts.push(cdFact("sends", W0.sends + " " + t, cdIco("up", EX.col.kind.endpoint), [crD(W0.sends), crV(t)], null)); F.joins.push({ end: "endpoint", want: [s[1]] }); });
+      if (!(o.send || []).length) F.facts.push(cdFact("sends", fill(CDW.unknown, { v: XW.parts.hook.sends.name }), cdIco("up"), [crV(fill(CDW.unknown, { v: XW.parts.hook.sends.name }))], null));
+      return F; },
+    sends: function (S0) { var o = S0.it.o, s0 = o.send[0], F = crItem(S0, xStation(o.epk, 16, EX.col.kind.endpoint || "var(--muted)") || cdSvg("up", null, 16), s0 ? s0[0] + " " + s0[1] : W.unknown, EX.col.kind.endpoint);   /* the request it sends: method, path, how */
+      o.send.forEach(function (s, i) { if (i) F.ident.push(cdLine("sends", "up", s[0] + " " + s[1])); if (s[2]) { var v = fill(CRI.via, { v: s[2] }); F.facts.push(cdFact("via", v, cdIco("link"), [crV(v)], null)); } F.joins.push({ end: "endpoint", want: [s[1]] }); });
+      F.ident.push(cdLine("endpoint", "endpoint", String(o.epk).replace(/^endpoint:/, ""), EX.col.kind.endpoint)); return F; },
+    file: function (S0) { var c = S0.c, F = crItem(S0, cdSvg("file", null, 16), xShort(c.file), null); crAt(F, c.at || c.file);                           /* the file, the line, the hook it holds */
+      F.facts.push(cdFact("defines", c.n, cdIco("hook", EX.col.kind.hook), [cdChName(c.n, "hook", EX.col.kind.hook)], null)); F.joins.push({ end: "hook", want: [c.n] }); return F; },
+    marks: function (S0) { var it = S0.it, x = it.o.react[S0.ri], sw = cdStatusWords(x[1]), ec = EX.cat[it.ep + "|" + x[0]], col = xStatusCol(x[1]), F = crItem(S0, xSvg("target", 16, col), sw.name, col), own = x[2] ? (x[3] || CRI.own) : XW.list.noBranch;   /* an ending it answers, with or without a branch of its own */
+      F.chips = [cdStatusPill(x[1])]; if (ec) F.ident.push(cdLine("ending", "target", cdClip(xEndWords(ec), 70)));
+      F.facts.push(cdFact("branch", own, cdIco("merge", x[2] ? EX.col.opc.gate : null), [crV(own)], x[4] || null)); return F; } };
+  CDREG.inf = {
+    head: function (S0) { var c = S0.c, F = crHead(S0), W0 = CRH.inf, col = EN.life[c.dies] || "var(--muted)", T = W.terms.life[c.dies === "with the answer" ? "req" : c.dies === "with the server process" ? "srv" : "unk"];   /* its lifetime, and where it is set */
+      F.name = xRoleName("inf", c.ik); F.chips = [cdPill(xLife(c.dies), col, cdLook("inf"))]; F.facts.push(cdFact("lasts", T.plain, cdIco("layers", col), [crV(T.plain)], null));
+      if (c.by) { F.facts.push(cdFact("set", W0.set + " " + c.by, cdIco("link"), [crD(W0.set), cdChFn(c.by)], null)); F.joins.push({ end: "setter", want: [c.by] }); if (c.set) F.facts.push(cdFact("at", c.set, cdIco("file"), [crV(c.set)], null)); }
+      else if (c.set) F.facts.push(cdFact("set", W0.set + " " + c.set, cdIco("link"), [crD(W0.set), crV(c.set)], null));
+      else F.facts.push(cdFact("set", XW.tip.inf.inNone, cdIco("link"), [crV(XW.tip.inf.inNone)], null));
+      return F; },
+    set: function (S0) { var c = S0.c, F = crItem(S0, (c.byk || []).map(function (K) { return xStation(K, 16, EX.col.kind["function"]); }).filter(Boolean)[0] || cdSvg("link", null, 16), c.by || c.set || W.unknown, c.by ? EX.col.kind["function"] : null);   /* who sets it, and where */
+      if (c.by) { F.ident.push(cdLine("setter", "function", c.by, EX.col.kind["function"])); F.joins.push({ end: "setter", want: [c.by] }); } if (c.set) crAt(F, c.set);
+      if (c.from) { var fr = fill(XW.tip.inf.from, { k: c.from[0], v: c.from[1] }); F.facts.push(cdFact("from", fr, cdIco("down"), [crV(fr)], null)); } return F; },
+    marks: function (S0) { var c = S0.c, x = S0.it.o.reads[S0.ri], mw = x[2] === "middleware", col = EN.life[c.dies] || "var(--muted)", F = crItem(S0, xSvg(mw ? "shield" : "function", 16, col), xT(x[1]) || W.unknown, col);   /* a place that reads it */
+      crAt(F, xT(x[0])); F.facts.push(cdFact("read", mw ? CRI.readMw : CRI.readFn, cdIco(mw ? "shield" : "function", col), [crV(mw ? CRI.readMw : CRI.readFn)], null)); return F; } };
   /* what a pointer on a region node is: the block it sits in, the region, the part, the item — or the block's own card when no provider serves it */
-  function cdRegionOf(k, it, reg, rp, ri, blk) { var c = EX.cat[it.id]; if (!c || !cdProvider(k, reg, rp)) return null; if (rp === "marks" && !xWayList(c)[ri]) return null;
+  function cdRegionOf(k, it, reg, rp, ri, blk) { var c = EX.cat[it.id]; if (!c || !cdProvider(k, reg, rp)) return null; if (rp === "marks" && !(ri < cdMarkN(k, c, it))) return null;
     return { t: blk || null, ik: null, key: c.key || null, ck: "reg", bk: k, c: c, it: it, X: {}, P: { name: "", kind: "", b: [], c: [], g: [], n: "" }, foot: blk ? cdFoot(blk) : null, bench: true, region: reg, rp: rp, ri: ri }; }
   function cdRegion(t) { var blk = t.closest('[data-tip="exblk"]'), S0 = null; if (!blk) return null; var k = blk.getAttribute("data-exk"), id = blk.getAttribute("data-exid"), ep = blk.getAttribute("data-exep"), r = BYID[ep],
       e = ((r && r.ex[k]) || []).filter(function (x) { return x[0] === id; })[0];

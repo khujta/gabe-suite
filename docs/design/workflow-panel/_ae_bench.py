@@ -39,8 +39,21 @@ LAB_KINDS = {"table": "DATACFG", "schema": "SCHCFG", "fn": "FNCFG"}
 # card (D-088), which is also what a part not named here gives · `items` — one card for each item of the part (the where line, each mark of the strip).
 # The page tags a part's node with its region wherever he drags the part (_ae-bench.js xRegions), so the region follows the part; a kind with no entry
 # here keeps the one card. The card a region draws is _ae-card.js CDREG — a kind adopts regions by an entry here and a provider there.
+# D-090 (his: "apply this not only to the endings, but to all the other elements that have a similar structure"): every kind has its entry, ONE RULE —
+# `head` = the glyph and the coloured pill that classifies the element (a table's channel, a schema's direction, a function's role, a test's result, a gate's kind,
+# a hook's role, an in-flight value's lifetime) · `items` = every LOCATION part (a file, a where, a via, a class, a set-by) and each mark of the strip · `title` =
+# the name and every other part. His to correct by one entry here; the build stops on a part the table leaves out, so a part never falls to `title` unnoticed.
 REGION_IDS = ("head", "title", "items")
-REGIONS = {"end": {"icon": "head", "status": "head", "name": "title", "stage": "title", "count": "title", "via": "items", "marks": "items"}}
+REGIONS = {
+    "end": {"icon": "head", "status": "head", "name": "title", "stage": "title", "count": "title", "via": "items", "marks": "items"},
+    "table": {"icon": "head", "rw": "head", "name": "title", "ent": "title", "count": "title", "model": "items", "marks": "items"},
+    "schema": {"icon": "head", "dir": "head", "name": "title", "ent": "title", "count": "title", "via": "items", "marks": "items"},
+    "fn": {"icon": "head", "role": "head", "name": "title", "commit": "title", "file": "items", "count": "title", "via": "items", "marks": "items"},
+    "test": {"icon": "head", "state": "head", "cid": "title", "proves": "title", "role": "title", "name": "title", "file": "items", "sends": "title", "asserts": "title", "marks": "items"},
+    "gate": {"icon": "head", "role": "head", "cond": "title", "fn": "items", "level": "items", "effect": "title", "via": "items", "count": "title", "marks": "items"},
+    "hook": {"icon": "head", "role": "head", "name": "title", "fkind": "title", "sends": "items", "file": "items", "count": "title", "marks": "items"},
+    "inf": {"icon": "head", "life": "head", "name": "title", "ikind": "title", "set": "items", "count": "title", "marks": "items"},
+}
 GATE_ROLES = ("limiter", "scheme", "login", "rule", "own", "down", "branch", "catch", "switch")   # EX-4: the feed's own groups
 TEST_ROLES = ("act", "check", "arrange", "service", "helper")
 SCH_ROLES = ("in", "out", "in-nested", "out-nested")
@@ -857,12 +870,24 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
             M = MINE[k]
             looks[k] = {**base, "form": "block", "rows": M["rows"], "size": M["size"], "iconCol": M["iconCol"], "mode": {"count": "badge", "via": "both", "file": "word"},
                         "on": {}, "off": [p for p in M["parts"] if p not in [q for r0 in M["rows"] for q in r0["l"] + r0["r"]]]}
-    # D-089: a region names a part the kind draws (or the strip), one of the three regions; the card words name every status an ending gives
+    # D-089/D-090: every kind names each part it draws (and the strip) in one of the three regions; the card words name every status an ending gives
+    if set(REGIONS) != set(KINDS):
+        die(f"REGIONS names {sorted(REGIONS)}, the bench draws {sorted(KINDS)}: every kind has its hover regions (D-090)")
     for k, R in REGIONS.items():
-        stray = sorted(set(R) - (set(MINE[k]["parts"]) | {"marks"})) if k in MINE else sorted(R)
-        if stray or not set(R.values()) <= set(REGION_IDS):
-            die(f"REGIONS.{k} names parts the block does not draw {stray} or a region that is none of {REGION_IDS}: {sorted(set(R.values()) - set(REGION_IDS))}")
+        drawn = (set(MINE[k]["parts"]) if k in MINE else {p["key"] for p in lk["parts"][k]}) | {"marks"}
+        stray, left = sorted(set(R) - drawn), sorted(drawn - set(R))
+        if stray or left or not set(R.values()) <= set(REGION_IDS):
+            die(f"REGIONS.{k} names parts the block does not draw {stray}, leaves out parts it does {left}, or names a region that is none of {REGION_IDS}: {sorted(set(R.values()) - set(REGION_IDS))}")
     RW = EW.get("region") or die("ex.region: the region cards have no words (D-089)")
+    HW, IW = RW.get("head") or die("ex.region.head: the head cards have no words (D-090)"), RW.get("item") or die("ex.region.item: the item cards have no words (D-090)")
+    for k, names in (("schema", EW["roles"]["schema"]), ("fn", EW["roles"]["fn"]), ("gate", EW["roles"]["gate"]), ("hook", EW["roles"]["hook"])):
+        if sorted(set(names) - set(HW.get(k) or {})):
+            die(f"ex.region.head.{k} says nothing of the roles {sorted(set(names) - set(HW.get(k) or {}))}: a head card says what its class means (D-090)")
+    for k, keys in (("schema", ("c422",)), ("fn", ("calls", "refuses")), ("test", ("pass", "fail", "proves", "fits", "checks")), ("gate", ("gives",)), ("hook", ("sends",)), ("inf", ("set",))):
+        if sorted(set(keys) - set(HW.get(k) or {})):
+            die(f"ex.region.head.{k} lacks the words {sorted(set(keys) - set(HW.get(k) or {}))} (D-090)")
+    if sorted({"field", "more", "fk", "uq", "uqWith", "after", "self", "own", "readMw", "readFn", "via"} - set(IW)):
+        die(f"ex.region.item lacks the words {sorted({'field', 'more', 'fk', 'uq', 'uqWith', 'after', 'self', 'own', 'readMw', 'readFn', 'via'} - set(IW))} (D-090)")
     gdc = W["enc"]["fam"]["gdc"]["vals"]
     lost = sorted({str(c["st"]) for c in cat.values() if c["k"] == "end"} - set(RW["status"]))
     if lost:

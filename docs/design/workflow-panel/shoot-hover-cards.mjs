@@ -9,7 +9,12 @@
 
    D-089 — the ending block's HOVER REGIONS, each by a real hover on that part of the 429 ending (the sensitive limit) of the examples bench, the whole block in the picture with
    its card: 20-ending-glyph · 21-ending-status (the one glyph-and-status card, from either) · 22-ending-title (the block's full card) · 23-ending-where-<n> (n = 1, the where line,
-   then each mark of the strip in order — one card per item of the last row). */
+   then each mark of the strip in order — one card per item of the last row).
+
+   D-090 — the same three regions on the seven other kinds of the bench, on their default examples: per kind the HEAD card (a real hover on its glyph) and ONE item card (a real hover on
+   the most telling mark of its strip), the whole block in the picture with its card: 30-<kind>-head · 31-<kind>-item, kind = table · schema · function · test · gate · client-hook · in-flight.
+   The telling mark: a table's field with a key to another table and a unique key, a schema's field with a rule, the first function of the endpoint that touches a table (the default example
+   draws no mark), the request that tests the endpoint, the check itself, the ending the screen answers in a branch of its own, the place the value is read. */
 import path from 'node:path';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
@@ -71,6 +76,16 @@ for (const [name, what, sel] of SHOTS) { if (ONLY && !ONLY.includes(name)) conti
   const items = await p.$$(BLK + ' [data-tip="exreg"][data-reg="items"]');                          /* DOM order: the where line, then the marks */
   for (let i = 0; i < items.length; i++) { const name = '23-ending-where-' + (i + 1); if (ONLY && !ONLY.includes(name)) continue;
     const ok = await shoot(p, items[i], '#tip', name + '.png', BLK); console.log((ok ? 'ok   ' : 'FAIL ') + name + ' · the ending block: item ' + (i + 1) + ' of the last row'); if (ok) n++; } }
+
+/* D-090 · the seven other kinds: the head (the glyph) and one item (the most telling mark) */
+{ const KINDS = [['table', 'table'], ['schema', 'schema'], ['fn', 'function'], ['test', 'test'], ['gate', 'gate'], ['hook', 'client-hook'], ['inf', 'in-flight']];
+  for (const [k, slug] of KINDS) { const BLK = '#exgrid .excol[data-k="' + k + '"] .blk', h = '30-' + slug + '-head', t = '31-' + slug + '-item';
+    if (k === 'fn' && (!ONLY || ONLY.includes(t))) { await p.evaluate(() => { const D = window.__allep.data, r = D.rows.filter((x) => x.id === 'POST /cooking/sessions')[0], e = r.ex.fn.filter((x) => x[2].ops.length && D.ex.cat['table:' + x[2].ops[0][1]])[0]; if (e) window.__allepEx.pick('fn', e[0]); }); await p.waitForTimeout(250); }
+    if (!ONLY || ONLY.includes(h)) { const ok = await shoot(p, BLK + ' [data-part="icon"]', '#tip', h + '.png', BLK); console.log((ok ? 'ok   ' : 'FAIL ') + h + ' · the ' + k + ' block: the glyph'); if (ok) n++; }
+    if (!ONLY || ONLY.includes(t)) { const at = await p.evaluate((a) => { const D = window.__allep.data, cur = window.__allepEx.current(a), c = D.ex.cat[cur.id], o = cur.o, f = (x) => (x >= 0 ? x : 0);
+        return a === 'table' ? f(c.cols.findIndex((q) => (c.fks || []).some((x) => x[0] === q[0]) && (c.uqs || []).includes(q[0]))) : a === 'schema' ? f(c.cols.findIndex((q) => q[5])) : a === 'test' ? f(c.calls.findIndex((q) => q[2] === 'act'))
+          : a === 'hook' ? f(o.react.findIndex((q) => q[2])) : 0; }, k);
+      const ms = await p.$$(BLK + ' .sqs > .sq'), ok = ms[at] ? await shoot(p, ms[at], '#tip', t + '.png', BLK) : false; console.log((ok ? 'ok   ' : 'FAIL ') + t + ' · the ' + k + ' block: mark ' + (at + 1) + ' of ' + ms.length); if (ok) n++; } } }
 
 /* the lab's own card, for comparison: a table block (locations), its hover as the lab draws it */
 if (!ONLY || ONLY.includes('00-lab-locations')) {

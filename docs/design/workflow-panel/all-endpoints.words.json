@@ -2814,7 +2814,7 @@
     "_about": "D-071 (his L-23 · L-08 · L-13 · L-11): the examples bench — one column per kind of element, in his order, each an example drawn as a block with its controls below it. The table's look is his DATA line (D-027); the schema's and the function's boot on the lab's looks, which is my choice (dashed); the other five kinds' parts and looks are my picks, dashed. Where BY MOMENT already has words for a thing (an in-flight value's kind, how long it lives, a gate's kind and where it decides, a race, the three parts of a hover, the reply), the bench reads those words, never a copy.",
     "title": "examples",
     "lede": "One example of each kind of element this page draws, a column each, in the order a request meets them: an ending, a table, a schema, a function, a test, a gate or decision, a client hook, an in-flight value. Pick the element at the top of a column, narrow it by its role, set the column's width, and change what its block shows with the controls under it.",
-    "how": "A block reads top to bottom: its title lines, then a strip of marks — a table's or a schema's fields, the tables a function touches, the requests a test makes, the checks on an ending's way, what a gate waits for, the endings a hook answers, the places a value is read — then a list that opens when you click the block. Its hover says what comes before it, what it checks and what it gives, in the form BY MOMENT's hovers option picks. An ending's block hovers by part: its glyph and its status give one card about what the ending is and what the status means, its title gives the whole card, and its where line and each mark of the strip give a card of their own. Above each block, icon squares (point at one for what it does): the elements of this endpoint or of every endpoint (one not on the open endpoint is drawn as it is on the first endpoint that has it), and the width of the element drawn there — dynamic, shorter, compact, most compact, the column's box keeping its size; the chips narrow the column to one role and the arrows step through the elements. Under each block, always in view: the parts to drag between the lines or into not drawn, their sizes and the colours; the squares at the bottom put the block back on its first look and copy its settings as one line, to paste back with your words.",
+    "how": "A block reads top to bottom: its title lines, then a strip of marks — a table's or a schema's fields, the tables a function touches, the requests a test makes, the checks on an ending's way, what a gate waits for, the endings a hook answers, the places a value is read — then a list that opens when you click the block. Its hover says what comes before it, what it checks and what it gives, in the form BY MOMENT's hovers option picks. A block hovers by part: its glyph and the pill that classifies it give one card about what the element is and what that class means for it, its title gives the whole card, and each place it names (a file, a where, a class, a setter) and each mark of the strip give a card of their own. Above each block, icon squares (point at one for what it does): the elements of this endpoint or of every endpoint (one not on the open endpoint is drawn as it is on the first endpoint that has it), and the width of the element drawn there — dynamic, shorter, compact, most compact, the column's box keeping its size; the chips narrow the column to one role and the arrows step through the elements. Under each block, always in view: the parts to drag between the lines or into not drawn, their sizes and the colours; the squares at the bottom put the block back on its first look and copy its settings as one line, to paste back with your words.",
     "whoseTitle": "whose look",
     "whose": {
       "his": { "name": "your DATA line", "plain": "The table block boots on the DATA line you pasted in the endpoint lab, word for word ({v}). Its chip and its count stand at {lo}px, under the page's {hi}px floor, as your line sets them; every other part of the bench keeps the floor." },
@@ -2964,7 +2964,8 @@
       "ways": { "one": "{n} way", "many": "{n} ways" },
       "tests": { "one": "{n} test", "many": "{n} tests" },
       "answered": { "one": "{n} ending answered", "many": "{n} endings answered" },
-      "reads": { "one": "{n} read", "many": "{n} reads" }
+      "reads": { "one": "{n} read", "many": "{n} reads" },
+      "functions": { "one": "{n} function", "many": "{n} functions" }
     },
     "rule": {
       "missing": "{name} must be given", "string_too_long": "{name} at most {v} characters", "string_too_short": "{name} at least {v} characters",
@@ -3024,7 +3025,7 @@
       "loop": "checks written inside a loop"
     },
     "region": {
-      "_about": "D-089, his words on the ending's hover (\"the hover should work as it is today … if we hover over the icon of the glyph and the status, it should give a different hover only regarding the glyph and the status. For the items at the end in the last row, each item should have its own hover notice about what it is\"): the words the REGION cards (_ae-card.js, CDREG) speak that no other line already says. A part of a block carries a region by data (EX.regions: head · title · items); the title region is the block's own card (D-088), the head region one short card about the glyph and the status, the items region one card per item of the row. `status` names every status an ending of the feed gives (the build stops on one it does not name): the HTTP reason phrase, and a plain line only where the page's own table of refusals (enc.fam.gdc) has none. `way` names a mark of the strip by what it is, its words taken from `terms` (one word per concept); a card never says where on the page it is (P2.1).",
+      "_about": "D-089, his words on the ending's hover (\"the hover should work as it is today … if we hover over the icon of the glyph and the status, it should give a different hover only regarding the glyph and the status. For the items at the end in the last row, each item should have its own hover notice about what it is\"): the words the REGION cards (_ae-card.js, CDREG) speak that no other line already says. A part of a block carries a region by data (EX.regions: head · title · items); the title region is the block's own card (D-088), the head region one short card about the glyph and the status, the items region one card per item of the row. `status` names every status an ending of the feed gives (the build stops on one it does not name): the HTTP reason phrase, and a plain line only where the page's own table of refusals (enc.fam.gdc) has none. `way` names a mark of the strip by what it is, its words taken from `terms` (one word per concept); a card never says where on the page it is (P2.1). D-090 gives the other seven kinds the same three regions: `head` and `item` below hold their words.",
       "status": {
         "200": { "name": "OK", "plain": "The request worked and the answer carries the result." },
         "201": { "name": "Created", "plain": "The request worked and something new was created." },
@@ -3060,7 +3061,70 @@
       "ends": "stops it",
       "fails": "if it fails",
       "taken": "this way takes it",
-      "notTaken": "this way does not take it"
+      "notTaken": "this way does not take it",
+      "head": {
+        "_about": "D-090, his words (\"apply this not only to the endings, but to all the other elements that have a similar structure\"): what the HEAD card of each other kind says about its class for THIS element — the glyph and the pill that classifies it (a table's channel, a schema's direction, a function's role, a test's result, a gate's kind, a hook's role, an in-flight value's lifetime). One short line per class, never the kind's plain line (a card keeps those off, P1.1); the rest of the card is the element's own facts. A schema, a function, a gate and a hook say a line for each role the build knows (it stops on one it does not).",
+        "schema": {
+          "in": "what the client sends, checked before the handler runs",
+          "out": "what the handler answers with",
+          "in-nested": "a part of what the client sends, checked with it",
+          "out-nested": "a part of what the handler answers with",
+          "c422": "ways to it: {n}"
+        },
+        "fn": {
+          "accessor": "reads or writes the database itself",
+          "caller": "reaches the database through the functions it calls",
+          "gate": "checks something and can stop the request",
+          "pure": "touches no database and reaches no function that does",
+          "none": "no role is known for it",
+          "calls": "calls",
+          "refuses": "refuses"
+        },
+        "test": {
+          "pass": "passed when last run",
+          "fail": "failed when last run",
+          "proves": "proves",
+          "fits": "fits, without telling which",
+          "checks": "checks while setting up"
+        },
+        "gate": {
+          "limiter": "counts a caller's requests and refuses the ones past its limit",
+          "scheme": "reads the login header before the endpoint's own code runs",
+          "login": "works out who is calling and refuses a caller it does not know",
+          "rule": "a rule on one field of the body",
+          "own": "a check written in the handler itself",
+          "down": "a check inside a function the handler calls",
+          "branch": "a fork that picks which answer comes back",
+          "catch": "catches an error from below, then turns it into an answer or passes it on",
+          "switch": "a setting or a plugged-in part that decides which code runs",
+          "gives": "can give"
+        },
+        "hook": {
+          "fetcher": "sends a request to the server",
+          "streamer": "its request is a stream: the answer keeps arriving",
+          "store": "reads or writes state the web app keeps",
+          "orchestrator": "puts other hooks together, touches no data itself",
+          "effect": "a side channel: analytics, logging",
+          "deriver": "works out values from its inputs",
+          "none": "no role is known for it",
+          "sends": "sends"
+        },
+        "inf": { "set": "set by" }
+      },
+      "item": {
+        "_about": "D-090: the words an ITEM card says that no other line already says — a mark of a table's or a schema's strip (what kind of field, a key to another table, a unique key), a check a gate waits for or is, the answer a hook has a branch for, where an in-flight value is read, how a request is sent. A card names its item first (the column, the table, the request, the function) and says what the item is under it.",
+        "field": "{v} field",
+        "more": "a field from the model",
+        "fk": "points to",
+        "uq": "unique",
+        "uqWith": "unique together with",
+        "after": "check it waits for",
+        "self": "the check itself",
+        "own": "answered in a branch of its own",
+        "readMw": "read in middleware",
+        "readFn": "read in a function",
+        "via": "sent with {v}"
+      }
     },
     "copy": { "where": "examples", "on": "on {ep}", "all": "every endpoint", "role": "role {v}" }
   }
