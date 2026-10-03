@@ -1276,3 +1276,26 @@ endings, the limiters, the users row the login adds, the login check, the repeat
 records in order, so a fresh page shows these four ruled.
 Revisit if: a security fact appears on another endpoint that fits neither the home facts nor the marked ones — it is added to the row's roster
 by name, never by guess.
+
+## D-085 — Swaps deleted; the read-aloud bar lands; my recommended picks become his; "go" on the queue
+Date: 2026-10-02 · Input: his message "I confirm delete the old swaps. also land it use recommended approach on pending esicion. go"
+("esicion" read as "decision" — dictation).
+Decision, his: (1) the two old WSL swap files in Windows Temp are deleted (done: `1E706178…` 4.57 GB, `3A761F6D…` 0.88 GB; the live
+`5C520C0D…` kept; C: 49 → 54 GB free). (2) **Land it** — the read-aloud bar (D-076 … D-078, draft `legibility/drafts/gabe-artifact-read-aloud/`)
+lands in the gabe-artifact skill, under the full proof regime for suite code; the draft's eleven open choices take the draft's picks (its
+README, "Open choices"). (3) **The recommended approach on the pending decisions**: the Security look is **marks to their home row**
+(`mo.secmv`), the player's after-a-decision is **stop there** (`pl.after`). (4) **Go** on the queue: P4.1 · P8.1 · P10.1, the P3.2 and P2.1
+redrafts, L-33, L-39.
+Reading: "use recommended approach" is read as covering the choices that carried a recommendation when he wrote it. The rate limit middleware
+standing twice in the Security row had none yet, so it is built as an option — **merged** (the switch nests inside its numbered middleware;
+my pick, dashed) or **apart** — and stays his.
+How the queue is built — his P2.1 note (D-081) governs it: *"produce a better corpus that has these rules embedded, rather than generating
+something, then correcting everything … label different parts, such as hovers related to endings, databases, schemas, functions … and then
+check those dynamically … one final pass, something like that, but I don't want to have n passes."* So P4.1 (both ends of a relation), P8.1
+(a count's label from its own definition; state words) and P10.1 (a standing rule gets a check on a running rail) are built as checks AT
+EMISSION over labelled hovers — every hover is made by one emitter that knows its element's kind, and the rules for that kind run as it is
+made — not as passes over a finished page; the audit A1 stays the one final pass. L-33's card (the endpoint lab's hover format, its origin
+traced first) is that emitter's one output. P2.1 and P3.2 are redrafted to his words and shown for a new "land it" (P3.2's note: an unknown
+kind gets the generic label "unknown", accumulated and judged in batches by a tool, never labelled live). L-39's bench sections follow, on
+the same emitter.
+Revisit if: a rule cannot be checked at emission (it needs the whole page, like twins across sections) — it stays in the audit, by name.
