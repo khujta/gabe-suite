@@ -1374,3 +1374,20 @@ correct by one table entry): **glyph and status** = the glyph plus the coloured 
 schema's in/out, a function's role, a test's state, a gate's role, a hook's role, an in-flight value's lifetime); **title** = the name and every
 other part (today's full card); **each item** = every location part (file, where, class, set by) and each mark of the strip, one card per item.
 His bench configurations stay as saved (keys, part ids, copy lines unchanged).
+
+## D-091 — The bench blocks take the lab's type, icon size and line alignment, and its field marks: paler when nullable, corners when unique
+Date: 2026-10-03 · Input: his message with a picture comparing the all-endpoints bench's `users` table block with the endpoint lab's.
+Decision, his: "The font is different. I don't know if maybe the icon size is different. In the endpoint lab, we have the lines actually
+aligning, and not in the old endpoints. We should fix that. Also, there is some encoding for the keys that can be null or not on the tables.
+There are some markers in the corners … We should apply that in the table section here, and we can do the same for anything similar on the
+other elements. Maybe in other elements, we might do that with different colors … We might do the same on schemas if there is something like
+that. For functions, endpoints, gates, or any other element, we might do something similar, but maybe in the other corners or with other
+colors, if we have to do some encoding like that."
+Reading (from the lab's code, `_lab-ep-panels.js` sqNode + `_lab-ep.css` "THE UNIQUE CORNERS" / "FIELD-MARK OPACITY"): in the lab the
+CORNERS (an L at top-right and bottom-left, accent colour) mark a UNIQUE column; a column that CAN BE NULL (`| None`) is drawn PALER (the
+optional stop of one opacity bar). Both come over.
+Consequence: (1) every bench block (and the bench look wherever drawn) takes the lab block's font (monospace), sizes (icon 13 · name 13 ·
+other parts 12, read from the lab's BKDEF) and alignment (a fixed icon column, so each line's text starts at the same x); (2) the TABLE block's
+field marks become the lab's: type-coloured marks, nullable paler, unique cornered; (3) the SCHEMA block's field marks take the same mark,
+with an optional field (not required) paler — the schema's analogue of nullable; (4) other kinds get a corner or colour encoding only where
+the feed carries a real yes/no property of the same nature — proposed as options with my pick dashed, never invented.
