@@ -199,27 +199,29 @@
 
   /* ── the strip of marks: one per field (a table, a schema — the lab's field marks, lifted), per table touched (a function), per
      request (a test), per check on the way (an ending), per condition waited for (a gate), per ending answered (a hook), per read ── */
-  function xMark(cls, col, sym, ch, title) { var q = el("i", "sq " + cls); q.style.setProperty("--fc", col); if (/e-symbol/.test(cls) && sym) q.appendChild(xSvg(sym, 11, "currentColor"));
-    else if (/e-char/.test(cls)) q.textContent = ch || ""; if (title) q.setAttribute("data-w", title); return q; }
+  function xMark(cls, col, sym, ch, title, mk, mv) { var q = el("i", "sq " + cls); q.style.setProperty("--fc", col); if (/e-symbol/.test(cls) && sym) q.appendChild(xSvg(sym, 11, "currentColor"));
+    else if (/e-char/.test(cls)) q.textContent = ch || ""; if (title) q.setAttribute("data-w", title);
+    if (mk) { q.setAttribute("data-mk", mk); if (mv != null) q.setAttribute("data-mv", mv); }   /* D-088: what the mark counts — the hover card's marks are these, counted, labelled by mo.card.mark[mk] */
+    return q; }
   function xField(f, L, c, it, extra) { var tc = XSQ[f[2]] || XSQ.other, pal = L.sqPal, col = pal === "mono" ? "var(--muted)" : pal === "entity" ? (c.ec || "var(--muted)")
       : pal === "channel" ? xChanCol(it.k, c, it) : tc.col;
-    return xMark("e-" + L.sqEnc + " t-" + tc.key + (f[3] ? " opt" : "") + (extra ? " " + extra : ""), col, tc.sym, tc.ch, f[0]); }
+    return xMark("e-" + L.sqEnc + " t-" + tc.key + (f[3] ? " opt" : "") + (extra ? " " + extra : ""), col, tc.sym, tc.ch, f[0], "field", tc.word); }
   function xStrip(k, c, it, L) { var s = el("div", "sqs"), o = it.o, enc = L.sqEnc === "symbol" || L.sqEnc === "char" ? L.sqEnc : "colour", E = EX.col;
-    function m(col, sym, ch, cls) { s.appendChild(xMark("e-" + enc + (cls ? " " + cls : ""), col, sym, ch)); }
+    function m(col, sym, ch, cls, mk) { s.appendChild(xMark("e-" + enc + (cls ? " " + cls : ""), col, sym, ch, null, mk)); }
     if (k === "table") { var fk = {}, uq = {}; (c.fks || []).forEach(function (f) { fk[f[0]] = 1; }); (c.uqs || []).forEach(function (u) { uq[u] = 1; });
       c.cols.forEach(function (f) { s.appendChild(xField(f, L, c, it, (fk[f[0]] ? "fk" : "") + (uq[f[0]] ? " uq" : ""))); });
-      (c.more || []).forEach(function (f) { s.appendChild(xMark("e-colour exmore", "var(--muted)", null, null, f[0])); }); }
+      (c.more || []).forEach(function (f) { s.appendChild(xMark("e-colour exmore", "var(--muted)", null, null, f[0], "more")); }); }
     else if (k === "schema") c.cols.forEach(function (f) { s.appendChild(xField([f[0], f[1], f[2], f[4] ? 0 : 1], L, c, it)); });
-    else if (k === "fn") o.ops.forEach(function (q) { m(E.rw[q[0]] || E.opc.pure, "model", q[0] === "w" ? "W" : "R"); });
+    else if (k === "fn") o.ops.forEach(function (q) { m(E.rw[q[0]] || E.opc.pure, "model", q[0] === "w" ? "W" : "R", "", "op-" + (E.rw[q[0]] ? q[0] : "r")); });
     else if (k === "end") { var P = BYID[c.ep].ex.paths[c.paths[0]]; (P ? P.ch : []).forEach(function (q) { if (q[0] === "step") return;
         m(q[0] === "gate" ? (q[2] ? xStatusCol(c.st) : E.opc.gate) : q[0] === "call" ? E.kind["function"] : q[0] === "branch" ? E.opc.call : q[0] === "switch" ? E.opc.pure : xStatusCol(c.st),
           q[0] === "gate" ? "shield" : q[0] === "call" ? "function" : q[0] === "branch" ? "merge" : q[0] === "switch" ? "role" : "target", q[0] === "call" ? "ƒ" : q[0].charAt(0).toUpperCase(),
-          (q[0] === "gate" && q[2] === 0 ? "expass" : "") + (q[0] === "exit" ? " exhere" : "")); }); }
-    else if (k === "test") { if (c.calls.length) c.calls.forEach(function (q, i) { m(q[2] === "act" ? E.opc.call : q[2] === "arrange-checked" ? E.opc.gate : E.opc.pure, "endpoint", q[0] ? q[0].charAt(0) : "?", o.here.indexOf(i) >= 0 ? "exhere" : ""); });
-      else c.raises.forEach(function () { m(E.kind["function"], "function", "ƒ", "exhere"); }); }
-    else if (k === "gate") { o.after.forEach(function () { m(E.opc.pure, "shield", "·", "expass"); }); m(E.opc.gate, "shield", "!", "exhere"); }
-    else if (k === "hook") o.react.forEach(function (x) { m(xStatusCol(x[1]), "target", String(x[1]).charAt(0), x[2] ? "" : "exnob"); });
-    else if (k === "inf") it.o.reads.forEach(function (x) { m(EN.life[c.dies] || "var(--muted)", x[2] === "middleware" ? "shield" : "function", "r"); });
+          (q[0] === "gate" && q[2] === 0 ? "expass" : "") + (q[0] === "exit" ? " exhere" : ""), "way-" + (q[0] === "gate" ? (q[2] === 0 ? "pass" : "stop") : q[0])); }); }
+    else if (k === "test") { if (c.calls.length) c.calls.forEach(function (q, i) { m(q[2] === "act" ? E.opc.call : q[2] === "arrange-checked" ? E.opc.gate : E.opc.pure, "endpoint", q[0] ? q[0].charAt(0) : "?", o.here.indexOf(i) >= 0 ? "exhere" : "", "call-" + (q[2] === "act" ? "act" : q[2] === "arrange-checked" ? "check" : "arrange")); });
+      else c.raises.forEach(function () { m(E.kind["function"], "function", "ƒ", "exhere", "call-service"); }); }
+    else if (k === "gate") { o.after.forEach(function () { m(E.opc.pure, "shield", "·", "expass", "after"); }); m(E.opc.gate, "shield", "!", "exhere", "self"); }
+    else if (k === "hook") o.react.forEach(function (x) { m(xStatusCol(x[1]), "target", String(x[1]).charAt(0), x[2] ? "" : "exnob", x[2] ? "react-own" : "react-none"); });
+    else if (k === "inf") it.o.reads.forEach(function (x) { m(EN.life[c.dies] || "var(--muted)", x[2] === "middleware" ? "shield" : "function", "r", "", "read-" + (x[2] === "middleware" ? "mw" : "fn")); });
     return s.childNodes.length ? s : null; }
 
   /* ── the list a click opens: every field, the ways through the code, the ordered chain a test runs through ── */
@@ -322,7 +324,10 @@
     else pl = fill(K.inNone, { v: c.sg });
     var raw = c.guard ? c.guard[1] : c.pred || (c.ph === "security" || c.ph === "dependency" ? c.via : null);
     return [pl].concat(raw ? [fill(A, { v: raw })] : []); }
-  function xTipBlock(k, it) { var c = EX.cat[it.id], o = it.o, T = XW.tip, K = T[k], A = T.asWritten, P = { b: [], c: [], g: [], n: "" }, ln = function (i, s) { if (s) P["bcg".charAt(i)].push(s); };
+  /* D-088: the hover's three parts, as data — the card (_ae-card.js) draws them under its identity and marks; xTipBlock is the old one-string form */
+  function xTipBlock(k, it) { return ioHtml(xTipParts(k, it)); }
+  function xTipParts(k, it) { var c = EX.cat[it.id], o = it.o, T = XW.tip, K = T[k], A = T.asWritten, P = { b: [], c: [], g: [], n: "" }, ln = function (i, s) { if (s) P["bcg".charAt(i)].push(s); };
+    P.name = (k === "test" ? c.cid : k === "end" ? c.st + " · " + xEndWords(c) : c.n) + xTw(it); P.kind = XW.kinds[k].name;
     P.head = (k === "test" ? c.cid + " · " + c.n : k === "end" ? c.st + " · " + xEndWords(c) : c.n) + xTw(it) + " · " + XW.kinds[k].name + " · " + xRoleName(k, it.role);
     if (k === "end") { xEndIn(c).forEach(function (s) { ln(0, s); });
       ln(1, c.at ? fill(c.via ? K.doVia : K.do, { at: c.at, v: c.via }) : K.doNone); ln(1, c.skip != null ? fill(K.skip, { v: c.skip }) : fill(K.ways, { n: c.paths.length }));
@@ -332,9 +337,11 @@
     else if (k === "table") { var fns = {}; o.ops.forEach(function (q) { fns[q[2]] = 1; });
       ln(0, Object.keys(fns).length ? fill(K.in, { v: Object.keys(fns).join(" · ") }) : K.inNone);
       ln(1, o.ops.length ? fill(K.do, { v: o.ops.map(function (q) { return q[0] + " " + q[1]; }).join(" · ") }) : xRoleName("table", it.role));
-      var w = o.ops.filter(function (q) { return q[0] !== "read"; }); ln(2, !w.length ? K.outRead : w.some(function (q) { return q[3]; }) ? K.out : K.outNot);
-      if (o.rc) ln(2, fill(W.mo.x.race, { cols: o.rc[2].join(", "), cons: o.rc[0], at: o.rc[4], st: o.rc[3] }));            /* S4-21: BY MOMENT's race sentence (mo.x.race, the one key since the 1b merge) */
-      c.drift.forEach(function (d) { ln(2, fill(K.drift, { v: d[0] + " " + d[1] })); }); if (c.writers) ln(2, fill(K.writers, { n: c.writers })); }
+      /* D-088: what only the table knows, as data beside the sentence (P.G: key · tokens · sentence) — the card draws these as rows */
+      P.G = []; var gl = function (key, tpl, tok) { tok = tok || {}; P.G.push({ k: key, t: tok, s: fill(tpl, tok) }); ln(2, fill(tpl, tok)); };
+      var w = o.ops.filter(function (q) { return q[0] !== "read"; }); gl(!w.length ? "t:outRead" : w.some(function (q) { return q[3]; }) ? "t:out" : "t:outNot", !w.length ? K.outRead : w.some(function (q) { return q[3]; }) ? K.out : K.outNot);
+      if (o.rc) gl("x.race", W.mo.x.race, { cols: o.rc[2].join(", "), cons: o.rc[0], at: o.rc[4], st: o.rc[3] });            /* S4-21: BY MOMENT's race sentence (mo.x.race, the one key since the 1b merge) */
+      c.drift.forEach(function (d) { gl("t:drift", K.drift, { v: d[0] + " " + d[1] }); }); if (c.writers) gl("t:writers", K.writers, { n: c.writers }); }
     else if (k === "schema") { ln(0, fill(K.in, { v: xRoleName("schema", it.role) + (o.parent ? " · " + fill(XW.face.inside, { name: o.parent }) : "") }));
       ln(1, fill(K.do, { n: c.cols.length, k: c.cols.filter(function (f) { return f[4]; }).length, w: c.cols.filter(function (f) { return f[5]; }).length }));
       if (o.c422) ln(1, fill(K.c422, { n: o.c422 })); if (c.extra) ln(2, fill(K.extra, { v: c.extra })); if (c.cons) ln(2, fill(K.cons, { n: c.cons })); }
@@ -368,7 +375,7 @@
     else if (k === "inf") { ln(0, c.by || c.set ? fill(K.in, { name: c.by || "?", at: c.set || "?" }) : K.inNone); if (c.from) ln(0, fill(K.from, { k: c.from[0], v: c.from[1] }));
       ln(1, fill(K.do, { n: it.o.reads.length, v: it.o.reads.map(function (x) { return xT(x[1]); }).filter(function (x, i, a) { return a.indexOf(x) === i; }).join(" · ") }));
       ln(2, c.dies === "with the answer" ? XC2.il.end : c.dies === "with the server process" ? XC2.il.keep : XC2.il.unk); }        /* BY MOMENT's lifetime words */
-    return ioHtml(P); }
+    return P; }
 
   /* ── one column: its title, the selector, the block, the controls under it, the copy line ── */
   function xList0(k) { var st = XS.col[k], r = BYID[S.open], here = (r && r.ex[k]) || [];
@@ -569,8 +576,6 @@
     if (e.target.closest && e.target.closest('button[data-mopt="gic"]')) setTimeout(renderEx, 0); });
   /* the hovers: a block's one card, the options', the roles', the parts' — the controls' meanings live in the section's info line */
   function exTip(t, kind) {
-    if (kind === "exblk") { var k = t.getAttribute("data-exk"), id = t.getAttribute("data-exid"), ep = t.getAttribute("data-exep"), r = BYID[ep], e = ((r && r.ex[k]) || []).filter(function (x) { return x[0] === id; })[0];
-      return e ? xTipBlock(k, { k: k, id: id, role: e[1], ep: ep, o: e[2] }) : null; }
     if (kind === "exopt") { var g = t.getAttribute("data-xopt"), R = XW.opt[g], v = t.getAttribute("data-v"); return "<b>" + esc(R.opts[v].name) + "</b>" + (R.pick === v ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(R.opts[v].plain) + "</span>"; }
     if (kind === "exwho") { var wh = t.getAttribute("data-whose"), ts = EX.look.table.size, fs = Math.min.apply(null, Object.keys(ts).map(function (p) { return ts[p]; }));
       return "<b>" + esc(XW.whose[wh].name) + "</b><span class=pl>" + esc(fill(XW.whose[wh].plain, { v: XW.look.table.ruled, lo: fs, hi: EX.floor })) + "</span>"; }

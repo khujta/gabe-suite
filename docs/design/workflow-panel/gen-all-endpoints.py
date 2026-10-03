@@ -52,6 +52,7 @@ BM_WORDS = DC / "brainmap.words.json"
 PRISMS = DC / "prisms-endpoint.json"                                          # the clustering options the ruled tree was built with
 KIT_JS = DC / "kit-blocks.js"
 EPSLUG_JS = HERE / "_ep-slug.js"                                               # the ONE slug rule (D-035), inlined so the page stays standalone
+CARD_JS, CARD_CSS = HERE / "_ae-card.js", HERE / "_ae-card.css"                # D-088 — the hover card: the endpoint lab's, one renderer for every element hover
 DEF_FORMS = Path("~/.cache/gabe-map-baselines/lab-input/forms.json")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _ae_universe as UNI  # noqa: E402  (D-036 — the one-endpoint section: the universe card, the block marks, the gaps)
@@ -4396,6 +4397,8 @@ def build(argv: list) -> tuple:
                       ("<!--__ENCLOOK__-->", '<style id="enclook">\n' + enc_css.replace("</", "<\\/") + "\n</style>"),
                       ("<!--__BENCHLOOK__-->", '<style id="benchlook">\n' + ex_css.replace("</", "<\\/") + "\n</style>"),
                       ("/*__BENCHJS__*/", ex_js.replace("</", "<\\/")),
+                      ("<!--__CARDLOOK__-->", '<style id="cardlook">\n' + CARD_CSS.read_text(encoding="utf-8").replace("</", "<\\/") + "\n</style>"),
+                      ("/*__CARDJS__*/", CARD_JS.read_text(encoding="utf-8").replace("</", "<\\/")),
                       ("/*__DATA__*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c"))):
         if mark not in html:
             die("template marker missing: " + mark)

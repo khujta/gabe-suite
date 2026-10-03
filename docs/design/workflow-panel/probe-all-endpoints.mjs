@@ -157,6 +157,7 @@ const drawn = () => p.evaluate(() => [...document.querySelectorAll('#board tr.ro
 const heads = () => p.evaluate(() => [...document.querySelectorAll('#board [data-group]')].map((e) => ({ g: e.getAttribute('data-group'), t: e.textContent })));
 
 await open(PAGE);
+const tipTxt = () => p.$eval('#tip', (e) => { const c = e.cloneNode(true); c.querySelectorAll('.cdmore').forEach((r) => r.remove()); c.querySelectorAll('.cdw[data-line]').forEach((r) => r.replaceWith(document.createTextNode(r.getAttribute('data-line')))); return c.textContent; });   /* D-088: a card's rows carry their sentence in data-line; the asserts that read a hover read the facts, not the drawing */
 const D = await p.evaluate(() => window.__allep.data);
 const shot = async (n) => { if (shotsAt) await p.screenshot({ path: path.join(shotsAt, n + '.png') }); };
 
@@ -1354,7 +1355,7 @@ ok(!errs.length, 'no page error after the D-041 checks', errs);
      && sq55.every(([g, v, on, dash, ruled]) => (on === 'true') === (v === pk(g)) && dash !== 'dashed' && (ruled === 'true') === (v === pk(g))) && m0.bodyRows === m0.heads.length,
     'D-055 · BY MOMENT · his defaults on a cold start: moments as columns, cells as chips, pressed and marked ruled (no dash), a row per block', m0.squares);
   await p.hover('#mobar .opt[data-mopt="lay"][data-v="cols"]'); await p.waitForTimeout(120);
-  const tipR = await p.$eval('#tip', (e) => e.textContent);
+  const tipR = await tipTxt();
   ok(tipR.includes(D.words.ruledMark) && !tipR.includes(D.words.pickMark), 'D-055 · BY MOMENT · his default\'s hover says it is his, not my pick', tipR);
   await p.click('#mobar .opt[data-mopt="lay"][data-v="rows"]'); await p.waitForTimeout(80);
   const m3 = await readM();
@@ -1467,7 +1468,7 @@ ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
     'D-055 · the path row is one line: all paths, then each ending\'s status alone in time order (' + pr.codes.map((c) => c[1]).join(' ') + '), a gap between moments', pr);
   const momName = (si) => { const x = R.mo.sp[si]; if (x[0] !== 'fail') return MW.moms[x[0]].name; const g = R.d.exits.moms[x[1]]; return MW.moms.fail.name + ' — ' + fillW(g[2].length ? EW.caught : EW.caughtBare, { calls: g[2].join(' · '), at: g[0], cls: g[1] }); };
   const tips = [];
-  for (const i of live) { await p.hover('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(60); tips.push([i, await p.$eval('#tip', (e) => e.textContent)]); }
+  for (const i of live) { await p.hover('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(60); tips.push([i, await tipTxt()]); }
   const badTip = tips.filter(([i, t]) => !t.includes(fillW(MW.path.mom, { mom: momName(R.mo.ex[i][3]) })) || !t.includes(MW.path.pickIt) || (R.mo.ex[i][6] && !t.includes(R.mo.ex[i][6])));
   const byStatus = {}; tips.forEach(([i, t]) => { (byStatus[R.mo.ex[i][1]] = byStatus[R.mo.ex[i][1]] || []).push(t); });
   const dupSame = Object.entries(byStatus).filter(([, ts]) => new Set(ts).size !== ts.length), dups = Object.keys(byStatus).filter((k) => byStatus[k].length > 1);
@@ -1501,7 +1502,7 @@ ok(!errs.length, 'no page error after the BY MOMENT checks', errs);
      && face('work') === MW.moms.work.name + ' · ' + wcalls[0] + ' +' + (wcalls.length - 1) && hd.every((h) => h.lines <= 2),
     'D-055 · the handler heads: ' + hd.filter((h) => h.m === 'fail').map((h) => h.face).join(' | ') + ' · ' + face('checks') + ' · ' + face('work') + ' · ' + face('save') + ' — no head past two lines', hd.map((h) => [h.face, h.lines]));
   const fh = hd.find((h) => h.m === 'fail'); await p.hover('#mogrid th.mom[data-si="' + fh.si + '"]'); await p.waitForTimeout(80);
-  const ftip = await p.$eval('#tip', (e) => e.textContent);
+  const ftip = await tipTxt();
   ok(ftip.includes(momName(fh.si)) && ftip.includes(R.d.exits.moms[0][0]), 'D-055 · a failure head\'s hover holds its full name, the catch\'s place among it', ftip);
   /* (c) the switch */
   await p.$eval('#ocol-cm', (e) => e.scrollIntoView({ block: 'start' })); await p.mouse.move(5, 5); await p.waitForTimeout(60);
@@ -1612,7 +1613,7 @@ ok(!errs.length, 'no page error after the D-055 checks', errs);
   const C4 = C4w.GABE_C4;   /* the station's own feed, run as the station runs it */
   const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
   const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
-    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await tipTxt(); await p.mouse.move(5, 5); return t; };
   const cell = (mom, f) => p.$$eval('#mogrid td[data-mom="' + mom + '"][data-f="' + f + '"] .mc', (cs) => cs.map((c) => ({ keys: (c.getAttribute('data-keys') || '').split('\n'), t: c.innerText.replace(/\s+/g, ' ').trim(),
     hol: c.classList.contains('hol'), dash: getComputedStyle(c).borderTopStyle, st: [...c.querySelectorAll('.vc-status')].map((v) => [v.textContent, v.getAttribute('data-decl'), getComputedStyle(v).backgroundColor]),
     fate: [...c.querySelectorAll('.vc-fate')].map((v) => v.getAttribute('data-vv')), race: !!c.querySelector('.mrc'), sub: [...c.querySelectorAll('.sksub')].map((v) => v.getAttribute('data-vc') + ':' + v.getAttribute('data-vv')), hint: c.getAttribute('data-hint') })));
@@ -1845,7 +1846,7 @@ ok(!errs.length, 'no page error after the D-056 checks', errs);
   const base = (at) => String(at || '').split('/').pop();
   const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
   const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
-    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await tipTxt(); await p.mouse.move(5, 5); return t; };
   const cell = (mom, f) => p.$$eval('#mogrid td[data-mom="' + mom + '"][data-f="' + f + '"] .mc', (cs) => cs.map((c) => ({ keys: c.getAttribute('data-keys'), t: c.innerText.replace(/\s+/g, ' ').trim(),
     name: (c.querySelector('.mt') || {}).textContent || '', glyph: !!c.querySelector('.skg'), st: [...c.querySelectorAll('.vc-status')].map((v) => v.textContent), does: !!c.querySelector('[data-vc="does"]'),
     w: [...c.querySelectorAll('.vc[data-vc="op"]')].map((v) => v.getAttribute('data-vv')), fate: [...c.querySelectorAll('.vc-fate')].map((v) => v.getAttribute('data-vv')), hint: c.getAttribute('data-hint') })));
@@ -2038,7 +2039,7 @@ ok(!errs.length, 'no page error after the D-057 checks', errs);
   const MX = D.words.mo.x, NK = D.words.mo.nm.k, L_ = (at) => +String(at || '').replace(/^.*:(\d+)$/, '$1'), F_ = (at) => String(at || '').replace(/:\d+$/, '');
   const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
   const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
-    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+    const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await tipTxt(); await p.mouse.move(5, 5); return t; };
   const pickP = async (i) => { await p.click('#mobar .mopath[data-path="' + i + '"]'); await p.waitForTimeout(120); };
   const idx = (ep, pid) => ROW[ep].mo.ex.findIndex((x) => x[8] === pid);
   const onP = (e, i) => e[5] == null || !!((e[5] >> i) & 1);
@@ -2270,7 +2271,7 @@ ok(!errs.length, 'no page error after the review-of-D-064 checks', errs);
   if (!pAt.length) { F3E = FEED.find((ep) => Object.values(ROW[ep].gcv.a).some((a) => a[0] === 'p')); if (F3E) { await openEp(F3E); pAt = (await readG()).items.filter((x) => x.gcs === 'p'); } }
   const rxP = new RegExp(CW.panels.gaps.tipPart.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{(n|of)\}/g, '(\\d+)')), f3 = [];
   for (const x of pAt) { const h = await p.$('#ocol-gaps .gap[data-attr="' + x.t + '"]'); await h.scrollIntoViewIfNeeded(); const bx = await h.boundingBox();
-    await p.mouse.move(bx.x + 4, bx.y + bx.height / 2); await p.waitForTimeout(90); const m = rxP.exec(await p.$eval('#tip', (e) => e.textContent)); f3.push([x.t, m && +m[1], m && +m[2]]); await p.mouse.move(5, 5); }
+    await p.mouse.move(bx.x + 4, bx.y + bx.height / 2); await p.waitForTimeout(90); const m = rxP.exec(await tipTxt()); f3.push([x.t, m && +m[1], m && +m[2]]); await p.mouse.move(5, 5); }
   ok(pAt.length > 0 && f3.every(([, n, of]) => n != null && n < of),
     'F3 · THE GAPS from the code map (' + F3E + '): every attribute carried in part says fewer than all its elements — ' + f3.map((x) => x[0] + ' ' + x[1] + '/' + x[2]).join(' · '), f3);
   if (F3E !== E) await openEp(E);
@@ -2345,11 +2346,12 @@ ok(!errs.length, 'no page error after the D-058 checks', errs);
        ending when several reach it. The side line and the plain left the item's hover (what a journey is stands in the Proof row's legend) */
     const IP = MW.io.parts, bef = (J.name ? [J.name] : []).concat(rng.filter((i) => i < K.k).map(line)),
       giv = rng.filter((i) => i > K.k).map(line).concat([go], K.on.length > K.joined.length ? [JW.onEach] : []);
-    return [fillW(JW.head, { cid: J.cid })].concat(bef.length ? [IP.b + bef.join('')] : [], [IP.c + line(K.k)], [IP.g + giv.join('')]); };
+    return [J.cid + ' \u00b7 ' + MW.io.k.journey.name].concat(bef.length ? [IP.b + bef.join('')] : [], [IP.c + line(K.k)], [IP.g + giv.join('')]); };
   const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
   const tipLines = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
     const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
-    const t = await p.$eval('#tip', (e) => [...e.children].map((c) => c.textContent)); await p.mouse.move(5, 5); return t; };
+    /* CHANGED 2026-10-03 (D-088): an element's hover is the lab's card — its lines are the head's name and kind, then the three parts as the card's `.io` groups; a hover that is not a card keeps its children */
+    const t = await p.$eval('#tip', (e) => e.querySelector('.cdc') ? [e.querySelector('.cdh b').textContent + ' \u00b7 ' + e.querySelector('.cdh .cdv').textContent].concat([...e.querySelectorAll('.cdd .io')].map((c) => { const k = c.cloneNode(true); k.querySelectorAll('.cdmore').forEach((r) => r.remove()); k.querySelectorAll('.cdw[data-line]').forEach((r) => r.replaceWith(document.createTextNode(r.getAttribute('data-line')))); return k.textContent; })) : [...e.children].map((c) => c.textContent)); await p.mouse.move(5, 5); return t; };
   const jyCell = (mom) => p.$$eval('#mogrid td[data-mom="' + mom + '"][data-f="proof"] .mc[data-jy]', (cs) => cs.map((c) => [c.getAttribute('data-jy'), c.getAttribute('data-side'), +c.getAttribute('data-k'),
     ((c.querySelector('.mt') || {}).textContent || '').trim(), ((c.querySelector('.mq') || {}).textContent || '').trim()]));
   const pickP = async (i) => { const sel = '#mobar .mopath[data-path="' + i + '"]'; await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await p.click(sel); await p.waitForTimeout(110); };
@@ -2457,14 +2459,14 @@ ok(!errs.length, 'no page error after the D-065 checks', errs);
   /* (2) the two 429s read apart: each names its limit, the line it is checked at, its scope and its numbers (read from forms.json) */
   const lims = FE.rate.limits.map((l) => ({ nm: l.limiter.replace(/^_/, ''), at: l.at.split('/').pop(), lim: l.args.find((a) => a.param === 'limit').value, w: l.args.find((a) => a.param === 'window_seconds').value, key: l.key }));
   const t429 = []; for (const c of await p.$$('#mogrid td[data-mom="edge"][data-f="end"] .mc')) { await c.scrollIntoViewIfNeeded(); const bx = await c.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
-    t429.push(await p.$eval('#tip', (e) => e.textContent)); await p.mouse.move(5, 5); }
+    t429.push(await tipTxt()); await p.mouse.move(5, 5); }
   // CHANGED 2026-09-30 (round-1 review CR-36): the key in words
   ok(t429.length === 2 && t429[0] !== t429[1] && lims.every((l) => t429.filter((t) => t.startsWith('429 · ' + l.nm) && t.includes(l.at) && t.includes(fillW(IO.l.limIp, { n: l.lim, w: l.w, v: l.nm }))).length === 1)
      && t429.every((t) => t.includes(IO.parts.b) && t.includes(IO.parts.c) && t.includes(IO.parts.g)),
     'D-067 (L-03) · ' + E + ' · the two 429s at the edge read apart: ' + lims.map((l) => l.nm + ' at ' + l.at + ', ' + l.lim + ' per ' + l.w + ' s').join(' · ') + ', each in before · checks · gives', t429.map((t) => t.slice(0, 90)));
   /* (3) the C237 chips, one per ending it fits, each names the ending it proves (the build stops on two that read the same) */
   const t237 = []; for (const c of await p.$$('#mogrid .mc[data-f="proof"][data-keys="case:C237"]')) { await c.scrollIntoViewIfNeeded(); const bx = await c.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
-    t237.push(await p.$eval('#tip', (e) => e.textContent)); await p.mouse.move(5, 5); }
+    t237.push(await tipTxt()); await p.mouse.move(5, 5); }
   /* CHANGED 2026-09-30 (round-1 review F03): one chip per cell, each hover naming the endings it FITS there */
   ok(t237.length === 3 && new Set(t237).size === 3 && t237.every((t) => t.includes(fillW(IO.l.fitsOf, { n: 4, h: '' }).split(',')[0])), 'D-067 (L-03) · C237\'s ' + t237.length + ' chips, one per cell its status fits endings in, each hover names the endings it fits there', t237.map((t) => t.slice(-90)));
   /* (4) no page-facing line in an item's hover (D-017), nor a kind's definition */
@@ -2525,7 +2527,7 @@ ok(!errs.length, 'no page error after the D-067 checks', errs);
   const openEp = async (ep) => { await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#board tr.row[data-ep="' + ep + '"] td.id'); await p.waitForTimeout(150); };
   const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40);
     const bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(90);
-    const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+    const t = await tipTxt(); await p.mouse.move(5, 5); return t; };
   const outCols = async () => (await p.$eval('#out', (e) => e.value)).split('\n').filter((l) => l.startsWith(D.words.copy.lines.mo + ' · ' + MW.col.copy + ':'));
   const clk = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await p.click(sel); await p.waitForTimeout(130); };
   await open(PAGE); await openEp(E); await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' }));
@@ -2590,8 +2592,10 @@ ok(!errs.length, 'no page error after the D-067 checks', errs);
     return { on: on.length, onOk: on.every((e) => e.getAttribute('data-keys').split('\n').some((k) => K.has(k))), missed: all.filter((e) => !e.classList.contains('colon') && e.getAttribute('data-keys').split('\n').some((k) => K.has(k))).length,
       pin: !!document.querySelector('#pin tbody td[data-mocol] [data-col="deciders"]'), pressed: document.querySelector('#mogrid .msc[data-mcol="deciders"]').getAttribute('aria-pressed') }; }, R.ck.deciders);
   const tCh = await tipAt('#mogrid td[data-mom="work"][data-f="fn"] .mc[data-key="fn:apps/api/services/cooking.py::start_session"]');
-  ok(lit.on >= 3 && lit.onOk && !lit.missed && lit.pin && lit.pressed === 'true' && tCh && tCh.trim().endsWith(fillW(MW.rowh.cnt, { v: ['deciders', 'datafns', 'behind'].map((c) => D.words.cols[c].head).join(' · ') })),
-    'D-068 (L-20) · "' + D.words.cols.deciders.head + ' ' + R.k.deciders + '" lights the ' + lit.on + ' chips that draw its members, none else, and its cell in the pinned row; start_session\'s hover ends with the columns that count it', { lit, tCh: (tCh || '').slice(-80) });
+  /* CHANGED 2026-10-03 (D-088, and the coordinator's relay of his feedback): the hover is the lab's card, and a card says nothing about the page (P2.1) — the "counted in" line of his L-20 is not on it; the footer, what a click does, closes it */
+  const cntL = fillW(MW.rowh.cnt, { v: ['deciders', 'datafns', 'behind'].map((c) => D.words.cols[c].head).join(' \u00b7 ') }), footL = D.words.mo.card.foot.lit;
+  ok(lit.on >= 3 && lit.onOk && !lit.missed && lit.pin && lit.pressed === 'true' && tCh && tCh.trim().endsWith(footL) && !tCh.includes(cntL.split(':')[0]),
+    'D-068 (L-20) · "' + D.words.cols.deciders.head + ' ' + R.k.deciders + '" lights the ' + lit.on + ' chips that draw its members, none else, and its cell in the pinned row; start_session\'s hover is a card that ends with what a click does and no longer carries the columns that count it', { lit, tCh: (tCh || '').slice(-120) });
   await clk('#mogrid tbody th[data-f="fn"] .msc[data-mcol="deciders"]');
   /* (e) the columns */
   const colW = () => p.evaluate(() => { const cs = [...document.querySelectorAll('#mogrid colgroup col')].slice(1).map((c) => parseFloat(c.style.width)), hs = [...document.querySelectorAll('#mogrid thead th.mom')];
@@ -2688,7 +2692,7 @@ ok(!errs.length, 'no page error after the D-068 checks', errs);
   ok(o.host > 10 && !o.groups && o.rows.includes('std') && !o.lanes.includes(C1.set) && o.lanes.includes(C1.rareHere) && o.secSw === 2,
     'D-069 (e) · "' + MW.opt.gdl.opts.chain.name + '" puts the function in each gate chip; "' + MW.opt.std.opts.keep.name + '" brings the row back, in its lane of rare pieces (its two switches stand in Security, D-084)', o);
   const qt = await (async () => { const h = await p.$('#mogrid tbody th[data-f="std"] .mbn'); if (!h) return ''; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const bx = await h.boundingBox();
-    await p.mouse.move(bx.x + 4, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; })();
+    await p.mouse.move(bx.x + 4, bx.y + bx.height / 2); await p.waitForTimeout(90); const t = await tipTxt(); await p.mouse.move(5, 5); return t; })();
   ok(qt.includes(MW.rowq.std), 'D-069 (e) · the row\'s head says the question it answers', qt.slice(0, 160));
   await setLook({ gdl: MW.opt.gdl.pick, gef: MW.opt.gef.pick, gic: MW.opt.gic.pick, grl: MW.opt.grl.pick, fnm: MW.opt.fnm.pick, std: MW.opt.std.pick, ifl: MW.opt.ifl.pick });
   await p.evaluate(() => window.scrollTo(0, 0)); }
@@ -2824,7 +2828,8 @@ ok(!errs.length, 'no page error on the fixture', errs);
   const inner = await p.$$eval('#exgrid .blk .bkhd [data-tip]', (n) => n.length), IOP = D.words.mo.io.parts;
   await p.hover(CX + '[data-k="table"] .blk .bkhd [data-part="name"]'); await p.waitForTimeout(120);
   const tp = await p.$eval('#tip', (e) => ({ show: e.getAttribute('data-show'), io: [...e.querySelectorAll('.io > i')].map((i) => i.textContent), txt: e.innerText }));
-  ok(!inner && tp.show === 'true' && JSON.stringify(tp.io) === JSON.stringify([IOP.b, IOP.c, IOP.g]), 'D-071 · one hover per block, reading before → checks → gives, as BY MOMENT\'s', { inner, tp });
+  /* CHANGED 2026-10-03 (D-088): the table's functions are rows of its checks (each function with its R or W), so the table's card has no "before" part — its parts are the generator's, in order, and a part with nothing to say is not drawn */
+  ok(!inner && tp.show === 'true' && JSON.stringify(tp.io) === JSON.stringify([IOP.c, IOP.g]), 'D-071 · one hover per block, reading its parts in BY MOMENT\'s order (checks → gives for a table: its functions are its checks)', { inner, tp });
   ok(tp.txt.includes('household_id, idempotency_key') && tp.txt.includes('500'), 'review S4-21 · the table\'s race is BY MOMENT\'s sentence, filled with its unique key and the ending it escapes to', tp.txt.slice(0, 300));
   await p.mouse.move(0, 0); await p.waitForTimeout(60);
   /* the page's copy text: the bench's two options, then one line per kind, after BY MOMENT's (CHANGED 2026-09-30, review S4-06) */
@@ -2948,7 +2953,8 @@ ok(!errs.length, 'no page error on the fixture', errs);
       life: [...G.querySelectorAll('td[data-f="inf"] .mlt')].map((x) => x.textContent), gateCols: [...G.querySelectorAll('th[data-f="gate"] .msc')].map((b) => b.getAttribute('data-mcol')),
       risk: (document.querySelector('#mometa .nmc[data-nmk="risk"]') || {}).textContent, ow: getComputedStyle(G.querySelector('.mc .mt')).overflowWrap,
       gateLeg: tipOf(G.querySelector('th[data-f="gate"]')), endLeg: tipOf(G.querySelector('th[data-f="end"]')) }; });
-  ok(sc.heads > 3 && !sc.nested && sc.headTip.includes(MW.io.parts.b) && sc.headTip.includes(MW.io.parts.g), 'F1b · F09 · S4-07 · ' + sc.heads + ' host heads, none with a hover inside it; a head\'s hover is its before · checks · gives', sc.headTip.slice(0, 120));
+  /* CHANGED 2026-10-03 (D-088): a middleware's place in the run order is its pill ("2 of 3"), no longer a line in a "before" part — the head's hover keeps its checks and its gives */
+  ok(sc.heads > 3 && !sc.nested && sc.headTip.includes(MW.io.parts.c) && sc.headTip.includes(MW.io.parts.g), 'F1b · F09 · S4-07 · ' + sc.heads + ' host heads, none with a hover inside it; a head\'s hover is its facts, checks · gives', sc.headTip.slice(0, 120));
   ok(!sc.metaPlain && sc.titleTip, 'F1b · F10 · CR-21 · the metadata\'s paragraph stands once, on its title — on no item', sc.metaPlain);
   ok(sc.alarms.length === 6 && sc.alarms.every((a) => !/^[a-z]+(-[a-z0-9]+)+$/.test(a)) && sc.alarms.includes(D.words.enc.fam.alarm.vals['race-500'].name), 'F1b · CR-22 · the alarms wear plain faces, their names in the hover', sc.alarms);
   ok(!sc.erow && !sc.titles, 'F1b · S4-08 · S4-14 · an endings row of the code map is one hover; the universe column has no native tooltip left');
@@ -3131,7 +3137,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
       mo: [...document.querySelectorAll('#mogrid th[data-f="client"] .msc[data-mcol="fetched"] .msh')].map((e) => e.textContent),
       screens: [...document.querySelectorAll('#pin .msh, #pin th, #mogrid th[data-f="client"] .msh')].filter((e) => e.textContent.trim() === 'screen').length }; });
   await p.$eval('#mogrid th[data-f="client"] .msc[data-mcol="fetched"]', (e) => e.scrollIntoView({ block: 'center' })); const hb = await (await p.$('#mogrid th[data-f="client"] .msc[data-mcol="fetched"]')).boundingBox();
-  await p.mouse.move(hb.x + 6, hb.y + 6); await p.waitForTimeout(160); const f24tip = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5);
+  await p.mouse.move(hb.x + 6, hb.y + 6); await p.waitForTimeout(160); const f24tip = await tipTxt(); await p.mouse.move(5, 5);
   ok(f24.col[0] === 'sends it' && f24.col[1].includes('send it') && !/screen/.test(f24.col[2]) && f24.pin.includes('sends it') && f24.mo.length > 0 && f24.mo.every((w) => w === 'sends it') && !f24.screens && f24tip.startsWith('sends it ') && f24tip.includes(f24.col[1]),
     'D-084 · F24 · the pinned row\'s Client column is headed "sends it" (its words: ' + f24.col[1] + ' / ' + f24.col[2] + '), BY MOMENT\'s Client head reads it and its hover names it; no head still says "screen" for it', { f24, f24tip: f24tip.slice(0, 120) });
   /* (2) the Security row: where it stands, and every home fact recomputed from the feed */
@@ -3171,11 +3177,12 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(sc.edge.every((c) => c[3] === 0) && sc.all.length > 5, 'D-084 · one hover per item: no chip of the Security row carries a second hover inside it', sc.edge);
   /* hovers: a mark names what it holds and the row it is in; the row's legend lists the mark kind once */
   const tipAt = async (sel) => { const h = await p.$(sel); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await p.waitForTimeout(40); const bx = await h.boundingBox();
-    await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(120); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+    await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(120); const t = await tipTxt(); await p.mouse.move(5, 5); return t; };
   const tMark = await tipAt('#mogrid tr[data-f="sec"] .mc[data-secmk="rate"]'), tHead = await tipAt('#mogrid tr[data-f="sec"] th .mbn');
   const fillW = (t, x) => String(t).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
-  ok(tMark && tMark.startsWith(SW.items.rate.name) && (tMark.includes(fillW(IOW.l.markIn, { v: famName('end') })) || tMark.includes(fillW(IOW.l.markIn, { v: famName('gate') })) || tMark.includes(fillW(IOW.l.markIn, { v: famName('inf') }))) && tMark.includes(IOW.l.markGo),
-    'D-084 · a mark\'s hover names its item, what it holds, the row it points to, and what a click does', { tMark });
+  /* CHANGED 2026-10-03 (D-088): the mark's hover is the lab's card — the row it points to is its identity line, what a click does is the footer (the two lines that said so are not said twice) */
+  ok(tMark && tMark.startsWith(SW.items.rate.name) && ['end', 'gate', 'inf'].some((f) => tMark.includes(famName(f))) && tMark.includes(D.words.mo.card.foot.go),
+    'D-084 · a mark\'s hover names its item, what it holds, the row it points to, and what a click does (D-088: the row is its identity line, the click its footer)', { tMark });
   ok(tHead && tHead.includes(MW.rowq.sec) && tHead.includes(IOW.k.secmark.plain) && tHead.includes(IOW.k.cors.plain) && tHead.includes(IOW.k.secret.plain),
     'D-084 · the row\'s legend (its head\'s hover) says once what a mark, the allowed origins and a secret are', { tHead: (tHead || '').slice(0, 200) });
   /* (3) a fact the feed lacks says "not recorded"; one it proves absent says "none on this endpoint"; never a bare 0 */
@@ -3258,7 +3265,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(sw.length === 2 && JSON.stringify(sw.map((q) => q[0])) === JSON.stringify(['merged', 'apart']) && JSON.stringify(sw.map((q) => q[1])) === JSON.stringify([O.opts.merged.name, O.opts.apart.name]) && O.pick === 'merged' && !O.ruled
      && sw[0][2] === 'true' && sw[0][3] === 'true' && sw[0][4] === null && sw[0][5] === 'dashed' && sw[1][2] === 'false' && sw[1][3] === null,
     'D-085 · the option "' + O.label + '" sits in the Security row\'s own options beside the Security look: two icon squares — ' + sw.map((q) => q[1]).join(' · ') + ' — and my pick, merged, is pressed and DASHED (not ruled: D-085 leaves it his)', { sw });
-  const tip = async (sel) => { const h = await p.$(sel), bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(140); const t = await p.$eval('#tip', (e) => e.textContent); await p.mouse.move(5, 5); return t; };
+  const tip = async (sel) => { const h = await p.$(sel), bx = await h.boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(140); const t = await tipTxt(); await p.mouse.move(5, 5); return t; };
   const tS = await tip('#mogrid .mrop .opt[data-mopt="secmv"][data-v="marks"]'), tM = await tip('#mogrid .mrop .opt[data-mopt="secmw"][data-v="merged"]');
   ok(tS.includes(MW.opt.secmv.opts.marks.name) && tS.includes(D.words.ruledMark) && !tS.includes(D.words.pickMark) && tM.includes(O.opts.merged.name) && tM.includes(D.words.pickMark) && tM.includes(O.opts.merged.plain.slice(0, 40)),
     'D-085 · the hover of the ruled Security look says ruled, the hover of merged says my pick and what it does', { tS: tS.slice(0, 80), tM: tM.slice(0, 80) });
@@ -3286,6 +3293,122 @@ ok(!errs.length, 'no page error on the fixture', errs);
   const okS = seen.every(([l, ep, n, st, ne]) => ne === 0 && st === 3 && (ep === E0 ? n === 0 : n === (l === 'merged' ? 1 : 2)));
   ok(okS && seen.length === 8, 'D-085 · the same on ' + sample.join(' · ') + ': apart draws each host twice, merged once, the run order of three stands; ' + E0 + ' has no switch a middleware hosts and draws no block either way', { seen });
   ok(!errs.length, 'D-085 · no page error', errs); }
+
+/* 36 · D-088 (his, on the endpoint lab's hover: "much more beautiful, better structured, and more detailed … I need that for the hover information that we show, especially on these cells.
+   In all the examples, we go and check how we did it in the frontend lab") — the lab's card is THE hover of every element on BY MOMENT's cells and on the examples bench. Smoke checks (D-086:
+   one pass, no mutants, no walk), by REAL hovers on POST /cooking/sessions, in the page's two Data effects looks (the table's nodes in the map; its chips):
+   (1) every element target draws a card, counted by kind — no kind unknown, none left on the old text path; (2) each card has its head (glyph + name), identity lines, the rule, a pill or a mark,
+   and a footer exactly where a click does something; (3) no card carries a kind's plain line; (4) the renderer reported no issue (P1.1 · P2.1 · P4.1 · P8.1), and the guard FIRES on a card made to
+   break each rule and stays silent on a clean one; (5) the frame is the lab's, read from the lab's source: panel colour, border, radius, padding, width range, the 12px floor on every text;
+   (6) the card follows the bench: a look set on a kind of the bench is the card's; (7) heads and controls keep the short hover; (8) the one-sentence form reaches the card */
+{ const E = 'POST /cooking/sessions', ROWIDS = D.rows.map((r) => r.id), TIPS = D.words.mo.card.foot, LABST = fs.readFileSync(path.join(HERE, '_station.js'), 'utf8'), LABCSS = fs.readFileSync(path.join(HERE, '_lab-ep.css'), 'utf8');
+  const TARGETS = '#sec-mo [data-tip="mochip"], #sec-mo [data-tip="modxn"], #sec-mo [data-tip="mojy"], #sec-mo [data-tip="moilf"], #sec-ex [data-tip="exblk"]';
+  const plains = []; { const take = (o) => { if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) { if (k === 'plain' && typeof v === 'string' && v.length > 24) plains.push(v); else take(v); } };
+    take(D.words.mo.io.k); take(D.words.ex.kinds); take(D.words.ex.roles); take(D.words.kinds); }
+  const readCard = () => p.evaluate(() => { const t = document.getElementById('tip'), c = t.querySelector('.cdc'); if (!c) return { card: null, cd: t.classList.contains('cd'), show: t.getAttribute('data-show') };
+    const all = [...c.querySelectorAll('*')], small = all.filter((e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).map((e) => e.className + ':' + getComputedStyle(e).fontSize);
+    return { card: c.getAttribute('data-card'), cik: c.getAttribute('data-ik'), bench: c.getAttribute('data-bench'), bound: c.getAttribute('data-bound'), issues: +c.getAttribute('data-card-issues'), issue: c.getAttribute('data-card-issue'),
+      unknown: c.hasAttribute('data-card-unknown-kind') ? c.getAttribute('data-card-unknown-kind') : null, glyph: !!c.querySelector('.cdh .cdg svg'), name: ((c.querySelector('.cdh b') || {}).textContent || '').trim(), kind: ((c.querySelector('.cdh .cdv') || {}).textContent || '').trim(),
+      idents: c.querySelectorAll('.cdl').length, rule: !!c.querySelector('.cdsep'), pills: c.querySelectorAll('.cdpill, .cdfp').length, marks: c.querySelectorAll('.mx').length, foot: ((c.querySelector('.cdfoot') || {}).textContent || '').trim(),
+      rowsN: c.querySelectorAll('.cdw:not(.cdmore)').length, sentN: c.querySelectorAll('.cdw[data-k="@s"]').length, noLine: c.querySelectorAll('.cdw:not(.cdmore):not([data-line])').length,
+      ledN: [...c.querySelectorAll('.cdw:not(.cdmore)')].filter((r) => r.querySelector('.cdwl, .cdch, .cdpill')).length, chipN: c.querySelectorAll('.cdd .cdch, .cdd .cdrw, .cdd .cdpill').length, tailN: c.querySelectorAll('.cdd .cdwt').length,
+      text: c.textContent.replace(/\s+/g, ' '), small, cd: t.classList.contains('cd'), show: t.getAttribute('data-show'), rect: (() => { const r = t.getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height) }; })() }; });
+  /* one real hover per target; the rows keep what the target is, so each card is read against it */
+  const sweep = async () => { const hs = await p.$$(TARGETS), n = hs.length, out = [];
+    for (let i = 0; i < n; i++) { const h = hs[i]; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const bx = await h.boundingBox();
+      const meta = await h.evaluate((x) => ({ tip: x.getAttribute('data-tip'), ik: x.getAttribute('data-ik'), exk: x.getAttribute('data-exk'), click: x.hasAttribute('data-key') || x.hasAttribute('data-secmk') || x.getAttribute('data-tip') === 'exblk' || x.getAttribute('data-tip') === 'moilf' }));
+      if (!bx) { out.push({ ...meta, miss: true }); continue; }
+      await p.mouse.move(5, 5); await p.mouse.move(bx.x + Math.min(bx.width / 2, 30), bx.y + Math.min(bx.height / 2, 10)); await p.waitForTimeout(25); out.push({ ...meta, ...(await readCard()) }); }
+    await p.mouse.move(5, 5); return out; };
+  const byKind = (rows) => { const o = {}; rows.forEach((r) => { const k = r.card + (r.bench ? '/' + r.bench : ''); o[k] = (o[k] || 0) + 1; }); return o; };
+  const judge = (rows, what) => {
+    const bad = rows.filter((r) => !r.card), noGlyph = rows.filter((r) => r.card && (!r.glyph || !r.name)), noIdent = rows.filter((r) => r.card && !r.idents), noRule = rows.filter((r) => r.card && !r.rule), noPill = rows.filter((r) => r.card && !r.pills && !r.marks),
+      footWrong = rows.filter((r) => r.card && (r.click ? ![TIPS.lit, TIPS.go, TIPS.open, TIPS.close].includes(r.foot) && !/^(show|fold)/.test(r.foot) : r.foot !== '')), plainOn = rows.filter((r) => r.card && plains.some((q) => r.text.includes(q))), small = rows.filter((r) => r.card && r.small.length),
+      issues = rows.filter((r) => r.issues), unknown = rows.filter((r) => r.unknown), notCd = rows.filter((r) => r.card && !r.cd);
+    ok(rows.length >= 100 && !bad.length && !notCd.length, 'D-088 · ' + what + ': every one of the ' + rows.length + ' element targets draws a card in the lab\'s frame, by a real hover', { bad: bad.slice(0, 3), notCd: notCd.length });
+    ok(!noGlyph.length && !noIdent.length && !noRule.length && !noPill.length, 'D-088 · ' + what + ': each card has its head (the glyph and the bold name), identity lines, the rule, and a pill or a mark', { noGlyph: noGlyph.map((r) => r.card + ':' + r.name).slice(0, 4), noIdent: noIdent.map((r) => r.card + ':' + r.name).slice(0, 4), noRule: noRule.length, noPill: noPill.map((r) => r.card + ':' + r.name).slice(0, 4) });
+    ok(!footWrong.length, 'D-088 · ' + what + ': the footer says what a click does, on exactly the elements a click does something to', footWrong.map((r) => r.card + ':' + r.name + ' → ' + r.foot).slice(0, 4));
+    ok(!plainOn.length, 'D-088 · ' + what + ': no card carries a kind\'s plain line (P1.1) — it stays on the legend and on heads and controls', plainOn.map((r) => r.card + ':' + r.name).slice(0, 3));
+    ok(!issues.length && !unknown.length, 'D-088 · ' + what + ': the renderer reported no issue on any card (P1.1 · P2.1 · P4.1 · P8.1) and no kind it does not know', { issues: issues.map((r) => r.card + ':' + r.name + ' → ' + r.issue).slice(0, 4), unknown: unknown.map((r) => r.ik).slice(0, 4) });
+    const cards = rows.filter((r) => r.card), tot = cards.reduce((n, r) => n + r.rowsN, 0), sent = cards.reduce((n, r) => n + r.sentN, 0), noLine = cards.filter((r) => r.noLine), unled = cards.filter((r) => r.rowsN > r.ledN), counted = cards.filter((r) => /counted in/.test(r.text));
+    const hs = cards.map((r) => r.rect.h).sort((x, y) => x - y), p90 = hs[Math.floor(hs.length * 0.9)], med = hs[hs.length >> 1];
+    ok(tot > 200 && sent / tot <= 0.25 && !noLine.length && !unled.length, 'D-088 · ' + what + ': the lower part of a card is rows, not sentences — ' + tot + ' rows, ' + sent + ' of them a generator sentence with no structure (at most a quarter), each led by an icon, a pill or a chip, each carrying its sentence in data-line', { tot, sent, noLine: noLine.length, unled: unled.map((r) => r.card + ':' + r.name).slice(0, 3) });
+    ok(cards.reduce((n, r) => n + r.chipN, 0) > 40 && cards.reduce((n, r) => n + r.tailN, 0) > 20, 'D-088 · ' + what + ': facts are drawn as chips, marks and pills (' + cards.reduce((n, r) => n + r.chipN, 0) + ') with their place set quiet at the row\'s end (' + cards.reduce((n, r) => n + r.tailN, 0) + ' rows)');
+    ok(!counted.length, 'D-088 · ' + what + ': no card carries the line that says which columns of the table count it (that is about the page, P2.1)', counted.map((r) => r.card + ':' + r.name).slice(0, 3));
+    ok(p90 <= 480 && med <= 380, 'D-088 · ' + what + ': cards stay compact — median ' + med + 'px, nine in ten under ' + p90 + 'px (the lab\'s own run 142 to 261; a long list ends with "+N more")', { med, p90, max: hs[hs.length - 1] });
+    ok(!small.length && rows.filter((r) => r.card).every((r) => r.rect.w >= 210 && r.rect.w <= 362), 'D-088 · ' + what + ': every text on a card is 12px or more, and its width stays in the lab\'s range (210 to 360)', small.map((r) => r.card + ':' + r.small.join()).slice(0, 3)); };
+
+  /* (1)-(5), the table's chips (the probe's own opening look: Data effects as chips) */
+  await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(500);
+  await p.evaluate(() => { window.__allepCard.log.length = 0; });
+  const rowsA = await sweep(); judge(rowsA, 'Data effects as chips');
+  const kA = byKind(rowsA); console.log('  D-088 cards by kind (chips look): ' + JSON.stringify(kA));
+  /* (1) the bench: one card for each of its eight kinds, bound to the kind it is */
+  const benchKinds = D.ex.kinds, bench = rowsA.filter((r) => r.bench);
+  ok(bench.length === benchKinds.length && benchKinds.every((k) => bench.some((r) => r.bench === k && r.card === k)), 'D-088 · the examples bench: its ' + benchKinds.length + ' elements (' + benchKinds.join(' · ') + ') each draw a card of their own kind', bench.map((r) => r.card));
+  /* the kinds of BY MOMENT: every kind of chip the endpoint draws has a card of a kind the page knows; the counts by kind are the page's own targets */
+  const tgtN = await p.evaluate((sel) => { const o = {}; document.querySelectorAll(sel).forEach((n) => { const k = n.getAttribute('data-tip') + '|' + (n.getAttribute('data-ik') || ''); o[k] = (o[k] || 0) + 1; }); return o; }, '#sec-mo [data-tip="mochip"], #sec-mo [data-tip="modxn"], #sec-mo [data-tip="mojy"], #sec-mo [data-tip="moilf"]');
+  const rowN = {}; rowsA.filter((r) => !r.bench).forEach((r) => { const k = r.tip + '|' + (r.ik || ''); rowN[k] = (rowN[k] || 0) + 1; });
+  const dif = Object.keys({ ...tgtN, ...rowN }).filter((k) => tgtN[k] !== rowN[k]).map((k) => k + ' drawn ' + tgtN[k] + ', hovered ' + rowN[k]);
+  ok(!dif.length && Object.keys(tgtN).length >= 20, 'D-088 · ' + Object.keys(tgtN).length + ' kinds of element target on this endpoint, each hovered as many times as it is drawn', dif);
+  /* (4) the guard fires on a card made to break each rule, stays silent on a clean one */
+  const gd = await p.evaluate(() => { const C = window.__allepCard, t = document.querySelector('#sec-mo .mc[data-tip="mochip"][data-ik="fn"]'), S0 = C.subject(t), html = C.make(S0.ck, S0), box = document.createElement('div'); box.innerHTML = html; const root = () => box.firstChild.cloneNode(true);
+    const run = (mut, F) => { const r = root(); mut(r); return C.guard(r, F || { joins: [] }); }, plain = Object.values(window.__allep.data.words.mo.io.k).map((q) => q.plain).filter((q) => q && q.length > 24)[0], mk = (c, txt, at) => { const n = document.createElement('span'); n.className = c; n.textContent = txt; if (at) Object.entries(at).forEach(([k, v]) => n.setAttribute(k, v)); return n; };
+    return { clean: run(() => {}), p21: run((r) => r.appendChild(mk('cdt', 'drawn as the map draws it'))), p21b: run((r) => r.appendChild(mk('cdt', 'found by the page'))), p11label: run((r) => r.appendChild(mk('cdv', 'a label that runs far past the short limit', { 'data-shared': '1' }))),
+      p11plain: run((r) => r.appendChild(mk('cdt', plain))), p41: run(() => {}, { joins: [{ end: 'caller', want: ['no_such_function_anywhere'] }] }), p81: run((r) => r.appendChild(mk('cdfp', '0', { 'data-unit': 'fields', 'data-n': '0', 'aria-label': '0 things' }))),
+      p81unk: run((r) => r.appendChild(mk('cdfp', '0', { 'data-unit': 'fields', 'data-n': '', 'aria-label': '' }))), p81unit: run((r) => r.appendChild(mk('cdfp', '3', { 'data-unit': 'nothing', 'data-n': '3' }))), form: run((r) => r.querySelector('.cdh .cdg').remove()) }; });
+  ok(gd.clean.length === 0 && gd.p21.some((i) => i.startsWith('p2.1')) && gd.p21b.some((i) => i.startsWith('p2.1')) && gd.p11label.some((i) => i.startsWith('p1.1')) && gd.p11plain.some((i) => i.startsWith('p1.1')) && gd.p41.some((i) => i.startsWith('p4.1'))
+    && gd.p81.some((i) => i.startsWith('p8.1')) && gd.p81unk.some((i) => i.startsWith('p8.1')) && gd.p81unit.some((i) => i.startsWith('p8.1')) && gd.form.some((i) => i.startsWith('form')),
+    'D-088 · the guard stays silent on a clean card and fires on each rule: P1.1 (a long label, a kind\'s plain line) · P2.1 (words about the map or the page) · P4.1 (a join\'s other end not named) · P8.1 (a count not from its unit, a 0 for what is not recorded) · the card\'s form', gd);
+  ok((await p.evaluate(() => window.__allepCard.log.length)) === 0, 'D-088 · the renderer\'s log holds no issue after all ' + rowsA.length + ' hovers');
+  /* (5) the frame is the lab's: its values read from the lab's own source, never typed here */
+  const lab = { panel: (/--panel:\s*(#[0-9a-f]{6})/i.exec(LABST) || [])[1], line: (/--line:\s*(#[0-9a-f]{6})/i.exec(LABST) || [])[1], radius: (/\.jdcolpop\{[^}]*border-radius:(\d+)px/.exec(LABST) || [])[1], pad: (/\.jdcolpop\{[^}]*padding:(\d+)px (\d+)px/.exec(LABST) || []).slice(1, 3).join(' '),
+    shadow: (/\.jdcolpop\{[^}]*box-shadow:([^;]+);/.exec(LABST) || [])[1], min: (/\.jdcolpop\{[^}]*min-width:(\d+)px/.exec(LABST) || [])[1], max: (/#hover\{ max-width:(\d+)px; \}/.exec(LABCSS) || [])[1] };
+  const rgb = (h) => { const n = parseInt(h.slice(1), 16); return 'rgb(' + (n >> 16) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255) + ')'; };
+  await p.$eval('#sec-mo', (e) => e.scrollIntoView({ block: 'start' })); const fn1 = await p.$('#sec-mo .mc[data-tip="mochip"][data-ik="fn"]'); await fn1.evaluate((x) => x.scrollIntoView({ block: 'center' })); const fb = await fn1.boundingBox(); await p.mouse.move(fb.x + 12, fb.y + 6); await p.waitForTimeout(80);
+  const fr = await p.$eval('#tip', (e) => { const c = getComputedStyle(e); return { bg: c.backgroundColor, bd: c.borderTopWidth + ' ' + c.borderTopStyle + ' ' + c.borderTopColor, radius: c.borderTopLeftRadius, pad: c.paddingTop + ' ' + c.paddingLeft, shadow: c.boxShadow, minw: c.minWidth, maxw: c.maxWidth }; });
+  ok(lab.panel && lab.line && lab.radius && lab.pad && lab.min && lab.max && fr.bg === rgb(lab.panel) && fr.bd === '1px solid ' + rgb(lab.line) && fr.radius === lab.radius + 'px' && fr.pad === lab.pad.split(' ').join('px ') + 'px' && fr.minw === lab.min + 'px' && fr.maxw === lab.max + 'px'
+    && fr.shadow.includes('0px ' + /0 (\d+)px (\d+)px/.exec(lab.shadow).slice(1, 3).join('px ') + 'px'), 'D-088 · the frame is the lab\'s, read from its source: panel ' + lab.panel + ' · border 1px ' + lab.line + ' · radius ' + lab.radius + 'px · padding ' + lab.pad + ' · width ' + lab.min + '–' + lab.max + 'px', { lab, fr });
+  await p.mouse.move(5, 5);
+  /* (6) the card follows the bench: the fn glyph's colour rule and the table's chip box set on the bench are the card's */
+  const glyphCol = () => p.evaluate(() => { const g = document.querySelector('#tip .cdh .cdg svg'); return g ? getComputedStyle(g).color : null; });
+  const hoverFn = async () => { const h = await p.$('#sec-mo .mc[data-tip="mochip"][data-ik="fn"][data-keys^="fn:apps/api/services/cooking.py::start_session"]'); await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const b2 = await h.boundingBox(); await p.mouse.move(5, 5); await p.mouse.move(b2.x + 12, b2.y + 6); await p.waitForTimeout(60); };
+  await hoverFn(); const g0 = await glyphCol(); await p.mouse.move(5, 5);
+  await p.evaluate(() => window.__allepEx.set('fn', (L) => { L.iconCol = 'muted'; })); await p.waitForTimeout(80); await hoverFn(); const g1 = await glyphCol(); await p.mouse.move(5, 5);
+  const bch = await p.$eval('#exgrid .excol[data-k="fn"] .blk [data-part="icon"] svg', (e) => getComputedStyle(e).color), mut = await p.$eval('#sec-ex', (e) => getComputedStyle(e).getPropertyValue('--muted').trim());
+  await p.evaluate(() => window.__allepEx.set('fn', (L) => { L.iconCol = 'kind'; })); await p.waitForTimeout(60);
+  ok(g0 && g1 && g0 !== g1 && g1 === bch, 'D-088 · the card follows the bench: the function kind\'s glyph colour, set to "quiet" on the bench, is the card\'s glyph colour too (' + g0 + ' → ' + g1 + ')', { g0, g1, bch, mut });
+  const chipR = async () => { const h = await p.$('#sec-mo .mdxn[data-keys*="table:cooking_sessions"], #sec-mo .mc[data-ik="table"][data-keys*="table:cooking_sessions"]'); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const b3 = await h.boundingBox(); await p.mouse.move(5, 5); await p.mouse.move(b3.x + 6, b3.y + 6); await p.waitForTimeout(60);
+    return p.evaluate(() => { const c = document.querySelector('#tip .cdr[data-row="channel"] .cdpill'); return c ? getComputedStyle(c).borderTopLeftRadius : null; }); };
+  const r0 = await chipR(); await p.evaluate(() => window.__allepEx.set('table', (L) => { L.rwBox = 'square'; })); await p.waitForTimeout(60); const r1 = await chipR(); await p.evaluate(() => window.__allepEx.set('table', (L) => { L.rwBox = 'pill'; })); await p.mouse.move(5, 5);
+  ok(r0 && r1 && r0 !== r1 && r1 === '0px', 'D-088 · the table card\'s channel pill takes the bench\'s chip box: pill (' + r0 + ') → square (' + r1 + ')', { r0, r1 });
+  /* (7) heads and controls keep the short hover — the card's frame is on only while a card is drawn */
+  await hoverFn(); const onCard = await p.$eval('#tip', (e) => e.classList.contains('cd') && !!e.querySelector('.cdc')); await p.mouse.move(5, 5);
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.hover('.opt[data-rail="lay"]'); await p.waitForTimeout(80);
+  const hh = await p.$eval('#tip', (e) => ({ cd: e.classList.contains('cd'), cdc: !!e.querySelector('.cdc'), text: e.textContent.length, show: e.getAttribute('data-show') })); await p.mouse.move(5, 5);
+  ok(onCard && !hh.cd && !hh.cdc && hh.show === 'true' && hh.text > 0, 'D-088 · a control keeps its short hover after a card (no card frame, no card): the card is for elements', { onCard, hh });
+  /* (8) the one-sentence form (the hovers option) reaches the card */
+  await p.evaluate(() => { window.__allep.mo.looks.ipo = 'sent'; }); await hoverFn();
+  const sn = await p.$eval('#tip', (e) => ({ sent: !!e.querySelector('.cdc .iosent'), parts: e.querySelectorAll('.cdc .io > i').length })); await p.mouse.move(5, 5); await p.evaluate(() => { window.__allep.mo.looks.ipo = 'lines'; });
+  ok(sn.sent && sn.parts === 0, 'D-088 · the hovers option\'s one-sentence form is the card\'s too: the three parts joined, no part headings', sn);
+  ok(!errs.length, 'D-088 · no page error', errs.slice(0, 3));
+  /* (1) again, in the page's own default looks: the Data effects map's nodes are tables and functions, a lane folds in-flight values */
+  await open(PAGE, 'default'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(500); await p.evaluate(() => { window.__allepCard.log.length = 0; });
+  const rowsB = await sweep(); judge(rowsB, 'Data effects as a map (the page\'s own looks)'); console.log('  D-088 cards by kind (map look): ' + JSON.stringify(byKind(rowsB)));
+  ok(rowsB.some((r) => r.card === 'table' && r.tip === 'modxn') && rowsB.some((r) => r.card === 'fn' && r.tip === 'modxn') && rowsB.some((r) => r.card === 'lane'), 'D-088 · in the map look the tables and functions of the data map and the in-flight lane draw cards too', byKind(rowsB));
+  ok(!errs.length, 'D-088 · no page error after the second look', errs.slice(0, 3));
+  /* every endpoint, not only this one: the renderer is called on every element target of all 80 endpoints (no hover — the cards are made and their rules read), in the page's own looks */
+  const allN = { cards: 0, issues: [], unknown: [], errors: [], kinds: new Set() };
+  for (const id of ROWIDS) { await p.evaluate((ep) => window.__allep.pick(ep), id); await p.waitForTimeout(60);
+    const r = await p.evaluate(() => { const C = window.__allepCard, o = { n: 0, issues: [], unknown: [], errs: [], kinds: [] };
+      document.querySelectorAll('#sec-mo [data-tip="mochip"], #sec-mo [data-tip="modxn"], #sec-mo [data-tip="mojy"], #sec-mo [data-tip="moilf"], #sec-ex [data-tip="exblk"]').forEach((t) => { try { const S0 = C.subject(t); if (!S0) { o.errs.push('no subject for ' + t.getAttribute('data-tip')); return; }
+        const d = document.createElement('div'); d.innerHTML = C.make(S0.ck, S0); const c = d.firstChild; o.n++; o.kinds.push(S0.ck); if (+c.getAttribute('data-card-issues')) o.issues.push(S0.ck + ':' + ((c.querySelector('.cdh b') || {}).textContent || '') + ' → ' + c.getAttribute('data-card-issue')); if (c.hasAttribute('data-card-unknown-kind')) o.unknown.push(c.getAttribute('data-card-unknown-kind')); } catch (e) { o.errs.push(e.message); } });
+      return o; });
+    allN.cards += r.n; r.issues.forEach((x) => allN.issues.push(id + ' · ' + x)); r.unknown.forEach((x) => allN.unknown.push(x)); r.errs.forEach((x) => allN.errors.push(id + ' · ' + x)); r.kinds.forEach((k) => allN.kinds.add(k)); }
+  console.log('  D-088 every endpoint: ' + allN.cards + ' cards over ' + ROWIDS.length + ' endpoints · kinds ' + [...allN.kinds].sort().join(' '));
+  ok(ROWIDS.length === FEED.length && allN.cards > 5000 && !allN.issues.length && !allN.unknown.length && !allN.errors.length, 'D-088 · all ' + ROWIDS.length + ' endpoints: ' + allN.cards + ' element cards made, none with a renderer issue (P1.1 · P2.1 · P4.1 · P8.1), none of a kind it does not know, none that fails to draw',
+    { issues: allN.issues.slice(0, 3), unknown: allN.unknown.slice(0, 3), errors: allN.errors.slice(0, 3) });
+  ok(!errs.length, 'D-088 · no page error over all endpoints', errs.slice(0, 3)); }
 
 await b.close();
 console.log((fail ? 'FAIL ✗' : 'PASS ✓') + ` probe-all-endpoints · ${pass} passed · ${fail} failed · ${FEED.length} endpoints · sample ${SAMPLE.length} · page ${path.basename(PAGE)}`);

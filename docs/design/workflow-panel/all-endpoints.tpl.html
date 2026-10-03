@@ -6,6 +6,7 @@
 <!-- the endpoint lab's channel chip (.jdrw) for the code map's value chips (D-043), lifted from _lab-ep.css by gen-all-endpoints.py -->
 <!--__ENCLOOK__-->
 <!--__BENCHLOOK__-->
+<!--__CARDLOOK__-->
 <style>
   /* ══ the page's own rules — the kit block above is pasted verbatim by gen-all-endpoints.py ══ */
   /* centred (his rule, 2026-09-17) and WIDE: the subject is a table of every endpoint, and every column saved is a row seen */
@@ -1952,16 +1953,20 @@
      adds its lines in the generator, never a branch here ══ */
   var IOW = MW.io;
   function ioKind(k) { return k.indexOf("end:") === 0 ? ((W.kinds[k.slice(4)] || {}).name || k.slice(4)) : ((IOW.k[k] || {}).name || W.el.kinds[k] || k); }
-  function ioLine(q) { var k = q[0], t = k.indexOf("x.") === 0 ? MW.x[k.slice(2)] : k.indexOf("outcome.") === 0 ? IOW.outcome[k.slice(8)] : IOW.l[k]; return fill(t, q[1] || {}); }
-  function ioParts(X, node) { var io = X.io, XW = MW.x, P = { head: (io.h[2] ? ioLine(io.h[2]) : io.h[0]) + " \u00b7 " + ioKind(io.h[1]), b: io.b.map(ioLine), c: io.c.map(ioLine), g: io.g.map(ioLine), n: cntOf(node) };   /* h[2]: a title in words (review CR-37, CR-38) */
+  function ioTpl(k) { return k.indexOf("x.") === 0 ? MW.x[k.slice(2)] : k.indexOf("outcome.") === 0 ? IOW.outcome[k.slice(8)] : IOW.l[k]; }
+  function ioLine(q) { return fill(ioTpl(q[0]), q[1] || {}); }
+  function ioParts(X, node) { var io = X.io, XW = MW.x, P = { head: (io.h[2] ? ioLine(io.h[2]) : io.h[0]) + " \u00b7 " + ioKind(io.h[1]), name: io.h[2] ? ioLine(io.h[2]) : io.h[0], kind: ioKind(io.h[1]), b: io.b.map(ioLine), c: io.c.map(ioLine), g: io.g.map(ioLine), n: cntOf(node) };   /* h[2]: a title in words (review CR-37, CR-38) */
+    P.L = { b: io.b.map(ioLn), c: io.c.map(ioLn), g: io.g.map(ioLn) };               /* D-088: each line as data (key · tokens · its sentence) beside the sentence — the hover card draws its rows from these */
+    function more(part, str) { P[part].push(str); P.L[part].push({ k: "@s", s: str }); }
     /* review F15 · S4-12: a caller that can end partway, before it calls this (D-064 (1)) — the code fact, once; how the page places
        paths is not said (a check inside a call already says the call it stands in, on its own line) */
     if (X.lq) X.lq.forEach(function (q) { if (MPATH.i != null && q[1].indexOf(MPATH.i) < 0) return;
-      P.b.push(MPATH.i == null ? fill(XW.leftInAll, { via: q[0] }) : fill(XW.leftIn, { via: q[0] })); });
-    if (X.fa && MPATH.i != null && X.fa[MPATH.i]) P.g.push(fill(XW.fate, { v: X.fa[MPATH.i].map(function (f) { return W.fates[f].name; }).join(" \u00b7 ") }));   /* D-056 (4) */
-    if (X.ra && MS.std === "split") X.ra.forEach(function (q) { P.g.push(fill(C1.rare, { v: q[2], n: q[0], of: q[1] })); });   /* D-069: a rare piece it carries */
-    if (X.mk) P.c.push(fill(IOW.l.markIn, { v: BLK[MO.fam[X.mk[1]]].name }));      /* D-084: the row a mark points to */
+      more("b", MPATH.i == null ? fill(XW.leftInAll, { via: q[0] }) : fill(XW.leftIn, { via: q[0] })); });
+    if (X.fa && MPATH.i != null && X.fa[MPATH.i]) more("g", fill(XW.fate, { v: X.fa[MPATH.i].map(function (f) { return W.fates[f].name; }).join(" \u00b7 ") }));   /* D-056 (4) */
+    if (X.ra && MS.std === "split") X.ra.forEach(function (q) { more("g", fill(C1.rare, { v: q[2], n: q[0], of: q[1] })); });   /* D-069: a rare piece it carries */
+    if (X.mk) more("c", fill(IOW.l.markIn, { v: BLK[MO.fam[X.mk[1]]].name }));      /* D-084: the row a mark points to */
     return P; }
+  function ioLn(q) { return { k: q[0], t: q[1] || {}, s: ioLine(q) }; }
   /* the two forms (MS.ipo): labelled lines, top to bottom (my pick, dashed) · one sentence, the parts joined by arrows. `bold` the index
      of a line to set in bold (a journey's own request) as [part, i] */
   function ioHtml(P, bold) { var h = "<b>" + esc(P.head) + "</b>", ps = ["b", "c", "g"].filter(function (p) { return P[p].length; }), cn = P.n ? "<span class=\"ln iocnt\">" + esc(P.n) + "</span>" : "";
@@ -2078,11 +2083,11 @@
     + (s[4] ? "" : " \u00b7 " + JW.noEp); }
   /* D-067: a journey's hover in the three parts — before: the test and its requests before this one · checks: this request, what it
      asserts · gives: its requests after this one, and where it stays when a path is picked */
-  function jyTip(J) { var JW = MW.jy, me = J.sq.filter(function (s) { return s[8] === 1; })[0], asked = me ? me[3] : [], mi = me ? me[7] : 0;
+  function jyParts(J) { var JW = MW.jy, me = J.sq.filter(function (s) { return s[8] === 1; })[0], asked = me ? me[3] : [], mi = me ? me[7] : 0;
     var go = J.jv.length ? fill(JW.on, { v: J.jv.join(" \u00b7 ") }) : fill(JW.leave[J.j], { v: asked.join(" \u00b7 "), n: J.jn });
     var P = { head: fill(JW.head, { cid: J.c }), b: (J.nm ? [J.nm] : []).concat(J.sq.filter(function (s) { return s[7] < mi; }).map(function (s) { return jyLine(s, s[8]); })),
-      c: me ? [jyLine(me, 1)] : [], g: J.sq.filter(function (s) { return s[7] > mi; }).map(function (s) { return jyLine(s, s[8]); }).concat([go], J.pm ? [JW.onEach] : []) };
-    return ioHtml(P, me ? ["c", 0] : null); }
+      c: me ? [jyLine(me, 1)] : [], g: J.sq.filter(function (s) { return s[7] > mi; }).map(function (s) { return jyLine(s, s[8]); }).concat([go], J.pm ? [JW.onEach] : []), n: "", bold: me ? ["c", 0] : null };
+    return P; }
   function jyEl(e) { var J = e[7].jy, JW = MW.jy, kk = J.nh > 1 ? " " + fill(JW.ofStep, { k: J.k }) : "";   /* a journey calling here more than once: which call */
     if (MS.jy !== "each") { var c = el("span", "mc mjy"); c.setAttribute("data-f", "proof"); c.setAttribute("data-tip", "mojy"); c.setAttribute("data-ik", "journey"); c.setAttribute("data-jy", J.id); c.setAttribute("data-side", J.s); c.setAttribute("data-k", String(J.k)); c._jy = J;
       kd(c, moK(e[2])); c.appendChild(testMark()); c.appendChild(moTxt(el("span", "mt"), J.c));
@@ -3041,16 +3046,10 @@
         + (nk === "risk" && NK.ids[nx.id] ? "<span class=pl>" + esc(NK.ids[nx.id].plain) + "</span>" : nk === "arr" && nx.t ? "<span class=pl>" + esc(NK.plainAct) + "</span>" : nrep || nk === "alarm" ? "" : "<span class=pl>" + esc(NK.plain) + "</span>")
         + (nk === "alarm" ? "<span class=pl>" + esc(fill(NK.id, { v: nx.id })) + "</span>" : "")
         + (cntOf(t) ? "<span class=\"ln iocnt\">" + esc(cntOf(t)) + "</span>" : ""); }                /* D-068: the columns that count it, last */   /* review F4: each flag its own words; review J7: a journey's requests have moments */
-    if (kind === "mojy") return jyTip(t._jy);                                                    /* D-065: a journey, its requests in order */
     if (kind === "mojs") { var js0 = t._js; return "<b>" + esc(js0[1][0] + " " + js0[1][1]) + "</b> \u00b7 " + esc(fill(W.mo.jy.stepOf, { i: js0[1][7], cid: js0[0].c }))
       + "<span class=ln>" + esc(jyLine(js0[1], 0)) + "</span>"; }                                         /* D-067: what a journey is, in the row's legend */
     if (kind === "mowhy") { var mw = W.mo.why[t.getAttribute("data-why")]; return "<b>" + esc(mw.name) + "</b> · " + esc(W.mo.band.title) + "<span class=pl>" + esc(mw.plain) + "</span>"; }
     /* D-070 · the data map's node, link, tick and rule; an in-flight lane's read, end and fold — each its own facts */
-    if (kind === "modxn") { var w0 = t.closest(".mdx"), Z0 = w0 && w0._dx, s0 = t.getAttribute("data-side"), i0 = +t.getAttribute("data-i"), r0 = BYID[S.open], K0 = keysOf(t)[0]; if (!Z0 || !r0) return null;
-      var ls0 = Z0.L.filter(function (q) { return q[s0] === i0; }), X0d = r0.mo.dx;
-      return "<b>" + esc(kName(K0)) + "</b> \u00b7 " + esc(elKind(K0)) + "<span class=ln>" + esc(fill(C2.dx[(s0 === "f" ? "fnTip" : "tblTip") + (ls0.length === 1 ? "1" : "")], { n: ls0.length })) + "</span>"
-        + ls0.map(function (q) { var o0 = MO.keys[s0 === "f" ? X0d.t[q.t] : X0d.f[q.f]]; return "<span class=ln>" + esc(kName(o0) + ": " + q.ops.map(function (o) { return fill(C2.dx.op, { op: C2.dx[o[0]], at: o[2], mom: moName(r0, r0.mo.sp[o[1]]) }); }).join(" \u00b7 ")) + "</span>"; }).join("")
-        + (s0 === "f" ? Z0.K.filter(function (o) { return o.q[0] === i0; }).map(function (o) { return "<span class=ln>" + esc(fill(C2.dx.tick, { op: o.q[2], at: o.q[4], mom: moName(r0, r0.mo.sp[o.q[3]]) })) + "</span>"; }).join("") : ""); }
     if (kind === "modxl") { var Z1 = t.closest(".mdx")._dx, q1 = Z1.L[+t.getAttribute("data-j")], r1 = BYID[S.open], X1 = r1.mo.dx;
       return "<b>" + esc(fill(C2.dx.link, { fn: kName(MO.keys[X1.f[q1.f]]), tbl: kName(MO.keys[X1.t[q1.t]]) })) + "</b>"
         + q1.ops.map(function (o) { var fa = MPATH.i != null && o[4] ? o[4][String(MPATH.i)] : null; return "<span class=ln>" + esc(fill(C2.dx.op, { op: C2.dx[o[0]], at: o[2], mom: moName(r1, r1.mo.sp[o[1]]) }))
@@ -3074,13 +3073,7 @@
       var L5 = TL[k5 === "cap" ? "req" : k5 === "keep" ? "srv" : "unk"];            /* review S4-18: the one lifetime pair */
       return "<b>" + esc(ilName(r5.mo, ln5)) + "</b><span class=ln>" + esc(L5.name + " \u2014 " + L5.plain) + "</span>"
         + (ln5.un.length ? "<span class=ln>" + esc(fill(C2.il.also, { v: ln5.un.join(", ") })) + "</span>" : ""); }
-    if (kind === "moilf") { var ln6 = t._ln, r6 = BYID[S.open], M6 = r6.mo, op6 = t.getAttribute("aria-expanded") === "true";
-      return "<b>" + esc(ilName(M6, ln6)) + "</b><span class=ln>" + esc(fill(C2.il.members, { n: ln6.ms.length, v: ln6.ms.map(function (m) { return M6.el[m[0]][3]; }).join(", ") })) + "</span>"
-        + "<span class=ln>" + esc(fill(C2.il.set, { mom: moName(r6, M6.sp[ln6.s0]) }) + " \u00b7 " + (TL[ln6.lt] || TL.unk).name) + "</span>"
-        + (ln6.un.length ? "<span class=ln>" + esc(fill(C2.il.also, { v: ln6.un.join(", ") })) + "</span>" : "")
-        + "<span class=pl>" + esc(fill(op6 ? C2.il.close : C2.il.open, { n: ln6.ms.length })) + "</span>"; }
-    if (kind === "mochip") { var X0 = t._x || {}; if (X0.io) return ioHtml(ioParts(X0, t));             /* D-067: the item's one hover · D-068: what counts it */
-      var mks = keysOf(t); return "<b>" + esc(mks.length ? elName(mks[0]) : t.textContent.trim()) + "</b>" + (mks.length ? " \u00b7 " + esc(elKind(mks[0])) : ""); }   /* a chip the band names: its reason is its line */
+    if (kind === "mochip") { var mks = keysOf(t); return "<b>" + esc(mks.length ? elName(mks[0]) : t.textContent.trim()) + "</b>" + (mks.length ? " \u00b7 " + esc(elKind(mks[0])) : ""); }   /* a chip the band names: its reason is its line */
     /* D-067 (P4, D-017): a glyph says what kind of element it marks — where the page took its look from is not a fact of the code */
     if (kind === "sk") { var sk0 = t.getAttribute("data-sk"), sx = SK.kinds[sk0] || {}, en0 = t.getAttribute("data-ent"); return "<b>" + esc(sx.t) + "</b>" + (sk0 === "entity" && en0 ? " \u00b7 " + esc(en0) : ""); }
     /* D-043: a value chip — its words, its family, what it means, and where its look is read (an element's hover: a little richer) */
@@ -3111,16 +3104,17 @@
     if (!t && tip.getAttribute("data-live") === "true" && tip.getAttribute("data-show") === "true") { if (!TIPH) TIPH = setTimeout(function () { tipOff(); REFH.m = null; elRefHover(); }, 400); return; }
     clearTimeout(TIPH); TIPH = null;
     if (!t) { tipOff(); return; }
+    tip.classList.remove("cd");                                                                /* D-088: the card's frame only while a card is drawn */
     if (t.getAttribute("data-tip") === "cell" && e.target.closest(".spine i")) { var si = e.target.closest(".spine i"), c = COL[t.getAttribute("data-col")];
       tip.innerHTML = "<b>" + esc(si.getAttribute("data-stage")) + "</b> · " + esc(fill(W.stageCell, { stage: si.getAttribute("data-stage"), n: si.getAttribute("data-n") })); }   /* D-067 (P4): what a stage is, on the column's head */
     else if (t.getAttribute("data-tip") === "cell" && e.target.closest(".dots i")) { var dt = e.target.closest(".dots i"); tip.innerHTML = "<b>" + esc(dt.getAttribute("data-f")) + "</b> · " + esc(dt.classList.contains("on") ? W.dotOn : W.dotOff); }
-    else { var h = tipFor(t); if (!h) { tipOff(); return; } tip.innerHTML = h; }
+    else { var h = hoverFor(t); if (!h) { tipOff(); return; } tip.innerHTML = h; }
     var live = !!tip.querySelector(".elref[data-gref]"), gp = live ? 0 : 6;
     var bx = t.getBoundingClientRect(), tw = tip.offsetWidth, thh = tip.offsetHeight;
     var x = Math.min(window.innerWidth - tw - 8, Math.max(8, bx.left)), y = bx.bottom + gp; if (y + thh > window.innerHeight - 4) y = Math.max(4, bx.top - thh - gp);
     tip.style.left = x + "px"; tip.style.top = y + "px"; tip.setAttribute("data-live", live ? "true" : "false"); tip.setAttribute("data-show", "true"); TIPAT = t; });
   document.addEventListener("focusin", function (e) { var t = e.target.closest && e.target.closest(".opt[data-tip], .mopath[data-tip]"); if (!t || !t.matches(":focus-visible")) return;   /* a keyboard focus, not a mouse press */
-    var h = tipFor(t); if (!h) return; tip.innerHTML = h; var bx = t.getBoundingClientRect();
+    tip.classList.remove("cd"); var h = tipFor(t); if (!h) return; tip.innerHTML = h; var bx = t.getBoundingClientRect();
     tip.style.left = Math.min(window.innerWidth - tip.offsetWidth - 8, Math.max(8, bx.left)) + "px"; tip.style.top = (bx.bottom + 6) + "px"; tip.setAttribute("data-show", "true"); });
   document.addEventListener("focusout", function (e) { if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest("#tip")) return; tipOff(); });
   window.hoverHide = function () { tipOff(); };
@@ -3290,6 +3284,7 @@
     if (!want) return; var hit = ROWS.filter(function (r) { return slugOf(r.id) === want; })[0];
     if (hit) S.open = hit.id; else { $("onenote").hidden = false; $("onenote").textContent = fill(W.one.notFound, { ep: window.EPSLUG.valid(want) ? want : "?" }); } })();
 /*__BENCHJS__*/
+/*__CARDJS__*/
   render();
   window.__allep = { ready: true, key: KEY, rails: RAILS, icons: ICON, data: D, state: S, render: render, bins: BINS, layout: layout, groups: groups, cellWords: cellWords, aggOf: aggOf, pick: pick, slug: slugOf, groupOfAttr: groupOfAttr, rowKeys: rowKeys, elName: elName,
     mo: { key: MKEY, looks: MS, path: MPATH, fams: moFams, face: moFace, colKey: MCKEY, cols: MC, lit: MCOL, stage: moStage, forks: moForks }, carry: { key: CKEY, get: function () { return CV; } },
