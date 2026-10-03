@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-084). Updated 2026-10-02 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-091). Updated 2026-10-02 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -10,11 +10,14 @@ Loop 1 is the API endpoint card. Its display half lives on ONE page, `../workflo
 `05007957`, frozen feed). On 2026-09-30 he read that page as a HUMAN and dictated 23 items of feedback (D-066): much that was clear
 to the model was not clear to him. Round 1 fixed them AND named the patterns behind them, so they can be carried into the Gabe Suite.
 
-**Now: PAUSED ON DISK, the fix is his (D-086, 2026-10-03).** C: fell 54 → 33 GB while no file grew (writes, not storage: WSL wrote 49 GB in
-37 h). His steps, ready in `C:\Users\Gabe\disk-fix\` (README.txt): (1) `1-restore-points.ps1` — admin, reads, asks before capping restore
-points at 15 GB; (2) `2-compact-wsl.ps1` — every WSL window closed, 15–60 min. Ours (4), done: `~/.local/bin/heavy <cmd>` runs browser jobs
-one at a time with temp in RAM (one check: 222 MB → 2 MB written) and refuses under 40 GB. Testing is lean (D-086): a suite change runs its
-skill's batteries + the parity check, the full sweep before a push; a page check once per batch; a walk only for a click path.
+**Now (2026-10-03): he configures the all-endpoints bench card by card (D-083); the page follows the endpoint lab.** Pushed to both
+GitHub repos (Brownbull + khujta, `graft-adoption` + the two `wip/` side branches). Built today: D-087 a bench column keeps its size, its
+width narrows only the element (`a47cb40`) · D-088 the lab's hover card on every cell element and bench example (`27402fe`) · D-089/D-090
+every kind's block hovers by REGION — glyph + its class pill · the title · each location and mark (`0bb5eda`, `d496480`) · D-091 the lab's
+type, alignment and field marks — nullable paler, unique cornered; other kinds' markings as off-by-default options (`d7accdf`, probe 993/0).
+Disk (D-086): C: recovered to ~50 GB by itself; his steps wait in `C:\Users\Gabe\disk-fix\` (1 cap restore points · 2 compact the WSL disk);
+`~/.local/bin/heavy` runs every browser job (temp in RAM); testing is lean (a change runs its own batteries, the full sweep before a push).
+Next from him: each kind's bench copy line when he is happy with it → it becomes that kind's ruled default.
 Round 1 is ruled (D-081, D-084, D-085). D-085 ("land it", "use recommended approach", "go"): Security = marks, after-a-decision = stop there
 (`9a9bb86`); the doubled rate limit middleware as an option, merged (my pick, dashed) or apart (`1790c87`, probe 776/0); L-33 traced + the
 hover emitter designed + P2.1/P3.2 redrafted (`8b7917d`, `legibility/drafts/hover-and-corpus/`).
