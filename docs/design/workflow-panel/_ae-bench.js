@@ -21,14 +21,14 @@
   function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, col: {} }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
     window.localStorage.setItem(XKEY, JSON.stringify(o)); } catch (e) {} }
   /* L-36 · the controls' icons (24px, drawn by the same rule as BY MOMENT's option squares): the columns' layouts, follow or stay, the
-     elements shown, the steps, the five widths, copy, back to the default */
+     elements shown, the steps, the element's widths (D-087: the default and three narrower), copy, back to the default */
   var XICON = { lay: { row: '<rect x="3" y="7" width="5" height="10" rx="1"/><rect x="10" y="7" width="5" height="10" rx="1"/><rect x="17" y="7" width="4" height="10" rx="1"/>',
         wrap: '<rect x="3" y="4" width="8" height="7" rx="1"/><rect x="13" y="4" width="8" height="7" rx="1"/><rect x="3" y="13" width="8" height="7" rx="1"/>',
         half: '<rect x="3" y="4" width="5" height="6" rx="1"/><rect x="10" y="4" width="5" height="6" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/><rect x="3" y="14" width="5" height="6" rx="1"/><rect x="10" y="14" width="5" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/>' },
       follow: { on: '<path d="M3 12h10"/><path d="M9 8l4 4-4 4"/><rect x="16" y="5" width="5" height="14" rx="1"/>', off: '<path d="M12 17v5"/><path d="M8 3h8"/><path d="M9 3v6l-3 4h12l-3-4V3"/>' },
       scope: { here: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>', all: '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>' },
-      width: { dynamic: '<path d="M3 12h5M16 12h5"/><path d="M6 9l-3 3 3 3M18 9l3 3-3 3"/><circle cx="12" cy="12" r="1.6"/>',
-        full: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="13" height="8" rx="1"/>', shorter: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="9" height="8" rx="1"/>',
+      width: { dynamic: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="13" height="8" rx="1"/>',   /* D-087: the default fills its column's walls, the other three narrow inside them */
+        shorter: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="9" height="8" rx="1"/>',
         compact: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="6" height="8" rx="1"/>', tight: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="3.5" height="8" rx="1"/>' },
       prev: '<path d="M15 5l-7 7 7 7"/>', next: '<path d="M9 5l7 7-7 7"/>', copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
       reset: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>' };
@@ -409,8 +409,8 @@
     var wm = el("span", "exwho", XW.whose[whose].name); wm.setAttribute("data-whose", whose); wm.setAttribute("data-tip", "exwho"); hd.appendChild(wm); col.appendChild(hd);
     if (EX.absent[k]) { col.appendChild(el("p", "exnone", W.absent + " · " + fill(W.absentWhy, { why: EX.absent[k] }))); return col; }   /* the arm is off: said, never a partial list */
     var redraw = function () { xSave(); renderEx(); writeOut(LAST.L, LAST.GS); };
-    /* the controls at the top (L-36): icon squares — which elements (this endpoint · every endpoint), the width of the column (dynamic · full · shorter ·
-       compact · most compact) — then the roles with their counts, then the element itself with a step before and one after; each one's meaning is its hover,
+    /* the controls at the top (L-36): icon squares — which elements (this endpoint · every endpoint), the width of the element drawn in the column (the default ·
+       shorter · compact · most compact; D-087: the column's box never changes) — then the roles with their counts, then the element itself with a step before and one after; each one's meaning is its hover,
        a verb and its object */
     var sel = el("div", "exsel"), top = el("div", "extop"), sc = el("div", "opts exscope"), wd = el("div", "opts exwidth");
     sc.setAttribute("role", "radiogroup"); sc.setAttribute("aria-label", XW.opt.scope.label); wd.setAttribute("role", "radiogroup"); wd.setAttribute("aria-label", XW.width.label);
@@ -582,4 +582,4 @@
   (function () { var I = $("info-ex"); if (!I) return; I.appendChild(el("p", "cap", XW.lede)); I.appendChild(el("p", "cap", XW.how)); })();
   window.__allepEx = { key: XKEY, state: XS, move: xMove, copy: xCopy, lines: exLines, render: function () { renderEx(); }, current: xCurrent, items: xItems,
     set: function (k, f) { xSet(k, f); }, pick: function (k, id) { XS.col[k].id = id; renderEx(); }, scope: function (k, v) { XS.col[k].scope = v; XS.col[k].role = null; renderEx(); },
-    role: function (k, r) { XS.col[k].role = r; renderEx(); }, width: function (k, v) { XS.col[k].width = v; xSave(); renderEx(); writeOut(LAST.L, LAST.GS); }, tip: function (k, it) { return xTipBlock(k, it); } };
+    role: function (k, r) { XS.col[k].role = r; renderEx(); }, width: function (k, v) { XS.col[k].width = XW.width.opts[v] ? v : XW.width.pick; xSave(); renderEx(); writeOut(LAST.L, LAST.GS); }, tip: function (k, it) { return xTipBlock(k, it); } };

@@ -1190,10 +1190,10 @@ if (go('d066')) { // D-066 ROUND 1 (his note "API Hover Legend Consolidation"; D
   await press('bench-one-row-across-the-page', '#exbar .opt[data-xopt="lay"][data-v="row"]', ['L-23', 'lay', 'row'], S.page('#sec-ex'));
   await press('bench-back-to-an-upper-and-a-lower-row', '#exbar .opt[data-xopt="lay"][data-v="half"]', ['L-23', 'lay', 'half'], S.el(['#exbar']));
 
-  /* L-36 · the bench's icon squares: a hover is a verb and its object; each column's width — compact, most compact, full — and back to dynamic (my pick) */
+  /* L-36 · the bench's icon squares: a hover is a verb and its object; each column's element width — compact, most compact (full is gone, D-087) — and back to dynamic (my pick) */
   await hoverShot('hover-an-icon-square-every-endpoint', XC('gate') + ' .exscope .opt[data-v="all"]', ['L-36']);
   await hoverShot('hover-an-icon-square-the-copy-button', XC('table') + ' .excopy', ['L-36']);
-  for (const v of ['compact', 'tight', 'full']) await press('width-' + v, XC('end') + ' .exwidth .opt[data-v="' + v + '"]', ['L-36'], S.page(XC('end')));
+  for (const v of ['compact', 'tight']) await press('width-' + v, XC('end') + ' .exwidth .opt[data-v="' + v + '"]', ['L-36'], S.page(XC('end')));
   await press('width-back-to-dynamic', XC('end') + ' .exwidth .opt[data-v="dynamic"]', ['L-36'], S.el([XC('end') + ' .extop'], { box: '#exgrid' }));
 
   /* L-35 · what each bench look would show after it is picked: the column as drawn (the look "as drawn" keeps it), then — by a real drag of one title-line part

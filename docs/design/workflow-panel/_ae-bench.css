@@ -2,18 +2,19 @@
    _ae_bench.py and scoped here: the lab's tokens are the page's) ══ */
 #sec-ex { --line: var(--rule); --chip-bg: var(--raised); --panel: var(--card); --font-mono: var(--af-stack); }
 .exbar { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: flex-start; margin: 0 0 10px; }
-/* the columns (D-071, D-081) — A: one row across the page, each column as wide as its width says, the row sideways when narrower · B: wrapped rows ·
-   C: an upper and a lower row (his ruling). A column's width is its own (L-36): dynamic (the layout's share, my pick) · full (the whole box) · shorter ·
-   compact · most compact */
+/* the columns (D-071, D-081) — A: one row across the page, each column as wide as its layout gives it, the row sideways when narrower · B: wrapped rows ·
+   C: an upper and a lower row (his ruling). A column's BOX never changes with its width control (D-087, his words): every column keeps the size the layout
+   gives it, so the grid does not reflow; the control (L-36: the default · shorter · compact · most compact) narrows only the element drawn at the top of the
+   column, left-aligned in it — a share of the column, so each step is narrower than the one before at any layout */
 .exgrid { display: flex; flex-wrap: nowrap; gap: 12px; align-items: flex-start; overflow-x: auto; padding-bottom: 8px; }
 .exgrid[data-lay="wrap"] { flex-wrap: wrap; overflow-x: visible; }
 .exgrid[data-lay="half"] { flex-direction: column; align-items: stretch; }
 .exrow { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
 .excol { flex: 1 1 264px; min-width: 264px; }
-.excol[data-w="full"] { flex: 1 0 100%; min-width: min(100%, 264px); }
-.excol[data-w="shorter"] { flex: 0 0 376px; min-width: 0; max-width: 100%; }
-.excol[data-w="compact"] { flex: 0 0 300px; min-width: 0; max-width: 100%; }
-.excol[data-w="tight"] { flex: 0 0 232px; min-width: 0; max-width: 100%; }
+.excol[data-w="shorter"] > .exw, .excol[data-w="compact"] > .exw, .excol[data-w="tight"] > .exw { align-self: flex-start; box-sizing: border-box; }
+.excol[data-w="shorter"] > .exw { width: 80%; }
+.excol[data-w="compact"] > .exw { width: 64%; }
+.excol[data-w="tight"] > .exw { width: 48%; }
 .excol { display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 10px; }
 .exhd { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .exhd h3 { display: flex; align-items: center; gap: 6px; margin: 0; font-size: var(--fs-sm); letter-spacing: .08em; text-transform: uppercase; }

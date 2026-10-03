@@ -3008,7 +3008,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
 /* 33 · D-081 + L-34 … L-38 (2026-10-02, round 3) — his ruled looks are the defaults, and the bench and the table gained the controls he asked for.
    Smoke checks (D-037): (1) the looks he ruled open pressed and undashed, the three still my pick dashed; (2) R-11: a table wider than its box opens
    fitted; (3) the bench's controls are icon squares with a verb-and-object hover, no fold, the copy line never shown and still whole in the clipboard;
-   (4) a column's width: five, dynamic my pick (dashed), kept per viewer, in the copy line; (5) a widened BY MOMENT column's edge dragged by the mouse and
+   (4) a column's width: four (D-087 removed full), dynamic my pick (dashed), narrowing only the drawn element, kept per viewer, in the copy line; (5) a widened BY MOMENT column's edge dragged by the mouse and
    moved by the keys inside its floor and its maximum, kept through a reload and in the copy text; (6) a table wider than its box, even fitted, slides
    with Shift and the wheel, and says so */
 { const E = 'POST /cooking/sessions', MW = D.words.mo, XW = D.words.ex, fillW = (t, x) => String(t).replace(/\{(\w+)\}/g, (m, k) => (x[k] != null ? x[k] : m));
@@ -3037,22 +3037,49 @@ ok(!errs.length, 'no page error on the fixture', errs);
       sections: [...c.querySelectorAll('.exctl .exsh')].map((h) => h.textContent), vis: [...c.querySelectorAll('.exctl .exsec')].every((x) => x.getBoundingClientRect().height > 10), line: line.textContent }; });
   await p.$eval('#exgrid .excol[data-k="table"] .excopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#exgrid .excol[data-k="table"] .excopy'); await p.waitForTimeout(120);
   const copied = await p.evaluate(() => window.__w81copied);
-  ok(bn.n === 11 && bn.textless && bn.verbs.every((v) => v.length > 8 && !/undefined/.test(v)) && bn.lineHidden && !bn.folds && JSON.stringify(bn.sections) === JSON.stringify([XW.ctl.parts, XW.ctl.size, XW.ctl.colour]) && bn.vis && copied === bn.line,
+  ok(bn.n === 10 && bn.textless && bn.verbs.every((v) => v.length > 8 && !/undefined/.test(v)) && bn.lineHidden && !bn.folds && JSON.stringify(bn.sections) === JSON.stringify([XW.ctl.parts, XW.ctl.size, XW.ctl.colour]) && bn.vis && copied === bn.line,
     'D-081 · L-36 · the table column\'s controls are ' + bn.n + ' icon squares (no text), each a verb and its object; parts, size and colour are always on the page (no fold); the copy line is not shown and the copy button copies all of it', { bn: { ...bn, line: bn.line.slice(0, 60) }, copied: (copied || '').slice(0, 60) });
-  /* (4) the width of a column */
+  /* (4) the width of a column — CHANGED 2026-10-03 (D-087, his words): four options, "full" removed; a width narrows ONLY the element drawn at the top of the
+     column, never the column's box — the head, the squares, the chips, the picker, the parts/size/colour controls and the grid keep the default's place and size
+     (what sits under the element keeps its x and width, and its distance from the element; it moves down only as far as the element grew taller). A saved "full" reads as the default. */
   const w0 = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol[data-k="end"] .exwidth .opt')].map((b) => [b.getAttribute('data-v'), b.getAttribute('aria-checked'), b.getAttribute('data-pick'), getComputedStyle(b).borderTopStyle]));
-  await p.$eval('#exgrid .excol[data-k="end"] .exwidth', (e) => e.scrollIntoView({ block: 'center' }));
-  const wOf = (k) => p.$eval('#exgrid .excol[data-k="' + k + '"]', (e) => Math.round(e.getBoundingClientRect().width));
-  const dynW = await wOf('end'), res = {};
-  for (const v of ['compact', 'tight', 'shorter', 'full']) { await p.click('#exgrid .excol[data-k="end"] .exwidth .opt[data-v="' + v + '"]'); await p.waitForTimeout(80); res[v] = await wOf('end'); }
-  const boxW = await p.$eval('#exgrid', (e) => Math.round(e.getBoundingClientRect().width)), cpw = await p.$eval('#exgrid .excol[data-k="end"] .exline', (e) => e.textContent);
+  const optSets = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol .exwidth')].map((g) => [...g.querySelectorAll('.opt')].map((b) => b.getAttribute('data-v')).join(',')));
+  const geo = (k) => p.evaluate((k) => { const c = document.querySelector('#exgrid .excol[data-k="' + k + '"]'), R = (e) => { if (!e) return null; const q = e.getBoundingClientRect(); return { x: Math.round(q.left), y: Math.round(q.top + window.scrollY), w: Math.round(q.width), h: Math.round(q.height) }; };
+    const g = (s) => R(c.querySelector(s)); return { col: R(c), head: g('.exhd'), sq: g('.extop'), roles: g('.exroles'), pick: g('.expick'), card: g('.exw'), ctl: g('.exctl'), copy: g('.excopy'), reset: g('.exreset'), w: c.getAttribute('data-w'), gap: ['.exctl', '.excopy', '.exreset'].map((q) => c.querySelector(q).getBoundingClientRect().top - c.querySelector('.exw').getBoundingClientRect().bottom),
+      grid: [...document.querySelectorAll('#exgrid .excol')].map((x) => { const q = x.getBoundingClientRect(); return Math.round(q.left) + ':' + Math.round(q.width); }).join('|') }; }, k);
+  const eqBox = (a, b) => JSON.stringify(a) === JSON.stringify(b), geoRes = {}, geoBad = [];
+  for (const k of ['end', 'table']) {
+    await p.$eval('#exgrid .excol[data-k="' + k + '"] .exwidth', (e) => e.scrollIntoView({ block: 'center' }));
+    await p.click('#exgrid .excol[data-k="' + k + '"] .exwidth .opt[data-v="dynamic"]'); await p.waitForTimeout(80);
+    const d = await geo(k); geoRes[k] = { dynamic: d.card.w }; let prev = d.card.w;
+    for (const v of ['shorter', 'compact', 'tight']) {
+      await p.click('#exgrid .excol[data-k="' + k + '"] .exwidth .opt[data-v="' + v + '"]'); await p.waitForTimeout(80);
+      const g = await geo(k); geoRes[k][v] = g.card.w;
+      const same = g.col.x === d.col.x && g.col.y === d.col.y && g.col.w === d.col.w && g.grid === d.grid && ['head', 'sq', 'roles', 'pick'].every((q) => eqBox(g[q], d[q]))
+        && ['ctl', 'copy', 'reset'].every((q) => g[q].x === d[q].x && g[q].w === d[q].w) && g.gap.every((x, i) => Math.abs(x - d.gap[i]) < 0.5) && g.w === v;
+      if (!same || !(g.card.w < prev) || g.card.x !== g.head.x || g.card.w > g.col.w - 20) geoBad.push([k, v, same, g.card.w, prev, g.card.x, g.head.x]);
+      prev = g.card.w; }
+    await p.click('#exgrid .excol[data-k="' + k + '"] .exwidth .opt[data-v="dynamic"]'); await p.waitForTimeout(80); }
+  ok(JSON.stringify(w0.map((x) => x[0])) === JSON.stringify(['dynamic', 'shorter', 'compact', 'tight']) && w0[0][1] === 'true' && w0[0][2] === 'true' && w0[0][3] === 'dashed' && w0.slice(1).every((x) => !x[2])
+     && optSets.length >= 4 && optSets.every((x) => x === 'dynamic,shorter,compact,tight') && !XW.width.opts.full && Object.keys(XW.width.opts).length === 4 && !geoBad.length,
+    'D-087 · a column has four widths — dynamic (my pick, dashed) · shorter · compact · most compact, no full; each narrows only its drawn element (end ' + [geoRes.end.dynamic, geoRes.end.shorter, geoRes.end.compact, geoRes.end.tight].join(' → ') + ' px, table ' + [geoRes.table.dynamic, geoRes.table.shorter, geoRes.table.compact, geoRes.table.tight].join(' → ')
+      + ' px) at the column\'s own place, the same box and grid, head · squares · chips · picker unmoved, the controls under it in the same x and width, the element left-aligned', { geoBad, w0, optSets });
+  /* the choice is in the column's copy line and kept per viewer; a saved "full" (an older bench) and a "full" set through the page's own handle read as the default — no error */
+  const errs0 = errs.length;
+  await p.click('#exgrid .excol[data-k="end"] .exwidth .opt[data-v="compact"]'); await p.waitForTimeout(80);
+  const cpw = await p.$eval('#exgrid .excol[data-k="end"] .exline', (e) => e.textContent), wCompact = (await geo('end')).card.w;
   await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
-  const kept = await p.$eval('#exgrid .excol[data-k="end"]', (e) => e.getAttribute('data-w'));
+  const kept = await geo('end');
+  await p.evaluate(() => { const A = window.__allepEx, o = JSON.parse(localStorage.getItem(A.key)); o.col.end.width = 'full'; o.col.table.width = 'full'; localStorage.setItem(A.key, JSON.stringify(o)); });
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
+  const fullE = await geo('end'), fullT = await geo('table'), cpf = await p.$eval('#exgrid .excol[data-k="end"] .exline', (e) => e.textContent);
+  await p.evaluate(() => window.__allepEx.width('table', 'full')); await p.waitForTimeout(100);
+  const viaApi = await geo('table');
   await p.click('#exgrid .excol[data-k="end"] .exwidth .opt[data-v="dynamic"]'); await p.waitForTimeout(80);
   const cpd = await p.$eval('#exgrid .excol[data-k="end"] .exline', (e) => e.textContent);
-  ok(JSON.stringify(w0.map((x) => x[0])) === JSON.stringify(['dynamic', 'full', 'shorter', 'compact', 'tight']) && w0[0][1] === 'true' && w0[0][2] === 'true' && w0[0][3] === 'dashed' && w0.slice(1).every((x) => !x[2])
-     && res.tight < res.compact && res.compact < res.shorter && res.shorter < res.full && res.full >= boxW - 2 && res.tight >= 200 && dynW >= 264 && cpw.includes(' · ' + XW.ctl.widthIs + ' ' + XW.width.opts.full.name + ' (') && kept === 'full' && cpd.includes(XW.ctl.widthIs + ' ' + XW.width.opts.dynamic.name + ' (' + D.words.copy.pick + ')'),
-    'D-081 · L-36 · a column has five widths — dynamic (my pick, dashed) · full · shorter · compact · most compact (' + [dynW, res.full, res.shorter, res.compact, res.tight].join(' · ') + ' px); the choice is in the column\'s copy line and kept through a reload', { w0, dynW, res, boxW, kept });
+  ok(cpw.includes(' · ' + XW.ctl.widthIs + ' ' + XW.width.opts.compact.name + ' (') && kept.w === 'compact' && kept.card.w === wCompact && fullE.w === 'dynamic' && fullT.w === 'dynamic' && fullE.card.w === geoRes.end.dynamic && fullT.card.w === geoRes.table.dynamic
+     && cpf.includes(XW.ctl.widthIs + ' ' + XW.width.opts.dynamic.name + ' (' + D.words.copy.pick + ')') && viaApi.w === 'dynamic' && viaApi.card.w === geoRes.table.dynamic && cpd.includes(XW.ctl.widthIs + ' ' + XW.width.opts.dynamic.name + ' (' + D.words.copy.pick + ')') && errs.length === errs0,
+    'D-087 · the width is in the column\'s copy line and kept through a reload; a saved full — and a full set through the page — reads as the default (data-w ' + fullE.w + ', the element ' + fullE.card.w + ' px), no error', { cpw: cpw.slice(-60), kept: kept.w, wCompact, keptW: kept.card.w, fullE: fullE.w, fullT: fullT.w, viaApi: viaApi.w, cpf: cpf.slice(-60), errs: errs.slice(errs0) });
   /* (5) a widened BY MOMENT column's edge */
   await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(250);
   await p.evaluate(() => { const A = window.__allep; A.mo.cols.fit = false; A.mo.looks.wid = 'names'; localStorage.setItem(A.mo.colKey, JSON.stringify(A.mo.cols)); localStorage.setItem(A.mo.key, JSON.stringify(A.mo.looks)); }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
