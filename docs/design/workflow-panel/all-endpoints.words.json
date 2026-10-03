@@ -1861,17 +1861,28 @@
       "optional": "optional",
       "mark": {
         "field": { "one": "{n} {v} field", "many": "{n} {v} fields" },
+        "field-opt": { "one": "{n} optional {v} field", "many": "{n} optional {v} fields" },
+        "field-uq": { "one": "{n} unique {v} field", "many": "{n} unique {v} fields" },
+        "field-opt-uq": { "one": "{n} optional, unique {v} field", "many": "{n} optional, unique {v} fields" },
         "more": { "one": "{n} more field", "many": "{n} more fields" },
         "op-r": { "one": "{n} table read", "many": "{n} table reads" },
         "op-w": { "one": "{n} table write", "many": "{n} table writes" },
         "op-rw": { "one": "{n} table read and write", "many": "{n} tables read and written" },
+        "op-w-y": { "one": "{n} table write that a commit saves", "many": "{n} table writes that a commit saves" },
+        "op-w-n": { "one": "{n} table write that no commit saves", "many": "{n} table writes that no commit saves" },
+        "op-rw-y": { "one": "{n} table read and written, the write saved by a commit", "many": "{n} tables read and written, the writes saved by a commit" },
+        "op-rw-n": { "one": "{n} table read and written, the write not saved", "many": "{n} tables read and written, the writes not saved" },
         "way-pass": { "one": "{n} check passed on the way", "many": "{n} checks passed on the way" },
         "way-stop": { "one": "{n} check that stops it", "many": "{n} checks that stop it" },
         "way-call": { "one": "{n} call on the way", "many": "{n} calls on the way" },
         "way-branch": { "one": "{n} fork on the way", "many": "{n} forks on the way" },
+        "way-branch-y": { "one": "{n} fork the way takes", "many": "{n} forks the way takes" },
+        "way-branch-n": { "one": "{n} fork the way does not take", "many": "{n} forks the way does not take" },
         "way-switch": { "one": "{n} switch on the way", "many": "{n} switches on the way" },
         "way-exit": { "one": "the way out", "many": "the way out" },
         "call-act": { "one": "{n} request that tests it", "many": "{n} requests that test it" },
+        "call-act-y": { "one": "{n} request that proves an ending", "many": "{n} requests that prove an ending" },
+        "call-act-n": { "one": "{n} request that only reaches it", "many": "{n} requests that only reach it" },
         "call-check": { "one": "{n} request that sets up and checks", "many": "{n} requests that set up and check" },
         "call-arrange": { "one": "{n} request that sets up", "many": "{n} requests that set up" },
         "call-service": { "one": "{n} call to the code behind it", "many": "{n} calls to the code behind it" },
@@ -2814,7 +2825,7 @@
     "_about": "D-071 (his L-23 · L-08 · L-13 · L-11): the examples bench — one column per kind of element, in his order, each an example drawn as a block with its controls below it. The table's look is his DATA line (D-027); the schema's and the function's boot on the lab's looks, which is my choice (dashed); the other five kinds' parts and looks are my picks, dashed. Where BY MOMENT already has words for a thing (an in-flight value's kind, how long it lives, a gate's kind and where it decides, a race, the three parts of a hover, the reply), the bench reads those words, never a copy.",
     "title": "examples",
     "lede": "One example of each kind of element this page draws, a column each, in the order a request meets them: an ending, a table, a schema, a function, a test, a gate or decision, a client hook, an in-flight value. Pick the element at the top of a column, narrow it by its role, set the column's width, and change what its block shows with the controls under it.",
-    "how": "A block reads top to bottom: its title lines, then a strip of marks — a table's or a schema's fields, the tables a function touches, the requests a test makes, the checks on an ending's way, what a gate waits for, the endings a hook answers, the places a value is read — then a list that opens when you click the block. Its hover says what comes before it, what it checks and what it gives, in the form BY MOMENT's hovers option picks. A block hovers by part: its glyph and the pill that classifies it give one card about what the element is and what that class means for it, its title gives the whole card, and each place it names (a file, a where, a class, a setter) and each mark of the strip give a card of their own. Above each block, icon squares (point at one for what it does): the elements of this endpoint or of every endpoint (one not on the open endpoint is drawn as it is on the first endpoint that has it), and the width of the element drawn there — dynamic, shorter, compact, most compact, the column's box keeping its size; the chips narrow the column to one role and the arrows step through the elements. Under each block, always in view: the parts to drag between the lines or into not drawn, their sizes and the colours; the squares at the bottom put the block back on its first look and copy its settings as one line, to paste back with your words.",
+    "how": "A block reads top to bottom: its title lines, then a strip of marks — a table's or a schema's fields, the tables a function touches, the requests a test makes, the checks on an ending's way, what a gate waits for, the endings a hook answers, the places a value is read — then a list that opens when you click the block. Its hover says what comes before it, what it checks and what it gives, in the form BY MOMENT's hovers option picks. A block hovers by part: its glyph and the pill that classifies it give one card about what the element is and what that class means for it, its title gives the whole card, and each place it names (a file, a where, a class, a setter) and each mark of the strip give a card of their own. A mark of a field is paler when the column can be null (a schema's: when the field may be left out) and carries a corner at its top right and its bottom left when a unique key names it; a line under the block says so, with how many. A function's, a test's or an ending's marks can carry one more yes or no the feed records: an option under the block, off until it is chosen, my pick dashed. Above each block, icon squares (point at one for what it does): the elements of this endpoint or of every endpoint (one not on the open endpoint is drawn as it is on the first endpoint that has it), and the width of the element drawn there — dynamic, shorter, compact, most compact, the column's box keeping its size; the chips narrow the column to one role and the arrows step through the elements. Under each block, always in view: the parts to drag between the lines or into not drawn, their sizes and the colours; the squares at the bottom put the block back on its first look and copy its settings as one line, to paste back with your words.",
     "whoseTitle": "whose look",
     "whose": {
       "his": { "name": "your DATA line", "plain": "The table block boots on the DATA line you pasted in the endpoint lab, word for word ({v}). Its chip and its count stand at {lo}px, under the page's {hi}px floor, as your line sets them; every other part of the bench keeps the floor." },
@@ -3117,6 +3128,8 @@
         "more": "a field from the model",
         "fk": "points to",
         "uq": "unique",
+        "uqYes": "unique",
+        "uqNo": "not unique",
         "uqWith": "unique together with",
         "after": "check it waits for",
         "self": "the check itself",
@@ -3126,6 +3139,32 @@
         "via": "sent with {v}"
       }
     },
-    "copy": { "where": "examples", "on": "on {ep}", "all": "every endpoint", "role": "role {v}" }
+    "copy": { "where": "examples", "on": "on {ep}", "all": "every endpoint", "role": "role {v}" },
+    "legend": {
+      "_about": "D-091 (his: the lab's table block marks a column that can be null and a column that is unique — apply it to the table section and to schemas): what a paler mark and a cornered one mean, said ONCE, under a block's strip — the lab's footer row says \"optional\" the same way — each entry drawn as the strip draws it and counted over the element's own fields. The hover of an entry is its meaning; the card of a mark says the column's own facts.",
+      "opt": { "name": "optional",
+               "table": "A column that can be null. Its mark is drawn paler.",
+               "schema": "A field the body or the answer may leave out. Its mark is drawn paler." },
+      "uq": { "name": "unique",
+              "table": "A column a unique key names. Its mark carries a corner at its top right and one at its bottom left, and every column that shares the key carries them." }
+    },
+    "yn": {
+      "_about": "D-091 item 4 (his: for functions, endpoints, gates or any other element, a similar encoding, but maybe in the other corners or with other colours): a yes or no the feed itself records on a kind's marks, offered as an option of that kind's column, off until it is chosen, my pick dashed — never on by default. Built for the three kinds whose marks carry such a fact: a function's write that a commit saves, a test's request that proves an ending, a fork the way takes. `corners` uses the two corners a unique key leaves free; `grey` is another colour. A mark of another nature (a read, a request that only sets up, a check) has no such fact and is never marked.",
+      "title": "extra mark: {v}",
+      "pick": "corners",
+      "opts": {
+        "off": { "name": "not marked", "plain": "Every mark of this kind is drawn as it is. Nothing is added." },
+        "corners": { "name": "corners", "plain": "A mark that has the fact gets a corner at its top left and one at its bottom right, the corners a unique key leaves free." },
+        "grey": { "name": "grey", "plain": "A mark that lacks the fact is drawn in grey. A mark that has it keeps its colour." }
+      },
+      "kinds": {
+        "fn": { "name": "saved by a commit", "noName": "not saved", "yes": "A commit on a way to the answer saves this write.", "no": "No commit on any way saves this write.",
+                "plain": "A table the function writes, by whether a commit saves the write. A table it only reads has no such fact and stays as it is." },
+        "test": { "name": "proves an ending", "noName": "only reaches it", "yes": "The request is matched to an ending the code produces, so the test proves it.", "no": "The request reaches the endpoint without being matched to an ending.",
+                  "plain": "A request that tests the endpoint, by whether it proves an ending. A request that only sets up has no such fact and stays as it is." },
+        "end": { "name": "fork taken", "noName": "fork not taken", "yes": "The way to this ending takes this branch.", "no": "The way to this ending does not take this branch.",
+                 "plain": "A fork on the way, by whether the way takes it. A check, a call or a switch has no such fact and stays as it is." }
+      }
+    }
   }
 }

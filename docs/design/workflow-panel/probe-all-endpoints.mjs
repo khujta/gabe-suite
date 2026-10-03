@@ -3685,7 +3685,199 @@ ok(!errs.length, 'no page error on the fixture', errs);
     const run = (mut, F) => { const x = root(); mut(x); return C.guard(x, F || { joins: [] }); };
     return { clean: run(() => {}), p21: run((x) => x.appendChild(mk('cdt', 'the code map holds it'))), p41: run(() => {}, { joins: [{ end: 'function', want: ['a_function_named_nowhere'] }] }) }; });
   ok(gd3.clean.length === 0 && gd3.p21.some((q) => q.startsWith('p2.1')) && gd3.p41.some((q) => q.startsWith('p4.1')), 'D-090 · the guard stays silent on a clean head card of another kind and fires on one made to break a rule (P2.1 words about the map · P4.1 a join\'s other end not named)', gd3);
-  ok((await p.evaluate(() => window.__allepCard.log.length)) === 0 && !errs.length, 'D-090 · the renderer\'s log holds no issue and the page raised no error after every region hover and the sweep', { log: await p.evaluate(() => window.__allepCard.log.slice(0, 2)), errs: errs.slice(0, 3) }); }
+  ok((await p.evaluate(() => window.__allepCard.log.length)) === 0 && !errs.length, 'D-090 · the renderer\'s log holds no issue and the page raised no error after every region hover and the sweep', { log: await p.evaluate(() => window.__allepCard.log.slice(0, 2)), errs: errs.slice(0, 3) });
+
+  /* 39 · D-091 (his, comparing the bench's `users` table block with the endpoint lab's: "The font is different. I don't know if maybe the icon size is different. In the endpoint lab, we have the lines
+     actually aligning, and not in the old endpoints … there is some encoding for the keys that can be null or not on the tables. There are some markers in the corners … We should apply that in the table
+     section here, and we can do the same for anything similar on the other elements … schemas … functions, endpoints, gates, or any other element, maybe in the other corners or with other colors").
+     Measured, not looked at, on POST /cooking/sessions, the lab's own `users` block (endpoint-lab.html, read-only) against the bench's:
+   (1) the type — the computed font family of the block and of every part is the lab's `--font-mono` (read from the lab's own variables, never typed here), the size and glyph box of each part the lab sizes
+       (icon · name · entity · count · channel · class) equal, the text of each left part starting at the lab's x (±1px), the glyph centred on its line as the lab centres it;
+   (2) the lines align on every kind: a line that leads with text starts where the title's text starts, a line that leads with its own glyph keeps the lab's geometry;
+   (3) a table's field marks are the lab's one mark: the type's colour on each, a column that can be null at the optional stop of the opacity bar (paler), a unique column cornered at its top right and
+       bottom left — checked on every table of the endpoint against the forms feed's own columns (`nullable`) and unique constraints, read here and never from the page's data;
+   (4) a schema's marks: an optional field (not required in the feed) paler, no corners (the feed names no unique field of a schema);
+   (5) the legend under a block says each new mark once, counted over the element's own fields, and the mark's card says the column, its type, optional or required, unique or not, the key it points to;
+   (6) item 4 — the yes/no options of a function (a write a commit saves), a test (a request that proves an ending) and an ending (a fork the way takes): off by default, my pick dashed, the marks as the
+       feed says, the card of a mark saying its fact only while the option is on, the copy line growing only when it is on, an old saved configuration read as it was (no migration);
+   (7) every element of every endpoint, with the options on: each mark's card and each block's card made through card() and its guard, none with an issue */
+  {
+  const WROPS = new Set(['add', 'update', 'delete', 'insert', 'upsert', 'merge', 'bulk_insert', 'execute', 'write']);
+  const YW = D.words.ex.yn, LGW = D.words.ex.legend, IW9 = D.words.ex.region.item, CMK = D.words.mo.card, SQC = {}; D.ex.sq.forEach((x) => { SQC[x.key] = x.col; });
+  const MODELS = {}; Object.values(FJ.models || {}).forEach((m) => { if (m.table) MODELS[m.table] = m; });
+  const LABMONO = /--font-mono:\s*([^;"]+?)\s*;/.exec(fs.readFileSync(path.join(HERE, '_station.js'), 'utf8'))[1].replace(/,\s*/g, ', ');   /* as the browser spells a computed stack */
+  const MEAS = (sel) => { const blk = document.querySelector(sel); if (!blk) return null; const br = blk.getBoundingClientRect(), out = { fam: getComputedStyle(blk.querySelector('.bkhd')).fontFamily, lines: [] };
+    blk.querySelectorAll('.bkln').forEach((ln) => { const L = [];
+      ln.querySelectorAll('.bkcol').forEach((col, ci) => { [...col.children].forEach((n) => { const r = n.getBoundingClientRect(), cs = getComputedStyle(n), sv = n.querySelector('svg'), tn = [...n.querySelectorAll('*')].concat([n]).map((x) => [...x.childNodes].find((c) => c.nodeType === 3 && c.textContent.trim())).find(Boolean);
+        let tx = null; if (tn) { const rg = document.createRange(); rg.selectNodeContents(tn); tx = rg.getBoundingClientRect().left - br.left; }
+        L.push({ side: ci ? 'r' : 'l', c: String(n.className || n.tagName).split(' ')[0], fs: parseFloat(cs.fontSize), fam: cs.fontFamily, svg: sv ? [sv.getBoundingClientRect().width, sv.getBoundingClientRect().height] : null, bx: r.left - br.left, tx, cy: (r.top + r.bottom) / 2 - br.top }); }); });
+      out.lines.push(L); }); return out; };
+  const ALIGN = (sel) => { const blk = document.querySelector(sel), br = blk.getBoundingClientRect(), ic = blk.querySelector('.bkcol.l > .bki'); if (!ic) return { icon: false, out: [] };
+    const out = []; blk.querySelectorAll('.bkln').forEach((ln, i) => { const A = ln.querySelector('.bkcol.l'), f0 = A && A.firstChild; if (!f0) return;
+      out.push({ i, kind: f0.classList.contains('bki') ? 'icon' : (f0.firstChild && f0.firstChild.nodeName.toLowerCase() === 'svg') ? 'glyph' : 'text', x: f0.getBoundingClientRect().left - br.left }); });
+    return { icon: true, want: ic.getBoundingClientRect().right + 7 - br.left, iconX: ic.getBoundingClientRect().left - br.left, out }; };
+  const STRIP = (sel) => { const blk = document.querySelector(sel); return [...blk.querySelectorAll('.sqs > .sq')].map((q) => ({ cls: q.className, fc: q.style.getPropertyValue('--fc'), op: getComputedStyle(q).opacity, bef: getComputedStyle(q, '::before').content, aft: getComputedStyle(q, '::after').content,
+    name: q.getAttribute('data-w'), mk: q.getAttribute('data-mk'), yn: q.getAttribute('data-yn'), fil: getComputedStyle(q).filter })); };
+  await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(500);
+  const labp = await ctx.newPage(); labp.on('pageerror', (e) => errs.push('lab: ' + e.message)); await labp.goto('file://' + path.join(HERE, 'endpoint-lab.html')); await labp.waitForTimeout(2200);
+  const TBK = '#exgrid .excol[data-k="table"] .blk';
+  await p.evaluate(() => window.__allepEx.pick('table', 'table:users')); await p.waitForTimeout(300);
+  const mb = await p.evaluate(MEAS, TBK), ml = await labp.evaluate(MEAS, '.blk[data-table="users"]'), flat = (m) => m.lines.flat(), part = (m, c) => flat(m).find((n) => n.c === c);
+  /* (1) the type, the sizes, the alignment of the `users` block, against the lab's */
+  ok(ml && mb && ml.fam === LABMONO && mb.fam === ml.fam && flat(mb).every((n) => n.fam === ml.fam) && flat(ml).every((n) => n.fam === ml.fam), 'D-091 · the font: the bench\'s `users` block and every part of it draw in the lab\'s monospace stack (' + LABMONO + ')', { lab: ml && ml.fam, bench: mb && mb.fam, want: LABMONO });
+  const PC = ['bki', 'B', 'bke', 'bkn', 'bkrw', 'bkm'], szOk = PC.map((c) => { const a = part(ml, c), z = part(mb, c); return a && z && Math.abs(a.fs - z.fs) < 0.1 && JSON.stringify(a.svg) === JSON.stringify(z.svg) ? [c, 'ok'] : [c, 'bad', a && [a.fs, a.svg], z && [z.fs, z.svg]]; });
+  ok(szOk.every((v) => v[1] === 'ok'), 'D-091 · the sizes: the glyph box (' + JSON.stringify(part(mb, 'bki').svg) + '), the name (' + part(mb, 'B').fs + 'px), the entity and the class (' + part(mb, 'bke').fs + 'px, glyph ' + JSON.stringify(part(mb, 'bke').svg) + '), the count (' + part(mb, 'bkn').fs + 'px) and the channel chip (' + part(mb, 'bkrw').fs + 'px) are the lab\'s', szOk.filter((v) => v[1] !== 'ok'));
+  const xs = [['bki', 'bx'], ['B', 'tx'], ['bke', 'tx'], ['bkm', 'tx']].map(([c, f]) => [c, part(ml, c)[f], part(mb, c)[f]]);
+  ok(xs.every(([, a, z]) => Math.abs(a - z) <= 1), 'D-091 · the lines: the text of each left part starts where the lab\'s does — glyph ' + xs[0][2].toFixed(1) + ', name ' + xs[1][2].toFixed(1) + ', entity ' + xs[2][2].toFixed(1) + ', class ' + xs[3][2].toFixed(1) + ' (lab ' + xs.map((q) => q[1].toFixed(1)).join(' · ') + ')', xs);
+  const dyl = part(ml, 'bki').cy - part(ml, 'B').cy, dyb = part(mb, 'bki').cy - part(mb, 'B').cy;
+  ok(Math.abs(dyb - dyl) <= 1 && Math.abs(dyb) <= 1, 'D-091 · the glyph sits on the middle of its line as the lab\'s does (offset ' + dyb.toFixed(1) + 'px, lab ' + dyl.toFixed(1) + 'px)', { dyl, dyb });
+  console.log('  D-091 users block · font ' + mb.fam + ' · sizes ' + PC.map((c) => c + ' ' + part(mb, c).fs + (part(mb, c).svg ? '/' + part(mb, c).svg[0] : '')).join(' ') + ' · text x ' + xs.map((q) => q[0] + ' ' + q[2].toFixed(1)).join(' ') + ' (lab ' + xs.map((q) => q[1].toFixed(1)).join(' ') + ') · glyph offset ' + dyb.toFixed(1));
+  /* (2) every other kind: a line that leads with text starts where the title's text starts; one that leads with its own glyph keeps the lab's geometry */
+  const al = {}; for (const k of ['table', 'schema', 'fn', 'end', 'test', 'gate', 'hook', 'inf']) al[k] = await p.evaluate(ALIGN, '#exgrid .excol[data-k="' + k + '"] .blk');
+  const alOk = Object.entries(al).map(([k, a]) => [k, a.icon && a.out.every((q) => q.kind === 'text' ? Math.abs(q.x - a.want) <= 1 : Math.abs(q.x - a.iconX) <= 1), a.out.filter((q) => q.kind === 'text').length]);
+  ok(alOk.every(([, v]) => v) && alOk.filter(([, , n]) => n > 0).length >= 5, 'D-091 · the lines align on every kind: a line that leads with text starts at the title\'s text (' + alOk.map(([k, , n]) => k + ' ' + n).join(' · ') + ' such lines), a line that leads with a glyph keeps the glyph column', { al, alOk });
+  /* (3) the table marks, on every table of the endpoint */
+  const TBL = await p.evaluate((ep) => window.__allep.data.rows.filter((x) => x.id === ep)[0].ex.table.map((e) => e[0]), E), tstat = { tables: 0, marks: 0, corner: 0, cornerWant: 0, pale: 0, paleWant: 0, bad: [], sk: 0 };
+  for (const id of TBL) { await p.evaluate((i) => window.__allepEx.pick('table', i), id); await p.waitForTimeout(120);
+    const c = await p.evaluate((i) => window.__allep.data.ex.cat[i], id), mk = await p.evaluate(STRIP, TBK), mod = MODELS[c.n], uqc = new Set(((mod && mod.constraints && mod.constraints.uniques) || []).flatMap((u) => u.cols));
+    tstat.tables++; if (mk.length !== c.cols.length + (c.more || []).length) tstat.bad.push([c.n, 'marks', mk.length]);
+    c.cols.forEach((f, i) => { const m = mk[i], mc = mod && mod.columns[f[0]], pale = mc ? !!mc.nullable : !!f[3], uq = uqc.has(f[0]); tstat.marks++;
+      if (!mc) tstat.sk++; if (pale) tstat.paleWant++; if (uq) tstat.cornerWant++;
+      const typeOk = m.cls.includes('t-' + f[2]) && m.fc === SQC[f[2]], palOk = m.op === (pale ? '0.5' : '1'), cOk = (m.bef === '""' && m.aft === '""') === uq && (uq || (m.bef === 'none' && m.aft === 'none'));
+      if (m.op === '0.5') tstat.pale++; if (m.bef === '""') tstat.corner++; if (!typeOk || !palOk || !cOk) tstat.bad.push([c.n, f[0], f[1], { typeOk, palOk, cOk, op: m.op, bef: m.bef, fc: m.fc }]); }); }
+  ok(tstat.tables === TBL.length && tstat.tables >= 10 && !tstat.bad.length && tstat.corner === tstat.cornerWant && tstat.pale === tstat.paleWant && tstat.cornerWant > 0 && tstat.paleWant > 0,
+    'D-091 · all ' + tstat.tables + ' tables of the endpoint, ' + tstat.marks + ' field marks: each wears its type\'s colour, the ' + tstat.paleWant + ' that can be null are paler (the optional stop, half strength), the ' + tstat.cornerWant + ' a unique key names carry both corners (' + tstat.corner + ' drawn) — read from the forms feed, ' + tstat.sk + ' column the feed names otherwise', tstat);
+  console.log('  D-091 tables on ' + E + ' · ' + tstat.tables + ' tables · ' + tstat.marks + ' field marks · cornered ' + tstat.corner + ' of ' + tstat.cornerWant + ' unique · paler ' + tstat.pale + ' of ' + tstat.paleWant + ' nullable');
+  /* (4) a schema's marks */
+  const SCH = await p.evaluate((ep) => window.__allep.data.rows.filter((x) => x.id === ep)[0].ex.schema.map((e) => e[0]), E), sst = { n: 0, marks: 0, pale: 0, want: 0, bad: [], corner: 0 };
+  for (const id of SCH) { await p.evaluate((i) => window.__allepEx.pick('schema', i), id); await p.waitForTimeout(120);
+    const mk = await p.evaluate(STRIP, '#exgrid .excol[data-k="schema"] .blk'), fl = (FJ.schemas[id] || {}).fields || []; sst.n++;
+    if (mk.length !== fl.length || !fl.length) sst.bad.push([id, mk.length, fl.length]);
+    fl.forEach((f, i) => { const m = mk[i]; sst.marks++; if (!f.required) sst.want++; if (m.op === '0.5') sst.pale++; if (m.bef === '""') sst.corner++; if (m.op !== (f.required ? '1' : '0.5') || m.bef !== 'none' || !m.fc) sst.bad.push([id, f.name, m.op, m.bef]); }); }
+  ok(sst.n === SCH.length && sst.n >= 3 && !sst.bad.length && sst.pale === sst.want && sst.want > 0 && sst.corner === 0, 'D-091 · the ' + sst.n + ' schemas of the endpoint, ' + sst.marks + ' field marks: the ' + sst.want + ' fields the feed does not require are paler (' + sst.pale + ' drawn), none is cornered (the feed names no unique schema field)', sst);
+  console.log('  D-091 schemas on ' + E + ' · ' + sst.n + ' schemas · ' + sst.marks + ' field marks · paler ' + sst.pale + ' of ' + sst.want + ' optional · cornered ' + sst.corner);
+  /* (5) the legend and the mark's card, on `users` (two unique columns, two that can be null) and on a schema */
+  await p.evaluate(() => window.__allepEx.pick('table', 'table:users')); await p.waitForTimeout(250);
+  const usr = await p.evaluate(() => window.__allep.data.ex.cat['table:users']), uMod = MODELS.users, uqU = new Set(uMod.constraints.uniques.flatMap((u) => u.cols)), nU = usr.cols.filter((f) => uMod.columns[f[0]].nullable).length, qU = usr.cols.filter((f) => uqU.has(f[0])).length;
+  const lg = await p.evaluate((sel) => [...document.querySelectorAll(sel + ' .exlgi')].map((i) => ({ lg: i.getAttribute('data-lg'), n: +i.getAttribute('data-n'), text: i.textContent.replace(/\s+/g, ' ').trim(), inBlk: !!i.closest('.blk'), samp: (() => { const q = i.querySelector('.sq'); return { op: getComputedStyle(q).opacity, bef: getComputedStyle(q, '::before').content }; })() })), TBK);
+  ok(lg.length === 2 && lg[0].lg === 'opt' && lg[0].n === nU && nU > 0 && lg[0].text.startsWith(LGW.opt.name) && lg[0].samp.op === '0.5' && lg[1].lg === 'uq' && lg[1].n === qU && qU > 0 && lg[1].text.startsWith(LGW.uq.name) && lg[1].samp.bef === '""' && lg.every((q) => q.inBlk),
+    'D-091 · the legend under the `users` block says each new mark once, drawn as the strip draws it and counted over the table\'s own columns: ' + lg.map((q) => q.text).join(' · '), { lg, nU, qU });
+  const hv = async (css) => { const h = await p.$(css); await hoverAt(h); return p.evaluate(() => { const t = document.getElementById('tip'); return { text: t.textContent.replace(/\s+/g, ' ').trim(), cd: t.classList.contains('cd') }; }); };
+  const tgl = await hv(TBK + ' .exlgi[data-lg="uq"]'), tgo = await hv(TBK + ' .exlgi[data-lg="opt"]');
+  ok(tgl.text.includes(LGW.uq.name) && tgl.text.includes(LGW.uq.table) && tgo.text.includes(LGW.opt.name) && tgo.text.includes(LGW.opt.table) && !tgl.cd, 'D-091 · the hover of a legend entry is its meaning (' + LGW.uq.name + ' · ' + LGW.opt.name + '), with its count', { tgl: tgl.text.slice(0, 140), tgo: tgo.text.slice(0, 140) });
+  const colIx = (n) => usr.cols.findIndex((f) => f[0] === n), cardOf = (i) => hoverCard(TBK + ' .sqs > .sq', i);
+  const cU = await cardOf(colIx('auth_provider')), cO = await cardOf(colIx('email')), cI = await cardOf(colIx('id')), uf = usr.cols[colIx('auth_provider')], ef = usr.cols[colIx('email')];
+  ok(cU && cU.card === 'reg' && cU.rp === 'marks' && !cU.issues && cU.name === 'auth_provider' && cU.text.includes(uf[1]) && cU.pills.includes(CMK.required) && cU.pills.includes(IW9.uqYes) && cU.text.includes(IW9.uqWith) && cU.text.includes('auth_provider_id'),
+    'D-091 · a unique field\'s card: the column (auth_provider), its type (' + uf[1] + '), required, unique, and what it is unique together with — no renderer issue', cU && { name: cU.name, pills: cU.pills, issue: cU.issue });
+  ok(cO && !cO.issues && cO.name === 'email' && cO.text.includes(ef[1]) && cO.pills.includes(CMK.optional) && cO.pills.includes(IW9.uqNo) && !cO.pills.includes(IW9.uqYes) && cI && !cI.issues && cI.pills.includes(CMK.required) && cI.pills.includes(IW9.uqNo),
+    'D-091 · a field that can be null and is not unique says so (optional · not unique), and a key column says required · not unique', cO && { pills: cO.pills, id: cI && cI.pills });
+  await p.evaluate(() => window.__allepEx.pick('table', 'table:cooking_sessions')); await p.waitForTimeout(250);
+  const cs = await p.evaluate(() => window.__allep.data.ex.cat['table:cooking_sessions']), fkc = cs.fks[0], cF = await hoverCard(TBK + ' .sqs > .sq', cs.cols.findIndex((f) => f[0] === fkc[0]));
+  ok(cF && !cF.issues && cF.name === fkc[0] && cF.text.includes(fkc[1]) && cF.text.includes(IW9.fk), 'D-091 · a key to another table says where it points: ' + fkc[0] + ' ' + IW9.fk + ' ' + fkc[1], cF && cF.text.slice(0, 160));
+  await p.evaluate(() => window.__allepEx.pick('schema', 'schema:CookingSessionResponse')); await p.waitForTimeout(250);
+  const SBK = '#exgrid .excol[data-k="schema"] .blk', scr = await p.evaluate(() => window.__allep.data.ex.cat['schema:CookingSessionResponse']), oi = scr.cols.findIndex((f) => !f[4]), cS = await hoverCard(SBK + ' .sqs > .sq', oi),
+    lgS = await p.evaluate((sel) => [...document.querySelectorAll(sel + ' .exlgi')].map((i) => [i.getAttribute('data-lg'), +i.getAttribute('data-n')]), SBK), nOptS = scr.cols.filter((f) => !f[4]).length;
+  ok(cS && !cS.issues && cS.name === scr.cols[oi][0] && cS.pills.includes(CMK.optional) && JSON.stringify(lgS) === JSON.stringify([['opt', nOptS]]), 'D-091 · a schema field that may be left out: its card says optional, and the legend under the block counts them (' + nOptS + ' of ' + scr.cols.length + ') with no unique entry', { pills: cS && cS.pills, lgS });
+  /* (6) item 4 — the options. What the feed says is read HERE, from forms.json: a function's write that a commit saves (the step's own bucket), a test's request that proves an ending (its `refs`), a fork the way takes (the chain's `hit`) */
+  const OPTK = ['fn', 'test', 'end'], KEEP = { fn: PINS.fn.copy, test: PINS.test.copy, end: BASE_COPY }, E2 = 'DELETE /pantry/locations/{location_id}';
+  await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(450);
+  const o0 = await p.evaluate((ks) => ks.map((k) => ({ k, fact: window.__allepEx.state.col[k].look.fact, def: window.__allep.data.ex.look[k].fact, on: document.querySelectorAll('#exgrid .excol[data-k="' + k + '"] .sqs > .sq[data-yn]').length,
+    opts: [...document.querySelectorAll('#exgrid .excol[data-k="' + k + '"] .exynopts [data-xyn]')].map((b) => ({ v: b.getAttribute('data-v'), on: b.getAttribute('aria-checked'), pick: b.hasAttribute('data-pick'), bs: getComputedStyle(b).borderTopStyle, label: b.getAttribute('aria-label') })),
+    lg: document.querySelectorAll('#exgrid .excol[data-k="' + k + '"] .exlg').length, copy: window.__allepEx.copy(k) })), OPTK);
+  ok(o0.every((x) => x.fact === 'off' && x.def === 'off' && x.on === 0 && x.lg === 0 && x.copy === KEEP[x.k] && JSON.stringify(x.opts.map((q) => q.v)) === JSON.stringify(Object.keys(YW.opts)) && x.opts.filter((q) => q.on === 'true').map((q) => q.v).join() === 'off'
+    && x.opts.filter((q) => q.pick).map((q) => q.v).join() === YW.pick && x.opts.every((q) => (q.bs === 'dashed') === (q.v === YW.pick) && q.label === YW.opts[q.v].name)),
+    'D-091 · item 4: the fact option of a function, a test and an ending is OFF by default — no mark carries it, no legend entry, the copy line is the one before the change — and my pick (' + YW.opts[YW.pick].name + ') is the dashed one', o0);
+  const facts = async (ep) => { const epj = FJ.endpoints['endpoint:' + ep], saved = {}, sk = (f, t) => f + '|' + t;
+    for (const pth of epj.paths) { const e = pth.effects, bk = {}; ['committed', 'maybe_committed', 'rolled_back', 'uncommitted'].forEach((b) => (e[b] || []).forEach((id) => { bk[id] = b; }));
+      for (const s of e.steps) { const st = FJ.steps[s.step] || {}; if (!st.fn || !st.table || !WROPS.has(st.op)) continue; const key = sk(st.fn, st.table); saved[key] = saved[key] || bk[s.step] === 'committed'; } }
+    await p.evaluate((e) => window.__allep.pick(e), ep); await p.waitForTimeout(350);
+    const R = await p.evaluate((e) => { const D0 = window.__allep.data, r = D0.rows.filter((x) => x.id === e)[0], c = (i) => D0.ex.cat[i]; return { fn: r.ex.fn.map((x) => [x[0], x[2].ops.map((q) => q[0] + '|' + q[1])]),
+      test: r.ex.test.map((x) => [x[0], c(x[0]).cid, c(x[0]).calls.map((q) => q[2])]), end: r.ex.end.map((x) => [x[0], c(x[0]).paths[0] || null]) }; }, ep);
+    const out = { fn: R.fn.map(([id, ops]) => [id, ops.map((o) => { const [rw, t] = o.split('|'); const k = sk(id.replace(/^fn:/, ''), t); return rw.includes('w') && k in saved ? (saved[k] ? 1 : 0) : null; })]),
+      test: R.test.map(([id, cid, roles]) => [id, roles.length ? roles.map((rl, i) => rl === 'act' ? (((FJ.test_cases[cid] || {}).calls || [])[i].refs || []).some((z) => !String(z.conf || '').startsWith('ambiguous')) ? 1 : 0 : null) : null]),
+      end: R.end.map(([id, pid]) => [id, pid ? epj.paths.filter((x) => x.id === pid)[0].chain.filter((c) => c.kind === 'branch').map((c) => (c.hit ? 1 : 0)) : []]) };
+    return out; };
+  const factsOf = (mk) => mk.map((m) => (m.mk && /-y$/.test(m.mk) ? 1 : m.mk && /-n$/.test(m.mk) ? 0 : null));
+  const setFact = (k, v) => p.evaluate((a) => { window.__allepEx.state.col[a[0]].look.fact = a[1]; window.__allepEx.render(); }, [k, v]);
+  const yst = { fn: { yes: 0, no: 0, none: 0, items: 0 }, test: { yes: 0, no: 0, none: 0, items: 0 }, end: { yes: 0, no: 0, none: 0, items: 0 } }, ybad = [], FOUND = {};
+  for (const ep of [E, E2]) { const F = await facts(ep); FOUND[ep] = F;
+    for (const k of OPTK) { const BK = '#exgrid .excol[data-k="' + k + '"] .blk';
+      for (const [id, want] of F[k]) { await p.evaluate((a) => window.__allepEx.pick(a[0], a[1]), [k, id]); await p.waitForTimeout(40);
+        const off = await p.evaluate(STRIP, BK); if (off.some((m) => m.yn || /-[yn]$/.test(m.mk || ''))) ybad.push([ep, k, id, 'off carries a fact']);
+        await setFact(k, 'corners'); await p.waitForTimeout(40);
+        const on = await p.evaluate(STRIP, BK), got = factsOf(on); yst[k].items++;
+        let exp = want; if (k === 'end') { const br = want.slice(); exp = on.map((m) => (/^way-branch/.test(m.mk || '') ? br.shift() : null)); if (br.length) exp = null; } else if (k === 'test' && want === null) exp = on.map(() => null);
+        if (!exp || JSON.stringify(got) !== JSON.stringify(exp)) ybad.push([ep, k, id, got, exp]);
+        got.forEach((v) => { yst[k][v === 1 ? 'yes' : v === 0 ? 'no' : 'none']++; });
+        on.forEach((m, i) => { const y = got[i]; if (y == null ? (m.yn || /\byn\b/.test(m.cls)) : !(m.yn === 'corners' && m.cls.includes(y ? 'yny' : 'ynn') && ((m.bef === '""' && m.aft === '""') === (y === 1)))) ybad.push([ep, k, id, 'mark', i, m.cls, m.bef]); });
+        await setFact(k, 'off'); } } }
+  ok(!ybad.length && OPTK.every((k) => yst[k].items > 0 && yst[k].yes > 0 && yst[k].no > 0 && yst[k].none > 0), 'D-091 · item 4, with each option on, over every element of each kind on two endpoints (' + E + ' · ' + E2 + '): ' + OPTK.map((k) => k + ' ' + yst[k].items + ' elements · ' + yst[k].yes + ' yes · ' + yst[k].no + ' no · ' + yst[k].none + ' with no such fact').join(' · ') + ' — each mark as the feed says (' + OPTK.map((k) => YW.kinds[k].name).join(' · ') + ')', { yst, bad: ybad.slice(0, 4) });
+  console.log('  D-091 options on ' + E + ' + ' + E2 + ' · ' + OPTK.map((k) => k + ' ' + yst[k].yes + ' yes ' + yst[k].no + ' no ' + yst[k].none + ' none').join(' · '));
+  /* the option as a control: a real click, the legend, the card, the copy line, the storage, back to off */
+  const clickOpt = async (k, v) => { await p.click('#exgrid .excol[data-k="' + k + '"] .exynopts [data-xyn="' + v + '"]'); await p.waitForTimeout(150); };
+  for (const k of OPTK) { const ep = k === 'test' ? E : E2, F = FOUND[ep], BK = '#exgrid .excol[data-k="' + k + '"] .blk', K = YW.kinds[k];
+    const loc = (st) => { for (const [id, w] of F[k]) { const i = (w || []).indexOf(st); if (i >= 0) return [id, i]; } return null; };
+    await p.evaluate((e) => window.__allep.pick(e), ep); await p.waitForTimeout(300);
+    const first = loc(1) || [F[k][0][0], 0];
+    await p.evaluate((a) => window.__allepEx.pick(a[0], a[1]), [k, first[0]]); await p.waitForTimeout(100);
+    const c0 = await p.evaluate((q) => window.__allepEx.copy(q), k), html0 = await p.evaluate((b) => document.querySelector(b + ' .sqs').outerHTML, BK);
+    await clickOpt(k, 'corners');
+    const s1 = await p.evaluate((a) => ({ fact: window.__allepEx.state.col[a].look.fact, lg: [...document.querySelectorAll('#exgrid .excol[data-k="' + a + '"] .exlgi')].map((i) => ({ lg: i.getAttribute('data-lg'), n: +i.getAttribute('data-n'), text: i.textContent.replace(/\s+/g, ' ').trim() })),
+      chk: [...document.querySelectorAll('#exgrid .excol[data-k="' + a + '"] .exynopts [data-xyn]')].filter((b) => b.getAttribute('aria-checked') === 'true').map((b) => b.getAttribute('data-v')), store: JSON.parse(window.localStorage.getItem('gabe:allep:bench:v3') || '{}'), copy: window.__allepEx.copy(a) }), k);
+    const mk1 = await p.evaluate(STRIP, BK), f1 = factsOf(mk1), ny = f1.filter((v) => v === 1).length;
+    const nrm = (x) => x.replace(/ \([^()]*\)$/, ''), tailOf = (x) => (/ \(([^()]*)\)$/.exec(x) || [])[1];                 /* the line's closing "(my pick)" turns to "(your choice)" for any look that is not the default — the page's own rule */
+    ok(s1.fact === 'corners' && s1.chk.join() === 'corners' && nrm(s1.copy) === nrm(c0).replace(' · not drawn', ' · ' + K.name + ' ' + YW.opts.corners.name + ' · not drawn') && tailOf(s1.copy) !== tailOf(c0) && s1.store.col && s1.store.col[k].look.fact === 'corners' && OPTK.filter((q) => q !== k).every((q) => !s1.store.col[q].look.fact || s1.store.col[q].look.fact === 'off')
+      && s1.lg.length === 1 && s1.lg[0].lg === 'yes' && s1.lg[0].n === ny && ny > 0 && s1.lg[0].text.startsWith(K.name), 'D-091 · ' + k + ' · turned on by a real click: the copy line grows by one phrase (' + K.name + ' ' + YW.opts.corners.name + ') and only that, it is saved for this column alone, and the legend says "' + s1.lg.map((q) => q.text).join('') + '"', { fact: s1.fact, lg: s1.lg, chk: s1.chk, copy: s1.copy.slice(-150) });
+    /* the card of a mark that has the fact, of one that lacks it, of one that has no such fact */
+    const at = async (st) => { const l = loc(st); if (!l) return null; await p.evaluate((a) => window.__allepEx.pick(a[0], a[1]), [k, l[0]]); await p.waitForTimeout(80);
+      if (k !== 'end') return hoverCard(BK + ' .sqs > .sq', l[1]);
+      const m = await p.evaluate(STRIP, BK), ix = m.map((x, i) => [x, i]).filter(([x]) => /^way-branch/.test(x.mk || '')); return hoverCard(BK + ' .sqs > .sq', ix[l[1]][1]); };
+    const cy = await at(1), cn = await at(0);
+    if (k === 'end') ok(cy && !cy.issues && cy.text.includes(D.words.ex.region.taken) && cn && !cn.issues && cn.text.includes(D.words.ex.region.notTaken), 'D-091 · end · the card of a fork says whether the way takes it (' + D.words.ex.region.taken + ' · ' + D.words.ex.region.notTaken + ') — it said so before the option, and says it after', { cy: cy && cy.text.slice(-90), cn: cn && cn.text.slice(-90) });
+    else { const cz = await (async () => { await p.evaluate((a) => window.__allepEx.pick(a[0], a[1]), [k, (F[k].filter(([, w]) => (w || []).includes(null))[0] || F[k][0])[0]]); await p.waitForTimeout(80); const m = factsOf(await p.evaluate(STRIP, BK)), i = m.indexOf(null); return i >= 0 ? hoverCard(BK + ' .sqs > .sq', i) : null; })();
+      ok(cy && !cy.issues && cy.text.includes(K.yes) && !cy.text.includes(K.no) && cn && !cn.issues && cn.text.includes(K.no) && !cn.text.includes(K.yes) && cz && !cz.issues && !cz.text.includes(K.yes) && !cz.text.includes(K.no),
+        'D-091 · ' + k + ' · with the option on, the card of a mark that has the fact says "' + K.yes + '", one that lacks it says "' + K.no + '", and a mark of another nature says neither', { yes: cy && cy.text.slice(-130), no: cn && cn.text.slice(-130), none: cz && cz.text.slice(-100) }); }
+    await p.evaluate((a) => window.__allepEx.pick(a[0], a[1]), [k, first[0]]); await p.waitForTimeout(100);
+    const bc1 = await p.evaluate((b) => { const C = window.__allepCard, S0 = C.subject(document.querySelector(b)), d = document.createElement('div'); d.innerHTML = C.make(S0.ck, S0); return { issues: +d.firstChild.getAttribute('data-card-issues'), mx: [...d.querySelectorAll('.mx')].map((m) => [m.getAttribute('data-mk'), m.getAttribute('aria-label'), !!m.querySelector('[data-yn]')]) }; }, BK);
+    ok(!bc1.issues && bc1.mx.every((m) => m[1]) && bc1.mx.some((m) => /-[yn]$/.test(m[0])) && bc1.mx.filter((m) => /-[yn]$/.test(m[0])).every((m) => m[2]), 'D-091 · ' + k + ' · the block\'s card counts the marks by the same words (' + bc1.mx.filter((m) => /-[yn]$/.test(m[0])).map((m) => m[1]).join(' · ') + ') and draws them as the strip does', bc1);
+    if (k !== 'end') { const g0 = loc(0) || first; await p.evaluate((a) => window.__allepEx.pick(a[0], a[1]), [k, g0[0]]); await p.waitForTimeout(80); await clickOpt(k, 'grey'); const mk2 = await p.evaluate(STRIP, BK), w2 = factsOf(mk2);
+      ok(mk2.every((m, i) => (w2[i] == null ? !m.yn : m.yn === 'grey') && (w2[i] === 0) === /grayscale/.test(m.fil) && m.bef === 'none') && w2.includes(0), 'D-091 · ' + k + ' · grey: a mark that lacks the fact is drawn in grey, the rest keep their colour, no corner is drawn (' + w2.filter((v) => v === 0).length + ' grey)', { w2 }); }
+    await clickOpt(k, 'off'); await p.evaluate((a) => window.__allepEx.pick(a[0], a[1]), [k, first[0]]); await p.waitForTimeout(100);
+    const s3 = await p.evaluate((a) => ({ copy: window.__allepEx.copy(a), html: document.querySelector('#exgrid .excol[data-k="' + a + '"] .blk .sqs').outerHTML, lg: document.querySelectorAll('#exgrid .excol[data-k="' + a + '"] .exlg').length }), k);
+    ok(s3.copy === c0 && s3.html === html0 && !s3.lg, 'D-091 · ' + k + ' · turned off again: the copy line, the strip and the legend are what they were, byte for byte', { same: s3.copy === c0, strip: s3.html === html0, lg: s3.lg });
+    await clickOpt(k, 'corners'); await p.click('#exgrid .excol[data-k="' + k + '"] .exreset'); await p.waitForTimeout(150);
+    ok((await p.evaluate((a) => window.__allepEx.state.col[a].look.fact, k)) === 'off', 'D-091 · ' + k + ' · "back to the default" puts the option off too'); }
+  /* an old saved configuration is read as it was: a look saved before this change has no `fact` — it stays as he left it, and the option is off */
+  await p.evaluate(() => { const st = JSON.parse(JSON.stringify(window.__allepEx.state)), o = { lay: st.lay, follow: st.follow, col: {} }; Object.keys(st.col).forEach((k) => { const c = st.col[k], l = JSON.parse(JSON.stringify(c.look)); delete l.fact; o.col[k] = { scope: c.scope, role: c.role, id: c.id, look: l, width: c.width }; });
+    o.col.fn.look.size.name = 15; window.localStorage.setItem('gabe:allep:bench:v3', JSON.stringify(o)); });
+  await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400);
+  const ol = await p.evaluate((ks) => ks.map((k) => [k, window.__allepEx.state.col[k].look.fact, window.__allepEx.state.col[k].look.size.name]), OPTK);
+  ok(ol.every((x) => x[1] === 'off') && ol[0][2] === 15 && ol[1][2] !== 15, 'D-091 · his saved configuration (a look saved before the change, no `fact` in it) is read as it was — the size he set is kept (' + ol[0][2] + '), the option is off, nothing is migrated', ol);
+  await p.evaluate(() => { try { window.localStorage.removeItem('gabe:allep:bench:v3'); } catch (e) {} }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400);
+  /* (7) every element of every endpoint, the options on: every mark's card and every block's card through card() and its guard */
+  const sw91 = { marks: 0, blocks: 0, issues: [], errs: [], unlabeled: 0 };
+  await p.evaluate(() => { ['fn', 'test', 'end'].forEach((k) => { window.__allepEx.state.col[k].look.fact = 'corners'; }); });
+  for (const id of D.rows.map((r) => r.id)) { await p.evaluate((ep) => window.__allep.pick(ep), id); await p.waitForTimeout(40);                       /* the cards read the open endpoint: each is made on its own */
+    const r = await p.evaluate((ep) => { const C = window.__allepCard, D0 = window.__allep.data, r = D0.rows.filter((x) => x.id === ep)[0], o = { marks: 0, blocks: 0, issues: [], errs: [], unlabeled: 0 };
+      const once = (h, tag) => { const d = document.createElement('div'); d.innerHTML = h; const cc = d.firstChild; if (+cc.getAttribute('data-card-issues')) o.issues.push(ep + ' · ' + tag + ' → ' + cc.getAttribute('data-card-issue')); return cc; };
+      for (const k of ['table', 'schema', 'fn', 'test', 'end']) for (const e of (r.ex[k] || [])) { const it = { k, id: e[0], role: e[1], ep: r.id, o: e[2] }, c = D0.ex.cat[e[0]];
+        try { const t = document.createElement('div'); t.setAttribute('data-tip', 'exblk'); t.setAttribute('data-exk', k); t.setAttribute('data-exid', e[0]); t.setAttribute('data-exep', r.id);
+          const S0 = C.subject(t); o.blocks++; const cc = once(C.make(S0.ck, S0), k + ' ' + e[0] + ' block'); cc.querySelectorAll('.mx').forEach((m) => { if (!m.getAttribute('aria-label')) o.unlabeled++; });
+          const n = k === 'table' ? c.cols.length + (c.more || []).length : k === 'schema' ? c.cols.length : k === 'fn' ? e[2].ops.length : k === 'test' ? (c.calls.length || c.raises.length) : 0;
+          for (let i = 0; i < n; i++) { const S1 = C.region(k, it, 'items', 'marks', i, null); if (!S1) { o.errs.push(k + ' ' + e[0] + ' mark ' + i + ' has no region'); continue; } o.marks++; once(C.make('reg', S1), k + ' ' + e[0] + ' mark ' + i); }
+        } catch (x) { o.errs.push(k + ' ' + e[0] + ' ' + x.message); } }
+      return o; }, id);
+    sw91.marks += r.marks; sw91.blocks += r.blocks; sw91.unlabeled += r.unlabeled; r.issues.forEach((x) => sw91.issues.push(x)); r.errs.forEach((x) => sw91.errs.push(x)); }
+  await p.evaluate(() => { ['fn', 'test', 'end'].forEach((k) => { window.__allepEx.state.col[k].look.fact = 'off'; }); });
+  /* a join the TABLE block's card already failed before this change — an undrawn table whose ops name a function the card's own rows never name (GET /recipes: 3 cards, measured on the page at d496480, same text) — is no
+     part of this work and is told apart: every other issue is a failure, and none may sit on a schema, a function, a test, an ending or any mark */
+  const PRE = /^[^·]+ · table table:\S+ block → (p4\.1 the function “[^”]+” is not named( \| )?)+$/, preIssues = sw91.issues.filter((x) => PRE.test(x)), newIssues = sw91.issues.filter((x) => !PRE.test(x));
+  ok(sw91.blocks > 3000 && sw91.marks > 5000 && !newIssues.length && !sw91.errs.length && !sw91.unlabeled && preIssues.length <= 8, 'D-091 · all ' + D.rows.length + ' endpoints, the three options on: ' + sw91.blocks + ' block cards and ' + sw91.marks + ' field and mark cards made through card() and its guard — none with an issue of this work, none unmade, every counted mark labelled (' + preIssues.length + ' table block cards of undrawn tables keep a P4.1 join they had before)', { blocks: sw91.blocks, marks: sw91.marks, newIssues: newIssues.slice(0, 3), errs: sw91.errs.slice(0, 3), unlabeled: sw91.unlabeled, pre: preIssues.length });
+  console.log('  D-091 every element: ' + sw91.blocks + ' block cards · ' + sw91.marks + ' mark cards');
+  const log91 = await p.evaluate(() => window.__allepCard.log.filter((x) => !(x.ck === 'table' && x.issues.every((q) => /^p4\.1 the function “[^”]+” is not named$/.test(q)))).slice(0, 3));
+  ok(!log91.length && !errs.length, 'D-091 · the renderer\'s log holds no issue of this work and the page (and the lab) raised no error', { log: log91, errs: errs.slice(0, 3) });
+  await labp.close(); }
+}
 
 await b.close();
 console.log((fail ? 'FAIL ✗' : 'PASS ✓') + ` probe-all-endpoints · ${pass} passed · ${fail} failed · ${FEED.length} endpoints · sample ${SAMPLE.length} · page ${path.basename(PAGE)}`);

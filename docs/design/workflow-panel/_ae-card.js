@@ -415,9 +415,10 @@
     marks: function (S0) { var c = S0.c, i = S0.ri, nc = c.cols.length, f = i < nc ? c.cols[i] : c.more[i - nc], F, R = CRI;
       if (i >= nc) { F = crItem(S0, cdSvg("doc", "var(--muted)", 16), f[0], "var(--muted)"); F.ident.push(cdLine("mark", "doc", R.more)); F.ident.push(cdLine("type", "doc", f[1] || W.unknown)); return F; }
       F = crField(S0, f); F.chips = [cdPill(f[3] ? CDW.optional : CDW.required, f[3] ? EX.col.opc.pure : EX.col.opc.gate, cdLook("table"))];
-      var fk = (c.fks || []).filter(function (x) { return x[0] === f[0]; })[0], uq = (c.uq || []).filter(function (u) { return u[1].indexOf(f[0]) >= 0; })[0];
+      var fk = (c.fks || []).filter(function (x) { return x[0] === f[0]; })[0], uq = (c.uq || []).filter(function (u) { return u[1].indexOf(f[0]) >= 0; })[0], isUq = !!xUqSet(c)[f[0]];
+      F.chips.push(cdPill(isUq ? R.uqYes : R.uqNo, isUq ? "var(--accent)" : EX.col.opc.pure, cdLook("table")));                       /* D-091: the column, its type, optional or required, unique or not, the key it points to */
       if (fk) { F.facts.push(cdFact("fk", R.fk + " " + fk[1], cdIco("link"), [crD(R.fk), cdChName(fk[1], "model", EX.col.kind.model)], null)); F.joins.push({ end: "table", want: [fk[1]] }); }
-      if (uq || (c.uqs || []).indexOf(f[0]) >= 0) { var rest = uq ? uq[1].filter(function (x) { return x !== f[0]; }) : [];
+      if (uq || isUq) { var rest = uq ? uq[1].filter(function (x) { return x !== f[0]; }) : [];
         F.facts.push(cdFact("uq", rest.length ? R.uqWith + " " + rest.join(" \u00b7 ") : R.uq, cdIco("key"), rest.length ? [crD(R.uqWith)].concat(rest.map(crK)) : [crV(R.uq)], null)); }
       return F; } };
   CDREG.schema = {
@@ -456,7 +457,11 @@
     marks: function (S0) { var c = S0.c, q = S0.it.o.ops[S0.ri], tc = EX.cat["table:" + q[1]], col = EX.col.rw[q[0]] || EX.col.opc.pure, F = crItem(S0, xSvg("model", 16, col), q[1], col);   /* a table it touches, read or written */
       F.chips = [cdPill(xRoleName("table", q[0]), col, cdLook("fn"))];
       if (tc) { if (tc.ent) F.ident.push(cdLine("entity", "entity", tc.ent, tc.ec, cdLift(tc.ec))); F.ident.push(cdLine("class", "doc", tc.model || W.unknown, EX.col.kind.schema)); }
-      F.facts.push(cdFact("by", c.n, cdRw(q[0]), [cdChFn(c.n)], null)); F.joins.push({ end: "function", want: [c.n] }); return F; } };
+      F.facts.push(cdFact("by", c.n, cdRw(q[0]), [cdChFn(c.n)], null)); F.joins.push({ end: "function", want: [c.n] });
+      cdYnFact(F, "fn", c, S0.it, S0.ri); return F; } };
+  /* D-091 item 4: the yes or no a mark carries, said on its card only while the column's option marks it (an option that is off changes nothing) */
+  function cdYnFact(F, k, c, it, i, q) { var L = cdLook(k), v = xYn(k, c, it, i, q); if (!xYnOn(L) || v == null) return; var K = XW.yn.kinds[k], w = v ? K.yes : K.no;
+    F.facts.push(cdFact("yn", w, cdIco(v ? "target" : "alert"), [crV(w)], null)); }
   CDREG.test = {
     head: function (S0) { var c = S0.c, it = S0.it, F = crHead(S0), W0 = CRH.test, ok = c.state === "pass", col = ok ? EX.col.opc.read : "var(--alert)", E = xTestEnds(it), all = [];   /* its result, and the ending it proves */
       F.chips = [cdPill(ok ? XW.face.pass : XW.face.fail, col, cdLook("test"))];
@@ -476,7 +481,8 @@
         F.ident.push(cdLine("at", "target", xShort(c.file) + ":" + q[3]));
         if (q[4]) F.facts.push(cdFact("helper", xRoleName("test", "helper") + " " + q[4], cdIco("function", EX.col.kind["function"]), [crD(xRoleName("test", "helper")), cdChFn(q[4])], null));
         if ((q[5] || []).length) { var hs = fill(K["in"], { v: q[5].join(" \u00b7 ") }); F.facts.push(cdFact("sends", hs, cdIco("up"), [crV(hs)], null)); }
-        var fl = xAsserts([q]).f; if (fl.length) { var fs0 = fill(K.outFields, { v: fl.join(" \u00b7 ") }); F.facts.push(cdFact("reads", fs0, cdIco("target"), [crV(fs0)], null)); } return F; }
+        var fl = xAsserts([q]).f; if (fl.length) { var fs0 = fill(K.outFields, { v: fl.join(" \u00b7 ") }); F.facts.push(cdFact("reads", fs0, cdIco("target"), [crV(fs0)], null)); }
+        cdYnFact(F, "test", c, S0.it, i); return F; }
       var z = c.raises[i]; F = crItem(S0, crFnGlyph(null), z[0], EX.col.kind["function"]); F.chips = [cdPill(xRoleName("test", "service"), EX.col.kind["function"], cdLook("test"))];
       F.ident.push(cdLine("at", "target", xShort(c.file) + ":" + z[2])); F.facts.push(cdFact("direct", fill(K.doService, { v: z[0] }), cdIco("function", EX.col.kind["function"]), [crV(fill(K.doService, { v: z[0] }))], null));
       F.facts.push(cdFact("expects", XW.chain.raise + " " + z[1], cdIco("alert", "var(--cd-red)"), [crD(XW.chain.raise), cdChCls(z[1])], null)); F.joins.push({ end: "function", want: [z[0]] }); return F; } };

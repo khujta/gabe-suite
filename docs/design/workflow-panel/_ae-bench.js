@@ -18,7 +18,8 @@
     if (xr) { if (XW.opt.lay.opts[xr.lay]) XS.lay = xr.lay; if (XW.opt.follow.opts[xr.follow]) XS.follow = xr.follow;
       XK.forEach(function (k) { var c = (xr.col || {})[k]; if (!c) return; var st = XS.col[k];
         if (XW.opt.scope.opts[c.scope]) st.scope = c.scope; if (typeof c.id === "string") st.id = c.id; if (typeof c.role === "string") st.role = c.role; if (XW.width.opts[c.width]) st.width = c.width;
-        if (c.look && Array.isArray(c.look.rows) && c.look.rows.length === 3) st.look = Object.assign(xClone(EX.look[k]), c.look); }); } } catch (e) {}
+        if (c.look && Array.isArray(c.look.rows) && c.look.rows.length === 3) st.look = Object.assign(xClone(EX.look[k]), c.look);
+        if (EX.yn && EX.yn.kinds.indexOf(k) >= 0 && !(XW.yn.opts || {})[st.look.fact]) st.look.fact = "off"; }); } } catch (e) {}   /* D-091: a remembered extra mark must name an option, else it is off */
   function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, col: {} }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
     window.localStorage.setItem(XKEY, JSON.stringify(o)); } catch (e) {} }
   /* L-36 · the controls' icons (24px, drawn by the same rule as BY MOMENT's option squares): the columns' layouts, follow or stay, the
@@ -31,6 +32,8 @@
       width: { dynamic: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="13" height="8" rx="1"/>',   /* D-087: the default fills its column's walls, the other three narrow inside them */
         shorter: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="9" height="8" rx="1"/>',
         compact: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="6" height="8" rx="1"/>', tight: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="3.5" height="8" rx="1"/>' },
+      yn: { off: '<rect x="5" y="5" width="14" height="14" rx="2"/>', corners: '<rect x="6" y="6" width="12" height="12" rx="2" opacity=".45"/><path d="M3 9V3h6"/><path d="M21 15v6h-6"/>',
+        grey: '<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M5 19L19 5V19z" fill="currentColor" stroke="none"/>' },   /* D-091: not marked · the other two corners · the no in grey */
       prev: '<path d="M15 5l-7 7 7 7"/>', next: '<path d="M9 5l7 7-7 7"/>', copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
       reset: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>' };
   var XSTR = EX.str; function xT(i) { return i == null ? null : XSTR[i]; }   /* the generator's one table of repeated strings */
@@ -204,9 +207,13 @@
     else if (/e-char/.test(cls)) q.textContent = ch || ""; if (title) q.setAttribute("data-w", title);
     if (mk) { q.setAttribute("data-mk", mk); if (mv != null) q.setAttribute("data-mv", mv); }   /* D-088: what the mark counts — the hover card's marks are these, counted, labelled by mo.card.mark[mk] */
     return q; }
+  /* D-091 · ONE field mark, the lab's sqNode: `e-<enc> t-<type>` in the type's colour, `opt` when the column can be null (a schema's: when the field is not required) — drawn at the
+     optional stop of the lab's opacity bar — `fk` for a key to another table, `uq` for a unique one (the lab's two corners). The mark's card counts it by the same words (field-opt · field-uq) */
   function xField(f, L, c, it, extra) { var tc = XSQ[f[2]] || XSQ.other, pal = L.sqPal, col = pal === "mono" ? "var(--muted)" : pal === "entity" ? (c.ec || "var(--muted)")
-      : pal === "channel" ? xChanCol(it.k, c, it) : tc.col;
-    return xMark("e-" + L.sqEnc + " t-" + tc.key + (f[3] ? " opt" : "") + (extra ? " " + extra : ""), col, tc.sym, tc.ch, f[0], "field", tc.word); }
+      : pal === "channel" ? xChanCol(it.k, c, it) : tc.col, uq = / uq\b|^uq\b/.test(extra || "");
+    return xMark("e-" + L.sqEnc + " t-" + tc.key + (f[3] ? " opt" : "") + (extra ? " " + extra : ""), col, tc.sym, tc.ch, f[0], "field" + (f[3] ? "-opt" : "") + (uq ? "-uq" : ""), tc.word); }
+  /* a table's unique columns: the lab's rule (uqSet) — every column a unique key names, composite keys included */
+  function xUqSet(c) { var o = {}; (c.uqs || []).forEach(function (u) { (Array.isArray(u) ? u : [u]).forEach(function (n) { o[n] = 1; }); }); return o; }
   /* an ending's strip of marks, one per step of the first way to it (the steps themselves are not marks): the mark's colour, symbol, letter, class and what it counts.
      ONE source — the strip draws it and, since D-089, the card of each mark reads it, so the two never say a mark differently */
   function xWayList(c) { var P = c.paths.length ? BYID[c.ep].ex.paths[c.paths[0]] : null; return (P ? P.ch : []).filter(function (q) { return q[0] !== "step"; }); }
@@ -214,15 +221,25 @@
     return { col: t === "gate" ? (q[2] ? xStatusCol(c.st) : E.opc.gate) : t === "call" ? E.kind["function"] : t === "branch" ? E.opc.call : t === "switch" ? E.opc.pure : xStatusCol(c.st),
       sym: t === "gate" ? "shield" : t === "call" ? "function" : t === "branch" ? "merge" : t === "switch" ? "role" : "target", ch: t === "call" ? "ƒ" : t.charAt(0).toUpperCase(),
       cls: (t === "gate" && q[2] === 0 ? "expass" : "") + (t === "exit" ? " exhere" : ""), mk: "way-" + (t === "gate" ? (q[2] === 0 ? "pass" : "stop") : t) }; }
-  function xStrip(k, c, it, L) { var s = el("div", "sqs"), o = it.o, enc = L.sqEnc === "symbol" || L.sqEnc === "char" ? L.sqEnc : "colour", E = EX.col;
-    function m(col, sym, ch, cls, mk) { s.appendChild(xMark("e-" + enc + (cls ? " " + cls : ""), col, sym, ch, null, mk)); }
-    if (k === "table") { var fk = {}, uq = {}; (c.fks || []).forEach(function (f) { fk[f[0]] = 1; }); (c.uqs || []).forEach(function (u) { uq[u] = 1; });
+  /* D-091 · item 4 — a yes/no FACT a mark can carry, the feed's own: a function's write that a commit saves (fn op[2]) · a test's request that proves an ending (call[8]) · a fork the way takes
+     (the chain's own hit). 1 · 0 · null — null: the mark is of another nature (a read, a request that only sets up, a check), it has no such fact. Drawn only when the column's `fact` option
+     is on (off by default, my pick dashed): `corners` marks the yes in the two corners a unique key does not use, `grey` draws the no in grey. */
+  function xYn(k, c, it, i, q) {
+    if (k === "fn") { var op = it.o.ops[i]; return op && op[2] != null ? op[2] : null; }
+    if (k === "test") { var cl = c.calls[i]; return cl && cl[2] === "act" ? (cl[8] ? 1 : 0) : null; }
+    if (k === "end") return q && q[0] === "branch" ? (q[2] ? 1 : 0) : null;
+    return null; }
+  function xYnOn(L) { return !!L.fact && L.fact !== "off"; }
+  function xYnMark(q, L, v, mk) { if (!xYnOn(L) || v == null) return mk; q.classList.add("yn", v ? "yny" : "ynn"); q.setAttribute("data-yn", L.fact); return mk + (v ? "-y" : "-n"); }
+  function xStrip(k, c, it, L) { var s = el("div", "sqs"), o = it.o, enc = L.sqEnc === "symbol" || L.sqEnc === "char" ? L.sqEnc : "colour", E = EX.col, ix = 0;
+    function m(col, sym, ch, cls, mk, yn) { var q = xMark("e-" + enc + (cls ? " " + cls : ""), col, sym, ch, null, mk); var mk2 = xYnMark(q, L, yn, mk); if (mk2) q.setAttribute("data-mk", mk2); s.appendChild(q); }
+    if (k === "table") { var fk = {}, uq = xUqSet(c); (c.fks || []).forEach(function (f) { fk[f[0]] = 1; });
       c.cols.forEach(function (f) { s.appendChild(xField(f, L, c, it, (fk[f[0]] ? "fk" : "") + (uq[f[0]] ? " uq" : ""))); });
       (c.more || []).forEach(function (f) { s.appendChild(xMark("e-colour exmore", "var(--muted)", null, null, f[0], "more")); }); }
     else if (k === "schema") c.cols.forEach(function (f) { s.appendChild(xField([f[0], f[1], f[2], f[4] ? 0 : 1], L, c, it)); });
-    else if (k === "fn") o.ops.forEach(function (q) { m(E.rw[q[0]] || E.opc.pure, "model", q[0] === "w" ? "W" : "R", "", "op-" + (E.rw[q[0]] ? q[0] : "r")); });
-    else if (k === "end") xWayList(c).forEach(function (q) { var w = xWay(c, q); m(w.col, w.sym, w.ch, w.cls, w.mk); });
-    else if (k === "test") { if (c.calls.length) c.calls.forEach(function (q, i) { m(q[2] === "act" ? E.opc.call : q[2] === "arrange-checked" ? E.opc.gate : E.opc.pure, "endpoint", q[0] ? q[0].charAt(0) : "?", o.here.indexOf(i) >= 0 ? "exhere" : "", "call-" + (q[2] === "act" ? "act" : q[2] === "arrange-checked" ? "check" : "arrange")); });
+    else if (k === "fn") o.ops.forEach(function (q, i) { m(E.rw[q[0]] || E.opc.pure, "model", q[0] === "w" ? "W" : "R", "", "op-" + (E.rw[q[0]] ? q[0] : "r"), xYn(k, c, it, i)); });
+    else if (k === "end") xWayList(c).forEach(function (q) { var w = xWay(c, q); m(w.col, w.sym, w.ch, w.cls, w.mk, xYn(k, c, it, ix++, q)); });
+    else if (k === "test") { if (c.calls.length) c.calls.forEach(function (q, i) { m(q[2] === "act" ? E.opc.call : q[2] === "arrange-checked" ? E.opc.gate : E.opc.pure, "endpoint", q[0] ? q[0].charAt(0) : "?", o.here.indexOf(i) >= 0 ? "exhere" : "", "call-" + (q[2] === "act" ? "act" : q[2] === "arrange-checked" ? "check" : "arrange"), xYn(k, c, it, i)); });
       else c.raises.forEach(function () { m(E.kind["function"], "function", "ƒ", "exhere", "call-service"); }); }
     else if (k === "gate") { o.after.forEach(function () { m(E.opc.pure, "shield", "·", "expass", "after"); }); m(E.opc.gate, "shield", "!", "exhere", "self"); }
     else if (k === "hook") o.react.forEach(function (x) { m(xStatusCol(x[1]), "target", String(x[1]).charAt(0), x[2] ? "" : "exnob", x[2] ? "react-own" : "react-none"); });
@@ -264,12 +281,13 @@
     o.ops.forEach(function (q) { out.push(fill(K.ops, { op: xRoleName("table", q[0]), tbl: q[1] })); });
     if (c.commits) out.push(K.commit);
     return out; }
-  function xList(k, c, it) { var b = el("div", "bkfl exfl"), o = it.o, L = XW.list; b.setAttribute("data-tip", "exnone");
+  function xList(k, c, it) { var b = el("div", "bkfl exfl"), o = it.o, L = XW.list, LK = XS.col[k].look; b.setAttribute("data-tip", "exnone");
+    /* D-091: the list draws a field in the same mark as the strip (the lab's list calls the same sqNode): its encoding, its type's colour, paler when the column can be null */
     if (k === "table") { xHead(b, L.fields); var fk = {}; (c.fks || []).forEach(function (f) { fk[f[0]] = f[1]; });
-      c.cols.forEach(function (f) { xRow(b, [xMark("e-colour t-" + f[2], (XSQ[f[2]] || XSQ.other).col), f[0], el("span", "exs", f[1]), fk[f[0]] ? el("span", "exs", "→ " + fk[f[0]]) : null]); });
+      c.cols.forEach(function (f) { xRow(b, [xField(f, LK, c, it, ""), f[0], el("span", "exs", f[1]), fk[f[0]] ? el("span", "exs", "→ " + fk[f[0]]) : null]); });
       if (c.more.length) { xHead(b, fill(L.more, { n: c.more.length })); c.more.forEach(function (f) { xRow(b, [xMark("e-colour exmore", "var(--muted)"), f[0], el("span", "exs", f[1])]); }); }
       if (o.ops.length) { xHead(b, L.ops); o.ops.forEach(function (q) { xRow(b, [el("span", "exk", q[0]), q[2] ? xFnRef(xKeyOf(q[2]), 12) : null, el("span", "exs", q[1]), q[3] && q[0] !== "read" ? el("span", "exs", L.saved) : null]); }); } }
-    else if (k === "schema") { xHead(b, L.fields); c.cols.forEach(function (f) { xRow(b, [xMark("e-colour t-" + f[2], (XSQ[f[2]] || XSQ.other).col), f[0], el("span", "exs", f[1]), f[5] ? el("span", "exs", f[5]) : null]); }); }
+    else if (k === "schema") { xHead(b, L.fields); c.cols.forEach(function (f) { xRow(b, [xField([f[0], f[1], f[2], f[4] ? 0 : 1], LK, c, it, ""), f[0], el("span", "exs", f[1]), f[5] ? el("span", "exs", f[5]) : null]); }); }
     else if (k === "fn") { var dz = xFnDoes(c, o); if (dz.length) { xHead(b, L.does); dz.forEach(function (t) { xRow(b, [el("span", "exk", "·"), t]); }); }
       if (c.raises.length) { xHead(b, L.raises); c.raises.forEach(function (z, i) { var to = (o.rz || [])[i] || []; xRow(b, [el("span", "exk", "!"), z[0], el("span", "exs", z[1]), to.length ? xStatusChip(to.join("|"), 12) : null]); }); }
       if (o.ops.length) { xHead(b, L.tables); o.ops.forEach(function (q) { xRow(b, [xChip(q[0].toUpperCase(), EX.col.rw[q[0]], 12), xTblRef(q[1], 12)]); }); }
@@ -447,23 +465,50 @@
     if (!cur) { col.appendChild(el("p", "exnone", st.role ? XW.ctl.noneRole : XW.ctl.none)); return col; }
     if (cur.ep !== S.open) col.appendChild(el("p", "exon", fill(XW.ctl.on, { ep: cur.ep })));
     /* the block, in its look */
-    var L = st.look, w = el("div", "exw form-block rail-" + L.railSide + " rwbox-" + L.rwBox + " cntbox-" + L.cntBox + (L.rwA < 50 ? " rw-thin" : "") + (L.sqShape === "square" ? " sqs-square" : "")
+    var L = st.look, w = el("div", "exw form-block rail-" + L.railSide + " rwbox-" + L.rwBox + " cntbox-" + L.cntBox + (L.rwA < 50 ? " rw-thin" : "") + (L.sqShape === "square" ? " sqs-square" : "") + (L.sqOpt === 0 ? " sq-noopt" : "")
       + (L.sqUqMark === "corners" ? " uqm-corners uqc-" + L.sqUqAt : "") + (L.sqUqFlip ? " uqc-flip" : ""));
     w.style.setProperty("--rail-w", L.railW + "px"); w.style.setProperty("--rail-s", L.railStyle); w.style.setProperty("--rw-a", String(L.rwA)); w.style.setProperty("--cnt-a", String(L.cntA));
-    w.style.setProperty("--sq", L.sqSize + "px"); w.style.setProperty("--sqg", L.sqGap + "px"); w.style.setProperty("--uq-len", String((L.sqUqLen || 40) / 100));
+    w.style.setProperty("--sq", L.sqSize + "px"); w.style.setProperty("--sqg", L.sqGap + "px");
+    w.style.setProperty("--sq-base", String((L.sqBase == null ? 100 : L.sqBase) / 100)); w.style.setProperty("--sq-opt-a", String((L.sqOptA == null ? 50 : L.sqOptA) / 100));   /* the lab's opacity bar: the standard and the optional stop (D-091) */ w.style.setProperty("--uq-len", String((L.sqUqLen || 40) / 100));
     w.style.setProperty("--uq-w", (L.sqUqW || 1.5) + "px"); w.style.setProperty("--uq-tip", ((L.sqUqW || 1.5) * (L.sqUqTip || 10) / 100) + "px");
     w.appendChild(xBlock(k, cur, L)); col.appendChild(w);
     col.appendChild(xCtl(k, cur)); return col; }
+  /* D-091 · THE LINES ALIGN (his: "in the endpoint lab we have the lines actually aligning, and not in the old endpoints"). The lab's block sets its glyph at the left of a line, the text after it, and
+     centres the glyph on the line. Here a line is a wrapping row (his F28: no name is cut), so the glyph sat at its top and a line that leads with a name or a chip began under the glyph. The glyph's
+     column (its size and the lab's gap) is now kept by every line: a line that leads with text is indented by it, so its text starts where the title's text starts, and the glyph is set on the first
+     line's middle, as the lab centres it. A line that leads with its own glyph (an entity, a class, a file) is the lab's, to the pixel. */
+  function xAlign(ti, L) { var z = L.size.icon || 12, ic = ti.querySelector(".bkcol.l > .bki"), ind = ic ? z + 7 : 0;
+    [].forEach.call(ti.children, function (ln) { var A = ln.firstChild, f0 = A && A.firstChild; if (!f0) return;
+      var glyph = f0.classList.contains("bki") || (f0.firstChild && f0.firstChild.nodeType === 1 && f0.firstChild.nodeName.toLowerCase() === "svg");
+      if (!glyph && ind) { ln.classList.add("bktx"); A.style.paddingLeft = ind + "px"; }
+      if (f0.classList.contains("bki")) { var lh = z; [].forEach.call(A.children, function (n) { if (n === f0) return; var fs = L.size[n.getAttribute("data-part")] || 12; lh = Math.max(lh, n.classList.contains("bkrw") ? fs * 1.35 + 2 : fs * 1.4); });
+        f0.style.marginTop = Math.max(0, (lh - z) / 2) + "px"; } }); }
+  /* D-091 · THE LEGEND of a block's own marks: what a paler mark and a cornered one mean (a table's, a schema's), and — only while a column's fact option is on — what its corners or its grey mean.
+     Said once, under the strip, as the lab's footer row says "optional": the mark as the strip draws it, its word, how many it is of in this element; its hover is the meaning. */
+  function xLegend(k, c, it, L) { var rows = [], enc = L.sqEnc === "symbol" || L.sqEnc === "char" ? L.sqEnc : "colour", LW = XW.legend;
+    function plain(cls) { var q = el("i", "sq e-colour " + cls); q.style.setProperty("--fc", "var(--muted)"); return q; }
+    if (k === "table" || k === "schema") {
+      var nOpt = c.cols.filter(function (f) { return k === "table" ? f[3] : !f[4]; }).length; if (nOpt) rows.push(["opt", plain("opt"), nOpt, LW.opt.name]);
+      if (k === "table") { var uq = xUqSet(c), nUq = c.cols.filter(function (f) { return uq[f[0]]; }).length; if (nUq) rows.push(["uq", plain("uq"), nUq, LW.uq.name]); } }
+    else if (XW.yn && EX.yn.kinds.indexOf(k) >= 0 && xYnOn(L)) { var ys = xYnFacts(k, c, it), want = L.fact === "corners" ? 1 : 0, n = ys.filter(function (v) { return v === want; }).length, K = XW.yn.kinds[k];
+      if (n) { var q = xMark("e-" + enc + " yn " + (want ? "yny" : "ynn"), "var(--muted)", "model", "·", null, null); q.setAttribute("data-yn", L.fact); rows.push([want ? "yes" : "no", q, n, want ? K.name : K.noName]); } }
+    if (!rows.length) return null;
+    var d = el("div", "exlg"); rows.forEach(function (r) { var i = el("span", "exlgi"); i.setAttribute("data-tip", "exlg"); i.setAttribute("data-lg", r[0]); i.setAttribute("data-lk", k); i.setAttribute("data-n", String(r[2]));
+      i.appendChild(r[1]); i.appendChild(el("span", "exlgw", r[3])); i.appendChild(el("b", "exlgn", String(r[2]))); d.appendChild(i); });
+    return d; }
+  function xYnFacts(k, c, it) { return k === "fn" ? it.o.ops.map(function (q, i) { return xYn(k, c, it, i); }) : k === "test" ? c.calls.map(function (q, i) { return xYn(k, c, it, i); })
+    : k === "end" ? xWayList(c).map(function (q) { return xYn(k, c, it, 0, q); }) : []; }
   function xBlock(k, it, L) { var c = EX.cat[it.id], blk = el("div", "blk rw-" + (k === "table" ? it.role : "x")), hd = el("div", "bkhd"), ti = el("div", "bkti");
     blk.style.setProperty("--ec", c.ec || xKindCol(k, c));
     L.rows.forEach(function (row) { var ln = el("div", "bkln"), A = el("div", "bkcol l"), B = el("div", "bkcol r");
       row.l.forEach(function (p) { var n = XPART[k](p, c, it, L, L.size[p] || 12); if (n) { n.setAttribute("data-part", p); A.appendChild(n); } });
       row.r.forEach(function (p) { var n = XPART[k](p, c, it, L, L.size[p] || 12); if (n) { n.setAttribute("data-part", p); B.appendChild(n); } });
       if (A.childNodes.length || B.childNodes.length) { ln.appendChild(A); ln.appendChild(B); ti.appendChild(ln); } });
-    hd.appendChild(ti); var sq = xStrip(k, c, it, L); if (sq) hd.appendChild(sq); blk.appendChild(hd); blk.appendChild(xList(k, c, it));
+    xAlign(ti, L);
+    hd.appendChild(ti); var sq = xStrip(k, c, it, L); if (sq) hd.appendChild(sq); blk.appendChild(hd); var lg = xLegend(k, c, it, L); blk.appendChild(xList(k, c, it));
     blk.setAttribute("data-tip", "exblk"); blk.setAttribute("data-exk", k); blk.setAttribute("data-exid", it.id); blk.setAttribute("data-exep", it.ep); if (c.key) blk.setAttribute("data-keys", c.key);
     blk.querySelectorAll("[data-tip]").forEach(function (n) { if (n !== blk && !n.closest(".exfl")) n.removeAttribute("data-tip"); });
-    xRegions(k, blk);
+    xRegions(k, blk); if (lg) blk.insertBefore(lg, blk.querySelector(".exfl"));          /* the legend is no region of the block's hover: its entries carry their own */
     if (XS.col[k].open) blk.classList.add("open");
     blk.addEventListener("click", function (e) { if (e.target.closest(".exfl")) return; XS.col[k].open = !XS.col[k].open; blk.classList.toggle("open", XS.col[k].open); });
     return blk; }
@@ -537,6 +582,12 @@
     cg.appendChild(xPick(XW.ctl.enc, L.sqEnc, ["symbol", "colour", "char", "shape"], function (v) { xSet(k, function (x) { x.sqEnc = v; }); }));
     cg.appendChild(xPick(XW.ctl.pal, L.sqPal, ["type", "channel", "entity", "mono"], function (v) { xSet(k, function (x) { x.sqPal = v; }); }));
     cg.appendChild(xPick(XW.ctl.shape, L.sqShape, ["round", "square"], function (v) { xSet(k, function (x) { x.sqShape = v; }); })); co.appendChild(cg); box.appendChild(co);
+    if (EX.yn.kinds.indexOf(k) >= 0) { var YW = XW.yn, YK = YW.kinds[k], yn = xSec(fill(YW.title, { v: YK.name }), "exyn"), yg = el("div", "opts exynopts"); yn.appendChild(el("p", "exhint", YK.plain));
+      yg.setAttribute("role", "radiogroup"); yg.setAttribute("aria-label", fill(YW.title, { v: YK.name }));
+      Object.keys(YW.opts).forEach(function (v) { var b = el("button", "opt exo exi"); b.type = "button"; b.setAttribute("role", "radio"); b.setAttribute("data-xyn", v); b.setAttribute("data-v", v); b.setAttribute("data-tip", "exyn");
+        b.setAttribute("aria-checked", (L.fact || "off") === v ? "true" : "false"); b.setAttribute("aria-label", YW.opts[v].name); b.appendChild(xIco(XICON.yn[v]));
+        if (YW.pick === v) b.setAttribute("data-pick", "true"); b.addEventListener("click", function () { xSet(k, function (x) { x.fact = v; }); }); yg.appendChild(b); });
+      yn.appendChild(yg); box.appendChild(yn); }
     var cp = el("div", "excp"), code = el("code", "exline", xCopy(k)), said = el("span", "said");
     code.hidden = true;                                           /* the line is not shown — the button copies it whole (L-36) */
     var rs = xAct("opt exo exi exreset", XICON.reset, "reset", null, function () { st.look = xClone(EX.look[k]); st.sel = null; xSave(); renderEx(); writeOut(LAST.L, LAST.GS); });
@@ -547,7 +598,8 @@
   /* ── the copy line. The table's is the lab's own words (COPYTXT), so it reads as his DATA line while it is his; every other kind's
      names its parts with the words the controls show (S4-26), each part's mode and the glyph's colour included (S4-05) ── */
   function xBlockLine(k, L) { var on = function (p) { return L.rows.some(function (r) { return r.l.indexOf(p) >= 0 || r.r.indexOf(p) >= 0; }); };
-    var tail = " · squares " + L.sqSize + "px gap " + L.sqGap + " " + L.sqShape + " as " + L.sqEnc + " by " + L.sqPal;
+    var tail = " · squares " + L.sqSize + "px gap " + L.sqGap + " " + L.sqShape + " as " + L.sqEnc + " by " + L.sqPal
+      + (xYnOn(L) ? " · " + XW.yn.kinds[k].name + " " + XW.yn.opts[L.fact].name : "");                  /* D-091: said only when it is on — the default line is byte for byte what it was */
     if (k === "table") { var cp = XW.cp.table;
       var st = XPARTS[k].map(function (p) { if (p === "icon") return cp.icon + " " + (on(p) ? "on" : "off") + " " + L.iconCol;
         if (EX.modes[p] && (L.mode || {})[p]) return cp[p] + " " + (on(p) ? L.mode[p] : "off"); return cp[p] + " " + (on(p) ? "on" : "off"); });
@@ -597,6 +649,11 @@
     if (kind === "exopt") { var g = t.getAttribute("data-xopt"), R = XW.opt[g], v = t.getAttribute("data-v"); return "<b>" + esc(R.opts[v].name) + "</b>" + (R.pick === v ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(R.opts[v].plain) + "</span>"; }
     if (kind === "exwho") { var wh = t.getAttribute("data-whose"), ts = EX.look.table.size, fs = Math.min.apply(null, Object.keys(ts).map(function (p) { return ts[p]; }));
       return "<b>" + esc(XW.whose[wh].name) + "</b><span class=pl>" + esc(fill(XW.whose[wh].plain, { v: XW.look.table.ruled, lo: fs, hi: EX.floor })) + "</span>"; }
+    if (kind === "exyn") { var yk = t.closest(".excol").getAttribute("data-k"), YV = t.getAttribute("data-v"), YR = XW.yn;
+      return "<b>" + esc(YR.opts[YV].name) + "</b>" + (YR.pick === YV ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(fill(YR.opts[YV].plain, { v: YR.kinds[yk].name, yes: YR.kinds[yk].yes, no: YR.kinds[yk].no })) + "</span>"; }
+    if (kind === "exlg") { var lk = t.getAttribute("data-lk"), lg = t.getAttribute("data-lg"), ln = t.getAttribute("data-n"), LW = XW.legend, YK2 = (XW.yn.kinds || {})[lk], nm, pl;
+      if (lg === "opt") { nm = LW.opt.name; pl = LW.opt[lk]; } else if (lg === "uq") { nm = LW.uq.name; pl = LW.uq[lk]; } else { nm = lg === "yes" ? YK2.name : YK2.noName; pl = lg === "yes" ? YK2.yes : YK2.no; }
+      return "<b>" + esc(nm) + "</b> · " + esc(ln) + "<span class=pl>" + esc(pl) + "</span>"; }
     if (kind === "exctl") return "<b>" + esc(t.getAttribute("data-verb")) + "</b> " + esc(t.getAttribute("data-obj"));        /* L-36: a verb and its object */
     if (kind === "exrole") { var col = t.closest(".excol").getAttribute("data-k"), rl = t.getAttribute("data-role"), pl = rl ? xRolePlain(col, rl) : XW.ctl.allPlain, A = rl ? XW.act.role : XW.act.roleAll;
       return "<b>" + esc(A.verb) + "</b> " + esc(fill(A.obj, { v: rl ? xRoleName(col, rl) : "" })) + (pl ? "<span class=pl>" + esc(pl) + "</span>" : ""); }

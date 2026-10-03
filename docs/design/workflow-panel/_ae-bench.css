@@ -1,6 +1,6 @@
 /* ══ D-071 · THE EXAMPLES BENCH — the page's own rules around the lab's block (the block rules above are cut out of _lab-ep.css by
    _ae_bench.py and scoped here: the lab's tokens are the page's) ══ */
-#sec-ex { --line: var(--rule); --chip-bg: var(--raised); --panel: var(--card); --font-mono: var(--af-stack); }
+#sec-ex { --line: var(--rule); --chip-bg: var(--raised); --panel: var(--card); --font-mono: __LAB_MONO__; }
 .exbar { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: flex-start; margin: 0 0 10px; }
 /* the columns (D-071, D-081) — A: one row across the page, each column as wide as its layout gives it, the row sideways when narrower · B: wrapped rows ·
    C: an upper and a lower row (his ruling). A column's BOX never changes with its width control (D-087, his words): every column keeps the size the layout
@@ -113,3 +113,22 @@
 .excp { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; border-top: 1px solid var(--rule); padding-top: 6px; }
 /* L-36: the copy line is never shown (the element is hidden); the copy button copies it whole */
 .exline[hidden] { display: none; }
+/* ══ D-091 · the bench's blocks take the lab's type, alignment and field marks ══
+   THE TYPE is the lab's (`--font-mono` above is the stack the lab's own variables name, lifted at build). THE LINES ALIGN: a line that leads with text (a name, a chip) is
+   indented by the glyph's column (xAlign sets its padding and the glyph's own top margin from the part sizes), so its text starts where the title's text starts. */
+/* THE LEGEND of a block's own marks: the paler mark and the cornered one, said once under the strip (as the lab's footer row says "optional"), each drawn as the strip draws it, counted */
+#sec-ex .exw .exlg { display: flex; flex-wrap: wrap; gap: 3px 14px; padding: 0 9px 5px 11px; font: 600 12px/1.4 var(--font-mono); color: var(--muted); }
+#sec-ex .exw .exlgi { display: inline-flex; align-items: center; gap: 5px; cursor: help; white-space: nowrap; }
+#sec-ex .exw .exlgi .sq { --sq: 11px; }
+#sec-ex .exw .exlgn { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+/* item 4 — a yes/no fact a mark can carry, off until the column's option turns it on: `corners` puts an L at the top left and the bottom right of a yes (the corners a unique key does not
+   use), `grey` draws a no in grey. The rules hang on the mark's own data-yn, so the strip, the legend and the card's counted marks draw it the same way. */
+.sq[data-yn="corners"].yny { position: relative; }
+.sq[data-yn="corners"].yny::before, .sq[data-yn="corners"].yny::after { content: ""; position: absolute; pointer-events: none; background: var(--yn-col, var(--ink));
+  width: calc((100% + 6px) * var(--uq-len, .4)); height: calc((100% + 6px) * var(--uq-len, .4));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, calc(100% - var(--uq-tip, .15px)) 100%, calc(100% - var(--uq-w, 1.5px)) var(--uq-w, 1.5px), 0 var(--uq-tip, .15px)); }
+.sq[data-yn="corners"].yny::before { top: -3px; left: -3px; transform: scaleX(-1); }
+.sq[data-yn="corners"].yny::after { bottom: -3px; right: -3px; transform: scaleY(-1); }
+.sq[data-yn="grey"].ynn { filter: grayscale(1); }
+.tip.cd { --yn-col: var(--cd-ink); }
+.exynopts { display: flex; gap: 4px; }

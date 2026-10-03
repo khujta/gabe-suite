@@ -14,7 +14,12 @@
    D-090 — the same three regions on the seven other kinds of the bench, on their default examples: per kind the HEAD card (a real hover on its glyph) and ONE item card (a real hover on
    the most telling mark of its strip), the whole block in the picture with its card: 30-<kind>-head · 31-<kind>-item, kind = table · schema · function · test · gate · client-hook · in-flight.
    The telling mark: a table's field with a key to another table and a unique key, a schema's field with a rule, the first function of the endpoint that touches a table (the default example
-   draws no mark), the request that tests the endpoint, the check itself, the ending the screen answers in a branch of its own, the place the value is read. */
+   draws no mark), the request that tests the endpoint, the check itself, the ending the screen answers in a branch of its own, the place the value is read.
+
+   D-091 — the bench's blocks take the lab's type, alignment and field marks; four pictures asked for, by real renders and a real hover, and three of the options:
+   40-users-bench-vs-lab (the bench's `users` block beside the endpoint lab's — the same table, both on the dark ground) · 40-cooking-sessions-table (the table block with its legend: marks paler where a column
+   can be null, cornered where it is unique) · 40-schema-block (a schema with many optional fields) · 40-unique-mark-hover (the real hover on a unique field's mark: its card) ·
+   40-option-<fn|test|end>-corners (a function's, a test's, an ending's marks with the yes/no option on) · 40-option-controls (the option as the column draws it: not marked, corners, grey — my pick dashed). */
 import path from 'node:path';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
@@ -86,6 +91,30 @@ for (const [name, what, sel] of SHOTS) { if (ONLY && !ONLY.includes(name)) conti
         return a === 'table' ? f(c.cols.findIndex((q) => (c.fks || []).some((x) => x[0] === q[0]) && (c.uqs || []).includes(q[0]))) : a === 'schema' ? f(c.cols.findIndex((q) => q[5])) : a === 'test' ? f(c.calls.findIndex((q) => q[2] === 'act'))
           : a === 'hook' ? f(o.react.findIndex((q) => q[2])) : 0; }, k);
       const ms = await p.$$(BLK + ' .sqs > .sq'), ok = ms[at] ? await shoot(p, ms[at], '#tip', t + '.png', BLK) : false; console.log((ok ? 'ok   ' : 'FAIL ') + t + ' · the ' + k + ' block: mark ' + (at + 1) + ' of ' + ms.length); if (ok) n++; } } }
+
+/* D-091 · the blocks take the lab's type, alignment and field marks */
+{ const want = (nm) => !ONLY || ONLY.includes(nm), BKT = '#exgrid .excol[data-k="table"] .blk', pickEl = async (k, id) => { await p.evaluate((a) => window.__allepEx.pick(a[0], a[1]), [k, id]); await p.waitForTimeout(250); };
+  const elShot = async (page, sel, file) => { const h = await page.$(sel); if (!h) { console.log('  MISSING ' + sel); return false; } await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); await page.waitForTimeout(100); await h.screenshot({ path: path.join(OUT, file) }); return true; };
+  const say = (ok, name, what) => { console.log((ok ? 'ok   ' : 'FAIL ') + name + ' · ' + what); if (ok) n++; };
+  if (want('40-users-bench-vs-lab')) {                                                                  /* the same table in both, side by side, on the dark ground the lab draws on */
+    await p.emulateMedia({ colorScheme: 'dark' }); await pickEl('table', 'table:users');
+    const bb = await (await p.$(BKT)).screenshot(), q = await ctx.newPage(); q.on('pageerror', (e) => errs.push('lab: ' + e.message)); await q.goto('file://' + path.join(HERE, 'endpoint-lab.html')); await q.waitForTimeout(1800);
+    const lb = await (await q.$('.blk[data-table="users"]')).screenshot(); await q.close(); await p.emulateMedia({ colorScheme: null });
+    const c = await ctx.newPage(), im = (buf) => '<img style="display:block" src="data:image/png;base64,' + buf.toString('base64') + '">';
+    await c.setContent('<body style="margin:0;padding:18px;background:#0b0e13;color:#c7cfdd;font:600 13px ui-monospace,monospace;display:flex;gap:28px;align-items:flex-start"><figure style="margin:0"><figcaption style="margin-bottom:8px">the all-endpoints bench: users</figcaption>' + im(bb) + '</figure><figure style="margin:0"><figcaption style="margin-bottom:8px">the endpoint lab: users</figcaption>' + im(lb) + '</figure></body>');
+    await c.waitForTimeout(150); const cb = await c.evaluate(() => { const r = document.body.getBoundingClientRect(), f = [...document.querySelectorAll('figure')].map((x) => x.getBoundingClientRect()); return { w: Math.ceil(Math.max(...f.map((x) => x.right)) + 18), h: Math.ceil(Math.max(...f.map((x) => x.bottom)) + 18) }; });
+    await c.screenshot({ path: path.join(OUT, '40-users-bench-vs-lab.png'), clip: { x: 0, y: 0, width: cb.w, height: cb.h } }); await c.close(); say(true, '40-users-bench-vs-lab', 'the bench\'s users block beside the lab\'s'); }
+  if (want('40-cooking-sessions-table')) { await pickEl('table', 'table:cooking_sessions'); say(await elShot(p, BKT, '40-cooking-sessions-table.png'), '40-cooking-sessions-table', 'the table block with its legend'); }
+  if (want('40-schema-block')) { await pickEl('schema', 'schema:CookingSessionResponse'); say(await elShot(p, '#exgrid .excol[data-k="schema"] .blk', '40-schema-block.png'), '40-schema-block', 'a schema block, its optional fields paler'); }
+  if (want('40-unique-mark-hover')) { await pickEl('table', 'table:users'); const i = await p.evaluate(() => window.__allep.data.ex.cat['table:users'].cols.findIndex((f) => f[0] === 'auth_provider')), ms = await p.$$(BKT + ' .sqs > .sq');
+    say(ms[i] ? await shoot(p, ms[i], '#tip', '40-unique-mark-hover.png', BKT) : false, '40-unique-mark-hover', 'a real hover on a unique field\'s mark (users.auth_provider)'); }
+  for (const k of ['fn', 'test', 'end']) { const nm = '40-option-' + k + '-corners'; if (!want(nm)) continue;
+    const ep = k === 'test' ? 'POST /cooking/sessions' : 'DELETE /pantry/locations/{location_id}'; await p.evaluate((e) => window.__allep.pick(e), ep); await p.waitForTimeout(400);
+    const id = await p.evaluate((a) => { const D = window.__allep.data, r = D.rows.filter((x) => x.id === a[1])[0], hit = r.ex[a[0]].filter((e) => { const c = D.ex.cat[e[0]]; return a[0] === 'fn' ? e[2].ops.some((q) => q[2] === 1) : a[0] === 'test' ? c.calls.some((q) => q[2] === 'act' && q[8]) : ((r.ex.paths[D.ex.cat[e[0]].paths[0]] || { ch: [] }).ch.some((q) => q[0] === 'branch' && q[2])); })[0] || r.ex[a[0]][0]; return hit[0]; }, [k, ep]);
+    await pickEl(k, id); await p.evaluate((a) => { window.__allepEx.state.col[a].look.fact = 'corners'; window.__allepEx.render(); }, k); await p.waitForTimeout(250);
+    say(await elShot(p, '#exgrid .excol[data-k="' + k + '"] .blk', nm + '.png'), nm, 'the ' + k + ' block with the yes/no option on (corners)'); await p.evaluate((a) => { window.__allepEx.state.col[a].look.fact = 'off'; window.__allepEx.render(); }, k); }
+  if (want('40-option-controls')) { await p.evaluate((e) => window.__allep.pick(e), 'POST /cooking/sessions'); await p.waitForTimeout(400); say(await elShot(p, '#exgrid .excol[data-k="fn"] .exyn', '40-option-controls.png'), '40-option-controls', 'the option as the column draws it, my pick dashed'); }
+}
 
 /* the lab's own card, for comparison: a table block (locations), its hover as the lab draws it */
 if (!ONLY || ONLY.includes('00-lab-locations')) {

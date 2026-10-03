@@ -12,6 +12,11 @@ lab shares them). The parts registries (BKPART · SCHPART · FNPART) and the fie
 every column type) come out of _lab-ep-panels.js the same way; the block CSS is cut out of _lab-ep.css and scoped to the section. The
 other five kinds' parts and default looks are MY picks (dashed on the page).
 
+D-091 — THE LAB'S TYPE AND FIELD MARKS. The block draws in the lab's own `--font-mono` (read from the station's variables, never retyped); its lines keep the glyph's
+column (`_ae-bench.js` xAlign); the lab's opacity bar (`sqBase`/`sqOptA`) and its unique corners are lifted with the block rules — a rule the lab writes beside the portrait's
+twin selector (`#port … .rctab`) is kept for the block (PORT_TWIN), which is how the corners and the optional stop were lost before. Item 4: YN names the yes/no facts a kind's
+marks carry in the feed (a function's write that a commit saves, a test's request that proves an ending, a fork the way takes) — an OPTION of the column, off by default.
+
 WHAT IS COUNTED. Every element list is read from the lab's facts and the feed; the build stops when a list and the feed disagree
 (the endings against the endpoint's exits, every path an ending or a test names, every case a path names, the gate roles against the
 feed's own groups, a table's columns against the forms models). No wallclock: the same inputs give the same bytes.
@@ -54,6 +59,15 @@ REGIONS = {
     "hook": {"icon": "head", "role": "head", "name": "title", "fkind": "title", "sends": "items", "file": "items", "count": "title", "marks": "items"},
     "inf": {"icon": "head", "life": "head", "name": "title", "ikind": "title", "set": "items", "count": "title", "marks": "items"},
 }
+# D-091 item 4 — a yes/no FACT a kind's marks can carry, each the feed's own (never invented), drawn only as an OPTION of the kind's column (`look.fact`, "off" by default; my pick, dashed, is YN_PICK):
+#   fn   — a table's write mark: a commit on a way saves it (the lab's `committed` bucket of the step that writes it)          → o.ops[i][2] · 1 · 0 · null (a read has no such fact)
+#   test — a request mark: the request PROVES an ending (its `refs` name an exit the code produces, not an ambiguous one)    → call[8] · 1 · 0, on an `act` request only
+#   end  — a fork mark on the way: the way takes the branch (the chain's own `hit`)                                              → the chain's q[2]
+# Not built, found: a gate's own check proved by a test (o.tests — one mark, the count badge says it already) · a schema field that carries a rule (f[5] — a schema is not in item 4's list) ·
+# a hook's ending answered in a branch of its own and an in-flight value's read in middleware or a function (both already drawn: paler, and by glyph).
+YN = {"fn": "saved", "test": "proves", "end": "taken"}
+YN_VARIANTS = ("off", "corners", "grey")
+YN_PICK = "corners"
 GATE_ROLES = ("limiter", "scheme", "login", "rule", "own", "down", "branch", "catch", "switch")   # EX-4: the feed's own groups
 TEST_ROLES = ("act", "check", "arrange", "service", "helper")
 SCH_ROLES = ("in", "out", "in-nested", "out-nested")
@@ -104,6 +118,7 @@ process.stdout.write(JSON.stringify({cfg,parts:{table:part(win.BKPART),schema:pa
 # the block's rules in the lab's stylesheet: a selector naming one of these classes, and no lab region but #panel (re-scoped)
 BLOCK_CLASSES = re.compile(r"\.(blk|bkhd|bkti|bkln|bkcol|bki|bke|bkm|bkn|bkrw|sqs|sq|bkfl|jdrw)\b")
 LAB_REGIONS = re.compile(r"#(?!panel\b)[A-Za-z]")
+PORT_TWIN = re.compile(r"#port(?:\.[\w-]+)* \.rctab")
 CSS_MUST = (".blk", ".bkhd", ".sqs", ".sq", ".bkln", ".bkcol.r", ".sq.e-symbol svg", '#panel[class*="rail-"] .blk', "#panel.rail-left .blk",
             "#panel .bkhd .bkrw .jdrw", "#panel.rwbox-pill .bkhd .bkrw .jdrw", "#panel.cntbox-pill .bkhd .bkn.badge", ".form-block .bkhd")
 
@@ -112,19 +127,34 @@ def _css() -> str:
     """The lab's block rules, scoped: `#panel` (the lab's look carrier) becomes a column's `.exw`, every other rule sits under #sec-ex."""
     out, seen = [], set()
     for sel, body in UNI._css_rules(LAB_CSS.read_text(encoding="utf-8")):
+        # the portrait's twin of a block selector (`#port .rctab`, `#port.uqm-corners.uqc-both .rctab` …) is no part of the bench: it is
+        # turned into a selector that matches nothing (§ is its placeholder until the rule is scoped), so the rule's block half stays (D-091 — the unique corners and the opacity bar are such rules)
+        sel = PORT_TWIN.sub("§", sel)
         parts = [s.strip() for s in sel.split(",")]
-        if not any(BLOCK_CLASSES.search(s) for s in parts) or any(LAB_REGIONS.search(s.replace("#port .rctab", "")) for s in parts):
+        if not any(BLOCK_CLASSES.search(s) for s in parts) or any(LAB_REGIONS.search(s) for s in parts):
             continue
         seen.update(parts)
         scoped = []
         for s in parts:
-            s = s.replace("#port .rctab", "#sec-ex .exw .nothing")
+            s = s.replace("§", "#sec-ex .exw .nothing")
             scoped.append(s.replace("#panel", "#sec-ex .exw") if "#panel" in s else ("#sec-ex .exw" + s) if s.startswith(".form-block") else ("#sec-ex .exw " + s))
         out.append(", ".join(scoped) + "{ " + " ".join(body.split()) + " }")
     lost = [s for s in CSS_MUST if s not in seen]
     if lost:
         die(f"the lab's stylesheet no longer has the block rules {lost}")
     return "\n".join(out)
+
+
+STATION_JS = HERE / "_station.js"
+
+
+def _lab_mono() -> str:
+    """The lab's monospace stack — `--font-mono` of the station's own variables (the lab's :root), read, never retyped. The bench's blocks draw in it
+    (D-091, his: "the font is different"), not in the page's font cog's stack, which the lab has no part in."""
+    m = re.search(r"--font-mono:\s*([^;\"]+?)\s*;", STATION_JS.read_text(encoding="utf-8"))
+    if not m or "monospace" not in m.group(1):
+        die("the station's variables no longer carry a monospace --font-mono (the bench's blocks draw in the lab's font)")
+    return m.group(1)
 
 
 def _copy_block(kind: str, cfg: dict, parts: list) -> str:
@@ -160,7 +190,7 @@ def lift(types: set) -> dict:
     X = json.loads(r.stdout)
     D, look = X["cfg"]["table"], {}
     shared = {k: D["bk"][k] for k in ("railSide", "railStyle", "railW", "cntBox", "cntA", "rwBox", "rwA", "iconCol")}
-    sq = {k: D[k] for k in ("sqSize", "sqGap", "sqShape", "sqEnc", "sqPal", "sqOpt", "sqUqMark", "sqUqAt", "sqUqFlip", "sqUqLen", "sqUqW", "sqUqTip")}
+    sq = {k: D[k] for k in ("sqSize", "sqGap", "sqShape", "sqEnc", "sqPal", "sqOpt", "sqBase", "sqOptA", "sqUqMark", "sqUqAt", "sqUqFlip", "sqUqLen", "sqUqW", "sqUqTip")}
     for k in LAB_KINDS:
         B = dict(X["cfg"][k]["bk"])
         base = {**shared, **{x: B[x] for x in B if x in shared}} if k == "table" else dict(shared)   # schema · fn: Data's look, as the lab shares it
@@ -524,6 +554,16 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
             st = {**((fj.get("steps") or {}).get(s.get("step")) or {}), **{q: s[q] for q in ("table", "op", "fn") if s.get(q)}}
             if st.get("table") and st.get("fn") and (st.get("op") in write_ops or st.get("op") == "read"):
                 fn_ops[st["fn"]].setdefault(st["table"], set()).add("w" if st["op"] in write_ops else "r")
+    saved_by = collections.defaultdict(set)                    # D-091: (function, table) → for each write there, whether a commit on a way saves it (the lab's bucket, as the table's `ops` say it)
+    for p in F.get("paths") or []:
+        for s in (p.get("effects") or {}).get("steps") or []:
+            st = {**((fj.get("steps") or {}).get(s.get("step")) or {}), **{q: s[q] for q in ("table", "op", "fn") if s.get(q)}}
+            if st.get("table") and st.get("fn") and st.get("op") in write_ops:
+                saved_by[(st["fn"], st["table"])].add(s.get("bucket") == "committed")
+
+    def saved_of(q, rw, table):
+        v = saved_by.get((q, table)) if q and "w" in str(rw or "") else None
+        return None if not v else 1 if True in v else 0
     own_checks = collections.defaultdict(list)                 # CR-29: the checks a function's own code makes, each with its refusal
     for g in F.get("preconditions") or []:
         q = host_of(g)
@@ -542,11 +582,11 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
                           "raises": raises_of(q), "doc": (f.get("insight") or {}).get("doc"), "ent": f.get("entity")}
             else:
                 cat[i] = {"k": "fn", "n": f["name"], "key": None, "nokey": 1, "raises": [], "commits": 0}
-        o = {"lv": lv, "via": via, "h": 1 if lv == 0 else 0, "ops": [[o0.get("rw"), o0.get("table")] for o0 in f.get("ops") or []],
+        o = {"lv": lv, "via": via, "h": 1 if lv == 0 else 0, "ops": [[o0.get("rw"), o0.get("table"), saved_of(q, o0.get("rw"), o0.get("table"))] for o0 in f.get("ops") or []],
              "calls": [[I("fn:" + g["id"].replace("#", "::")), []] for l2, g, v2 in walk if lv is not None and v2 == f.get("name") and l2 == lv + 1 and g.get("id")],
              "rz": raises_here(q) if q else [], "chk": own_checks.get(q, []) if q else []}
         if f.get("_x") and q:                                  # not on the walk: who calls it, where the handler's chain says so
-            o["ops"] = [["".join(sorted(v, key="rw".index)), t0] for t0, v in fn_ops.get(q, {}).items()]
+            o["ops"] = [["".join(sorted(v, key="rw".index)), t0, saved_of(q, "".join(v), t0)] for t0, v in fn_ops.get(q, {}).items()]
             if q in chain_at:
                 o["by"] = [I(_fname(handler)), I(_short(chain_at[q]))]
             else:
@@ -584,7 +624,8 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
         if i not in cat:
             cat[i] = {"k": "test", "n": _case_name(t.get("name"), cid), "cid": cid, "key": i, "file": t.get("file"), "line": t.get("line"), "corpus": t.get("corpus"),
                       "state": t.get("state"), "calls": [[c.get("method"), (c.get("endpoint") or "").replace("endpoint:", "") or f"{c.get('method')} {c.get('path')}", c.get("role"), c.get("line"), c.get("helper"),
-                                                          c.get("sends") or [], (c.get("asserts") or {}).get("status") or [], (c.get("asserts") or {}).get("attrs") or []]
+                                                          c.get("sends") or [], (c.get("asserts") or {}).get("status") or [], (c.get("asserts") or {}).get("attrs") or [],
+                                                          1 if any(not str(z.get("conf") or "").startswith("ambiguous") for z in c.get("refs") or []) else 0]   # [8] D-091: it proves an ending
                                                          for c in tc.get("calls") or []],
                       "raises": [[z.get("call"), z.get("raises"), z.get("line")] for z in tc.get("raises") or []], "ents": jy.get(cid, [])}
         here = [k for k, c in enumerate(tc.get("calls") or []) if c.get("endpoint") == "endpoint:" + ep]
@@ -853,7 +894,7 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
     if not re.fullmatch(r"D-\d{3}", str(EW["look"]["table"].get("ruled", ""))):
         die("ex.look.table must name the ruling that made the DATA line his (D-nnn)")
     # the looks: the lab's three lifted, my five from MINE, all on one shape
-    base = {k: lk["look"]["table"][k] for k in ("railSide", "railStyle", "railW", "cntBox", "cntA", "rwBox", "rwA", "sqSize", "sqGap", "sqShape", "sqEnc", "sqPal", "sqOpt",
+    base = {k: lk["look"]["table"][k] for k in ("railSide", "railStyle", "railW", "cntBox", "cntA", "rwBox", "rwA", "sqSize", "sqGap", "sqShape", "sqEnc", "sqPal", "sqOpt", "sqBase", "sqOptA",
                                                   "sqUqMark", "sqUqAt", "sqUqFlip", "sqUqLen", "sqUqW", "sqUqTip")}
     looks = {}
     for k in KINDS:
@@ -870,6 +911,18 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
             M = MINE[k]
             looks[k] = {**base, "form": "block", "rows": M["rows"], "size": M["size"], "iconCol": M["iconCol"], "mode": {"count": "badge", "via": "both", "file": "word"},
                         "on": {}, "off": [p for p in M["parts"] if p not in [q for r0 in M["rows"] for q in r0["l"] + r0["r"]]]}
+    # D-091 item 4: the fact option — off for every kind, three variants, my pick the one named here; the words say each kind's fact once (what a yes and a no are)
+    YW = EW.get("yn") or die("ex.yn: the extra marks' option has no words (D-091)")
+    if list(YW["opts"]) != list(YN_VARIANTS) or YW.get("pick") != YN_PICK or list(YW["kinds"]) != list(YN):
+        die(f"ex.yn must name the variants {list(YN_VARIANTS)}, my pick {YN_PICK!r} and the kinds {list(YN)}: {list(YW['opts'])} · {YW.get('pick')!r} · {list(YW['kinds'])}")
+    for k, K in YW["kinds"].items():
+        if sorted(set(("name", "noName", "yes", "no", "plain")) - set(K)):
+            die(f"ex.yn.kinds.{k} lacks the words {sorted(set(('name', 'noName', 'yes', 'no', 'plain')) - set(K))}")
+    for k in YN:
+        looks[k]["fact"] = "off"
+    LGW = EW.get("legend") or die("ex.legend: the marks' legend has no words (D-091)")
+    if sorted({"opt", "uq"} - set(LGW)) or sorted({"name", "table"} - set(LGW["opt"])) or sorted({"name", "table"} - set(LGW["uq"])) or "schema" not in LGW["opt"]:
+        die("ex.legend must say the optional mark (name, table, schema) and the unique one (name, table)")
     # D-089/D-090: every kind names each part it draws (and the strip) in one of the three regions; the card words name every status an ending gives
     if set(REGIONS) != set(KINDS):
         die(f"REGIONS names {sorted(REGIONS)}, the bench draws {sorted(KINDS)}: every kind has its hover regions (D-090)")
@@ -886,8 +939,12 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
     for k, keys in (("schema", ("c422",)), ("fn", ("calls", "refuses")), ("test", ("pass", "fail", "proves", "fits", "checks")), ("gate", ("gives",)), ("hook", ("sends",)), ("inf", ("set",))):
         if sorted(set(keys) - set(HW.get(k) or {})):
             die(f"ex.region.head.{k} lacks the words {sorted(set(keys) - set(HW.get(k) or {}))} (D-090)")
-    if sorted({"field", "more", "fk", "uq", "uqWith", "after", "self", "own", "readMw", "readFn", "via"} - set(IW)):
-        die(f"ex.region.item lacks the words {sorted({'field', 'more', 'fk', 'uq', 'uqWith', 'after', 'self', 'own', 'readMw', 'readFn', 'via'} - set(IW))} (D-090)")
+    if sorted({"field", "more", "fk", "uq", "uqYes", "uqNo", "uqWith", "after", "self", "own", "readMw", "readFn", "via"} - set(IW)):
+        die(f"ex.region.item lacks the words {sorted({'field', 'more', 'fk', 'uq', 'uqYes', 'uqNo', 'uqWith', 'after', 'self', 'own', 'readMw', 'readFn', 'via'} - set(IW))} (D-090 · D-091)")
+    CMK = W["mo"]["card"]["mark"]                                                                    # D-091: every count a field mark or a fact mark can make says its noun
+    need_mk = ["field-opt", "field-uq", "field-opt-uq", "op-w-y", "op-w-n", "op-rw-y", "op-rw-n", "call-act-y", "call-act-n", "way-branch-y", "way-branch-n"]
+    if sorted(set(need_mk) - set(CMK)):
+        die(f"mo.card.mark lacks the words {sorted(set(need_mk) - set(CMK))} (D-091: a mark that counts says what it counts)")
     gdc = W["enc"]["fam"]["gdc"]["vals"]
     lost = sorted({str(c["st"]) for c in cat.values() if c["k"] == "end"} - set(RW["status"]))
     if lost:
@@ -900,9 +957,15 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
         die(f"ex.region.way names {sorted(RW['way'])}, the strip of marks draws {marks}")
     icons = {p["ico"] for k in LAB_KINDS for p in lk["parts"][k]} | {x["sym"] for x in lk["sq"]} | set(EW["icons"].values())
     D = {"kinds": list(KINDS), "look": looks, "parts": lk["parts"], "icol": lk["icol"], "sq": lk["sq"], "col": lk["col"], "his": lk["his"],
-         "cat": dict(sorted(cat.items())), "modes": MODES, "regions": REGIONS, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
+         "cat": dict(sorted(cat.items())), "modes": MODES, "regions": REGIONS, "yn": {"kinds": list(YN)}, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
          "absent": {k: arm_off(fj, a) for k, a in KIND_ARM.items() if k in KINDS and arm_off(fj, a)}}
-    css = _css() + "\n" + BENCH_CSS.read_text(encoding="utf-8")
+    bench_css = BENCH_CSS.read_text(encoding="utf-8")
+    if bench_css.count("__LAB_MONO__") != 1:
+        die("_ae-bench.css must give the bench's --font-mono through the one __LAB_MONO__ token (the lab's stack)")
+    css = _css() + "\n" + bench_css.replace("__LAB_MONO__", _lab_mono())
+    for need in ("--uq-len", "--sq-opt-a", "uqm-corners.uqc-both", "uqc-flip"):          # D-091: the lab's unique corners and its opacity bar must have come over with the block rules
+        if need not in css:
+            die(f"the bench's stylesheet lost the lab's {need!r} rule (the field marks' corners and optional stop)")
     js = BENCH_JS.read_text(encoding="utf-8")
     line = ("L-23 · examples · " + " · ".join(f"{k} {tally['n:' + k]}" for k in KINDS) + f" (on {len(rows)} endpoints, {len(cat)} elements feed-wide)"
             + f" · endings the code skips here {tally['skipped']} · test links {tally['testLinks']} · tables whose column names the lab and the model spell differently {tally['tblMismatch']}"
