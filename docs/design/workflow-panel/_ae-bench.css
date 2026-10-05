@@ -117,10 +117,6 @@
    THE TYPE is the lab's (`--font-mono` above is the stack the lab's own variables name, lifted at build). THE LINES ALIGN: a line that leads with text (a name, a chip) is
    indented by the glyph's column (xAlign sets its padding and the glyph's own top margin from the part sizes), so its text starts where the title's text starts. */
 /* THE LEGEND of a block's own marks: the paler mark and the cornered one, said once under the strip (as the lab's footer row says "optional"), each drawn as the strip draws it, counted */
-#sec-ex .exw .exlg { display: flex; flex-wrap: wrap; gap: 3px 14px; padding: 0 9px 5px 11px; font: 600 12px/1.4 var(--font-mono); color: var(--muted); }
-#sec-ex .exw .exlgi { display: inline-flex; align-items: center; gap: 5px; cursor: help; white-space: nowrap; }
-#sec-ex .exw .exlgi .sq { --sq: 11px; }
-#sec-ex .exw .exlgn { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
 /* item 4 — a yes/no fact a mark can carry, off until the column's option turns it on: `corners` puts an L at the top left and the bottom right of a yes (the corners a unique key does not
    use), `grey` draws a no in grey. The rules hang on the mark's own data-yn, so the strip, the legend and the card's counted marks draw it the same way. */
 .sq[data-yn="corners"].yny { position: relative; }

@@ -3140,14 +3140,6 @@
       }
     },
     "copy": { "where": "examples", "on": "on {ep}", "all": "every endpoint", "role": "role {v}" },
-    "legend": {
-      "_about": "D-091 (his: the lab's table block marks a column that can be null and a column that is unique — apply it to the table section and to schemas): what a paler mark and a cornered one mean, said ONCE, under a block's strip — the lab's footer row says \"optional\" the same way — each entry drawn as the strip draws it and counted over the element's own fields. The hover of an entry is its meaning; the card of a mark says the column's own facts.",
-      "opt": { "name": "optional",
-               "table": "A column that can be null. Its mark is drawn paler.",
-               "schema": "A field the body or the answer may leave out. Its mark is drawn paler." },
-      "uq": { "name": "unique",
-              "table": "A column a unique key names. Its mark carries a corner at its top right and one at its bottom left, and every column that shares the key carries them." }
-    },
     "yn": {
       "_about": "D-091 item 4 (his: for functions, endpoints, gates or any other element, a similar encoding, but maybe in the other corners or with other colours): a yes or no the feed itself records on a kind's marks, offered as an option of that kind's column, off until it is chosen, my pick dashed — never on by default. Built for the three kinds whose marks carry such a fact: a function's write that a commit saves, a test's request that proves an ending, a fork the way takes. `corners` uses the two corners a unique key leaves free; `grey` is another colour. A mark of another nature (a read, a request that only sets up, a check) has no such fact and is never marked.",
       "title": "extra mark: {v}",

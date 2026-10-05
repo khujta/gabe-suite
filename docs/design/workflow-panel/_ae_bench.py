@@ -920,9 +920,6 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
             die(f"ex.yn.kinds.{k} lacks the words {sorted(set(('name', 'noName', 'yes', 'no', 'plain')) - set(K))}")
     for k in YN:
         looks[k]["fact"] = "off"
-    LGW = EW.get("legend") or die("ex.legend: the marks' legend has no words (D-091)")
-    if sorted({"opt", "uq"} - set(LGW)) or sorted({"name", "table"} - set(LGW["opt"])) or sorted({"name", "table"} - set(LGW["uq"])) or "schema" not in LGW["opt"]:
-        die("ex.legend must say the optional mark (name, table, schema) and the unique one (name, table)")
     # D-089/D-090: every kind names each part it draws (and the strip) in one of the three regions; the card words name every status an ending gives
     if set(REGIONS) != set(KINDS):
         die(f"REGIONS names {sorted(REGIONS)}, the bench draws {sorted(KINDS)}: every kind has its hover regions (D-090)")

@@ -483,19 +483,6 @@
       if (!glyph && ind) { ln.classList.add("bktx"); A.style.paddingLeft = ind + "px"; }
       if (f0.classList.contains("bki")) { var lh = z; [].forEach.call(A.children, function (n) { if (n === f0) return; var fs = L.size[n.getAttribute("data-part")] || 12; lh = Math.max(lh, n.classList.contains("bkrw") ? fs * 1.35 + 2 : fs * 1.4); });
         f0.style.marginTop = Math.max(0, (lh - z) / 2) + "px"; } }); }
-  /* D-091 · THE LEGEND of a block's own marks: what a paler mark and a cornered one mean (a table's, a schema's), and — only while a column's fact option is on — what its corners or its grey mean.
-     Said once, under the strip, as the lab's footer row says "optional": the mark as the strip draws it, its word, how many it is of in this element; its hover is the meaning. */
-  function xLegend(k, c, it, L) { var rows = [], enc = L.sqEnc === "symbol" || L.sqEnc === "char" ? L.sqEnc : "colour", LW = XW.legend;
-    function plain(cls) { var q = el("i", "sq e-colour " + cls); q.style.setProperty("--fc", "var(--muted)"); return q; }
-    if (k === "table" || k === "schema") {
-      var nOpt = c.cols.filter(function (f) { return k === "table" ? f[3] : !f[4]; }).length; if (nOpt) rows.push(["opt", plain("opt"), nOpt, LW.opt.name]);
-      if (k === "table") { var uq = xUqSet(c), nUq = c.cols.filter(function (f) { return uq[f[0]]; }).length; if (nUq) rows.push(["uq", plain("uq"), nUq, LW.uq.name]); } }
-    else if (XW.yn && EX.yn.kinds.indexOf(k) >= 0 && xYnOn(L)) { var ys = xYnFacts(k, c, it), want = L.fact === "corners" ? 1 : 0, n = ys.filter(function (v) { return v === want; }).length, K = XW.yn.kinds[k];
-      if (n) { var q = xMark("e-" + enc + " yn " + (want ? "yny" : "ynn"), "var(--muted)", "model", "·", null, null); q.setAttribute("data-yn", L.fact); rows.push([want ? "yes" : "no", q, n, want ? K.name : K.noName]); } }
-    if (!rows.length) return null;
-    var d = el("div", "exlg"); rows.forEach(function (r) { var i = el("span", "exlgi"); i.setAttribute("data-tip", "exlg"); i.setAttribute("data-lg", r[0]); i.setAttribute("data-lk", k); i.setAttribute("data-n", String(r[2]));
-      i.appendChild(r[1]); i.appendChild(el("span", "exlgw", r[3])); i.appendChild(el("b", "exlgn", String(r[2]))); d.appendChild(i); });
-    return d; }
   function xYnFacts(k, c, it) { return k === "fn" ? it.o.ops.map(function (q, i) { return xYn(k, c, it, i); }) : k === "test" ? c.calls.map(function (q, i) { return xYn(k, c, it, i); })
     : k === "end" ? xWayList(c).map(function (q) { return xYn(k, c, it, 0, q); }) : []; }
   function xBlock(k, it, L) { var c = EX.cat[it.id], blk = el("div", "blk rw-" + (k === "table" ? it.role : "x")), hd = el("div", "bkhd"), ti = el("div", "bkti");
@@ -505,10 +492,10 @@
       row.r.forEach(function (p) { var n = XPART[k](p, c, it, L, L.size[p] || 12); if (n) { n.setAttribute("data-part", p); B.appendChild(n); } });
       if (A.childNodes.length || B.childNodes.length) { ln.appendChild(A); ln.appendChild(B); ti.appendChild(ln); } });
     xAlign(ti, L);
-    hd.appendChild(ti); var sq = xStrip(k, c, it, L); if (sq) hd.appendChild(sq); blk.appendChild(hd); var lg = xLegend(k, c, it, L); blk.appendChild(xList(k, c, it));
+    hd.appendChild(ti); var sq = xStrip(k, c, it, L); if (sq) hd.appendChild(sq); blk.appendChild(hd); blk.appendChild(xList(k, c, it));
     blk.setAttribute("data-tip", "exblk"); blk.setAttribute("data-exk", k); blk.setAttribute("data-exid", it.id); blk.setAttribute("data-exep", it.ep); if (c.key) blk.setAttribute("data-keys", c.key);
     blk.querySelectorAll("[data-tip]").forEach(function (n) { if (n !== blk && !n.closest(".exfl")) n.removeAttribute("data-tip"); });
-    xRegions(k, blk); if (lg) blk.insertBefore(lg, blk.querySelector(".exfl"));          /* the legend is no region of the block's hover: its entries carry their own */
+    xRegions(k, blk); xQuiet(blk);
     if (XS.col[k].open) blk.classList.add("open");
     blk.addEventListener("click", function (e) { if (e.target.closest(".exfl")) return; XS.col[k].open = !XS.col[k].open; blk.classList.toggle("open", XS.col[k].open); });
     return blk; }
@@ -524,6 +511,18 @@
     [].forEach.call(blk.querySelectorAll("[data-part]"), function (n) { var p = n.getAttribute("data-part"), g = R[p]; if (!g || g === "title") return;
       var its = n.querySelectorAll("[data-it]"); if (g === "items" && its.length) [].forEach.call(its, function (q, i) { xRegionTag(q, g, p, i); }); else xRegionTag(n, g, p, 0); });
     var sq = blk.querySelector(".sqs"), g2 = R.marks; if (sq && g2 && g2 !== "title") [].forEach.call(sq.children, function (q, i) { xRegionTag(q, g2, "marks", i); }); }
+
+  /* D-092 · his: "put a container around all these icons and make it so the container doesn't offer any hover action … we just show the hover when we are hovering
+     on those icons". The GROUPS of a block's tagged items that sit side by side — the strip's marks, a part's items, tagged parts next to each other on one line (the
+     glyph and its status) — are each a quiet band: in the gap between two of them no card shows, neither an item's nor the block's (the page's handler asks
+     blk._quiet). The band is the group's own outline, no wrapper is put in, so every line stays where D-091 aligned it and a part dragged elsewhere leaves its band */
+  function xQuiet(blk) { var G = [], tagged = function (n) { return n.getAttribute("data-tip") === "exreg"; };
+    var sq = blk.querySelector(".sqs"), ms = sq ? [].filter.call(sq.children, tagged) : []; if (ms.length > 1) G.push(ms);
+    [].forEach.call(blk.querySelectorAll("[data-part]"), function (n) { var its = [].filter.call(n.querySelectorAll("[data-it]"), tagged); if (its.length > 1) G.push(its); });
+    [].forEach.call(blk.querySelectorAll(".bkcol"), function (c) { var run = []; [].forEach.call(c.children, function (n) { if (tagged(n)) run.push(n); else { if (run.length > 1) G.push(run); run = []; } }); if (run.length > 1) G.push(run); });
+    blk._quiet = G.length ? function (e) { return G.some(function (g) { var l = Infinity, t = Infinity, r = -Infinity, b = -Infinity;
+      g.forEach(function (n) { var R = n.getBoundingClientRect(); if (!R.width && !R.height) return; l = Math.min(l, R.left); t = Math.min(t, R.top); r = Math.max(r, R.right); b = Math.max(b, R.bottom); });
+      return e.clientX >= l && e.clientX <= r && e.clientY >= t && e.clientY <= b; }); } : null; }
 
   /* ── the controls under a block: parts (drag between the lines, or into not drawn) · size · colour, and the copy line ── */
   function xPartWord(k, p) { return (XW.parts[k][p] || {}).name || p; }
@@ -651,9 +650,6 @@
       return "<b>" + esc(XW.whose[wh].name) + "</b><span class=pl>" + esc(fill(XW.whose[wh].plain, { v: XW.look.table.ruled, lo: fs, hi: EX.floor })) + "</span>"; }
     if (kind === "exyn") { var yk = t.closest(".excol").getAttribute("data-k"), YV = t.getAttribute("data-v"), YR = XW.yn;
       return "<b>" + esc(YR.opts[YV].name) + "</b>" + (YR.pick === YV ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(fill(YR.opts[YV].plain, { v: YR.kinds[yk].name, yes: YR.kinds[yk].yes, no: YR.kinds[yk].no })) + "</span>"; }
-    if (kind === "exlg") { var lk = t.getAttribute("data-lk"), lg = t.getAttribute("data-lg"), ln = t.getAttribute("data-n"), LW = XW.legend, YK2 = (XW.yn.kinds || {})[lk], nm, pl;
-      if (lg === "opt") { nm = LW.opt.name; pl = LW.opt[lk]; } else if (lg === "uq") { nm = LW.uq.name; pl = LW.uq[lk]; } else { nm = lg === "yes" ? YK2.name : YK2.noName; pl = lg === "yes" ? YK2.yes : YK2.no; }
-      return "<b>" + esc(nm) + "</b> · " + esc(ln) + "<span class=pl>" + esc(pl) + "</span>"; }
     if (kind === "exctl") return "<b>" + esc(t.getAttribute("data-verb")) + "</b> " + esc(t.getAttribute("data-obj"));        /* L-36: a verb and its object */
     if (kind === "exrole") { var col = t.closest(".excol").getAttribute("data-k"), rl = t.getAttribute("data-role"), pl = rl ? xRolePlain(col, rl) : XW.ctl.allPlain, A = rl ? XW.act.role : XW.act.roleAll;
       return "<b>" + esc(A.verb) + "</b> " + esc(fill(A.obj, { v: rl ? xRoleName(col, rl) : "" })) + (pl ? "<span class=pl>" + esc(pl) + "</span>" : ""); }

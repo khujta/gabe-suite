@@ -3320,7 +3320,10 @@ ok(!errs.length, 'no page error on the fixture', errs);
     for (let i = 0; i < n; i++) { const h = hs[i]; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const bx = await h.boundingBox();
       const meta = await h.evaluate((x) => ({ tip: x.getAttribute('data-tip'), ik: x.getAttribute('data-ik'), exk: x.getAttribute('data-exk'), click: x.hasAttribute('data-key') || x.hasAttribute('data-secmk') || x.getAttribute('data-tip') === 'exblk' || x.getAttribute('data-tip') === 'moilf' }));
       if (!bx) { out.push({ ...meta, miss: true }); continue; }
-      await p.mouse.move(5, 5); await p.mouse.move(bx.x + Math.min(bx.width / 2, 30), bx.y + Math.min(bx.height / 2, 10)); await p.waitForTimeout(25); out.push({ ...meta, ...(await readCard()) }); }
+      /* CHANGED D-092: a block is hovered on a part of its own card (one with no hover item inside) — the old point, 30px in and 10px down, fell between the glyph
+         and its status, a gap that is now quiet */
+      const own = meta.tip === 'exblk' ? await h.evaluate((x) => { const q = [...x.querySelectorAll('[data-part]:not([data-tip])')].filter((n) => !n.querySelector('[data-tip]') && n.getBoundingClientRect().width)[0]; if (!q) return null; const r = q.getBoundingClientRect(); return { x: r.left + Math.min(r.width / 2, 30), y: r.top + r.height / 2 }; }) : null;
+      await p.mouse.move(5, 5); await p.mouse.move(own ? own.x : bx.x + Math.min(bx.width / 2, 30), own ? own.y : bx.y + Math.min(bx.height / 2, 10)); await p.waitForTimeout(25); out.push({ ...meta, ...(await readCard()) }); }
     await p.mouse.move(5, 5); return out; };
   const byKind = (rows) => { const o = {}; rows.forEach((r) => { const k = r.card + (r.bench ? '/' + r.bench : ''); o[k] = (o[k] || 0) + 1; }); return o; };
   const judge = (rows, what) => {
@@ -3493,9 +3496,9 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(mk[1].name === WR.way['way-stop'].replace('{check}', D.words.terms.gate.check) && mk[1].text.includes(gw) && mk[1].text.includes('sensitive limit') && mk[1].text.includes('20 per 60 seconds') && mk[1].pills.includes('429') && mk[1].text.includes(WR.ends) && mk[1].text.includes('Rate limit exceeded'),
     'D-089 · the check\'s card: what it is (' + mk[1].name + '), where it sits (' + gw + '), what it checks (the sensitive limit), the status it gives and that it ends the request', mk[1].text);
   ok(mk[2].name === WR.way['way-exit'] && mk[2].text.includes(c0.sg) && mk[2].pills.includes('429') && mk[2].pills.includes(kindName) && mk[2].lines.join() === 'stage', 'D-089 · the way out\'s card: what it is, the stage it ends at (' + c0.sg + '), its status and its kind', mk[2].text);
-  const gap = await p.evaluate((b) => { const q = [...document.querySelectorAll(b + ' .sqs > .sq')], a = q[0].getBoundingClientRect(), c = q[1].getBoundingClientRect(); return { x: (a.right + c.left) / 2, y: (a.top + a.bottom) / 2 }; }, BLK);
-  await p.mouse.move(5, 5); await p.mouse.move(gap.x, gap.y); await p.waitForTimeout(80); const gp = await card();
-  ok(gp && gp.card === 'end' && gp.html === full, 'D-089 · the gap between two marks is no item: the pointer there gets the block\'s card, never a card for the whole row', gp && { card: gp.card, reg: gp.reg });
+  const m0 = await hoverCard(BLK + ' .sqs > .sq', 0), gap = await p.evaluate((b) => { const q = [...document.querySelectorAll(b + ' .sqs > .sq')], a = q[0].getBoundingClientRect(), c = q[1].getBoundingClientRect(); return { x: (a.right + c.left) / 2, y: (a.top + a.bottom) / 2 }; }, BLK);
+  await p.mouse.move(gap.x, gap.y); await p.waitForTimeout(80); const gp = await card();      /* CHANGED D-092 (his: the container between the icons offers no hover): the gap was the block's card */
+  ok(m0 && m0.show === 'true' && m0.card === 'reg' && gp && gp.show === 'false', 'D-092 · the gap between two marks is no item and is quiet: the mark\'s card goes, and neither the block\'s card nor one for the whole row shows', gp && { show: gp.show, card: gp.card, m0: m0 && m0.card });
   ok((await p.evaluate(() => window.localStorage.getItem('gabe:allep:bench:v3'))) === store0, 'D-089 · his configuration: hovering the regions wrote nothing to storage');
   /* (6) the regions follow the parts */
   const regOf = (rp) => p.evaluate((a) => { const n = document.querySelector(a[0] + ' [data-part="' + a[1] + '"]'); return n ? { tip: n.getAttribute('data-tip'), reg: n.getAttribute('data-reg') } : null; }, [BLK, rp]);
@@ -3643,9 +3646,9 @@ ok(!errs.length, 'no page error on the fixture', errs);
     const hs = [...its.map(([, c]) => c && c.html), ...mks.map((c) => c && c.html)];
     ok(its.length + mks.length === hs.length && new Set(its.map(([, c]) => c.html)).size === its.length && its.every(([, c]) => !mks.some((m) => m && m.html === c.html)) && new Set(mks.map((m) => m && m.html)).size === X.distinct,
       'D-090 · ' + k + ' · one card per item, never one for the whole row: the ' + its.length + ' location cards differ from one another and from the marks\', and the ' + X.marks + ' marks give ' + X.distinct + ' distinct cards (' + (X.marks - X.distinct) + ' marks share every fact)', { its: its.length, marks: mks.length, distinct: new Set(mks.map((m) => m && m.html)).size, want: X.distinct });
-    if (tg.strip > 1) { const gap = await p.evaluate((b) => { const q = [...document.querySelectorAll(b + ' .sqs > .sq')], a = q[0].getBoundingClientRect(), c = q[1].getBoundingClientRect(); return { x: (a.right + c.left) / 2, y: (a.top + a.bottom) / 2, gap: c.left - a.right }; }, BK);
-      await p.mouse.move(5, 5); await p.mouse.move(gap.x, gap.y); await p.waitForTimeout(80); const gp = await card();
-      ok(gp && gp.card === k && gp.html === full, 'D-090 · ' + k + ' · the gap between two marks is no item: the pointer there gets the block\'s card, never a card for the whole row', gp && { card: gp.card, reg: gp.reg, gap: gap.gap }); }
+    if (tg.strip > 1) { const m0 = await hoverCard(BK + ' .sqs > .sq', 0), gap = await p.evaluate((b) => { const q = [...document.querySelectorAll(b + ' .sqs > .sq')], a = q[0].getBoundingClientRect(), c = q[1].getBoundingClientRect(); return { x: (a.right + c.left) / 2, y: (a.top + a.bottom) / 2, gap: c.left - a.right }; }, BK);
+      await p.mouse.move(gap.x, gap.y); await p.waitForTimeout(80); const gp = await card();   /* CHANGED D-092: the gap was the block's card */
+      ok(m0 && m0.show === 'true' && gp && gp.show === 'false', 'D-092 · ' + k + ' · the gap between two marks is quiet: the mark\'s card goes and no other card shows', gp && { show: gp.show, card: gp.card, gap: gap.gap }); }
     ok((await p.evaluate(() => window.localStorage.getItem('gabe:allep:bench:v3'))) !== undefined && (await p.evaluate(() => window.__allepCard.log.length)) === 0, 'D-090 · ' + k + ' · the renderer\'s log holds no issue after the hovers');
     /* (6) the regions follow the parts, a hidden part has no region, and putting everything back restores the copy line */
     const rows0 = await p.evaluate((q) => JSON.parse(JSON.stringify([window.__allepEx.state.col[q].look.rows, window.__allepEx.state.col[q].look.off || []])), k);
@@ -3703,7 +3706,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
    (7) every element of every endpoint, with the options on: each mark's card and each block's card made through card() and its guard, none with an issue */
   {
   const WROPS = new Set(['add', 'update', 'delete', 'insert', 'upsert', 'merge', 'bulk_insert', 'execute', 'write']);
-  const YW = D.words.ex.yn, LGW = D.words.ex.legend, IW9 = D.words.ex.region.item, CMK = D.words.mo.card, SQC = {}; D.ex.sq.forEach((x) => { SQC[x.key] = x.col; });
+  const YW = D.words.ex.yn, IW9 = D.words.ex.region.item, CMK = D.words.mo.card, SQC = {}; D.ex.sq.forEach((x) => { SQC[x.key] = x.col; });
   const MODELS = {}; Object.values(FJ.models || {}).forEach((m) => { if (m.table) MODELS[m.table] = m; });
   const LABMONO = /--font-mono:\s*([^;"]+?)\s*;/.exec(fs.readFileSync(path.join(HERE, '_station.js'), 'utf8'))[1].replace(/,\s*/g, ', ');   /* as the browser spells a computed stack */
   const MEAS = (sel) => { const blk = document.querySelector(sel); if (!blk) return null; const br = blk.getBoundingClientRect(), out = { fam: getComputedStyle(blk.querySelector('.bkhd')).fontFamily, lines: [] };
@@ -3759,12 +3762,10 @@ ok(!errs.length, 'no page error on the fixture', errs);
   /* (5) the legend and the mark's card, on `users` (two unique columns, two that can be null) and on a schema */
   await p.evaluate(() => window.__allepEx.pick('table', 'table:users')); await p.waitForTimeout(250);
   const usr = await p.evaluate(() => window.__allep.data.ex.cat['table:users']), uMod = MODELS.users, uqU = new Set(uMod.constraints.uniques.flatMap((u) => u.cols)), nU = usr.cols.filter((f) => uMod.columns[f[0]].nullable).length, qU = usr.cols.filter((f) => uqU.has(f[0])).length;
-  const lg = await p.evaluate((sel) => [...document.querySelectorAll(sel + ' .exlgi')].map((i) => ({ lg: i.getAttribute('data-lg'), n: +i.getAttribute('data-n'), text: i.textContent.replace(/\s+/g, ' ').trim(), inBlk: !!i.closest('.blk'), samp: (() => { const q = i.querySelector('.sq'); return { op: getComputedStyle(q).opacity, bef: getComputedStyle(q, '::before').content }; })() })), TBK);
-  ok(lg.length === 2 && lg[0].lg === 'opt' && lg[0].n === nU && nU > 0 && lg[0].text.startsWith(LGW.opt.name) && lg[0].samp.op === '0.5' && lg[1].lg === 'uq' && lg[1].n === qU && qU > 0 && lg[1].text.startsWith(LGW.uq.name) && lg[1].samp.bef === '""' && lg.every((q) => q.inBlk),
-    'D-091 · the legend under the `users` block says each new mark once, drawn as the strip draws it and counted over the table\'s own columns: ' + lg.map((q) => q.text).join(' · '), { lg, nU, qU });
-  const hv = async (css) => { const h = await p.$(css); await hoverAt(h); return p.evaluate(() => { const t = document.getElementById('tip'); return { text: t.textContent.replace(/\s+/g, ' ').trim(), cd: t.classList.contains('cd') }; }); };
-  const tgl = await hv(TBK + ' .exlgi[data-lg="uq"]'), tgo = await hv(TBK + ' .exlgi[data-lg="opt"]');
-  ok(tgl.text.includes(LGW.uq.name) && tgl.text.includes(LGW.uq.table) && tgo.text.includes(LGW.opt.name) && tgo.text.includes(LGW.opt.table) && !tgl.cd, 'D-091 · the hover of a legend entry is its meaning (' + LGW.uq.name + ' · ' + LGW.opt.name + '), with its count', { tgl: tgl.text.slice(0, 140), tgo: tgo.text.slice(0, 140) });
+  /* D-092 (his: "in Users … we also put the legend … We don't want that. In the endpoint lab, we are not putting that there"): no legend under any block — what a
+     paler or a cornered mark means is in the mark's own card (below) */
+  const lgN = await p.evaluate(() => document.querySelectorAll('#exgrid .exlg, #exgrid .exlgi').length), uqDrawn = await p.evaluate((sel) => [...document.querySelectorAll(sel + ' .sqs > .sq')].filter((q) => getComputedStyle(q, '::before').content === '""').length, TBK);
+  ok(lgN === 0 && nU > 0 && qU > 0 && uqDrawn === qU, 'D-092 · no legend under the `users` block, nor under any other: its ' + qU + ' unique marks keep their corners, its ' + nU + ' that can be null stay paler, and the meaning is in each mark\'s card', { lgN, uqDrawn, qU, nU });
   const colIx = (n) => usr.cols.findIndex((f) => f[0] === n), cardOf = (i) => hoverCard(TBK + ' .sqs > .sq', i);
   const cU = await cardOf(colIx('auth_provider')), cO = await cardOf(colIx('email')), cI = await cardOf(colIx('id')), uf = usr.cols[colIx('auth_provider')], ef = usr.cols[colIx('email')];
   ok(cU && cU.card === 'reg' && cU.rp === 'marks' && !cU.issues && cU.name === 'auth_provider' && cU.text.includes(uf[1]) && cU.pills.includes(CMK.required) && cU.pills.includes(IW9.uqYes) && cU.text.includes(IW9.uqWith) && cU.text.includes('auth_provider_id'),
@@ -3777,7 +3778,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
   await p.evaluate(() => window.__allepEx.pick('schema', 'schema:CookingSessionResponse')); await p.waitForTimeout(250);
   const SBK = '#exgrid .excol[data-k="schema"] .blk', scr = await p.evaluate(() => window.__allep.data.ex.cat['schema:CookingSessionResponse']), oi = scr.cols.findIndex((f) => !f[4]), cS = await hoverCard(SBK + ' .sqs > .sq', oi),
     lgS = await p.evaluate((sel) => [...document.querySelectorAll(sel + ' .exlgi')].map((i) => [i.getAttribute('data-lg'), +i.getAttribute('data-n')]), SBK), nOptS = scr.cols.filter((f) => !f[4]).length;
-  ok(cS && !cS.issues && cS.name === scr.cols[oi][0] && cS.pills.includes(CMK.optional) && JSON.stringify(lgS) === JSON.stringify([['opt', nOptS]]), 'D-091 · a schema field that may be left out: its card says optional, and the legend under the block counts them (' + nOptS + ' of ' + scr.cols.length + ') with no unique entry', { pills: cS && cS.pills, lgS });
+  ok(cS && !cS.issues && cS.name === scr.cols[oi][0] && cS.pills.includes(CMK.optional) && !lgS.length, 'D-091 · a schema field that may be left out: its card says optional (' + nOptS + ' of ' + scr.cols.length + ' fields), and no legend sits under the block (D-092)', { pills: cS && cS.pills, lgS });
   /* (6) item 4 — the options. What the feed says is read HERE, from forms.json: a function's write that a commit saves (the step's own bucket), a test's request that proves an ending (its `refs`), a fork the way takes (the chain's `hit`) */
   const OPTK = ['fn', 'test', 'end'], KEEP = { fn: PINS.fn.copy, test: PINS.test.copy, end: BASE_COPY }, E2 = 'DELETE /pantry/locations/{location_id}';
   await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(450);
@@ -3827,7 +3828,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
     const mk1 = await p.evaluate(STRIP, BK), f1 = factsOf(mk1), ny = f1.filter((v) => v === 1).length;
     const nrm = (x) => x.replace(/ \([^()]*\)$/, ''), tailOf = (x) => (/ \(([^()]*)\)$/.exec(x) || [])[1];                 /* the line's closing "(my pick)" turns to "(your choice)" for any look that is not the default — the page's own rule */
     ok(s1.fact === 'corners' && s1.chk.join() === 'corners' && nrm(s1.copy) === nrm(c0).replace(' · not drawn', ' · ' + K.name + ' ' + YW.opts.corners.name + ' · not drawn') && tailOf(s1.copy) !== tailOf(c0) && s1.store.col && s1.store.col[k].look.fact === 'corners' && OPTK.filter((q) => q !== k).every((q) => !s1.store.col[q].look.fact || s1.store.col[q].look.fact === 'off')
-      && s1.lg.length === 1 && s1.lg[0].lg === 'yes' && s1.lg[0].n === ny && ny > 0 && s1.lg[0].text.startsWith(K.name), 'D-091 · ' + k + ' · turned on by a real click: the copy line grows by one phrase (' + K.name + ' ' + YW.opts.corners.name + ') and only that, it is saved for this column alone, and the legend says "' + s1.lg.map((q) => q.text).join('') + '"', { fact: s1.fact, lg: s1.lg, chk: s1.chk, copy: s1.copy.slice(-150) });
+      && !s1.lg.length && ny > 0, 'D-091 · ' + k + ' · turned on by a real click: the copy line grows by one phrase (' + K.name + ' ' + YW.opts.corners.name + ') and only that, it is saved for this column alone, and no legend appears (D-092)', { fact: s1.fact, lg: s1.lg, chk: s1.chk, copy: s1.copy.slice(-150) });
     /* the card of a mark that has the fact, of one that lacks it, of one that has no such fact */
     const at = async (st) => { const l = loc(st); if (!l) return null; await p.evaluate((a) => window.__allepEx.pick(a[0], a[1]), [k, l[0]]); await p.waitForTimeout(80);
       if (k !== 'end') return hoverCard(BK + ' .sqs > .sq', l[1]);
@@ -3876,6 +3877,28 @@ ok(!errs.length, 'no page error on the fixture', errs);
   console.log('  D-091 every element: ' + sw91.blocks + ' block cards · ' + sw91.marks + ' mark cards');
   const log91 = await p.evaluate(() => window.__allepCard.log.filter((x) => !(x.ck === 'table' && x.issues.every((q) => /^p4\.1 the function “[^”]+” is not named$/.test(q)))).slice(0, 3));
   ok(!log91.length && !errs.length, 'D-091 · the renderer\'s log holds no issue of this work and the page (and the lab) raised no error', { log: log91, errs: errs.slice(0, 3) });
+  /* D-092 · THE QUIET BANDS, by real mouse moves on the ending block (his: "put a container around all these icons and make it so the container doesn't offer any
+     hover action … we just show the hover when we are hovering on those icons"): between two marks, and between the glyph and its status, no card shows; the rest of the
+     block shows its own card as before, also when the pointer slides out of a band over the same element (no new mouseover — the handler's mousemove arm) */
+  { await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(450);
+    const QB = '#exgrid .excol[data-k="end"] .blk', st0 = await p.evaluate(() => window.localStorage.getItem('gabe:allep:bench:v3'));
+    await p.evaluate((b) => document.querySelector(b).scrollIntoView({ block: 'center' }), QB); await p.waitForTimeout(300);
+    const G = await p.evaluate((b) => { const blk = document.querySelector(b), R = (n) => { const r = n.getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom, x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2 }; };
+      return { ms: [...blk.querySelectorAll('.sqs > .sq[data-tip="exreg"]')].map(R), sqs: R(blk.querySelector('.sqs')), ic: R(blk.querySelector('[data-part="icon"]')), st: R(blk.querySelector('[data-part="status"]')), nm: R(blk.querySelector('[data-part="name"]')) }; }, QB);
+    const at = async (x, y) => { await p.mouse.move(x, y); await p.waitForTimeout(90); return p.evaluate(() => { const t = document.getElementById('tip'), c = t.querySelector('.cdc'); return { show: t.getAttribute('data-show'), card: c ? c.getAttribute('data-card') : null, rp: c ? c.getAttribute('data-rp') : null }; }); };
+    const my = G.ms[0].y, last = G.ms[G.ms.length - 1], steps = [];
+    await p.mouse.move(5, 5);
+    for (let i = 0; i < G.ms.length; i++) { steps.push(['mark ' + i, await at(G.ms[i].x, my)]); if (i + 1 < G.ms.length) steps.push(['gap ' + i, await at((G.ms[i].r + G.ms[i + 1].l) / 2, my)]); }
+    const bad = steps.filter(([w, s]) => (w.startsWith('mark') ? !(s.show === 'true' && s.card === 'reg' && s.rp === 'marks') : s.show !== 'false'));
+    ok(G.ms.length > 1 && !bad.length, 'D-092 · across the ending\'s ' + G.ms.length + ' marks, one by one: each mark shows its own card and each of the ' + (G.ms.length - 1) + ' gaps shows none — no block card, no stuck card', bad.slice(0, 4));
+    const bx = last.r + 24 < G.sqs.r - 2 ? last.r + 24 : null, beyond = bx ? await at(bx, my) : null;
+    ok(bx && beyond.show === 'true' && beyond.card === 'end', 'D-092 · past the last mark, on the empty rest of its row, the block\'s own card shows as before: the band is the marks\' outline, not the row', beyond);
+    await at(G.ms[0].x, my); const q1 = await at((G.ms[0].r + G.ms[1].l) / 2, my), q2 = bx ? await at(bx, my) : null;
+    ok(q1.show === 'false' && q2 && q2.show === 'true' && q2.card === 'end', 'D-092 · from a gap the pointer slides on along the same row past the marks, with no new element under it: the block\'s card comes back', { q1, q2 });
+    const hy = Math.max(G.ic.t, G.st.t) + Math.min(G.ic.b - G.ic.t, G.st.b - G.st.t) / 2;
+    const h1 = await at(G.ic.x, hy), h2 = await at((G.ic.r + G.st.l) / 2, hy), h3 = await at(G.st.x, hy), h4 = await at(G.nm.x, G.nm.y);
+    ok(h1.show === 'true' && h1.card === 'reg' && h2.show === 'false' && h3.show === 'true' && h3.card === 'reg' && h4.show === 'true' && h4.card === 'end', 'D-092 · the glyph, the gap, the status, the title in turn: the glyph\'s card, none, the status\'s card, the block\'s card', { h1, h2, h3, h4 });
+    ok((await p.evaluate(() => window.localStorage.getItem('gabe:allep:bench:v3'))) === st0 && !errs.length, 'D-092 · the moves wrote nothing to storage and the page raised no error', errs.slice(0, 3)); }
   await labp.close(); }
 }
 

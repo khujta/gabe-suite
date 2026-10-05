@@ -3096,14 +3096,22 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (ch) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]; }); }
   /* a hover that holds a link (D-044) is LIVE: it sits flush against its item, the pointer may move onto it, and leaving the item for
      anything but another hover gives a short grace before it closes */
-  var TIPH = null, TIPAT = null;
+  /* D-092 · A QUIET BAND: an item may say where its own hover holds back — t._quiet(e) true means the pointer rests between the items it groups (the
+     gap between two icons of a row), and there no card shows, neither the item's nor the whole block's. The band is the items' own outline, so the rest
+     of the item still hovers as it did; moving out of the band over the same item (no new mouseover) is caught by the mousemove below */
+  var TIPH = null, TIPAT = null, TIPQ = null;
   function tipOff() { clearTimeout(TIPH); TIPH = null; TIPAT = null; tip.setAttribute("data-show", "false"); tip.setAttribute("data-live", "false"); }
   document.addEventListener("mouseover", function (e) {
     if (e.target.closest && e.target.closest("#tip")) { clearTimeout(TIPH); TIPH = null; return; }
     var rcb = e.target.closest(".mdxrc"), t = rcb && rcb._lk ? rcb._lk : e.target.closest("[data-tip]");   /* R-04: a race badge hovers as its link */
     if (!t && tip.getAttribute("data-live") === "true" && tip.getAttribute("data-show") === "true") { if (!TIPH) TIPH = setTimeout(function () { tipOff(); REFH.m = null; elRefHover(); }, 400); return; }
-    clearTimeout(TIPH); TIPH = null;
+    clearTimeout(TIPH); TIPH = null; TIPQ = null;
     if (!t) { tipOff(); return; }
+    if (t._quiet && t._quiet(e)) { tipOff(); TIPQ = t; return; }
+    tipShow(t, e); });
+  document.addEventListener("mousemove", function (e) { if (!TIPQ || TIPQ._quiet(e)) return; var t = TIPQ; TIPQ = null;
+    if (e.target.closest && e.target.closest("[data-tip]") === t) tipShow(t, e); });
+  function tipShow(t, e) {
     tip.classList.remove("cd");                                                                /* D-088: the card's frame only while a card is drawn */
     if (t.getAttribute("data-tip") === "cell" && e.target.closest(".spine i")) { var si = e.target.closest(".spine i"), c = COL[t.getAttribute("data-col")];
       tip.innerHTML = "<b>" + esc(si.getAttribute("data-stage")) + "</b> · " + esc(fill(W.stageCell, { stage: si.getAttribute("data-stage"), n: si.getAttribute("data-n") })); }   /* D-067 (P4): what a stage is, on the column's head */
@@ -3112,7 +3120,7 @@
     var live = !!tip.querySelector(".elref[data-gref]"), gp = live ? 0 : 6;
     var bx = t.getBoundingClientRect(), tw = tip.offsetWidth, thh = tip.offsetHeight;
     var x = Math.min(window.innerWidth - tw - 8, Math.max(8, bx.left)), y = bx.bottom + gp; if (y + thh > window.innerHeight - 4) y = Math.max(4, bx.top - thh - gp);
-    tip.style.left = x + "px"; tip.style.top = y + "px"; tip.setAttribute("data-live", live ? "true" : "false"); tip.setAttribute("data-show", "true"); TIPAT = t; });
+    tip.style.left = x + "px"; tip.style.top = y + "px"; tip.setAttribute("data-live", live ? "true" : "false"); tip.setAttribute("data-show", "true"); TIPAT = t; }
   document.addEventListener("focusin", function (e) { var t = e.target.closest && e.target.closest(".opt[data-tip], .mopath[data-tip]"); if (!t || !t.matches(":focus-visible")) return;   /* a keyboard focus, not a mouse press */
     tip.classList.remove("cd"); var h = tipFor(t); if (!h) return; tip.innerHTML = h; var bx = t.getBoundingClientRect();
     tip.style.left = Math.min(window.innerWidth - tip.offsetWidth - 8, Math.max(8, bx.left)) + "px"; tip.style.top = (bx.bottom + 6) + "px"; tip.setAttribute("data-show", "true"); });

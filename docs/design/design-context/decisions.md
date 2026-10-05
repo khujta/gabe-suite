@@ -1391,3 +1391,18 @@ other parts 12, read from the lab's BKDEF) and alignment (a fixed icon column, s
 field marks become the lab's: type-coloured marks, nullable paler, unique cornered; (3) the SCHEMA block's field marks take the same mark,
 with an optional field (not required) paler — the schema's analogue of nullable; (4) other kinds get a corner or colour encoding only where
 the feed carries a real yes/no property of the same nature — proposed as options with my pick dashed, never invented.
+
+## D-092 — The gaps between a row's icons hover nothing; no legend under the field marks
+Date: 2026-10-05 · Input: his message after D-091, with two pictures (the ending's strip hovered; the `users` block with its legend row).
+Decision, his: "when I hover in the last row on the end, for example, or in any other row that has this kind of thing, there is a little
+moment where I show the hover for the whole block … What we could do is put a container around all these icons and make it so the container
+doesn't offer any hover action. Instead of showing the huge hover, which is for the whole container, we don't show any hover when I am moving
+from one to the other." And: "in Users and other places where we have this notation with the optional and unique [encoding] on the icons, we
+also put the legend … We don't want that. In the endpoint lab, we are not putting that there. That is information not necessary."
+Consequence: (1) every group of a block's hover items that sit side by side — the strip's marks, a part's items, tagged parts next to each
+other on one line (the glyph and its status, a gate's function and level) — is a QUIET BAND: in a gap between two of them no card shows,
+neither the item's nor the block's; on the items each card shows as before, and the rest of the block (its title, the empty rest of a row)
+still shows the block's card. D-089's "a gap keeps the block's own card" is replaced for gaps inside a band. (2) The legend row under a table's
+and a schema's strip ("optional 2 · unique 2", and the item-4 option's entry) is removed; what a paler or a cornered mark means stays in
+each mark's own card. Chosen alone (his to correct): the band is the group's own outline, computed at hover time, not a wrapper element — a
+wrapper would move the lines D-091 aligned to the lab's pixels and would not follow a part he drags elsewhere.
