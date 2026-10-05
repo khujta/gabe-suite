@@ -2956,7 +2956,13 @@
     "ctl": {
       "widthIs": "width", "parts": "parts", "size": "size", "colour": "colour", "tray": "not drawn", "line": "line {i}", "left": "left", "right": "right",
       "partsPlain": "Drag a part to another line or side, or into not drawn to hide it.",
-      "each": "each part", "box": "box", "marks": "marks", "hover": "hover", "theMarks": "the marks",
+      "each": "each part", "box": "box", "marks": "marks", "hover": "hover", "theMarks": "the marks", "tabsLabel": "the controls", "sizes": "sizes",
+      "tab": {
+        "order": { "name": "order", "plain": "Drag a part to another line or side, or into not drawn to hide it." },
+        "show": { "name": "show", "plain": "What each part shows of its data." },
+        "format": { "name": "format", "plain": "The text sizes, the box around the element and how its marks are drawn." },
+        "hover": { "name": "hover", "plain": "On: hovering the part opens a card of its own. Off: it opens the block's card." }
+      },
       "sizeOf": "size of {name}", "pickPart": "Click a part under parts to size it.", "mode": "shown as", "markSize": "mark size", "gap": "gap between marks",
       "glyph": "glyph colour", "edgeSide": "edge", "edgePat": "edge pattern", "edgeW": "edge thickness", "chipBox": "chip box", "chipFill": "chip fill",
       "cntBox": "count box", "cntFill": "count fill", "enc": "marks drawn as", "pal": "marks coloured by", "shape": "mark corners",

@@ -1428,3 +1428,16 @@ counts) · MARKS (drawn as, coloured by, corners, and the marks' hover switch). 
 not no card; every part has a row at once, not only the picked one, so a form is one click from anywhere; a text part keeps its size
 control; a status chip takes three forms (in its box · the word in its colour · a dot, the word on its hover); "name and word" puts the
 part's own name before its value ("class User"); the box options and the marks' drawing stay as options.
+
+## D-094 — The bench's controls as four tabs: order · show · format · hover
+Date: 2026-10-05 · Input: his message after D-093, on the built controls.
+Decision, his: "the configuration part is getting crowded, so let's make the configuration different tabs … I would like to have separate
+sections for: the hover · the order of the parts · the format (whatever is related to size, colors, borders, or anything else). Maybe there
+is another section where we can separate things."
+Consequence: each column's controls are four TABS, one pane shown at a time — ORDER (the three lines and not drawn, dragged as before) ·
+SHOW (the "another section": each part that takes more than one form, its forms; and the kind's extra mark, where it has one) · FORMAT
+(the text parts' sizes, the box — edge, chips, counts — and how the marks are drawn) · HOVER (a switch for every part and one for the
+marks). Nothing sits in two tabs; reset and copy stay under the tabs on every tab. Measured on the table column: the controls stood about
+790 px with everything on the page; by tab they stand 302 · 267 · 511 · 406 px. Chosen alone (his to correct): a tab picked in one column
+opens in every column (the bench compares kinds side by side), it is kept per viewer, and the order tab opens first; the tabs are words,
+not icon squares (they name sections, they are not looks); SHOW lists only the parts with a choice, FORMAT only the text parts.

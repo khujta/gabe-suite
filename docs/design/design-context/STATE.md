@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-093). Updated 2026-10-05 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-094). Updated 2026-10-05 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -16,7 +16,8 @@ pushed. Since then, local and NOT pushed: D-092 the gaps between a row's icons h
 fixed at the lab's values (a saved look that set them is read with them put back); every part has a row with its FORMS (only the forms
 its data can take — a count as number and unit, the number alone, boxed or bare; a status as its box, its word or a dot; a value as glyph and
 word, the word, the glyph, or the part's name before it) and a HOVER SWITCH (on = a card of its own, off = the block's; the default is
-today's); the controls are four sections — lines · each part · box · marks. Before any push: `git log origin/graft-adoption..HEAD` for a
+today's) (`b31bffe`) · D-094 the controls are four TABS, one shown at a time — order · show · format · hover (his: "getting crowded"); about 790 px
+of controls become 267–511 px by tab; a tab picked in one column opens in all, kept per viewer (probe 1007 passed · 1 failed — the probe's own count of drop zones, fixed; the D-094 section rerun alone, 4 of 4). Before any push: `git log origin/graft-adoption..HEAD` for a
 foreign commit (the branch is shared).
 Disk (D-086): C: is at 41 GB free (2026-10-05) — one GB over `heavy`'s floor, under it every browser job refuses; his steps wait in `C:\Users\Gabe\disk-fix\` (1 cap restore points · 2 compact the WSL disk);
 `~/.local/bin/heavy` runs every browser job (temp in RAM); testing is lean (a change runs its own batteries, the full sweep before a push).
