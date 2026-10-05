@@ -27,6 +27,8 @@
   function xFix(k, L) { var F = EX.fixed[k]; L.size = Object.assign({}, L.size); L.size.icon = F.icon; L.sqSize = F.sqSize; L.sqGap = F.sqGap; L.iconCol = F.iconCol;
     L.mode = Object.assign({}, L.mode); Object.keys(EX.forms[k] || {}).forEach(function (p) { if (L.mode[p] != null && EX.forms[k][p].opts.indexOf(L.mode[p]) < 0) delete L.mode[p]; });
     if (EX.cardLays.indexOf(L.card) < 0) L.card = EX.look[k].card;                                  /* D-095: a card layout must be one of the four */
+    if (EX.heres.indexOf(L.here) < 0) L.here = EX.look[k].here;                                     /* D-096: the item's own mark must be one of the six */
+    if (!(L.hereW >= 1 && L.hereW <= 4)) L.hereW = EX.look[k].hereW;
     var H = EX.look[k].hov || {}; L.hov = Object.assign({}, H, L.hov || {}); Object.keys(L.hov).forEach(function (p) { if (!(p in H)) delete L.hov[p]; }); return L; }
   XK.forEach(function (k) { xFix(k, XS.col[k].look); });
   function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, tab: XS.tab, col: {} }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
@@ -43,6 +45,12 @@
         compact: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="6" height="8" rx="1"/>', tight: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="3.5" height="8" rx="1"/>' },
       card: { cols: '<rect x="3" y="5" width="5" height="3" rx="1"/><path d="M11 6.5h10M11 11h10M11 15.5h7"/>', rows: '<rect x="3" y="4" width="7" height="3" rx="1"/><path d="M3 11h18M3 15h18M3 19h12"/>',
       wide: '<rect x="1.5" y="5" width="4" height="3" rx="1"/><path d="M8 6.5h14.5M8 11h14.5M8 15.5h10"/><path d="M1 20h22" stroke-dasharray="2 2"/>', both: '<rect x="1.5" y="3" width="7" height="3" rx="1"/><path d="M1.5 10h21M1.5 14h21M1.5 18h14"/><path d="M1 21.5h22" stroke-dasharray="2 2"/>' },
+    here: { ring: '<rect x="8" y="8" width="8" height="8" rx="1.5"/><rect x="4" y="4" width="16" height="16" rx="3.5"/>',
+        tint: '<rect x="8" y="8" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="4" y="4" width="16" height="16" rx="3.5" stroke-width="3"/>',
+        box: '<rect x="3" y="3" width="18" height="18" rx="4" fill="currentColor" opacity=".3" stroke="none"/><rect x="8" y="8" width="8" height="8" rx="1.5"/>',
+        double: '<rect x="9" y="9" width="6" height="6" rx="1"/><rect x="5.5" y="5.5" width="13" height="13" rx="2.5"/><rect x="2.5" y="2.5" width="19" height="19" rx="4"/>',
+        pale: '<rect x="9" y="7" width="6" height="10" rx="1" fill="currentColor"/><rect x="2" y="7" width="5" height="10" rx="1" opacity=".35"/><rect x="17" y="7" width="5" height="10" rx="1" opacity=".35"/>',
+        none: '<rect x="7" y="7" width="10" height="10" rx="2"/>' },   /* D-096: how the strip marks the item's own place */
     yn: { off: '<rect x="5" y="5" width="14" height="14" rx="2"/>', corners: '<rect x="6" y="6" width="12" height="12" rx="2" opacity=".45"/><path d="M3 9V3h6"/><path d="M21 15v6h-6"/>',
         grey: '<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M5 19L19 5V19z" fill="currentColor" stroke="none"/>' },   /* D-091: not marked · the other two corners · the no in grey */
       /* D-093: a part's forms — a chip in its box · the word · a dot · a count boxed with its unit · the number boxed · the number and unit · the number · the glyph and the word ·
@@ -503,6 +511,7 @@
     w.style.setProperty("--rail-w", L.railW + "px"); w.style.setProperty("--rail-s", L.railStyle); w.style.setProperty("--rw-a", String(L.rwA)); w.style.setProperty("--cnt-a", String(L.cntA));
     w.style.setProperty("--sq", L.sqSize + "px"); w.style.setProperty("--sqg", L.sqGap + "px");
     w.style.setProperty("--sq-base", String((L.sqBase == null ? 100 : L.sqBase) / 100)); w.style.setProperty("--sq-opt-a", String((L.sqOptA == null ? 50 : L.sqOptA) / 100));   /* the lab's opacity bar: the standard and the optional stop (D-091) */ w.style.setProperty("--uq-len", String((L.sqUqLen || 40) / 100));
+    w.setAttribute("data-here", L.here); w.style.setProperty("--here-w", L.hereW + "px");   /* D-096: how the item's own mark is drawn */
     w.style.setProperty("--uq-w", (L.sqUqW || 1.5) + "px"); w.style.setProperty("--uq-tip", ((L.sqUqW || 1.5) * (L.sqUqTip || 10) / 100) + "px");
     w.appendChild(xBlock(k, cur, L)); col.appendChild(w);
     col.appendChild(xCtl(k, cur)); return col; }
@@ -660,7 +669,15 @@
     var mk = xSec(XW.ctl.marks, "exmarks"), mg = el("div", "exgrid2");
     mg.appendChild(xPick(XW.ctl.enc, L.sqEnc, ["symbol", "colour", "char", "shape"], function (v) { xSet(k, function (x) { x.sqEnc = v; }); }));
     mg.appendChild(xPick(XW.ctl.pal, L.sqPal, ["type", "channel", "entity", "mono"], function (v) { xSet(k, function (x) { x.sqPal = v; }); }));
-    mg.appendChild(xPick(XW.ctl.shape, L.sqShape, ["round", "square"], function (v) { xSet(k, function (x) { x.sqShape = v; }); })); mk.appendChild(mg); pf.appendChild(mk); box.appendChild(pf);
+    mg.appendChild(xPick(XW.ctl.shape, L.sqShape, ["round", "square"], function (v) { xSet(k, function (x) { x.sqShape = v; }); })); mk.appendChild(mg);
+    /* D-096: how the strip marks the item's own place — six looks as icon squares, my pick dashed, and the ring's thickness */
+    if (EX.hereKinds.indexOf(k) >= 0) { var HW = XW.here, hs = el("div", "exhere-sec"), hg = el("div", "opts exhereopts"), what = HW.kinds[k].name;
+      hs.appendChild(el("h5", "exsh2", HW.title)); hs.appendChild(el("p", "exhint", HW.plain)); hg.setAttribute("role", "radiogroup"); hg.setAttribute("aria-label", HW.title);
+      EX.heres.forEach(function (v) { var b = xAct("opt exo exi", XICON.here[v], "here", { what: what, v: HW.opts[v].name }, function () { xSet(k, function (x) { x.here = v; }); });
+        b.setAttribute("role", "radio"); b.setAttribute("data-xhere", v); b.setAttribute("aria-checked", L.here === v ? "true" : "false"); if (HW.pick === v) b.setAttribute("data-pick", "true"); hg.appendChild(b); });
+      hs.appendChild(hg); if (["ring", "tint", "double"].indexOf(L.here) >= 0) hs.appendChild(xRange(HW.w, L.hereW, 1, 4, 1, function (v) { xSet(k, function (x) { x.hereW = v; }); }));
+      mk.appendChild(hs); }
+    pf.appendChild(mk); box.appendChild(pf);
     /* HOVER: every part's switch, then the marks' — pressed = a card of its own, else the block's card */
     var ph = xPane("hover"); order.concat(["marks"]).forEach(function (p) { var r = xCtlRow(k, p, L); r.appendChild(xHov(k, p, L, p === "marks" ? XW.ctl.theMarks : xPartWord(k, p))); ph.appendChild(r); });
     /* D-095: how this kind's hover cards lay out their sections — four looks, my pick dashed */
@@ -699,7 +716,9 @@
   /* D-093: each part whose hover is not the default's, its own card or the block's — nothing when every switch is as the bench opened */
   function xHovLine(k, L) { var H0 = EX.look[k].hov || {}, H = L.hov || {}, d = Object.keys(H0).filter(function (p) { return !!H[p] !== !!H0[p]; });
     return (d.length ? " · " + XW.ctl.hover + " " + d.map(function (p) { return (p === "marks" ? XW.ctl.theMarks : xPartWord(k, p)) + " " + (H[p] ? "own" : "block"); }).join(", ") : "")
-      + (L.card !== EX.look[k].card ? " · " + XW.cardLay.title + " " + XW.cardLay.opts[L.card].name : ""); }   /* D-095: said only when it is not the bench's own */
+      + (L.card !== EX.look[k].card ? " · " + XW.cardLay.title + " " + XW.cardLay.opts[L.card].name : "")   /* D-095: said only when it is not the bench's own */
+      + (EX.hereKinds.indexOf(k) >= 0 && (L.here !== EX.look[k].here || L.hereW !== EX.look[k].hereW) ? " · " + XW.here.title + " " + XW.here.opts[L.here].name
+        + (["ring", "tint", "double"].indexOf(L.here) >= 0 ? " " + L.hereW + "px" : "") : ""); }   /* D-096: the same way */
   function xSame(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
   function xCopy(k) { var st = XS.col[k], it = xCurrent(k), L = st.look, whose = xWhose(k), mine = !xSame(L, EX.look[k]) || st.width !== XW.width.pick;   /* L-36: the column's width is part of its look */
     var off = (L.off || []).map(function (p) { return k === "table" ? p : xPartWord(k, p); }).join(k === "table" ? " " : " · ") || "—";

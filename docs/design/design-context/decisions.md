@@ -1454,3 +1454,18 @@ invalid token (DELETE /me, a short card) name above is 258 px wide against 308 b
 /recipes' 400 invalid temperature code (a long check) beside is 360 × 438, above 360 × 473, wider 520 × 387, above-and-wider 520 × 422.
 Chosen alone (his to correct): the default is NAME ABOVE (dashed) — his first ask; "wider" is a ceiling, not a fixed width, so a short card
 stays short; the layout is per column like every other look, and every card a column opens takes it (the block's card and the parts' cards).
+
+## D-096 — The item's own mark in its strip, as a choice: a ring · in its colour · a box behind it · double · the others paler · not marked
+Date: 2026-10-05 · Input: his message on the ending's hover card (same message as D-095).
+Decision, his: "some icons … the gate 401 refusal has a border that is thicker than the other ones … That's something similar to the
+encoding that we do in tables for the keys that are required and the ones that are optional. I would like to be able to tailor that also. Go
+and check in the endpoint lab how we were able to tailor that kind of thing … Maybe the same one with a different color, or another one mainly
+related to the border."
+Consequence: the thick ring is the strip marking the item's OWN place — an ending's way out, a test's acting call, a gate's own check (one
+per strip). The format tab's marks section gains THIS ITEM'S MARK on those three kinds, six looks as icon squares the way the lab offers an
+encoding (the extra mark's off · corners · grey): a ring (today) · a ring in the mark's own colour · a pale box of its colour behind it · a
+double ring · the others paler (no ring; the other marks drop to the optional stop a table's nullable columns use) · not marked — and the
+ring's thickness, 1 to 4 px, under the ring looks. The copy line names the look only off the default. Found on the way and fixed: the faded
+marks (a gate the way passes, a field past the shown ones) had drawn at full strength since D-091 — the lab's imported opacity rule outranked
+the bench's; they fade to 0.38 again. Chosen alone (his to correct): the default stays today's ring, dashed; the look is per column; a ring
+drawn inside the mark was built and dropped — on a 14 px mark it reads as a dark square.

@@ -66,7 +66,7 @@
 #sec-ex .exw .excdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--alert); flex: none; }
 #sec-ex .exw .bkn.god { box-shadow: 0 0 0 1.5px var(--alert); }
 #sec-ex .exw .sq.exhere { outline: 2px solid var(--ink); outline-offset: 1px; }
-#sec-ex .exw .sq.expass, #sec-ex .exw .sq.exnob, #sec-ex .exw .sq.exmore { opacity: .38; }
+#sec-ex #exgrid .excol .exw .sqs > .sq.expass, #sec-ex #exgrid .excol .exw .sqs > .sq.exnob, #sec-ex #exgrid .excol .exw .sqs > .sq.exmore { opacity: .38; }   /* D-096: (2,5,0) lifts it over the lab's imported opacity rule (two ids), which had drawn these full since D-091 */
 /* the list a click opens */
 #sec-ex .exfl { max-height: 380px; overflow: auto; padding: 4px 9px 9px; font: 600 12px/1.45 var(--font-mono); cursor: default; }
 .exr { display: flex; align-items: center; gap: 6px; padding: 1px 0; flex-wrap: wrap; color: var(--ink); overflow-wrap: anywhere; }
@@ -167,3 +167,16 @@
 .excardopts { display: flex; gap: 3px; }
 .excardopts .opt { width: 26px; height: 26px; border-radius: 6px; }
 .excardopts .opt svg { width: 15px; height: 15px; }
+/* ══ D-096 · how a strip marks the item's own place: a ring (today) · in the mark's colour · a pale box behind it · double · the others paler · not marked;
+   the thickness rides --here-w (1–4 px). The base rule above keeps today's ring when the look is the default ══ */
+#sec-ex .exw .sq.exhere { outline-width: var(--here-w, 2px); }
+#sec-ex .exw[data-here="tint"] .sq.exhere { outline-color: var(--fc, var(--ink)); }
+#sec-ex .exw[data-here="box"] .sq.exhere { outline: none; background-color: color-mix(in srgb, var(--fc, var(--ink)) 24%, transparent); border-radius: 3px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--fc, var(--ink)) 24%, transparent); }
+#sec-ex .exw[data-here="double"] .sq.exhere { outline-style: double; outline-width: calc(var(--here-w, 2px) + 1px); }
+#sec-ex .exw[data-here="pale"] .sq.exhere, #sec-ex .exw[data-here="none"] .sq.exhere { outline: none; }
+#sec-ex #exgrid .exw[data-here="pale"] .sqs > .sq:not(.exhere):not(.expass):not(.exnob):not(.exmore) { opacity: var(--sq-opt-a, .5); }   /* the optional stop, the one a table's nullable columns use */
+#sec-ex .exhere-sec { margin-top: 8px; }
+#sec-ex .exhere-sec .exsh2 { margin: 0 0 2px; font: inherit; font-weight: 600; }
+#sec-ex .exhereopts { display: flex; flex-wrap: wrap; gap: 3px; margin: 4px 0; }
+#sec-ex .exhereopts .opt { width: 26px; height: 26px; border-radius: 6px; }
+#sec-ex .exhereopts .opt svg { width: 15px; height: 15px; }
