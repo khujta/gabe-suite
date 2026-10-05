@@ -1,0 +1,13 @@
+  /* the example's one figure form: three parts in a row, each an icon on its tone, a name, a line.
+     The kit dims a part waiting for its cue (data-at="next"); this rings the one the voice is naming. */
+  .mini-row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .mini-row li { display: flex; flex-direction: column; gap: 6px; padding: 12px; border: 1px solid var(--rule-soft); border-radius: 10px; background: var(--raised); min-width: 0; }
+  .mini-row .ic { display: inline-grid; place-items: center; width: 1.75em; height: 1.75em; border-radius: 7px; background: var(--c, var(--accent-soft)); color: var(--c, var(--accent)); }
+  .mini-row li[style] .ic { color: var(--sec-ink); }
+  .mini-row .ic svg { width: 1.05em; height: 1.05em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .mini-row span:last-child { font-size: var(--fs-sm); color: var(--ink-soft); }
+  .fig[data-step] .mini-row li[data-at="now"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--card); }
+  /* the moving stage: a track the cue words fill (page.js) — full at rest, empty when play starts */
+  .mini-meter { margin-top: 12px; height: 6px; border-radius: 999px; background: var(--rule-soft); overflow: hidden; }
+  .mini-meter i { display: block; height: 100%; width: 100%; border-radius: inherit; background: var(--accent); }
+  @media (max-width: 640px) { .mini-row { grid-template-columns: minmax(0, 1fr); } }

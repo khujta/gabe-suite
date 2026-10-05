@@ -1,0 +1,246 @@
+  /* ══ gabe-artifact · recorded narration (H7, engine "recorded") ═══════════
+     Spec: references/narration.md · engine: assets/narrated.js · built by
+     tools/narrate-build.py, which injects this block before the cog's CSS so
+     the cog's own rules still win a tie. Gate: tools/verify-narration.mjs. */
+
+  /* the host adds this, the gate's local server does not — without it `.dd { display:flex }`
+     beats `hidden`, every dropdown renders open and the page scrolls sideways (v1 defect) */
+  [hidden] { display: none !important; }
+  /* a standalone file (the default): no host wraps it, so the UA's 8px body margin is ours to drop */
+  html, body { margin: 0; }
+
+  /* ── the reading column (H1): the page column is centred; inside it prose, titles and
+     controls sit on one narrower centred measure, and figures take the column's full width ── */
+  :root { --col: 64rem; --read: calc(var(--af-size) * 46); }
+  .artifact-page { max-width: var(--col); }
+  .artifact-page > :first-child { padding-right: 0; }   /* the cog floats over the sticky dock, never over the header */
+  .artifact-page > header > *, .sec > :not(.tx), .tx > p { width: 100%; max-width: var(--read); margin-inline: auto; box-sizing: border-box; }
+  .artifact-page > header > .wide, .sec > .wide { max-width: none; }
+  code { font-size: max(.95em, 12.5px); }   /* a .95em code inside an --fs-min caption fell to 11.7px */
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  /* ── the page header a narrated page opens with ── */
+  /* labels speak at reading case (operator 2026-10-05: fewer shouted, tracked caps) and lead with an icon where one names the thing */
+  .eyebrow { display: flex; align-items: center; gap: 7px; font-size: var(--fs-sm); font-weight: 600; letter-spacing: 0; color: var(--accent); margin: 0; }
+  .eyebrow svg, .facts svg, .sec-head .n svg { width: 1.1em; height: 1.1em; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .sec-head .n { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-sm); letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
+  .artifact-page h1 { font-size: 2.1em; line-height: 1.15; margin-block: 8px 0; text-wrap: balance; }   /* margin-block: a shorthand would zero the centring margin-inline */
+  @media (max-width: 640px) { .artifact-page h1 { font-size: 1.55em; } }
+  .lead { color: var(--ink-soft); max-width: 66ch; margin: 12px 0 0; }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 16px; font-size: var(--fs-sm); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .facts > span { display: inline-flex; align-items: center; gap: 7px; }
+  .facts svg { color: var(--muted); }
+  .facts b { color: var(--ink); font-weight: 600; }
+  .muted { color: var(--muted); font-size: var(--fs-sm); }
+
+  /* ── the dock: ONE sticky bar (operator 2026-10-05: "integrate the player with the config bar").
+     Left: the sections menu, Play all and Next — icons, named on hover. Centre: the player — transport, what is
+     playing over its seek bar, restart · stop · speed. Right: the cog, riding inside the bar. Sticky in the flow,
+     never fixed, so nothing on the page floats (H2). ── */
+  .dock {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 150;
+    background: color-mix(in srgb, var(--ground) 92%, transparent);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .dock-in {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 18px;
+    box-sizing: border-box; max-width: calc(var(--col) + 48px); margin: 0 auto; padding: 8px 24px;
+  }
+  .dk-left, .dk-right, .pl-trans, .pl-x { display: flex; align-items: center; gap: 2px; }
+  .dk-icon, .pl-btn {
+    display: inline-grid; place-items: center; width: 34px; height: 34px; padding: 0; cursor: pointer;
+    color: var(--ink-soft); background: transparent; border: 1px solid transparent; border-radius: 9px;
+  }
+  .dk-icon:hover, .pl-btn:hover, .dk-icon[aria-expanded="true"] { color: var(--accent); border-color: var(--rule); background: var(--card); }
+  .dk-icon svg, .pl-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .dk-icon .solid, .pl-btn .solid { fill: currentColor; stroke: none; }
+  #playall .i-pause { display: none; }
+  #playall[data-playing="true"] { color: var(--accent); }
+  #playall[data-playing="true"] .i-all { display: none; }
+  #playall[data-playing="true"] .i-pause { display: block; }
+
+  /* the cog lives in the bar now: in the flow, the bar's height, no shadow of its own; its panel still drops under it */
+  .dock .af-chrome { position: relative; top: auto; right: auto; z-index: auto; }
+  .dock .af-cog { width: 34px; height: 34px; box-shadow: none; border-color: transparent; background: transparent; border-radius: 9px; }
+  .dock .af-cog:hover, .dock .af-cog[aria-expanded="true"] { border-color: var(--rule); background: var(--card); }
+  .dock .af-panel { top: calc(100% + 9px); max-height: calc(100vh - var(--dock-h, 56px) - 16px); }
+
+  /* the sections menu: one button, the reader's place in it ("3 / 7"), and a list of every section —
+     each in its section's own tone and icon, so the menu and the section pills read as one key */
+  .toc-wrap { position: relative; }
+  .toc-btn { width: auto; flex: none; white-space: nowrap; display: inline-flex; gap: 6px; padding: 0 8px; font: inherit; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+  .toc-btn .chev { width: 14px; height: 14px; opacity: .6; transition: transform .2s ease; }
+  .toc-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  .toc {
+    position: absolute; top: calc(100% + 9px); left: 0; z-index: 160; box-sizing: border-box;
+    width: min(26rem, calc(100vw - 24px)); max-height: calc(100vh - var(--dock-h, 56px) - 16px); overflow-y: auto;
+    background: var(--card); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow); padding: 6px;
+  }
+  .toc-head { display: flex; align-items: center; gap: 8px; margin: 4px 8px 6px; font-size: var(--fs-min); color: var(--muted); }
+  .toc-head svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .ti { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; border-radius: 9px; }
+  .ti:hover { background: var(--raised); }
+  .ti[data-current="true"] { background: var(--accent-soft); }
+  .ti-go {
+    all: unset; box-sizing: border-box; cursor: pointer; border-radius: 9px; min-width: 0;
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px;
+    padding: 7px 8px; font-size: var(--fs-sm); color: var(--ink);
+  }
+  .ti-go:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .ti[data-current="true"] .ti-go { font-weight: 600; }
+  .ti-ico { display: grid; place-items: center; width: 1.75em; height: 1.75em; border-radius: 7px; background: var(--c); color: var(--sec-ink); }
+  .ti-ico svg { width: 1.05em; height: 1.05em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .ti-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ti-d { font-size: var(--fs-min); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .ti-play { margin-right: 4px; color: var(--muted); }
+  .ti-play { display: inline-grid; place-items: center; width: 32px; height: 32px; padding: 0; cursor: pointer; background: transparent; border: 1px solid transparent; border-radius: 8px; }
+  .ti-play:hover { color: var(--accent); border-color: var(--rule); background: var(--card); }
+  .ti-play svg { width: 14px; height: 14px; fill: currentColor; }
+  .ti-play .i-pause { display: none; }
+  .ti[data-playing="true"] .ti-play { color: var(--accent); }
+  .ti[data-playing="true"] .ti-play .i-play { display: none; }
+  .ti[data-playing="true"] .ti-play .i-pause { display: block; }
+  .sec { scroll-margin-top: calc(var(--dock-h, 56px) + 14px); }
+  .artifact-page::after { content: ""; display: block; height: var(--tail, 0px); }   /* sized by the engine: room for the last section to reach the dock */
+
+  /* the player: transport | what is playing, over its seek bar | restart · stop · speed */
+  .player { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; min-width: 0; }
+  .pl-main { width: 38px; height: 38px; color: var(--accent); background: var(--accent-soft); border-color: var(--accent); border-radius: 999px; }
+  .pl-main:hover { background: var(--card); border-color: var(--accent); }
+  .pl-main .i-pause { display: none; }
+  .pl-main[data-playing="true"] .i-play { display: none; }
+  .pl-main[data-playing="true"] .i-pause { display: block; }
+  .pl-rate { width: auto; min-width: 42px; padding: 0 6px; font: inherit; font-size: var(--fs-min); font-variant-numeric: tabular-nums; }
+  .pl-now { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .pl-line { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: var(--fs-sm); line-height: 1.3; }
+  .pl-ico { flex: 0 0 auto; display: grid; place-items: center; width: 1.55em; height: 1.55em; border-radius: 6px; background: var(--pc, var(--rule-soft)); color: var(--pc-ink, var(--muted)); }
+  .pl-ico svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .pl-title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+  .player[data-idle="true"] .pl-title { color: var(--muted); }
+  .pl-time { flex: 0 0 auto; font-size: var(--fs-min); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  /* .seek is a flex row's item elsewhere (flex: 1 1 140px); inside this column its basis would become HEIGHT — reset it here */
+  .pl-now .seek { flex: none; width: 100%; max-width: none; height: 6px; margin: 5px 0 3px; }
+
+  /* narrower: "start over" and "restart" leave the bar — the menu's first section plays from the top, and the
+     previous button's first press restarts the section, so neither is lost */
+  @media (max-width: 980px) { .dock-in { gap: 8px 10px; } #pl-top, #pl-restart { display: none; } }
+  /* a phone: row 1 the menu · Play all · Next … cog; row 2 the player, what is playing above its controls */
+  @media (max-width: 640px) {
+    .dock-in { grid-template-columns: auto 1fr auto; padding: 6px 12px; gap: 4px 6px; }
+    .dk-right { grid-column: 3; grid-row: 1; }
+    .player { grid-column: 1 / -1; grid-row: 2; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0 6px; }
+    .pl-trans, .pl-x { gap: 0; }
+    .dk-icon, .pl-btn { width: 32px; height: 32px; }
+    .dock .toc-btn { width: auto; }   /* the 32px square above would squeeze "3 / 7" under Play all */
+    .pl-main { width: 36px; height: 36px; }
+    /* the title takes the whole top line; the time moves beside the seek bar */
+    .pl-now { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; column-gap: 6px; }
+    .pl-line { display: contents; }
+    .pl-ico { grid-area: 1 / 1; }
+    .pl-title { grid-area: 1 / 2 / auto / -1; }
+    .pl-now .seek { grid-area: 2 / 1 / auto / 3; }
+    .pl-time { grid-area: 2 / 3; }
+  }
+
+  /* ── a section's listen row: play pill + seek bar + time ── */
+  .listen { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .play {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    font: inherit; font-size: var(--fs-sm); color: var(--accent);
+    background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 999px;
+    padding: 5px 14px 5px 10px; text-align: left;   /* a long label wraps flush left beside its icon, not centred */
+  }
+  .play:hover { background: var(--card); }
+  .play svg { width: 1em; height: 1em; fill: currentColor; stroke: none; }
+  .play .i-pause { display: none; }
+  .play[data-playing="true"] .i-play { display: none; }
+  .play[data-playing="true"] .i-pause { display: inline; }
+  .dur { font-size: var(--fs-min); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .seek {
+    -webkit-appearance: none; appearance: none; flex: 1 1 140px; max-width: 320px; height: 6px; margin: 8px 0; cursor: pointer;
+    border-radius: 999px; background: linear-gradient(var(--accent), var(--accent)) 0 0 / var(--p, 0%) 100% no-repeat, var(--rule-soft);
+  }
+  .seek:disabled { cursor: default; opacity: .6; }
+  .seek::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--card); box-shadow: 0 0 0 1px var(--accent); }
+  .seek::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--card); }
+  .seek::-moz-range-track { background: transparent; }
+
+  /* ── the script IS the content (script v2): every paragraph is spoken and shown, and the
+     figures the script places with @img / @vid / @fig sit between the paragraphs they illustrate.
+     The figure under the voice's paragraph goes live (data-live) and a clip restarts when it does. ── */
+  .tx { display: flex; flex-direction: column; gap: calc(var(--af-size) * var(--af-para, 1.1)); }   /* the cog's Spacing sets the air between paragraphs */
+  .tx > p { color: var(--ink-soft); margin-block: 0; }
+  .fig { margin: 4px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+  /* a still or a clip shows at its own CSS size; wider than the column, it breaks out evenly both sides, never past the screen */
+  .tx > .fig[style*="--fw"] { align-self: center; width: min(var(--fw), calc(100vw - 48px)); }
+  .fig > :first-child { max-width: 100%; border-radius: 8px; outline: 2px solid transparent; outline-offset: 4px; transition: outline-color .35s ease; }
+  .fig[data-live="true"] > :first-child { outline-color: var(--accent); }
+  /* a cued figure marks its live PART (data-at="now"), so the whole-figure outline would only frame the frame */
+  .fig[data-cued][data-live="true"] > :first-child { outline-color: transparent; }
+  .fig > button { all: unset; cursor: zoom-in; display: block; width: fit-content; max-width: 100%; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+  .fig > button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .fig img { display: block; max-width: 100%; height: auto; }
+  .fig > video { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); background: var(--raised); cursor: zoom-in; }
+  .fig > .widget { width: 100%; box-sizing: border-box; }
+  /* a widget figure (@fig) sits a little wider than the prose so it reads as a figure; a .wide widget takes the column */
+  .tx > .fig[data-fig] { align-self: center; width: 100%; max-width: calc(var(--af-size) * 54); }
+  .tx > .fig[data-fig]:has(> .wide) { max-width: none; }
+  .fig figcaption { width: 100%; max-width: var(--read); font-size: var(--fs-sm); color: var(--ink-soft); }
+  .fig figcaption b { color: var(--ink); }
+  /* a caption says what kind of figure it is with an icon — a film strip for a clip, a frame for a still — not a shouted label */
+  .fig figcaption:has(.kind) { display: flex; align-items: flex-start; gap: 8px; }
+  .fig .kind { flex: 0 0 auto; display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; margin-top: .05em; border-radius: 6px; color: var(--accent); background: var(--accent-soft); }
+  .fig .kind svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ── cues (script v3): the voice steps a figure. A word carrying data-cue="fig:k" sets data-step=k on that figure
+     while the voice has passed it; each child naming its step in data-k reads data-at = past · now · next. With no
+     voice in the clip the figure carries no data-step and shows whole — the at-rest reading is the full figure.
+     These are the defaults; a page styles [data-at="now"] in its own figure's terms (a ring, a fill, a weight). ── */
+  .fig [data-k] { transition: opacity .3s ease, background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease; }
+  .fig[data-step] [data-k][data-at="next"] { opacity: .32; }
+  dialog.zoom { border: 0; padding: 0; background: transparent; max-width: 96vw; max-height: 94vh; overflow: visible; }
+  dialog.zoom::backdrop { background: color-mix(in srgb, var(--ground) 84%, transparent); backdrop-filter: blur(3px); }
+  dialog.zoom img, dialog.zoom video { display: block; max-width: 96vw; max-height: 94vh; width: auto; height: auto; border: 1px solid var(--rule); border-radius: 8px; cursor: zoom-out; }
+
+  /* ── the reading wave: ONE copy of each word; --w (0–1) thickens its strokes and lifts its ink.
+     A stroke never changes a glyph's advance, so nothing reflows and nothing doubles.
+     Never cross-fade a regular and a bold copy — in a proportional face they read as two words. ── */
+  .w {
+    -webkit-text-stroke: calc(var(--w, 0) * 0.8px) currentColor;
+    color: color-mix(in srgb, var(--ink) calc(var(--w, 0) * 100%), var(--ink-soft));
+  }
+
+  /* ── the section foot: go next ── */
+  .sec-foot { display: flex; justify-content: flex-start; }
+  .next-btn {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    font: inherit; font-size: var(--fs-sm); color: var(--ink); background: var(--card);
+    border: 1px solid var(--rule); border-radius: 999px; padding: 6px 14px;
+  }
+  .next-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .next-btn svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ── furniture narrated explainers reach for ── */
+  .row-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: space-between; }
+  .btn { font: inherit; font-size: var(--fs-sm); cursor: pointer; background: var(--raised); color: var(--ink); border: 1px solid var(--rule); border-radius: 8px; padding: 5px 12px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .chip { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: var(--fs-min); border: 1px solid var(--rule); color: var(--ink-soft); background: var(--raised); font-variant-numeric: tabular-nums; }
+  .chip b { color: var(--ink); }
+  .ill { font-size: var(--fs-min); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 14px; }
+  .shots figure { margin: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .shots figure button { all: unset; cursor: zoom-in; display: block; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+  .shots figure button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .shots figure img { display: block; width: 100%; height: auto; }
+  .shots figure[data-wide="true"] { grid-column: 1 / -1; }
+  .shots figure[data-wide="true"] button { cursor: zoom-out; }
+  .shots figcaption { font-size: var(--fs-sm); color: var(--ink-soft); }
+  .shots figcaption b { color: var(--ink); }
+  .tbl { overflow-x: auto; }
+  .tbl table { border-collapse: collapse; width: 100%; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+  .tbl th, .tbl td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+  .tbl th { color: var(--muted); font-weight: 600; font-size: var(--fs-min); letter-spacing: .06em; text-transform: uppercase; }
+

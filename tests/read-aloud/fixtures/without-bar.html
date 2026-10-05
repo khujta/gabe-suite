@@ -1,32 +1,17 @@
-<!--
-  gabe-artifact · artifact-chrome kit
-  ────────────────────────────────────────────────────────────────────────
-  Open this file in a browser to see the chrome working. To use it, copy the
-  three marked blocks into a new artifact page:
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Read-aloud bar demo — WITHOUT the bar (fixture)</title>
+<!-- FIXTURE: assets/read-aloud-demo.html with the read-aloud module removed — the page the gate must FIRE on. gabe-artifact read-aloud module, proving itself standalone. On a disk page the module is two sibling files; for a published
+     Artifact (strict CSP, no sibling files) the same two files are PASTED in as block 4 (style) and block 5 (script), beside the kit's three blocks.
+     Run: node skills/gabe-artifact/tools/verify-read-aloud.mjs tests/read-aloud/fixtures/without-bar.html — it must exit 1. -->
 
-    BLOCK 1  the style block   → tokens, 3 skins, section blocks, devices, cog CSS
-    BLOCK 2  the markup block  → the cog button + options panel (paste last in the body)
-    BLOCK 3  the script block  → font roster, skin roster, motion switch
-
-  Note for anything that extracts these blocks programmatically: this comment
-  deliberately spells the tags out in words. A literal <style>…</style> here is
-  the first thing a non-greedy regex finds, and the page it assembles has no CSS.
-
-  Artifacts are published without <!doctype>/<html>/<head>/<body> — the host
-  wraps the file. Keep <title> and drop this comment when you copy.
-
-  Verify with:  node tools/verify-artifact-chrome.mjs <your-file.html>
--->
-<title>Artifact chrome kit — gabe-artifact</title>
-
-<!-- ══ BLOCK 1 ══════════════════════════════════════════════════════════ -->
+<!-- ══ BLOCK 1 · the kit's style block, pasted verbatim from skills/gabe-artifact/assets/artifact-chrome.html ══ -->
 <style>
   /* ── font roster (H3) — the script keeps these in sync ─────────────── */
-  :root { --af-stack: ui-monospace, monospace; --af-size: 16.5px; --af-track: -0.025em; }
-  /* ── text size + spacing — the reader's own dials, beside the family.
-        Size scales the family's base (never below it, so the 12px floor holds at every step);
-        spacing sets line height, the gap between paragraphs and a little tracking. */
-  :root { --af-lh: 1.65; --af-para: 1.1; }
+  :root { --af-stack: ui-monospace, monospace; --af-size: 15px; --af-track: -0.025em; }
 
   /* ── title face (H3) — ONLY the section title pills pin a face: a modern
         condensed grotesque, set in caps. DIN lineage, so it reads as console
@@ -58,21 +43,19 @@
         spec'd light-only; their dark arms are derived so the viewer's theme
         toggle still answers. Chart series and status colours are NEVER themed. */
 
-  /* --muted holds ≥ 4.5:1 on card, ground and raised in every skin and theme (2026-10-04: the old greys
-     measured 3.6–4.3:1 in the light themes, and the narrated dock sets its times in it at --fs-min). */
   /* ── Catalog · cool developer portal (default) ── */
   :root, :root[data-skin="catalog"] {
     --ground:#f6f7f9; --card:#ffffff; --raised:#fbfcfd;
-    --ink:#141a24; --ink-soft:#3d4756; --muted:#677081;
+    --ink:#141a24; --ink-soft:#3d4756; --muted:#7a8595;
     --rule:#e7e9ee; --rule-soft:#eef0f4;
     --accent:#4f46e5; --accent-soft:#eef0fe; --strong:#101726;
-    --radius:10px;
+    --radius:10px; --rail:5px;
     --shadow:0 1px 2px rgba(16,24,40,.05), 0 4px 14px rgba(16,24,40,.10);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]), :root[data-skin="catalog"]:not([data-theme="light"]) {
       --ground:#101726; --card:#1b2436; --raised:#212b40;
-      --ink:#e7ebf3; --ink-soft:#c7cfdd; --muted:#8e98ae;
+      --ink:#e7ebf3; --ink-soft:#c7cfdd; --muted:#79839a;
       --rule:#2c3648; --rule-soft:#232d3f;
       --accent:#8b83f5; --accent-soft:#23214a; --strong:#c7cfdd;
       --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
@@ -80,14 +63,14 @@
   }
   :root[data-theme="dark"], :root[data-skin="catalog"][data-theme="dark"] {
     --ground:#101726; --card:#1b2436; --raised:#212b40;
-    --ink:#e7ebf3; --ink-soft:#c7cfdd; --muted:#8e98ae;
+    --ink:#e7ebf3; --ink-soft:#c7cfdd; --muted:#79839a;
     --rule:#2c3648; --rule-soft:#232d3f;
     --accent:#8b83f5; --accent-soft:#23214a; --strong:#c7cfdd;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
   }
   :root[data-skin="catalog"][data-theme="light"] {
     --ground:#f6f7f9; --card:#ffffff; --raised:#fbfcfd;
-    --ink:#141a24; --ink-soft:#3d4756; --muted:#677081;
+    --ink:#141a24; --ink-soft:#3d4756; --muted:#7a8595;
     --rule:#e7e9ee; --rule-soft:#eef0f4; --accent:#4f46e5; --accent-soft:#eef0fe;
     --strong:#101726;
   }
@@ -95,28 +78,28 @@
   /* ── Blueprint · skin F, blue ink ── */
   :root[data-skin="blueprint"] {
     --ground:#f6f8fc; --card:#fdfeff; --raised:#f1f5fd;
-    --ink:#16233b; --ink-soft:#41547a; --muted:#5f6f90;
+    --ink:#16233b; --ink-soft:#41547a; --muted:#8494b5;
     --rule:#c3d0f0; --rule-soft:#dde5f8;
     --accent:#1d4ed8; --accent-soft:#e4ecfe; --strong:#16233b;
-    --radius:6px; --shadow:none;
+    --radius:6px; --rail:5px; --shadow:none;
   }
   @media (prefers-color-scheme: dark) {
     :root[data-skin="blueprint"]:not([data-theme="light"]) {
       --ground:#0b1220; --card:#101a2e; --raised:#142138;
-      --ink:#dce6fa; --ink-soft:#a8bce4; --muted:#8195bd;
+      --ink:#dce6fa; --ink-soft:#a8bce4; --muted:#7286b0;
       --rule:#23375f; --rule-soft:#1a2942;
       --accent:#6f9bff; --accent-soft:#16264a; --strong:#a8bce4; --shadow:none;
     }
   }
   :root[data-skin="blueprint"][data-theme="dark"] {
     --ground:#0b1220; --card:#101a2e; --raised:#142138;
-    --ink:#dce6fa; --ink-soft:#a8bce4; --muted:#8195bd;
+    --ink:#dce6fa; --ink-soft:#a8bce4; --muted:#7286b0;
     --rule:#23375f; --rule-soft:#1a2942;
     --accent:#6f9bff; --accent-soft:#16264a; --strong:#a8bce4; --shadow:none;
   }
   :root[data-skin="blueprint"][data-theme="light"] {
     --ground:#f6f8fc; --card:#fdfeff; --raised:#f1f5fd;
-    --ink:#16233b; --ink-soft:#41547a; --muted:#5f6f90;
+    --ink:#16233b; --ink-soft:#41547a; --muted:#8494b5;
     --rule:#c3d0f0; --rule-soft:#dde5f8; --accent:#1d4ed8; --accent-soft:#e4ecfe;
     --strong:#16233b;
   }
@@ -124,28 +107,28 @@
   /* ── Mission Console · skin B, teal ops console ── */
   :root[data-skin="mission"] {
     --ground:#eef1f4; --card:#ffffff; --raised:#f6f8fa;
-    --ink:#1a2b36; --ink-soft:#4a6272; --muted:#5b6f7d;
+    --ink:#1a2b36; --ink-soft:#4a6272; --muted:#7d92a0;
     --rule:#c8d4dc; --rule-soft:#e2e9ee;
     --accent:#0e7c8c; --accent-soft:#e0f1f4; --strong:#1a2b36;
-    --radius:4px; --shadow:none;
+    --radius:4px; --rail:5px; --shadow:none;
   }
   @media (prefers-color-scheme: dark) {
     :root[data-skin="mission"]:not([data-theme="light"]) {
       --ground:#0e161c; --card:#16222b; --raised:#1b2934;
-      --ink:#e3edf3; --ink-soft:#b3c6d2; --muted:#8aa0ae;
+      --ink:#e3edf3; --ink-soft:#b3c6d2; --muted:#7d92a0;
       --rule:#27394a; --rule-soft:#1e2c39;
       --accent:#2ba7bb; --accent-soft:#0f3038; --strong:#b3c6d2; --shadow:none;
     }
   }
   :root[data-skin="mission"][data-theme="dark"] {
     --ground:#0e161c; --card:#16222b; --raised:#1b2934;
-    --ink:#e3edf3; --ink-soft:#b3c6d2; --muted:#8aa0ae;
+    --ink:#e3edf3; --ink-soft:#b3c6d2; --muted:#7d92a0;
     --rule:#27394a; --rule-soft:#1e2c39;
     --accent:#2ba7bb; --accent-soft:#0f3038; --strong:#b3c6d2; --shadow:none;
   }
   :root[data-skin="mission"][data-theme="light"] {
     --ground:#eef1f4; --card:#ffffff; --raised:#f6f8fa;
-    --ink:#1a2b36; --ink-soft:#4a6272; --muted:#5b6f7d;
+    --ink:#1a2b36; --ink-soft:#4a6272; --muted:#7d92a0;
     --rule:#c8d4dc; --rule-soft:#e2e9ee; --accent:#0e7c8c; --accent-soft:#e0f1f4;
     --strong:#1a2b36;
   }
@@ -189,11 +172,11 @@
   }
   :root[data-theme="dark"] { --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; }
 
-  /* ══ the page: one centred column, text set left inside it (H1) ════ */
+  /* ══ the page: content anchored LEFT, never centred (H1) ═══════════ */
   body {
     background: var(--ground); color: var(--ink);
     font-family: var(--af-stack); font-size: var(--af-size); letter-spacing: var(--af-track);
-    line-height: var(--af-lh); text-align: left; -webkit-font-smoothing: antialiased;
+    line-height: 1.55; text-align: left; -webkit-font-smoothing: antialiased;
   }
   /* ── scrollbars wear the skin ────────────────────────────────────────
      A native scrollbar is the one piece of chrome the page does not own by
@@ -220,7 +203,7 @@
 
   .artifact-page {
     max-width: 74rem;
-    margin: 0 auto;   /* centred: a wide screen keeps equal air both sides */
+    margin: 0 auto 0 clamp(16px, 4vw, 56px);   /* left-anchored, never `margin: 0 auto` */
     padding: 32px 24px 48px;
     display: flex; flex-direction: column; gap: 30px;
     text-align: left;
@@ -232,8 +215,8 @@
   p { margin: 0; }
 
   /* ══ the two devices (H5) — every skin, every section ══════════════ */
-  .sec { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-  .sec-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--rule); padding-bottom: 8px; }
+  .sec { display: flex; flex-direction: column; gap: 14px; }
+  .sec-head { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--rule); padding-bottom: 8px; }
   .sec-head .n { margin-left: auto; font-size: var(--fs-min); color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
   /* Title = normal-size text in a PILL that hugs it, led by an icon.
      Prominence is the background and the icon, never the type: no uppercase,
@@ -263,12 +246,12 @@
   .panel {
     background: var(--card); border: 1px solid var(--rule);
     border-radius: var(--radius, 10px); padding: 15px;
-    display: flex; flex-direction: column; gap: 12px; min-width: 0;
+    display: flex; flex-direction: column; gap: 12px;
   }
-  /* No accent rail (operator 2026-10-05): a 5px accent bar down every panel read as AI slop —
-     the same mark on every box says nothing about any of them. A panel is a hairline frame; what is inside
-     it carries the colour, and only where the colour encodes something. */
-  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 14px; align-items: start; }
+  /* :root prefix so the rail beats the `border:` shorthand above at equal
+     specificity — without it the rail silently renders at 1px. */
+  :root .panel { border-left: var(--rail) solid var(--accent); }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; align-items: start; }
 
   /* ══ cog + options panel (H2 — the only floating affordance) ═══════ */
   .af-chrome { position: fixed; top: 14px; right: 14px; z-index: 200; }
@@ -299,10 +282,6 @@
   .af-opt:hover { border-color: var(--accent); }
   .af-opt[aria-checked="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
   .af-opt .af-name { font-size: 14px; line-height: 1.2; }
-  /* size and spacing are short scales — one row of steps, so the panel still fits one screen */
-  .af-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; }
-  .af-seg .af-opt { justify-content: center; align-items: center; padding: 6px 4px; min-height: 34px; }
-  .af-seg .af-name { line-height: 1; }
   .af-opt .af-spec { font-size: 12px; color: var(--muted); letter-spacing: 0; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .af-opt[aria-checked="true"] .af-spec { color: var(--accent); }
   .af-foot { font-size: 12px; color: var(--muted); margin: 0; letter-spacing: 0; }
@@ -314,52 +293,45 @@
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 
+<style>
+  /* the page's own rules: sizes only off the kit's --fs-* steps */
+  .eyebrow { font-size: var(--fs-min); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 0; }
+  .cap { font-size: var(--fs-sm); color: var(--ink-soft); margin: 0; max-width: 90ch; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip { font-size: var(--fs-min); color: var(--ink); border: 1px solid var(--rule); border-radius: 10px; padding: 0 9px; line-height: 1.7; background: var(--card); }
+  .chip.pick { border-color: var(--accent); color: var(--accent); }
+  table.t { border-collapse: collapse; width: 100%; font-size: var(--fs-sm); }
+  table.t th, table.t td { text-align: left; padding: 6px 16px 6px 0; vertical-align: top; border-bottom: 1px solid var(--rule-soft); font-weight: 400; color: var(--ink); }
+  table.t th { color: var(--muted); font-size: var(--fs-min); letter-spacing: .06em; text-transform: uppercase; }
+  table.t td:first-child { white-space: nowrap; }
+  .panel h3 { margin: 0; font-size: 1em; }
+  @media (max-width: 720px) { table.t td:first-child { white-space: normal; } }
+  .panel ul { margin: 0; padding-left: 1.2em; font-size: var(--fs-sm); color: var(--ink-soft); }
+</style>
+</head>
+<body>
 <div class="artifact-page">
   <header>
-    <p style="font-size:var(--fs-min);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0">gabe-artifact · chrome kit</p>
-    <h1 style="font-size:2.1em;line-height:1.15;margin:8px 0 0;text-wrap:balance">The cog is the only floating thing</h1>
-    <p style="color:var(--muted);max-width:62ch;margin:12px 0 0">The column is centred and its text reads left-aligned. Each section title sits on its own contrasting block; a panel is a hairline frame — colour lives in what it holds. Switch skin, family, size or spacing in the cog — all of them persist.</p>
+    <p class="eyebrow">gabe-artifact · read aloud</p>
+    <h1 style="font-size:2.1em;line-height:1.15;margin:8px 0 0;text-wrap:balance">A page that reads itself aloud</h1>
+    <p class="cap" style="margin-top:12px">Every section opens with a summary written to be spoken. The bar below the title stays at the top of the screen while you scroll.</p>
   </header>
 
-  <!-- ICON SET (H6) — Lucide geometry, inlined. Paste the inner paths into
-       the title's <svg>; the CSS above sizes and strokes it. Any Lucide glyph
-       works — these are the ones a report reaches for first.
-         key-round   <circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>
-         route       <circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>
-         file-text   <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/><path d="M16 13H8"/><path d="M16 17H8"/>
-         panel-left  <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>
-         swap        <path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/>
-         bar-chart   <path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>
-         alert       <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>
-         gavel       <path d="m14.5 12.5-8 8a2.1 2.1 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/>
-         layers      <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m6.08 11-3.5 1.6a1 1 0 0 0 0 1.81l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9a1 1 0 0 0 0-1.83L17.9 11"/>
-         search      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/> -->
-  <section class="sec" data-sec="1">
-    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path></svg>First section</h2><span class="n">block 1</span></div>
-    <div class="cols">
-      <div class="panel">
-        <h3 style="margin:0;font-size:.92em">A plain panel</h3>
-        <p style="color:var(--ink-soft);font-size:.85em">A hairline frame and the card ground; no accent bar down its side.</p>
-      </div>
-      <div class="panel">
-        <h3 style="margin:0;font-size:.92em">Second panel</h3>
-        <p style="color:var(--ink-soft);font-size:.85em">Ingrediente canónico · 12 recetas · ñÑ ¿0123?</p>
-      </div>
-    </div>
+  <section class="sec" data-sec="1" id="sec-what">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>What this page is</h2><span class="n" data-n="sec-what"></span></div>
+    <div class="body" data-body="sec-what" style="display:flex;flex-direction:column;gap:14px;min-width:0"></div>
   </section>
-
-  <section class="sec" data-sec="2">
-    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="15.5" r="5.5"></circle><path d="m21 2-9.6 9.6"></path><path d="m15.5 7.5 3 3L22 7l-3-3"></path></svg>Second section</h2><span class="n">block 2</span></div>
-    <div class="cols">
-      <div class="panel">
-        <h3 style="margin:0;font-size:.92em">A different block colour</h3>
-        <p style="color:var(--ink-soft);font-size:.85em">Eight tones are defined (<code>--sec1…--sec8</code>); set <code>data-sec</code> on each section.</p>
-      </div>
-    </div>
+  <section class="sec" data-sec="2" id="sec-calls">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 12.5-8 8a2.1 2.1 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>Your calls</h2><span class="n" data-n="sec-calls"></span></div>
+    <div class="body" data-body="sec-calls" style="display:flex;flex-direction:column;gap:14px;min-width:0"></div>
+  </section>
+  <section class="sec" data-sec="3" id="sec-patterns">
+    <div class="sec-head"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m6.08 11-3.5 1.6a1 1 0 0 0 0 1.81l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9a1 1 0 0 0 0-1.83L17.9 11"/></svg>The patterns</h2><span class="n" data-n="sec-patterns"></span></div>
+    <div class="body" data-body="sec-patterns" style="display:flex;flex-direction:column;gap:14px;min-width:0"></div>
   </section>
 </div>
 
-<!-- ══ BLOCK 2 ══════════════════════════════════════════════════════════ -->
+<!-- ══ BLOCK 2 · the kit's cog markup, verbatim ══ -->
 <div class="af-chrome">
   <button class="af-cog" id="af-cog" type="button" aria-expanded="false" aria-controls="af-panel" aria-label="Display options">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -370,8 +342,6 @@
 
   <div class="af-panel" id="af-panel" data-open="false">
     <div class="af-group" role="radiogroup" aria-label="Font family" id="af-fonts"><p class="af-legend">Font family</p></div>
-    <div class="af-group" aria-label="Text size"><p class="af-legend">Text size</p><div class="af-seg" role="radiogroup" aria-label="Text size" id="af-size"></div></div>
-    <div class="af-group" aria-label="Spacing"><p class="af-legend">Spacing</p><div class="af-seg" role="radiogroup" aria-label="Spacing" id="af-space"></div></div>
     <div class="af-divider"></div>
     <div class="af-group" role="radiogroup" aria-label="Theme" id="af-skins"><p class="af-legend">Theme</p></div>
     <div class="af-divider"></div>
@@ -381,7 +351,7 @@
   </div>
 </div>
 
-<!-- ══ BLOCK 3 ══════════════════════════════════════════════════════════ -->
+<!-- ══ BLOCK 3 · the kit's script, verbatim ══ -->
 <script>
 var MOTION = { on: true };   /* animations read this before scheduling work */
 
@@ -391,34 +361,19 @@ var MOTION = { on: true };   /* animations read this before scheduling work */
   /* Add an entry to either roster to add an option — nothing else changes. */
   var FONTS = [
     { id: "mono",  label: "Mono",     stack: 'ui-monospace, monospace', size: 15, track: -0.025 },
-    { id: "segoe", label: "Segoe UI", stack: '"Segoe UI", sans-serif',  size: 16, track: -0.015 },
-    { id: "georgia", label: "Georgia", stack: 'Georgia, "Times New Roman", serif', size: 16, track: 0.005 }
+    { id: "segoe", label: "Segoe UI", stack: '"Segoe UI", sans-serif',  size: 16, track: -0.015 }
   ];
   var SKINS = [
     { id: "catalog",   label: "Catalog",         note: "center · indigo" },
     { id: "blueprint", label: "Blueprint",       note: "skin F · blue" },
     { id: "mission",   label: "Mission Console", note: "skin B · teal" }
   ];
-  /* text size multiplies the family's base — never below 1, so the legibility floor holds at every step */
-  var SIZES = [
-    { id: "100", label: "A", z: 1,    px: 12 },
-    { id: "110", label: "A", z: 1.1,  px: 14 },
-    { id: "120", label: "A", z: 1.2,  px: 16 },
-    { id: "135", label: "A", z: 1.35, px: 18 }
-  ];
-  var SPACES = [
-    { id: "tight",  label: "Tight",  lh: 1.5,  para: 0.85, track: 0 },
-    { id: "normal", label: "Normal", lh: 1.65, para: 1.1,  track: 0 },
-    { id: "airy",   label: "Airy",   lh: 1.85, para: 1.45, track: 0.012 }
-  ];
-  var FKEY = "gabe:artifact:font", SKEY = "gabe:artifact:skin", ZKEY = "gabe:artifact:size", LKEY = "gabe:artifact:spacing";
+  var FKEY = "gabe:artifact:font", SKEY = "gabe:artifact:skin";
 
   var root = document.documentElement;
   var cog = document.getElementById("af-cog"), panel = document.getElementById("af-panel");
   var fhost = document.getElementById("af-fonts"), shost = document.getElementById("af-skins");
   var mhost = document.getElementById("af-motion"), foot = document.getElementById("af-foot");
-  var zhost = document.getElementById("af-size"), lhost = document.getElementById("af-space");
-  var font = FONTS[0], zoom = SIZES[1], space = SPACES[1];
 
   function read(key, list, dflt) {          /* sandboxed frames can throw on storage */
     try {
@@ -447,28 +402,13 @@ var MOTION = { on: true };   /* animations read this before scheduling work */
     });
   }
 
-  function pick(list, id) { return list.filter(function (x) { return x.id === id; })[0]; }
-  /* family, size and spacing land together: the family's base × the size step, its tracking + the spacing's */
-  function applyType() {
-    var px = Math.round(font.size * zoom.z * 100) / 100, tr = Math.round((font.track + space.track) * 1000) / 1000;
-    root.style.setProperty("--af-stack", font.stack);
-    root.style.setProperty("--af-size", px + "px");
-    root.style.setProperty("--af-track", tr + "em");
-    root.style.setProperty("--af-lh", String(space.lh));
-    root.style.setProperty("--af-para", String(space.para));
-    foot.textContent = px + "px · " + tr + "em · line " + space.lh;
-  }
   function applyFont(id) {
-    font = pick(FONTS, id) || FONTS[0];
-    write(FKEY, font.id); mark(fhost, font.id); applyType();
-  }
-  function applySize(id) {
-    zoom = pick(SIZES, id) || SIZES[1];
-    write(ZKEY, zoom.id); if (zhost) mark(zhost, zoom.id); applyType();
-  }
-  function applySpace(id) {
-    space = pick(SPACES, id) || SPACES[1];
-    write(LKEY, space.id); if (lhost) mark(lhost, space.id); applyType();
+    var f = FONTS.filter(function (x) { return x.id === id; })[0] || FONTS[0];
+    root.style.setProperty("--af-stack", f.stack);
+    root.style.setProperty("--af-size", f.size + "px");
+    root.style.setProperty("--af-track", f.track + "em");
+    write(FKEY, f.id); mark(fhost, f.id);
+    foot.textContent = f.size + "px · " + f.track + "em";
   }
   function applySkin(id) {
     root.setAttribute("data-skin", id);
@@ -489,17 +429,6 @@ var MOTION = { on: true };   /* animations read this before scheduling work */
   }
 
   FONTS.forEach(function (f) { opt(fhost, f, f.size + " / " + f.track, applyFont); });
-  if (zhost) SIZES.forEach(function (z) {
-    opt(zhost, z, "", applySize);
-    var b = zhost.lastChild, n = b.querySelector(".af-name");
-    n.style.fontSize = z.px + "px"; b.removeChild(b.querySelector(".af-spec"));
-    b.setAttribute("aria-label", "Text size " + z.id + "%"); b.title = "Text size " + z.id + "%";
-  });
-  if (lhost) SPACES.forEach(function (s) {
-    opt(lhost, s, "", applySpace);
-    var b = lhost.lastChild; b.removeChild(b.querySelector(".af-spec"));
-    b.title = s.label + " — line height " + s.lh;
-  });
   SKINS.forEach(function (s) { opt(shost, s, s.note, applySkin); });
   [{ id: "on", label: "Playing" }, { id: "off", label: "Paused" }].forEach(function (m) {
     opt(mhost, m, m.id === "on" ? "loops + replays" : "frozen", function (id) { setMotion(id === "on"); });
@@ -513,13 +442,93 @@ var MOTION = { on: true };   /* animations read this before scheduling work */
     if (e.key === "Escape" && panel.getAttribute("data-open") === "true") { open(false); cog.focus(); }
   });
 
-  zoom = pick(SIZES, read(ZKEY, SIZES, "110")); space = pick(SPACES, read(LKEY, SPACES, "normal"));
-  if (zhost) mark(zhost, zoom.id); if (lhost) mark(lhost, space.id);
   applyFont(read(FKEY, FONTS, "mono"));
   applySkin(read(SKEY, SKINS, "catalog"));
   setMotion(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   window.__setSkin = applySkin;
   window.__setMotion = setMotion;
-  window.__setSize = applySize; window.__setSpacing = applySpace;
 })();
 </script>
+
+<script>
+(function () {
+  "use strict";
+  /* The page's data. Every number a summary says is COUNTED from these arrays at load time: a number is never typed into a sentence. */
+  var CONTROLS = [
+    { name: "Play and pause", does: "Starts reading from the section you are looking at, and pauses it. Play again reads the sentence you paused on from its first word." },
+    { name: "Stop", does: "Ends the reading. The next play starts from where you are looking." },
+    { name: "Previous and next", does: "Move the reading one summary back or forward, and take the page there too." },
+    { name: "The contents", does: "One chip for each section. A section with items inside has a small arrow that opens them." },
+    { name: "Speed", does: "Slower, normal or faster, always measured around the pace of the voice that reads." },
+    { name: "Follow", does: "When on, the page scrolls along as the reading moves on by itself." }
+  ];
+  var CALLS = [
+    { id: "call-voice", title: "Which voice reads", plain: "A voice choice — who speaks the summaries when you press play.", options: ["your saved voice", "the voice this page was built with", "the browser's own voice"], pick: "the voice this page was built with", ruled: true,
+      body: "The saved voice wins when there is one. Without it the page uses the voice it was built with, then a British Google voice, then an English voice, then the browser's own." },
+    { id: "call-bar", title: "Where the bar sits", plain: "A bar position — whether the player stays at the top of the screen or only appears while a voice is playing.", options: ["always at the top", "only while a voice plays"], pick: "always at the top", ruled: true,
+      body: "The bar is a sticky strip in the page, not a floating panel, so the cog stays the only fixed thing on the page." },
+    { id: "call-speed", title: "How fast it reads", plain: "A speed setting — slower, normal or faster, always measured around the voice's own pace.", options: ["slower", "normal", "faster"], pick: "normal", ruled: false,
+      body: "Normal is the pace of the voice itself. Slower and faster scale that pace, so a voice you tuned in the voice lab keeps its character." }
+  ];
+  var PATTERNS = [
+    { id: "pat-summary", title: "Summary first", plain: "A spoken summary — the short text that opens a section so you hear the point before you read the detail.",
+      rules: ["three to six sentences", "plain spoken words", "no ids, paths or symbols", "every number generated"] },
+    { id: "pat-plain", title: "Plain words", plain: "A plain line — one sentence that says what a thing is, in the words of the person reading it.",
+      rules: ["one sentence", "a concrete noun first", "at most one dash", "the reader's side of the screen"] }
+  ];
+  var NUM = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+  function n(x) { return NUM[x] || String(x); }
+  function andList(a) { return a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function $(id) { return document.getElementById(id); }
+  function body(id) { return document.querySelector('[data-body="' + id + '"]'); }
+
+  /* ── the page's content ── */
+  var tb = el("table", "t"), tr = el("tr");
+  ["Control", "What it does"].forEach(function (h) { tr.appendChild(el("th", null, h)); }); tb.appendChild(tr);
+  CONTROLS.forEach(function (c) { var r = el("tr"); r.appendChild(el("td", null, c.name)); r.appendChild(el("td", null, c.does)); tb.appendChild(r); });
+  var p1 = el("div", "panel"); p1.appendChild(el("h3", null, "The bar's controls")); p1.appendChild(tb); body("sec-what").appendChild(p1);
+  function card(c, list) { var d = el("div", "panel"); d.id = c.id; d.appendChild(el("h3", null, c.title)); return d; }
+  CALLS.forEach(function (c) { var d = card(c), ch = el("div", "chips"); c.options.forEach(function (o) { ch.appendChild(el("span", "chip" + (o === c.pick ? " pick" : ""), o)); });
+    d.appendChild(ch); d.appendChild(el("p", "cap", c.body)); body("sec-calls").appendChild(d); });
+  PATTERNS.forEach(function (p) { var d = card(p), ul = el("ul"); p.rules.forEach(function (r) { ul.appendChild(el("li", null, r)); }); d.appendChild(ul); body("sec-patterns").appendChild(d); });
+  var nRules = PATTERNS.reduce(function (a, p) { return a + p.rules.length; }, 0), nRuled = CALLS.filter(function (c) { return c.ruled; }).length;
+  $("sec-what").querySelector(".n").textContent = CONTROLS.length + " controls";
+  $("sec-calls").querySelector(".n").textContent = CALLS.length + " calls";
+  $("sec-patterns").querySelector(".n").textContent = PATTERNS.length + " patterns";
+
+  var nSections = document.querySelectorAll(".artifact-page > section.sec").length, nWithItems = [CALLS, PATTERNS].filter(function (a) { return a.length; }).length;
+
+  /* ── the spoken summaries: sentence templates filled from the data above ── */
+  var SECTIONS = [
+    { id: "sec-what", title: "What this page is", say: [
+        "This page shows how an artifact reads itself aloud.",
+        "It has " + n(nSections) + " sections, and " + n(nWithItems) + " of them hold items you can open from the bar.",
+        "Each section opens with a short summary written to be spoken.",
+        "The bar at the top stays in view while you scroll, with the controls and one chip for every section.",
+        "Press play and the page reads from the section you are looking at."].join(" ") },
+    { id: "sec-calls", title: "Your calls", say: [
+        "Here are the calls that wait for you.",
+        "There are " + n(CALLS.length) + " choices, and " + n(nRuled) + " are already ruled.",
+        "Each one has its own summary and a plain line that says what it means.",
+        "Pick one from the menu in the bar, and the page and the reading both go there."].join(" "),
+      items: CALLS.map(function (c) { return { id: c.id, title: c.title, plain: c.plain, say: [
+        "This call decides " + c.title.toLowerCase() + ".",
+        "The " + n(c.options.length) + " options are " + andList(c.options) + ".",
+        c.ruled ? "It is ruled, and the choice is " + c.pick + "." : "It is not ruled yet, and my pick is " + c.pick + "."].join(" ") }; }) },
+    { id: "sec-patterns", title: "The patterns", say: [
+        "Here are the patterns behind this page.",
+        "There are " + n(PATTERNS.length) + " of them, with " + n(nRules) + " rules between them.",
+        "Each rule is checked by the render gate and not by eye."].join(" "),
+      items: PATTERNS.map(function (p) { return { id: p.id, title: p.title, plain: p.plain, say: [
+        "This pattern is called " + p.title.toLowerCase() + ".",
+        "It has " + n(p.rules.length) + " rules.",
+        "They are " + andList(p.rules) + "."].join(" ") }; }) }
+  ];
+
+  /* the project's ruled voice, inlined by the generator from its voice file (a published Artifact cannot fetch) */
+  var VOICE = { engine: "browser", voice: "Google UK English Female", lang: "en-GB", rate: 1.15, pitch: 1, volume: 1, pauseSentence: 250, pauseSection: 900, readTitles: true };
+})();
+</script>
+</body>
+</html>

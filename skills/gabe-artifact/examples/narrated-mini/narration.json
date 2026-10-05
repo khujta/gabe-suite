@@ -1,0 +1,12 @@
+{
+  "title": "Narrated Page Primer",
+  "slug": "narrated-mini",
+  "description": "The worked example and test fixture for gabe-artifact's recorded narration: three short sections, each with a figure the voice steps through.",
+  "voice": "en-US-AndrewNeural",
+  "rate": "+4%",
+  "sections": [
+    { "id": "script", "clip": "00-script", "title": "The script is the page", "icon": "file-text" },
+    { "id": "cues", "clip": "01-cues", "title": "A diagram steps with the voice", "icon": "list-checks" },
+    { "id": "bar", "clip": "02-bar", "title": "One bar on top", "icon": "panel-left" }
+  ]
+}

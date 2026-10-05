@@ -1,0 +1,4 @@
+A narrated page is built from one script per section. Every paragraph you hear is also written on the page, in the same order, so reading and listening never drift apart.
+Each idea arrives in three parts. [[parts:1]]A paragraph says it. [[parts:2]]A figure under the paragraph shows it, and lights up while the paragraph is spoken. [[parts:3]]And a cue word points at one piece of the figure, at the moment the voice names that piece.
+@fig parts
+Nothing is typed twice. The builder takes the scripts, the figures and the recorded voice, and writes one file that travels on its own.

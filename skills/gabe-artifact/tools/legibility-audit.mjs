@@ -81,7 +81,7 @@ const URL_ = isUrl ? O.page + O.query : 'file://' + path.resolve(O.page) + O.que
 const skip = (why) => { console.log('SKIP ⚠ — LEGIBILITY AUDIT DID NOT RUN (' + why + ')'); process.exit(0); };
 let chromium = null;
 if (process.env.GABE_PW_DIR) { try { chromium = require(process.env.GABE_PW_DIR).chromium; } catch { /* fall through to the suite resolver */ } }
-if (!chromium) { try { chromium = (await import('../../gabe-docsite/tools/_playwright.mjs')).chromium; } catch { /* named below */ } }
+if (!chromium) { try { chromium = (await import(new globalThis.URL('../../gabe-docsite/tools/_playwright.mjs', import.meta.url).href).catch(() => import(`${process.env.HOME}/.claude/skills/gabe-docsite/tools/_playwright.mjs`))).chromium; } catch { /* named below */ } }
 if (!chromium) skip('no Playwright: set GABE_PW_DIR=<node_modules/playwright-core> or install one gabe-docsite can find');
 const exe = [process.env.GABE_CHROME_BIN, '/usr/bin/google-chrome-stable', '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser'].filter(Boolean).find((p) => fs.existsSync(p));
 let browser;

@@ -1,0 +1,68 @@
+<div class="artifact-page">
+  <header>
+    <p class="eyebrow">{{ICON:headphones}}gabe-artifact · worked example · script v3</p>
+    <h1>A page that reads itself aloud</h1>
+    <p class="lead">Three short sections about the narrated page, built the way every narrated page is built: one script per section, a figure under each idea, and cue words that step the figure while the voice names its parts.</p>
+    <div class="facts">
+      <span>{{ICON:list}}<b>3</b> sections</span>
+      <span>{{ICON:list-checks}}<b>3</b> cued figures</span>
+      <span>{{ICON:headphones}}<b>{{RUNTIME}}</b> of narration</span>
+    </div>
+    <p class="muted">Press play in the bar above, or read down the page. A figure lights the part the voice is naming; stop, and it shows whole.</p>
+  </header>
+
+  <!-- ── the script ── -->
+  <section class="sec" data-sec="1" id="script">
+    <div class="sec-head"><h2>{{ICON:file-text}}The script is the page</h2><span class="n">{{ICON:list}}paragraph · figure · cue</span></div>
+    {{LISTEN:00-script:Listen: the script}}
+    {{TX:00-script}}
+    <!-- fig:parts -->
+    <div class="widget panel">
+      <ol class="mini-row">
+        <li data-k="1" style="--c:var(--sec1)"><span class="ic">{{ICON:file-text}}</span><b>Paragraph</b><span>says one idea, spoken and shown</span></li>
+        <li data-k="2" style="--c:var(--sec2)"><span class="ic">{{ICON:image}}</span><b>Figure</b><span>shows it; live while it is spoken</span></li>
+        <li data-k="3" style="--c:var(--sec3)"><span class="ic">{{ICON:locate}}</span><b>Cue word</b><span>points at one part as it is named</span></li>
+      </ol>
+    </div>
+    <figcaption><b>Three parts per idea</b> — in the script: a line, an <code>@fig</code> marker, and a <code>[[fig:k]]</code> token before a word.</figcaption>
+    <!-- /fig -->
+    {{NEXT:script}}
+  </section>
+
+  <!-- ── cues ── -->
+  <section class="sec" data-sec="2" id="cues">
+    <div class="sec-head"><h2>{{ICON:list-checks}}A diagram steps with the voice</h2><span class="n">{{ICON:eye}}next · now · past</span></div>
+    {{LISTEN:01-cues:Listen: the cues}}
+    {{TX:01-cues}}
+    <!-- fig:states -->
+    <div class="widget panel">
+      <ol class="mini-row">
+        <li data-k="1"><span class="ic">{{ICON:clock}}</span><b>Next</b><span>dimmed, waiting for its word</span></li>
+        <li data-k="2"><span class="ic">{{ICON:locate}}</span><b>Now</b><span>ringed while the voice names it</span></li>
+        <li data-k="3"><span class="ic">{{ICON:check}}</span><b>Past</b><span>kept in view, so the picture builds</span></li>
+      </ol>
+      <div class="mini-meter" data-fx="meter" aria-hidden="true"><i></i></div>
+    </div>
+    <figcaption><b>The three states a cued part moves through</b> — set as <code>data-at</code> on every <code>[data-k]</code> part; at rest there is none, and the figure shows whole. The bar is a moving stage (<code>page.js</code>): it rests full, empties when play starts, and fills a third at each cue.</figcaption>
+    <!-- /fig -->
+    {{NEXT:cues}}
+  </section>
+
+  <!-- ── the bar ── -->
+  <section class="sec" data-sec="3" id="bar">
+    <div class="sec-head"><h2>{{ICON:panel-left}}One bar on top</h2><span class="n">{{ICON:list}}menu · player · cog</span></div>
+    {{LISTEN:02-bar:Listen: the bar}}
+    {{TX:02-bar}}
+    <!-- fig:bar -->
+    <div class="widget panel">
+      <ol class="mini-row">
+        <li data-k="1"><span class="ic">{{ICON:list}}</span><b>Left</b><span>sections menu · play all · next</span></li>
+        <li data-k="2"><span class="ic">{{ICON:play}}</span><b>Centre</b><span>what is playing, over its seek bar</span></li>
+        <li data-k="3"><span class="ic">{{ICON:type}}</span><b>Right</b><span>the cog: font, size, spacing, skin, motion</span></li>
+      </ol>
+    </div>
+    <figcaption><b>The dock, left to right</b> — sticky in the flow; nothing on the page is fixed.</figcaption>
+    <!-- /fig -->
+    {{NEXT:bar}}
+  </section>
+</div>

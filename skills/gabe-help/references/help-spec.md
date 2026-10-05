@@ -100,7 +100,7 @@ The Gabe Suite — 30 skills (each skill IS its slash command).
 
 | Skill | Command | What it does |
 |------|---------|--------------|
-| gabe-artifact | /gabe-artifact | House chrome for published Artifacts — left-anchored content, a cog panel top-right, the fixed font roster, three suite skins, iconed section title pills set… |
+| gabe-artifact | /gabe-artifact | House chrome for published pages — one centred column, a cog panel top-right (font, text size, spacing, skin, motion), the fixed font roster, three suite ski… |
 | gabe-assess | /gabe-assess | The direction guard — rapid impact assessment (blast radius, maturity-appropriate scope, prerequisites) before committing to an 'obvious' change, plus the bo… |
 | gabe-cc-entity | /gabe-cc-entity | Entity-context reader — assembles one entity's slice (code map + registry + bindings) into a context pack from the command center's committed data, without r… |
 | gabe-cc-init | /gabe-cc-init | Brownfield command-center adoption — archive-never-delete init, machine-ranked entity shortlist, back-catalog ingested one section per run, each closed by an… |

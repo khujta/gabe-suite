@@ -32,7 +32,7 @@ const WINDOW_MS = Number(process.env.FX_WINDOW_MS || 2400);
 const SETTLE_MS = Number(process.env.FX_SETTLE_MS || 800);
 const USER_DRIVEN = new Set((process.env.FX_USER_DRIVEN || 'scrub,scrolly').split(','));
 
-const { chromium } = await import(`${process.env.HOME}/.claude/skills/gabe-docsite/tools/_playwright.mjs`);
+const { chromium } = await import(new globalThis.URL('../../gabe-docsite/tools/_playwright.mjs', import.meta.url).href).catch(() => import(`${process.env.HOME}/.claude/skills/gabe-docsite/tools/_playwright.mjs`));   // the suite's sibling path, else the installed suite (a project fork)
 const html = await readFile(target, 'utf8');
 /* `/` is always the page under test; any other path is served from the page's
    own directory. An ARTIFACT is self-contained and never asks for a second

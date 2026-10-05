@@ -1,0 +1,4 @@
+One bar sits at the top of the page and stays there while you scroll. It holds everything a listener needs to steer.
+[[bar:1]]On the left, a menu lists every section, with play all and next beside it. [[bar:2]]In the middle, the player shows what is playing, over its seek bar. [[bar:3]]On the right, the cog sets the font, its size and spacing, the skin and the motion.
+@fig bar
+On a phone the bar takes two rows, and the title of what is playing keeps a line of its own.

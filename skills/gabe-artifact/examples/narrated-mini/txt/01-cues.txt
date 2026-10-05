@@ -1,0 +1,4 @@
+A figure the voice explains never animates on its own clock. It waits for the voice, so the reader follows one line, not two.
+Watch the three states. [[states:1]]Before the voice reaches a part, that part is dimmed, waiting its turn. [[states:2]]When the voice names it, the part is marked as now, with a ring around it. [[states:3]]After the voice moves on, the part stays in view, marked as past, so the picture builds up.
+@fig states
+Stop the audio, and every figure shows whole again. A reader who never presses play loses nothing.

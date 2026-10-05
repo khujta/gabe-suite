@@ -14,7 +14,7 @@
 | Docsite generator | `skills/gabe-docsite/generator/` | building/refreshing HTML doc sites — never rebuild one from scratch |
 | Diagram compliance | `skills/gabe-docsite/tools/diagram-compliance.mjs` | validating Mermaid diagrams on generated pages |
 | Icon factory | `skills/gabe-docsite/tools/icon_factory.py` | docsite icons/memes |
-| Artifact chrome kit | `skills/gabe-artifact/assets/artifact-chrome.html` | publishing an Artifact — house chrome (left-anchored column, cog panel, font roster); never hand-roll page chrome |
+| Artifact chrome kit | `skills/gabe-artifact/assets/artifact-chrome.html` | publishing an Artifact — house chrome (centred column, cog panel with font · size · spacing, font roster); never hand-roll page chrome |
 | Artifact pattern libraries | `skills/gabe-artifact/assets/{motion,static}-patterns.html` | 25 motion + 31 static visual elements, gated and self-contained — read before inventing a chart/diagram/UI form |
 | Artifact chrome gate | `skills/gabe-artifact/tools/verify-artifact-chrome.mjs` | pre-publish render check for artifacts (cog, panel, roster, persistence, layout) |
 | Artifact motion gate | `skills/gabe-artifact/tools/verify-motion.mjs` | proves each animation actually moves (computed-style sampling) + reduced-motion end states |

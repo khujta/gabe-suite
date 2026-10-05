@@ -1,0 +1,100 @@
+/* gabe-artifact · read-aloud module — the stylesheet.
+   Paste as an extra block beside the kit's style block, or link it on a disk page. Every colour is a skin token the kit already defines
+   (--ground --card --raised --ink --ink-soft --muted --rule --rule-soft --accent --accent-soft --radius --rail --shadow), so the bar wears
+   Catalog, Blueprint and Mission Console, light and dark, with no rule of its own per skin. Every size is one of the kit's --fs-* steps
+   (computed from the roster base, so nesting never shrinks them); the fallback after each comma is only for a page without the kit and is
+   never under 12px. NO MOTION: no animation, no transition, no smooth scroll — the page starts finished and a state is a static style. */
+
+:root { --ra-bar-h: 0px; }
+
+/* a jump (a chip, a menu item, a skip) lands just under the bar */
+[data-ra-unit] { scroll-margin-top: calc(var(--ra-bar-h, 0px) + 14px); }
+
+/* ── the row above the bar: copy every summary, and which voice reads (named in words, not only in a hover) ── */
+.ra-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: var(--fs-sm, 13px); margin-bottom: -10px; padding-right: 56px; }
+.ra-note { margin: 0; flex: 1 1 24rem; min-width: 0; font-size: var(--fs-sm, 13px); color: var(--ink-soft, #3d4756); }
+.ra-said { font-size: var(--fs-sm, 13px); color: var(--accent, #4f46e5); min-height: 1.4em; }
+
+.ra-ico { width: 1.2em; height: 1.2em; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.ra-btn { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: var(--fs-sm, 13px); letter-spacing: inherit; cursor: pointer; border-radius: 8px; padding: 5px 11px;
+  border: 1px solid var(--rule, #e7e9ee); background: var(--raised, #fbfcfd); color: var(--ink, #141a24); text-align: left; }
+.ra-btn:hover { border-color: var(--accent, #4f46e5); color: var(--accent, #4f46e5); }
+.ra-btn.ra-pri { background: var(--accent, #4f46e5); border-color: var(--accent, #4f46e5); color: var(--ground, #fff); }
+.ra-btn.ra-pri:hover { color: var(--ground, #fff); filter: brightness(1.08); }
+.ra-btn[data-on="true"] { background: var(--accent-soft, #eef0fe); border-color: var(--accent, #4f46e5); color: var(--accent, #4f46e5); }
+.ra-btn[hidden] { display: none; }
+
+/* ── the bar: in view all the time; sticky, so it is in the page's flow and the cog stays the only FIXED thing ── */
+.ra-bar { display: flex; flex-direction: column; gap: 8px; position: sticky; top: 0; z-index: 100; box-sizing: border-box; min-width: 0;
+  background: var(--ground, #f6f7f9); padding: 8px 56px 8px 0; margin: -14px 0 -6px; font-size: var(--fs-sm, 13px);
+  box-shadow: 0 1px 0 var(--rule, #e7e9ee), 0 12px 14px -12px rgba(0, 0, 0, .5); }
+.ra-bar[data-mode="playing"][data-frozen="false"] { position: static; box-shadow: none; }   /* the other option: only while a voice plays */
+.ra-row { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; min-width: 0; }
+.ra-player { display: none; }
+.ra-bar[data-player="true"] .ra-player { display: flex; }
+.ra-lab { font-size: var(--fs-min, 12px); letter-spacing: .1em; text-transform: uppercase; color: var(--muted, #7a8595); margin: 0; display: flex; align-items: center; gap: 7px; }
+
+.ra-pb { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 34px; height: 32px; padding: 0 9px; box-sizing: border-box; font: inherit; font-size: var(--fs-sm, 13px);
+  letter-spacing: inherit; color: var(--ink, #141a24); background: var(--raised, #fbfcfd); border: 1px solid var(--rule, #e7e9ee); border-radius: 8px; cursor: pointer; }
+.ra-pb:hover:not(:disabled) { border-color: var(--accent, #4f46e5); color: var(--accent, #4f46e5); }
+.ra-pb:disabled { opacity: .45; cursor: default; }
+.ra-pb .ra-ico { width: 1.2em; height: 1.2em; }
+.ra-pb.ra-go { background: var(--accent, #4f46e5); border-color: var(--accent, #4f46e5); color: var(--ground, #fff); }
+.ra-pb.ra-go:hover:not(:disabled) { color: var(--ground, #fff); filter: brightness(1.08); }
+.ra-pb[aria-pressed="true"] { border-color: var(--accent, #4f46e5); background: var(--accent-soft, #eef0fe); color: var(--accent, #4f46e5); }
+.ra-pb[aria-pressed="false"] .ra-ico { opacity: .7; }
+.ra-vox { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-min, 12px); color: var(--ink-soft, #3d4756); min-width: 0; }
+.ra-vox .ra-ico { width: 1.3em; height: 1.3em; color: var(--accent, #4f46e5); }
+.ra-vn { max-width: 18ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ra-rate { display: inline-flex; align-items: center; }
+.ra-sel { font: inherit; font-size: var(--fs-sm, 13px); color: var(--ink, #141a24); background: var(--raised, #fbfcfd); border: 1px solid var(--rule, #e7e9ee); border-radius: 8px; height: 32px; box-sizing: border-box; padding: 0 8px; }
+
+/* the contents: a flat chip for a section with nothing inside, a split chip (the section + a caret) for one with items */
+.ra-tcs { position: relative; }
+.ra-bar .ra-tcs > * { flex: 0 0 auto; white-space: nowrap; }
+.ra-tc { display: inline-flex; align-items: stretch; }
+.ra-chip { color: var(--ink-soft, #3d4756); text-decoration: none; border: 1px solid var(--rule, #e7e9ee); border-radius: 10px; padding: 0 10px; line-height: 1.8; background: var(--card, #fff); }
+.ra-chip:hover { border-color: var(--accent, #4f46e5); color: var(--accent, #4f46e5); }
+.ra-tc[data-items="true"] .ra-chip { border-top-right-radius: 0; border-bottom-right-radius: 0; border-right-width: 0; }
+.ra-caret { display: inline-flex; align-items: center; justify-content: center; padding: 0 6px; font: inherit; color: var(--ink-soft, #3d4756); background: var(--card, #fff); cursor: pointer;
+  border: 1px solid var(--rule, #e7e9ee); border-radius: 0 10px 10px 0; }
+.ra-caret:hover, .ra-caret[aria-expanded="true"] { border-color: var(--accent, #4f46e5); color: var(--accent, #4f46e5); }
+.ra-caret[aria-expanded="true"] .ra-ico { transform: rotate(180deg); }   /* a state, not a motion: no transition */
+.ra-chip[data-lit="true"], .ra-tc[data-lit="true"] .ra-caret { background: var(--accent, #4f46e5); border-color: var(--accent, #4f46e5); color: var(--ground, #fff); }
+
+/* the dropdown: ONE menu on the bar (not inside the chip row, whose own scroll would clip it); each item is a link with its plain line under it */
+.ra-menu { position: absolute; top: calc(100% - 2px); left: 0; width: min(34rem, 100%); max-height: min(60vh, 30rem); overflow-y: auto; box-sizing: border-box; z-index: 110;
+  background: var(--card, #fff); border: 1px solid var(--rule, #e7e9ee); border-radius: var(--radius, 10px); box-shadow: var(--shadow, 0 8px 24px rgba(0, 0, 0, .25)); padding: 6px; }
+.ra-menu[hidden] { display: none; }
+.ra-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.ra-mi { display: flex; flex-direction: column; gap: 2px; padding: 6px 10px; border-radius: 8px; color: var(--ink, #141a24); text-decoration: none; white-space: normal; }
+.ra-mi:hover { background: var(--accent-soft, #eef0fe); }
+.ra-mi[data-lit="true"] { background: var(--accent, #4f46e5); color: var(--ground, #fff); }
+.ra-mi[data-lit="true"] .ra-plain { color: inherit; }
+.ra-mt { font-size: var(--fs-sm, 13px); }
+
+/* ── the summary that opens a section (and, indented, an item): what it sums up to, in plain spoken words ── */
+.ra-say { display: flex; flex-direction: column; gap: 8px; background: var(--raised, #fbfcfd); border: 1px solid var(--rule, #e7e9ee); border-left: var(--rail, 5px) solid var(--accent, #4f46e5);
+  border-radius: var(--radius, 10px); padding: 15px; min-width: 0; }
+.ra-say.ra-sub { gap: 6px; padding: 9px 12px; border-left-width: 3px; }
+.ra-say[data-reading="true"] { background: var(--accent-soft, #eef0fe); box-shadow: inset 0 0 0 2px var(--accent, #4f46e5); }   /* the summary being read */
+.ra-text { margin: 0; max-width: 112ch; line-height: 1.55; color: var(--ink, #141a24); }
+.ra-sub .ra-text { font-size: var(--fs-sm, 13px); }
+.ra-plain { margin: 0; font-size: var(--fs-min, 12px); color: var(--ink-soft, #3d4756); max-width: 112ch; }
+.ra-ex, .ra-im { margin: 0; font-size: var(--fs-sm, 13px); line-height: 1.5; color: var(--ink, #141a24); max-width: 112ch; }   /* an item's example and impact, under its say */
+.ra-ex > b, .ra-im > b { color: var(--muted, #7a8595); font-weight: 400; font-size: var(--fs-min, 12px); letter-spacing: .08em; text-transform: uppercase; margin-right: 6px; }
+.ra-say > .ra-plain { font-size: var(--fs-sm, 13px); }
+.ra-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+:is(.ra-btn, .ra-pb, .ra-sel, .ra-caret, .ra-chip, .ra-mi):focus-visible { outline: 2px solid var(--accent, #4f46e5); outline-offset: 2px; border-radius: 4px; }
+
+/* a phone (390px): clear of the fixed cog, controls on as few rows as fit, the chips scroll inside their own row, the menu takes the bar's width */
+@media (max-width: 720px) {
+  .ra-tcs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; }
+  .ra-player { gap: 4px; }
+  .ra-vox, .ra-fw { display: none; }
+  .ra-pb { min-width: 30px; padding: 0 5px; }
+  .ra-sel { padding: 0 3px; max-width: 76px; }
+  .ra-menu { left: 0 !important; width: 100%; }
+}

@@ -6,7 +6,7 @@ The binding spec for `--target disk`, which is the default. The artifact target
 ## Why a second target exists
 
 An Artifact is a published page: one URL, strict CSP, everything inline, and a
-fixed 74rem column anchored left. That is right for something leaving the repo
+fixed 74rem column, centred. That is right for something leaving the repo
 and wrong for a floor plan, which wants the screen and wants to sit beside the
 work it explains. The disk target trades the URL for the viewport.
 

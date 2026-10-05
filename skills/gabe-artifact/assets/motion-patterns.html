@@ -48,7 +48,7 @@
     line-height: 1.55; text-align: left; -webkit-font-smoothing: antialiased;
   }
   .artifact-page {
-    max-width: 74rem; margin: 0 auto 0 clamp(16px, 4vw, 56px);
+    max-width: 74rem; margin: 0 auto;
     padding: 32px 24px 48px; display: flex; flex-direction: column; gap: 32px; text-align: left;
   }
   .artifact-page > :first-child { padding-right: 56px; }
@@ -571,7 +571,8 @@ var MOTION = { on: true };
   "use strict";
   var FONTS = [
     { id: "mono",  label: "Mono",     stack: 'ui-monospace, monospace', size: 15, track: -0.025 },
-    { id: "segoe", label: "Segoe UI", stack: '"Segoe UI", sans-serif',  size: 16, track: -0.015 }
+    { id: "segoe", label: "Segoe UI", stack: '"Segoe UI", sans-serif',  size: 16, track: -0.015 },
+    { id: "georgia", label: "Georgia", stack: 'Georgia, "Times New Roman", serif', size: 16, track: 0.005 }
   ];
   var DEFAULT_ID = "mono", STORE_KEY = "gabe:artifact:font";
   var root = document.documentElement;
