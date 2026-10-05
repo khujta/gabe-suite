@@ -1406,3 +1406,21 @@ still shows the block's card. D-089's "a gap keeps the block's own card" is repl
 and a schema's strip ("optional 2 · unique 2", and the item-4 option's entry) is removed; what a paler or a cornered mark means stays in
 each mark's own card. Chosen alone (his to correct): the band is the group's own outline, computed at hover time, not a wrapper element — a
 wrapper would move the lines D-091 aligned to the lab's pixels and would not follow a part he drags elsewhere.
+
+## D-093 — The bench's controls, second revision: fixed glyph and marks, a form per part, a hover switch per part
+Date: 2026-10-05 · Input: his two messages after D-092 ("the two controls" read as "the controls" — dictation).
+Decision, his: "I want to have a second revision in the options for each example of the different elements because they are too generic.
+If we look in the endpoint lab, we have better options for the containers for the tables, for example: - The size of the glyph will not
+change. - Mark size won't change either. - The gap between marks won't change either. - Glyph color won't change. It would be its kind's
+color in every case. What could change is the way that we display data. For example, we still have differences against the endpoint lab.
+We still show the six fields and the name fields there. That should be an option to show or not show that kind of thing, like the
+labeling, the content, just the number, just the icon, or the position in some other thing … We have draggable sections for the items.
+That's okay … let's rethink how we show the [controls] now on the elements in all endpoints." And: "let's make a hover for every one of
+the items, and we will have an option to enable or disable the hover. The default should be as we have configured today."
+Consequence: (1) glyph size, mark size, the gap between marks and the glyph's colour leave the controls — fixed at the lab's values, the
+glyph in its kind's colour; a saved configuration that set them is read with those keys ignored. (2) Each part gets a FORM — what it shows
+of its data (the word and the value, the value alone, the number alone, the glyph alone, the glyph and the value), only the forms the part's
+data can take; the lines and dragging stay. (3) Every part gets a hover card of its own, and a switch per part: on = its own card, off = the
+block's card; the default is today's (the glyph and status and each item on, the title parts off). (4) The controls are laid out again
+around the part: the lines, then the picked part's form, size and hover, then the block's box and the marks. Read alone (his to correct):
+"off" means the block's card, not no card; the box options (edge, chips, counts) and the marks' drawing stay as options.
