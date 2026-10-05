@@ -50,7 +50,7 @@ LAB_KINDS = {"table": "DATACFG", "schema": "SCHCFG", "fn": "FNCFG"}
 # the name and every other part. His to correct by one entry here; the build stops on a part the table leaves out, so a part never falls to `title` unnoticed.
 REGION_IDS = ("head", "title", "items")
 REGIONS = {
-    "end": {"icon": "head", "status": "head", "name": "title", "stage": "title", "count": "title", "via": "items", "marks": "items"},
+    "end": {"icon": "head", "status": "head", "name": "title", "stage": "title", "count": "title", "via": "items", "how": "items", "marks": "items"},
     "table": {"icon": "head", "rw": "head", "name": "title", "ent": "title", "count": "title", "model": "items", "marks": "items"},
     "schema": {"icon": "head", "dir": "head", "name": "title", "ent": "title", "count": "title", "via": "items", "marks": "items"},
     "fn": {"icon": "head", "role": "head", "name": "title", "commit": "title", "file": "items", "count": "title", "via": "items", "marks": "items"},
@@ -803,9 +803,9 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
 FLOOR = 12   # the page's legibility floor: every text part of a block at or above it, but the table's (his DATA line, D-027)
 GLYPH_PARTS = {"icon", "commit"}   # parts that draw no text — a glyph, a dot — and may go below the floor
 MINE = {   # my picks (dashed on the page): each kind's parts in three lines of a left and a right side, their sizes (S4-24: text at 12)
-    "end": {"parts": ["icon", "status", "name", "stage", "count", "via"],
+    "end": {"parts": ["icon", "status", "name", "stage", "count", "via", "how"],   # D-097: "how" — the code that makes it, not drawn by default
             "rows": [{"l": ["icon", "status"], "r": ["stage"]}, {"l": ["name"], "r": ["count"]}, {"l": ["via"], "r": []}],
-            "size": {"icon": 13, "status": 12, "name": 13, "stage": 12, "count": 12, "via": 12}, "iconCol": "kind"},
+            "size": {"icon": 13, "status": 12, "name": 13, "stage": 12, "count": 12, "via": 12, "how": 12}, "iconCol": "kind"},
     "test": {"parts": ["icon", "cid", "state", "proves", "role", "name", "file", "sends", "asserts"],
              "rows": [{"l": ["icon", "cid", "proves"], "r": ["state"]}, {"l": ["name"], "r": []}, {"l": ["role", "sends"], "r": ["asserts"]}],
              "size": {"icon": 13, "cid": 13, "state": 12, "proves": 12, "role": 12, "name": 12, "file": 12, "sends": 12, "asserts": 12}, "iconCol": "kind"},
@@ -830,7 +830,7 @@ MODES = {"ent": ["word", "icon", "both"], "count": ["words", "badge"], "model": 
 #   text  — a value: the value · the part's name and the value
 FORM_TYPES = {"chip": ["chip", "word", "dot"], "count": ["badge", "number", "words", "bare"], "gtext": ["both", "word", "icon", "label"], "text": ["word", "label"]}
 PART_TYPE = {
-    "end": {"status": "chip", "stage": "text", "count": "count", "via": "gtext"},
+    "end": {"status": "chip", "stage": "text", "count": "count", "via": "gtext", "how": "gtext"},
     "table": {"rw": "chip", "ent": "gtext", "count": "count", "model": "gtext"},
     "schema": {"dir": "chip", "ent": "gtext", "count": "count", "via": "gtext"},
     "fn": {"role": "chip", "file": "gtext", "count": "count", "via": "gtext"},

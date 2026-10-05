@@ -2928,7 +2928,7 @@
         "name": { "name": "words", "plain": "What the ending says to the caller; a rate limiter's ending also names its limit." },
         "stage": { "name": "stage", "plain": "Where in the request it leaves: at the edge, the gate, the input, the handler or the answer." },
         "count": { "name": "ways", "plain": "How many ways through the code reach it." },
-        "via": { "name": "where", "plain": "The file and line that produce it." } },
+        "via": { "name": "where", "plain": "The file and line that produce it." }, "how": { "name": "how", "plain": "What in the code makes it: the error it catches, the call it is raised in, or the security scheme or middleware that refuses." } },
       "test": {
         "icon": { "name": "glyph", "plain": "The page's own mark for a test: the Gabe Universe draws no node for a test." },
         "cid": { "name": "case", "plain": "The test's case id." },
@@ -3006,6 +3006,7 @@
       "label": { "name": "name and word", "plain": "The part's name before its value: class User." }
     },
     "face": {
+      "how": { "_about": "D-097: an ending's how part — the feed's via in words; {name} and {at} are filled", "catch": "catches {name}", "or": " or ", "call": "raised inside {name}, called at {at}", "scheme": "refused by {name}", "mw": "refused by {name}, a middleware" },
       "noWords": "says nothing of its own", "answer": "{v} of {n} fields", "inside": "inside {name}", "handler": "the handler", "level": "level {i} · called by {name}",
       "calledBy": "called by {name} at {at}", "noRole": "no role known", "noFn": "no function named", "returns": "returns an answer", "impl": "ways to run: {n}",
       "answers": "answers {v}", "accepts": "accepts {v}", "none": "—", "pass": "pass", "fail": "fail",

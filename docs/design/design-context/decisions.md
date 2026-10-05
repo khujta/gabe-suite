@@ -1469,3 +1469,16 @@ ring's thickness, 1 to 4 px, under the ring looks. The copy line names the look 
 marks (a gate the way passes, a field past the shown ones) had drawn at full strength since D-091 — the lab's imported opacity rule outranked
 the bench's; they fade to 0.38 again. Chosen alone (his to correct): the default stays today's ring, dashed; the look is per column; a ring
 drawn inside the mark was built and dropped — on a 14 px mark it reads as a dark square.
+
+## D-097 — An ending's "how": what in the code makes it, as a part he can draw
+Date: 2026-10-05 · Input: his message on the ending's hover card (same message as D-095).
+Decision, his: "when I hover over this invalid token 401, the fourth field says 'except invalid token error.' What is that? That might be
+something we want to show as well. It seems like not everyone has this … I want to know what that is and whether that might be something we
+want to show in this card for these endings."
+Consequence: the line is the feed's `via` — what in the code turns the request into this ending, beside "where" (its file and line). It takes
+four shapes, said in words on a new ending part HOW: an error the code catches ("catches InvalidTokenError") · a call it is raised in
+("raised inside AuthContext.require_household, called at api/cooking.py:572") · a security scheme ("refused by HTTPBearer") · a middleware
+("refused by RateLimitMiddleware"). Measured over the page's 728 endings: 394 have one — catches 141 · middleware 103 · scheme 78 · call 72 —
+and 334 say nothing (a success, a plain raise in the handler); swept, every one of the 394 draws its words, none empty or unfilled. The hover
+card keeps the raw line in its head. Chosen alone (his to correct): HOW starts in NOT DRAWN — he drags it onto a line to see it on the block;
+it is a separate part from WHERE (the call shape names a second file); the words name the code, never the feed's syntax.

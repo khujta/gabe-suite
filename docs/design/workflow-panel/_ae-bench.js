@@ -175,6 +175,7 @@
       if (p === "stage") { var t = el("span", "bkm exstg", c.sg); t.style.fontSize = z + "px"; return t; }
       if (p === "count") return xCount(c.paths.length, z, md.count, fill(XW.tip.end.ways, { n: c.paths.length }), "ways");
       if (p === "via") return c.at ? xMeta("file", xShort(c.at), z, md.via) : null;
+      if (p === "how") return c.via ? xMeta("link", xHow(c.via), z, md.how) : null;   /* D-097: what in the code makes it, in words */
       return null; },
     test: function (p, c, it, L, z) { var md = L.mode || {}, o = it.o, here = o.here.map(function (i) { return c.calls[i]; });
       if (p === "icon") { var s = el("span", "bki"); s.appendChild(xSvg("test", z, xGlyphCol("test", c, it, L))); return s; }
@@ -244,6 +245,12 @@
 
   /* ── the strip of marks: one per field (a table, a schema — the lab's field marks, lifted), per table touched (a function), per
      request (a test), per check on the way (an ending), per condition waited for (a gate), per ending answered (a hook), per read ── */
+  /* D-097 · how the code makes an ending, from the feed's `via`, in words: an error it catches · a call it is raised in · a security scheme · a middleware */
+  function xHow(v) { var H = XW.face.how, m;
+    if ((m = /^except (.+)$/.exec(v))) return fill(H.catch, { name: m[1].split(" | ").join(H.or) });
+    if ((m = /^call (\S+) @ (.+)$/.exec(v))) return fill(H.call, { name: m[1], at: xShort(m[2]) });
+    if ((m = /^(\S+) (\S+)$/.exec(v))) return fill(H.scheme, { name: m[1] });
+    return fill(/middleware/i.test(v) ? H.scheme : H.mw, { name: v }); }   /* a name that already says middleware is not told so twice */
   function xMark(cls, col, sym, ch, title, mk, mv) { var q = el("i", "sq " + cls); q.style.setProperty("--fc", col); if (/e-symbol/.test(cls) && sym) q.appendChild(xSvg(sym, 11, "currentColor"));
     else if (/e-char/.test(cls)) q.textContent = ch || ""; if (title) q.setAttribute("data-w", title);
     if (mk) { q.setAttribute("data-mk", mk); if (mv != null) q.setAttribute("data-mv", mv); }   /* D-088: what the mark counts — the hover card's marks are these, counted, labelled by mo.card.mark[mk] */
