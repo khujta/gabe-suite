@@ -1422,5 +1422,9 @@ glyph in its kind's colour; a saved configuration that set them is read with tho
 of its data (the word and the value, the value alone, the number alone, the glyph alone, the glyph and the value), only the forms the part's
 data can take; the lines and dragging stay. (3) Every part gets a hover card of its own, and a switch per part: on = its own card, off = the
 block's card; the default is today's (the glyph and status and each item on, the title parts off). (4) The controls are laid out again
-around the part: the lines, then the picked part's form, size and hover, then the block's box and the marks. Read alone (his to correct):
-"off" means the block's card, not no card; the box options (edge, chips, counts) and the marks' drawing stay as options.
+around the part, four sections always on the page: LINES (drag a part to a line, a side, or not drawn) · EACH PART (one row per part: its
+name, its forms as icon squares, a size for a text part, its hover switch; picking a part on the block lights its row) · BOX (edge, chips,
+counts) · MARKS (drawn as, coloured by, corners, and the marks' hover switch). Read alone (his to correct): "off" means the block's card,
+not no card; every part has a row at once, not only the picked one, so a form is one click from anywhere; a text part keeps its size
+control; a status chip takes three forms (in its box · the word in its colour · a dot, the word on its hover); "name and word" puts the
+part's own name before its value ("class User"); the box options and the marks' drawing stay as options.

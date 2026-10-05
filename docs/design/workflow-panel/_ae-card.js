@@ -338,12 +338,12 @@
      led by an icon or a pill, as the lab draws them (F.facts). A kind adopts regions by an entry in REGIONS and a provider here, keyed `head` or by the part it serves; a kind with no
      provider keeps the block's card. The ending's three, on the bench: its glyph and status (the kind in its colour with its glyph, what the status means, who shares it) · where
      (the file and the line) · each mark of the strip (what the mark is, and this ending's fact for it). ══ */
-  function cdProvider(k, reg, rp) { return (CDREG[k] || {})[reg === "head" ? "head" : rp]; }
+  function cdProvider(k, reg, rp) { var P = CDREG[k] || {}; return reg === "head" ? P.head : P[rp] || (reg === "part" ? cdPartCard : null); }   /* D-093: a title part switched on has a card of its own */
   function cdTextCol(col) { return col && /^(#|var\()/.test(col) ? "color-mix(in srgb, " + col + " 68%, #fff)" : col; }   /* a colour as TEXT on the card's dark panel */
   /* the label at the head's right: the parts a head region joins (glyph · status), or the one part an item belongs to — short, shared (P1.1) */
   function cdRegionLabel(S0) { var k = S0.bk, R = XREG[k] || {}, PW = XW.parts[k] || {};
     if (S0.region === "head") return Object.keys(R).filter(function (p) { return R[p] === "head" && PW[p]; }).map(function (p) { return PW[p].name; }).join(" · ");
-    return XW.region.part[S0.rp] || (PW[S0.rp] || {}).name || S0.rp; }
+    return XW.region.part[k + "." + S0.rp] || XW.region.part[S0.rp] || (PW[S0.rp] || {}).name || S0.rp; }   /* a kind's own card label first: the test's part says "role here", its card says "role" (D-093) */
   function cdFact(key, line, lead, kids, tail) { var m = el("span", "cdwm"); kids.forEach(function (n) { if (n) m.appendChild(n); }); return cdRowEl(key, line, lead, m, tail); }
   /* what a status means: its HTTP name, and a plain line (its own, or the page's table of refusals); the build proves every status an ending gives is named */
   function cdStatusWords(st) { var R = (XW.region.status || {})[String(st)] || {}, g = XF.gdc.vals[String(st)] || {}; return { name: R.name || W.unknown, plain: R.plain || g.plain || null }; }
@@ -532,6 +532,22 @@
     marks: function (S0) { var c = S0.c, x = S0.it.o.reads[S0.ri], mw = x[2] === "middleware", col = EN.life[c.dies] || "var(--muted)", F = crItem(S0, xSvg(mw ? "shield" : "function", 16, col), xT(x[1]) || W.unknown, col);   /* a place that reads it */
       crAt(F, xT(x[0])); F.facts.push(cdFact("read", mw ? CRI.readMw : CRI.readFn, cdIco(mw ? "shield" : "function", col), [crV(mw ? CRI.readMw : CRI.readFn)], null)); return F; } };
   /* what a pointer on a region node is: the block it sits in, the region, the part, the item — or the block's own card when no provider serves it */
+  /* ══ D-093 · A PART'S OWN CARD (his: "let's make a hover for every one of the items"). A title part whose hover he switches on (look.hov) gets this card: the part's
+     glyph, its value in full (the part drawn in its fullest form — a count with its unit, a chip's word, a value without its glyph cut), the part's name at the right;
+     then what differs from one element to the next — where the element is, for its name; the columns, for a count of fields. Nothing about the part's meaning: the
+     controls' rows say what a part is (P1.1). ══ */
+  function cdPartText(n) { if (!n) return ""; var kids = [].filter.call(n.children, function (x) { return !/^(svg|wbr)$/i.test(x.nodeName) && x.textContent.trim(); }),
+      sep = n.classList.contains("exends") || n.classList.contains("exhdr") ? " \u00b7 " : " ";
+    return cdOneLine(kids.length > 1 ? kids.map(function (x) { return x.textContent; }).join(sep) : n.textContent); }
+  function cdPartCard(S0) { var k = S0.bk, p = S0.rp, c = S0.c, it = S0.it, L = cdLook(k), t = xFormOf(k, p), F = cdBase(S0), o = it.o || {};
+    L.mode = Object.assign({}, L.mode); if (t) L.mode[p] = t === "count" ? "words" : t === "chip" ? "chip" : "word";
+    var n = XPART[k](p, c, it, L, 14), chip = n && n.querySelector ? n.querySelector(".jdrw") : null, col = chip ? chip.style.getPropertyValue("--rwc") : (n && n.style && n.style.color) || "";
+    F.glyph = cdSvg(xPartIco(k, p), col || xKindCol(k, c), 16); F.name = cdPartText(n) || W.unknown; if (col) F.nameCol = cdTextCol(col); F.kind = cdRegionLabel(S0);
+    var at = k === "gate" ? xT(o.at) : k === "test" ? (c.file ? c.file + ":" + c.line : null) : c.at || c.file;
+    if ((p === "name" || p === "cid" || p === "cond") && at) crAt(F, at);
+    if (p === "count" && (k === "table" || k === "schema")) { var nm = c.cols.map(function (f) { return f[0]; }).concat((c.more || []).map(function (f) { return f[0]; })), x = crChips(nm, crK, 6);
+      F.facts.push(cdFact("cols", nm.join(" \u00b7 "), cdIco(k === "table" ? "model" : "schema", xKindCol(k, c)), x.kids, null)); }
+    return F; }
   function cdRegionOf(k, it, reg, rp, ri, blk) { var c = EX.cat[it.id]; if (!c || !cdProvider(k, reg, rp)) return null; if (rp === "marks" && !(ri < cdMarkN(k, c, it))) return null;
     return { t: blk || null, ik: null, key: c.key || null, ck: "reg", bk: k, c: c, it: it, X: {}, P: { name: "", kind: "", b: [], c: [], g: [], n: "" }, foot: blk ? cdFoot(blk) : null, bench: true, region: reg, rp: rp, ri: ri }; }
   function cdRegion(t) { var blk = t.closest('[data-tip="exblk"]'), S0 = null; if (!blk) return null; var k = blk.getAttribute("data-exk"), id = blk.getAttribute("data-exid"), ep = blk.getAttribute("data-exep"), r = BYID[ep],

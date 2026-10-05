@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-091). Updated 2026-10-02 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-093). Updated 2026-10-05 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -10,12 +10,15 @@ Loop 1 is the API endpoint card. Its display half lives on ONE page, `../workflo
 `05007957`, frozen feed). On 2026-09-30 he read that page as a HUMAN and dictated 23 items of feedback (D-066): much that was clear
 to the model was not clear to him. Round 1 fixed them AND named the patterns behind them, so they can be carried into the Gabe Suite.
 
-**Now (2026-10-03): he configures the all-endpoints bench card by card (D-083); the page follows the endpoint lab.** Pushed to both
-GitHub repos (Brownbull + khujta, `graft-adoption` + the two `wip/` side branches). Built today: D-087 a bench column keeps its size, its
-width narrows only the element (`a47cb40`) · D-088 the lab's hover card on every cell element and bench example (`27402fe`) · D-089/D-090
-every kind's block hovers by REGION — glyph + its class pill · the title · each location and mark (`0bb5eda`, `d496480`) · D-091 the lab's
-type, alignment and field marks — nullable paler, unique cornered; other kinds' markings as off-by-default options (`d7accdf`, probe 993/0).
-Disk (D-086): C: recovered to ~50 GB by itself; his steps wait in `C:\Users\Gabe\disk-fix\` (1 cap restore points · 2 compact the WSL disk);
+**Now (2026-10-05): he configures the all-endpoints bench card by card (D-083); the page follows the endpoint lab.** D-087 … D-091 are
+pushed. Since then, local and NOT pushed: D-092 the gaps between a row's icons hover nothing, and the legend under the field marks is gone
+(`3d812f1`) · D-093 the bench's controls, second revision (record `227cb99`, build in the next commit, probe 1003 passed · 1 failed, the one — the test's role card said "here" — fixed and swept on all 80 endpoints, 18,093 part cards, none breaks a rule): glyph size and colour, mark size and gap are
+fixed at the lab's values (a saved look that set them is read with them put back); every part has a row with its FORMS (only the forms
+its data can take — a count as number and unit, the number alone, boxed or bare; a status as its box, its word or a dot; a value as glyph and
+word, the word, the glyph, or the part's name before it) and a HOVER SWITCH (on = a card of its own, off = the block's; the default is
+today's); the controls are four sections — lines · each part · box · marks. Before any push: `git log origin/graft-adoption..HEAD` for a
+foreign commit (the branch is shared).
+Disk (D-086): C: is at 41 GB free (2026-10-05) — one GB over `heavy`'s floor, under it every browser job refuses; his steps wait in `C:\Users\Gabe\disk-fix\` (1 cap restore points · 2 compact the WSL disk);
 `~/.local/bin/heavy` runs every browser job (temp in RAM); testing is lean (a change runs its own batteries, the full sweep before a push).
 Next from him: each kind's bench copy line when he is happy with it → it becomes that kind's ruled default.
 Round 1 is ruled (D-081, D-084, D-085). D-085 ("land it", "use recommended approach", "go"): Security = marks, after-a-decision = stop there

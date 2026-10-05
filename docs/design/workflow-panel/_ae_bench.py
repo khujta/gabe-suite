@@ -821,6 +821,27 @@ MINE = {   # my picks (dashed on the page): each kind's parts in three lines of 
 }
 MODES = {"ent": ["word", "icon", "both"], "count": ["words", "badge"], "model": ["word", "icon", "both"], "via": ["word", "icon", "both"],
          "file": ["word", "icon", "both"]}
+# D-093 — a part's FORM: what it shows of its data (his: "the labeling, the content, just the number, just the icon"). Each part has ONE type, a type
+# the forms its data can take; a part with no type (the glyph, the name, the case, the condition, the commit dot) is shown or not, nothing else. The
+# form drawn by default is the look's own mode where it sets one, else the type's first — what the block drew before this ruling.
+#   chip  — a classifying word: in its coloured box · the word in its colour · a coloured dot (the word on its hover)
+#   count — a count: the number and its unit boxed · the number boxed · the number and its unit · the number alone
+#   gtext — a value with a glyph: both · the value · the glyph · the part's name and the value
+#   text  — a value: the value · the part's name and the value
+FORM_TYPES = {"chip": ["chip", "word", "dot"], "count": ["badge", "number", "words", "bare"], "gtext": ["both", "word", "icon", "label"], "text": ["word", "label"]}
+PART_TYPE = {
+    "end": {"status": "chip", "stage": "text", "count": "count", "via": "gtext"},
+    "table": {"rw": "chip", "ent": "gtext", "count": "count", "model": "gtext"},
+    "schema": {"dir": "chip", "ent": "gtext", "count": "count", "via": "gtext"},
+    "fn": {"role": "chip", "file": "gtext", "count": "count", "via": "gtext"},
+    "test": {"state": "chip", "proves": "chip", "role": "chip", "file": "gtext", "sends": "text", "asserts": "text"},
+    "gate": {"role": "chip", "fn": "gtext", "level": "text", "effect": "chip", "via": "gtext", "count": "count"},
+    "hook": {"role": "chip", "fkind": "text", "sends": "gtext", "file": "gtext", "count": "count"},
+    "inf": {"life": "chip", "ikind": "text", "set": "gtext", "count": "count"},
+}
+# D-093 — what no control changes any more (his: "the size of the glyph will not change … mark size … the gap between marks … glyph color won't change. It
+# would be its kind's color in every case"): the look's own values, kept by every saved look and every reset. The table's "model" colour IS its kind's colour.
+FIXED_KEYS = ("sqSize", "sqGap", "iconCol")
 
 
 def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict, write_ops: set, sweep=None) -> tuple:
@@ -920,6 +941,28 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
             die(f"ex.yn.kinds.{k} lacks the words {sorted(set(('name', 'noName', 'yes', 'no', 'plain')) - set(K))}")
     for k in YN:
         looks[k]["fact"] = "off"
+    # D-093: the forms each part can take (its default first in the look's mode), the fixed values, and each part's hover — its own card where its region
+    # gives one (head · items, and the strip of marks), the block's card for every other part: the default is the bench as it was (his: "as we have configured today")
+    forms, fixed = {}, {}
+    for k in KINDS:
+        drawn = set(MINE[k]["parts"]) if k in MINE else {p["key"] for p in lk["parts"][k]}
+        stray = sorted(set(PART_TYPE[k]) - drawn)
+        if stray:
+            die(f"PART_TYPE.{k} names parts the block does not draw: {stray} (D-093)")
+        forms[k] = {}
+        for p, t in PART_TYPE[k].items():
+            opts = FORM_TYPES[t]
+            cur = looks[k]["mode"].get(p)
+            if cur is not None and cur not in opts:
+                die(f"the {k} look shows {p} as {cur!r}, which is none of its forms {opts} (D-093)")
+            forms[k][p] = {"type": t, "opts": opts, "def": cur or opts[0]}
+        looks[k]["iconCol"] = "model" if k == "table" else "kind"
+        fixed[k] = {"icon": looks[k]["size"]["icon"], **{x: looks[k][x] for x in FIXED_KEYS}}
+        looks[k]["hov"] = {p: 1 if r in ("head", "items") else 0 for p, r in REGIONS[k].items()}
+    FW = EW.get("form") or die("ex.form: the forms have no words (D-093)")
+    lost = sorted({f for o in FORM_TYPES.values() for f in o} - set(FW))
+    if lost or any(not (FW[f].get("name") and FW[f].get("plain")) for f in FW if not f.startswith("_")):
+        die(f"ex.form must name and say every form {sorted({f for o in FORM_TYPES.values() for f in o})}: missing {lost} (D-093)")
     # D-089/D-090: every kind names each part it draws (and the strip) in one of the three regions; the card words name every status an ending gives
     if set(REGIONS) != set(KINDS):
         die(f"REGIONS names {sorted(REGIONS)}, the bench draws {sorted(KINDS)}: every kind has its hover regions (D-090)")
@@ -954,7 +997,7 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
         die(f"ex.region.way names {sorted(RW['way'])}, the strip of marks draws {marks}")
     icons = {p["ico"] for k in LAB_KINDS for p in lk["parts"][k]} | {x["sym"] for x in lk["sq"]} | set(EW["icons"].values())
     D = {"kinds": list(KINDS), "look": looks, "parts": lk["parts"], "icol": lk["icol"], "sq": lk["sq"], "col": lk["col"], "his": lk["his"],
-         "cat": dict(sorted(cat.items())), "modes": MODES, "regions": REGIONS, "yn": {"kinds": list(YN)}, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
+         "cat": dict(sorted(cat.items())), "modes": MODES, "forms": forms, "fixed": fixed, "regions": REGIONS, "yn": {"kinds": list(YN)}, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
          "absent": {k: arm_off(fj, a) for k, a in KIND_ARM.items() if k in KINDS and arm_off(fj, a)}}
     bench_css = BENCH_CSS.read_text(encoding="utf-8")
     if bench_css.count("__LAB_MONO__") != 1:

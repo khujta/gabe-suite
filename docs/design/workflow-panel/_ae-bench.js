@@ -20,6 +20,13 @@
         if (XW.opt.scope.opts[c.scope]) st.scope = c.scope; if (typeof c.id === "string") st.id = c.id; if (typeof c.role === "string") st.role = c.role; if (XW.width.opts[c.width]) st.width = c.width;
         if (c.look && Array.isArray(c.look.rows) && c.look.rows.length === 3) st.look = Object.assign(xClone(EX.look[k]), c.look);
         if (EX.yn && EX.yn.kinds.indexOf(k) >= 0 && !(XW.yn.opts || {})[st.look.fact]) st.look.fact = "off"; }); } } catch (e) {}   /* D-091: a remembered extra mark must name an option, else it is off */
+  /* D-093 · his: "the size of the glyph will not change. Mark size won't change either. The gap between marks won't change either. Glyph color won't change. It would be its kind's color in
+     every case." What no control changes is put back on every look, a remembered one included (EX.fixed: the glyph's size, the marks' size and gap, the glyph's colour = the kind's own);
+     a part's form must be one its type takes, and every part has its hover switch (EX.look[k].hov: its own card where its region gives one, as the bench was) */
+  function xFix(k, L) { var F = EX.fixed[k]; L.size = Object.assign({}, L.size); L.size.icon = F.icon; L.sqSize = F.sqSize; L.sqGap = F.sqGap; L.iconCol = F.iconCol;
+    L.mode = Object.assign({}, L.mode); Object.keys(EX.forms[k] || {}).forEach(function (p) { if (L.mode[p] != null && EX.forms[k][p].opts.indexOf(L.mode[p]) < 0) delete L.mode[p]; });
+    var H = EX.look[k].hov || {}; L.hov = Object.assign({}, H, L.hov || {}); Object.keys(L.hov).forEach(function (p) { if (!(p in H)) delete L.hov[p]; }); return L; }
+  XK.forEach(function (k) { xFix(k, XS.col[k].look); });
   function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, col: {} }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
     window.localStorage.setItem(XKEY, JSON.stringify(o)); } catch (e) {} }
   /* L-36 · the controls' icons (24px, drawn by the same rule as BY MOMENT's option squares): the columns' layouts, follow or stay, the
@@ -34,6 +41,13 @@
         compact: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="6" height="8" rx="1"/>', tight: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="3.5" height="8" rx="1"/>' },
       yn: { off: '<rect x="5" y="5" width="14" height="14" rx="2"/>', corners: '<rect x="6" y="6" width="12" height="12" rx="2" opacity=".45"/><path d="M3 9V3h6"/><path d="M21 15v6h-6"/>',
         grey: '<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M5 19L19 5V19z" fill="currentColor" stroke="none"/>' },   /* D-091: not marked · the other two corners · the no in grey */
+      /* D-093: a part's forms — a chip in its box · the word · a dot · a count boxed with its unit · the number boxed · the number and unit · the number · the glyph and the word ·
+         the glyph · the part's name and the word — and the hover switch: a card of its own under the pointer */
+      form: { chip: '<rect x="3" y="7" width="18" height="10" rx="5"/><path d="M8 12h8"/>', word: '<path d="M4 10h16M4 14h11"/>', dot: '<circle cx="12" cy="12" r="4.5" fill="currentColor" stroke="none"/>',
+        badge: '<rect x="2.5" y="7" width="19" height="10" rx="5"/><path d="M6.5 12h2M11 12h6"/>', number: '<rect x="7" y="6.5" width="10" height="11" rx="5"/><path d="M11 10l1.4-1v6"/>',
+        words: '<path d="M4 12h2.5M9.5 12h10.5"/>', bare: '<path d="M10.5 8l2.2-1.6V18"/>', both: '<rect x="3" y="8" width="7" height="8" rx="1.5"/><path d="M13 12h8"/>',
+        icon: '<rect x="7" y="7" width="10" height="10" rx="2"/>', label: '<path d="M3 12h5" stroke-dasharray="1.5 2"/><path d="M11 12h10"/>' },
+      hov: '<rect x="3" y="4" width="14" height="10" rx="1.5"/><path d="M13 13l1.8 7 1.6-2.6 2.8-.9z"/>',
       prev: '<path d="M15 5l-7 7 7 7"/>', next: '<path d="M9 5l7 7-7 7"/>', copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>',
       reset: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>' };
   var XSTR = EX.str; function xT(i) { return i == null ? null : XSTR[i]; }   /* the generator's one table of repeated strings */
@@ -64,10 +78,25 @@
   function xB(text, z) { var b = xWrap(el("b"), text == null ? XW.face.none : String(text)); b.style.fontSize = z + "px"; return b; }
   function xChip(text, col, z, cls) { var s = el("span", "bkrw"), i = el("i", "jdrw" + (cls ? " " + cls : ""), String(text)); i.style.setProperty("--rwc", col); i.style.fontSize = z + "px"; s.appendChild(i); return s; }
   function xMeta(icon, text, z, mode, cls) { if (mode === "off") return null; var m = el("span", "bkm" + (cls ? " " + cls : "")); m.style.fontSize = z + "px";
-    if (mode !== "word" && icon) m.appendChild(typeof icon === "string" ? xSvg(icon, z, "var(--muted)") : icon); if (mode !== "icon" && text != null && text !== "") m.appendChild(xWrap(el("span"), text)); return m; }
+    if (mode !== "word" && mode !== "label" && icon) m.appendChild(typeof icon === "string" ? xSvg(icon, z, "var(--muted)") : icon); if (mode !== "icon" && text != null && text !== "") m.appendChild(xWrap(el("span"), text)); return m; }
   /* CR-25: every number names its unit — the badge says "17 fields", "53 lines", "0 tests" as the words form does */
   function xPl(u, n) { var U = XW.unit[u]; return fill(n === 1 ? U.one : U.many, { n: n }); }
-  function xCount(n, z, mode, words, unit) { if (mode === "off" || n == null) return null; var c = el("span", "bkn" + (mode === "badge" ? " badge" : ""), mode === "badge" ? xPl(unit, n) : words); c.style.fontSize = z + "px"; return c; }
+  /* D-093: a count in four forms — its number and unit boxed (CR-25's badge) · the number boxed · the number and unit · the number alone */
+  function xCount(n, z, mode, words, unit) { if (mode === "off" || n == null) return null; var box = mode === "badge" || mode === "number", bare = mode === "number" || mode === "bare";
+    var c = el("span", "bkn" + (box ? " badge" : ""), bare ? String(n) : mode === "badge" ? xPl(unit, n) : words); c.style.fontSize = z + "px"; if (bare) c.setAttribute("aria-label", xPl(unit, n)); return c; }
+  /* D-093 · a part's FORM (EX.forms[k][p]: its type, the forms it takes, its default): what the look's mode says, else the default */
+  function xForm(k, p, L) { var F = (EX.forms[k] || {})[p]; if (!F) return null; var v = (L.mode || {})[p]; return F.opts.indexOf(v) >= 0 ? v : F.def; }
+  function xFormOf(k, p) { return ((EX.forms[k] || {})[p] || {}).type || null; }
+  /* a classifying chip drawn in its form: in its box (as made) · the word in its colour · a dot in its colour, the word in its label and on its hover */
+  function xChipForm(s, f) { if (!s || f === "chip" || !f) return s; var i = s.querySelector(".jdrw"); if (!i) return s; var col = i.style.getPropertyValue("--rwc"), w = i.textContent, z = i.style.fontSize;
+    if (f === "word") { var m = el("span", "bkm exword", w); m.style.color = col; m.style.fontSize = z; return m; }
+    var d = el("span", "exdotw"), q = el("i", "exdot"); q.style.background = col; d.setAttribute("aria-label", w); d.appendChild(q); return d; }
+  /* a value with a glyph or a plain value, its part's name put before it (the label form) */
+  function xLabel(k, p, n) { if (!n) return n; var b = el("span", "exlab", xPartWord(k, p)); n.insertBefore(b, n.firstChild); n.classList.add("exlabd"); return n; }
+  /* a node built with its glyph and its value (a function named in a gate, the request a hook sends): the glyph alone, the value alone, or the name and the value */
+  function xGlyphForm(k, p, n, f) { if (!n || f === "both" || !f) return n; var g = n.querySelector(":scope > svg, :scope > .skg, :scope > span:first-child > svg");
+    var first = n.firstElementChild; if (f === "icon") { [].slice.call(n.childNodes).forEach(function (x) { if (x !== first) n.removeChild(x); }); return n; }
+    if (first && (first.nodeName.toLowerCase() === "svg" || first.querySelector("svg"))) n.removeChild(first); return f === "label" ? xLabel(k, p, n) : n; }
   function xShort(f) { return String(f || "").split("/").slice(-EX.dirs).join("/"); }
   /* a role's name: an in-flight value's kind in BY MOMENT's words (CR-27 · S4-17), a schema's side as BY MOMENT's body and reply (S4-27) */
   function xRoleName(k, r) { if (k === "end") return (W.kinds[r] || {}).name || r;
@@ -177,7 +206,7 @@
       if (p === "name") return xB(c.n + xTw(it), z);
       if (p === "ikind") return xMeta(null, xRoleName("inf", c.ik), z, "word");
       if (p === "set") { if (!c.by && !c.set) return null; var g0 = (c.byk || []).map(function (K) { return xStation(K, z, "var(--muted)"); }).filter(Boolean)[0];
-        return xMeta(g0 || "link", [c.by, c.set].filter(Boolean).join(" · "), z, "both"); }
+        return xMeta(g0 || "link", [c.by, c.set].filter(Boolean).join(" · "), z, md.set || "both"); }
       if (p === "count") return xCount(it.o.reads.length, z, md.count, xPl("reads", it.o.reads.length), "reads");
       return null; }
   };
@@ -485,17 +514,25 @@
         f0.style.marginTop = Math.max(0, (lh - z) / 2) + "px"; } }); }
   function xYnFacts(k, c, it) { return k === "fn" ? it.o.ops.map(function (q, i) { return xYn(k, c, it, i); }) : k === "test" ? c.calls.map(function (q, i) { return xYn(k, c, it, i); })
     : k === "end" ? xWayList(c).map(function (q) { return xYn(k, c, it, 0, q); }) : []; }
+  /* D-093 · a part as its form draws it: a chip in its box, as a word or a dot (each chip of a list of endings alike); a value with a glyph as both, the
+     word, the glyph or its name and the word; a plain value as itself or its name and itself; a count by xCount */
+  function xPartNode(k, p, c, it, L) { var n = XPART[k](p, c, it, L, L.size[p] || 12), t = xFormOf(k, p), f = xForm(k, p, L); if (!n || !t) return n;
+    if (t === "chip") { if (n.classList.contains("exends")) { [].slice.call(n.children).forEach(function (q) { if (q.classList.contains("bkrw")) n.replaceChild(xChipForm(q, f), q); }); return n; }
+      return n.classList.contains("bkrw") ? xChipForm(n, f) : n; }
+    if (t === "gtext") return n.classList.contains("exfn") || n.classList.contains("exsend") ? xGlyphForm(k, p, n, f) : f === "label" ? xLabel(k, p, n) : n;
+    return t === "text" && f === "label" ? xLabel(k, p, n) : n; }
   function xBlock(k, it, L) { var c = EX.cat[it.id], blk = el("div", "blk rw-" + (k === "table" ? it.role : "x")), hd = el("div", "bkhd"), ti = el("div", "bkti");
     blk.style.setProperty("--ec", c.ec || xKindCol(k, c));
+    var Lf = Object.assign({}, L, { mode: Object.assign({}, L.mode) }); Object.keys(EX.forms[k] || {}).forEach(function (p) { Lf.mode[p] = xForm(k, p, L); });   /* D-093: every part in its form */
     L.rows.forEach(function (row) { var ln = el("div", "bkln"), A = el("div", "bkcol l"), B = el("div", "bkcol r");
-      row.l.forEach(function (p) { var n = XPART[k](p, c, it, L, L.size[p] || 12); if (n) { n.setAttribute("data-part", p); A.appendChild(n); } });
-      row.r.forEach(function (p) { var n = XPART[k](p, c, it, L, L.size[p] || 12); if (n) { n.setAttribute("data-part", p); B.appendChild(n); } });
+      row.l.forEach(function (p) { var n = xPartNode(k, p, c, it, Lf); if (n) { n.setAttribute("data-part", p); A.appendChild(n); } });
+      row.r.forEach(function (p) { var n = xPartNode(k, p, c, it, Lf); if (n) { n.setAttribute("data-part", p); B.appendChild(n); } });
       if (A.childNodes.length || B.childNodes.length) { ln.appendChild(A); ln.appendChild(B); ti.appendChild(ln); } });
     xAlign(ti, L);
     hd.appendChild(ti); var sq = xStrip(k, c, it, L); if (sq) hd.appendChild(sq); blk.appendChild(hd); blk.appendChild(xList(k, c, it));
     blk.setAttribute("data-tip", "exblk"); blk.setAttribute("data-exk", k); blk.setAttribute("data-exid", it.id); blk.setAttribute("data-exep", it.ep); if (c.key) blk.setAttribute("data-keys", c.key);
     blk.querySelectorAll("[data-tip]").forEach(function (n) { if (n !== blk && !n.closest(".exfl")) n.removeAttribute("data-tip"); });
-    xRegions(k, blk); xQuiet(blk);
+    xRegions(k, blk, L); xQuiet(blk);
     if (XS.col[k].open) blk.classList.add("open");
     blk.addEventListener("click", function (e) { if (e.target.closest(".exfl")) return; XS.col[k].open = !XS.col[k].open; blk.classList.toggle("open", XS.col[k].open); });
     return blk; }
@@ -507,10 +544,13 @@
      takes its own hover (data-tip="exreg", data-reg, data-rp = the part, data-ri = its item); a `title` part, and every gap, keeps the block's own card. An item is a
      `.sq` of the strip, a node of the part marked data-it, or — when the part marks none — the part itself. The card each region draws is _ae-card.js (CDREG). ══ */
   function xRegionTag(n, reg, part, i) { n.setAttribute("data-tip", "exreg"); n.setAttribute("data-reg", reg); n.setAttribute("data-rp", part); n.setAttribute("data-ri", String(i)); }
-  function xRegions(k, blk) { var R = XREG[k]; if (!R) return;
-    [].forEach.call(blk.querySelectorAll("[data-part]"), function (n) { var p = n.getAttribute("data-part"), g = R[p]; if (!g || g === "title") return;
+  /* D-093 · his: "let's make a hover for every one of the items, and we will have an option to enable or disable the hover. The default should be as we have configured
+     today." Each part's switch is the look's hov[part] (the strip's is hov.marks): ON gives the part its own card — its region's (head · items), or, for a title part, a card
+     of its own (region `part`, _ae-card.js cdPartCard); OFF leaves it the block's card. The default is the regions above, so the bench opens as it was */
+  function xRegions(k, blk, L) { var R = XREG[k], H = (L && L.hov) || {}; if (!R) return;
+    [].forEach.call(blk.querySelectorAll("[data-part]"), function (n) { var p = n.getAttribute("data-part"), g = R[p]; if (!g || !H[p]) return; if (g === "title") g = "part";
       var its = n.querySelectorAll("[data-it]"); if (g === "items" && its.length) [].forEach.call(its, function (q, i) { xRegionTag(q, g, p, i); }); else xRegionTag(n, g, p, 0); });
-    var sq = blk.querySelector(".sqs"), g2 = R.marks; if (sq && g2 && g2 !== "title") [].forEach.call(sq.children, function (q, i) { xRegionTag(q, g2, "marks", i); }); }
+    var sq = blk.querySelector(".sqs"), g2 = R.marks; if (sq && g2 && H.marks) [].forEach.call(sq.children, function (q, i) { xRegionTag(q, g2 === "title" ? "part" : g2, "marks", i); }); }
 
   /* D-092 · his: "put a container around all these icons and make it so the container doesn't offer any hover action … we just show the hover when we are hovering
      on those icons". The GROUPS of a block's tagged items that sit side by side — the strip's marks, a part's items, tagged parts next to each other on one line (the
@@ -548,39 +588,51 @@
   function xPick(label, v, vals, on, words) { var r = el("label", "exrg"); r.appendChild(el("span", "rl", label)); var s = el("select");
     vals.forEach(function (x) { var o = el("option", null, words && words[x] ? words[x] : x); o.value = x; if (x === v) o.selected = true; s.appendChild(o); });
     s.addEventListener("change", function () { on(s.value); }); r.appendChild(s); return r; }
-  function xSet(k, f) { f(XS.col[k].look); xSave(); renderEx(); writeOut(LAST.L, LAST.GS); }
+  function xSet(k, f) { f(XS.col[k].look); xFix(k, XS.col[k].look); xSave(); renderEx(); writeOut(LAST.L, LAST.GS); }   /* D-093: what is fixed stays so, whatever sets it */
   /* the glyph colours a kind is offered: the table's in the lab's words (his DATA line says "model"), every other kind's in words of its own (S4-25) */
   function xIcol(k) { var o = {}; if (k === "table") Object.keys(EX.icol).forEach(function (x) { o[x] = EX.icol[x]; }); else Object.keys(XW.icol).forEach(function (x) { o[x] = XW.icol[x]; }); return o; }
   /* the smallest a part may be sized: a glyph to 9px; text to the floor (S4-24) — the table's parts to his own size where his line sets them lower */
   function xMin(k, p) { if (XGLYPH[p]) return 9; return k === "table" ? Math.min(EX.floor, EX.look.table.size[p] || EX.floor) : EX.floor; }
-  /* L-36 · every control is always on the page — none stands behind a fold: the parts (drag between the lines, or into not drawn), their size, the colours, and
-     under them the two buttons, back to the default and copy. The copy line is never shown; the button copies it whole. The part whose size is shown is the one
-     last clicked, the first drawn one until a click */
-  function xSelPart(k) { var st = XS.col[k], drawn = []; st.look.rows.forEach(function (r) { drawn = drawn.concat(r.l, r.r); });
-    return st.sel && XPARTS[k].indexOf(st.sel) >= 0 ? st.sel : (drawn[0] || XPARTS[k][0]); }
+  /* L-36 · every control is always on the page — none stands behind a fold. D-093 · his: "let's rethink how we show the controls now on the elements": the lines
+     (drag a part between them, or into not drawn — "that's okay"), then EACH PART on a row of its own — its forms (what it shows of its data), its size when it is
+     text, and its hover switch — then the block's box and its marks. The glyph's size and colour and the marks' size and gap are no control any more (xFix). Under
+     them the two buttons, back to the default and copy; the copy line is never shown, the button copies it whole. A part clicked on a line lights its row */
   function xSec(title, cls) { var d = el("div", "exsec " + cls); d.appendChild(el("h4", "exsh", title)); return d; }
+  function xHov(k, p, L, word) { var on = !!(L.hov || {})[p], b = xAct("opt exo exi exhov", XICON.hov, on ? "hovOff" : "hovOn", { part: word }, function () { xSet(k, function (x) { x.hov = Object.assign({}, x.hov); x.hov[p] = on ? 0 : 1; }); });
+    b.setAttribute("aria-pressed", on ? "true" : "false"); b.setAttribute("data-hov", p); return b; }
+  function xPartRow(k, p, L) { var r = el("div", "expr"), nm = xPartWord(k, p), F = (EX.forms[k] || {})[p], drawn = L.rows.some(function (q) { return q.l.indexOf(p) >= 0 || q.r.indexOf(p) >= 0; });
+    r.setAttribute("data-part", p); if (!drawn) r.classList.add("exprOff"); if (XS.col[k].sel === p) r.classList.add("on");
+    var h = el("span", "exprn"); h.appendChild(xSvg(xPartIco(k, p), 13, "currentColor")); h.appendChild(el("span", null, nm)); r.appendChild(h);
+    var fo = el("div", "opts exforms"); fo.setAttribute("role", "radiogroup"); fo.setAttribute("aria-label", fill(XW.act.form.obj, { part: nm, v: "" }).trim());
+    if (F) { var cur = xForm(k, p, L); F.opts.forEach(function (v) { var b = xAct("opt exo exi", XICON.form[v], "form", { part: nm, v: XW.form[v].name }, function () { xSet(k, function (x) { x.mode = Object.assign({}, x.mode); x.mode[p] = v; }); });
+      b.setAttribute("role", "radio"); b.setAttribute("data-xform", p); b.setAttribute("data-v", v); b.setAttribute("aria-checked", cur === v ? "true" : "false"); fo.appendChild(b); }); }
+    r.appendChild(fo);
+    var sz = el("span", "exprz"); if (!XGLYPH[p]) { var sl = el("select", "exsz"), lo = xMin(k, p), A = XW.act.size; sl.setAttribute("aria-label", A.verb + " " + fill(A.obj, { part: nm }));
+        sl.setAttribute("data-tip", "exctl"); sl.setAttribute("data-verb", A.verb); sl.setAttribute("data-obj", fill(A.obj, { part: nm }));
+        for (var z = lo; z <= 26; z++) { var o = el("option", null, z + "px"); o.value = z; if (z === (L.size[p] || 12)) o.selected = true; sl.appendChild(o); }
+        sl.addEventListener("change", function () { var v = +sl.value; xSet(k, function (x) { x.size = Object.assign({}, x.size); x.size[p] = v; }); }); sz.appendChild(sl); }
+    r.appendChild(sz); r.appendChild(xHov(k, p, L, nm)); return r; }
   function xCtl(k, it) { var st = XS.col[k], L = st.look, box = el("div", "exctl");
     var pa = xSec(XW.ctl.parts, "exparts"); pa.appendChild(el("p", "exhint", XW.ctl.partsPlain));
     L.rows.forEach(function (row, i) { var r = el("div", "lnrow"); r.appendChild(el("span", "dzl", fill(XW.ctl.line, { i: i + 1 }))); var sd = el("div", "lnsides");
       sd.appendChild(xZone(k, i, "l", row.l, XW.ctl.left)); sd.appendChild(el("span", "lnmid")); sd.appendChild(xZone(k, i, "r", row.r, XW.ctl.right)); r.appendChild(sd); pa.appendChild(r); });
     var tr = el("div", "lnrow extray"); tr.appendChild(el("span", "dzl", XW.ctl.tray)); var tz = xZone(k, "off", "", L.off || [], XW.ctl.tray); tz.classList.add("exoff"); tr.appendChild(tz); pa.appendChild(tr); box.appendChild(pa);
-    var sz = xSec(XW.ctl.size, "exsize"), p = xSelPart(k);
-    sz.appendChild(xRange(fill(XW.ctl.sizeOf, { name: xPartWord(k, p) }), L.size[p] || 12, xMin(k, p), 26, 1, function (v) { xSet(k, function (x) { x.size[p] = v; }); }));
-    if (EX.modes[p] && (k !== "end" || p === "count" || p === "via")) sz.appendChild(xPick(XW.ctl.mode, (L.mode || {})[p] || EX.modes[p][0], EX.modes[p], function (v) { xSet(k, function (x) { x.mode = x.mode || {}; x.mode[p] = v; }); }));
-    sz.appendChild(xRange(XW.ctl.markSize, L.sqSize, 6, 24, 1, function (v) { xSet(k, function (x) { x.sqSize = v; }); }));
-    sz.appendChild(xRange(XW.ctl.gap, L.sqGap, 0, 6, 1, function (v) { xSet(k, function (x) { x.sqGap = v; }); })); box.appendChild(sz);
-    var co = xSec(XW.ctl.colour, "excolour"), IC = xIcol(k), iw = {}; Object.keys(IC).forEach(function (x) { iw[x] = IC[x].word; }); var cg = el("div", "exgrid2");
-    cg.appendChild(xPick(XW.ctl.glyph, L.iconCol, Object.keys(IC), function (v) { xSet(k, function (x) { x.iconCol = v; }); }, iw));
+    var ea = xSec(XW.ctl.each, "exeach"), order = []; L.rows.forEach(function (r) { order = order.concat(r.l, r.r); }); order = order.concat((L.off || []).filter(function (p) { return order.indexOf(p) < 0; }));
+    XPARTS[k].forEach(function (p) { if (order.indexOf(p) < 0) order.push(p); }); order.forEach(function (p) { if (XPARTS[k].indexOf(p) >= 0) ea.appendChild(xPartRow(k, p, L)); }); box.appendChild(ea);
+    var bx = xSec(XW.ctl.box, "exbox"), cg = el("div", "exgrid2");
     cg.appendChild(xPick(XW.ctl.edgeSide, L.railSide, ["left", "right", "top", "bottom", "none"], function (v) { xSet(k, function (x) { x.railSide = v; }); }));
     cg.appendChild(xPick(XW.ctl.edgePat, L.railStyle, ["solid", "dashed", "dotted"], function (v) { xSet(k, function (x) { x.railStyle = v; }); }));
     cg.appendChild(xRange(XW.ctl.edgeW, L.railW, 1, 8, 1, function (v) { xSet(k, function (x) { x.railW = v; }); }));
+    cg.appendChild(el("span", "exgap"));
     cg.appendChild(xPick(XW.ctl.chipBox, L.rwBox, ["pill", "tag", "square", "outline", "bare"], function (v) { xSet(k, function (x) { x.rwBox = v; }); }));
     cg.appendChild(xRange(XW.ctl.chipFill, L.rwA, 0, 100, 5, function (v) { xSet(k, function (x) { x.rwA = v; }); }));
     cg.appendChild(xPick(XW.ctl.cntBox, L.cntBox, ["pill", "tag", "square", "outline", "bare"], function (v) { xSet(k, function (x) { x.cntBox = v; }); }));
-    cg.appendChild(xRange(XW.ctl.cntFill, L.cntA, 0, 100, 5, function (v) { xSet(k, function (x) { x.cntA = v; }); }));
-    cg.appendChild(xPick(XW.ctl.enc, L.sqEnc, ["symbol", "colour", "char", "shape"], function (v) { xSet(k, function (x) { x.sqEnc = v; }); }));
-    cg.appendChild(xPick(XW.ctl.pal, L.sqPal, ["type", "channel", "entity", "mono"], function (v) { xSet(k, function (x) { x.sqPal = v; }); }));
-    cg.appendChild(xPick(XW.ctl.shape, L.sqShape, ["round", "square"], function (v) { xSet(k, function (x) { x.sqShape = v; }); })); co.appendChild(cg); box.appendChild(co);
+    cg.appendChild(xRange(XW.ctl.cntFill, L.cntA, 0, 100, 5, function (v) { xSet(k, function (x) { x.cntA = v; }); })); bx.appendChild(cg); box.appendChild(bx);
+    var mk = xSec(XW.ctl.marks, "exmarks"), mg = el("div", "exgrid2");
+    mg.appendChild(xPick(XW.ctl.enc, L.sqEnc, ["symbol", "colour", "char", "shape"], function (v) { xSet(k, function (x) { x.sqEnc = v; }); }));
+    mg.appendChild(xPick(XW.ctl.pal, L.sqPal, ["type", "channel", "entity", "mono"], function (v) { xSet(k, function (x) { x.sqPal = v; }); }));
+    mg.appendChild(xPick(XW.ctl.shape, L.sqShape, ["round", "square"], function (v) { xSet(k, function (x) { x.sqShape = v; }); }));
+    var mh = el("label", "exrg exmh"); mh.appendChild(el("span", "rl", XW.ctl.hover)); mh.appendChild(xHov(k, "marks", L, XW.ctl.theMarks)); mg.appendChild(mh); mk.appendChild(mg); box.appendChild(mk);
     if (EX.yn.kinds.indexOf(k) >= 0) { var YW = XW.yn, YK = YW.kinds[k], yn = xSec(fill(YW.title, { v: YK.name }), "exyn"), yg = el("div", "opts exynopts"); yn.appendChild(el("p", "exhint", YK.plain));
       yg.setAttribute("role", "radiogroup"); yg.setAttribute("aria-label", fill(YW.title, { v: YK.name }));
       Object.keys(YW.opts).forEach(function (v) { var b = el("button", "opt exo exi"); b.type = "button"; b.setAttribute("role", "radio"); b.setAttribute("data-xyn", v); b.setAttribute("data-v", v); b.setAttribute("data-tip", "exyn");
@@ -589,7 +641,7 @@
       yn.appendChild(yg); box.appendChild(yn); }
     var cp = el("div", "excp"), code = el("code", "exline", xCopy(k)), said = el("span", "said");
     code.hidden = true;                                           /* the line is not shown — the button copies it whole (L-36) */
-    var rs = xAct("opt exo exi exreset", XICON.reset, "reset", null, function () { st.look = xClone(EX.look[k]); st.sel = null; xSave(); renderEx(); writeOut(LAST.L, LAST.GS); });
+    var rs = xAct("opt exo exi exreset", XICON.reset, "reset", null, function () { st.look = xFix(k, xClone(EX.look[k])); st.sel = null; xSave(); renderEx(); writeOut(LAST.L, LAST.GS); });
     var cb = xAct("opt exo exi excopy", XICON.copy, "copy", null, function () { copyText(code.textContent, said, XW.ctl.copied); });
     cp.appendChild(rs); cp.appendChild(cb); cp.appendChild(said); cp.appendChild(code); box.appendChild(cp);
     return box; }
@@ -598,10 +650,11 @@
      names its parts with the words the controls show (S4-26), each part's mode and the glyph's colour included (S4-05) ── */
   function xBlockLine(k, L) { var on = function (p) { return L.rows.some(function (r) { return r.l.indexOf(p) >= 0 || r.r.indexOf(p) >= 0; }); };
     var tail = " · squares " + L.sqSize + "px gap " + L.sqGap + " " + L.sqShape + " as " + L.sqEnc + " by " + L.sqPal
-      + (xYnOn(L) ? " · " + XW.yn.kinds[k].name + " " + XW.yn.opts[L.fact].name : "");                  /* D-091: said only when it is on — the default line is byte for byte what it was */
+      + (xYnOn(L) ? " · " + XW.yn.kinds[k].name + " " + XW.yn.opts[L.fact].name : "")                   /* D-091: said only when it is on — the default line is byte for byte what it was */
+      + xHovLine(k, L);                                                                                  /* D-093: the hovers he switched, the same way */
     if (k === "table") { var cp = XW.cp.table;
       var st = XPARTS[k].map(function (p) { if (p === "icon") return cp.icon + " " + (on(p) ? "on" : "off") + " " + L.iconCol;
-        if (EX.modes[p] && (L.mode || {})[p]) return cp[p] + " " + (on(p) ? L.mode[p] : "off"); return cp[p] + " " + (on(p) ? "on" : "off"); });
+        if (EX.forms.table[p] && (L.mode || {})[p]) return cp[p] + " " + (on(p) ? L.mode[p] : "off"); return cp[p] + " " + (on(p) ? "on" : "off"); });
       var sizes = Object.keys(L.size).filter(function (p) { return XPARTS[k].indexOf(p) >= 0; }).map(function (p) { return p + " " + L.size[p]; });
       return "block " + L.form + " (" + st.join(", ") + ") · edge " + L.railSide + (L.railSide === "none" ? "" : " " + L.railStyle + " " + L.railW + "px")
         + " · chips count " + L.cntBox + " " + L.cntA + "%, " + XW.chipWord[k] + " " + L.rwBox + " " + L.rwA + "%"
@@ -613,6 +666,9 @@
       + " · chips count " + L.cntBox + " " + L.cntA + "%, " + XW.chipWord[k] + " " + L.rwBox + " " + L.rwA + "%"
       + " · lines " + L.rows.map(function (r) { return (r.l.map(nm).join(" · ") || "—") + " | " + (r.r.map(nm).join(" · ") || "—"); }).join(" / ")
       + " · sizes " + XPARTS[k].filter(function (p) { return L.size[p] != null; }).map(function (p) { return nm(p) + " " + L.size[p]; }).join(", ") + tail; }
+  /* D-093: each part whose hover is not the default's, its own card or the block's — nothing when every switch is as the bench opened */
+  function xHovLine(k, L) { var H0 = EX.look[k].hov || {}, H = L.hov || {}, d = Object.keys(H0).filter(function (p) { return !!H[p] !== !!H0[p]; });
+    return d.length ? " · " + XW.ctl.hover + " " + d.map(function (p) { return (p === "marks" ? XW.ctl.theMarks : xPartWord(k, p)) + " " + (H[p] ? "own" : "block"); }).join(", ") : ""; }
   function xSame(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
   function xCopy(k) { var st = XS.col[k], it = xCurrent(k), L = st.look, whose = xWhose(k), mine = !xSame(L, EX.look[k]) || st.width !== XW.width.pick;   /* L-36: the column's width is part of its look */
     var off = (L.off || []).map(function (p) { return k === "table" ? p : xPartWord(k, p); }).join(k === "table" ? " " : " · ") || "—";

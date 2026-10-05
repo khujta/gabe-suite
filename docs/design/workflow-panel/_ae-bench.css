@@ -128,3 +128,24 @@
 .sq[data-yn="grey"].ynn { filter: grayscale(1); }
 .tip.cd { --yn-col: var(--cd-ink); }
 .exynopts { display: flex; gap: 4px; }
+/* ══ D-093 · the controls, second revision: EACH PART on a row — its name, its forms (icon squares, the one drawn pressed), its size when it is text, its hover switch
+   (pressed = a card of its own) — then the block's box and its marks. A part on no line keeps its row, quieter; a part clicked on a line lights its row ══ */
+.exeach { gap: 3px; }
+.expr { display: grid; grid-template-columns: 104px 1fr 64px 26px; align-items: center; gap: 6px; padding: 2px 4px; border-radius: 6px; }
+.expr.on { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.expr.exprOff .exprn { opacity: .55; }
+.exprn { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-soft); min-width: 0; }
+.exprn span { overflow-wrap: anywhere; }
+.expr .exforms { display: flex; gap: 3px; justify-content: flex-start; }
+.expr .opt, .exmh .opt { width: 26px; height: 26px; border-radius: 6px; }
+.expr .opt svg, .exmh .opt svg { width: 15px; height: 15px; }
+.exsz { width: 100%; font: inherit; font-size: 12px; }
+.exhov[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--ground); }
+.exgap { display: block; }
+.exmh .rl { width: auto; }
+/* the forms as the block draws them: a chip's word in its colour, a dot in its colour, a part's name before its value */
+#sec-ex .exw .bkm.exword { font-weight: 650; opacity: 1; }
+.exdotw { display: inline-flex; align-items: center; height: 1.2em; flex: none; }
+.exdot { display: block; width: 9px; height: 9px; border-radius: 50%; }
+.exlab { color: var(--muted); font-weight: 400; margin-right: .35em; }
+#sec-ex .exw .bkcol > .exdotw { flex: none; }

@@ -3045,8 +3045,8 @@ ok(!errs.length, 'no page error on the fixture', errs);
       sections: [...c.querySelectorAll('.exctl .exsh')].map((h) => h.textContent), vis: [...c.querySelectorAll('.exctl .exsec')].every((x) => x.getBoundingClientRect().height > 10), line: line.textContent }; });
   await p.$eval('#exgrid .excol[data-k="table"] .excopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#exgrid .excol[data-k="table"] .excopy'); await p.waitForTimeout(120);
   const copied = await p.evaluate(() => window.__w81copied);
-  ok(bn.n === 10 && bn.textless && bn.verbs.every((v) => v.length > 8 && !/undefined/.test(v)) && bn.lineHidden && !bn.folds && JSON.stringify(bn.sections) === JSON.stringify([XW.ctl.parts, XW.ctl.size, XW.ctl.colour]) && bn.vis && copied === bn.line,
-    'D-081 · L-36 · the table column\'s controls are ' + bn.n + ' icon squares (no text), each a verb and its object; parts, size and colour are always on the page (no fold); the copy line is not shown and the copy button copies all of it', { bn: { ...bn, line: bn.line.slice(0, 60) }, copied: (copied || '').slice(0, 60) });
+  ok(bn.n === 10 && bn.textless && bn.verbs.every((v) => v.length > 8 && !/undefined/.test(v)) && bn.lineHidden && !bn.folds && JSON.stringify(bn.sections) === JSON.stringify([XW.ctl.parts, XW.ctl.each, XW.ctl.box, XW.ctl.marks]) && bn.vis && copied === bn.line,
+    'D-081 · L-36 · CHANGED D-093 · the table column\'s controls are ' + bn.n + ' icon squares (no text), each a verb and its object; the lines, each part, the box and the marks are always on the page (no fold); the copy line is not shown and the copy button copies all of it', { bn: { ...bn, line: bn.line.slice(0, 60) }, copied: (copied || '').slice(0, 60) });
   /* (4) the width of a column — CHANGED 2026-10-03 (D-087, his words): four options, "full" removed; a width narrows ONLY the element drawn at the top of the
      column, never the column's box — the head, the squares, the chips, the picker, the parts/size/colour controls and the grid keep the default's place and size
      (what sits under the element keeps its x and width, and its distance from the element; it moves down only as far as the element grew taller). A saved "full" reads as the default. */
@@ -3379,10 +3379,11 @@ ok(!errs.length, 'no page error on the fixture', errs);
   const glyphCol = () => p.evaluate(() => { const g = document.querySelector('#tip .cdh .cdg svg'); return g ? getComputedStyle(g).color : null; });
   const hoverFn = async () => { const h = await p.$('#sec-mo .mc[data-tip="mochip"][data-ik="fn"][data-keys^="fn:apps/api/services/cooking.py::start_session"]'); await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const b2 = await h.boundingBox(); await p.mouse.move(5, 5); await p.mouse.move(b2.x + 12, b2.y + 6); await p.waitForTimeout(60); };
   await hoverFn(); const g0 = await glyphCol(); await p.mouse.move(5, 5);
+  /* CHANGED 2026-10-05 (D-093, his: "glyph color won't change. It would be its kind's color in every case"): the glyph's colour is no setting any more — a look that asks for "quiet" is put back to the kind's colour, on the bench and on the card */
   await p.evaluate(() => window.__allepEx.set('fn', (L) => { L.iconCol = 'muted'; })); await p.waitForTimeout(80); await hoverFn(); const g1 = await glyphCol(); await p.mouse.move(5, 5);
   const bch = await p.$eval('#exgrid .excol[data-k="fn"] .blk [data-part="icon"] svg', (e) => getComputedStyle(e).color), mut = await p.$eval('#sec-ex', (e) => getComputedStyle(e).getPropertyValue('--muted').trim());
-  await p.evaluate(() => window.__allepEx.set('fn', (L) => { L.iconCol = 'kind'; })); await p.waitForTimeout(60);
-  ok(g0 && g1 && g0 !== g1 && g1 === bch, 'D-088 · the card follows the bench: the function kind\'s glyph colour, set to "quiet" on the bench, is the card\'s glyph colour too (' + g0 + ' → ' + g1 + ')', { g0, g1, bch, mut });
+  const ic93 = await p.evaluate(() => window.__allepEx.state.col.fn.look.iconCol);
+  ok(g0 && g1 && g0 === g1 && ic93 === 'kind', 'D-093 · the glyph keeps its kind\'s colour: a look set to "quiet" is put back, and the card\'s glyph is the same colour before and after (' + g0 + ' · ' + g1 + ')', { g0, g1, bch, mut, ic93 });
   const chipR = async () => { const h = await p.$('#sec-mo .mdxn[data-keys*="table:cooking_sessions"], #sec-mo .mc[data-ik="table"][data-keys*="table:cooking_sessions"]'); if (!h) return null; await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const b3 = await h.boundingBox(); await p.mouse.move(5, 5); await p.mouse.move(b3.x + 6, b3.y + 6); await p.waitForTimeout(60);
     return p.evaluate(() => { const c = document.querySelector('#tip .cdr[data-row="channel"] .cdpill'); return c ? getComputedStyle(c).borderTopLeftRadius : null; }); };
   const r0 = await chipR(); await p.evaluate(() => window.__allepEx.set('table', (L) => { L.rwBox = 'square'; })); await p.waitForTimeout(60); const r1 = await chipR(); await p.evaluate(() => window.__allepEx.set('table', (L) => { L.rwBox = 'pill'; })); await p.mouse.move(5, 5);
@@ -3899,6 +3900,64 @@ ok(!errs.length, 'no page error on the fixture', errs);
     const h1 = await at(G.ic.x, hy), h2 = await at((G.ic.r + G.st.l) / 2, hy), h3 = await at(G.st.x, hy), h4 = await at(G.nm.x, G.nm.y);
     ok(h1.show === 'true' && h1.card === 'reg' && h2.show === 'false' && h3.show === 'true' && h3.card === 'reg' && h4.show === 'true' && h4.card === 'end', 'D-092 · the glyph, the gap, the status, the title in turn: the glyph\'s card, none, the status\'s card, the block\'s card', { h1, h2, h3, h4 });
     ok((await p.evaluate(() => window.localStorage.getItem('gabe:allep:bench:v3'))) === st0 && !errs.length, 'D-092 · the moves wrote nothing to storage and the page raised no error', errs.slice(0, 3)); }
+  /* ══ D-093 · THE CONTROLS, SECOND REVISION (his: "the size of the glyph will not change. Mark size won't change either. The gap between marks won't change either. Glyph
+     color won't change … What could change is the way that we display data … the labeling, the content, just the number, just the icon" and "let's make a hover for every one
+     of the items, and we will have an option to enable or disable the hover. The default should be as we have configured today"). By real clicks on the table column. ══ */
+  { await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(450);
+    const TC = '#exgrid .excol[data-k="table"]', XD = D.ex, CW = D.words.ex;
+    await p.evaluate(() => window.__allepEx.pick('table', 'table:users')); await p.waitForTimeout(150);
+    /* (1) what is fixed has no control, and a saved look cannot move it */
+    const fx = await p.evaluate(([CW, KS]) => { const o = {}; KS.forEach((k) => { const c = document.querySelector('#exgrid .excol[data-k="' + k + '"]'); if (!c.querySelector('.exctl')) return;
+      o[k] = { labels: [...c.querySelectorAll('.exctl .exrg .rl')].map((x) => x.textContent), rows: [...c.querySelectorAll('.exeach .expr')].map((r) => r.getAttribute('data-part')),
+        forms: [...c.querySelectorAll('.exeach .expr')].map((r) => [r.getAttribute('data-part'), r.querySelectorAll('[data-xform]').length, (r.querySelector('[data-xform][aria-checked="true"]') || { getAttribute: () => null }).getAttribute('data-v'), r.querySelector('.exhov').getAttribute('aria-pressed'), !!r.querySelector('.exsz')]) }; });
+      return o; }, [CW, D.ex.kinds]);
+    const gone = [CW.ctl.glyph, CW.ctl.markSize, CW.ctl.gap].concat(Object.keys(D.words.ex.parts).map((k) => CW.ctl.sizeOf.replace('{name}', D.words.ex.parts[k].icon.name)));
+    const fbad = [];
+    Object.entries(fx).forEach(([k, f]) => { if (f.labels.some((l) => gone.includes(l))) fbad.push(k + ': a fixed control is still there');
+      if (JSON.stringify([...f.rows].sort()) !== JSON.stringify([...(XD.parts[k] ? XD.parts[k].map((q) => q.key) : Object.keys(D.words.ex.parts[k]))].sort())) fbad.push(k + ': rows ' + f.rows.join());
+      f.forms.forEach(([pt, n, cur, hv, sz]) => { const F = (XD.forms[k] || {})[pt], H = (XD.look[k].hov || {})[pt]; if ((F ? F.opts.length : 0) !== n) fbad.push(k + '.' + pt + ': ' + n + ' forms');
+        if (F && cur !== ((XD.look[k].mode || {})[pt] || F.def)) fbad.push(k + '.' + pt + ': drawn as ' + cur); if (hv !== (H ? 'true' : 'false')) fbad.push(k + '.' + pt + ': hover ' + hv);
+        if (sz === (pt === 'icon' || pt === 'commit')) fbad.push(k + '.' + pt + ': size control ' + sz); }); });
+    ok(Object.keys(fx).length === 8 && !fbad.length, 'D-093 · on all 8 columns: no control for the glyph\'s size or colour or the marks\' size and gap; one row per part, with exactly the forms its type takes (the drawn one pressed), a size for text parts only, and its hover switch pressed where the bench gave it its own card', fbad.slice(0, 6));
+    const saved = await p.evaluate(() => { const X = window.__allepEx, o = JSON.parse(window.localStorage.getItem(X.key) || '{"col":{}}'); o.col = o.col || {}; o.col.table = Object.assign({}, o.col.table || {}, { look: Object.assign(JSON.parse(JSON.stringify(X.state.col.table.look)), { sqSize: 22, sqGap: 0, iconCol: 'entity', size: Object.assign({}, X.state.col.table.look.size, { icon: 24, name: 15 }) }) });
+      window.localStorage.setItem(X.key, JSON.stringify(o)); return true; });
+    await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400);
+    const rd = await p.evaluate(() => { const X = window.__allepEx, L = X.state.col.table.look, F = window.__allep.data.ex.fixed.table, w = document.querySelector('#exgrid .excol[data-k="table"] .exw'), g = w.querySelector('[data-part="icon"] svg');
+      return { L: [L.sqSize, L.sqGap, L.iconCol, L.size.icon, L.size.name], F: [F.sqSize, F.sqGap, F.iconCol, F.icon], sq: w.style.getPropertyValue('--sq'), gw: g && g.getAttribute('width'), gc: g && getComputedStyle(g).color }; });
+    ok(saved && rd.L[0] === rd.F[0] && rd.L[1] === rd.F[1] && rd.L[2] === rd.F[2] && rd.L[3] === rd.F[3] && rd.L[4] === 15 && rd.sq === rd.F[0] + 'px' && +rd.gw === rd.F[3],
+      'D-093 · a saved look that set the marks to 22px with no gap, the glyph to 24px in its entity\'s colour is read with those put back (' + rd.F.join(' · ') + ') — the name size it set (15) is kept', rd);
+    await p.evaluate(() => { try { window.localStorage.removeItem('gabe:allep:bench:v3'); } catch (e) {} }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });
+    await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400); await p.evaluate(() => window.__allepEx.pick('table', 'table:users')); await p.waitForTimeout(150);
+    /* (2) the forms, by real clicks: the count as the number alone in its box, the channel as a dot, the class with its name before it, the entity as its glyph */
+    const clickForm = async (pt, v) => { const s0 = TC + ' .expr[data-part="' + pt + '"] [data-xform][data-v="' + v + '"]'; await p.$eval(s0, (e) => e.scrollIntoView({ block: 'center' })); await p.click(s0); await p.waitForTimeout(120); };
+    await clickForm('count', 'number'); await clickForm('rw', 'dot'); await clickForm('model', 'label'); await clickForm('ent', 'icon');
+    const fm = await p.evaluate(() => { const b = document.querySelector('#exgrid .excol[data-k="table"] .blk'), q = (s) => b.querySelector(s), cnt = q('[data-part="count"]'), rw = q('[data-part="rw"]'), md = q('[data-part="model"]'), en = q('[data-part="ent"]');
+      return { cnt: cnt && [cnt.textContent, cnt.classList.contains('badge'), cnt.getAttribute('aria-label')], rw: rw && [rw.classList.contains('exdotw'), rw.getAttribute('aria-label'), rw.textContent], md: md && [(md.querySelector('.exlab') || {}).textContent, md.textContent],
+        en: en && [!!en.querySelector('svg'), en.textContent.trim()], line: document.querySelector('#exgrid .excol[data-k="table"] .exline').textContent }; });
+    const c0 = D.ex.cat['table:users'], n0 = c0.cols.length + (c0.nmore || 0);
+    ok(fm.cnt && fm.cnt[0] === String(n0) && fm.cnt[1] && fm.cnt[2] === CW.unit.fields.many.replace('{n}', n0) && fm.rw && fm.rw[0] && fm.rw[1] === 'RW' && !fm.rw[2] && fm.md && fm.md[0] === CW.parts.table.model.name && fm.md[1] === CW.parts.table.model.name + c0.model
+       && fm.en && fm.en[0] && !fm.en[1] && fm.line.includes('chip dot') && fm.line.includes('count number') && fm.line.includes('model label') && fm.line.includes('entity icon') && fm.line.endsWith('(' + D.words.copy.his + ')'),
+      'D-093 · four clicks: the count is the number alone in its box (' + (fm.cnt || [])[0] + ', its unit in its label), the channel a dot, the class says its name before it, the entity is its glyph — and the copy line says each, the look now his', fm);
+    /* (3) the hover switches, by real clicks and a real hover: the name gets a card of its own; the glyph gives the block's card; the copy line says both; back to the default puts all back */
+    const sw = async (pt) => { const s0 = TC + ' .expr[data-part="' + pt + '"] .exhov'; await p.$eval(s0, (e) => e.scrollIntoView({ block: 'center' })); await p.click(s0); await p.waitForTimeout(120); };
+    await sw('name'); await sw('icon');
+    const hv = async (pt) => { const h = await p.$(TC + ' .blk [data-part="' + pt + '"]'); await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const bb = await h.boundingBox(); await p.mouse.move(5, 5); await p.waitForTimeout(60);
+      await p.mouse.move(bb.x + Math.min(bb.width / 2, 20), bb.y + bb.height / 2); await p.waitForTimeout(160);
+      return p.evaluate(() => { const t = document.getElementById('tip'), c = t.querySelector('.cdc'); return { show: t.getAttribute('data-show'), card: c && c.getAttribute('data-card'), reg: c && c.getAttribute('data-reg'), rp: c && c.getAttribute('data-rp'), is: c && c.getAttribute('data-card-issues'), txt: c ? c.innerText.replace(/\s+/g, ' ').slice(0, 160) : '' }; }); };
+    const hN = await hv('name'), hI = await hv('icon'); await p.mouse.move(5, 5);
+    const ln3 = await p.$eval(TC + ' .exline', (e) => e.textContent);
+    ok(hN.show === 'true' && hN.card === 'reg' && hN.reg === 'part' && hN.rp === 'name' && hN.is === '0' && hN.txt.includes('users') && hI.show === 'true' && hI.card === 'table' && ln3.includes(' · ' + CW.ctl.hover + ' ' + CW.parts.table.icon.name + ' block, ' + CW.parts.table.name.name + ' own'),
+      'D-093 · two clicks on the switches: the name now has a card of its own (users, where it is defined; no rule broken), the glyph gives the block\'s card, and the copy line says both', { hN, hI, line: ln3.slice(ln3.indexOf(' · width') - 80) });
+    await p.$eval(TC + ' .exreset', (e) => e.scrollIntoView({ block: 'center' })); await p.click(TC + ' .exreset'); await p.waitForTimeout(120);
+    ok((await p.$eval(TC + ' .exline', (e) => e.textContent)).includes(' · ' + XD.his + ' · '), 'D-093 · back to the default puts the forms and the hovers back: the table is on his DATA line again');
+    /* (4) every part of every element of this endpoint, every switch on: each part's own card is made and breaks no rule */
+    const pc = await p.evaluate(() => { const C = window.__allepCard, D0 = window.__allep.data, r = D0.rows.filter((x) => x.id === window.__allep.open || x.id === 'POST /cooking/sessions')[0], o = { n: 0, issues: [], none: [] };
+      Object.keys(D0.ex.regions).forEach((k) => (r.ex[k] || []).forEach((e) => { const it = { k, id: e[0], role: e[1], ep: r.id, o: e[2] };
+        Object.keys(D0.ex.regions[k]).forEach((pt) => { if (pt === 'marks' || D0.ex.regions[k][pt] !== 'title') return; const S0 = C.region(k, it, 'part', pt, 0, null); if (!S0) { o.none.push(k + '.' + pt); return; } o.n++;
+          const d = document.createElement('div'); d.innerHTML = C.make('reg', S0); const cc = d.firstChild; if (+cc.getAttribute('data-card-issues')) o.issues.push(k + ' ' + e[0] + ' ' + pt + ' → ' + cc.getAttribute('data-card-issue')); }); }));
+      return o; });
+    ok(pc.n > 100 && !pc.issues.length && !pc.none.length, 'D-093 · every title part of every element of ' + E + ' switched on: ' + pc.n + ' cards of their own, none breaks a rule of the card', { issues: pc.issues.slice(0, 4), none: pc.none.slice(0, 4) });
+    ok(!errs.length, 'D-093 · the clicks raised no error', errs.slice(0, 3)); }
   await labp.close(); }
 }
 

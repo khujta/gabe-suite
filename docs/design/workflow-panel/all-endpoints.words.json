@@ -1,6 +1,7 @@
 {
   "_about": "Authored words for all-endpoints.html — the only strings on the page that are not facts. gen-all-endpoints.py refuses to build when a line here types a number (a {token} the generator or the page fills instead) or says a word D-018 took out. Tokens the generator fills are listed in its `tok`; the ones the page fills while it runs are listed in _runtime.",
   "_runtime": [
+    "part",
     "check",
     "fork",
     "switch",
@@ -2867,7 +2868,9 @@
       "scopeHere": { "verb": "show", "obj": "the elements of this endpoint" }, "scopeAll": { "verb": "show", "obj": "the elements of every endpoint" },
       "width": { "verb": "set the width of the element to", "obj": "{v}" }, "role": { "verb": "narrow to", "obj": "{v}" }, "roleAll": { "verb": "show", "obj": "every role" },
       "prev": { "verb": "show", "obj": "the element before" }, "next": { "verb": "show", "obj": "the element after" },
-      "copy": { "verb": "copy", "obj": "this column's settings as one line" }, "reset": { "verb": "put back", "obj": "this column's first look" } },
+      "copy": { "verb": "copy", "obj": "this column's settings as one line" }, "reset": { "verb": "put back", "obj": "this column's first look" },
+      "form": { "verb": "show", "obj": "{part} as {v}" }, "size": { "verb": "set the size of", "obj": "{part}" },
+      "hovOn": { "verb": "give", "obj": "{part} a hover card of its own" }, "hovOff": { "verb": "give", "obj": "{part} the block's hover card" } },
     "roles": {
       "table": { "r": { "name": "reads" }, "w": { "name": "writes" }, "rw": { "name": "reads and writes" } },
       "schema": { "in": { "plain": "The shape FastAPI reads the request's body into." }, "out": { "plain": "The shape the reply's body is built from." },
@@ -2952,7 +2955,8 @@
     },
     "ctl": {
       "widthIs": "width", "parts": "parts", "size": "size", "colour": "colour", "tray": "not drawn", "line": "line {i}", "left": "left", "right": "right",
-      "partsPlain": "Drag a part to another line or side, or into not drawn to hide it. Click a part to show its size below.",
+      "partsPlain": "Drag a part to another line or side, or into not drawn to hide it.",
+      "each": "each part", "box": "box", "marks": "marks", "hover": "hover", "theMarks": "the marks",
       "sizeOf": "size of {name}", "pickPart": "Click a part under parts to size it.", "mode": "shown as", "markSize": "mark size", "gap": "gap between marks",
       "glyph": "glyph colour", "edgeSide": "edge", "edgePat": "edge pattern", "edgeW": "edge thickness", "chipBox": "chip box", "chipFill": "chip fill",
       "cntBox": "count box", "cntFill": "count fill", "enc": "marks drawn as", "pal": "marks coloured by", "shape": "mark corners",
@@ -2960,6 +2964,18 @@
       "prev": "the element before", "next": "the element after", "all": "all", "allPlain": "Every role.",
       "none": "nothing of this kind on this endpoint", "noneRole": "no element of this kind has this role here",
       "on": "drawn as it is on {ep}", "pickEl": "pick the element to draw"
+    },
+    "form": { "_about": "D-093: what a part shows of its data — the forms its type can take (_ae_bench.py FORM_TYPES); the first of a type is what the block drew before.",
+      "chip": { "name": "in its box", "plain": "The word in its coloured box." },
+      "word": { "name": "the word", "plain": "The value alone, without a box or a glyph." },
+      "dot": { "name": "a dot", "plain": "A dot in its colour; the word is on the hover." },
+      "badge": { "name": "number and unit, boxed", "plain": "The number and what it counts, in a box." },
+      "number": { "name": "the number, boxed", "plain": "The number alone, in a box; what it counts is on the hover." },
+      "words": { "name": "number and unit", "plain": "The number and what it counts, without a box." },
+      "bare": { "name": "the number", "plain": "The number alone; what it counts is on the hover." },
+      "both": { "name": "glyph and word", "plain": "The part's glyph and its value." },
+      "icon": { "name": "the glyph", "plain": "The glyph alone; the value is on the hover." },
+      "label": { "name": "name and word", "plain": "The part's name before its value: class User." }
     },
     "face": {
       "noWords": "says nothing of its own", "answer": "{v} of {n} fields", "inside": "inside {name}", "handler": "the handler", "level": "level {i} · called by {name}",
@@ -3068,7 +3084,7 @@
         "way-branch": "{fork}",
         "way-exit": "the way out"
       },
-      "part": { "marks": "mark" },
+      "part": { "marks": "mark", "test.role": "role" },
       "ends": "stops it",
       "fails": "if it fails",
       "taken": "this way takes it",
