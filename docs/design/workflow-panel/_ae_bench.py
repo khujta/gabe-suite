@@ -443,7 +443,10 @@ def per_endpoint(L: dict, fj: dict, r: dict, X: dict, phase_stage: dict, write_o
         cat[i] = {"k": "end", "n": str(x.get("status")), "ep": ep, "st": x.get("status"), "kd": x["kind"], "sg": phase_stage.get(x.get("phase"), "HANDLER") if x["kind"] != "success" else "ANSWER",
                   "say": x.get("detail"), "code": x.get("code"), "at": x.get("at") or rs.get("source"), "via": x.get("via"), "pred": x.get("pred"), "form": x.get("form"),
                   "decl": decl.get(x["id"]), "hd": sorted((rs.get("headers") or {}).items()), "media": rs.get("media"),
-                  "fields": len(rs.get("fields") or []), "model": rs.get("model"), "tests": [q[0] for q in tests_of(x)], "paths": by_exit.get(x["id"], []),
+                  "fields": len(rs.get("fields") or []), "model": rs.get("model"),
+                  # D-098 · the portrait's answer and rules, as the lab's exitPortrait reads them: the field names, the body's keys, each rule that refuses the body [where, kind, rule]
+                  "fl": [str(f.get("name") if isinstance(f, dict) else f) for f in rs.get("fields") or []], "body": sorted(rs["body"]) if isinstance(rs.get("body"), dict) else [],
+                  "cases": [[".".join(map(str, c["loc"])) if isinstance(c.get("loc"), list) else str(c.get("loc") or c.get("param") or "body"), c.get("type"), c.get("rule")] for c in x.get("cases") or []], "tests": [q[0] for q in tests_of(x)], "paths": by_exit.get(x["id"], []),
                   # CR-28 · F26: what its plain line needs — the phase it leaves at, a limiter's name and numbers, the check that stops it
                   # (its host and its condition as written), the header a login scheme reads, the schema a 422 checks
                   "ph": x.get("phase"), "lim": lim_x.get(x["id"]), "hdr": CX["hdr"].get(x["id"]),

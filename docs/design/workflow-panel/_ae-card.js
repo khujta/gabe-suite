@@ -596,11 +596,35 @@
     if (ck === "other") root.setAttribute(S0.ik && CDIK[S0.ik] || String(S0.ik).indexOf("end:") === 0 || !S0.ik ? "data-card-unbound" : "data-card-unknown-kind", S0.ik || "");   /* P3.2: a kind no table lists is kept, counted, and judged in a batch */
     return root.outerHTML; }
 
+  /* D-098 · THE PORTRAIT — what the endpoint lab opens in its portrait when an element is clicked, rebuilt here on the bench's own data for the kind being tailored.
+     The ending's is built (the lab's exitPortrait, _lab-ep-panels.js): its head; its facts; the lines its hover card says (before · checks · gives); the answer it sends;
+     the rules that refuse the body; every way that ends here, drawn as its strip; the tests that prove it. A kind the lab opens no portrait for says so, and a kind whose
+     portrait is not rebuilt yet says that — never a partial one */
+  var PTK = { end: "built", table: "owed", schema: "owed", fn: "owed", test: "owed", gate: "none", hook: "none", inf: "none" };
+  function cdPortrait(k, blk) { var PW = XW.portrait, box = el("div", "expt"), st = PTK[k] || "none"; box.setAttribute("data-pt", k); box.setAttribute("data-state", st);
+    if (st !== "built") { box.appendChild(el("p", "exhint", fill(PW[st], { kind: XW.kinds[k].name }))); return box; }
+    var S0 = blk ? cdBlock(blk) : null, c = S0 && S0.c; if (!c) { box.setAttribute("data-state", "empty"); box.appendChild(el("p", "exhint", PW.empty)); return box; }
+    var it = S0.it, L = cdLook("end"), F = PW.f, h = el("div", "expth"), g = el("span", "cdg");
+    g.appendChild(XPART.end("icon", c, it, L, 18).firstChild); h.appendChild(g); h.appendChild(cdStatusPill(c.st)); h.appendChild(xWrap(el("b"), xEndWords(c))); h.appendChild(el("span", "cdv", c.sg)); box.appendChild(h);
+    var sec = function (t, n, key) { var s = el("div", "exptsec"); s.setAttribute("data-ps", key); s.appendChild(el("h5", "exptst", n == null ? t : t + " · " + n)); box.appendChild(s); return s; };
+    var row = function (s, l, v) { var r = el("div", "exptr"); r.appendChild(el("span", "exptl", l)); r.appendChild(xWrap(el("span", "exptv"), v == null || v === "" ? "—" : String(v))); s.appendChild(r); };
+    var s1 = sec(PW.sec.facts, null, "facts"); row(s1, F.stage, c.sg); row(s1, F.where, c.at); row(s1, F.how, c.via ? xHow(c.via) : null); row(s1, F.check, c.pred); row(s1, F.code, c.code); row(s1, F.form, c.form);
+    row(s1, F.decl, c.decl ? PW.decl : PW.notDecl);
+    var d = S0.P ? cdDetail(S0.P) : null; if (d) sec(PW.sec.lines, null, "lines").appendChild(d);
+    var s3 = sec(PW.sec.answer, null, "answer"); row(s3, F.media, c.media); row(s3, F.model, c.model); row(s3, F.fields, (c.fl || []).join(" · ")); row(s3, F.body, (c.body || []).join(" · "));
+    row(s3, F.headers, (c.hd || []).map(function (q) { return q[0] + (q[1] && q[1] !== "…" ? ": " + q[1] : ""); }).join(" · ") || PW.noHdr);
+    if ((c.cases || []).length) { var s4 = sec(PW.sec.rules, c.cases.length, "rules"); c.cases.forEach(function (q) { row(s4, q[0], [q[1], q[2]].filter(Boolean).join(" · ")); }); }
+    var s5 = sec(PW.sec.ways, c.paths.length, "ways"), wr = el("div", "exw exptw"); wr.setAttribute("data-here", L.here);
+    wr.style.setProperty("--sq", L.sqSize + "px"); wr.style.setProperty("--sqg", L.sqGap + "px"); wr.style.setProperty("--here-w", L.hereW + "px");
+    c.paths.forEach(function (pid, i) { var r = el("div", "exptway"); r.appendChild(el("span", "exptl", String(i + 1))); r.appendChild(xStrip("end", Object.assign({}, c, { paths: [pid] }), it, L)); wr.appendChild(r); }); s5.appendChild(wr);
+    var s6 = sec(PW.sec.tests, (c.tests || []).length, "tests"), tl = el("div", "expttests"); (c.tests || []).forEach(function (t) { tl.appendChild(cdPill(t, EX.col.opc.read, L)); });
+    if (!(c.tests || []).length) tl.appendChild(el("span", "exhint", PW.noTest)); s6.appendChild(tl);
+    return box; }
   /* the hover handler's one door: a card for what is hovered, or null (the page's other hovers stay as they are) */
   function cardFor(t) { var k = t.getAttribute("data-tip"), S0 = null;
     try { S0 = k === "mochip" ? cdChip(t) : k === "modxn" ? cdNode(t) : k === "exblk" ? cdBlock(t) : k === "exreg" ? cdRegion(t) : k === "mojy" ? cdJourney(t) : k === "moilf" ? cdLane(t) : null; } catch (e) { CDLOG.push({ ck: "error", ik: k, name: t.textContent.slice(0, 40), issues: ["error: " + e.message] }); if (window.console) console.warn("card:", e); return null; }
     return S0 ? card(S0.ck, S0) : null; }
   function hoverFor(t) { var h = cardFor(t); tip.classList.toggle("cd", !!h); return h || tipFor(t); }
   window.__allepCard = { make: card, spec: CDSPEC, subject: function (t) { var k = t.getAttribute("data-tip"); return k === "mochip" ? cdChip(t) : k === "modxn" ? cdNode(t) : k === "exblk" ? cdBlock(t) : k === "exreg" ? cdRegion(t) : k === "mojy" ? cdJourney(t) : k === "moilf" ? cdLane(t) : null; },
-    region: cdRegionOf, providers: CDREG,
+    region: cdRegionOf, providers: CDREG, portrait: cdPortrait,
     guard: cdGuard, log: CDLOG, kinds: CDIK, words: CDW, stop: CDSTOP };

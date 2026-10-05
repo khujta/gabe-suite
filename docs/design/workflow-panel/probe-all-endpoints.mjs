@@ -2768,6 +2768,10 @@ ok(!errs.length, 'no page error after the D-070 checks', errs);
   ok(labSha() === LAB0, 'the lab\'s own facts file is untouched by the fixture build'); }
 ok(!errs.length, 'no page error on the fixture', errs);
 
+/* D-098: one kind is tailored at a time — its controls (the four tabs, the copy line, back-to-default) sit in ONE row under the columns, #exact,
+   built for the active kind only; tailor(k) makes k the active one by a real click on its column's square, CT(k) names that row */
+const CT = (k) => '#exact[data-k="' + k + '"]';
+const tailor = async (k) => { if (await p.$(CT(k))) return; const s0 = '#exgrid .excol[data-k="' + k + '"] .extailor'; await p.$eval(s0, (e) => e.scrollIntoView({ block: 'center' })); await p.click(s0); await p.waitForTimeout(150); };
 /* 8 · D-071 · THE EXAMPLES BENCH (his L-23 · L-08 · L-13 · L-11) — smoke checks (D-037): the fixture's in-flight column says absent;
    then on the page: eight columns in his order between ONE ENDPOINT and BY MOMENT, each drawing a block; the table's copy line carries his
    DATA line's block segment word for word; a real drag moves a part in the drawn block and in the copy line; a part dragged into "not drawn"
@@ -2779,10 +2783,10 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(fx8 && !fx8.blk && fx8.say.startsWith(D.words.absent), 'D-071 · on the arms-off fixture the in-flight column says absent and draws no block', fx8);
   await open(PAGE); await p.click('#board tr.row[data-ep="POST /cooking/sessions"] td.id'); await p.waitForTimeout(200);
   await p.$eval('#sec-ex', (e) => e.scrollIntoView({ block: 'start' })); await p.waitForTimeout(80);
-  const c8 = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol')].map((c) => [c.getAttribute('data-k'), !!c.querySelector('.blk'), (c.querySelector('.exline') || {}).textContent || '']));
+  const c8 = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol')].map((c) => [c.getAttribute('data-k'), !!c.querySelector('.blk'), window.__allepEx.copy(c.getAttribute('data-k')) || '']));   /* CHANGED 2026-10-05 (D-098): a column's copy line is in the row of the kind tailored; the line itself is the bench's copy */
   ok(JSON.stringify(c8.map((x) => x[0])) === JSON.stringify(['end', 'table', 'schema', 'fn', 'test', 'gate', 'hook', 'inf']) && JSON.stringify(EXD.kinds) === JSON.stringify(c8.map((x) => x[0])),
     'D-071 · eight columns across the page in his order: ending · table · schema · function · test · gate or decision · client hook · in-flight', c8.map((x) => x[0]));
-  ok(c8.every((x) => x[1] && x[2].startsWith(WX.copy.where + ' · ')), 'D-071 · every column draws its example as a block, with its copy line under it', c8.filter((x) => !x[1]).map((x) => x[0]));
+  ok(c8.every((x) => x[1] && x[2].startsWith(WX.copy.where + ' · ')), 'D-071 · every column draws its example as a block, and has its copy line', c8.filter((x) => !x[1]).map((x) => x[0]));
   const tl = c8[1][2];
   ok(tl.includes(' · ' + EXD.his + ' · ') && tl.endsWith('(' + WX.whose.his.name + ', ' + WX.look.table.ruled + ')') && EXD.his.startsWith('block block (icon on model, chip on, name on, entity both, count badge, model both) · edge left solid 2px'),
     'D-071 · the table boots on his DATA line: its copy line carries the block segment he pasted, word for word, and says whose it is', tl);
@@ -2790,17 +2794,19 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(JSON.stringify(tb0) === JSON.stringify(['icon name | ', 'ent | count rw', 'model | ']), 'D-071 · the table block draws its parts on his three lines', tb0);
   /* a real drag: the channel chip from line 2's right side to line 1's right side */
   /* CHANGED 2026-10-02 (L-36, D-081): the parts' zones are always on the page — no fold to open */
-  await p.dragAndDrop(CX + '[data-k="table"] .exz[data-line="1"][data-side="r"] .expc[data-part="rw"]', CX + '[data-k="table"] .exz[data-line="0"][data-side="r"]'); await p.waitForTimeout(120);
+  /* CHANGED 2026-10-05 (D-098): the zones are the active kind's, in the row under the columns — the table is made the one tailored first */
+  await tailor('table');
+  await p.dragAndDrop(CT('table') + ' .exz[data-line="1"][data-side="r"] .expc[data-part="rw"]', CT('table') + ' .exz[data-line="0"][data-side="r"]'); await p.waitForTimeout(120);
   const dr = await p.evaluate(() => ({ l1: [...document.querySelectorAll('#exgrid .excol[data-k="table"] .blk .bkln:first-child [data-part]')].map((n) => n.getAttribute('data-part')),
-    cp: document.querySelector('#exgrid .excol[data-k="table"] .exline').textContent }));
+    cp: document.querySelector('#exact[data-k="table"] .exline').textContent }));
   ok(dr.l1.join(' ') === 'icon name rw' && dr.cp.includes(' · lines icon name | rw / ent | count / model | — · ') && dr.cp.endsWith('(' + D.words.copy.his + ')'),
     'D-071 · dragging the channel chip to line 1 moves it in the drawn block and in the copy line, which now says the look is his choice', dr);
   await p.evaluate(() => window.__allepEx.move('table', 'model', 'off')); await p.waitForTimeout(80);
-  const off = await p.evaluate(() => ({ drawn: !!document.querySelector('#exgrid .excol[data-k="table"] .blk [data-part="model"]'), tray: [...document.querySelectorAll('#exgrid .excol[data-k="table"] .exz.exoff .expc')].map((n) => n.getAttribute('data-part')),
-    cp: document.querySelector('#exgrid .excol[data-k="table"] .exline').textContent }));
+  const off = await p.evaluate(() => ({ drawn: !!document.querySelector('#exgrid .excol[data-k="table"] .blk [data-part="model"]'), tray: [...document.querySelectorAll('#exact[data-k="table"] .exz.exoff .expc')].map((n) => n.getAttribute('data-part')),
+    cp: document.querySelector('#exact[data-k="table"] .exline').textContent }));
   ok(!off.drawn && off.tray.join() === 'model' && off.cp.includes(', model off)') && off.cp.includes(' · ' + WX.ctl.tray + ' model '), 'D-071 · a part dragged into not drawn leaves the block, and the copy line says so', off);
-  await p.click(CX + '[data-k="table"] .exreset'); await p.waitForTimeout(80);
-  ok((await p.$eval(CX + '[data-k="table"] .exline', (e) => e.textContent)).includes(' · ' + EXD.his + ' · '), 'D-071 · back to the default puts the table on his DATA line again');
+  await p.click(CT('table') + ' .exreset'); await p.waitForTimeout(80);
+  ok((await p.$eval(CT('table') + ' .exline', (e) => e.textContent)).includes(' · ' + EXD.his + ' · '), 'D-071 · back to the default puts the table on his DATA line again');
   /* EX-4 · the gate column's role filter narrows its list */
   const g0 = await p.$$eval(CX + '[data-k="gate"] .exselect option', (o) => o.length);
   await p.click(CX + '[data-k="gate"] .exrc[data-role="rule"]'); await p.waitForTimeout(80);
@@ -2836,7 +2842,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
   await p.mouse.move(0, 0); await p.waitForTimeout(60);
   /* the page's copy text: the bench's two options, then one line per kind, after BY MOMENT's (CHANGED 2026-09-30, review S4-06) */
   const cp8 = (await p.$eval('#out', (e) => e.value)).split('\n').filter((l) => l.startsWith(WX.copy.where + ' · '));
-  ok(cp8.length === 10 && cp8[3] === (await p.$eval(CX + '[data-k="table"] .exline', (e) => e.textContent)), 'D-071 · the page\'s copy text carries each example\'s line, the table\'s as its column shows it', cp8.length);
+  ok(cp8.length === 10 && cp8[3] === (await p.$eval(CT('table') + ' .exline', (e) => e.textContent)), 'D-071 · the page\'s copy text carries each example\'s line, the table\'s as its column shows it', cp8.length);
   /* review smoke (D-037): N3-07 · CR-16 · F26 no twin faces in any column's list, the login check is its function; N3-24 the functions
      are BY MOMENT's members; N3-19 the commit is the handler's; N3-14 a test that only checks while setting up proves nothing; CR-25 a
      badge names its unit; CR-26 no title text overflows its part; CR-27 in-flight kinds in BY MOMENT's words; S4-04 · S4-30 dashed only
@@ -2852,9 +2858,9 @@ ok(!errs.length, 'no page error on the fixture', errs);
     const ifk = D0.words.enc.fam.ifk.vals; out.ifk = [...document.querySelectorAll('#exgrid .excol[data-k="inf"] .exrc[data-role]')].map((b) => b.getAttribute('data-role')).filter((r) => r && ifk[r] && b0(r));
     function b0(r) { const b = document.querySelector('#exgrid .excol[data-k="inf"] .exrc[data-role="' + r + '"]'); return !b.textContent.startsWith(ifk[r].name + ' '); }
     out.dash = [getComputedStyle(document.querySelector('#exgrid .exwho[data-whose="lab"]')).borderTopStyle];
-    const ctls = [...document.querySelectorAll('#exgrid .exreset, #exgrid .excopy, #exgrid .exscope .opt, #exgrid .exwidth .opt, #exgrid .exstep')];   /* L-36: each icon's hover is a verb and its object */
+    const ctls = [...document.querySelectorAll('#sec-ex .exreset, #sec-ex .excopy, #exgrid .exscope .opt, #exgrid .exwidth .opt, #exgrid .exstep, #exgrid .extailor')];   /* CHANGED 2026-10-05 (D-098): back-to-default and copy are the row's; each column's tailor square joins */   /* L-36: each icon's hover is a verb and its object */
     out.ctls = ctls.length; out.tips = ctls.filter((c) => c.getAttribute('data-tip') === 'exctl' && c.getAttribute('data-verb') && c.getAttribute('data-obj') && c.getAttribute('aria-label') === c.getAttribute('data-verb') + ' ' + c.getAttribute('data-obj')).length;
-    out.folds = document.querySelectorAll('#exgrid .exctl .exfold, #exgrid .exctl [aria-expanded], #exgrid .exctl details').length;
+    out.folds = document.querySelectorAll('#sec-ex .exctl .exfold, #sec-ex .exctl [aria-expanded], #sec-ex .exctl details').length;
     return out; });
   ok(!sm.twins.length && JSON.stringify(sm.login) === JSON.stringify(['get_auth_context']), 'review N3-07 · CR-16 · F26 · no two items of one column wear the same face; the login check is its dependency function', sm);
   const CF = new Set(Object.values(FJ.steps || {}).filter((s) => s.op === 'commit').map((s) => s.fn));   /* this probe's own reading of the feed */
@@ -3039,21 +3045,24 @@ ok(!errs.length, 'no page error on the fixture', errs);
   await open(PAGE, 'default'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
   /* (3) the bench's controls: icon squares, each a verb and its object; no fold; the copy line hidden, whole in the clipboard */
   await p.evaluate(() => { window.__w81copied = null; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: (x) => { window.__w81copied = x; return Promise.resolve(); } } }); });
-  const bn = await p.evaluate(() => { const c = document.querySelector('#exgrid .excol[data-k="table"]'), ic = [...c.querySelectorAll('.exscope .opt, .exwidth .opt, .exstep, .exreset, .excopy')];
-    const line = c.querySelector('.exline'); return { n: ic.length, textless: ic.every((b) => !b.textContent.trim() && b.querySelector('svg')), verbs: ic.map((b) => b.getAttribute('data-verb') + ' ' + b.getAttribute('data-obj')),
+  /* CHANGED 2026-10-05 (D-098): the column keeps its squares (scope · width · step · tailor); back-to-default, copy, the line and the tabs are the row's, the table made the one tailored */
+  await tailor('table');
+  const bn = await p.evaluate(() => { const c = document.querySelector('#exgrid .excol[data-k="table"]'), r = document.querySelector('#exact[data-k="table"]'), ic = [...c.querySelectorAll('.exscope .opt, .exwidth .opt, .exstep, .extailor'), ...r.querySelectorAll('.exreset, .excopy')];
+    const line = r.querySelector('.exline'); return { n: ic.length, textless: ic.every((b) => !b.textContent.trim() && b.querySelector('svg')), verbs: ic.map((b) => b.getAttribute('data-verb') + ' ' + b.getAttribute('data-obj')),
       lineHidden: !!line && line.hidden && line.offsetParent === null && line.textContent.length > 40, folds: c.querySelectorAll('.exfold, details, [aria-expanded]').length,
-      sections: [...c.querySelectorAll('.exctl .extab')].map((h) => h.textContent), vis: [...c.querySelectorAll('.exctl .extp')].filter((x) => x.getBoundingClientRect().height > 10).map((x) => x.getAttribute('data-tp')).join(), line: line.textContent }; });
-  await p.$eval('#exgrid .excol[data-k="table"] .excopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click('#exgrid .excol[data-k="table"] .excopy'); await p.waitForTimeout(120);
+      sections: [...r.querySelectorAll('.exctl .extab')].map((h) => h.textContent), vis: [...r.querySelectorAll('.exctl .extp')].filter((x) => x.getBoundingClientRect().height > 10).map((x) => x.getAttribute('data-tp')).join(), line: line.textContent }; });
+  await p.$eval(CT('table') + ' .excopy', (e) => e.scrollIntoView({ block: 'center' })); await p.click(CT('table') + ' .excopy'); await p.waitForTimeout(120);
   const copied = await p.evaluate(() => window.__w81copied);
-  ok(bn.n === 10 && bn.textless && bn.verbs.every((v) => v.length > 8 && !/undefined/.test(v)) && bn.lineHidden && !bn.folds && JSON.stringify(bn.sections) === JSON.stringify(['order', 'show', 'format', 'hover'].map((t) => XW.ctl.tab[t].name)) && bn.vis === 'order' && copied === bn.line,
-    'D-081 · L-36 · CHANGED D-094 · the table column\'s controls are ' + bn.n + ' icon squares (no text), each a verb and its object; the rest sits in four tabs, order · show · format · hover, the order tab open (no fold); the copy line is not shown and the copy button copies all of it', { bn: { ...bn, line: bn.line.slice(0, 60) }, copied: (copied || '').slice(0, 60) });
+  ok(bn.n === 11 && bn.textless && bn.verbs.every((v) => v.length > 8 && !/undefined/.test(v)) && bn.lineHidden && !bn.folds && JSON.stringify(bn.sections) === JSON.stringify(['order', 'show', 'format', 'hover'].map((t) => XW.ctl.tab[t].name)) && bn.vis === 'order' && copied === bn.line,
+    'D-081 · L-36 · CHANGED D-094 · D-098 · the table\'s controls are ' + bn.n + ' icon squares (no text), each a verb and its object; the rest sits in four tabs, order · show · format · hover, the order tab open (no fold); the copy line is not shown and the copy button copies all of it', { bn: { ...bn, line: bn.line.slice(0, 60) }, copied: (copied || '').slice(0, 60) });
   /* (4) the width of a column — CHANGED 2026-10-03 (D-087, his words): four options, "full" removed; a width narrows ONLY the element drawn at the top of the
      column, never the column's box — the head, the squares, the chips, the picker, the parts/size/colour controls and the grid keep the default's place and size
      (what sits under the element keeps its x and width, and its distance from the element; it moves down only as far as the element grew taller). A saved "full" reads as the default. */
   const w0 = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol[data-k="end"] .exwidth .opt')].map((b) => [b.getAttribute('data-v'), b.getAttribute('aria-checked'), b.getAttribute('data-pick'), getComputedStyle(b).borderTopStyle]));
   const optSets = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol .exwidth')].map((g) => [...g.querySelectorAll('.opt')].map((b) => b.getAttribute('data-v')).join(',')));
   const geo = (k) => p.evaluate((k) => { const c = document.querySelector('#exgrid .excol[data-k="' + k + '"]'), R = (e) => { if (!e) return null; const q = e.getBoundingClientRect(); return { x: Math.round(q.left), y: Math.round(q.top + window.scrollY), w: Math.round(q.width), h: Math.round(q.height) }; };
-    const g = (s) => R(c.querySelector(s)); return { col: R(c), head: g('.exhd'), sq: g('.extop'), roles: g('.exroles'), pick: g('.expick'), card: g('.exw'), ctl: g('.exctl'), copy: g('.excopy'), reset: g('.exreset'), w: c.getAttribute('data-w'), gap: ['.exctl', '.excopy', '.exreset'].map((q) => c.querySelector(q).getBoundingClientRect().top - c.querySelector('.exw').getBoundingClientRect().bottom),
+    const g = (s) => R(c.querySelector(s)); return { col: R(c), head: g('.exhd'), sq: g('.extop'), roles: g('.exroles'), pick: g('.expick'), card: g('.exw'), ctl: R(document.querySelector('#exact .exctl')), copy: R(document.querySelector('#exact .excopy')), reset: R(document.querySelector('#exact .exreset')), w: c.getAttribute('data-w'),
+      gap: [document.getElementById('exact').getBoundingClientRect().top - document.getElementById('exgrid').getBoundingClientRect().bottom],   /* CHANGED 2026-10-05 (D-098): the controls are the row's, under the grid — same x and width, the same distance from the grid */
       grid: [...document.querySelectorAll('#exgrid .excol')].map((x) => { const q = x.getBoundingClientRect(); return Math.round(q.left) + ':' + Math.round(q.width); }).join('|') }; }, k);
   const eqBox = (a, b) => JSON.stringify(a) === JSON.stringify(b), geoRes = {}, geoBad = [];
   for (const k of ['end', 'table']) {
@@ -3074,17 +3083,18 @@ ok(!errs.length, 'no page error on the fixture', errs);
       + ' px) at the column\'s own place, the same box and grid, head · squares · chips · picker unmoved, the controls under it in the same x and width, the element left-aligned', { geoBad, w0, optSets });
   /* the choice is in the column's copy line and kept per viewer; a saved "full" (an older bench) and a "full" set through the page's own handle read as the default — no error */
   const errs0 = errs.length;
+  await tailor('end');   /* D-098: the ending's copy line is the row's when the ending is the one tailored */
   await p.click('#exgrid .excol[data-k="end"] .exwidth .opt[data-v="compact"]'); await p.waitForTimeout(80);
-  const cpw = await p.$eval('#exgrid .excol[data-k="end"] .exline', (e) => e.textContent), wCompact = (await geo('end')).card.w;
+  const cpw = await p.$eval(CT('end') + ' .exline', (e) => e.textContent), wCompact = (await geo('end')).card.w;
   await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
   const kept = await geo('end');
   await p.evaluate(() => { const A = window.__allepEx, o = JSON.parse(localStorage.getItem(A.key)); o.col.end.width = 'full'; o.col.table.width = 'full'; localStorage.setItem(A.key, JSON.stringify(o)); });
   await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready'); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(300);
-  const fullE = await geo('end'), fullT = await geo('table'), cpf = await p.$eval('#exgrid .excol[data-k="end"] .exline', (e) => e.textContent);
+  const fullE = await geo('end'), fullT = await geo('table'), cpf = await p.$eval(CT('end') + ' .exline', (e) => e.textContent);
   await p.evaluate(() => window.__allepEx.width('table', 'full')); await p.waitForTimeout(100);
   const viaApi = await geo('table');
   await p.click('#exgrid .excol[data-k="end"] .exwidth .opt[data-v="dynamic"]'); await p.waitForTimeout(80);
-  const cpd = await p.$eval('#exgrid .excol[data-k="end"] .exline', (e) => e.textContent);
+  const cpd = await p.$eval(CT('end') + ' .exline', (e) => e.textContent);
   ok(cpw.includes(' · ' + XW.ctl.widthIs + ' ' + XW.width.opts.compact.name + ' (') && kept.w === 'compact' && kept.card.w === wCompact && fullE.w === 'dynamic' && fullT.w === 'dynamic' && fullE.card.w === geoRes.end.dynamic && fullT.card.w === geoRes.table.dynamic
      && cpf.includes(XW.ctl.widthIs + ' ' + XW.width.opts.dynamic.name + ' (' + D.words.copy.pick + ')') && viaApi.w === 'dynamic' && viaApi.card.w === geoRes.table.dynamic && cpd.includes(XW.ctl.widthIs + ' ' + XW.width.opts.dynamic.name + ' (' + D.words.copy.pick + ')') && errs.length === errs0,
     'D-087 · the width is in the column\'s copy line and kept through a reload; a saved full — and a full set through the page — reads as the default (data-w ' + fullE.w + ', the element ' + fullE.card.w + ' px), no error', { cpw: cpw.slice(-60), kept: kept.w, wCompact, keptW: kept.card.w, fullE: fullE.w, fullT: fullT.w, viaApi: viaApi.w, cpf: cpf.slice(-60), errs: errs.slice(errs0) });
@@ -3431,7 +3441,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
 { const E = 'POST /cooking/sessions', CEND = '#exgrid .excol[data-k="end"]', BLK = CEND + ' .blk';
   /* the default ending column's copy line, as the page gave it BEFORE this change (commit 7c2bcc1) — pinned, never recomputed */
   const BASE_COPY = 'examples · ending · 429 · sensitive limit: 20 per 60 seconds · Rate limit exceeded. Try again shortly. · on POST /cooking/sessions · block block (glyph on, its kind\'s colour, status on, words on, stage on, ways badge, where both, how off) · edge left solid 2px · chips count pill 100%, status pill 90% · lines glyph · status | stage / words | ways / where | — · sizes glyph 13, status 12, words 13, stage 12, ways 12, where 12, how 12 · squares 14px gap 4 round as symbol by type · not drawn how · width dynamic (my pick)';   /* D-097 re-pinned: the ending's new part "how" (not drawn by default) adds "how off", "how 12" and "not drawn how" — nothing else moved */
-  const BASE_LOOK = { rows: [{ l: ['icon', 'status'], r: ['stage'] }, { l: ['name'], r: ['count'] }, { l: ['via'], r: [] }], size: { icon: 13, status: 12, name: 13, stage: 12, count: 12, via: 12 }, iconCol: 'kind' };
+  const BASE_LOOK = { rows: [{ l: ['icon', 'status'], r: ['stage'] }, { l: ['name'], r: ['count'] }, { l: ['via'], r: [] }], size: { icon: 13, status: 12, name: 13, stage: 12, count: 12, via: 12, how: 12 }, iconCol: 'kind' };   /* D-097 re-pinned: the new part "how" takes the where line's size */
   const hoverAt = async (h) => { await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const bx = await h.boundingBox(); await p.mouse.move(5, 5); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.waitForTimeout(80); };
   const card = () => p.evaluate(() => { const t = document.getElementById('tip'), c = t.querySelector('.cdc'); if (!c) return null;
     const small = [...c.querySelectorAll('*')].filter((e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim()) && parseFloat(getComputedStyle(e).fontSize) < 12).map((e) => e.className);
@@ -3447,10 +3457,10 @@ ok(!errs.length, 'no page error on the fixture', errs);
   const cp0 = await p.evaluate(() => window.__allepEx.copy('end'));
   ok(cp0 === BASE_COPY, 'D-089 · his configuration: the copy line of the default ending column is byte-identical to the one before the change', { now: cp0.slice(0, 160) });
   const keys = await p.evaluate(() => ({ key: window.__allepEx.key, look: window.__allep.data.ex.look.end, lookKeys: Object.keys(window.__allep.data.ex.look.end), regions: window.__allep.data.ex.regions, parts: Object.keys(window.__allep.data.words.ex.parts.end), cur: window.__allepEx.current('end').id }));
-  ok(keys.key === 'gabe:allep:bench:v3' && JSON.stringify(keys.parts) === JSON.stringify(['icon', 'status', 'name', 'stage', 'count', 'via']) && JSON.stringify(keys.look.rows) === JSON.stringify(BASE_LOOK.rows) && JSON.stringify(keys.look.size) === JSON.stringify(BASE_LOOK.size) && keys.look.iconCol === BASE_LOOK.iconCol
-    && !keys.lookKeys.includes('regions') && !keys.lookKeys.some((q) => /reg/i.test(q)), 'D-089 · his configuration: the storage key, the six part ids and the default look of the ending are exactly as they were — the regions are a table of their own, never part of the saved look', keys);
+  ok(keys.key === 'gabe:allep:bench:v3' && JSON.stringify(keys.parts) === JSON.stringify(['icon', 'status', 'name', 'stage', 'count', 'via', 'how']) && JSON.stringify(keys.look.rows) === JSON.stringify(BASE_LOOK.rows) && JSON.stringify(keys.look.size) === JSON.stringify(BASE_LOOK.size) && keys.look.iconCol === BASE_LOOK.iconCol
+    && !keys.lookKeys.includes('regions') && !keys.lookKeys.some((q) => /reg/i.test(q)), 'D-089 · his configuration: the storage key, the part ids (his six, and D-097\'s how) and the default look of the ending are exactly as they were — the regions are a table of their own, never part of the saved look', keys);
   /* CHANGED 2026-10-03 (D-090): every kind declares its regions now (section 38); the ending's entry is what it was */
-  ok(JSON.stringify(keys.regions.end) === JSON.stringify({ icon: 'head', status: 'head', name: 'title', stage: 'title', count: 'title', via: 'items', marks: 'items' }), 'D-089 · the regions are data: the ending\'s — the glyph and the status → head, the where line and the strip of marks → items, the rest → title', keys.regions.end);
+  ok(JSON.stringify(keys.regions.end) === JSON.stringify({ icon: 'head', status: 'head', name: 'title', stage: 'title', count: 'title', via: 'items', how: 'items', marks: 'items' }), 'D-089 · CHANGED D-097 · the regions are data: the ending\'s — the glyph and the status → head, the where line, the how line and the strip of marks → items, the rest → title', keys.regions.end);
   ok(keys.cur === E + '|x:8437446a6c', 'D-089 · the ending drawn first is the 429 of the sensitive limit', keys.cur);
   /* (2) the tags: each part carries its region, nothing else carries a hover of its own */
   const tags = await p.evaluate((b) => { const blk = document.querySelector(b), o = [...blk.querySelectorAll('[data-tip="exreg"]')].map((n) => ({ reg: n.dataset.reg, rp: n.dataset.rp, ri: n.dataset.ri, part: n.getAttribute('data-part'), sq: n.classList.contains('sq') }));
@@ -3783,9 +3793,10 @@ ok(!errs.length, 'no page error on the fixture', errs);
   /* (6) item 4 — the options. What the feed says is read HERE, from forms.json: a function's write that a commit saves (the step's own bucket), a test's request that proves an ending (its `refs`), a fork the way takes (the chain's `hit`) */
   const OPTK = ['fn', 'test', 'end'], KEEP = { fn: PINS.fn.copy, test: PINS.test.copy, end: BASE_COPY }, E2 = 'DELETE /pantry/locations/{location_id}';
   await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(450);
-  const o0 = await p.evaluate((ks) => ks.map((k) => ({ k, fact: window.__allepEx.state.col[k].look.fact, def: window.__allep.data.ex.look[k].fact, on: document.querySelectorAll('#exgrid .excol[data-k="' + k + '"] .sqs > .sq[data-yn]').length,
-    opts: [...document.querySelectorAll('#exgrid .excol[data-k="' + k + '"] .exynopts [data-xyn]')].map((b) => ({ v: b.getAttribute('data-v'), on: b.getAttribute('aria-checked'), pick: b.hasAttribute('data-pick'), bs: getComputedStyle(b).borderTopStyle, label: b.getAttribute('aria-label') })),
-    lg: document.querySelectorAll('#exgrid .excol[data-k="' + k + '"] .exlg').length, copy: window.__allepEx.copy(k) })), OPTK);
+  /* CHANGED 2026-10-05 (D-098): a kind's option squares are in the row while it is the one tailored — each kind made so in turn */
+  const o0 = []; for (const k0 of OPTK) { await tailor(k0); o0.push(await p.evaluate((k) => ({ k, fact: window.__allepEx.state.col[k].look.fact, def: window.__allep.data.ex.look[k].fact, on: document.querySelectorAll('#exgrid .excol[data-k="' + k + '"] .sqs > .sq[data-yn]').length,
+    opts: [...document.querySelectorAll('#exact[data-k="' + k + '"] .exynopts [data-xyn]')].map((b) => ({ v: b.getAttribute('data-v'), on: b.getAttribute('aria-checked'), pick: b.hasAttribute('data-pick'), bs: getComputedStyle(b).borderTopStyle, label: b.getAttribute('aria-label') })),
+    lg: document.querySelectorAll('#exgrid .excol[data-k="' + k + '"] .exlg').length, copy: window.__allepEx.copy(k) }), k0)); }
   ok(o0.every((x) => x.fact === 'off' && x.def === 'off' && x.on === 0 && x.lg === 0 && x.copy === KEEP[x.k] && JSON.stringify(x.opts.map((q) => q.v)) === JSON.stringify(Object.keys(YW.opts)) && x.opts.filter((q) => q.on === 'true').map((q) => q.v).join() === 'off'
     && x.opts.filter((q) => q.pick).map((q) => q.v).join() === YW.pick && x.opts.every((q) => (q.bs === 'dashed') === (q.v === YW.pick) && q.label === YW.opts[q.v].name)),
     'D-091 · item 4: the fact option of a function, a test and an ending is OFF by default — no mark carries it, no legend entry, the copy line is the one before the change — and my pick (' + YW.opts[YW.pick].name + ') is the dashed one', o0);
@@ -3816,7 +3827,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
   ok(!ybad.length && OPTK.every((k) => yst[k].items > 0 && yst[k].yes > 0 && yst[k].no > 0 && yst[k].none > 0), 'D-091 · item 4, with each option on, over every element of each kind on two endpoints (' + E + ' · ' + E2 + '): ' + OPTK.map((k) => k + ' ' + yst[k].items + ' elements · ' + yst[k].yes + ' yes · ' + yst[k].no + ' no · ' + yst[k].none + ' with no such fact').join(' · ') + ' — each mark as the feed says (' + OPTK.map((k) => YW.kinds[k].name).join(' · ') + ')', { yst, bad: ybad.slice(0, 4) });
   console.log('  D-091 options on ' + E + ' + ' + E2 + ' · ' + OPTK.map((k) => k + ' ' + yst[k].yes + ' yes ' + yst[k].no + ' no ' + yst[k].none + ' none').join(' · '));
   /* the option as a control: a real click, the legend, the card, the copy line, the storage, back to off */
-  const clickOpt = async (k, v) => { await p.click('#exgrid .excol[data-k="' + k + '"] .extab[data-tab="show"]'); await p.click('#exgrid .excol[data-k="' + k + '"] .exynopts [data-xyn="' + v + '"]'); await p.waitForTimeout(150); };   /* D-094: the option is on the show tab */
+  const clickOpt = async (k, v) => { await tailor(k); await p.click(CT(k) + ' .extab[data-tab="show"]'); await p.click(CT(k) + ' .exynopts [data-xyn="' + v + '"]'); await p.waitForTimeout(150); };   /* D-098: in the row, the kind made the one tailored */   /* D-094: the option is on the show tab */
   for (const k of OPTK) { const ep = k === 'test' ? E : E2, F = FOUND[ep], BK = '#exgrid .excol[data-k="' + k + '"] .blk', K = YW.kinds[k];
     const loc = (st) => { for (const [id, w] of F[k]) { const i = (w || []).indexOf(st); if (i >= 0) return [id, i]; } return null; };
     await p.evaluate((e) => window.__allep.pick(e), ep); await p.waitForTimeout(300);
@@ -3825,7 +3836,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
     const c0 = await p.evaluate((q) => window.__allepEx.copy(q), k), html0 = await p.evaluate((b) => document.querySelector(b + ' .sqs').outerHTML, BK);
     await clickOpt(k, 'corners');
     const s1 = await p.evaluate((a) => ({ fact: window.__allepEx.state.col[a].look.fact, lg: [...document.querySelectorAll('#exgrid .excol[data-k="' + a + '"] .exlgi')].map((i) => ({ lg: i.getAttribute('data-lg'), n: +i.getAttribute('data-n'), text: i.textContent.replace(/\s+/g, ' ').trim() })),
-      chk: [...document.querySelectorAll('#exgrid .excol[data-k="' + a + '"] .exynopts [data-xyn]')].filter((b) => b.getAttribute('aria-checked') === 'true').map((b) => b.getAttribute('data-v')), store: JSON.parse(window.localStorage.getItem('gabe:allep:bench:v3') || '{}'), copy: window.__allepEx.copy(a) }), k);
+      chk: [...document.querySelectorAll('#exact[data-k="' + a + '"] .exynopts [data-xyn]')].filter((b) => b.getAttribute('aria-checked') === 'true').map((b) => b.getAttribute('data-v')), store: JSON.parse(window.localStorage.getItem('gabe:allep:bench:v3') || '{}'), copy: window.__allepEx.copy(a) }), k);
     const mk1 = await p.evaluate(STRIP, BK), f1 = factsOf(mk1), ny = f1.filter((v) => v === 1).length;
     const nrm = (x) => x.replace(/ \([^()]*\)$/, ''), tailOf = (x) => (/ \(([^()]*)\)$/.exec(x) || [])[1];                 /* the line's closing "(my pick)" turns to "(your choice)" for any look that is not the default — the page's own rule */
     ok(s1.fact === 'corners' && s1.chk.join() === 'corners' && nrm(s1.copy) === nrm(c0).replace(' · not drawn', ' · ' + K.name + ' ' + YW.opts.corners.name + ' · not drawn') && tailOf(s1.copy) !== tailOf(c0) && s1.store.col && s1.store.col[k].look.fact === 'corners' && OPTK.filter((q) => q !== k).every((q) => !s1.store.col[q].look.fact || s1.store.col[q].look.fact === 'off')
@@ -3847,7 +3858,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
     await clickOpt(k, 'off'); await p.evaluate((a) => window.__allepEx.pick(a[0], a[1]), [k, first[0]]); await p.waitForTimeout(100);
     const s3 = await p.evaluate((a) => ({ copy: window.__allepEx.copy(a), html: document.querySelector('#exgrid .excol[data-k="' + a + '"] .blk .sqs').outerHTML, lg: document.querySelectorAll('#exgrid .excol[data-k="' + a + '"] .exlg').length }), k);
     ok(s3.copy === c0 && s3.html === html0 && !s3.lg, 'D-091 · ' + k + ' · turned off again: the copy line, the strip and the legend are what they were, byte for byte', { same: s3.copy === c0, strip: s3.html === html0, lg: s3.lg });
-    await clickOpt(k, 'corners'); await p.click('#exgrid .excol[data-k="' + k + '"] .exreset'); await p.waitForTimeout(150);
+    await clickOpt(k, 'corners'); await p.click(CT(k) + ' .exreset'); await p.waitForTimeout(150);
     ok((await p.evaluate((a) => window.__allepEx.state.col[a].look.fact, k)) === 'off', 'D-091 · ' + k + ' · "back to the default" puts the option off too'); }
   /* an old saved configuration is read as it was: a look saved before this change has no `fact` — it stays as he left it, and the option is off */
   await p.evaluate(() => { const st = JSON.parse(JSON.stringify(window.__allepEx.state)), o = { lay: st.lay, follow: st.follow, col: {} }; Object.keys(st.col).forEach((k) => { const c = st.col[k], l = JSON.parse(JSON.stringify(c.look)); delete l.fact; o.col[k] = { scope: c.scope, role: c.role, id: c.id, look: l, width: c.width }; });
@@ -3904,15 +3915,15 @@ ok(!errs.length, 'no page error on the fixture', errs);
      color won't change … What could change is the way that we display data … the labeling, the content, just the number, just the icon" and "let's make a hover for every one
      of the items, and we will have an option to enable or disable the hover. The default should be as we have configured today"). By real clicks on the table column. ══ */
   { await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(450);
-    const TC = '#exgrid .excol[data-k="table"]', XD = D.ex, CW = D.words.ex;
+    const TC = '#exgrid .excol[data-k="table"]', TR = CT('table'), XD = D.ex, CW = D.words.ex;   /* D-098: TC the table's column (its block), TR the row of its controls */
     await p.evaluate(() => window.__allepEx.pick('table', 'table:users')); await p.waitForTimeout(150);
-    /* (1) what is fixed has no control, and a saved look cannot move it */
-    const fx = await p.evaluate(([CW, KS]) => { const o = {}; KS.forEach((k) => { const c = document.querySelector('#exgrid .excol[data-k="' + k + '"]'); if (!c.querySelector('.exctl')) return;
-      o[k] = { labels: [...c.querySelectorAll('.exctl .exrg .rl')].map((x) => x.textContent), rows: [...c.querySelectorAll('.extp[data-tp="hover"] .expr')].map((r) => r.getAttribute('data-part')).filter((q) => q !== 'marks'),
+    /* (1) what is fixed has no control, and a saved look cannot move it — CHANGED 2026-10-05 (D-098): each kind made the one tailored in turn, its controls read from the row */
+    const fx = {}; for (const k0 of D.ex.kinds) { await tailor(k0); const f0 = await p.evaluate((k) => { const c = document.querySelector('#exact[data-k="' + k + '"]'); if (!c || !c.querySelector('.exctl')) return null;
+      return { labels: [...c.querySelectorAll('.exctl .exrg .rl')].map((x) => x.textContent), rows: [...c.querySelectorAll('.extp[data-tp="hover"] .expr')].map((r) => r.getAttribute('data-part')).filter((q) => q !== 'marks'),
         forms: [...c.querySelectorAll('.extp[data-tp="show"] .expr')].map((r) => [r.getAttribute('data-part'), r.querySelectorAll('[data-xform]').length, (r.querySelector('[data-xform][aria-checked="true"]') || { getAttribute: () => null }).getAttribute('data-v')]),
         sizes: [...c.querySelectorAll('.extp[data-tp="format"] .expr')].filter((r) => r.querySelector('.exsz')).map((r) => r.getAttribute('data-part')),
-        hov: [...c.querySelectorAll('.extp[data-tp="hover"] .expr')].map((r) => [r.getAttribute('data-part'), r.querySelector('.exhov').getAttribute('aria-pressed')]) }; });
-      return o; }, [CW, D.ex.kinds]);
+        hov: [...c.querySelectorAll('.extp[data-tp="hover"] .expr')].map((r) => [r.getAttribute('data-part'), r.querySelector('.exhov').getAttribute('aria-pressed')]) }; }, k0);
+      if (f0) fx[k0] = f0; }
     const gone = [CW.ctl.glyph, CW.ctl.markSize, CW.ctl.gap].concat(Object.keys(D.words.ex.parts).map((k) => CW.ctl.sizeOf.replace('{name}', D.words.ex.parts[k].icon.name)));
     const fbad = [];
     Object.entries(fx).forEach(([k, f]) => { if (f.labels.some((l) => gone.includes(l))) fbad.push(k + ': a fixed control is still there');
@@ -3921,7 +3932,7 @@ ok(!errs.length, 'no page error on the fixture', errs);
       if (JSON.stringify([...f.sizes].sort()) !== JSON.stringify(PK.filter((q) => q !== 'icon' && q !== 'commit').sort())) fbad.push(k + ': size rows ' + f.sizes.join());
       f.forms.forEach(([pt, n, cur]) => { const F = (XD.forms[k] || {})[pt]; if (F.opts.length !== n) fbad.push(k + '.' + pt + ': ' + n + ' forms'); if (cur !== ((XD.look[k].mode || {})[pt] || F.def)) fbad.push(k + '.' + pt + ': drawn as ' + cur); });
       f.hov.forEach(([pt, hv]) => { if (hv !== ((XD.look[k].hov || {})[pt] ? 'true' : 'false')) fbad.push(k + '.' + pt + ': hover ' + hv); }); if (!f.hov.some((x) => x[0] === 'marks')) fbad.push(k + ': no marks switch'); });
-    ok(Object.keys(fx).length === 8 && !fbad.length, 'D-093 · on all 8 columns: no control for the glyph\'s size or colour or the marks\' size and gap; CHANGED D-094 · show holds a row for each part that takes forms (exactly its forms, the drawn one pressed), format a size for each text part, hover a switch for every part and the marks, pressed where the bench gave it its own card', fbad.slice(0, 6));
+    ok(Object.keys(fx).length === 8 && !fbad.length, 'D-093 · D-098 · on all 8 kinds, each tailored in turn: no control for the glyph\'s size or colour or the marks\' size and gap; CHANGED D-094 · show holds a row for each part that takes forms (exactly its forms, the drawn one pressed), format a size for each text part, hover a switch for every part and the marks, pressed where the bench gave it its own card', fbad.slice(0, 6));
     const saved = await p.evaluate(() => { const X = window.__allepEx, o = JSON.parse(window.localStorage.getItem(X.key) || '{"col":{}}'); o.col = o.col || {}; o.col.table = Object.assign({}, o.col.table || {}, { look: Object.assign(JSON.parse(JSON.stringify(X.state.col.table.look)), { sqSize: 22, sqGap: 0, iconCol: 'entity', size: Object.assign({}, X.state.col.table.look.size, { icon: 24, name: 15 }) }) });
       window.localStorage.setItem(X.key, JSON.stringify(o)); return true; });
     await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400);
@@ -3931,28 +3942,29 @@ ok(!errs.length, 'no page error on the fixture', errs);
       'D-093 · a saved look that set the marks to 22px with no gap, the glyph to 24px in its entity\'s colour is read with those put back (' + rd.F.join(' · ') + ') — the name size it set (15) is kept', rd);
     await p.evaluate(() => { try { window.localStorage.removeItem('gabe:allep:bench:v3'); } catch (e) {} }); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 });
     await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400); await p.evaluate(() => window.__allepEx.pick('table', 'table:users')); await p.waitForTimeout(150);
+    await tailor('table');
     /* (2) the forms, by real clicks: the count as the number alone in its box, the channel as a dot, the class with its name before it, the entity as its glyph */
-    const clickForm = async (pt, v) => { await p.click(TC + ' .extab[data-tab="show"]'); const s0 = TC + ' .expr[data-part="' + pt + '"] [data-xform][data-v="' + v + '"]'; await p.$eval(s0, (e) => e.scrollIntoView({ block: 'center' })); await p.click(s0); await p.waitForTimeout(120); };
+    const clickForm = async (pt, v) => { await p.click(TR + ' .extab[data-tab="show"]'); const s0 = TR + ' .expr[data-part="' + pt + '"] [data-xform][data-v="' + v + '"]'; await p.$eval(s0, (e) => e.scrollIntoView({ block: 'center' })); await p.click(s0); await p.waitForTimeout(120); };
     await clickForm('count', 'number'); await clickForm('rw', 'dot'); await clickForm('model', 'label'); await clickForm('ent', 'icon');
     const fm = await p.evaluate(() => { const b = document.querySelector('#exgrid .excol[data-k="table"] .blk'), q = (s) => b.querySelector(s), cnt = q('[data-part="count"]'), rw = q('[data-part="rw"]'), md = q('[data-part="model"]'), en = q('[data-part="ent"]');
       return { cnt: cnt && [cnt.textContent, cnt.classList.contains('badge'), cnt.getAttribute('aria-label')], rw: rw && [rw.classList.contains('exdotw'), rw.getAttribute('aria-label'), rw.textContent], md: md && [(md.querySelector('.exlab') || {}).textContent, md.textContent],
-        en: en && [!!en.querySelector('svg'), en.textContent.trim()], line: document.querySelector('#exgrid .excol[data-k="table"] .exline').textContent }; });
+        en: en && [!!en.querySelector('svg'), en.textContent.trim()], line: document.querySelector('#exact[data-k="table"] .exline').textContent }; });
     const c0 = D.ex.cat['table:users'], n0 = c0.cols.length + (c0.nmore || 0);
     ok(fm.cnt && fm.cnt[0] === String(n0) && fm.cnt[1] && fm.cnt[2] === CW.unit.fields.many.replace('{n}', n0) && fm.rw && fm.rw[0] && fm.rw[1] === 'RW' && !fm.rw[2] && fm.md && fm.md[0] === CW.parts.table.model.name && fm.md[1] === CW.parts.table.model.name + c0.model
        && fm.en && fm.en[0] && !fm.en[1] && fm.line.includes('chip dot') && fm.line.includes('count number') && fm.line.includes('model label') && fm.line.includes('entity icon') && fm.line.endsWith('(' + D.words.copy.his + ')'),
       'D-093 · four clicks: the count is the number alone in its box (' + (fm.cnt || [])[0] + ', its unit in its label), the channel a dot, the class says its name before it, the entity is its glyph — and the copy line says each, the look now his', fm);
     /* (3) the hover switches, by real clicks and a real hover: the name gets a card of its own; the glyph gives the block's card; the copy line says both; back to the default puts all back */
-    const sw = async (pt) => { await p.click(TC + ' .extab[data-tab="hover"]'); const s0 = TC + ' .expr[data-part="' + pt + '"] .exhov'; await p.$eval(s0, (e) => e.scrollIntoView({ block: 'center' })); await p.click(s0); await p.waitForTimeout(120); };
+    const sw = async (pt) => { await p.click(TR + ' .extab[data-tab="hover"]'); const s0 = TR + ' .expr[data-part="' + pt + '"] .exhov'; await p.$eval(s0, (e) => e.scrollIntoView({ block: 'center' })); await p.click(s0); await p.waitForTimeout(120); };
     await sw('name'); await sw('icon');
     const hv = async (pt) => { const h = await p.$(TC + ' .blk [data-part="' + pt + '"]'); await h.evaluate((x) => x.scrollIntoView({ block: 'center' })); const bb = await h.boundingBox(); await p.mouse.move(5, 5); await p.waitForTimeout(60);
       await p.mouse.move(bb.x + Math.min(bb.width / 2, 20), bb.y + bb.height / 2); await p.waitForTimeout(160);
       return p.evaluate(() => { const t = document.getElementById('tip'), c = t.querySelector('.cdc'); return { show: t.getAttribute('data-show'), card: c && c.getAttribute('data-card'), reg: c && c.getAttribute('data-reg'), rp: c && c.getAttribute('data-rp'), is: c && c.getAttribute('data-card-issues'), txt: c ? c.innerText.replace(/\s+/g, ' ').slice(0, 160) : '' }; }); };
     const hN = await hv('name'), hI = await hv('icon'); await p.mouse.move(5, 5);
-    const ln3 = await p.$eval(TC + ' .exline', (e) => e.textContent);
+    const ln3 = await p.$eval(TR + ' .exline', (e) => e.textContent);
     ok(hN.show === 'true' && hN.card === 'reg' && hN.reg === 'part' && hN.rp === 'name' && hN.is === '0' && hN.txt.includes('users') && hI.show === 'true' && hI.card === 'table' && ln3.includes(' · ' + CW.ctl.hover + ' ' + CW.parts.table.icon.name + ' block, ' + CW.parts.table.name.name + ' own'),
       'D-093 · two clicks on the switches: the name now has a card of its own (users, where it is defined; no rule broken), the glyph gives the block\'s card, and the copy line says both', { hN, hI, line: ln3.slice(ln3.indexOf(' · width') - 80) });
-    await p.$eval(TC + ' .exreset', (e) => e.scrollIntoView({ block: 'center' })); await p.click(TC + ' .exreset'); await p.waitForTimeout(120);
-    ok((await p.$eval(TC + ' .exline', (e) => e.textContent)).includes(' · ' + XD.his + ' · '), 'D-093 · back to the default puts the forms and the hovers back: the table is on his DATA line again');
+    await p.$eval(TR + ' .exreset', (e) => e.scrollIntoView({ block: 'center' })); await p.click(TR + ' .exreset'); await p.waitForTimeout(120);
+    ok((await p.$eval(TR + ' .exline', (e) => e.textContent)).includes(' · ' + XD.his + ' · '), 'D-093 · back to the default puts the forms and the hovers back: the table is on his DATA line again');
     /* (4) every part of every element of this endpoint, every switch on: each part's own card is made and breaks no rule */
     const pc = await p.evaluate(() => { const C = window.__allepCard, D0 = window.__allep.data, r = D0.rows.filter((x) => x.id === window.__allep.open || x.id === 'POST /cooking/sessions')[0], o = { n: 0, issues: [], none: [] };
       Object.keys(D0.ex.regions).forEach((k) => (r.ex[k] || []).forEach((e) => { const it = { k, id: e[0], role: e[1], ep: r.id, o: e[2] };
@@ -3965,29 +3977,85 @@ ok(!errs.length, 'no page error on the fixture', errs);
   /* ══ D-094 · THE CONTROLS AS TABS (his: "the configuration part is getting crowded … I would like to have separate sections for the hover, the order of the parts, the format
      (whatever is related to size, colors, borders, or anything else)"). By real clicks and keys on the table column. ══ */
   { await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(450);
-    const TC = '#exgrid .excol[data-k="table"]', CW = D.words.ex, TABS = ['order', 'show', 'format', 'hover'];
-    const look = () => p.evaluate((TABS) => { const cs = [...document.querySelectorAll('#exgrid .exctl')], c = document.querySelector('#exgrid .excol[data-k="table"] .exctl');
+    const TC = CT('table'), CW = D.words.ex, TABS = ['order', 'show', 'format', 'hover'];   /* CHANGED 2026-10-05 (D-098): the tabs are the row's — one set on the page, the table made the one tailored */
+    await tailor('table');
+    const look = () => p.evaluate((TABS) => { const cs = [...document.querySelectorAll('#sec-ex .exctl')], c = document.querySelector('#exact .exctl');
       return { shown: cs.map((x) => [...x.querySelectorAll('.extp')].filter((q) => !q.hidden && q.getBoundingClientRect().height > 10).map((q) => q.getAttribute('data-tp')).join()), sel: cs.map((x) => [...x.querySelectorAll('.extab[aria-selected="true"]')].map((b) => b.getAttribute('data-tab')).join()),
         h: Math.round(c.getBoundingClientRect().height), panes: Object.fromEntries(TABS.map((t) => { const q = c.querySelector('.extp[data-tp="' + t + '"]'); return [t, { zones: q.querySelectorAll('.exz').length, forms: q.querySelectorAll('[data-xform]').length, yn: q.querySelectorAll('[data-xyn]').length,
           sizes: q.querySelectorAll('.exsz').length, picks: q.querySelectorAll('.exrg').length, hov: q.querySelectorAll('.exhov').length }]; })), focus: document.activeElement && document.activeElement.getAttribute('data-tab'), store: (() => { try { return JSON.parse(localStorage.getItem('gabe:allep:bench:v3') || '{}').tab; } catch (e) { return null; } })() }; }, TABS);
     const L0 = await look(), seen = {}, hs = {};
     for (const t of TABS) { const s0 = TC + ' .extab[data-tab="' + t + '"]'; await p.$eval(s0, (e) => e.scrollIntoView({ block: 'center' })); await p.click(s0); await p.waitForTimeout(120); const L1 = await look(); seen[t] = L1.shown.every((x) => x === t) && L1.sel.every((x) => x === t) && L1.store === t; hs[t] = L1.h; }
     const P = L0.panes, nP = D.ex.parts.table.length, nF = Object.keys(D.ex.forms.table).length, nT = D.ex.parts.table.filter((q) => q.key !== 'icon').length;
-    ok(L0.shown.length === 8 && L0.shown.every((x) => x === 'order') && TABS.every((t) => seen[t])
+    ok(L0.shown.length === 1 && L0.shown.every((x) => x === 'order') && TABS.every((t) => seen[t])
        && P.order.zones === 3 * 2 + 1 && !P.order.forms && !P.order.sizes && !P.order.hov && P.show.forms === Object.values(D.ex.forms.table).reduce((n, F) => n + F.opts.length, 0) && !P.show.zones && !P.show.sizes && !P.show.hov
        && P.format.sizes === nT && P.format.picks >= 9 && !P.format.forms && !P.format.hov && P.hover.hov === nP + 1 && !P.hover.forms && !P.hover.sizes,
-      'D-094 · four tabs, ' + TABS.map((t) => CW.ctl.tab[t].name).join(' · ') + ': the order tab opens; a click on a tab in one column opens it in all 8 and is kept; order holds the 3 lines (a left and a right side each) and not drawn, show the ' + nF + ' parts\' forms, format the ' + nT + ' text sizes with the box and the marks, hover ' + (nP + 1) + ' switches (each part and the marks) — nothing in two tabs',
+      'D-094 · four tabs, ' + TABS.map((t) => CW.ctl.tab[t].name).join(' · ') + ': the order tab opens; a click on a tab opens it and is kept (CHANGED D-098: one set of tabs on the page, in the row); order holds the 3 lines (a left and a right side each) and not drawn, show the ' + nF + ' parts\' forms, format the ' + nT + ' text sizes with the box and the marks, hover ' + (nP + 1) + ' switches (each part and the marks) — nothing in two tabs',
       { L0: { shown: L0.shown, panes: P }, seen });
-    const all = await p.evaluate(() => { const c = document.querySelector('#exgrid .excol[data-k="table"] .exctl'), ps = [...c.querySelectorAll('.extp')]; ps.forEach((q) => { q.hidden = false; }); const h = Math.round(c.getBoundingClientRect().height); return h; });
+    const all = await p.evaluate(() => { const c = document.querySelector('#exact .exctl'), ps = [...c.querySelectorAll('.extp')]; ps.forEach((q) => { q.hidden = false; }); const h = Math.round(c.getBoundingClientRect().height); return h; });
     await p.evaluate(() => window.__allepEx.render()); await p.waitForTimeout(100);
     ok(Math.max(...Object.values(hs)) < all * 0.75, 'D-094 · less crowded: the controls stand ' + TABS.map((t) => hs[t]).join(' · ') + ' px tall by tab, against ' + all + ' px with every pane open', { hs, all });
     /* the arrow keys move between tabs, the focus with them; a reload keeps the tab; reset and copy stay outside the tabs */
     await p.focus(TC + ' .extab[data-tab="hover"]'); await p.keyboard.press('ArrowRight'); await p.waitForTimeout(80); const k1 = await look(); await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(80); const k2 = await look();
     await p.click(TC + ' .extab[data-tab="format"]'); await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await p.evaluate((ep) => window.__allep.pick(ep), E); await p.waitForTimeout(400); const k3 = await look();
-    const out = await p.evaluate(() => { const c = document.querySelector('#exgrid .excol[data-k="table"] .exctl'); return ['.exreset', '.excopy'].map((q) => { const n = c.querySelector(q); return !!n && !n.closest('.extp') && n.getBoundingClientRect().height > 10; }); });
+    const out = await p.evaluate(() => { const c = document.querySelector('#exact .exctl'); return ['.exreset', '.excopy'].map((q) => { const n = c.querySelector(q); return !!n && !n.closest('.extp') && n.getBoundingClientRect().height > 10; }); });
     ok(k1.focus === 'order' && k1.shown.every((x) => x === 'order') && k2.focus === 'hover' && k3.shown.every((x) => x === 'format') && out.every(Boolean),
       'D-094 · → from hover goes round to order, ← back to hover (the focus moves with it); after a reload the format tab is still open; reset and copy sit under the tabs, on every tab', { k1: k1.focus, k2: k2.focus, k3: k3.shown[0], out });
     ok(!errs.length, 'D-094 · the clicks and keys raised no error', errs.slice(0, 3)); }
+
+  /* ══ D-098 · ONE KIND TAILORED AT A TIME (his: "only one of these can be active at a time … modify one of these at a time and, when we do, show the different options to
+     tailor it … move them in a row, showing the current section where we tailor this and the section of the portrait that we will show when we click that item"). By real clicks. ══ */
+  { await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), 'DELETE /me'); await p.waitForTimeout(450);
+    const CW = D.words.ex, RW = CW.row, PW = CW.portrait, KS = D.ex.kinds;
+    const st = () => p.evaluate(() => { const r = document.getElementById('exact'); return { k: r && r.getAttribute('data-k'), ctl: document.querySelectorAll('#sec-ex .exctl').length, inGrid: document.querySelectorAll('#exgrid .exctl, #exgrid .exline, #exgrid .extabs').length,
+      active: [...document.querySelectorAll('#exgrid .excol[data-active="true"]')].map((c) => c.getAttribute('data-k')), pressed: [...document.querySelectorAll('#exgrid .extailor[aria-pressed="true"]')].map((b) => b.closest('.excol').getAttribute('data-k')),
+      squares: [...document.querySelectorAll('#exgrid .excol')].map((c) => { const b = c.querySelector('.exhd .extailor'); return b ? [c.getAttribute('data-k'), b.getAttribute('data-verb'), b.getAttribute('data-obj'), b.getAttribute('aria-label'), !b.textContent.trim() && !!b.querySelector('svg')] : [c.getAttribute('data-k'), null]; }),
+      title: r && (r.querySelector('.exahd') || {}).textContent, ctlHd: r && (r.querySelector('.exactl > .exsh') || {}).textContent, ptHd: r && (r.querySelector('.exapt > .exsh') || {}).textContent,
+      tab: r && (r.querySelector('.extab[aria-selected="true"]') || { getAttribute: () => null }).getAttribute('data-tab'), pt: r && r.querySelector('.expt') ? r.querySelector('.expt').getAttribute('data-state') : null }; });
+    const s0 = await st();
+    ok(s0.k === 'end' && s0.ctl === 1 && !s0.inGrid && JSON.stringify(s0.active) === '["end"]' && JSON.stringify(s0.pressed) === '["end"]' && s0.pt === 'built'
+       && s0.title === RW.title.replace('{kind}', CW.kinds.end.name) && s0.ctlHd === RW.ctl && s0.ptHd === RW.pt,
+      'D-098 · one set of controls on the page, none in the columns: the row under them tailors the ending (the first column) until he picks — its controls at the left, the portrait the lab opens at the right', s0);
+    ok(s0.squares.length === KS.length && s0.squares.every(([k, v, o, l, ic]) => v === CW.act.tailor.verb && o === CW.act.tailor.obj.replace('{kind}', CW.kinds[k].name) && l === v + ' ' + o && ic),
+      'D-098 · L-36 · every column\'s head carries a tailor square — an icon, no text, its hover "' + CW.act.tailor.verb + ' ' + CW.act.tailor.obj.replace('{kind}', CW.kinds.fn.name) + '"', s0.squares);
+    /* a tab picked stays picked when another kind is made the one tailored; the kind is kept through a reload */
+    await p.click('#exact .extab[data-tab="hover"]'); await p.waitForTimeout(80); await p.click('#exgrid .excol[data-k="fn"] .extailor'); await p.waitForTimeout(150); const s1 = await st();
+    await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await p.waitForTimeout(300); const s2 = await st();
+    ok(s1.k === 'fn' && JSON.stringify(s1.active) === '["fn"]' && JSON.stringify(s1.pressed) === '["fn"]' && s1.ctl === 1 && s1.tab === 'hover' && s1.title === RW.title.replace('{kind}', CW.kinds.fn.name) && s2.k === 'fn' && s2.tab === 'hover',
+      'D-098 · a real click on the function\'s square makes it the one tailored (its column outlined, its square pressed, the ending\'s released) and the hover tab stays open; a reload keeps both', { s1, s2 });
+    /* each kind's portrait: the ending's built; the table, schema, function and test owed; the gate, the client hook and the in-flight value — the lab opens none */
+    const PTK = { end: 'built', table: 'owed', schema: 'owed', fn: 'owed', test: 'owed', gate: 'none', hook: 'none', inf: 'none' }, pk = {};
+    for (const k of KS) { await tailor(k); pk[k] = await p.evaluate(() => { const q = document.querySelector('#exact .expt'); return q ? [q.getAttribute('data-state'), q.innerText.replace(/\s+/g, ' ').trim().slice(0, 120)] : null; }); }
+    ok(KS.every((k) => pk[k] && pk[k][0] === PTK[k] && (PTK[k] === 'built' || pk[k][1] === PW[PTK[k]].replace('{kind}', CW.kinds[k].name))),
+      'D-098 · the portrait each kind opens: the ending\'s built here; the table · schema · function · test say theirs is owed; the gate · client hook · in-flight value say the lab opens none', pk);
+    /* the ending's portrait, DELETE /me's 401 invalid token: its sections in order, its "how" in words, one strip per way with the ending's own mark */
+    await tailor('end');
+    const inv = await p.evaluate(() => { const X = window.__allepEx, C = window.__allep.data.ex.cat, it = X.items('end').filter((i) => /InvalidToken/.test(C[i.id].via || ''))[0]; X.pick('end', it.id); return [it.id, C[it.id].paths.length, (C[it.id].tests || []).length]; });
+    await p.waitForTimeout(150);
+    const pe = await p.evaluate(() => { const q = document.querySelector('#exact .expt'), row = (l) => { const r = [...q.querySelectorAll('.exptsec[data-ps="facts"] .exptr')].filter((x) => x.querySelector('.exptl').textContent === l)[0]; return r ? r.querySelector('.exptv').textContent : null; };
+      return { head: q.querySelector('.expth').innerText.replace(/\s+/g, ' '), secs: [...q.querySelectorAll('.exptsec')].map((s) => s.getAttribute('data-ps')), how: row(window.__allep.data.words.ex.portrait.f.how), where: row(window.__allep.data.words.ex.portrait.f.where),
+        ways: q.querySelectorAll('.exptsec[data-ps="ways"] .exptway').length, here: [...q.querySelectorAll('.exptsec[data-ps="ways"] .exptway')].map((w) => w.querySelectorAll('.sq.exhere').length),
+        lines: [...q.querySelectorAll('.exptsec[data-ps="lines"] .io > i')].map((i) => getComputedStyle(i).display + ':' + i.textContent), left: [...q.querySelectorAll('.exptway .sqs')].map((x) => Math.round(x.getBoundingClientRect().left - x.closest('.exptway').getBoundingClientRect().left)) }; });
+    ok(pe.head.includes('401') && JSON.stringify(pe.secs) === JSON.stringify(['facts', 'lines', 'answer', 'ways', 'tests']) && pe.how === CW.face.how.catch.replace('{name}', 'InvalidTokenError') && /context\.py:\d+$/.test(pe.where || '')
+       && pe.ways === inv[1] && pe.here.every((n) => n === 1) && pe.lines.length === 3 && pe.lines.every((x) => !x.startsWith('inline')) && pe.left.every((x) => x < 40),
+      'D-098 · the ending\'s portrait on DELETE /me\'s 401 invalid token: what it is (where · "' + pe.how + '") → before · checks · gives, drawn as the card draws them → the answer it sends → ' + pe.ways + ' way, its own mark ringed, the strip at its number → the tests that prove it', pe);
+    /* a 422 with rules: one row per rule the body is refused by */
+    const r4 = await p.evaluate(() => { const C = window.__allep.data.ex.cat, id = Object.keys(C).filter((i) => C[i].k === 'end' && (C[i].cases || []).length >= 3)[0]; return [id, C[id].cases.length]; });
+    await p.evaluate((ep) => window.__allep.pick(ep), r4[0].split('|')[0]); await p.waitForTimeout(350); await p.evaluate((id) => window.__allepEx.pick('end', id), r4[0]); await p.waitForTimeout(150);
+    const rr = await p.evaluate(() => [...document.querySelectorAll('#exact .exptsec[data-ps="rules"] .exptr')].map((r) => r.innerText.replace(/\s+/g, ' ')));
+    ok(rr.length === r4[1] && rr.every((t) => t.length > 6), 'D-098 · a refused body\'s portrait lists its rules: ' + r4[0] + ' — ' + rr.length + ' rules, each its place, type and limit', rr);
+    /* swept: every ending of every endpoint opens a portrait whose words are whole — no token unfilled, no undefined, null or NaN the PAGE wrote. Judged per text node and per
+       " · " fact: a brace or a null inside the code's own words (the ending's data, quoted whole or cut with …) is the code's — an f-string message, a date pattern, "cannot be null" */
+    const sw = await p.evaluate(async () => { const C = window.__allep.data.ex.cat, X = window.__allepEx, bad = [], eps = [...new Set(Object.keys(C).filter((i) => C[i].k === 'end').map((i) => i.split('|')[0]))]; let n = 0, quoted = 0;
+      const strs = (o, a = []) => { if (typeof o === 'string') a.push(o); else if (o && typeof o === 'object') Object.values(o).forEach((v) => strs(v, a)); return a; }, RX = /[{}]|undefined|\bnull\b|NaN/;
+      for (const ep of eps) { window.__allep.pick(ep); await new Promise((r) => setTimeout(r, 20)); for (const it of X.items('end')) { X.pick('end', it.id); n++; const q = document.querySelector('#exact .expt');
+          if (!q || q.getAttribute('data-state') !== 'built') { bad.push([it.id, 'state']); continue; }
+          const own = strs(C[it.id]).map((x) => x.replace(/\s+/g, ' ')), tw = document.createTreeWalker(q, NodeFilter.SHOW_TEXT); let nd, hit = null, q0 = false;
+          while ((nd = tw.nextNode())) { const v = nd.nodeValue.replace(/\s+/g, ' '); if (!RX.test(v)) continue; const segs = v.replace(/^[\s…]+|[\s…]+$/g, '').split(' · ').filter((g) => RX.test(g));
+            if (segs.length && segs.every((g) => own.some((x) => x.includes(g)))) { q0 = true; continue; } hit = v.slice(0, 80); break; }
+          if (q0) quoted++; if (hit) bad.push([it.id, hit]); } }
+      return { n, eps: eps.length, quoted, bad: bad.slice(0, 5), nbad: bad.length }; });
+    ok(sw.n >= 700 && !sw.nbad, 'D-098 · swept: all ' + sw.n + ' endings of ' + sw.eps + ' endpoints open a built portrait, its words whole (' + sw.quoted + ' quote the code\'s own braces or nulls)', sw);
+    ok(!errs.length, 'D-098 · the clicks raised no error', errs.slice(0, 3)); }
   await labp.close(); }
 }
 

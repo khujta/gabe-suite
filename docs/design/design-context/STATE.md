@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-094). Updated 2026-10-05 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-098). Updated 2026-10-05 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -11,21 +11,26 @@ Loop 1 is the API endpoint card. Its display half lives on ONE page, `../workflo
 to the model was not clear to him. Round 1 fixed them AND named the patterns behind them, so they can be carried into the Gabe Suite.
 
 **Now (2026-10-05): he configures the all-endpoints bench card by card (D-083); the page follows the endpoint lab.** D-087 … D-091 are
-pushed. Since then, local and NOT pushed: D-092 the gaps between a row's icons hover nothing, and the legend under the field marks is gone
-(`3d812f1`) · D-093 the bench's controls, second revision (record `227cb99`, build in the next commit, probe 1003 passed · 1 failed, the one — the test's role card said "here" — fixed and swept on all 80 endpoints, 18,093 part cards, none breaks a rule): glyph size and colour, mark size and gap are
-fixed at the lab's values (a saved look that set them is read with them put back); every part has a row with its FORMS (only the forms
-its data can take — a count as number and unit, the number alone, boxed or bare; a status as its box, its word or a dot; a value as glyph and
-word, the word, the glyph, or the part's name before it) and a HOVER SWITCH (on = a card of its own, off = the block's; the default is
-today's) (`b31bffe`) · D-094 the controls are four TABS, one shown at a time — order · show · format · hover (his: "getting crowded"); about 790 px
-of controls become 267–511 px by tab; a tab picked in one column opens in all, kept per viewer (probe 1007 passed · 1 failed — the probe's own count of drop zones, fixed; the D-094 section rerun alone, 4 of 4). Before any push: `git log origin/graft-adoption..HEAD` for a
-foreign commit (the branch is shared).
-Disk (D-086): C: is at 41 GB free (2026-10-05) — one GB over `heavy`'s floor, under it every browser job refuses; his steps wait in `C:\Users\Gabe\disk-fix\` (1 cap restore points · 2 compact the WSL disk);
-`~/.local/bin/heavy` runs every browser job (temp in RAM); testing is lean (a change runs its own batteries, the full sweep before a push).
-Next from him: each kind's bench copy line when he is happy with it → it becomes that kind's ruled default.
+pushed. Local and NOT pushed: D-092 the gaps between a row's icons hover nothing, no legend under the field marks (`3d812f1`) · D-093 the
+controls' second revision — fixed sizes and colours at the lab's values, a FORMS row and a HOVER SWITCH per part (`227cb99` + `b31bffe`) ·
+D-094 the controls as four TABS, order · show · format · hover (`cbd1131`). His message on the ending's hover card (2026-10-05) gave four
+more: D-095 the card's layout per kind — the section's name above its lines (my pick), wider, or both (`4973686`) · D-096 the item's own
+mark in its strip as a choice — a ring (default) · its colour · a box · double · the others paler · none, the ring 1–4 px; the faded marks
+fade again (broken since D-091) (`997c524`) · D-097 an ending's HOW — what in the code makes it, in words (catches X · raised inside f ·
+refused by a scheme · by a middleware), 394 of 728 endings have one, starts in not drawn (`1260ce1`) · D-098 ONE KIND TAILORED AT A TIME:
+a tailor square per column, one active (outlined); the controls leave the columns for one row under the grid — how it is drawn at the left,
+what opens on a click (the lab's portrait) at the right; the ending's portrait is built (what it is · before-checks-gives · the answer ·
+the rules · the ways · the tests), the other kinds say owed or none (commit after the round's probe). Before any push: `git log
+origin/graft-adoption..HEAD` for a foreign commit (the branch is shared).
+Disk (D-086): C: is at 49 GB free (2026-10-05) — his step 1 capped the restore points (15.3 → 3 GB used, max 15 GB; they were the cause);
+step 2, the WSL disk compact (~150 GB stranded), still waits in `C:\Users\Gabe\disk-fix\` and needs every WSL session closed.
+Testing cadence (2026-10-05, his ask): per ask a build + `--check` + one targeted look; the full page probe (~12 min) once per round of asks,
+before the round's commit; the doctor only before a push that carries suite code. `~/.local/bin/heavy` runs every browser job.
+Next from him: his read of the ending's portrait (D-098) → then the table · schema · function · test portraits; each kind's bench copy line when he is happy with it → it becomes that kind's ruled default.
 Round 1 is ruled (D-081, D-084, D-085). D-085 ("land it", "use recommended approach", "go"): Security = marks, after-a-decision = stop there
 (`9a9bb86`); the doubled rate limit middleware as an option, merged (my pick, dashed) or apart (`1790c87`, probe 776/0); L-33 traced + the
 hover emitter designed + P2.1/P3.2 redrafted (`8b7917d`, `legibility/drafts/hover-and-corpus/`).
-OWED, in order, once C: ≥ 40 GB: (1) the read-aloud landing in gabe-artifact 1.5.0 — done in the working tree and on `wip/read-aloud-landing`
+OWED, in order (C: is over the 40 GB floor again, so these can run): (1) the read-aloud landing in gabe-artifact 1.5.0 — done in the working tree and on `wip/read-aloud-landing`
 (`ccb96c6`), battery 42/42, install parity CLEAN — needs gabe-artifact's own batteries (artifact-chrome · artifact-motion · legibility-audit; read-aloud 42/42 done) through `heavy`, then its commit — the full sweep before a push (D-086); (2) the all-endpoints walk (the merged/apart steps
 are written, never run), two `walk-extra.json` tags, the review page regenerated + its probe (both edited, uncommitted, never run) → the third
 commit; (3) phase 2: the hover emitter on both pages (the lab's card, P1.1/P2.1/P4.1/P8.1/P10.1 checked at emission) + the redrafts on the

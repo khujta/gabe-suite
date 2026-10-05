@@ -180,3 +180,28 @@
 #sec-ex .exhereopts { display: flex; flex-wrap: wrap; gap: 3px; margin: 4px 0; }
 #sec-ex .exhereopts .opt { width: 26px; height: 26px; border-radius: 6px; }
 #sec-ex .exhereopts .opt svg { width: 15px; height: 15px; }
+/* ══ D-098 · one kind at a time: its column's tailor square, and the row under the columns — its controls at the left, its portrait at the right ══ */
+.excol[data-active="true"] { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 8px; }
+.exhd .extailor { width: 26px; height: 26px; border-radius: 6px; flex: none; }
+.exhd .extailor svg { width: 15px; height: 15px; }
+.exhd .extailor[aria-pressed="true"] { background: var(--ink); color: var(--ground); }
+.exact { margin-top: 16px; border-top: 1px solid var(--rule); padding-top: 12px; }
+.exact .exahd { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; font-size: var(--fs-sm); letter-spacing: .08em; text-transform: uppercase; }
+.exabody { display: grid; grid-template-columns: minmax(300px, 400px) minmax(0, 680px); gap: 24px; align-items: start; }
+@media (max-width: 900px) { .exabody { grid-template-columns: minmax(0, 1fr); } }
+.exactl .exctl { border-top: 0; padding-top: 0; }
+.exapt > .exhint { margin: 0 0 8px; }
+.expt { --cd-ink: var(--ink); --cd-muted: var(--muted); --cd-line: var(--rule); --cd-edge: var(--rule); --cd-chip: var(--raised); --cd-ok: #2f9e6a; --cd-red: #d64545;
+  --cd-ui: var(--font-ui, sans-serif); --cd-mono: var(--font-mono, monospace); background: var(--card); color: var(--ink); }   /* the card's tokens, on the page's colours: the portrait's rows are the card's rows */
+.expt { border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; font-size: 12px; }
+.expth { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.expth b { font-size: 14px; } .expth .cdv { margin-left: auto; color: var(--muted); font: 600 12px var(--font-mono, monospace); letter-spacing: .06em; }
+.exptsec { display: flex; flex-direction: column; gap: 3px; border-top: 1px solid var(--rule); padding-top: 8px; }
+.exptst { margin: 0 0 3px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.exptr { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px; align-items: baseline; }
+.exptl { color: var(--muted); font-size: 12px; } .exptv { overflow-wrap: anywhere; font-family: var(--font-mono, monospace); font-size: 12px; }
+#sec-ex .expt .cdd { border-top: 0; margin-top: 0; padding-top: 2px; }   /* the section carries the rule; the card's own would double it */
+#sec-ex .exptw .exptway .sqs { margin-left: 0; padding-left: 0; }   /* (1,3,0) over the lab's strip rule, which sends a strip to the right of its block */
+#sec-ex .exptw { border: 0; padding: 0; background: none; box-shadow: none; display: flex; flex-direction: column; gap: 4px; }
+.exptway { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 6px; }
+.expttests { display: flex; flex-wrap: wrap; gap: 4px; }

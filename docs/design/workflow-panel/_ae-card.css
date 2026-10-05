@@ -6,57 +6,59 @@
   --cd-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; --cd-mono: Menlo, Consolas, ui-monospace, monospace;
   background: var(--cd-panel); color: var(--cd-ink); border: 1px solid var(--cd-line); border-radius: 10px; padding: 9px 11px; box-shadow: 0 8px 30px #0009;
   box-sizing: border-box; min-width: 210px; max-width: 360px; max-height: calc(100vh - 12px); overflow: hidden; font: 500 12px/1.4 var(--cd-ui); transition: opacity .12s ease; }
-.tip.cd .cdc { display: block; }
-.tip.cd .cdh { display: flex; align-items: center; gap: 8px; }
-.tip.cd .cdg { display: inline-flex; align-items: center; flex: none; }
-.tip.cd .cdg svg { display: block; }
-.tip.cd .cdh b { font: 800 13.5px/1.25 var(--cd-mono); color: var(--cd-ink); overflow-wrap: anywhere; }
-.tip.cd .cdh .cdv { margin-left: auto; padding-left: 8px; font: 700 12px/1 var(--cd-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--cd-muted); white-space: nowrap; align-self: flex-start; }
-.tip.cd .cdl, .tip.cd .cdr { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; margin-top: 6px; font: 600 12px/1.35 var(--cd-mono); color: var(--cd-ink); }
-.tip.cd .cdr { flex-wrap: wrap; row-gap: 4px; }
-.tip.cd .cdi { display: inline-flex; align-items: center; justify-content: center; width: 16px; flex: none; }
-.tip.cd .cdi svg { display: block; }
-.tip.cd .cdi .bm { display: inline-flex; color: var(--bc, var(--cd-muted)); }
-.tip.cd .cdi .bm svg { width: 14px; height: 14px; }
-.tip.cd .cdt { color: var(--cd-muted); overflow-wrap: anywhere; flex: 1 1 0; min-width: 100px; }
-.tip.cd .cdlt { margin-left: auto; flex: 0 1 auto; max-width: 100%; text-align: right; font: 500 12px/1.35 var(--cd-mono); color: var(--cd-muted); opacity: .8; overflow-wrap: anywhere; }
-.tip.cd .cdsep { border-top: 1px solid var(--cd-line); margin: 9px 0 2px; }
-.tip.cd .cdpill { display: inline-flex; align-items: center; font: 700 12px/1 var(--cd-mono); font-style: normal; padding: 3px 8px; border: 1px solid transparent; white-space: nowrap; }
-.tip.cd .cdfp { display: inline-flex; align-items: center; font: 700 12px/1 var(--cd-mono); padding: 3px 9px; border: 1px solid; color: var(--cd-ink); background: var(--cd-chip); }
-.tip.cd .cdmix { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin-left: 4px; }
-.tip.cd .cdmix .mx { display: inline-flex; align-items: center; gap: 4px; color: var(--cd-ink); font: 700 12px/1 var(--cd-mono); }
+:is(.tip.cd, .expt) .cdc { display: block; }
+:is(.tip.cd, .expt) .cdh { display: flex; align-items: center; gap: 8px; }
+:is(.tip.cd, .expt) .cdg { display: inline-flex; align-items: center; flex: none; }
+:is(.tip.cd, .expt) .cdg svg { display: block; }
+:is(.tip.cd, .expt) .cdh b { font: 800 13.5px/1.25 var(--cd-mono); color: var(--cd-ink); overflow-wrap: anywhere; }
+:is(.tip.cd, .expt) .cdh .cdv { margin-left: auto; padding-left: 8px; font: 700 12px/1 var(--cd-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--cd-muted); white-space: nowrap; align-self: flex-start; }
+:is(.tip.cd, .expt) .cdl, :is(.tip.cd, .expt) .cdr { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; margin-top: 6px; font: 600 12px/1.35 var(--cd-mono); color: var(--cd-ink); }
+:is(.tip.cd, .expt) .cdr { flex-wrap: wrap; row-gap: 4px; }
+:is(.tip.cd, .expt) .cdi { display: inline-flex; align-items: center; justify-content: center; width: 16px; flex: none; }
+:is(.tip.cd, .expt) .cdi svg { display: block; }
+:is(.tip.cd, .expt) .cdi .bm { display: inline-flex; color: var(--bc, var(--cd-muted)); }
+:is(.tip.cd, .expt) .cdi .bm svg { width: 14px; height: 14px; }
+:is(.tip.cd, .expt) .cdt { color: var(--cd-muted); overflow-wrap: anywhere; flex: 1 1 0; min-width: 100px; }
+:is(.tip.cd, .expt) .cdlt { margin-left: auto; flex: 0 1 auto; max-width: 100%; text-align: right; font: 500 12px/1.35 var(--cd-mono); color: var(--cd-muted); opacity: .8; overflow-wrap: anywhere; }
+:is(.tip.cd, .expt) .cdsep { border-top: 1px solid var(--cd-line); margin: 9px 0 2px; }
+:is(.tip.cd, .expt) .cdpill { display: inline-flex; align-items: center; font: 700 12px/1 var(--cd-mono); font-style: normal; padding: 3px 8px; border: 1px solid transparent; white-space: nowrap; }
+:is(.tip.cd, .expt) .cdfp { display: inline-flex; align-items: center; font: 700 12px/1 var(--cd-mono); padding: 3px 9px; border: 1px solid; color: var(--cd-ink); background: var(--cd-chip); }
+:is(.tip.cd, .expt) .cdmix { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin-left: 4px; }
+:is(.tip.cd, .expt) .cdmix .mx { display: inline-flex; align-items: center; gap: 4px; color: var(--cd-ink); font: 700 12px/1 var(--cd-mono); }
+/* D-098: the rules above and below name the lab's portrait too (.expt, the bench's row) — the same rows on the page's own colours, set there.
+   The marks' rules stay the card's alone: the portrait's strips are the bench's own and draw by its rules. */
 /* the bench's marks, counted: the symbol, the colour or the character, as the kind's look draws them */
 .tip.cd .sq { display: block; flex: none; width: 13px; height: 13px; border-radius: 2px; background: var(--fc, var(--cd-muted)); }
 .tip.cd .sq.e-symbol { background: none; color: var(--fc, var(--cd-muted)); border-radius: 0; display: inline-flex; align-items: center; justify-content: center; }
 .tip.cd .sq.e-symbol svg { width: 13px; height: 13px; display: block; }
 .tip.cd .sq.e-char { background: none; color: var(--fc, var(--cd-muted)); width: auto; min-width: 13px; height: auto; line-height: 1; border-radius: 0; font: 800 13px/1 var(--cd-mono); text-align: center; }
 /* the element's own facts — rows: an icon, a pill or a chip leads; the words are short; the place is quiet at the end */
-.tip.cd .cdd { display: block; margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--cd-line); }
-.tip.cd .cdd .io { display: grid; grid-template-columns: 66px minmax(0, 1fr); column-gap: 8px; align-items: start; margin-top: 0; }
-.tip.cd .cdd .io:not([hidden]) ~ .io:not([hidden]) { margin-top: 7px; }
-.tip.cd .cdd .io > i { grid-column: 1; grid-row: 1 / span 12; font: 700 12px/1.45 var(--cd-mono); font-style: normal; text-transform: uppercase; letter-spacing: .05em; color: var(--cd-muted); opacity: 1; padding-top: 5px; }
-.tip.cd .cdd .io > .cdw { grid-column: 2; }
-.tip.cd .cdw { display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: 7px; margin-top: 4px; font: 500 12px/1.45 var(--cd-ui); color: var(--cd-ink); }
-.tip.cd .cdw[hidden], .tip.cd .cdd .io[hidden], .tip.cd .cdd[hidden] { display: none; }
-.tip.cd .cdwl { display: inline-flex; align-items: center; justify-content: center; flex: none; min-width: 16px; min-height: 17px; }
-.tip.cd .cdwl svg, .tip.cd .cdwi svg { display: block; }
-.tip.cd .cdwm { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 6px; flex: 1 1 0; min-width: 100px; padding-top: 1px; }
-.tip.cd .cdwt { flex: 0 1 auto; max-width: 100%; margin-left: auto; margin-top: -1px; padding-top: 1px; text-align: right; font: 500 12px/1.4 var(--cd-mono); color: var(--cd-muted); opacity: .85; overflow-wrap: anywhere; }
-.tip.cd .cdwd { color: var(--cd-muted); }
-.tip.cd .cdwv { color: var(--cd-ink); overflow-wrap: anywhere; }
-.tip.cd .cdcode { font: 500 12px/1.4 var(--cd-mono); color: var(--cd-muted); overflow-wrap: anywhere; }
-.tip.cd .cdq { font: 500 12px/1.4 var(--cd-ui); font-style: italic; color: var(--cd-muted); overflow-wrap: anywhere; }
-.tip.cd .cdsub { display: block; flex-basis: 100%; }
-.tip.cd .cdch { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; padding: 1px 6px; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--cdc, var(--cd-muted)) 50%, var(--cd-line)); background: var(--cd-chip); }
-.tip.cd .cdch svg { flex: none; display: block; }
-.tip.cd .cdwn { font: 700 12px/1.3 var(--cd-mono); color: var(--cd-ink); overflow-wrap: anywhere; }
-.tip.cd .cdrw { display: inline-flex; align-items: center; margin-left: 2px; padding: 0 4px; border-radius: 3px; font: 800 12px/1.35 var(--cd-mono); font-style: normal; color: #0b0e13; }
-.tip.cd .cdwg { display: inline-flex; align-items: center; }
-.tip.cd .cdd .io > .cdmore { grid-column: 1; grid-row: 2; align-self: start; margin-top: 0; }
-.tip.cd .cdmore .cdfp { font-size: 12px; padding: 0 5px; white-space: nowrap; color: var(--cd-muted); border-color: var(--cd-line); background: transparent; }
-.tip.cd .cdd .iosent { display: block; font: 500 12px/1.45 var(--cd-ui); color: var(--cd-ink); }
-.tip.cd .cdfoot { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-top: 7px; border-top: 1px solid var(--cd-line); font: 500 12px/1.4 var(--cd-ui); color: var(--cd-edge); }
-.tip.cd .cdfoot .cdi { width: 16px; }
+:is(.tip.cd, .expt) .cdd { display: block; margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--cd-line); }
+:is(.tip.cd, .expt) .cdd .io { display: grid; grid-template-columns: 66px minmax(0, 1fr); column-gap: 8px; align-items: start; margin-top: 0; }
+:is(.tip.cd, .expt) .cdd .io:not([hidden]) ~ .io:not([hidden]) { margin-top: 7px; }
+:is(.tip.cd, .expt) .cdd .io > i { grid-column: 1; grid-row: 1 / span 12; font: 700 12px/1.45 var(--cd-mono); font-style: normal; text-transform: uppercase; letter-spacing: .05em; color: var(--cd-muted); opacity: 1; padding-top: 5px; }
+:is(.tip.cd, .expt) .cdd .io > .cdw { grid-column: 2; }
+:is(.tip.cd, .expt) .cdw { display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: 7px; margin-top: 4px; font: 500 12px/1.45 var(--cd-ui); color: var(--cd-ink); }
+:is(.tip.cd, .expt) .cdw[hidden], :is(.tip.cd, .expt) .cdd .io[hidden], :is(.tip.cd, .expt) .cdd[hidden] { display: none; }
+:is(.tip.cd, .expt) .cdwl { display: inline-flex; align-items: center; justify-content: center; flex: none; min-width: 16px; min-height: 17px; }
+:is(.tip.cd, .expt) .cdwl svg, :is(.tip.cd, .expt) .cdwi svg { display: block; }
+:is(.tip.cd, .expt) .cdwm { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 6px; flex: 1 1 0; min-width: 100px; padding-top: 1px; }
+:is(.tip.cd, .expt) .cdwt { flex: 0 1 auto; max-width: 100%; margin-left: auto; margin-top: -1px; padding-top: 1px; text-align: right; font: 500 12px/1.4 var(--cd-mono); color: var(--cd-muted); opacity: .85; overflow-wrap: anywhere; }
+:is(.tip.cd, .expt) .cdwd { color: var(--cd-muted); }
+:is(.tip.cd, .expt) .cdwv { color: var(--cd-ink); overflow-wrap: anywhere; }
+:is(.tip.cd, .expt) .cdcode { font: 500 12px/1.4 var(--cd-mono); color: var(--cd-muted); overflow-wrap: anywhere; }
+:is(.tip.cd, .expt) .cdq { font: 500 12px/1.4 var(--cd-ui); font-style: italic; color: var(--cd-muted); overflow-wrap: anywhere; }
+:is(.tip.cd, .expt) .cdsub { display: block; flex-basis: 100%; }
+:is(.tip.cd, .expt) .cdch { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; padding: 1px 6px; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--cdc, var(--cd-muted)) 50%, var(--cd-line)); background: var(--cd-chip); }
+:is(.tip.cd, .expt) .cdch svg { flex: none; display: block; }
+:is(.tip.cd, .expt) .cdwn { font: 700 12px/1.3 var(--cd-mono); color: var(--cd-ink); overflow-wrap: anywhere; }
+:is(.tip.cd, .expt) .cdrw { display: inline-flex; align-items: center; margin-left: 2px; padding: 0 4px; border-radius: 3px; font: 800 12px/1.35 var(--cd-mono); font-style: normal; color: #0b0e13; }
+:is(.tip.cd, .expt) .cdwg { display: inline-flex; align-items: center; }
+:is(.tip.cd, .expt) .cdd .io > .cdmore { grid-column: 1; grid-row: 2; align-self: start; margin-top: 0; }
+:is(.tip.cd, .expt) .cdmore .cdfp { font-size: 12px; padding: 0 5px; white-space: nowrap; color: var(--cd-muted); border-color: var(--cd-line); background: transparent; }
+:is(.tip.cd, .expt) .cdd .iosent { display: block; font: 500 12px/1.45 var(--cd-ui); color: var(--cd-ink); }
+:is(.tip.cd, .expt) .cdfoot { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-top: 7px; border-top: 1px solid var(--cd-line); font: 500 12px/1.4 var(--cd-ui); color: var(--cd-edge); }
+:is(.tip.cd, .expt) .cdfoot .cdi { width: 16px; }
 /* ══ D-095 · the card's layout, per kind (the bench's hover tab): "rows" — a section's name on its own line, its lines under it at the card's full width;
    "wide" — the card may grow to fit what it holds; "both" — the two. "cols" is the lab's (the name in a 66px column). ══ */
 .tip.cd .cdc[data-lay="rows"] .cdd .io, .tip.cd .cdc[data-lay="both"] .cdd .io { grid-template-columns: minmax(0, 1fr); }

@@ -1482,3 +1482,22 @@ four shapes, said in words on a new ending part HOW: an error the code catches (
 and 334 say nothing (a success, a plain raise in the handler); swept, every one of the 394 draws its words, none empty or unfilled. The hover
 card keeps the raw line in its head. Chosen alone (his to correct): HOW starts in NOT DRAWN — he drags it onto a line to see it on the block;
 it is a separate part from WHERE (the call shape names a second file); the words name the code, never the feed's syntax.
+
+## D-098 — One kind tailored at a time: its controls and the lab's portrait, in a row under the columns
+Date: 2026-10-05 · Input: his message on the ending's hover card (same message as D-095).
+Decision, his: "I need the things we are going to show in the endpoint lab that would be in the portrait section when we click any of these
+to see the details inside. Let's make it so that only one of these can be active at a time. Can we modify one of these at a time and, when we
+do, show the different options to tailor it? We also move them in a row, showing the current section where we tailor this and the section of
+the portrait that we will show when we click that item."
+Consequence: every column's head gains a TAILOR square (a sliders icon; hover "tailor the ending"); one column is active at a time, drawn
+with an outline and its square pressed. The controls leave the columns — the eight columns keep only their element — and one row under the
+grid holds the active kind: HOW IT IS DRAWN at the left (the four tabs, unchanged) and WHAT OPENS ON A CLICK at the right, the portrait the
+lab opens for that element. The ending's portrait is built from the bench's own data: its head (glyph · status · words · stage), then WHAT IT
+IS (stage · where · how · check · code · answer form · in the contract), BEFORE · CHECKS · GIVES (the card's lines, on the page's colours),
+THE ANSWER IT SENDS (media · model · fields · body · headers), THE RULES THAT REFUSE THE BODY (each rule's place, type and limit — on 42 of
+the 728 endings, 281 rules), WAYS THAT END HERE (one strip per way, the ending's own mark ringed — 14 endings have more than one) and TESTS
+THAT PROVE IT (184 endings have one). The table, schema, function and test say their portrait is owed; the gate, the client hook and the
+in-flight value say the lab opens none. The active kind survives a reload.
+Chosen alone (his to correct): the ending is active until he picks; the portrait is rebuilt on the bench's data, not imported from the lab;
+its lines section keeps the label beside its lines (the row is wide, so the hover card's D-095 layout does not apply to it); the other kinds'
+portraits wait for his read of this one.
