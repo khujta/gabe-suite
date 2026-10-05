@@ -164,3 +164,6 @@
 .extp[data-tp="hover"] .expr { grid-template-columns: 104px 26px; }
 .exsizes { gap: 3px; }
 .exmkic { display: block; width: 11px; height: 11px; border-radius: 3px; background: currentColor; opacity: .6; flex: none; margin: 1px; }
+.excardopts { display: flex; gap: 3px; }
+.excardopts .opt { width: 26px; height: 26px; border-radius: 6px; }
+.excardopts .opt svg { width: 15px; height: 15px; }

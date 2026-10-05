@@ -576,6 +576,7 @@
   function card(ck, S0) { var spec = CDSPEC[ck] || CDSPEC.other, F = spec(S0), root = el("div", "cdc"), h = el("div", "cdh"), g = el("span", "cdg");
     if (!F.ident.length && S0.X && S0.X.io) { var at = cdAts(S0.X.io)[0]; if (at) F.ident.push(cdLine("file", "file", at)); }               /* a kind with no host of its own: where it is, as its facts say */
     root.setAttribute("data-card", ck); if (S0.ik) root.setAttribute("data-ik", S0.ik); if (S0.c) root.setAttribute("data-bound", S0.bk); if (S0.bench) root.setAttribute("data-bench", S0.bk);
+    var lk = S0.bk && XS.col[S0.bk] ? XS.col[S0.bk].look : null; root.setAttribute("data-lay", (lk && lk.card) || XW.cardLay.pick);   /* D-095: the kind's card layout, my pick when the card speaks for no bench kind */
     if (S0.region) { root.setAttribute("data-reg", S0.region); root.setAttribute("data-rp", S0.rp); root.setAttribute("data-ri", String(S0.ri || 0)); }   /* D-089: the region this card speaks for */
     var nb = xWrap(el("b"), F.name); if (F.nameCol) nb.style.color = F.nameCol;
     g.appendChild(F.glyph); h.appendChild(g); h.appendChild(nb);

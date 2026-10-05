@@ -26,6 +26,7 @@
      a part's form must be one its type takes, and every part has its hover switch (EX.look[k].hov: its own card where its region gives one, as the bench was) */
   function xFix(k, L) { var F = EX.fixed[k]; L.size = Object.assign({}, L.size); L.size.icon = F.icon; L.sqSize = F.sqSize; L.sqGap = F.sqGap; L.iconCol = F.iconCol;
     L.mode = Object.assign({}, L.mode); Object.keys(EX.forms[k] || {}).forEach(function (p) { if (L.mode[p] != null && EX.forms[k][p].opts.indexOf(L.mode[p]) < 0) delete L.mode[p]; });
+    if (EX.cardLays.indexOf(L.card) < 0) L.card = EX.look[k].card;                                  /* D-095: a card layout must be one of the four */
     var H = EX.look[k].hov || {}; L.hov = Object.assign({}, H, L.hov || {}); Object.keys(L.hov).forEach(function (p) { if (!(p in H)) delete L.hov[p]; }); return L; }
   XK.forEach(function (k) { xFix(k, XS.col[k].look); });
   function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, tab: XS.tab, col: {} }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
@@ -40,7 +41,9 @@
       width: { dynamic: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="13" height="8" rx="1"/>',   /* D-087: the default fills its column's walls, the other three narrow inside them */
         shorter: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="9" height="8" rx="1"/>',
         compact: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="6" height="8" rx="1"/>', tight: '<path d="M3 4v16M21 4v16"/><rect x="5.5" y="8" width="3.5" height="8" rx="1"/>' },
-      yn: { off: '<rect x="5" y="5" width="14" height="14" rx="2"/>', corners: '<rect x="6" y="6" width="12" height="12" rx="2" opacity=".45"/><path d="M3 9V3h6"/><path d="M21 15v6h-6"/>',
+      card: { cols: '<rect x="3" y="5" width="5" height="3" rx="1"/><path d="M11 6.5h10M11 11h10M11 15.5h7"/>', rows: '<rect x="3" y="4" width="7" height="3" rx="1"/><path d="M3 11h18M3 15h18M3 19h12"/>',
+      wide: '<rect x="1.5" y="5" width="4" height="3" rx="1"/><path d="M8 6.5h14.5M8 11h14.5M8 15.5h10"/><path d="M1 20h22" stroke-dasharray="2 2"/>', both: '<rect x="1.5" y="3" width="7" height="3" rx="1"/><path d="M1.5 10h21M1.5 14h21M1.5 18h14"/><path d="M1 21.5h22" stroke-dasharray="2 2"/>' },
+    yn: { off: '<rect x="5" y="5" width="14" height="14" rx="2"/>', corners: '<rect x="6" y="6" width="12" height="12" rx="2" opacity=".45"/><path d="M3 9V3h6"/><path d="M21 15v6h-6"/>',
         grey: '<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M5 19L19 5V19z" fill="currentColor" stroke="none"/>' },   /* D-091: not marked · the other two corners · the no in grey */
       /* D-093: a part's forms — a chip in its box · the word · a dot · a count boxed with its unit · the number boxed · the number and unit · the number · the glyph and the word ·
          the glyph · the part's name and the word — and the hover switch: a card of its own under the pointer */
@@ -659,7 +662,12 @@
     mg.appendChild(xPick(XW.ctl.pal, L.sqPal, ["type", "channel", "entity", "mono"], function (v) { xSet(k, function (x) { x.sqPal = v; }); }));
     mg.appendChild(xPick(XW.ctl.shape, L.sqShape, ["round", "square"], function (v) { xSet(k, function (x) { x.sqShape = v; }); })); mk.appendChild(mg); pf.appendChild(mk); box.appendChild(pf);
     /* HOVER: every part's switch, then the marks' — pressed = a card of its own, else the block's card */
-    var ph = xPane("hover"); order.concat(["marks"]).forEach(function (p) { var r = xCtlRow(k, p, L); r.appendChild(xHov(k, p, L, p === "marks" ? XW.ctl.theMarks : xPartWord(k, p))); ph.appendChild(r); }); box.appendChild(ph);
+    var ph = xPane("hover"); order.concat(["marks"]).forEach(function (p) { var r = xCtlRow(k, p, L); r.appendChild(xHov(k, p, L, p === "marks" ? XW.ctl.theMarks : xPartWord(k, p))); ph.appendChild(r); });
+    /* D-095: how this kind's hover cards lay out their sections — four looks, my pick dashed */
+    var CL = XW.cardLay, cs = xSec(CL.title, "excard"), cg2 = el("div", "opts excardopts"); cs.appendChild(el("p", "exhint", CL.plain)); cg2.setAttribute("role", "radiogroup"); cg2.setAttribute("aria-label", CL.title);
+    EX.cardLays.forEach(function (v) { var b = xAct("opt exo exi", XICON.card[v], "card", { v: CL.opts[v].name }, function () { xSet(k, function (x) { x.card = v; }); });
+      b.setAttribute("role", "radio"); b.setAttribute("data-xcard", v); b.setAttribute("aria-checked", L.card === v ? "true" : "false"); if (CL.pick === v) b.setAttribute("data-pick", "true"); cg2.appendChild(b); });
+    cs.appendChild(cg2); ph.appendChild(cs); box.appendChild(ph);
     xTabShow(box);
     var cp = el("div", "excp"), code = el("code", "exline", xCopy(k)), said = el("span", "said");
     code.hidden = true;                                           /* the line is not shown — the button copies it whole (L-36) */
@@ -690,7 +698,8 @@
       + " · sizes " + XPARTS[k].filter(function (p) { return L.size[p] != null; }).map(function (p) { return nm(p) + " " + L.size[p]; }).join(", ") + tail; }
   /* D-093: each part whose hover is not the default's, its own card or the block's — nothing when every switch is as the bench opened */
   function xHovLine(k, L) { var H0 = EX.look[k].hov || {}, H = L.hov || {}, d = Object.keys(H0).filter(function (p) { return !!H[p] !== !!H0[p]; });
-    return d.length ? " · " + XW.ctl.hover + " " + d.map(function (p) { return (p === "marks" ? XW.ctl.theMarks : xPartWord(k, p)) + " " + (H[p] ? "own" : "block"); }).join(", ") : ""; }
+    return (d.length ? " · " + XW.ctl.hover + " " + d.map(function (p) { return (p === "marks" ? XW.ctl.theMarks : xPartWord(k, p)) + " " + (H[p] ? "own" : "block"); }).join(", ") : "")
+      + (L.card !== EX.look[k].card ? " · " + XW.cardLay.title + " " + XW.cardLay.opts[L.card].name : ""); }   /* D-095: said only when it is not the bench's own */
   function xSame(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
   function xCopy(k) { var st = XS.col[k], it = xCurrent(k), L = st.look, whose = xWhose(k), mine = !xSame(L, EX.look[k]) || st.width !== XW.width.pick;   /* L-36: the column's width is part of its look */
     var off = (L.off || []).map(function (p) { return k === "table" ? p : xPartWord(k, p); }).join(k === "table" ? " " : " · ") || "—";

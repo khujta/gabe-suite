@@ -1441,3 +1441,16 @@ marks). Nothing sits in two tabs; reset and copy stay under the tabs on every ta
 790 px with everything on the page; by tab they stand 302 · 267 · 511 · 406 px. Chosen alone (his to correct): a tab picked in one column
 opens in every column (the bench compares kinds side by side), it is kept per viewer, and the order tab opens first; the tabs are words,
 not icon squares (they name sections, they are not looks); SHOW lists only the parts with a choice, FORMAT only the text parts.
+
+## D-095 — The hover card's layout: the section name above its content, a wider card, or both
+Date: 2026-10-05 · Input: his message on the ending's hover card (with two screenshots).
+Decision, his: "For all those sections where we have 'before checks' and 'gives,' let's make the information in a second row after that one.
+Instead of having two columns … we will have just one row, and we will put the message after that. It could be a configuration in the hover
+… or we can expand the width a little bit to accommodate things better based on the content inside, or a combination of both."
+Consequence: the hover tab gains CARD LAYOUT, four options per column — name beside (today: the section name in its own column, the content
+beside it) · name above (the name on its own row, the content under it at full width) · wider (name beside, the card may grow from 360 to
+520 px when its content needs it) · name above, wider. The copy line names the layout only when it is not the default. Measured: on 401
+invalid token (DELETE /me, a short card) name above is 258 px wide against 308 beside, and "wider" changes nothing — the content fits; on GET
+/recipes' 400 invalid temperature code (a long check) beside is 360 × 438, above 360 × 473, wider 520 × 387, above-and-wider 520 × 422.
+Chosen alone (his to correct): the default is NAME ABOVE (dashed) — his first ask; "wider" is a ceiling, not a fixed width, so a short card
+stays short; the layout is per column like every other look, and every card a column opens takes it (the block's card and the parts' cards).

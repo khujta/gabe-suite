@@ -842,6 +842,7 @@ PART_TYPE = {
 # D-093 — what no control changes any more (his: "the size of the glyph will not change … mark size … the gap between marks … glyph color won't change. It
 # would be its kind's color in every case"): the look's own values, kept by every saved look and every reset. The table's "model" colour IS its kind's colour.
 FIXED_KEYS = ("sqSize", "sqGap", "iconCol")
+CARD_LAYS, CARD_PICK = ("cols", "rows", "wide", "both"), "rows"   # D-095: how a kind's hover card lays out its sections; my pick is his ask, the name above
 
 
 def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict, write_ops: set, sweep=None) -> tuple:
@@ -933,6 +934,9 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
             looks[k] = {**base, "form": "block", "rows": M["rows"], "size": M["size"], "iconCol": M["iconCol"], "mode": {"count": "badge", "via": "both", "file": "word"},
                         "on": {}, "off": [p for p in M["parts"] if p not in [q for r0 in M["rows"] for q in r0["l"] + r0["r"]]]}
     # D-091 item 4: the fact option — off for every kind, three variants, my pick the one named here; the words say each kind's fact once (what a yes and a no are)
+    CW_ = EW.get("cardLay") or die("ex.cardLay: the hover card's layout has no words (D-095)")
+    if list(CW_.get("opts") or {}) != list(CARD_LAYS) or CW_.get("pick") != CARD_PICK:
+        die(f"ex.cardLay must name the layouts {list(CARD_LAYS)} and my pick {CARD_PICK!r}")
     YW = EW.get("yn") or die("ex.yn: the extra marks' option has no words (D-091)")
     if list(YW["opts"]) != list(YN_VARIANTS) or YW.get("pick") != YN_PICK or list(YW["kinds"]) != list(YN):
         die(f"ex.yn must name the variants {list(YN_VARIANTS)}, my pick {YN_PICK!r} and the kinds {list(YN)}: {list(YW['opts'])} · {YW.get('pick')!r} · {list(YW['kinds'])}")
@@ -959,6 +963,7 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
         looks[k]["iconCol"] = "model" if k == "table" else "kind"
         fixed[k] = {"icon": looks[k]["size"]["icon"], **{x: looks[k][x] for x in FIXED_KEYS}}
         looks[k]["hov"] = {p: 1 if r in ("head", "items") else 0 for p, r in REGIONS[k].items()}
+        looks[k]["card"] = CARD_PICK
     FW = EW.get("form") or die("ex.form: the forms have no words (D-093)")
     lost = sorted({f for o in FORM_TYPES.values() for f in o} - set(FW))
     if lost or any(not (FW[f].get("name") and FW[f].get("plain")) for f in FW if not f.startswith("_")):
@@ -997,7 +1002,7 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
         die(f"ex.region.way names {sorted(RW['way'])}, the strip of marks draws {marks}")
     icons = {p["ico"] for k in LAB_KINDS for p in lk["parts"][k]} | {x["sym"] for x in lk["sq"]} | set(EW["icons"].values())
     D = {"kinds": list(KINDS), "look": looks, "parts": lk["parts"], "icol": lk["icol"], "sq": lk["sq"], "col": lk["col"], "his": lk["his"],
-         "cat": dict(sorted(cat.items())), "modes": MODES, "forms": forms, "fixed": fixed, "regions": REGIONS, "yn": {"kinds": list(YN)}, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
+         "cat": dict(sorted(cat.items())), "modes": MODES, "forms": forms, "fixed": fixed, "cardLays": list(CARD_LAYS), "regions": REGIONS, "yn": {"kinds": list(YN)}, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
          "absent": {k: arm_off(fj, a) for k, a in KIND_ARM.items() if k in KINDS and arm_off(fj, a)}}
     bench_css = BENCH_CSS.read_text(encoding="utf-8")
     if bench_css.count("__LAB_MONO__") != 1:

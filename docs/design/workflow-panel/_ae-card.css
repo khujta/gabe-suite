@@ -57,3 +57,10 @@
 .tip.cd .cdd .iosent { display: block; font: 500 12px/1.45 var(--cd-ui); color: var(--cd-ink); }
 .tip.cd .cdfoot { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-top: 7px; border-top: 1px solid var(--cd-line); font: 500 12px/1.4 var(--cd-ui); color: var(--cd-edge); }
 .tip.cd .cdfoot .cdi { width: 16px; }
+/* ══ D-095 · the card's layout, per kind (the bench's hover tab): "rows" — a section's name on its own line, its lines under it at the card's full width;
+   "wide" — the card may grow to fit what it holds; "both" — the two. "cols" is the lab's (the name in a 66px column). ══ */
+.tip.cd .cdc[data-lay="rows"] .cdd .io, .tip.cd .cdc[data-lay="both"] .cdd .io { grid-template-columns: minmax(0, 1fr); }
+.tip.cd .cdc[data-lay="rows"] .cdd .io > i, .tip.cd .cdc[data-lay="both"] .cdd .io > i { grid-row: auto; padding-top: 0; }
+.tip.cd .cdc[data-lay="rows"] .cdd .io > .cdw, .tip.cd .cdc[data-lay="both"] .cdd .io > .cdw,
+.tip.cd .cdc[data-lay="rows"] .cdd .io > .cdmore, .tip.cd .cdc[data-lay="both"] .cdd .io > .cdmore { grid-column: 1; grid-row: auto; }
+.tip.cd:has(.cdc[data-lay="wide"]), .tip.cd:has(.cdc[data-lay="both"]) { max-width: 520px; }
