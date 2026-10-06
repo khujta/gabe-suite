@@ -1,0 +1,133 @@
+/* ══ D-099 · THE PORTRAIT'S FRAME — the endpoint lab's #port (_lab-ep.css "THE PORTRAIT PANEL"): a box 440 × 560 with a 12px radius and a 1px line, a head 38px tall
+   on the nav colour with the subject in caps, one 26 × 24 square per way of drawing it; the body one of the lab's records. The lab's record, shape, wheel and keys rules
+   are carried here, scoped to .expf — the bench imports only the block's rules (_ae_bench.py BLOCK_CLASSES), and these name none of them. The colours are the lab's,
+   fixed: a dark panel in the light theme too, as the hover card is (D-088) — the page's own names are given the lab's values, so a strip or a mark drawn inside reads dark. ══ */
+#sec-ex .expf { --panel: #182136; --card: #182136; --ink: #e7ebf3; --ink-soft: #c3cad8; --muted: #8794ab; --line: #2b3650; --rule: #2b3650; --raised: #0e1524; --chip-bg: #0e1524;
+  --ground: #0c1322; --nav-bg: #0c1322; --accent: #8b83f5;
+  --cd-panel: #182136; --cd-ink: #e7ebf3; --cd-muted: #8794ab; --cd-line: #2b3650; --cd-edge: #4a525c; --cd-chip: #0e1524; --cd-ok: #4cbe83; --cd-red: #ff6b6b;
+  --cd-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; --cd-mono: var(--font-mono);
+  box-sizing: border-box; width: 440px; max-width: 100%; display: flex; flex-direction: column; overflow: hidden; background: var(--panel); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 12px; font: 500 12px/1.4 var(--cd-ui); }
+#sec-ex .expf[data-box="lab"] { height: 560px; }   /* the lab's box: the record scrolls inside it */
+#sec-ex .expf[data-box="grow"] { height: auto; }   /* as tall as its record: nothing scrolls */
+#sec-ex .expf[data-box="grow"] .ptbody { overflow: visible; }
+#sec-ex .expfhd { flex: none; display: flex; align-items: center; gap: 7px; padding: 6px 10px; min-height: 38px; box-sizing: border-box; border-bottom: 1px solid var(--line);
+  background: var(--nav-bg); font: 800 12px/1.2 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink); }
+#sec-ex .expfhd .pti { display: inline-flex; flex: none; }
+#sec-ex .expfhd .pti svg { display: block; }
+#sec-ex .expfhd .expft { min-width: 0; font: inherit; overflow-wrap: anywhere; }
+#sec-ex .expfhd .ptsub { flex: none; color: var(--muted); font-weight: 600; text-transform: none; letter-spacing: 0; }
+#sec-ex .expfv { margin-left: auto; display: flex; gap: 3px; flex: none; }
+#sec-ex .expf .ptv { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 24px; padding: 0; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--chip-bg); color: var(--muted); cursor: pointer; }
+#sec-ex .expf .ptv svg { display: block; }
+#sec-ex .expf .ptv:hover { color: var(--ink); border-color: var(--accent); }
+#sec-ex .expf .ptv.on { color: #fff; background: var(--accent); border-color: var(--accent); }
+#sec-ex .expf .ptv:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* the three the lab draws no portrait for say so, under the head */
+#sec-ex .expfnote { flex: none; margin: 0; padding: 6px 12px; border-bottom: 1px dashed var(--line); color: var(--muted); font: 500 12px/1.45 var(--cd-ui); }
+#sec-ex .expf .ptbody { flex: 1; min-height: 0; min-width: 0; overflow-y: auto; padding: 9px 12px; }
+#sec-ex .expf .ptidle { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 16px 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+#sec-ex .expf .ptsec { margin: 10px 0 5px; font: 700 12px/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+
+/* RECORD — the lab's .ptrec: a head (glyph · name), rows (an icon · a label · the value), sections, tables whose rows share one grid */
+#sec-ex .expf .ptrec .rchd { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 9px; padding: 2px 0 9px; }
+#sec-ex .expf .ptrec .rchd b { font: 800 15px/1.25 var(--font-mono); color: var(--ink); word-break: break-all; }
+#sec-ex .expf .ptrec .rchd.pfexit b { flex: 1 1 12ch; word-break: normal; overflow-wrap: anywhere; }
+#sec-ex .expf .ptrec .rchd .cdv { margin-left: auto; font: 700 12px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); white-space: nowrap; }
+#sec-ex .expf .rci { display: inline-flex; align-items: center; justify-content: center; width: 18px; flex: none; }
+#sec-ex .expf .rci svg { display: block; }
+#sec-ex .expf .rcrow { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px solid color-mix(in srgb, var(--line) 50%, transparent); font: 600 12px/1.4 var(--font-mono); }
+#sec-ex .expf .rcrow .k { flex: none; width: 62px; font-weight: 700; color: var(--muted); overflow-wrap: anywhere; }
+#sec-ex .expf .rcrow .v { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; color: var(--ink); word-break: break-word; }
+#sec-ex .expf .rcrow[data-row="file"] .v { color: var(--muted); word-break: break-all; }
+#sec-ex .expf .rcrow.own .v { color: var(--ink); } #sec-ex .expf .rcrow[data-row="react"]:not(.own) .v { color: var(--muted); }
+#sec-ex .expf .rcrow .k .cdpill { font-size: 12px; }
+/* a chip, the lab's default look (a tag filled with its colour, dark ink — chipLookOf) */
+#sec-ex .expf .rcchip { display: inline-flex; align-items: center; font: 700 12px/1 var(--font-mono); font-style: normal; padding: 3px 8px; border: 1px solid transparent; border-radius: 3px;
+  background: var(--rwc, var(--muted)); color: #0b0e13; }
+#sec-ex .expf .pfw { color: var(--ink); }
+#sec-ex .expf .pfat { color: var(--muted); opacity: .8; font-weight: 500; overflow-wrap: anywhere; }
+#sec-ex .expf .exmth { font-weight: 700; color: var(--ink); }
+/* the field table: ONE grid, every row borrows its columns (subgrid) — the lab's own reason: a row sizing its own columns put each row's keys at a different x */
+#sec-ex .expf .exw.flds.rctab { border: 0; border-radius: 0; background: none; box-shadow: none; padding: 0; margin: 12px 0 0; display: grid;
+  grid-template-columns: minmax(min-content, max-content) minmax(min-content, 1fr) minmax(min-content, max-content); column-gap: 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent); }
+#sec-ex .expf .exptsec .exw.flds.rctab { margin-top: 2px; }
+#sec-ex .expf .rctab .rcth, #sec-ex .expf .rctab .fld { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: center; gap: normal; }
+#sec-ex .expf .rctab .rcth { padding: 0 8px 6px; font: 700 12px/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: 0; color: var(--muted); white-space: nowrap; }
+#sec-ex .expf .rctab .rcth .c-f { display: inline-flex; align-items: center; gap: 7px; }
+#sec-ex .expf .rctab .rcfp { display: inline-flex; align-items: center; font: 700 12px/1 var(--font-mono); font-style: normal; letter-spacing: 0; padding: 2px 8px; border: 1px solid;
+  color: var(--ec, var(--ink)); border-color: color-mix(in srgb, var(--ec, var(--ink)) 60%, transparent); border-radius: 3px; }
+#sec-ex .expf .rctab .c-t { justify-self: end; }
+#sec-ex .expf .rctab .fld { padding: 5px 8px; cursor: help; border-top: 1px solid color-mix(in srgb, var(--line) 55%, transparent); }
+#sec-ex .expf .rctab .fld:hover { background: color-mix(in srgb, var(--ec, var(--accent)) 12%, transparent); }
+#sec-ex .expf .rctab .fld .c-f { display: flex; align-items: center; gap: 9px; min-width: 0; }
+#sec-ex .expf .rctab .fld .c-k { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; min-width: 0; color: var(--muted); font: 600 12px/1.4 var(--font-mono); }
+#sec-ex .expf .rctab .fld .fn { flex: 0 1 auto; min-width: 0; font: 600 12px/1.5 var(--font-mono); color: var(--ink); white-space: normal; }   /* a long name breaks where its words do (xWrap's breaks), so the three columns fit the lab's 440 */
+#sec-ex .expf .rctab .fld .ft { font: 600 12px/1.5 var(--font-mono); color: var(--muted); white-space: normal; text-align: right; overflow-wrap: anywhere; }
+#sec-ex .expf .rctab .fld.more .fn, #sec-ex .expf .rctab .fld.more .ft { color: var(--muted); font-style: italic; }
+#sec-ex .expf .rctab .fld.here { background: color-mix(in srgb, var(--accent) 16%, transparent); box-shadow: inset 2px 0 0 var(--accent); }
+#sec-ex .expf .rctab .fld.nest .fn { color: var(--ink); }
+#sec-ex .expf .fkx { display: inline-flex; align-items: center; gap: 3px; flex: none; min-width: 0; max-width: 13em; font: 600 12px/1 var(--font-mono); white-space: nowrap; color: var(--muted); }
+#sec-ex .expf .fkx svg { display: block; flex: none; }
+#sec-ex .expf .fkx span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+/* the sections an ending, a test, a gate, a hook and an in-flight value carry: a title in caps, its rows under it */
+#sec-ex .expf .exptsec { display: flex; flex-direction: column; gap: 0; margin-top: 4px; }
+#sec-ex .expf .exptsec > .ptsec { margin: 10px 0 3px; }
+#sec-ex .expf .exptsec .rcrow .k { width: 86px; }
+#sec-ex .expf .cdd { border-top: 0; margin-top: 0; padding-top: 2px; }   /* the section carries the title; the card's own rule would double it */
+#sec-ex .expf .exptw { border: 0; padding: 0; background: none; box-shadow: none; display: flex; flex-direction: column; gap: 4px; }
+#sec-ex .expf .exptw .exptway .sqs { margin-left: 0; padding-left: 0; }   /* over the lab's strip rule, which sends a strip to the right of its block */
+#sec-ex .expf .exptway { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 6px; }
+#sec-ex .expf .exptl { color: var(--muted); font: 600 12px/1.4 var(--font-mono); }
+#sec-ex .expf .expttests, #sec-ex .expf .pfends { display: flex; flex-wrap: wrap; gap: 4px 6px; }
+#sec-ex .expf .pfends { flex-direction: column; }
+#sec-ex .expf .pfend { display: inline-flex; align-items: center; gap: 8px; font: 600 12px/1.4 var(--font-mono); }
+#sec-ex .expf .exhint { color: var(--muted); font-size: 12px; }
+
+/* SHAPE — the drum as the graph draws it, the fields as cells beneath */
+#sec-ex .expf .ptbody.shp { display: flex; flex-direction: column; gap: 9px; }
+#sec-ex .expf .shdrum { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0 2px; }
+#sec-ex .expf .shdrum svg { display: block; }
+#sec-ex .expf .shdrum b { font: 700 14px/1.3 var(--font-mono); color: var(--ink); overflow-wrap: anywhere; text-align: center; }
+#sec-ex .expf .shdrum span { font: 600 12px/1.3 var(--font-mono); color: var(--muted); }
+#sec-ex .expf .shgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(122px, 1fr)); gap: 4px; align-content: start; }
+#sec-ex .expf .shcell { display: flex; align-items: center; gap: 5px; padding: 4px 6px; border-radius: 6px; cursor: help; min-width: 0;
+  background: color-mix(in srgb, var(--fc) 13%, transparent); border: 1px solid color-mix(in srgb, var(--fc) 34%, transparent); }
+#sec-ex .expf .shcell .shsw { flex: none; width: 8px; height: 8px; border-radius: 2px; background: var(--fc); }
+#sec-ex .expf .shcell .fn { font: 600 12px/1.3 var(--font-mono); color: var(--ink); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#sec-ex .expf .shcell .ft { margin-left: auto; font: 600 12px/1.3 var(--font-mono); color: var(--muted); white-space: nowrap; }
+#sec-ex .expf .shcell .fkx { max-width: 6em; }
+#sec-ex .expf .shcell.opt { opacity: .62; }
+#sec-ex .expf .shcell.fk { box-shadow: inset 2px 0 0 #94a3b8; }
+#sec-ex .expf .shcell.uq .fn { border-bottom: 1px dashed #eab308; }
+#sec-ex .expf .shcell:hover { border-color: var(--fc); }
+
+/* WHEEL — the fields in a ring around the drum; the mix is the picture */
+#sec-ex .expf .ptbody.whl { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+#sec-ex .expf .wwrap { position: relative; flex: none; width: min(100%, 300px); aspect-ratio: 1; }
+#sec-ex .expf .wsvg { width: 100%; height: 100%; display: block; }
+#sec-ex .expf .wseg { cursor: help; transition: fill-opacity .12s; } #sec-ex .expf .wseg:hover { fill-opacity: 1 !important; }
+#sec-ex .expf .whub { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; pointer-events: none; }
+#sec-ex .expf .whub svg { display: block; margin-bottom: 2px; }
+#sec-ex .expf .whub b { font: 800 17px/1 var(--font-mono); color: var(--ink); }
+#sec-ex .expf .whub span { font: 600 12px/1 var(--font-mono); color: var(--muted); }
+#sec-ex .expf .wlgd { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px 10px; }
+#sec-ex .expf .wlgd .lg { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+#sec-ex .expf .wlgd .lg .sw { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+
+/* KEYS — what it points at, and what points back */
+#sec-ex .expf .ptbody.keys .kcentre { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0 6px; }
+#sec-ex .expf .ptbody.keys .kcentre svg { display: block; }
+#sec-ex .expf .ptbody.keys .kcentre b { font: 700 13px/1.3 var(--font-mono); color: var(--ink); overflow-wrap: anywhere; }
+#sec-ex .expf .ptbody.keys .kcentre span { font: 600 12px/1.3 var(--font-mono); color: var(--muted); }
+#sec-ex .expf .krow { display: flex; align-items: center; gap: 6px; padding: 4px 7px; margin-bottom: 3px; border-radius: 6px; cursor: help;
+  background: var(--chip-bg); border: 1px solid var(--line); font: 600 12px/1.4 var(--font-mono); }
+#sec-ex .expf .krow svg { display: block; flex: none; }
+#sec-ex .expf .krow.kin { border-left: 3px solid var(--ec, var(--line)); }
+#sec-ex .expf .krow .kc { color: var(--ink); } #sec-ex .expf .krow .kt { color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+#sec-ex .expf .krow .ka { color: var(--muted); opacity: .7; }
+#sec-ex .expf .krow:hover { border-color: var(--accent); }
+#sec-ex .expf .kempty { font-size: 12px; line-height: 1.45; color: var(--muted); padding: 2px 2px 4px; }

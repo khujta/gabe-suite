@@ -3129,8 +3129,9 @@ const tailor = async (k) => { if (await p.$(CT(k))) return; const s0 = '#exgrid 
   await p.mouse.wheel(0, 200); await p.waitForTimeout(200); const plain = await p.evaluate(() => document.getElementById('mogrid').scrollLeft);
   await p.keyboard.down('Shift'); await p.mouse.wheel(0, 300); await p.keyboard.up('Shift'); await p.waitForTimeout(250);
   const sh = await p.evaluate(() => document.getElementById('mogrid').scrollLeft);
-  ok(ov.over > 1 && ov.hint && ov.hintText === MW.scrolls && /Shift/.test(ov.hintText) && plain === 0 && sh > 0,
-    'D-081 · L-38 · a table still wider than its box (' + ov.over + ' px) says so, naming Shift and the wheel; the plain wheel leaves it, Shift and the wheel slide it ' + sh + ' px', { ov, plain, sh });
+  /* CHANGED 2026-10-05: the plain wheel is judged against where the table stood, not 0 — gabe-artifact 1.7.0's chrome opens the page at 110 % text, the table grows, and focusing its edge already slides it */
+  ok(ov.over > 1 && ov.hint && ov.hintText === MW.scrolls && /Shift/.test(ov.hintText) && plain === ov.left && sh > plain,
+    'D-081 · L-38 · a table still wider than its box (' + ov.over + ' px) says so, naming Shift and the wheel; the plain wheel leaves it where it stood (' + plain + ' px), Shift and the wheel slide it to ' + sh + ' px', { ov, plain, sh });
   await p.setViewportSize({ width: 1920, height: 1080 }); await p.waitForTimeout(250);
   ok(!errs.length, 'D-081 · no page error', errs); }
 
@@ -3314,7 +3315,7 @@ const tailor = async (k) => { if (await p.$(CT(k))) return; const s0 = '#exgrid 
    break each rule and stays silent on a clean one; (5) the frame is the lab's, read from the lab's source: panel colour, border, radius, padding, width range, the 12px floor on every text;
    (6) the card follows the bench: a look set on a kind of the bench is the card's; (7) heads and controls keep the short hover; (8) the one-sentence form reaches the card */
 { const E = 'POST /cooking/sessions', ROWIDS = D.rows.map((r) => r.id), TIPS = D.words.mo.card.foot, LABST = fs.readFileSync(path.join(HERE, '_station.js'), 'utf8'), LABCSS = fs.readFileSync(path.join(HERE, '_lab-ep.css'), 'utf8');
-  const TARGETS = '#sec-mo [data-tip="mochip"], #sec-mo [data-tip="modxn"], #sec-mo [data-tip="mojy"], #sec-mo [data-tip="moilf"], #sec-ex [data-tip="exblk"]';
+  const TARGETS = '#sec-mo [data-tip="mochip"], #sec-mo [data-tip="modxn"], #sec-mo [data-tip="mojy"], #sec-mo [data-tip="moilf"], #sec-ex #exgrid [data-tip="exblk"]';   /* the columns only: the tailoring area's clone (D-099) draws the same block as its column */
   const plains = []; { const take = (o) => { if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) { if (k === 'plain' && typeof v === 'string' && v.length > 24) plains.push(v); else take(v); } };
     take(D.words.mo.io.k); take(D.words.ex.kinds); take(D.words.ex.roles); take(D.words.kinds); }
   const readCard = () => p.evaluate(() => { const t = document.getElementById('tip'), c = t.querySelector('.cdc'); if (!c) return { card: null, cd: t.classList.contains('cd'), show: t.getAttribute('data-show') };
@@ -4003,59 +4004,125 @@ const tailor = async (k) => { if (await p.$(CT(k))) return; const s0 = '#exgrid 
     ok(!errs.length, 'D-094 · the clicks and keys raised no error', errs.slice(0, 3)); }
 
   /* ══ D-098 · ONE KIND TAILORED AT A TIME (his: "only one of these can be active at a time … modify one of these at a time and, when we do, show the different options to
-     tailor it … move them in a row, showing the current section where we tailor this and the section of the portrait that we will show when we click that item"). By real clicks. ══ */
+     tailor it …") and D-099 · THE TAILORING AREA (his: "a section similar to the eight sections we have in Examples. It should have a dropdown where we can change the kind of
+     item … We will then clone the same configuration section … We're also going to show that element in what would be the portrait panel … actually kind of the same").
+     CHANGED 2026-10-05 (D-099): the row became the tailoring area — the chosen kind's column cloned (its kind a dropdown), its controls, its portrait in the lab's frame.
+     By real clicks and real picks. ══ */
   { await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), 'DELETE /me'); await p.waitForTimeout(450);
-    const CW = D.words.ex, RW = CW.row, PW = CW.portrait, KS = D.ex.kinds;
-    const st = () => p.evaluate(() => { const r = document.getElementById('exact'); return { k: r && r.getAttribute('data-k'), ctl: document.querySelectorAll('#sec-ex .exctl').length, inGrid: document.querySelectorAll('#exgrid .exctl, #exgrid .exline, #exgrid .extabs').length,
+    const CW = D.words.ex, RW = CW.row, PW = CW.portrait, PF = CW.pf, KS = D.ex.kinds;
+    const PTV = { table: ['record', 'shape', 'wheel', 'keys'], schema: ['record'], fn: ['record'], end: ['exit'], test: ['case'], gate: ['record'], hook: ['record'], inf: ['record'] }, LAB = ['table', 'schema', 'fn', 'end', 'test'];
+    const st = () => p.evaluate(() => { const r = document.getElementById('exact'), f = r && r.querySelector('.expf'); return { k: r && r.getAttribute('data-k'), ctl: document.querySelectorAll('#sec-ex .exctl').length,
+      inGrid: document.querySelectorAll('#exgrid .exctl, #exgrid .exline, #exgrid .extabs, #exgrid .excol[data-clone]').length,
       active: [...document.querySelectorAll('#exgrid .excol[data-active="true"]')].map((c) => c.getAttribute('data-k')), pressed: [...document.querySelectorAll('#exgrid .extailor[aria-pressed="true"]')].map((b) => b.closest('.excol').getAttribute('data-k')),
       squares: [...document.querySelectorAll('#exgrid .excol')].map((c) => { const b = c.querySelector('.exhd .extailor'); return b ? [c.getAttribute('data-k'), b.getAttribute('data-verb'), b.getAttribute('data-obj'), b.getAttribute('aria-label'), !b.textContent.trim() && !!b.querySelector('svg')] : [c.getAttribute('data-k'), null]; }),
-      title: r && (r.querySelector('.exahd') || {}).textContent, ctlHd: r && (r.querySelector('.exactl > .exsh') || {}).textContent, ptHd: r && (r.querySelector('.exapt > .exsh') || {}).textContent,
-      tab: r && (r.querySelector('.extab[aria-selected="true"]') || { getAttribute: () => null }).getAttribute('data-tab'), pt: r && r.querySelector('.expt') ? r.querySelector('.expt').getAttribute('data-state') : null }; });
+      title: r && (r.querySelector('.exahd h3') || {}).textContent, ctlHd: r && (r.querySelector('.exactl > .exsh') || {}).textContent, ptHd: r && (r.querySelector('.exapt > .exsh') || {}).textContent, colHd: r && (r.querySelector('.exaleft > .exsh') || {}).textContent,
+      tab: r && (r.querySelector('.extab[aria-selected="true"]') || { getAttribute: () => null }).getAttribute('data-tab'), pick: r && r.querySelector('.exkind') ? r.querySelector('.exkind').value : null,
+      opts: r ? [...r.querySelectorAll('.exkind option')].map((o) => o.value) : [], clone: r ? r.querySelectorAll('.excol[data-clone="true"] .blk').length : 0, cloneSq: r ? r.querySelectorAll('.excol[data-clone="true"] .extailor').length : -1,
+      pt: f && f.getAttribute('data-state'), src: f && f.getAttribute('data-src') }; });
     const s0 = await st();
-    ok(s0.k === 'end' && s0.ctl === 1 && !s0.inGrid && JSON.stringify(s0.active) === '["end"]' && JSON.stringify(s0.pressed) === '["end"]' && s0.pt === 'built'
-       && s0.title === RW.title.replace('{kind}', CW.kinds.end.name) && s0.ctlHd === RW.ctl && s0.ptHd === RW.pt,
-      'D-098 · one set of controls on the page, none in the columns: the row under them tailors the ending (the first column) until he picks — its controls at the left, the portrait the lab opens at the right', s0);
+    ok(s0.k === 'end' && s0.ctl === 1 && !s0.inGrid && JSON.stringify(s0.active) === '["end"]' && JSON.stringify(s0.pressed) === '["end"]' && s0.pt === 'drawn' && s0.src === 'lab'
+       && s0.title === RW.title && s0.colHd === RW.col && s0.ctlHd === RW.ctl && s0.ptHd === RW.pt && s0.pick === 'end' && JSON.stringify(s0.opts) === JSON.stringify(KS) && s0.clone === 1 && s0.cloneSq === 0,
+      'D-098 · D-099 · one set of controls on the page, none in the columns: the tailoring area under them holds the ending (the first column) until he picks — its column cloned, its kind a dropdown of all ' + KS.length + ', its controls under it, its portrait in the lab\'s frame beside it', s0);
     ok(s0.squares.length === KS.length && s0.squares.every(([k, v, o, l, ic]) => v === CW.act.tailor.verb && o === CW.act.tailor.obj.replace('{kind}', CW.kinds[k].name) && l === v + ' ' + o && ic),
       'D-098 · L-36 · every column\'s head carries a tailor square — an icon, no text, its hover "' + CW.act.tailor.verb + ' ' + CW.act.tailor.obj.replace('{kind}', CW.kinds.fn.name) + '"', s0.squares);
     /* a tab picked stays picked when another kind is made the one tailored; the kind is kept through a reload */
     await p.click('#exact .extab[data-tab="hover"]'); await p.waitForTimeout(80); await p.click('#exgrid .excol[data-k="fn"] .extailor'); await p.waitForTimeout(150); const s1 = await st();
     await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await p.waitForTimeout(300); const s2 = await st();
-    ok(s1.k === 'fn' && JSON.stringify(s1.active) === '["fn"]' && JSON.stringify(s1.pressed) === '["fn"]' && s1.ctl === 1 && s1.tab === 'hover' && s1.title === RW.title.replace('{kind}', CW.kinds.fn.name) && s2.k === 'fn' && s2.tab === 'hover',
-      'D-098 · a real click on the function\'s square makes it the one tailored (its column outlined, its square pressed, the ending\'s released) and the hover tab stays open; a reload keeps both', { s1, s2 });
-    /* each kind's portrait: the ending's built; the table, schema, function and test owed; the gate, the client hook and the in-flight value — the lab opens none */
-    const PTK = { end: 'built', table: 'owed', schema: 'owed', fn: 'owed', test: 'owed', gate: 'none', hook: 'none', inf: 'none' }, pk = {};
-    for (const k of KS) { await tailor(k); pk[k] = await p.evaluate(() => { const q = document.querySelector('#exact .expt'); return q ? [q.getAttribute('data-state'), q.innerText.replace(/\s+/g, ' ').trim().slice(0, 120)] : null; }); }
-    ok(KS.every((k) => pk[k] && pk[k][0] === PTK[k] && (PTK[k] === 'built' || pk[k][1] === PW[PTK[k]].replace('{kind}', CW.kinds[k].name))),
-      'D-098 · the portrait each kind opens: the ending\'s built here; the table · schema · function · test say theirs is owed; the gate · client hook · in-flight value say the lab opens none', pk);
+    ok(s1.k === 'fn' && JSON.stringify(s1.active) === '["fn"]' && JSON.stringify(s1.pressed) === '["fn"]' && s1.ctl === 1 && s1.tab === 'hover' && s1.pick === 'fn' && s2.k === 'fn' && s2.tab === 'hover' && s2.pick === 'fn',
+      'D-098 · a real click on the function\'s square makes it the one tailored (its column outlined, its square pressed, the ending\'s released, the dropdown names it) and the hover tab stays open; a reload keeps both', { s1, s2 });
+    /* the dropdown: a real pick makes that kind the one tailored, the same as its square */
+    await p.selectOption('#exact .exkind', 'gate'); await p.waitForTimeout(200); const s3 = await st();
+    await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await p.waitForTimeout(300); const s4 = await st();
+    ok(s3.k === 'gate' && JSON.stringify(s3.active) === '["gate"]' && JSON.stringify(s3.pressed) === '["gate"]' && s3.pick === 'gate' && s3.clone === 1 && s4.k === 'gate',
+      'D-099 · a real pick of "' + CW.kinds.gate.name + '" in the dropdown makes it the one tailored — its Examples column outlined, its square pressed — and a reload keeps it', { s3, s4 });
+    /* the clone is the column, not a copy of it: a step in the clone moves the column's example too */
+    await tailor('table');
+    const ids = () => p.evaluate(() => [(document.querySelector('#exgrid .excol[data-k="table"] .blk') || {}).getAttribute?.('data-exid'), (document.querySelector('#exact .excol[data-clone] .blk') || {}).getAttribute?.('data-exid'), (document.querySelector('#exact .expf .expft') || {}).textContent]);
+    const i0 = await ids(); await p.click('#exact .excol[data-clone] .exstep >> nth=1'); await p.waitForTimeout(200); const i1 = await ids();
+    ok(i0[0] && i0[0] === i0[1] && i1[0] === i1[1] && i1[0] !== i0[0] && i1[2] !== i0[2],
+      'D-099 · the clone is the column: a real click on the clone\'s next step moves the table column\'s example and the portrait with it (' + i0[0] + ' → ' + i1[0] + ')', { i0, i1 });
+    await p.click('#exact .excol[data-clone] .exstep >> nth=0'); await p.waitForTimeout(150);
+    /* a kind the endpoint has none of: DELETE /me reads no body, so its schema column is empty — the frame says the column's own sentence, never "pick one" */
+    await p.evaluate(() => window.__allep.pick('DELETE /me')); await p.waitForTimeout(300); await p.selectOption('#exact .exkind', 'schema'); await p.waitForTimeout(180);
+    const pe0 = await p.evaluate(() => { const f = document.querySelector('#exact .expf'), col = document.querySelector('#exgrid .excol[data-k="schema"] .exnone'); return { n: window.__allepEx.items('schema').length, state: f.getAttribute('data-state'), said: (f.querySelector('.ptidle') || {}).textContent || null, col: col ? col.textContent : null }; });
+    ok(pe0.n === 0 && pe0.state === 'empty' && pe0.said === CW.ctl.none && pe0.col === CW.ctl.none,
+      'D-099 · a kind the endpoint has none of (DELETE /me reads no body, so no schema): the portrait says what its column says, "' + CW.ctl.none + '", never "pick one"', pe0);
+    /* each kind's portrait, on the first endpoint that has every kind: drawn in the lab's frame; the lab's own views for the five it opens, approximated — and said — for the three it opens none for */
+    const FULL = await p.evaluate(async (KS) => { const X = window.__allepEx, C = window.__allep.data.ex.cat, eps = [...new Set(Object.keys(C).filter((i) => C[i].k === 'end').map((i) => i.split('|')[0]))];
+      for (const ep of eps) { window.__allep.pick(ep); await new Promise((r) => setTimeout(r, 15)); if (KS.every((k) => X.items(k).length)) return ep; } return null; }, KS);
+    await p.waitForTimeout(250);
+    const pk = {};
+    for (const k of KS) { await p.selectOption('#exact .exkind', k); await p.waitForTimeout(180);
+      pk[k] = await p.evaluate(() => { const f = document.querySelector('#exact .expf'); return f ? { state: f.getAttribute('data-state'), src: f.getAttribute('data-src'), views: [...f.querySelectorAll('.ptv')].map((b) => b.getAttribute('data-pv')),
+        on: [...f.querySelectorAll('.ptv.on')].map((b) => b.getAttribute('data-pv')), note: (f.querySelector('.expfnote') || {}).textContent || null, subj: (f.querySelector('.expft') || {}).textContent, rows: f.querySelectorAll('.rcrow, .fld').length, w: Math.round(f.getBoundingClientRect().width), h: Math.round(f.getBoundingClientRect().height) } : null; }); }
+    ok(KS.every((k) => { const q = pk[k], lab = LAB.includes(k); return q && q.state === 'drawn' && q.src === (lab ? 'lab' : 'approx') && JSON.stringify(q.views) === JSON.stringify(PTV[k]) && q.on[0] === PTV[k][0]
+         && (lab ? q.note === null : q.note === PW.approx.replace('{kind}', CW.kinds[k].name)) && q.subj && q.rows >= 2 && q.w === 440 && q.h === 560; }),
+      'D-099 · every kind\'s portrait is drawn in the lab\'s frame, 440 × 560, on ' + FULL + ' (the first endpoint with all ' + KS.length + ' kinds): ' + LAB.map((k) => CW.kinds[k].name + ' ' + PTV[k].map((v) => PF.v[v].name).join('/')).join(' · ') + ' as the lab draws them; ' + KS.filter((k) => !LAB.includes(k)).map((k) => CW.kinds[k].name).join(' · ') + ' approximated, and the frame says so', pk);
+    /* the table's four views, by real clicks on the frame's squares; the view is kept through a reload */
+    await p.selectOption('#exact .exkind', 'table'); await p.waitForTimeout(180);
+    const tc = await p.evaluate(() => { const D0 = window.__allep.data.ex.cat, id = document.querySelector('#exact .excol[data-clone] .blk').getAttribute('data-exid'), c = D0[id]; return { id, cols: c.cols.length, more: (c.more || []).length, fks: (c.fks || []).length, fkCols: c.cols.filter((f) => (c.fks || []).some((x) => x[0] === f[0])).length }; });
+    const rec = await p.evaluate(() => { const f = document.querySelector('#exact .expf'), t = f.querySelector('.rctab'); return { flds: f.querySelectorAll('.rctab .fld[data-col]').length, heads: [...t.querySelectorAll('.rcth > span')].map((s) => s.childNodes[0].textContent.trim()),
+      fko: [...f.querySelectorAll('.rctab .fld.fk .fko')].map((e) => Math.round(e.getBoundingClientRect().height)), fits: t.scrollWidth <= t.clientWidth + 1, types: [...f.querySelectorAll('.rctab .fld .ft')].map((e) => getComputedStyle(e).fontFamily === getComputedStyle(f.querySelector('.rctab .fld .fn')).fontFamily) }; });
+    ok(rec.flds === tc.cols + tc.more && JSON.stringify(rec.heads) === JSON.stringify([PF.cols.fields, PF.cols.fk, PF.cols.type]) && rec.fko.length === tc.fkCols && rec.fko.every((h) => h < 24) && rec.fits && rec.types.every(Boolean),
+      'D-099 · the table\'s Record on ' + tc.id + ': ' + rec.flds + ' fields under ' + rec.heads.join(' · ') + ', each foreign key on one line, the three columns inside the frame, every type in the record\'s font (the page\'s .out rule no longer reaches a key)', { tc, rec });
+    const vw = {};
+    for (const v of ['shape', 'wheel', 'keys']) { await p.click('#exact .expf .ptv[data-pv="' + v + '"]'); await p.waitForTimeout(150);
+      vw[v] = await p.evaluate(() => { const f = document.querySelector('#exact .expf'), b = f.querySelector('.ptbody'); return { pv: f.getAttribute('data-pv'), cls: b.className, on: (f.querySelector('.ptv.on') || {}).getAttribute?.('data-pv'), cells: b.querySelectorAll('.shcell').length, segs: b.querySelectorAll('.wseg').length,
+        lanes: [...b.querySelectorAll('.exptsec')].map((s) => s.getAttribute('data-ps')), kout: b.querySelectorAll('.krow.kout').length, kin: b.querySelectorAll('.krow.kin').length }; }); }
+    await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await p.waitForTimeout(300);
+    const vk = await p.evaluate(() => { const f = document.querySelector('#exact .expf'); return f && f.getAttribute('data-pv'); });
+    ok(vw.shape.pv === 'shape' && /\bshp\b/.test(vw.shape.cls) && vw.shape.cells === tc.cols && vw.wheel.pv === 'wheel' && /\bwhl\b/.test(vw.wheel.cls) && vw.wheel.segs === tc.cols
+       && vw.keys.pv === 'keys' && /\bkeys\b/.test(vw.keys.cls) && JSON.stringify(vw.keys.lanes) === '["out","in","uq"]' && vw.keys.kout === tc.fks && Object.values(vw).every((x) => x.on === x.pv) && vk === 'keys',
+      'D-099 · the table\'s other three views by real clicks on the frame\'s squares — ' + ['shape', 'wheel', 'keys'].map((v) => PF.v[v].name).join(' · ') + ': ' + vw.shape.cells + ' cells, ' + vw.wheel.segs + ' segments, ' + vw.keys.kout + ' keys out and ' + vw.keys.kin + ' in; a reload keeps the view', { vw, vk });
+    await p.click('#exact .expf .ptv[data-pv="record"]'); await p.waitForTimeout(120);
+    const vt = await p.evaluate(() => { const b = document.querySelector('#exact .expf .ptv[data-pv="wheel"]'); b.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); const tp = document.getElementById('tip'); return tp.textContent; });
+    ok(vt.includes(PF.v.wheel.name) && vt.includes(PF.view) && vt.includes(PF.v.wheel.plain), 'D-099 · a view square\'s hover names the view and says what it draws: "' + PF.v.wheel.name + ' · ' + PF.view + '"', vt);
+    /* the two options, mine, each its default dashed: where the controls sit (under the element · right of the portrait) and the portrait's box (the lab's · as tall as its record) */
+    const op = () => p.evaluate(() => { const r = document.getElementById('exact'), f = r.querySelector('.expf'), b = f.querySelector('.ptbody'); return { at: r.getAttribute('data-at'), under: !!r.querySelector('.exaleft > .exactl'), last: r.querySelector('.exabody').lastElementChild.className,
+      box: f.getAttribute('data-box'), h: Math.round(f.getBoundingClientRect().height), scrolls: b.scrollHeight > b.clientHeight + 1, picks: [...r.querySelectorAll('.exahd .opt[data-pick]')].map((o) => o.getAttribute('data-xopt') + ':' + o.getAttribute('data-v')) }; });
+    /* on DELETE /me's widest table, whose record is taller than the lab's box */
+    await p.evaluate(() => window.__allep.pick('DELETE /me')); await p.waitForTimeout(300);
+    const tall = await p.evaluate(() => { const X = window.__allepEx, C = window.__allep.data.ex.cat, t = X.items('table').map((i) => [i.id, C[i.id].cols.length + (C[i.id].more || []).length]).sort((a, b) => b[1] - a[1])[0]; X.pick('table', t[0]); return t; });
+    await p.waitForTimeout(200);
+    const o0 = await op(); await p.click('#exact .exahd [data-xopt="at"][data-v="right"]'); await p.waitForTimeout(150); const o1 = await op();
+    await p.click('#exact .exahd [data-xopt="at"][data-v="under"]'); await p.click('#exact .exahd [data-xopt="box"][data-v="grow"]'); await p.waitForTimeout(150); const o2 = await op();
+    await p.click('#exact .exahd [data-xopt="box"][data-v="lab"]'); await p.waitForTimeout(120);
+    ok(o0.at === 'under' && o0.under && o0.box === 'lab' && o0.h === 560 && o0.scrolls && JSON.stringify(o0.picks.sort()) === '["at:under","box:lab"]' && o1.at === 'right' && !o1.under && o1.last === 'exactl' && o2.box === 'grow' && o2.h > 560 && !o2.scrolls,
+      'D-099 · two options of mine, defaults dashed: the controls under the element, or right of the portrait (real click: the controls become the area\'s last column); the lab\'s box 440 × 560 that scrolls, or as tall as its record (' + tall[0] + ', ' + tall[1] + ' fields: ' + o2.h + 'px, nothing scrolls)', { tall, o0, o1, o2 });
     /* the ending's portrait, DELETE /me's 401 invalid token: its sections in order, its "how" in words, one strip per way with the ending's own mark */
-    await tailor('end');
+    await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), 'DELETE /me'); await p.waitForTimeout(450); await tailor('end');
     const inv = await p.evaluate(() => { const X = window.__allepEx, C = window.__allep.data.ex.cat, it = X.items('end').filter((i) => /InvalidToken/.test(C[i.id].via || ''))[0]; X.pick('end', it.id); return [it.id, C[it.id].paths.length, (C[it.id].tests || []).length]; });
     await p.waitForTimeout(150);
-    const pe = await p.evaluate(() => { const q = document.querySelector('#exact .expt'), row = (l) => { const r = [...q.querySelectorAll('.exptsec[data-ps="facts"] .exptr')].filter((x) => x.querySelector('.exptl').textContent === l)[0]; return r ? r.querySelector('.exptv').textContent : null; };
-      return { head: q.querySelector('.expth').innerText.replace(/\s+/g, ' '), secs: [...q.querySelectorAll('.exptsec')].map((s) => s.getAttribute('data-ps')), how: row(window.__allep.data.words.ex.portrait.f.how), where: row(window.__allep.data.words.ex.portrait.f.where),
+    const pe = await p.evaluate(() => { const q = document.querySelector('#exact .expf'), row = (l) => { const r = [...q.querySelectorAll('.exptsec[data-ps="facts"] .rcrow')].filter((x) => x.querySelector('.k').textContent === l)[0]; return r ? r.querySelector('.v').textContent : null; };
+      return { head: q.querySelector('.expfhd').innerText.replace(/\s+/g, ' '), secs: [...q.querySelectorAll('.exptsec')].map((s) => s.getAttribute('data-ps')), how: row(window.__allep.data.words.ex.portrait.f.how), where: row(window.__allep.data.words.ex.portrait.f.where),
         ways: q.querySelectorAll('.exptsec[data-ps="ways"] .exptway').length, here: [...q.querySelectorAll('.exptsec[data-ps="ways"] .exptway')].map((w) => w.querySelectorAll('.sq.exhere').length),
         lines: [...q.querySelectorAll('.exptsec[data-ps="lines"] .io > i')].map((i) => getComputedStyle(i).display + ':' + i.textContent), left: [...q.querySelectorAll('.exptway .sqs')].map((x) => Math.round(x.getBoundingClientRect().left - x.closest('.exptway').getBoundingClientRect().left)) }; });
     ok(pe.head.includes('401') && JSON.stringify(pe.secs) === JSON.stringify(['facts', 'lines', 'answer', 'ways', 'tests']) && pe.how === CW.face.how.catch.replace('{name}', 'InvalidTokenError') && /context\.py:\d+$/.test(pe.where || '')
        && pe.ways === inv[1] && pe.here.every((n) => n === 1) && pe.lines.length === 3 && pe.lines.every((x) => !x.startsWith('inline')) && pe.left.every((x) => x < 40),
-      'D-098 · the ending\'s portrait on DELETE /me\'s 401 invalid token: what it is (where · "' + pe.how + '") → before · checks · gives, drawn as the card draws them → the answer it sends → ' + pe.ways + ' way, its own mark ringed, the strip at its number → the tests that prove it', pe);
+      'D-098 · D-099 · the ending\'s Exit on DELETE /me\'s 401 invalid token: what it is (where · "' + pe.how + '") → before · checks · gives, drawn as the card draws them → the answer it sends → ' + pe.ways + ' way, its own mark ringed, the strip at its number → the tests that prove it', pe);
     /* a 422 with rules: one row per rule the body is refused by */
     const r4 = await p.evaluate(() => { const C = window.__allep.data.ex.cat, id = Object.keys(C).filter((i) => C[i].k === 'end' && (C[i].cases || []).length >= 3)[0]; return [id, C[id].cases.length]; });
     await p.evaluate((ep) => window.__allep.pick(ep), r4[0].split('|')[0]); await p.waitForTimeout(350); await p.evaluate((id) => window.__allepEx.pick('end', id), r4[0]); await p.waitForTimeout(150);
-    const rr = await p.evaluate(() => [...document.querySelectorAll('#exact .exptsec[data-ps="rules"] .exptr')].map((r) => r.innerText.replace(/\s+/g, ' ')));
+    const rr = await p.evaluate(() => [...document.querySelectorAll('#exact .exptsec[data-ps="rules"] .rcrow')].map((r) => r.innerText.replace(/\s+/g, ' ')));
     ok(rr.length === r4[1] && rr.every((t) => t.length > 6), 'D-098 · a refused body\'s portrait lists its rules: ' + r4[0] + ' — ' + rr.length + ' rules, each its place, type and limit', rr);
-    /* swept: every ending of every endpoint opens a portrait whose words are whole — no token unfilled, no undefined, null or NaN the PAGE wrote. Judged per text node and per
-       " · " fact: a brace or a null inside the code's own words (the ending's data, quoted whole or cut with …) is the code's — an f-string message, a date pattern, "cannot be null" */
-    const sw = await p.evaluate(async () => { const C = window.__allep.data.ex.cat, X = window.__allepEx, bad = [], eps = [...new Set(Object.keys(C).filter((i) => C[i].k === 'end').map((i) => i.split('|')[0]))]; let n = 0, quoted = 0;
-      const strs = (o, a = []) => { if (typeof o === 'string') a.push(o); else if (o && typeof o === 'object') Object.values(o).forEach((v) => strs(v, a)); return a; }, RX = /[{}]|undefined|\bnull\b|NaN/;
-      for (const ep of eps) { window.__allep.pick(ep); await new Promise((r) => setTimeout(r, 20)); for (const it of X.items('end')) { X.pick('end', it.id); n++; const q = document.querySelector('#exact .expt');
-          if (!q || q.getAttribute('data-state') !== 'built') { bad.push([it.id, 'state']); continue; }
-          const own = strs(C[it.id]).map((x) => x.replace(/\s+/g, ' ')), tw = document.createTreeWalker(q, NodeFilter.SHOW_TEXT); let nd, hit = null, q0 = false;
-          while ((nd = tw.nextNode())) { const v = nd.nodeValue.replace(/\s+/g, ' '); if (!RX.test(v)) continue; const segs = v.replace(/^[\s…]+|[\s…]+$/g, '').split(' · ').filter((g) => RX.test(g));
-            if (segs.length && segs.every((g) => own.some((x) => x.includes(g)))) { q0 = true; continue; } hit = v.slice(0, 80); break; }
-          if (q0) quoted++; if (hit) bad.push([it.id, hit]); } }
-      return { n, eps: eps.length, quoted, bad: bad.slice(0, 5), nbad: bad.length }; });
-    ok(sw.n >= 700 && !sw.nbad, 'D-098 · swept: all ' + sw.n + ' endings of ' + sw.eps + ' endpoints open a built portrait, its words whole (' + sw.quoted + ' quote the code\'s own braces or nulls)', sw);
-    ok(!errs.length, 'D-098 · the clicks raised no error', errs.slice(0, 3)); }
+    /* swept: every ending of every endpoint, and the first five of every other kind on every endpoint, open a drawn portrait whose words are whole — no token unfilled, no
+       undefined, null, NaN or [object the PAGE wrote. Judged per text node and per " · " fact: a brace or a null inside the code's own words (the element's data, or the
+       endpoint's endings it quotes — an f-string message, a date pattern, "cannot be null") is the code's */
+    const sw = await p.evaluate(async (CAP) => { const C = window.__allep.data.ex.cat, X = window.__allepEx, NK = window.__allep.data.words.ex.face.noKey, bad = [], eps = [...new Set(Object.keys(C).filter((i) => C[i].k === 'end').map((i) => i.split('|')[0]))], n = {}, of = {}; let quoted = 0, nokey = 0, nokeySaid = 0;
+      const strs = (o, a = []) => { if (typeof o === 'string') a.push(o); else if (o && typeof o === 'object') Object.values(o).forEach((v) => strs(v, a)); return a; }, RX = /[{}]|undefined|\bnull\b|NaN|\[object/;
+      for (const k of window.__allep.data.ex.kinds) { const sel = document.querySelector('#exact .exkind'); sel.value = k; sel.dispatchEvent(new Event('change')); await new Promise((r) => setTimeout(r, 30)); n[k] = 0; of[k] = 0;
+        for (const ep of eps) { window.__allep.pick(ep); await new Promise((r) => setTimeout(r, 15)); const epOwn = strs(Object.keys(C).filter((i) => i.startsWith(ep + '|')).map((i) => C[i])), all = X.items(k); of[k] += all.length;
+          for (const it of (k === 'end' ? all : all.filter((x, i) => i < CAP || C[x.id].nokey))) { X.pick(k, it.id); n[k]++; const q = document.querySelector('#exact .expf');
+            if (!q || q.getAttribute('data-state') !== 'drawn') { bad.push([it.id, 'state']); continue; }
+            if (C[it.id].nokey) { nokey++; if (q.innerText.includes(NK)) nokeySaid++; }
+            const own = strs(C[it.id]).concat(strs(it), epOwn).map((x) => String(x).replace(/\s+/g, ' ')), tw = document.createTreeWalker(q, NodeFilter.SHOW_TEXT); let nd, hit = null, q0 = false;
+            while ((nd = tw.nextNode())) { const v = nd.nodeValue.replace(/\s+/g, ' '); if (!RX.test(v)) continue; const segs = v.replace(/^[\s…]+|[\s…]+$/g, '').split(' · ').filter((g) => RX.test(g));
+              if (segs.length && segs.every((g) => own.some((x) => x.includes(g)))) { q0 = true; continue; } hit = v.slice(0, 80); break; }
+            if (q0) quoted++; if (hit) bad.push([it.id, hit]); } } }
+      return { n, of, eps: eps.length, quoted, nokey, nokeySaid, bad: bad.slice(0, 5), nbad: bad.length }; }, 5);
+    ok(sw.n.end >= 700 && sw.n.end === sw.of.end && Object.keys(sw.n).length === KS.length && KS.every((k) => sw.n[k] > 0) && !sw.nbad && sw.nokey > 0 && sw.nokeySaid === sw.nokey,
+      'D-098 · D-099 · swept on ' + sw.eps + ' endpoints: all ' + sw.n.end + ' endings, and ' + KS.filter((k) => k !== 'end').map((k) => sw.n[k] + ' of ' + sw.of[k] + ' ' + CW.kinds[k].name).join(' · ') + ' (the first five per endpoint, and every function the map knows by name only) open a drawn portrait, its words whole (' + sw.quoted + ' quote the code\'s own braces or nulls); the ' + sw.nokey + ' functions the map knows by name only say so', sw);
+    ok(!errs.length, 'D-098 · D-099 · the clicks raised no error', errs.slice(0, 3)); }
   await labp.close(); }
 }
 

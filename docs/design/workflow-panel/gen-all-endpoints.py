@@ -53,6 +53,7 @@ PRISMS = DC / "prisms-endpoint.json"                                          # 
 KIT_JS = DC / "kit-blocks.js"
 EPSLUG_JS = HERE / "_ep-slug.js"                                               # the ONE slug rule (D-035), inlined so the page stays standalone
 CARD_JS, CARD_CSS = HERE / "_ae-card.js", HERE / "_ae-card.css"                # D-088 — the hover card: the endpoint lab's, one renderer for every element hover
+PORT_JS, PORT_CSS = HERE / "_ae-port.js", HERE / "_ae-port.css"                # D-099 — the portrait in the lab's frame, per kind, beside the tailored element
 DEF_FORMS = Path("~/.cache/gabe-map-baselines/lab-input/forms.json")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _ae_universe as UNI  # noqa: E402  (D-036 — the one-endpoint section: the universe card, the block marks, the gaps)
@@ -4399,6 +4400,8 @@ def build(argv: list) -> tuple:
                       ("/*__BENCHJS__*/", ex_js.replace("</", "<\\/")),
                       ("<!--__CARDLOOK__-->", '<style id="cardlook">\n' + CARD_CSS.read_text(encoding="utf-8").replace("</", "<\\/") + "\n</style>"),
                       ("/*__CARDJS__*/", CARD_JS.read_text(encoding="utf-8").replace("</", "<\\/")),
+                      ("<!--__PORTLOOK__-->", '<style id="portlook">\n' + PORT_CSS.read_text(encoding="utf-8").replace("</", "<\\/") + "\n</style>"),
+                      ("/*__PORTJS__*/", PORT_JS.read_text(encoding="utf-8").replace("</", "<\\/")),
                       ("/*__DATA__*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c"))):
         if mark not in html:
             die("template marker missing: " + mark)

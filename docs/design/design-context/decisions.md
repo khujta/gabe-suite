@@ -1501,3 +1501,34 @@ in-flight value say the lab opens none. The active kind survives a reload.
 Chosen alone (his to correct): the ending is active until he picks; the portrait is rebuilt on the bench's data, not imported from the lab;
 its lines section keeps the label beside its lines (the row is wide, so the hover card's D-095 layout does not apply to it); the other kinds'
 portraits wait for his read of this one.
+
+## D-099 — The tailoring area: the kind's column cloned with a dropdown, its controls, and its portrait in the lab's frame
+Date: 2026-10-05 · Input: his message after D-098, with a screenshot of the endpoint lab's portrait panel (a table's record).
+Decision, his: "We are not there yet. In this section for Tailoring, let's have a section similar to the eight sections we have in Examples. It
+should have a dropdown where we can change the kind of item we want to change, including table schema, functions, and so on. We will then clone
+the same configuration section we have for that specific element. We're also going to show that element in what would be the portrait panel.
+[…] tables, for example, have different sections. I would like to replicate something similar here, actually kind of the same, because what we
+are going to configure is what we are going to show there in the endpoint lab later […] I want to be able to see in the Tailoring configuration
+section […] how the card is going to look next to what we are going to show in the portrait for each one of these elements. You can interpolate
+or approximate what we want to show in that portrait section by looking in the endpoint lab at what we already have for the tables."
+Consequence: the row under the columns becomes TAILORING. At its left, THE ELEMENT: the chosen kind's Examples column drawn again — the same
+scope and width squares, roles, picker and steps, the same block — bound to the same state, so a step there moves the column above too. The
+kind's name in its head is a dropdown of all eight; picking one makes it the one tailored, as its tailor square does. HOW IT IS DRAWN (the four
+tabs) sits under it. At its right, WHAT OPENS ON A CLICK: a portrait in the lab's own frame — its dark panel 440 × 560, the head with the
+subject's glyph, its name in caps, the view's name and one square per way of drawing it, the body one of the lab's records (glyph and name, rows
+of icon · label · value, sections in caps, field tables whose rows share one grid). The views are the lab's: a table's Record · Shape · Wheel ·
+Keys, a schema's and a function's Record, an ending's Exit (D-098's sections, now in record form), a test's Case. The gate, the client hook and
+the in-flight value — which the lab opens no portrait for — are drawn in the same record from the bench's data, and the frame says so in one
+line under its head. The field marks wear the column's look. The kind, the view per kind and both options survive a reload. Every element on
+all 80 endpoints draws one (728 endings · 648 tables · 218 schemas · 1,529 functions · 544 tests · 1,063 gates · 51 client hooks · 706
+in-flight values); the 44 functions the map knows by name only say so, as their card and block do.
+Chosen alone (his to correct): the column's tailor squares stay beside the dropdown; two options of mine, each its default dashed — where the
+controls sit (under the element · right of the portrait) and the portrait's box (the lab's 440 × 560 that scrolls · as tall as its record);
+the frame keeps the lab's dark colours in the light theme, as the hover card does (D-088); the approximated three follow the record pattern,
+not a new layout.
+Found while building: the page's kit owns a class `.out` (an output box 7em tall), which caught the lab's foreign-key class `fkx out` — the
+portrait's classes avoid `out` and `in`. A kind the endpoint has none of (DELETE /me reads no body, so it has no schema) first drew "Pick an
+element in its column", with nothing to pick; the portrait now says what its column says, "nothing of this kind on this endpoint".
+Came in from outside this lane: the rebuild inlines gabe-artifact 1.7.0's chrome (`020c2aae`, the other session's), which opens every page at
+text size 110 % — the whole page's text is a tenth larger than at D-098 (body 15 → 16.5 px); the cog's text size takes it back to 100 %. The
+portrait frame is sized in pixels and keeps 440 × 560.

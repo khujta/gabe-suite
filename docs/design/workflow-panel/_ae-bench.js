@@ -11,12 +11,13 @@
   var EX = D.ex, XW = W.ex, XKEY = "gabe:allep:bench:v3", XK = EX.kinds, XF = W.enc.fam, XIO = W.mo.io, XC2 = W.mo.x.c2;
   var XREG = EX.regions || {};                               /* D-089: the hover regions of each kind's parts (see xRegions) */
   var XTABS = ["order", "show", "format", "hover"];               /* D-094 · the controls' tabs, in his words: the order of the parts · what each part shows · its format · the hover */
-  var XS = { lay: XW.opt.lay.pick, follow: XW.opt.follow.pick, tab: XTABS[0], active: XK[0], col: {} };   /* D-098: the kind being tailored, one at a time — the first column's (the ending) until he picks */
+  var XS = { lay: XW.opt.lay.pick, follow: XW.opt.follow.pick, tab: XTABS[0], active: XK[0], col: {}, at: XW.pf.at.pick, box: XW.pf.box.pick, pv: {} };   /* D-098: the kind being tailored, one at a time — the first column's (the ending) until he picks */
   function xClone(o) { return JSON.parse(JSON.stringify(o)); }
   XK.forEach(function (k) { XS.col[k] = { scope: XW.opt.scope.pick, role: null, id: null, look: xClone(EX.look[k]), sel: null, open: false, width: XW.width.pick }; });
   try { window.localStorage.removeItem("gabe:allep:bench:v2"); } catch (e) {}   /* D-081: the looks he ruled are the defaults — a bench remembered before his ruling must not override them */
   try { var xr = JSON.parse(window.localStorage.getItem(XKEY) || "null");
     if (xr) { if (XW.opt.lay.opts[xr.lay]) XS.lay = xr.lay; if (XW.opt.follow.opts[xr.follow]) XS.follow = xr.follow; if (XTABS.indexOf(xr.tab) >= 0) XS.tab = xr.tab; if (XK.indexOf(xr.active) >= 0) XS.active = xr.active;
+      if (XW.pf.at.opts[xr.at]) XS.at = xr.at; if (XW.pf.box.opts[xr.box]) XS.box = xr.box; if (xr.pv && typeof xr.pv === "object") Object.keys(xr.pv).forEach(function (k) { if (XK.indexOf(k) >= 0 && XW.pf.v[xr.pv[k]]) XS.pv[k] = xr.pv[k]; });   /* D-099 */
       XK.forEach(function (k) { var c = (xr.col || {})[k]; if (!c) return; var st = XS.col[k];
         if (XW.opt.scope.opts[c.scope]) st.scope = c.scope; if (typeof c.id === "string") st.id = c.id; if (typeof c.role === "string") st.role = c.role; if (XW.width.opts[c.width]) st.width = c.width;
         if (c.look && Array.isArray(c.look.rows) && c.look.rows.length === 3) st.look = Object.assign(xClone(EX.look[k]), c.look);
@@ -31,7 +32,7 @@
     if (!(L.hereW >= 1 && L.hereW <= 4)) L.hereW = EX.look[k].hereW;
     var H = EX.look[k].hov || {}; L.hov = Object.assign({}, H, L.hov || {}); Object.keys(L.hov).forEach(function (p) { if (!(p in H)) delete L.hov[p]; }); return L; }
   XK.forEach(function (k) { xFix(k, XS.col[k].look); });
-  function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, tab: XS.tab, active: XS.active, col: {} }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
+  function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, tab: XS.tab, active: XS.active, col: {}, at: XS.at, box: XS.box, pv: XS.pv }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
     window.localStorage.setItem(XKEY, JSON.stringify(o)); } catch (e) {} }
   /* L-36 · the controls' icons (24px, drawn by the same rule as BY MOMENT's option squares): the columns' layouts, follow or stay, the
      elements shown, the steps, the element's widths (D-087: the default and three narrower), copy, back to the default */
@@ -46,6 +47,10 @@
       card: { cols: '<rect x="3" y="5" width="5" height="3" rx="1"/><path d="M11 6.5h10M11 11h10M11 15.5h7"/>', rows: '<rect x="3" y="4" width="7" height="3" rx="1"/><path d="M3 11h18M3 15h18M3 19h12"/>',
       wide: '<rect x="1.5" y="5" width="4" height="3" rx="1"/><path d="M8 6.5h14.5M8 11h14.5M8 15.5h10"/><path d="M1 20h22" stroke-dasharray="2 2"/>', both: '<rect x="1.5" y="3" width="7" height="3" rx="1"/><path d="M1.5 10h21M1.5 14h21M1.5 18h14"/><path d="M1 21.5h22" stroke-dasharray="2 2"/>' },
     tailor: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',   /* D-098: tailor this kind */
+    at: { under: '<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1" stroke-dasharray="2 1.6"/><rect x="13" y="3" width="8" height="18" rx="1"/>',
+        right: '<rect x="2" y="3" width="6" height="8" rx="1"/><rect x="9.5" y="3" width="6" height="18" rx="1"/><rect x="17" y="3" width="5" height="18" rx="1" stroke-dasharray="2 1.6"/>' },   /* D-099: the controls under the element · in a column right of the portrait */
+    box: { lab: '<rect x="5" y="3" width="14" height="13" rx="1.5"/><path d="M8 19h8" stroke-dasharray="1.6 1.6"/><path d="M8 22h8" stroke-dasharray="1.6 1.6"/>',
+        grow: '<rect x="5" y="2" width="14" height="20" rx="1.5"/><path d="M12 8v8M9.5 10.5L12 8l2.5 2.5M9.5 13.5L12 16l2.5-2.5"/>' },   /* D-099: the lab's box, its overflow scrolling · as tall as its record */
     here: { ring: '<rect x="8" y="8" width="8" height="8" rx="1.5"/><rect x="4" y="4" width="16" height="16" rx="3.5"/>',
         tint: '<rect x="8" y="8" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="4" y="4" width="16" height="16" rx="3.5" stroke-width="3"/>',
         box: '<rect x="3" y="3" width="18" height="18" rx="4" fill="currentColor" opacity=".3" stroke="none"/><rect x="8" y="8" width="8" height="8" rx="1.5"/>',
@@ -482,11 +487,13 @@
     hook: { fetcher: "hook", streamer: "wave", store: "store", orchestrator: "merge" }, test: { service: "function" } };
   function xRoleIco(k, r) { if (k === "end") return (EN.kind[r] || {}).icon || XW.icons.end; if (k === "schema") return (EN.dir[String(r).split("-")[0]] || {}).icon || "schema";
     if (k === "inf") return ((XF.ifk.vals || {})[r] || {}).icon || (EN.ifk[r] || {}).icon || W.marks.own.inf; return ((XROLEICO[k] || {})[r]) || xColIco(k); }
-  function xCol(k) { var st = XS.col[k], col = el("div", "excol"), whose = xWhose(k); col.setAttribute("data-k", k); col.setAttribute("data-w", st.width);
+  /* D-099: `clone` draws the column again in the tailoring area — the same state, so a change there is a change here — its kind name a dropdown of the eight */
+  function xCol(k, clone) { var st = XS.col[k], col = el("div", "excol"), whose = xWhose(k); col.setAttribute("data-k", k); col.setAttribute("data-w", st.width);
     var hd = el("div", "exhd"), t = el("h3"); t.appendChild(xSvg(xColIco(k), 16, xKindCol(k, { kd: "success" })));
-    t.appendChild(el("span", null, XW.kinds[k].name)); hd.appendChild(t);
-    var tb = xAct("opt exo exi extailor", XICON.tailor, "tailor", { kind: XW.kinds[k].name }, function () { XS.active = k; xSave(); renderEx(); });   /* D-098: this kind becomes the one tailored */
-    tb.setAttribute("aria-pressed", XS.active === k ? "true" : "false"); hd.appendChild(tb); col.setAttribute("data-active", XS.active === k ? "true" : "false");
+    t.appendChild(clone ? xKindPick(k) : el("span", null, XW.kinds[k].name)); hd.appendChild(t);
+    if (clone) col.setAttribute("data-clone", "true");
+    else { var tb = xAct("opt exo exi extailor", XICON.tailor, "tailor", { kind: XW.kinds[k].name }, function () { XS.active = k; xSave(); renderEx(); });   /* D-098: this kind becomes the one tailored */
+      tb.setAttribute("aria-pressed", XS.active === k ? "true" : "false"); hd.appendChild(tb); col.setAttribute("data-active", XS.active === k ? "true" : "false"); }
     var wm = el("span", "exwho", XW.whose[whose].name); wm.setAttribute("data-whose", whose); wm.setAttribute("data-tip", "exwho"); hd.appendChild(wm); col.appendChild(hd);
     if (EX.absent[k]) { col.appendChild(el("p", "exnone", W.absent + " · " + fill(W.absentWhy, { why: EX.absent[k] }))); return col; }   /* the arm is off: said, never a partial list */
     var redraw = function () { xSave(); renderEx(); writeOut(LAST.L, LAST.GS); };
@@ -516,15 +523,20 @@
     if (!cur) { col.appendChild(el("p", "exnone", st.role ? XW.ctl.noneRole : XW.ctl.none)); return col; }
     if (cur.ep !== S.open) col.appendChild(el("p", "exon", fill(XW.ctl.on, { ep: cur.ep })));
     /* the block, in its look */
-    var L = st.look, w = el("div", "exw form-block rail-" + L.railSide + " rwbox-" + L.rwBox + " cntbox-" + L.cntBox + (L.rwA < 50 ? " rw-thin" : "") + (L.sqShape === "square" ? " sqs-square" : "") + (L.sqOpt === 0 ? " sq-noopt" : "")
-      + (L.sqUqMark === "corners" ? " uqm-corners uqc-" + L.sqUqAt : "") + (L.sqUqFlip ? " uqc-flip" : ""));
+    var L = st.look, w = xLookOn(el("div", "exw form-block"), L);
+    w.appendChild(xBlock(k, cur, L)); col.appendChild(w);
+    if (clone) XCLONE = { it: cur, blk: w.querySelector(".blk") }; else XCUR[k] = { it: cur, blk: w.querySelector(".blk") }; return col; }   /* D-098: the controls left the column — the active kind's stand in the tailoring area */
+  function xLookOn(w, L) { ["rail-" + L.railSide, "rwbox-" + L.rwBox, "cntbox-" + L.cntBox, L.rwA < 50 ? "rw-thin" : "", L.sqShape === "square" ? "sqs-square" : "", L.sqOpt === 0 ? "sq-noopt" : "",
+      L.sqUqMark === "corners" ? "uqm-corners" : "", L.sqUqMark === "corners" ? "uqc-" + L.sqUqAt : "", L.sqUqFlip ? "uqc-flip" : ""].forEach(function (c) { if (c) w.classList.add(c); });
     w.style.setProperty("--rail-w", L.railW + "px"); w.style.setProperty("--rail-s", L.railStyle); w.style.setProperty("--rw-a", String(L.rwA)); w.style.setProperty("--cnt-a", String(L.cntA));
     w.style.setProperty("--sq", L.sqSize + "px"); w.style.setProperty("--sqg", L.sqGap + "px");
     w.style.setProperty("--sq-base", String((L.sqBase == null ? 100 : L.sqBase) / 100)); w.style.setProperty("--sq-opt-a", String((L.sqOptA == null ? 50 : L.sqOptA) / 100));   /* the lab's opacity bar: the standard and the optional stop (D-091) */ w.style.setProperty("--uq-len", String((L.sqUqLen || 40) / 100));
     w.setAttribute("data-here", L.here); w.style.setProperty("--here-w", L.hereW + "px");   /* D-096: how the item's own mark is drawn */
-    w.style.setProperty("--uq-w", (L.sqUqW || 1.5) + "px"); w.style.setProperty("--uq-tip", ((L.sqUqW || 1.5) * (L.sqUqTip || 10) / 100) + "px");
-    w.appendChild(xBlock(k, cur, L)); col.appendChild(w);
-    XCUR[k] = { it: cur, blk: w.querySelector(".blk") }; return col; }   /* D-098: the controls left the column — the active kind's stand in the row under the columns */
+    w.style.setProperty("--uq-w", (L.sqUqW || 1.5) + "px"); w.style.setProperty("--uq-tip", ((L.sqUqW || 1.5) * (L.sqUqTip || 10) / 100) + "px"); return w; }
+  /* D-099: the kind being tailored, picked in the tailoring column's head */
+  function xKindPick(k) { var s = el("select", "exkind"); s.setAttribute("aria-label", XW.row.kind);
+    XK.forEach(function (q) { var o = el("option", null, XW.kinds[q].name); o.value = q; if (q === k) o.selected = true; s.appendChild(o); });
+    s.addEventListener("change", function () { XS.active = s.value; xSave(); renderEx(); }); return s; }
   /* D-091 · THE LINES ALIGN (his: "in the endpoint lab we have the lines actually aligning, and not in the old endpoints"). The lab's block sets its glyph at the left of a line, the text after it, and
      centres the glyph on the line. Here a line is a wrapping row (his F28: no name is cut), so the glyph sat at its top and a line that leads with a name or a chip began under the glyph. The glyph's
      column (its size and the lab's gap) is now kept by every line: a line that leads with text is indented by it, so its text starts where the title's text starts, and the glyph is set on the first
@@ -748,23 +760,33 @@
       grp.appendChild(o); bar.appendChild(grp); }); }
   /* the columns: in one row across the page, wrapped, or (ruled, D-081) an upper and a lower row — each column at its own width (L-36) */
   function renderEx() { var box = $("exgrid"); if (!box || !BYID[S.open]) return; box.textContent = ""; box.setAttribute("data-lay", XS.lay); XCUR = {};
-    exBar(); var cols = XK.map(xCol);
+    exBar(); var cols = XK.map(function (k) { return xCol(k, false); });   /* never map(xCol): the index would land in clone */
     if (XS.lay === "half") { var n = Math.ceil(cols.length / 2); [cols.slice(0, n), cols.slice(n)].forEach(function (g) { var r = el("div", "exrow"); g.forEach(function (c) { r.appendChild(c); }); box.appendChild(r); }); }
     else cols.forEach(function (c) { box.appendChild(c); });
     xActRow(XS.active); }
   /* D-098 · ONE KIND AT A TIME (his: "only one of these can be active at a time … modify one of these at a time and, when we do, show the different options to tailor it … move
      them in a row, showing the current section where we tailor this and the section of the portrait that we will show when we click that item"). The kind picked by its
      column's tailor square gets the row under the columns: at the left its controls (the four tabs), at the right what the lab opens in its portrait on a click */
-  var XCUR = {};
-  function xActRow(k) { var R = XW.row, gr = $("exgrid"), row = $("exact"), c = XCUR[k];
+  var XCUR = {}, XCLONE = null;
+  /* D-099 · THE TAILORING AREA (his: "a section similar to the eight sections we have in Examples … a dropdown where we can change the kind … clone the same configuration
+     section … show that element in what would be the portrait panel … how the card is going to look next to what we are going to show in the portrait"). The kind's column drawn
+     again, its name a dropdown; the controls under it (or, as an option, right of the portrait); beside the element, the portrait in the lab's frame */
+  function xActRow(k) { var R = XW.row, PF = XW.pf, gr = $("exgrid"), row = $("exact"); XCLONE = null;
     if (!row) { row = el("div", "exact"); row.id = "exact"; gr.parentNode.insertBefore(row, gr.nextSibling); }
-    row.textContent = ""; row.setAttribute("data-k", k);
-    var t = el("h3", "exahd"); t.appendChild(xSvg(xColIco(k), 16, xKindCol(k, { kd: "success" }))); t.appendChild(el("span", null, fill(R.title, { kind: XW.kinds[k].name }))); row.appendChild(t);
-    var body = el("div", "exabody"), lc = el("div", "exactl"), pc = el("div", "exapt");
-    lc.appendChild(el("h4", "exsh", R.ctl)); lc.appendChild(c && c.it ? xCtl(k, c.it) : el("p", "exhint", R.noEl));
+    row.textContent = ""; row.setAttribute("data-k", k); row.setAttribute("data-at", XS.at);
+    var hd = el("div", "exahd"), t = el("h3"); t.appendChild(xIco(XICON.tailor, 16)); t.appendChild(el("span", null, R.title)); hd.appendChild(t);
+    [["at", XS.at], ["box", XS.box]].forEach(function (g) { var Rg = PF[g[0]], grp = el("div", "mgrp"), o = el("div", "opts exaopt"); grp.appendChild(el("span", "rl", Rg.label));
+      o.setAttribute("role", "radiogroup"); o.setAttribute("aria-label", Rg.label);
+      Object.keys(Rg.opts).forEach(function (v) { o.appendChild(xOptBtn(g[0], v, Rg, g[1], function (nv) { XS[g[0]] = nv; xSave(); xActRow(XS.active); }, XICON[g[0]][v])); });
+      grp.appendChild(o); hd.appendChild(grp); });
+    row.appendChild(hd);
+    var body = el("div", "exabody"), lc = el("div", "exaleft"), ctl = el("div", "exactl"), pc = el("div", "exapt");
+    lc.appendChild(el("h4", "exsh", R.col)); lc.appendChild(xCol(k, true));
+    ctl.appendChild(el("h4", "exsh", R.ctl)); ctl.appendChild(XCLONE && XCLONE.it ? xCtl(k, XCLONE.it) : el("p", "exhint", R.noEl));
     pc.appendChild(el("h4", "exsh", R.pt)); pc.appendChild(el("p", "exhint", R.ptPlain));
-    pc.appendChild(window.__allepCard ? window.__allepCard.portrait(k, c && c.blk) : el("p", "exhint", R.noEl));
-    body.appendChild(lc); body.appendChild(pc); row.appendChild(body); }
+    pc.appendChild(window.__allepPort ? window.__allepPort.frame(k, XCLONE && XCLONE.blk) : el("p", "exhint", R.noEl));
+    if (XS.at === "under") { lc.appendChild(ctl); body.appendChild(lc); body.appendChild(pc); } else { body.appendChild(lc); body.appendChild(pc); body.appendChild(ctl); }
+    row.appendChild(body); }
   /* the element lit anywhere (D-041): its kind's column shows it, when the column holds it and the option says follow */
   function exFollow() { if (XS.follow !== "on" || !S.el) return; var hit = false;
     XK.forEach(function (k) { var st = XS.col[k], it = xList0(k).filter(function (x) { return x.id === S.el || (EX.cat[x.id] || {}).key === S.el; })[0];
@@ -775,7 +797,8 @@
     if (e.target.closest && e.target.closest('button[data-mopt="gic"]')) setTimeout(renderEx, 0); });
   /* the hovers: a block's one card, the options', the roles', the parts' — the controls' meanings live in the section's info line */
   function exTip(t, kind) {
-    if (kind === "exopt") { var g = t.getAttribute("data-xopt"), R = XW.opt[g], v = t.getAttribute("data-v"); return "<b>" + esc(R.opts[v].name) + "</b>" + (R.pick === v ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(R.opts[v].plain) + "</span>"; }
+    if (kind === "expv") { var PV = XW.pf.v[t.getAttribute("data-pv")]; return "<b>" + esc(PV.name) + "</b> · " + esc(XW.pf.view) + "<span class=pl>" + esc(PV.plain) + "</span>"; }   /* D-099: a way of drawing the portrait */
+    if (kind === "exopt") { var g = t.getAttribute("data-xopt"), R = XW.opt[g] || XW.pf[g], v = t.getAttribute("data-v");   /* D-099: the tailoring area's two groups are pf's */ return "<b>" + esc(R.opts[v].name) + "</b>" + (R.pick === v ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(R.opts[v].plain) + "</span>"; }
     if (kind === "exwho") { var wh = t.getAttribute("data-whose"), ts = EX.look.table.size, fs = Math.min.apply(null, Object.keys(ts).map(function (p) { return ts[p]; }));
       return "<b>" + esc(XW.whose[wh].name) + "</b><span class=pl>" + esc(fill(XW.whose[wh].plain, { v: XW.look.table.ruled, lo: fs, hi: EX.floor })) + "</span>"; }
     if (kind === "exyn") { var yk = t.closest(".excol, .exact").getAttribute("data-k"), YV = t.getAttribute("data-v"), YR = XW.yn;
