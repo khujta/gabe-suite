@@ -11,13 +11,15 @@
   var EX = D.ex, XW = W.ex, XKEY = "gabe:allep:bench:v3", XK = EX.kinds, XF = W.enc.fam, XIO = W.mo.io, XC2 = W.mo.x.c2;
   var XREG = EX.regions || {};                               /* D-089: the hover regions of each kind's parts (see xRegions) */
   var XTABS = ["order", "show", "format", "hover"];               /* D-094 · the controls' tabs, in his words: the order of the parts · what each part shows · its format · the hover */
-  var XS = { lay: XW.opt.lay.pick, follow: XW.opt.follow.pick, tab: XTABS[0], active: XK[0], col: {}, at: XW.pf.at.pick, box: XW.pf.box.pick, pv: {} };   /* D-098: the kind being tailored, one at a time — the first column's (the ending) until he picks */
+  var XS = { lay: XW.opt.lay.pick, follow: XW.opt.follow.pick, tab: XTABS[0], active: XK[0], col: {}, at: XW.pf.at.pick, box: XW.pf.box.pick, pv: {}, pt: {}, ptab: "order" };   /* D-100: pt — how each kind's portrait is drawn, per way of drawing it ("k:view"); ptab — its controls' tab */   /* D-098: the kind being tailored, one at a time — the first column's (the ending) until he picks */
   function xClone(o) { return JSON.parse(JSON.stringify(o)); }
   XK.forEach(function (k) { XS.col[k] = { scope: XW.opt.scope.pick, role: null, id: null, look: xClone(EX.look[k]), sel: null, open: false, width: XW.width.pick }; });
   try { window.localStorage.removeItem("gabe:allep:bench:v2"); } catch (e) {}   /* D-081: the looks he ruled are the defaults — a bench remembered before his ruling must not override them */
   try { var xr = JSON.parse(window.localStorage.getItem(XKEY) || "null");
     if (xr) { if (XW.opt.lay.opts[xr.lay]) XS.lay = xr.lay; if (XW.opt.follow.opts[xr.follow]) XS.follow = xr.follow; if (XTABS.indexOf(xr.tab) >= 0) XS.tab = xr.tab; if (XK.indexOf(xr.active) >= 0) XS.active = xr.active;
       if (XW.pf.at.opts[xr.at]) XS.at = xr.at; if (XW.pf.box.opts[xr.box]) XS.box = xr.box; if (xr.pv && typeof xr.pv === "object") Object.keys(xr.pv).forEach(function (k) { if (XK.indexOf(k) >= 0 && XW.pf.v[xr.pv[k]]) XS.pv[k] = xr.pv[k]; });   /* D-099 */
+      if (xr.pt && typeof xr.pt === "object") Object.keys(xr.pt).forEach(function (q) { var z = q.split(":"); if (z.length === 2 && XK.indexOf(z[0]) >= 0 && Object.prototype.hasOwnProperty.call(XW.pf.v, z[1]) && xr.pt[q] && typeof xr.pt[q] === "object") XS.pt[q] = xr.pt[q]; });   /* D-100: each entry is checked again where it is drawn (pfLook) */
+      if (["order", "show", "layout"].indexOf(xr.ptab) >= 0) XS.ptab = xr.ptab;
       XK.forEach(function (k) { var c = (xr.col || {})[k]; if (!c) return; var st = XS.col[k];
         if (XW.opt.scope.opts[c.scope]) st.scope = c.scope; if (typeof c.id === "string") st.id = c.id; if (typeof c.role === "string") st.role = c.role; if (XW.width.opts[c.width]) st.width = c.width;
         if (c.look && Array.isArray(c.look.rows) && c.look.rows.length === 3) st.look = Object.assign(xClone(EX.look[k]), c.look);
@@ -32,7 +34,7 @@
     if (!(L.hereW >= 1 && L.hereW <= 4)) L.hereW = EX.look[k].hereW;
     var H = EX.look[k].hov || {}; L.hov = Object.assign({}, H, L.hov || {}); Object.keys(L.hov).forEach(function (p) { if (!(p in H)) delete L.hov[p]; }); return L; }
   XK.forEach(function (k) { xFix(k, XS.col[k].look); });
-  function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, tab: XS.tab, active: XS.active, col: {}, at: XS.at, box: XS.box, pv: XS.pv }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
+  function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, tab: XS.tab, active: XS.active, col: {}, at: XS.at, box: XS.box, pv: XS.pv, pt: XS.pt, ptab: XS.ptab }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
     window.localStorage.setItem(XKEY, JSON.stringify(o)); } catch (e) {} }
   /* L-36 · the controls' icons (24px, drawn by the same rule as BY MOMENT's option squares): the columns' layouts, follow or stay, the
      elements shown, the steps, the element's widths (D-087: the default and three narrower), copy, back to the default */
@@ -142,6 +144,8 @@
     if (MS.gic !== "one" && o.gk === "a" && o.fn != null) { var st = xStation(xT(o.fn), z, col); if (st) return st; }
     var x = XF.gdk.vals[MS.gic === "one" ? "one" : o.gk] || XF.gdk.vals.one; return xSvg(x.icon, z, col); }
   function xLife(d) { var t = (W.terms || {}).life || {}; return ((d === "with the answer" ? t.req : d === "with the server process" ? t.srv : t.unk) || {}).name || d; }   /* terms.life: one lifetime pair on every surface */
+  function xAform(c) { return c.form ? XW.face.aform[c.form] || c.form : null; }   /* D-100: an ending's answer form and contract, one wording for the card and the portrait */
+  function xDecl(c) { var D = XW.face.decl; return c.decl == null ? [D.unknown, "var(--muted)"] : c.decl ? [D.yes, EX.col.opc.read] : [D.no, "var(--alert)"]; }
   function xInfIco(c) { return ((XF.ifk.vals || {})[c.ik] || {}).icon || (EN.ifk[c.ik] || {}).icon || W.marks.own.inf; }
 
   /* ── the parts, per kind: part → a node on the title line, or null when the element has nothing for it ── */
@@ -182,6 +186,10 @@
       if (p === "count") return xCount(c.paths.length, z, md.count, fill(XW.tip.end.ways, { n: c.paths.length }), "ways");
       if (p === "via") return c.at ? xMeta("file", xShort(c.at), z, md.via) : null;
       if (p === "how") return c.via ? xMeta("link", xHow(c.via), z, md.how) : null;   /* D-097: what in the code makes it, in words */
+      if (p === "form") return c.form ? xMeta(null, xAform(c), z, "word", "exaf") : null;   /* D-100: the answer's form, the feed's word in words */
+      if (p === "decl") { var dw = xDecl(c); return xChip(dw[0], dw[1], z, "exdecl"); }   /* D-100: whether the contract names the status — "not known" where the feed says nothing */
+      if (p === "check") return c.pred ? xMeta(null, c.pred, z, "word", "excheck") : null;
+      if (p === "code") return c.code ? xMeta(null, c.code, z, "word", "excode") : null;
       return null; },
     test: function (p, c, it, L, z) { var md = L.mode || {}, o = it.o, here = o.here.map(function (i) { return c.calls[i]; });
       if (p === "icon") { var s = el("span", "bki"); s.appendChild(xSvg("test", z, xGlyphCol("test", c, it, L))); return s; }
@@ -600,9 +608,10 @@
       return e.clientX >= l && e.clientX <= r && e.clientY >= t && e.clientY <= b; }); } : null; }
 
   /* ── the controls under a block: parts (drag between the lines, or into not drawn) · size · colour, and the copy line ── */
+  var XPICO = { how: "link", form: "doc", decl: "info", check: "shield", code: "key" };   /* D-100: the ending's facts wear the portrait's row icons */
   function xPartWord(k, p) { return (XW.parts[k][p] || {}).name || p; }
   function xPartPlain(k, p) { var lp = EX.parts[k] ? EX.parts[k].filter(function (x) { return x.key === p; })[0] : null; return lp ? fill(lp.note || "", { god: EX.god, dirs: EX.dirs }) : (XW.parts[k][p] || {}).plain; }
-  function xPartIco(k, p) { var lp = EX.parts[k] ? EX.parts[k].filter(function (x) { return x.key === p; })[0] : null; return lp ? lp.ico : (p === "icon" ? xColIco(k) : p === "file" || p === "via" ? "file" : p === "count" ? "info" : p === "name" || p === "cond" ? "doc" : "role"); }
+  function xPartIco(k, p) { var lp = EX.parts[k] ? EX.parts[k].filter(function (x) { return x.key === p; })[0] : null; return lp ? lp.ico : XPICO[p] && k === "end" ? XPICO[p] : (p === "icon" ? xColIco(k) : p === "file" || p === "via" ? "file" : p === "count" ? "info" : p === "name" || p === "cond" ? "doc" : "role"); }
   function xMove(k, p, line, side, idx) { var L = XS.col[k].look; L.rows = L.rows.map(function (r) { return { l: r.l.filter(function (q) { return q !== p; }), r: r.r.filter(function (q) { return q !== p; }) }; });
     L.off = (L.off || []).filter(function (q) { return q !== p; });
     if (line === "off") L.off.push(p); else { var c = L.rows[line][side === "r" ? "r" : "l"]; c.splice(Math.max(0, Math.min(idx == null ? c.length : idx, c.length)), 0, p); }
@@ -780,12 +789,12 @@
       Object.keys(Rg.opts).forEach(function (v) { o.appendChild(xOptBtn(g[0], v, Rg, g[1], function (nv) { XS[g[0]] = nv; xSave(); xActRow(XS.active); }, XICON[g[0]][v])); });
       grp.appendChild(o); hd.appendChild(grp); });
     row.appendChild(hd);
-    var body = el("div", "exabody"), lc = el("div", "exaleft"), ctl = el("div", "exactl"), pc = el("div", "exapt");
+    var body = el("div", "exabody"), lc = el("div", "exaleft"), ctl = el("div", "exactl"), pc = el("div", "exapt"), pcc = el("div", "exaptc");   /* D-100: the portrait's own controls, right of it */
     lc.appendChild(el("h4", "exsh", R.col)); lc.appendChild(xCol(k, true));
     ctl.appendChild(el("h4", "exsh", R.ctl)); ctl.appendChild(XCLONE && XCLONE.it ? xCtl(k, XCLONE.it) : el("p", "exhint", R.noEl));
     pc.appendChild(el("h4", "exsh", R.pt)); pc.appendChild(el("p", "exhint", R.ptPlain));
-    pc.appendChild(window.__allepPort ? window.__allepPort.frame(k, XCLONE && XCLONE.blk) : el("p", "exhint", R.noEl));
-    if (XS.at === "under") { lc.appendChild(ctl); body.appendChild(lc); body.appendChild(pc); } else { body.appendChild(lc); body.appendChild(pc); body.appendChild(ctl); }
+    var fr = window.__allepPort ? window.__allepPort.frame(k, XCLONE && XCLONE.blk) : null; pc.appendChild(fr || el("p", "exhint", R.noEl)); if (fr) pcc.appendChild(window.__allepPort.ctl(k, XCLONE && XCLONE.blk, fr));
+    if (XS.at === "under") { lc.appendChild(ctl); body.appendChild(lc); body.appendChild(pc); body.appendChild(pcc); } else { body.appendChild(lc); body.appendChild(pc); body.appendChild(pcc); body.appendChild(ctl); }
     row.appendChild(body); }
   /* the element lit anywhere (D-041): its kind's column shows it, when the column holds it and the option says follow */
   function exFollow() { if (XS.follow !== "on" || !S.el) return; var hit = false;

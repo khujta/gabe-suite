@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-099). Updated 2026-10-05 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-100). Updated 2026-10-08 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -23,13 +23,17 @@ what opens on a click (the lab's portrait) at the right (`4cf6fe3`) · D-099 THE
 column CLONED (same state — a step there moves the column too), its kind a DROPDOWN of the eight, its four tabs under it, and beside it a
 PORTRAIT IN THE LAB'S FRAME (dark 440 × 560, head + view squares, the lab's records): table Record · Shape · Wheel · Keys, schema and
 function Record, ending Exit, test Case; gate · client hook · in-flight approximated in the same record, the frame says so; two options of
-mine — controls under / right, box the lab's / as tall as its record (probe 1023 / 0, committed locally). Before any push: `git log
+mine — controls under / right, box the lab's / as tall as its record (probe 1023 / 0, `1e7fee1`) · D-100 the ending's card gains how ·
+answer form · in the contract on line 3 (check and code in not drawn), in words, an unknown contract "not known"; the PORTRAIT GETS ITS OWN
+CONTROLS right of it — order (sections and rows, dragged, each with a not-drawn bin) · show (icon · label · value … value alone) · layout
+(names beside or above; before, checks and gives a section each, above by default) — per kind and view (built 2026-10-08, probe 1030 / 1:
+the one failure was a stale D-089 pin expecting how hidden, re-pinned and confirmed on the live page). Before any push: `git log
 origin/graft-adoption..HEAD` for a foreign commit (the branch is shared).
-Disk (D-086): C: is at 49 GB free (2026-10-05) — his step 1 capped the restore points (15.3 → 3 GB used, max 15 GB; they were the cause);
+Disk (D-086): C: is at 160 GB free (2026-10-08, after he cleared space; it had fallen to 28) — his step 1 capped the restore points (15.3 → 3 GB used, max 15 GB; they were the cause);
 step 2, the WSL disk compact (~150 GB stranded), still waits in `C:\Users\Gabe\disk-fix\` and needs every WSL session closed.
 Testing cadence (2026-10-05, his ask): per ask a build + `--check` + one targeted look; the full page probe (~12 min) once per round of asks,
 before the round's commit; the doctor only before a push that carries suite code. `~/.local/bin/heavy` runs every browser job.
-Next from him: his read of the tailoring area and the eight portraits (D-099) — which views, which rows, the two options; each kind's bench copy line when he is happy with it → it becomes that kind's ruled default.
+Next: from him: his read of D-100's card line 3 and the portrait controls, and of the tailoring area (D-099) — which views, which rows, the two options; each kind's bench copy line when he is happy with it → it becomes that kind's ruled default.
 Round 1 is ruled (D-081, D-084, D-085). D-085 ("land it", "use recommended approach", "go"): Security = marks, after-a-decision = stop there
 (`9a9bb86`); the doubled rate limit middleware as an option, merged (my pick, dashed) or apart (`1790c87`, probe 776/0); L-33 traced + the
 hover emitter designed + P2.1/P3.2 redrafted (`8b7917d`, `legibility/drafts/hover-and-corpus/`).

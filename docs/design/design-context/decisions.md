@@ -1532,3 +1532,30 @@ element in its column", with nothing to pick; the portrait now says what its col
 Came in from outside this lane: the rebuild inlines gabe-artifact 1.7.0's chrome (`020c2aae`, the other session's), which opens every page at
 text size 110 % — the whole page's text is a tenth larger than at D-098 (body 15 → 16.5 px); the cog's text size takes it back to 100 %. The
 portrait frame is sized in pixels and keeps 440 × 560.
+
+## D-100 — The ending's card gains how · answer form · in the contract; the portrait gets its own controls (order · show · layout)
+Date: 2026-10-08 · Input: his message after D-099 (dictated).
+Decision, his: "In the card, I think we are missing some elements. I can see that when we click the card or in the portrait section, we have:
+the stage, which we show; the where, which we show; the how, which we are not showing; the answer from; the in contract. Let's make those
+available. In the portrait section, let's also add some configuration on the right of the portrait, similar to the configuration that we have
+for the card, but for the portrait: stuff like what we show, how we show it, the order of the things in different sections, and the layout.
+For example, in the hover, you change the layout in the before section because it was too long. We have a similar situation here in the
+portrait, in the before section, so that layout might change for any of the other sections too. For checks and gives."
+Read as (dictation): "answer from" = the portrait's ANSWER FORM row; "in contract" = its IN THE CONTRACT row; "the card" = the bench's block,
+whose controls are the four tabs order · show · format · hover.
+Consequence, the card: the ending gains four parts — answer form, in the contract, check, code (the portrait's facts rows, each in words).
+Line 3 is now where · how | answer form · in the contract; check and code start in not drawn, his to drag in. The feed's form words become
+plain words (text → "a fixed message", object → "an object with fields", default-phrase → "the status's own phrase", dynamic → "a message built
+when it runs"), and a contract the feed does not know now says "not known" — the portrait said "not declared" for the 80 endings whose
+contract is unknown. Feed: 728 endings — form text 264 · object 195 · default-phrase 80 · dynamic 28 · none 161; in the contract declared
+180 · not declared 468 · not known 80; a check 223; a code 92.
+Consequence, the portrait: a column right of it, HOW THE PORTRAIT IS DRAWN, three tabs. ORDER — the sections top to bottom, each with its
+rows; drag a section above or below another, a row along its own section, either into a not-drawn bin. SHOW — per row: icon · label · value,
+label · value, icon · value, or the value alone. LAYOUT — per section that names things: the names beside or above (before, checks and gives
+are now a section each, their name the card's own). Kept per kind and per way of drawing it ("end:exit", "table:record", …), through a reload;
+back to the default and copy under the tabs, as the card's. It works the same for all eight kinds: the record is taken apart after it is drawn —
+its sections, its top rows as one section ("its facts"), each top table as its own section; rows under one key (a rule, a send) move as one.
+Chosen alone (his to correct, each default dashed): every row as the lab draws it (icon · label · value), names beside — except before,
+checks and gives, whose name sits above its lines, as he picked for the hover (D-095); the controls sit right of the portrait in every case
+(the card's "where the controls sit" option moves only the card's); a table's Shape and Wheel have no sections and say so; table sections
+(fields · tables it touches · functions it calls) are ordered but not laid out — a table's header row is already its names.

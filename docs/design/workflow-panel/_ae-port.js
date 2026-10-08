@@ -16,12 +16,12 @@
     hd.appendChild(xWrap(el("b", "expft"), c ? pfSubject(k, c) : XW.kinds[k].name)); hd.appendChild(el("span", "ptsub", PF.v[v].name));
     var nav = el("nav", "expfv"); vs.forEach(function (q) { var b = el("button", "ptv" + (q === v ? " on" : "")); b.type = "button"; b.setAttribute("data-pv", q); b.setAttribute("aria-pressed", q === v ? "true" : "false");
       b.setAttribute("aria-label", PF.v[q].name); b.setAttribute("data-tip", "expv"); b.appendChild(xSvg(PF.v[q].icon, 14, "currentColor"));
-      b.addEventListener("click", function () { XS.pv[k] = q; xSave(); box.replaceWith(pfFrame(k, blk)); }); nav.appendChild(b); });
+      b.addEventListener("click", function () { XS.pv[k] = q; xSave(); pfRe(k, blk, box); }); nav.appendChild(b); });   /* D-100: the controls follow the view, each view its own */
     hd.appendChild(nav); box.appendChild(hd);
     if (!PTLAB[k]) box.appendChild(el("p", "expfnote", fill(PW.approx, { kind: XW.kinds[k].name })));
     var b0 = el("div", "ptbody"); box.appendChild(b0);
     if (!c) { b0.className = "ptidle"; b0.appendChild(el("span", null, xCurrent(k) ? PW.empty : XS.col[k].role ? XW.ctl.noneRole : XW.ctl.none)); box.setAttribute("data-state", "empty"); return box; }   /* nothing to pick: the column's own sentence, not "pick one" */
-    box.setAttribute("data-state", "drawn"); PFV[k][v](b0, c, it, S0, XS.col[k].look); return box; }
+    box.setAttribute("data-state", "drawn"); PFV[k][v](b0, c, it, S0, XS.col[k].look); box._pt = pfTailor(b0, k, v); return box; }
   function pfSubject(k, c) { return k === "end" ? c.st + " · " + xEndWords(c) : k === "test" ? c.cid : c.n; }
 
   /* ── the record's pieces, the lab's classes: the head (glyph · name), a row (its icon · its label · its value), a section, a table with named columns ── */
@@ -32,8 +32,8 @@
     r.appendChild(el("span", "k", label != null ? label : PF.r[key] || key));   /* "" = no label, the section names it */ var v = el("span", "v");
     (Array.isArray(value) ? value : [value]).forEach(function (x) { v.appendChild(typeof x === "string" || typeof x === "number" ? xWrap(el("span"), String(x)) : x); }); r.appendChild(v); b.appendChild(r); return r; }
   function pfChip(text, col) { var i = el("i", "rcchip", text); i.style.setProperty("--rwc", col || "var(--muted)"); return i; }
-  function pfSec(b, key, title, n) { var s = el("div", "exptsec"); s.setAttribute("data-ps", key); s.appendChild(el("h5", "ptsec", n == null ? title : title + " · " + n)); b.appendChild(s); return s; }
-  function pfTab(b, heads, n, L, ec) { var t = xLookOn(el("div", "exw flds rctab"), L); if (ec) t.style.setProperty("--ec", ec);
+  function pfSec(b, key, title, n) { var s = el("div", "exptsec"); s.setAttribute("data-ps", key); s.setAttribute("data-pn", title); s.appendChild(el("h5", "ptsec", n == null ? title : title + " · " + n)); b.appendChild(s); return s; }
+  function pfTab(b, heads, n, L, ec, key, name) { var t = xLookOn(el("div", "exw flds rctab"), L); if (ec) t.style.setProperty("--ec", ec); if (key) { t.setAttribute("data-tk", key); t.setAttribute("data-pn", name || heads[0]); }
     var h = el("div", "rcth"), f = el("span", "c-f", heads[0]); if (n != null) f.appendChild(el("i", "rcfp", String(n))); h.appendChild(f); h.appendChild(el("span", "c-k", heads[1])); h.appendChild(el("span", "c-t", heads[2]));
     t.appendChild(h); b.appendChild(t); return t; }
   function pfFld(t, mark, name, mid, ty, cls) { var f = el("div", "fld" + (cls ? " " + cls : "")), a = el("span", "c-f"); if (mark) a.appendChild(mark); a.appendChild(xWrap(el("span", "fn"), name)); f.appendChild(a);
@@ -42,7 +42,11 @@
   function pfIco(name, z, col) { return xSvg(name, z, col); }
   function pfFile(c) { return c.at || c.file || null; }
   function pfFk(to) { var s = el("span", "fkx fko");   /* not "out": the page's kit owns .out (an output box 7em tall) */ s.appendChild(xSvg("key", 12, EX.col.kind.external)); s.appendChild(xWrap(el("span"), "→ " + (to || PF.keys.another))); return s; }
-  function pfLines(b, S0) { var d = S0 && S0.P ? cdDetail(S0.P) : null; if (d) pfSec(b, "lines", PF.sec.lines).appendChild(d); }
+  function pfLines(b, S0) { var d = S0 && S0.P ? cdDetail(S0.P) : null; if (!d || d.hidden) return;
+    var io = [].filter.call(d.children, function (x) { return x.classList.contains("io") && !x.hidden; });
+    if (!io.length) { pfSec(b, "lines", PF.sec.lines).appendChild(d); return; }   /* the hovers drawn as one sentence (BY MOMENT's option): one section, as before */
+    io.forEach(function (g) { var p = g.getAttribute("data-part"), s = el("div", "exptsec ptlines"), w = el("div", "cdd"); s.setAttribute("data-ps", PTLN[p] || p); s.setAttribute("data-pn", XIO.parts[p] || p);
+      w.appendChild(g); s.appendChild(w); b.appendChild(s); }); }   /* D-100: before · checks · gives, each a section of its own — its name is the card's own, beside or above its lines */
   function pfEnding(ep, x) { var ec = EX.cat[ep + "|" + x]; return ec ? [cdStatusPill(ec.st), xWrap(el("span", "pfw"), xEndWords(ec))] : null; }
 
   /* ── the TABLE (the lab's four: Record · Shape · Wheel · Keys) ── */
@@ -55,7 +59,7 @@
     pfRow(b, "model", pfIco("doc", 14, EX.col.kind.schema), c.model);
     pfRow(b, "file", "file", pfFile(c));
     pfRow(b, "channel", pfIco("role", 14, EX.col.opc.call), pfChip(PF.chan[it.role] || it.role, EX.col.rw[it.role]));
-    var t = pfTab(b, [PF.cols.fields, PF.cols.fk, PF.cols.type], c.cols.length + (c.nmore || 0), L, c.ec);
+    var t = pfTab(b, [PF.cols.fields, PF.cols.fk, PF.cols.type], c.cols.length + (c.nmore || 0), L, c.ec, "fields");
     c.cols.forEach(function (f) { var x = (fk[f[0]] ? "fk" : "") + (uq[f[0]] ? " uq" : "");
       pfFld(t, xField(f, L, c, it, x.trim()), f[0], fk[f[0]] ? pfFk(fk[f[0]] === true ? null : fk[f[0]]) : null, f[1], x.trim()).setAttribute("data-col", f[0]); });
     (c.more || []).forEach(function (n) { var m = Array.isArray(n) ? n : [n]; pfFld(t, null, m[0], null, m[1], "more").setAttribute("data-col", m[0]); });   /* the model's columns the lab names without a mark: [name, type] */
@@ -99,7 +103,7 @@
     pfRow(b, "file", "file", pfFile(c));
     if (c.extra) pfRow(b, "extra", "info", PF.extra[c.extra] || c.extra);
     if (!it.o.parent && side === "out" && c.cons != null) pfRow(b, "shared", "link", c.cons > 1 ? fill(PF.shared, { n: c.cons }) : PF.alone);
-    var t = pfTab(b, [PF.cols.fields, PF.cols.nest, PF.cols.type], c.cols.length, L, c.ec);
+    var t = pfTab(b, [PF.cols.fields, PF.cols.nest, PF.cols.type], c.cols.length, L, c.ec, "fields");
     c.cols.forEach(function (f) { var nb = pfSchBase(f[1]), mid = nb ? [xSvg("schema", 12, EX.col.kind.schema), nb] : f[5] || null;
       pfFld(t, xField([f[0], f[1], f[2], f[4] ? 0 : 1], L, c, it), f[0], mid, f[1], nb ? "nest" : "").setAttribute("data-col", f[0]); }); }
 
@@ -114,10 +118,10 @@
     if (c.commits) pfRow(b, "commits", pfIco("key", 14, EX.col.opc.write), PF.commits);
     if ((c.raises || []).length) pfRow(b, "raises", "info", c.raises.map(function (r) { return r[0]; }).join(" · "));
     if (c.doc) pfRow(b, "doc", "doc", c.doc);
-    if ((o.ops || []).length) { var t = pfTab(b, [PF.cols.tables, PF.cols.chan, PF.r.model], o.ops.length, L);
+    if ((o.ops || []).length) { var t = pfTab(b, [PF.cols.tables, PF.cols.chan, PF.r.model], o.ops.length, L, null, "tables", PF.sec.tables);
       o.ops.forEach(function (q) { var tc = EX.cat["table:" + q[1]] || {}, rw = q[0] === "w" ? "w" : q[0] === "rw" ? "rw" : "r";
         pfFld(t, xStation("table:" + q[1], 13, tc.ec || EX.col.kind.model) || xSvg("model", 13, tc.ec || EX.col.kind.model), q[1], pfChip(rw.toUpperCase(), EX.col.rw[rw]), tc.model || null).setAttribute("data-table", q[1]); }); }
-    if ((o.calls || []).length) { var t2 = pfTab(b, [PF.cols.calls, PF.cols.role, PF.cols.lines], o.calls.length, L);
+    if ((o.calls || []).length) { var t2 = pfTab(b, [PF.cols.calls, PF.cols.role, PF.cols.lines], o.calls.length, L, null, "calls", PF.sec.calls);
       o.calls.forEach(function (q) { var K = xT(q[0]), cc = EX.cat[K] || {}, col = EX.col.role[cc.role] || "var(--muted)";
         pfFld(t2, xSvg("function", 13, col), xFnName(K) || PF.none, cc.role ? pfChip(cc.role, col) : null, cc.lines != null ? String(cc.lines) : null).setAttribute("data-call", xFnName(K) || ""); }); } }
 
@@ -126,7 +130,7 @@
     pfHd(b, g ? g.firstChild : null, xEndWords(c), [cdStatusPill(c.st), el("span", "cdv", c.sg)]).classList.add("pfexit");
     var s1 = pfSec(b, "facts", PW.sec.facts);
     pfRow(s1, "stage", "journey", c.sg, F.stage); pfRow(s1, "where", "file", c.at, F.where); pfRow(s1, "how", "link", c.via ? xHow(c.via) : null, F.how); pfRow(s1, "check", "shield", c.pred, F.check);
-    pfRow(s1, "code", "key", c.code, F.code); pfRow(s1, "form", "doc", c.form, F.form); pfRow(s1, "decl", "info", c.decl ? PW.decl : PW.notDecl, F.decl);
+    pfRow(s1, "code", "key", c.code, F.code); pfRow(s1, "form", "doc", xAform(c), F.form); pfRow(s1, "decl", "info", pfChip.apply(null, xDecl(c)), F.decl);
     pfLines(b, S0);
     var s3 = pfSec(b, "answer", PW.sec.answer); pfRow(s3, "media", "doc", c.media, F.media); pfRow(s3, "model", "model", c.model, F.model); pfRow(s3, "fields", "schema", (c.fl || []).join(" · "), F.fields);
     pfRow(s3, "body", "doc", (c.body || []).join(" · "), F.body);
@@ -186,6 +190,112 @@
     if ((o.reads || []).length) { var s = pfSec(b, "reads", PF.sec.reads, o.reads.length); o.reads.forEach(function (q) { pfRow(s, "read", "function", [xT(q[1]) || PF.none].concat(q[0] != null ? [el("span", "pfat", xT(q[0]))] : []), q[2] || PF.none); }); }
     pfLines(b, S0); }
 
+  /* ══ D-100 · HOW THE PORTRAIT IS DRAWN (his: "add some configuration on the right of the portrait, similar to the configuration that we have for the card, but for the
+     portrait: stuff like what we show, how we show it, the order of the things in different sections, and the layout … in the before section … for checks and gives").
+     The record is taken apart after it is drawn, the same way for every kind: its sections (.exptsec), its top rows (one section, "its facts"), each top table (a section of
+     its own); rows under one key (a rule, a send) move as one. Kept per kind and per way of drawing it: the sections' order and which are drawn, each section's rows the same
+     way, what each row shows, and where each section puts its names. My picks, dashed: every row as the lab draws it, names beside — before, checks and gives above (D-095) ══ */
+  var PTLN = { b: "before", c: "checks", g: "gives" }, PTABS = ["order", "show", "layout"], PFORMS = ["ilv", "lv", "iv", "v"], PLAYS = ["beside", "above"];
+  var PICON = { ilv: '<circle cx="5" cy="12" r="2.5"/><path d="M10 12h3M16 12h5"/>', lv: '<path d="M3 12h5M12 12h9"/>', iv: '<circle cx="5" cy="12" r="2.5"/><path d="M11 12h10"/>', v: '<path d="M3 12h18"/>' };
+  function pfLay0(q) { return PTLN.b === q || PTLN.c === q || PTLN.g === q ? "above" : "beside"; }
+  function pfLook(k, v) { var T = XS.pt[k + ":" + v]; T = T && typeof T === "object" ? T : {};   /* what was remembered, each value checked: a key no section has is ignored where it is drawn */
+    var A = function (x) { return Array.isArray(x) ? x.filter(function (q) { return typeof q === "string"; }) : []; },
+      O = function (x, f) { var o = {}; if (x && typeof x === "object" && !Array.isArray(x)) Object.keys(x).forEach(function (q) { var y = f(x[q]); if (y != null) o[q] = y; }); return o; },
+      In = function (L) { return function (x) { return L.indexOf(x) >= 0 ? x : null; }; };
+    return { order: A(T.order), off: A(T.off), rows: O(T.rows, A), roff: O(T.roff, A), form: O(T.form, In(PFORMS)), lay: O(T.lay, In(PLAYS)) }; }
+  /* the remembered order over what this element has: a section or a row he has not placed keeps its place after the one it followed */
+  function pfMerge(nat, saved) { var out = saved.filter(function (q, i) { return nat.indexOf(q) >= 0 && saved.indexOf(q) === i; });
+    nat.forEach(function (q, i) { if (out.indexOf(q) >= 0) return; var j = i - 1; while (j >= 0 && out.indexOf(nat[j]) < 0) j--; out.splice(j < 0 ? 0 : out.indexOf(nat[j]) + 1, 0, q); }); return out; }
+  function pfUnits(b) { var secs = [], about = null, last = null;
+    [].slice.call(b.children).forEach(function (n) { var C = n.classList;
+      if (C.contains("rcrow")) { if (!about) { about = el("div", "exptsec ptabout"); about.setAttribute("data-ps", "about"); about.setAttribute("data-pn", PF.ctl.about); b.insertBefore(about, n); secs.push(about); } about.appendChild(n); last = about; return; }
+      if (C.contains("rctab")) { var s = el("div", "exptsec pttab"); s.setAttribute("data-ps", n.getAttribute("data-tk") || "table"); s.setAttribute("data-pn", n.getAttribute("data-pn") || PF.cols.fields); b.insertBefore(s, n); s.appendChild(n); secs.push(s); last = s; return; }
+      if (C.contains("exptsec")) { secs.push(n); last = n; return; }
+      if (last && C.contains("ptsec")) last.appendChild(n); });   /* a caption under a table ("and n more") stays with it */
+    return secs; }
+  function pfRowsOf(s) { var g = {}, ks = []; [].forEach.call(s.children, function (r) { if (!r.classList.contains("rcrow")) return; var q = r.getAttribute("data-row") || "row"; if (!g[q]) { g[q] = []; ks.push(q); } g[q].push(r); }); return { g: g, ks: ks }; }
+  function pfRowName(q, rs) { if (PF.ctl.rows[q]) return PF.ctl.rows[q]; var t = rs.map(function (r) { var x = r.querySelector(".k"); return x ? x.textContent.trim() : ""; });
+    return t[0] && t.every(function (x) { return x === t[0]; }) ? t[0] : PF.r[q] || q; }
+  function pfTailor(b, k, v) { var T = pfLook(k, v), secs = pfUnits(b), by = {}, nat = [], D = { k: k, v: v, secs: [] };
+    secs.forEach(function (s) { var q0 = s.getAttribute("data-ps"), q = q0, n = 2; while (by[q]) q = q0 + "-" + n++; s.setAttribute("data-ps", q); by[q] = s; nat.push(q); });
+    pfMerge(nat, T.order).forEach(function (q) { var s = by[q], R = pfRowsOf(s), off = T.off.indexOf(q) >= 0,
+        d = { key: q, name: s.getAttribute("data-pn") || q, kind: s.classList.contains("ptlines") ? "lines" : s.classList.contains("pttab") ? "tab" : R.ks.length ? "rows" : "other", off: off, rows: [], lay: T.lay[q] || pfLay0(q) };
+      if (R.ks.length) { var rs0 = [].filter.call(s.children, function (x) { return x.classList.contains("rcrow"); }), at = rs0[rs0.length - 1].nextSibling, roff = T.roff[q] || [];
+        pfMerge(R.ks, T.rows[q] || []).forEach(function (rq) { var rs = R.g[rq], ro = roff.indexOf(rq) >= 0, f = T.form[q + "/" + rq] || PFORMS[0], ic = rs[0].querySelector(".rci svg");
+          d.rows.push({ key: rq, name: pfRowName(rq, rs), icon: ic ? ic.cloneNode(true) : null, off: ro, form: f });
+          rs.forEach(function (r) { r.remove(); if (!ro) { r.setAttribute("data-pf", f); s.insertBefore(r, at); } }); }); }
+      s.setAttribute("data-lay", d.lay); D.secs.push(d); if (off) s.remove(); else b.appendChild(s); });
+    return D; }
+  /* the frame and its controls drawn again together, after a view or a control changed */
+  function pfRe(k, blk, f0) { var f = f0 || document.querySelector("#exact .expf"), ar = f && f.closest(".exabody"), c = ar ? ar.querySelector(".expctl") : null, nf = pfFrame(k, blk);
+    if (f) f.replaceWith(nf); if (c) c.replaceWith(pfCtl(k, blk, nf)); }
+  function pfPut(k, v, blk, f) { var T = pfLook(k, v); f(T); XS.pt[k + ":" + v] = T; xSave(); pfRe(k, blk); }
+  function pfSecIco(d, z) { return xSvg(d.kind === "lines" ? "journey" : d.kind === "tab" ? "model" : d.kind === "rows" ? "doc" : "info", z || 13, "currentColor"); }
+  function pfChipB(cls, icon, name, key, vars, data) { var A = XW.act[key], obj = fill(A.obj, vars), b = el("button", "expc " + cls); b.type = "button"; b.setAttribute("aria-label", A.verb + " " + obj);
+    b.setAttribute("data-tip", "exctl"); b.setAttribute("data-verb", A.verb); b.setAttribute("data-obj", obj); if (icon) b.appendChild(icon); b.appendChild(el("span", null, name)); b.draggable = true;
+    b.addEventListener("dragstart", function (e) { try { e.dataTransfer.setData("text/plain", data); e.dataTransfer.effectAllowed = "move"; } catch (x) {} b.classList.add("dragging"); });
+    b.addEventListener("dragend", function () { b.classList.remove("dragging"); }); return b; }
+  function pfDrop(z, on) { z.addEventListener("dragover", function (e) { e.preventDefault(); z.classList.add("over"); }); z.addEventListener("dragleave", function () { z.classList.remove("over"); });
+    z.addEventListener("drop", function (e) { e.preventDefault(); z.classList.remove("over"); if (on((e.dataTransfer.getData("text/plain") || "").split("|"), e) !== false) e.stopPropagation(); }); }
+  function pfAt(z, e, skip) { return [].filter.call(z.querySelectorAll(".expc"), function (c) { if (c.getAttribute("data-row") === skip) return false; var r = c.getBoundingClientRect(); return e.clientX > r.left + r.width / 2 || e.clientY > r.bottom; }).length; }
+  function pfCopy(k, v, D) { var C = PF.ctl, mine = JSON.stringify(XS.pt[k + ":" + v] || {}) !== "{}", on = D.secs.filter(function (d) { return !d.off; }), off = D.secs.filter(function (d) { return d.off; });
+    return XW.copy.where + " · " + C.copy + " · " + XW.kinds[k].name + " · " + PF.v[v].name + " · " + C.secs + " " + on.map(function (d) { var rs = d.rows.filter(function (x) { return !x.off; }), ro = d.rows.filter(function (x) { return x.off; });
+        return d.name + (d.kind === "lines" || rs.length ? " (" + C.lays[d.lay].name + ")" : "") + (rs.length ? ": " + rs.map(function (x) { return x.name + (x.form !== PFORMS[0] ? " as " + C.forms[x.form].name : ""); }).join(", ") : "")
+          + (ro.length ? "; " + C.tray + " " + ro.map(function (x) { return x.name; }).join(", ") : ""); }).join(" → ")
+      + " · " + C.tray + " " + (off.map(function (d) { return d.name; }).join(", ") || "—") + " (" + (mine ? W.copy.his : W.copy.pick) + ")"; }
+  function pfCtl(k, blk, f) { var C = PF.ctl, box = el("div", "expctl"), D = f && f._pt, v = D ? D.v : null; box.setAttribute("data-k", k); box.appendChild(el("h4", "exsh", C.title));
+    if (!D || !D.secs.length) { box.appendChild(el("p", "exhint", D ? C.noSec : XW.row.noEl)); return box; }
+    var bar = el("div", "extabs"); bar.setAttribute("role", "tablist"); bar.setAttribute("aria-label", C.tabsLabel);
+    var show = function () { bar.querySelectorAll(".exptab").forEach(function (b) { var on = b.getAttribute("data-ptab") === XS.ptab; b.setAttribute("aria-selected", on ? "true" : "false"); b.tabIndex = on ? 0 : -1; });
+      box.querySelectorAll(".extp").forEach(function (q) { q.hidden = q.getAttribute("data-ptp") !== XS.ptab; }); };
+    PTABS.forEach(function (t, i) { var b = el("button", "exptab", C.tab[t].name);   /* not .extab: the card's tabs are found by that name */ b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("data-ptab", t);
+      b.addEventListener("click", function () { XS.ptab = t; xSave(); show(); });
+      b.addEventListener("keydown", function (e) { var dd = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0; if (!dd) return; e.preventDefault(); XS.ptab = PTABS[(i + dd + PTABS.length) % PTABS.length]; xSave(); show();
+        var q = bar.querySelector('[data-ptab="' + XS.ptab + '"]'); if (q) q.focus(); });
+      bar.appendChild(b); }); box.appendChild(bar);
+    var pane = function (t) { var d = el("div", "extp"); d.setAttribute("role", "tabpanel"); d.setAttribute("data-ptp", t); d.appendChild(el("p", "exhint", C.tab[t].plain)); box.appendChild(d); return d; };
+    var keys = function (L, drawn) { return L.filter(function (x) { return !!x.off !== drawn; }).map(function (x) { return x.key; }); };
+    /* ORDER: the sections top to bottom, each with its rows; drag a section onto another (above or below its middle), a row along its own section; either into not drawn */
+    var po = pane("order"), list = el("div", "ptslist"), sbin = el("div", "dzone exz exoff ptsoff"); sbin.setAttribute("aria-label", C.tray);
+    var moveSec = function (a, to, after) { pfPut(k, v, blk, function (T) { var on = keys(D.secs, true).filter(function (q) { return q !== a; }), off = keys(D.secs, false).filter(function (q) { return q !== a; });
+      if (to == null) off.push(a); else on.splice(on.indexOf(to) + (after ? 1 : 0), 0, a); T.order = on.concat(off); T.off = off; }); };
+    D.secs.forEach(function (d) { var sc = pfChipB("ptsc", pfSecIco(d), d.name, "ptMove", { name: d.name }, "pts|" + d.key); sc.setAttribute("data-ps", d.key);
+      if (d.off) { sbin.appendChild(sc); return; }
+      var r = el("div", "ptsrow"); r.setAttribute("data-ps", d.key); r.appendChild(sc);
+      if (d.rows.length) { var w = el("div", "ptrws"), z = el("div", "dzone exz ptrz"), zo = el("div", "dzone exz exoff ptrz ptroff"), lb = el("div", "ptrofl"); z.setAttribute("data-ps", d.key); zo.setAttribute("data-ps", d.key); zo.setAttribute("aria-label", C.tray);
+        d.rows.forEach(function (rw) { var c = pfChipB("ptrc", rw.icon ? rw.icon.cloneNode(true) : null, rw.name, "ptRow", { name: rw.name }, "ptr|" + d.key + "|" + rw.key); c.setAttribute("data-row", rw.key); (rw.off ? zo : z).appendChild(c); });
+        [[z, true], [zo, false]].forEach(function (Z) { pfDrop(Z[0], function (dd, e) { if (dd[0] !== "ptr" || dd[1] !== d.key || !dd[2]) return false; var at = Z[1] ? pfAt(Z[0], e, dd[2]) : 0;
+          pfPut(k, v, blk, function (T) { var on = keys(d.rows, true).filter(function (q) { return q !== dd[2]; }), off = keys(d.rows, false).filter(function (q) { return q !== dd[2]; });
+            if (Z[1]) on.splice(Math.min(at, on.length), 0, dd[2]); else off.push(dd[2]); T.rows[d.key] = on.concat(off); T.roff[d.key] = off; }); }); });
+        w.appendChild(z); lb.appendChild(el("span", "dzl", C.tray)); lb.appendChild(zo); w.appendChild(lb); r.appendChild(w); }
+      pfDrop(r, function (dd, e) { if (dd[0] !== "pts" || !dd[1]) return false; if (dd[1] === d.key) return; var bx = r.getBoundingClientRect(); moveSec(dd[1], d.key, e.clientY > bx.top + bx.height / 2); });
+      list.appendChild(r); });
+    pfDrop(sbin, function (dd) { if (dd[0] !== "pts" || !dd[1]) return false; moveSec(dd[1], null); });
+    var sb = el("div", "ptsbin"); sb.appendChild(el("span", "dzl", C.tray)); sb.appendChild(sbin); po.appendChild(list); po.appendChild(sb);
+    /* SHOW: what each drawn row shows — its icon, its label, its value, or less */
+    var ps = pane("show"), anyR = false;
+    D.secs.forEach(function (d) { var rs = d.rows.filter(function (x) { return !x.off; }); if (d.off || !rs.length) return; anyR = true; ps.appendChild(el("h5", "exsh2 ptsh", d.name));
+      rs.forEach(function (rw) { var r = el("div", "expr"), h = el("span", "exprn"), o = el("div", "opts exforms"); r.setAttribute("data-ps", d.key); r.setAttribute("data-row", rw.key);
+        if (rw.icon) h.appendChild(rw.icon.cloneNode(true)); h.appendChild(el("span", null, rw.name)); r.appendChild(h); o.setAttribute("role", "radiogroup"); o.setAttribute("aria-label", rw.name);
+        PFORMS.forEach(function (fm) { var b = xAct("opt exo exi", PICON[fm], "ptForm", { name: rw.name, v: C.forms[fm].name }, function () { pfPut(k, v, blk, function (T) { T.form[d.key + "/" + rw.key] = fm; }); });
+          b.setAttribute("role", "radio"); b.setAttribute("data-pform", d.key + "/" + rw.key); b.setAttribute("data-v", fm); b.setAttribute("aria-checked", rw.form === fm ? "true" : "false"); if (fm === PFORMS[0]) b.setAttribute("data-pick", "true"); o.appendChild(b); });
+        r.appendChild(o); ps.appendChild(r); }); });
+    if (!anyR) ps.appendChild(el("p", "exhint", C.noRows));
+    /* LAYOUT: per section that names its rows or its lines, the names beside or above */
+    var pl = pane("layout"), anyL = false;
+    D.secs.forEach(function (d) { if (d.off || !(d.kind === "lines" || d.rows.some(function (x) { return !x.off; }))) return; anyL = true;
+      var r = el("div", "expr"), h = el("span", "exprn"), o = el("div", "opts exforms"); r.setAttribute("data-ps", d.key); h.appendChild(pfSecIco(d)); h.appendChild(el("span", null, d.name)); r.appendChild(h);
+      o.setAttribute("role", "radiogroup"); o.setAttribute("aria-label", d.name);
+      PLAYS.forEach(function (L0) { var b = xAct("opt exo exi", XICON.card[L0 === "beside" ? "cols" : "rows"], "ptLay", { name: d.name, v: C.lays[L0].name }, function () { pfPut(k, v, blk, function (T) { T.lay[d.key] = L0; }); });
+        b.setAttribute("role", "radio"); b.setAttribute("data-play", d.key); b.setAttribute("data-v", L0); b.setAttribute("aria-checked", d.lay === L0 ? "true" : "false"); if (pfLay0(d.key) === L0) b.setAttribute("data-pick", "true"); o.appendChild(b); });
+      r.appendChild(o); pl.appendChild(r); });
+    if (!anyL) pl.appendChild(el("p", "exhint", C.noLay));
+    show();
+    var cp = el("div", "excp"), code = el("code", "exptline", pfCopy(k, v, D)), said = el("span", "said"); code.hidden = true;   /* the line is not shown — the button copies it whole (L-36); its own class names, so nothing reading the card's controls finds these */
+    cp.appendChild(xAct("opt exo exi exptreset", XICON.reset, "ptReset", null, function () { delete XS.pt[k + ":" + v]; xSave(); pfRe(k, blk); }));
+    cp.appendChild(xAct("opt exo exi exptcopy", XICON.copy, "ptCopy", null, function () { copyText(code.textContent, said, XW.ctl.copied); })); cp.appendChild(said); cp.appendChild(code); box.appendChild(cp);
+    return box; }
+
   var PFV = { table: { record: pfTblRecord, shape: pfTblShape, wheel: pfTblWheel, keys: pfTblKeys }, schema: { record: pfSchRecord }, fn: { record: pfFnRecord },
     end: { exit: pfExit }, test: { "case": pfCase }, gate: { record: pfGate }, hook: { record: pfHook }, inf: { record: pfInf } };
-  window.__allepPort = { frame: pfFrame, views: PTV, lab: PTLAB };
+  window.__allepPort = { frame: pfFrame, ctl: pfCtl, views: PTV, lab: PTLAB, look: pfLook };

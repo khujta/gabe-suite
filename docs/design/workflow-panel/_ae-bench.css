@@ -151,11 +151,11 @@
 #sec-ex .exw .bkcol > .exdotw { flex: none; }
 /* ══ D-094 · the controls as four tabs — order · show · format · hover — one pane shown; the rows of a pane: the part's name, then that tab's control ══ */
 .extabs { display: flex; gap: 2px; border-bottom: 1px solid var(--rule); }
-.extab { font: inherit; font-size: 12px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent;
+.extab, .exptab { font: inherit; font-size: 12px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent;
   padding: 5px 9px 4px; margin-bottom: -1px; cursor: pointer; border-radius: 6px 6px 0 0; }
-.extab:hover { color: var(--ink-soft); }
-.extab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
-.extab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.extab:hover, .exptab:hover { color: var(--ink-soft); }
+.extab[aria-selected="true"], .exptab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.extab:focus-visible, .exptab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .extp { display: flex; flex-direction: column; gap: 6px; padding-top: 2px; }
 .extp[hidden] { display: none; }
 .extp > .exhint { margin: 0; }

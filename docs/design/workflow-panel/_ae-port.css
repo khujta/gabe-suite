@@ -3,7 +3,7 @@
    are carried here, scoped to .expf — the bench imports only the block's rules (_ae_bench.py BLOCK_CLASSES), and these name none of them. The colours are the lab's,
    fixed: a dark panel in the light theme too, as the hover card is (D-088) — the page's own names are given the lab's values, so a strip or a mark drawn inside reads dark. ══ */
 #sec-ex .expf { --panel: #182136; --card: #182136; --ink: #e7ebf3; --ink-soft: #c3cad8; --muted: #8794ab; --line: #2b3650; --rule: #2b3650; --raised: #0e1524; --chip-bg: #0e1524;
-  --ground: #0c1322; --nav-bg: #0c1322; --accent: #8b83f5;
+  --ground: #0c1322; --nav-bg: #0c1322; --accent: #8b83f5; --alert: #f0a35a;   /* D-100: the dark theme's, so a "not declared" chip keeps its ink */
   --cd-panel: #182136; --cd-ink: #e7ebf3; --cd-muted: #8794ab; --cd-line: #2b3650; --cd-edge: #4a525c; --cd-chip: #0e1524; --cd-ok: #4cbe83; --cd-red: #ff6b6b;
   --cd-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; --cd-mono: var(--font-mono);
   box-sizing: border-box; width: 440px; max-width: 100%; display: flex; flex-direction: column; overflow: hidden; background: var(--panel); color: var(--ink);
@@ -131,3 +131,35 @@
 #sec-ex .expf .krow .ka { color: var(--muted); opacity: .7; }
 #sec-ex .expf .krow:hover { border-color: var(--accent); }
 #sec-ex .expf .kempty { font-size: 12px; line-height: 1.45; color: var(--muted); padding: 2px 2px 4px; }
+
+/* ══ D-100 · the portrait's own controls (_ae-port.js pfTailor · pfCtl): what a row shows, where a section puts its names. The record's top rows, now one section, and its
+   top tables, each a section, keep the lab's look; before, checks and gives are a section each, their name the card's own (beside its lines, or above them) ══ */
+#sec-ex .expf .exptsec.ptabout, #sec-ex .expf .exptsec.pttab { margin-top: 0; }
+#sec-ex .expf .exptsec.ptabout .rcrow .k { width: 62px; }
+#sec-ex .expf .exptsec.pttab > .exw.flds.rctab { margin-top: 12px; }
+#sec-ex .expf .exptsec.ptlines { margin-top: 10px; }
+#sec-ex .expf .exptsec.ptlines + .exptsec.ptlines { margin-top: 7px; }
+#sec-ex .expf .rcrow[data-pf="lv"] > .rci, #sec-ex .expf .rcrow[data-pf="v"] > .rci { display: none; }
+#sec-ex .expf .rcrow[data-pf="iv"] > .k, #sec-ex .expf .rcrow[data-pf="v"] > .k { display: none; }
+#sec-ex .expf .exptsec[data-lay="above"] > .rcrow { flex-wrap: wrap; row-gap: 2px; }
+#sec-ex .expf .exptsec[data-lay="above"] > .rcrow > .k { width: auto; flex: 1 1 auto; }
+#sec-ex .expf .exptsec[data-lay="above"] > .rcrow[data-pf="ilv"] > .v, #sec-ex .expf .exptsec[data-lay="above"] > .rcrow[data-pf="lv"] > .v { flex: 1 0 100%; }
+#sec-ex .expf .exptsec[data-lay="above"] > .rcrow[data-pf="ilv"] > .v { padding-left: 26px; box-sizing: border-box; }
+#sec-ex .expf .exptsec.ptlines[data-lay="above"] .cdd .io { grid-template-columns: minmax(0, 1fr); }
+#sec-ex .expf .exptsec.ptlines[data-lay="above"] .cdd .io > i { grid-row: auto; padding-top: 0; margin-bottom: 3px; }
+#sec-ex .expf .exptsec.ptlines[data-lay="above"] .cdd .io > .cdw, #sec-ex .expf .exptsec.ptlines[data-lay="above"] .cdd .io > .cdmore { grid-column: 1; grid-row: auto; }
+/* the column right of the portrait: three tabs (order · show · layout), then back to the default and copy */
+.exaptc { flex: 0 1 360px; min-width: 280px; display: flex; flex-direction: column; }
+.expctl { display: flex; flex-direction: column; gap: 6px; }
+.expctl .ptslist { display: flex; flex-direction: column; gap: 5px; }
+.expctl .ptsrow { display: flex; flex-direction: column; gap: 4px; padding: 5px; border: 1px solid var(--rule); border-radius: 8px; }
+.expctl .ptsrow.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.expctl .ptsrow > .ptsc { align-self: flex-start; font-weight: 650; color: var(--ink); }
+.expctl .ptrws { display: flex; flex-direction: column; gap: 3px; padding-left: 12px; }
+.expctl .ptrofl, .expctl .ptsbin { display: flex; align-items: center; gap: 6px; }
+.expctl .dzl { flex: none; width: 66px; font-size: 12px; color: var(--muted); }
+.expctl .ptrofl .exz, .expctl .ptsbin .exz { flex: 1; min-width: 0; }
+.expctl .expc svg { display: block; width: 13px; height: 13px; flex: none; }
+.expctl .exprn svg { display: block; width: 13px; height: 13px; flex: none; }
+.expctl .ptsh { margin: 6px 0 0; font-size: 12px; font-weight: 650; color: var(--muted); }
+.expctl .exptline[hidden] { display: none; }
