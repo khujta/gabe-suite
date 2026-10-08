@@ -2857,7 +2857,7 @@ const tailor = async (k) => { if (await p.$(CT(k))) return; const s0 = '#exgrid 
     out.badges = [...document.querySelectorAll('#exgrid .blk .bkn.badge')].map((b) => b.textContent).filter((t) => /^\d+$/.test(t.trim()));
     out.cut = [...document.querySelectorAll('#exgrid .blk .bkhd [data-part]')].filter((e) => e.scrollWidth > e.clientWidth + 1).map((e) => e.getAttribute('data-part') + ':' + e.textContent.slice(0, 30));
     const ifk = D0.words.enc.fam.ifk.vals; out.ifk = [...document.querySelectorAll('#exgrid .excol[data-k="inf"] .exrc[data-role]')].map((b) => b.getAttribute('data-role')).filter((r) => r && ifk[r] && b0(r));
-    function b0(r) { const b = document.querySelector('#exgrid .excol[data-k="inf"] .exrc[data-role="' + r + '"]'); return !b.textContent.startsWith(ifk[r].name + ' '); }
+    function b0(r) { const b = document.querySelector('#exgrid .excol[data-k="inf"] .exrc[data-role="' + r + '"]'); return !(b.getAttribute('aria-label') || '').startsWith(ifk[r].name + ' · '); }   /* CHANGED D-102: the chip is its icon, its words in its label and hover */
     out.dash = [getComputedStyle(document.querySelector('#exgrid .exwho[data-whose="lab"]')).borderTopStyle];
     const ctls = [...document.querySelectorAll('#sec-ex .exreset, #sec-ex .excopy, #exgrid .exscope .opt, #exgrid .exwidth .opt, #exgrid .exstep, #exgrid .extailor')];   /* CHANGED 2026-10-05 (D-098): back-to-default and copy are the row's; each column's tailor square joins */   /* L-36: each icon's hover is a verb and its object */
     out.ctls = ctls.length; out.tips = ctls.filter((c) => c.getAttribute('data-tip') === 'exctl' && c.getAttribute('data-verb') && c.getAttribute('data-obj') && c.getAttribute('aria-label') === c.getAttribute('data-verb') + ' ' + c.getAttribute('data-obj')).length;
@@ -4079,7 +4079,8 @@ const tailor = async (k) => { if (await p.$(CT(k))) return; const s0 = '#exgrid 
     const vt = await p.evaluate(() => { const b = document.querySelector('#exact .expf .ptv[data-pv="wheel"]'); b.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); const tp = document.getElementById('tip'); return tp.textContent; });
     ok(vt.includes(PF.v.wheel.name) && vt.includes(PF.view) && vt.includes(PF.v.wheel.plain), 'D-099 · a view square\'s hover names the view and says what it draws: "' + PF.v.wheel.name + ' · ' + PF.view + '"', vt);
     /* the two options, mine, each its default dashed: where the controls sit (under the element · right of the portrait) and the portrait's box (the lab's · as tall as its record) */
-    const op = () => p.evaluate(() => { const r = document.getElementById('exact'), f = r.querySelector('.expf'), b = f.querySelector('.ptbody'); return { at: r.getAttribute('data-at'), under: !!r.querySelector('.exaleft > .exactl'), last: r.querySelector('.exabody').lastElementChild.className,
+    const op = () => p.evaluate(() => { const r = document.getElementById('exact'), f = r.querySelector('.expf'), b = f.querySelector('.ptbody'); return { at: r.getAttribute('data-at'), under: !!r.querySelector('.exaleft > .exactl'), last: r.querySelector('.exabody').lastElementChild.className, order: [...r.querySelector('.exabody').children].map((c) => c.className).join(' '),
+      lw: Math.round(r.querySelector('.exaleft').getBoundingClientRect().width),
       box: f.getAttribute('data-box'), h: Math.round(f.getBoundingClientRect().height), scrolls: b.scrollHeight > b.clientHeight + 1, picks: [...r.querySelectorAll('.exahd .opt[data-pick]')].map((o) => o.getAttribute('data-xopt') + ':' + o.getAttribute('data-v')) }; });
     /* on DELETE /me's widest table, whose record is taller than the lab's box */
     await p.evaluate(() => window.__allep.pick('DELETE /me')); await p.waitForTimeout(300);
@@ -4088,8 +4089,8 @@ const tailor = async (k) => { if (await p.$(CT(k))) return; const s0 = '#exgrid 
     const o0 = await op(); await p.click('#exact .exahd [data-xopt="at"][data-v="right"]'); await p.waitForTimeout(150); const o1 = await op();
     await p.click('#exact .exahd [data-xopt="at"][data-v="under"]'); await p.click('#exact .exahd [data-xopt="box"][data-v="grow"]'); await p.waitForTimeout(150); const o2 = await op();
     await p.click('#exact .exahd [data-xopt="box"][data-v="lab"]'); await p.waitForTimeout(120);
-    ok(o0.at === 'under' && o0.under && o0.box === 'lab' && o0.h === 560 && o0.scrolls && JSON.stringify(o0.picks.sort()) === '["at:under","box:lab"]' && o1.at === 'right' && !o1.under && o1.last === 'exactl' && o2.box === 'grow' && o2.h > 560 && !o2.scrolls,
-      'D-099 · two options of mine, defaults dashed: the controls under the element, or right of the portrait (real click: the controls become the area\'s last column); the lab\'s box 440 × 560 that scrolls, or as tall as its record (' + tall[0] + ', ' + tall[1] + ' fields: ' + o2.h + 'px, nothing scrolls)', { tall, o0, o1, o2 });
+    ok(o0.at === 'sides' && !o0.under && o0.order === 'exactl exaleft exapt exaptc' && o0.lw <= 280 && o0.box === 'lab' && o0.h === 560 && o0.scrolls && JSON.stringify(o0.picks.sort()) === '["at:sides","box:lab"]' && o1.at === 'right' && !o1.under && o1.last === 'exactl' && o2.at === 'under' && o2.under && o2.box === 'grow' && o2.h > 560 && !o2.scrolls,
+      'D-099 · CHANGED D-102 · where the controls sit: his both sides by default — the card\'s controls, the element ' + o0.lw + 'px wide, the portrait, the portrait\'s controls; or right of the portrait (real click: the controls become the area\'s last column), or under the element; the lab\'s box 440 × 560 that scrolls, or as tall as its record (' + tall[0] + ', ' + tall[1] + ' fields: ' + o2.h + 'px, nothing scrolls)', { tall, o0, o1, o2 });
     /* the ending's portrait, DELETE /me's 401 invalid token: its sections in order, its "how" in words, one strip per way with the ending's own mark */
     await open(PAGE); await p.evaluate((ep) => window.__allep.pick(ep), 'DELETE /me'); await p.waitForTimeout(450); await tailor('end');
     const inv = await p.evaluate(() => { const X = window.__allepEx, C = window.__allep.data.ex.cat, it = X.items('end').filter((i) => /InvalidToken/.test(C[i.id].via || ''))[0]; X.pick('end', it.id); return [it.id, C[it.id].paths.length, (C[it.id].tests || []).length]; });
@@ -4225,6 +4226,25 @@ const tailor = async (k) => { if (await p.$(CT(k))) return; const s0 = '#exgrid 
          && m4.outline === 'none' && m4.hc[0] === 'none' && m4.rest.every((a) => a === 1)
          && m1.copy.includes(HW.title + ' ' + HW.opts.corners.name + ' ' + HW.at.opts['top-right'] + ', ' + HW.rest.label + ' ' + HW.rest.opts.pale) && m4.copy.includes(HW.title + ' ' + HW.opts.none.name + ', ' + HW.rest.label + ' ' + HW.rest.opts.drawn),
         'D-101 · each control changes one thing: "top right" drops the bottom-left corner and leaves the others\' tone; "as drawn" brings the others to full and leaves the corner; a ring replaces the corners (its thickness the only other control); "no shape" draws its own mark as the others — and the copy line names the mark once it is not the bench\'s own', { m1: [m1.hc, m1.copy.slice(-140)], m2: m2.hc, m3: [m3.outline, m3.hc, m3.sel], m4: [m4.outline, m4.copy.slice(-140)] }); }
+    /* ══ D-102 · his: "if in parts I click the hide glyph, it shouldn't move from its position. It just keeps the same position, but hides it … The list shouldn't be
+       dynamic" · "Leave only the icons. No need to have the words there. The hover is enough." — by real clicks on POST /cooking/sessions' ending ══ */
+    { const PCW = D.words.ex.ctl, E0 = D.ex.look.end, TE = CT('end');
+      await open(PAGE); await p.evaluate(() => window.__allep.pick('POST /cooking/sessions')); await p.waitForTimeout(450); await tailor('end');
+      await p.click(TE + ' .extab[data-tab="parts"]'); await p.waitForTimeout(120);
+      const pr = () => p.evaluate(() => { const L = window.__allepEx.state.col.end.look; return { rows: L.rows, off: L.off, was: L.was || null, drawn: !!document.querySelector('#exgrid .excol[data-k="end"] .blk [data-part="via"]'),
+        list: [...document.querySelectorAll('#exact .extp[data-tp="parts"] .exptr:not(.exphd)')].map((r) => r.getAttribute('data-part')), via: document.querySelector('#exact .extp[data-tp="parts"] .exptr[data-part="via"] .expat').textContent }; });
+      const q0 = await pr(); await p.click(TE + ' .exptr[data-part="via"] .expon'); await p.waitForTimeout(150); const q1 = await pr();
+      await p.click(TE + ' .exptr[data-part="via"] .expon'); await p.waitForTimeout(150); const q2 = await pr();
+      const offW = PCW.offAt.replace('{i}', 3).replace('{side}', PCW.left);
+      ok(E0.rows[2].l[0] === 'via' && E0.rows[2].l.length > 1 && JSON.stringify(q1.list) === JSON.stringify(q0.list) && q1.via === offW && JSON.stringify(q1.was) === '{"via":[2,"l",0]}' && !q1.drawn && q1.off.includes('via')
+         && JSON.stringify(q2.rows) === JSON.stringify(E0.rows) && JSON.stringify(q2.off) === JSON.stringify(E0.off) && q2.was === null && q2.drawn && JSON.stringify(q2.list) === JSON.stringify(q0.list),
+        'D-102 · the parts list stands still: hiding where (the first part of line 3) keeps its row in place, it reads "' + offW + '", and the card drops it; its eye again puts it back first on line 3, the look exactly the bench\'s own', { q0: q0.list, q1, q2 });
+      const rx = new RegExp('^.+ · ' + PCW.roleN.replace('{n}', '(\\d+)').replace('{t}', '(\\d+)') + '$');
+      const ch = await p.evaluate(() => [...document.querySelectorAll('#exgrid .excol[data-k="end"] .exrc')].map((b) => [b.getAttribute('data-role'), b.textContent, !!b.querySelector('svg'), b.getAttribute('aria-label')]));
+      await p.hover('#exgrid .excol[data-k="end"] .exrc[data-role="refusal"]'); await p.waitForTimeout(150);
+      const tt = await p.$eval('#tip', (e) => e.innerText), lab = (ch.find((c) => c[0] === 'refusal') || [])[3] || '';
+      ok(ch.length > 2 && ch.every(([r, tx, sv, al]) => tx === '' && sv && rx.test(al || '')) && ch[0][0] === '' && ch[0][3].startsWith(PCW.all + ' · ') && tt.includes(lab.split(' · ')[1] || '@'),
+        'D-102 · the ending\'s case chips are their icons only (' + ch.length + '), each with its word and count in its label ("' + lab + '") and its hover', { ch, tt }); }
     /* swept: every ending of every endpoint, and the first five of every other kind on every endpoint, open a drawn portrait whose words are whole — no token unfilled, no
        undefined, null, NaN or [object the PAGE wrote. Judged per text node and per " · " fact: a brace or a null inside the code's own words (the element's data, or the
        endpoint's endings it quotes — an f-string message, a date pattern, "cannot be null") is the code's */

@@ -1,7 +1,7 @@
 # Where loop 1 stands
 
 One page, rewritten (never appended) whenever the position moves. Read it before `method.md` (the method) and
-`decisions.md` (every ruling, D-001 … D-101). Updated 2026-10-08 · on `graft-adoption`, **committed
+`decisions.md` (every ruling, D-001 … D-102). Updated 2026-10-08 · on `graft-adoption`, **committed
 locally, not pushed** (his rule: "All this work can remain local for now. Just committed.").
 
 ## In plain words
@@ -31,13 +31,16 @@ the one failure was a stale D-089 pin expecting how hidden, re-pinned and confir
 because his browser kept a look saved before D-097 — such a part now lands where the bench draws it; a PARTS tab opens first (one row per part:
 its eye, where, what it shows, size, own hover; the four old tabs kept until he has seen it); this item's mark is two controls, its own mark
 SHAPED (corners · ring · none) and the others TONED (as drawn · paler), as the lab's field marks (full probe 1036 passed · 0 failed; two
-stale pins re-pinned — a drag that assumed ORDER opens first, and D-081's four tabs). Before any push: `git log
+stale pins re-pinned — a drag that assumed ORDER opens first, and D-081's four tabs; `25b7a60`) · D-102 the parts list stands still (a
+hidden part keeps its row and its remembered place, the eye puts it back exactly); "both sides" is the tailoring default — the card's
+controls · the element at 280 px · the portrait · its controls; every column's case chips are icons, word and count on hover (full probe
+1038 passed · 0 failed). Before any push: `git log
 origin/graft-adoption..HEAD` for a foreign commit (the branch is shared).
 Disk (D-086): C: is at 160 GB free (2026-10-08, after he cleared space; it had fallen to 28) — his step 1 capped the restore points (15.3 → 3 GB used, max 15 GB; they were the cause);
 step 2, the WSL disk compact (~150 GB stranded), still waits in `C:\Users\Gabe\disk-fix\` and needs every WSL session closed.
 Testing cadence (2026-10-05, his ask): per ask a build + `--check` + one targeted look; the full page probe (~12 min) once per round of asks,
 before the round's commit; the doctor only before a push that carries suite code. `~/.local/bin/heavy` runs every browser job.
-Next: from him — his read of D-101 (the parts tab, the corners + paler mark); then his read of D-100's card line 3 and the portrait controls, and of the tailoring area (D-099) — which views, which rows, the two options; each kind's bench copy line when he is happy with it → it becomes that kind's ruled default.
+Next: from him — his read of D-102 (the still parts list, both sides, the icon chips) and of D-101 (the corners + paler mark); then his read of D-100's card line 3 and the portrait controls, and of the tailoring area (D-099) — which views, which rows, the two options; each kind's bench copy line when he is happy with it → it becomes that kind's ruled default.
 Round 1 is ruled (D-081, D-084, D-085). D-085 ("land it", "use recommended approach", "go"): Security = marks, after-a-decision = stop there
 (`9a9bb86`); the doubled rate limit middleware as an option, merged (my pick, dashed) or apart (`1790c87`, probe 776/0); L-33 traced + the
 hover emitter designed + P2.1/P3.2 redrafted (`8b7917d`, `legibility/drafts/hover-and-corpus/`).

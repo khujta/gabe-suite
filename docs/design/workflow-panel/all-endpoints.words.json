@@ -2899,8 +2899,10 @@
              "keys": { "name": "Keys", "icon": "key", "plain": "What this table points at, and what points back." },
              "exit": { "name": "Exit", "icon": "up", "plain": "The row an ending lands on: its answer, the ways that reach it, the tests that prove it." },
              "case": { "name": "Case", "icon": "test", "plain": "One test: what it calls, and the endings it proves." } },
-      "at": { "label": "where the controls sit", "pick": "under",
-              "opts": { "under": { "name": "under the element", "plain": "The controls under the element, so the element sits right beside the portrait." },
+      "at": { "_about": "D-102, his: \"let's put what we are modifying in the middle, like the actual card that we are modifying, in the middle panel in the endpoint lab in the future, next to it, but with a reduced width. That way, we can put the configurations for the card on the left and the configurations for the portrait on the right.\"",
+              "label": "where the controls sit", "pick": "sides",
+              "opts": { "sides": { "name": "both sides", "plain": "The card's controls at the left, the portrait's at the right; the element, narrower, beside the portrait in the middle." },
+                        "under": { "name": "under the element", "plain": "The controls under the element, so the element sits right beside the portrait." },
                         "right": { "name": "right of the portrait", "plain": "The controls in a column of their own, right of the portrait." } } },
       "box": { "label": "the portrait's box", "pick": "lab",
                "opts": { "lab": { "name": "the lab's box", "plain": "The size the lab's portrait has; what does not fit scrolls inside it." },
@@ -3060,7 +3062,7 @@
     "ctl": {
       "widthIs": "width", "parts": "parts", "size": "size", "colour": "colour", "tray": "not drawn", "line": "line {i}", "left": "left", "right": "right",
       "partsPlain": "Drag a part to another line or side, or into not drawn to hide it.",
-      "pcol": { "on": "drawn", "at": "where", "form": "shows", "size": "size", "hov": "own hover" }, "atLine": "line {i}, {side}", "oneForm": "one form",
+      "pcol": { "on": "drawn", "at": "where", "form": "shows", "size": "size", "hov": "own hover" }, "atLine": "line {i}, {side}", "offAt": "hidden · line {i}, {side}", "oneForm": "one form",
       "each": "each part", "box": "box", "marks": "marks", "hover": "hover", "theMarks": "the marks", "tabsLabel": "the controls", "sizes": "sizes",
       "tab": {
         "parts": { "name": "parts", "plain": "Every part, in the order the card draws it: drawn or not, where, what it shows, its size and its hover — one row each." },
@@ -3073,7 +3075,7 @@
       "glyph": "glyph colour", "edgeSide": "edge", "edgePat": "edge pattern", "edgeW": "edge thickness", "chipBox": "chip box", "chipFill": "chip fill",
       "cntBox": "count box", "cntFill": "count fill", "enc": "marks drawn as", "pal": "marks coloured by", "shape": "mark corners",
       "copy": "copy", "copied": "copied", "reset": "back to the default",
-      "prev": "the element before", "next": "the element after", "all": "all", "allPlain": "Every role.",
+      "prev": "the element before", "next": "the element after", "all": "all", "allPlain": "Every role.", "roleN": "{n} of {t} on this column",
       "none": "nothing of this kind on this endpoint", "noneRole": "no element of this kind has this role here",
       "on": "drawn as it is on {ep}", "pickEl": "pick the element to draw"
     },

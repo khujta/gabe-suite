@@ -1588,3 +1588,25 @@ columns are headed by their icons, their words on hover. The portrait's own cont
 shape waits on his read of the card's.
 Proof: full probe 1036 passed · 0 failed (two stale pins re-pinned: a drag that assumed ORDER opens first, and D-081's four tabs);
 the item's mark read by computed styles in each look, and by a close-up at 4× with the mouse off the marks.
+
+## D-102 — The parts list stands still; the card's controls left, the portrait's right; the case chips are icons
+Date: 2026-10-08 · Input: his message after D-101 (dictated, pasted).
+Decision, his: "the options should be kind of static in the sense that, for example, if in parts I click the hide glyph, it shouldn't move from
+its position. It just keeps the same position, but hides it, and that's it. The list shouldn't be dynamic in the sense of changing the
+configurations. Also, let's put what we are modifying in the middle, like the actual card that we are modifying, in the middle panel in the
+endpoint lab in the future, next to it, but with a reduced width. That way, we can put the configurations for the card on the left and the
+configurations for the portrait on the right. Also, for the selectors of the different cards that we have, where it says: All cases · Refusal ·
+Framing · Validation success · Uncot. Leave only the icons. No need to have the words there. The hover is enough."
+Read as (dictation): "Framing" = framework; "Validation success" = the two chips validation and success; "Uncot" = uncaught; "All cases" =
+the "all" chip; "the middle panel in the endpoint lab" = the portrait, drawn as the lab's middle panel draws it.
+Consequence: (1) the PARTS rows stand in the bench's own order (its lines, then not drawn), whatever the card does; hiding a part keeps its
+row, which reads "hidden · line 3, left", and the look remembers the place (look.was), so the eye again puts it back on the same line, side
+and place. A part dragged into not drawn in ORDER has no remembered place; its eye puts it where the bench draws it. (2) "Where the controls
+sit" gains "both sides", now the default: the card's controls · the element, narrower (280 px) · the portrait · the portrait's controls. The
+other two arrangements stay. (3) Every column's case chips are their icons only; the word and the count ("refusal · 9 of 14 on this
+column") moved to the chip's label and its hover. The "all" chip took an icon of four squares.
+Chosen alone (his to correct): the element at 280 px and the card's controls at 460 px (at 400 the parts table wrapped); the count kept in
+the hover rather than dropped; the same icon-only rule on every column's chips, not only the ending's; "both sides" carries the dash of a
+default not yet ruled, since the dash marks any default he has not confirmed by looking.
+Proof: full probe 1038 passed · 0 failed (the D-099 arrangement and the in-flight chip words re-pinned to D-102); the look by real clicks
+(hide and show "where" round-trips the look byte for byte; the arrangement read by box positions).

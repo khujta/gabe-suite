@@ -6,12 +6,25 @@
      (2) a part's settings sat in four tabs, and only ORDER said whether it is drawn: the PARTS tab is one row per part, in the order the card draws it — drawn or
          not, where, what it shows, its size, its own hover. The other four tabs stay as they were until he has seen it.
      And the item's own mark ("none is good enough because they are doing too many things at the same time"): as the lab's field marks, ONE channel per meaning —
-     its own mark SHAPED (the lab's corners, or a ring), the others TONED (the lab's optional stop). This file is inlined after _ae-bench.js, in the same scope. ══ */
+     its own mark SHAPED (the lab's corners, or a ring), the others TONED (the lab's optional stop). This file is inlined after _ae-bench.js, in the same scope.
+     D-102 · his: "the options should be kind of static … if in parts I click the hide glyph, it shouldn't move from its position. It just keeps the same position, but
+     hides it, and that's it. The list shouldn't be dynamic": the rows stand in the bench's own order whatever the card does, and the eye remembers where a part was
+     drawn (look.was) so showing it again puts it back on the same line, side and place. ══ */
   function xPartsOf(k) { return EX.parts[k] ? EX.parts[k].map(function (p) { return p.key; }) : Object.keys(XW.parts[k]); }   /* XPARTS is not set yet when xFix first runs */
   function xAtOf(R, p) { for (var i = 0; i < R.length; i++) { if (R[i].l.indexOf(p) >= 0) return [i, "l"]; if (R[i].r.indexOf(p) >= 0) return [i, "r"]; } return null; }
   function xPlaceNew(k, L) { var off = L.off || [], miss = xPartsOf(k).filter(function (p) { return off.indexOf(p) < 0 && !xAtOf(L.rows, p); }); if (!miss.length) return;
     L.rows = L.rows.map(function (r) { return { l: r.l.slice(), r: r.r.slice() }; }); L.off = off.slice();
     miss.forEach(function (p) { var at = xAtOf(EX.look[k].rows, p); if (at) L.rows[at[0]][at[1]].push(p); else L.off.push(p); }); }
+  /* a remembered place is kept only for a part that is hidden, on a line the look still has */
+  function xWasFix(L) { var w = {}; Object.keys(L.was || {}).forEach(function (p) { var a = L.was[p]; if ((L.off || []).indexOf(p) >= 0 && Array.isArray(a) && a[0] >= 0 && a[0] < L.rows.length && (a[1] === "l" || a[1] === "r")) w[p] = [a[0], a[1], +a[2] || 0]; });
+    if (Object.keys(w).length) L.was = w; else delete L.was; }
+  /* the PARTS rows: the bench's own order (its lines, then not drawn), then any part it does not place — never the card's current order */
+  function xStaticOrder(k, cur) { var D = EX.look[k], o = []; D.rows.forEach(function (r) { o = o.concat(r.l, r.r); }); o = o.concat(D.off || []);
+    xPartsOf(k).concat(cur).forEach(function (p) { if (o.indexOf(p) < 0) o.push(p); }); return o.filter(function (p) { return cur.indexOf(p) >= 0; }); }
+  /* the case chips (D-102, his: "Leave only the icons. No need to have the words there. The hover is enough."): the icon, its word and count for the hover and the reader */
+  function xRoleChip(b, ico, nm, n, t) { b.appendChild(ico.charAt(0) === "<" ? xIco(ico, 13) : xSvg(ico, 13, "currentColor")); b.setAttribute("data-n", n); b.setAttribute("data-t", t);
+    b.setAttribute("aria-label", nm + " · " + fill(XW.ctl.roleN, { n: n, t: t })); }
+  function xRoleNTip(t) { return t.hasAttribute("data-n") ? "<span class=pl>" + esc(fill(XW.ctl.roleN, { n: t.getAttribute("data-n"), t: t.getAttribute("data-t") })) + "</span>" : ""; }
   function xSel(cls, vals, cur, words, aria, on) { var s = el("select", cls); s.setAttribute("aria-label", aria); s.setAttribute("data-tip", "exctl"); s.setAttribute("data-verb", aria);
     vals.forEach(function (x) { var o = el("option", null, words[x]); o.value = x; if (String(x) === String(cur)) o.selected = true; s.appendChild(o); });
     s.addEventListener("change", function () { on(s.value); }); return s; }
@@ -19,13 +32,15 @@
   function xPartsPane(k, L, order) { var d = xPane("parts"), C = XW.ctl, P = C.pcol, t = el("div", "exptbl"), hd = el("div", "exptr exphd");
     [[P.on, XICON.eye.on], ["", null], [P.at, null], [P.form, null], [P.size, null], [P.hov, XICON.hov]].forEach(function (h) { var c = el("span", h[1] ? "exphi" : null, h[1] ? null : h[0]);
       if (h[1]) { c.appendChild(xIco(h[1], 14)); c.setAttribute("title", h[0]); c.setAttribute("aria-label", h[0]); } hd.appendChild(c); }); t.appendChild(hd);   /* a button's column is headed by its icon, its word on hover */
-    order.concat(["marks"]).forEach(function (p) { var mk = p === "marks", at = mk ? null : xAtOf(L.rows, p), nm = mk ? C.theMarks : xPartWord(k, p), r = el("div", "exptr" + (at || mk ? "" : " exptoff"));
+    xStaticOrder(k, order).concat(["marks"]).forEach(function (p) { var mk = p === "marks", at = mk ? null : xAtOf(L.rows, p), nm = mk ? C.theMarks : xPartWord(k, p), r = el("div", "exptr" + (at || mk ? "" : " exptoff"));
       r.setAttribute("data-part", p);
       if (mk) r.appendChild(el("span")); else { var on = xAct("opt exo exi expon", at ? XICON.eye.on : XICON.eye.off, at ? "partOff" : "partOn", { part: nm }, function () {
-          if (at) xMove(k, p, "off"); else { var h = xAtOf(EX.look[k].rows, p) || [L.rows.length - 1, "r"]; xMove(k, p, h[0], h[1]); } });
+          if (at) { L.was = Object.assign({}, L.was); L.was[p] = [at[0], at[1], L.rows[at[0]][at[1]].indexOf(p)]; xMove(k, p, "off"); }   /* D-102: hidden, its place remembered */
+          else { var w = (L.was || {})[p], h = w || xAtOf(EX.look[k].rows, p) || [L.rows.length - 1, "r"]; if (L.was) { delete L.was[p]; if (!Object.keys(L.was).length) delete L.was; } xMove(k, p, h[0], h[1], w ? w[2] : null); } });
         on.setAttribute("aria-pressed", at ? "true" : "false"); r.appendChild(on); }
       var h = el("span", "exprn"); h.appendChild(mk ? el("i", "exmkic") : xSvg(xPartIco(k, p), 13, "currentColor")); h.appendChild(el("span", null, nm)); r.appendChild(h);
-      r.appendChild(el("span", "expat", mk ? "" : at ? fill(C.atLine, { i: at[0] + 1, side: at[1] === "l" ? C.left : C.right }) : C.tray));
+      var wa = !mk && !at && (L.was || {})[p];
+      r.appendChild(el("span", "expat", mk ? "" : at ? fill(C.atLine, { i: at[0] + 1, side: at[1] === "l" ? C.left : C.right }) : wa ? fill(C.offAt, { i: wa[0] + 1, side: wa[1] === "l" ? C.left : C.right }) : C.tray));
       var F = mk ? null : (EX.forms[k] || {})[p], fw = {};
       if (F && F.opts.length > 1) { F.opts.forEach(function (v) { fw[v] = XW.form[v].name; });
         r.appendChild(xSel("expsel", F.opts, xForm(k, p, L), fw, fill(XW.act.form.obj, { part: nm, v: "" }).trim(), function (v) { xSet(k, function (x) { x.mode = Object.assign({}, x.mode); x.mode[p] = v; }); })); }

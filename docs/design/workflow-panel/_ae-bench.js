@@ -32,7 +32,7 @@
     if (EX.cardLays.indexOf(L.card) < 0) L.card = EX.look[k].card;                                  /* D-095: a card layout must be one of the four */
     if (EX.heres.indexOf(L.here) < 0) L.here = EX.look[k].here;                                     /* D-096: the item's own mark must be one of the six */
     if (!(L.hereW >= 1 && L.hereW <= 4)) L.hereW = EX.look[k].hereW;
-    if (EX.hereAts.indexOf(L.hereAt) < 0) L.hereAt = EX.look[k].hereAt; if (EX.hereRests.indexOf(L.hereRest) < 0) L.hereRest = EX.look[k].hereRest; xPlaceNew(k, L);   /* D-101 (_ae-parts.js) */
+    if (EX.hereAts.indexOf(L.hereAt) < 0) L.hereAt = EX.look[k].hereAt; if (EX.hereRests.indexOf(L.hereRest) < 0) L.hereRest = EX.look[k].hereRest; xPlaceNew(k, L); xWasFix(L);   /* D-101 · D-102 (_ae-parts.js) */
     var H = EX.look[k].hov || {}; L.hov = Object.assign({}, H, L.hov || {}); Object.keys(L.hov).forEach(function (p) { if (!(p in H)) delete L.hov[p]; }); return L; }
   XK.forEach(function (k) { xFix(k, XS.col[k].look); });
   function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, tab: XS.tab, active: XS.active, col: {}, at: XS.at, box: XS.box, pv: XS.pv, pt: XS.pt, ptab: XS.ptab }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
@@ -50,8 +50,10 @@
       card: { cols: '<rect x="3" y="5" width="5" height="3" rx="1"/><path d="M11 6.5h10M11 11h10M11 15.5h7"/>', rows: '<rect x="3" y="4" width="7" height="3" rx="1"/><path d="M3 11h18M3 15h18M3 19h12"/>',
       wide: '<rect x="1.5" y="5" width="4" height="3" rx="1"/><path d="M8 6.5h14.5M8 11h14.5M8 15.5h10"/><path d="M1 20h22" stroke-dasharray="2 2"/>', both: '<rect x="1.5" y="3" width="7" height="3" rx="1"/><path d="M1.5 10h21M1.5 14h21M1.5 18h14"/><path d="M1 21.5h22" stroke-dasharray="2 2"/>' },
     tailor: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',   /* D-098: tailor this kind */
-    at: { under: '<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1" stroke-dasharray="2 1.6"/><rect x="13" y="3" width="8" height="18" rx="1"/>',
-        right: '<rect x="2" y="3" width="6" height="8" rx="1"/><rect x="9.5" y="3" width="6" height="18" rx="1"/><rect x="17" y="3" width="5" height="18" rx="1" stroke-dasharray="2 1.6"/>' },   /* D-099: the controls under the element · in a column right of the portrait */
+    at: { sides: '<rect x="1.5" y="3" width="4" height="18" rx="1" stroke-dasharray="2 1.6"/><rect x="7" y="7" width="4" height="10" rx="1"/><rect x="12.5" y="3" width="5" height="18" rx="1"/><rect x="19" y="3" width="3.5" height="18" rx="1" stroke-dasharray="2 1.6"/>',
+        under: '<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1" stroke-dasharray="2 1.6"/><rect x="13" y="3" width="8" height="18" rx="1"/>',
+        right: '<rect x="2" y="3" width="6" height="8" rx="1"/><rect x="9.5" y="3" width="6" height="18" rx="1"/><rect x="17" y="3" width="5" height="18" rx="1" stroke-dasharray="2 1.6"/>' },   /* D-102: the card's controls left, the element narrower, the portrait, its controls right · D-099: the controls under the element · in a column right of the portrait */
+    roleAll: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',   /* D-102: every role */
     box: { lab: '<rect x="5" y="3" width="14" height="13" rx="1.5"/><path d="M8 19h8" stroke-dasharray="1.6 1.6"/><path d="M8 22h8" stroke-dasharray="1.6 1.6"/>',
         grow: '<rect x="5" y="2" width="14" height="20" rx="1.5"/><path d="M12 8v8M9.5 10.5L12 8l2.5 2.5M9.5 13.5L12 16l2.5-2.5"/>' },   /* D-099: the lab's box, its overflow scrolling · as tall as its record */
     here: { corners: '<rect x="8" y="8" width="8" height="8" rx="1.5"/><path d="M14 4h6v6M10 20H4v-6"/>', ring: '<rect x="8" y="8" width="8" height="8" rx="1.5"/><rect x="4" y="4" width="16" height="16" rx="3.5"/>',
@@ -514,10 +516,10 @@
     top.appendChild(sc); top.appendChild(wd); sel.appendChild(top);
     var all = xList0(k), roles = {}, order = [];
     all.forEach(function (it) { (st.scope === "here" ? [it.role] : Object.keys(XROLES[it.id] || {})).forEach(function (r) { if (!(r in roles)) { roles[r] = 0; order.push(r); } roles[r]++; }); });
-    if (order.length > 1 || st.role) { var rc = el("div", "exroles"); var ab = el("button", "exrc", XW.ctl.all + " " + all.length); ab.type = "button"; ab.setAttribute("aria-pressed", st.role ? "false" : "true");
+    if (order.length > 1 || st.role) { var rc = el("div", "exroles"); var ab = el("button", "exrc"); ab.type = "button"; ab.setAttribute("aria-pressed", st.role ? "false" : "true"); xRoleChip(ab, XICON.roleAll, XW.ctl.all, all.length, all.length);
       ab.setAttribute("data-tip", "exrole"); ab.setAttribute("data-role", ""); ab.addEventListener("click", function () { st.role = null; redraw(); }); rc.appendChild(ab);
       order.forEach(function (r) { var b = el("button", "exrc"); b.type = "button"; b.setAttribute("data-role", r); b.setAttribute("aria-pressed", st.role === r ? "true" : "false"); b.setAttribute("data-tip", "exrole");
-        b.appendChild(xSvg(xRoleIco(k, r), 13, "currentColor")); b.appendChild(document.createTextNode(xRoleName(k, r) + " " + roles[r])); b.addEventListener("click", function () { st.role = st.role === r ? null : r; redraw(); }); rc.appendChild(b); });
+        xRoleChip(b, xRoleIco(k, r), xRoleName(k, r), roles[r], all.length); b.addEventListener("click", function () { st.role = st.role === r ? null : r; redraw(); }); rc.appendChild(b); });
       sel.appendChild(rc); }
     var items = xItems(k), cur = xCurrent(k), pk = el("div", "expick");
     var prev = xAct("opt exo exi exstep", XICON.prev, "prev"), next = xAct("opt exo exi exstep", XICON.next, "next"), s = el("select", "exselect");
@@ -787,7 +789,8 @@
     ctl.appendChild(el("h4", "exsh", R.ctl)); ctl.appendChild(XCLONE && XCLONE.it ? xCtl(k, XCLONE.it) : el("p", "exhint", R.noEl));
     pc.appendChild(el("h4", "exsh", R.pt)); pc.appendChild(el("p", "exhint", R.ptPlain));
     var fr = window.__allepPort ? window.__allepPort.frame(k, XCLONE && XCLONE.blk) : null; pc.appendChild(fr || el("p", "exhint", R.noEl)); if (fr) pcc.appendChild(window.__allepPort.ctl(k, XCLONE && XCLONE.blk, fr));
-    if (XS.at === "under") { lc.appendChild(ctl); body.appendChild(lc); body.appendChild(pc); body.appendChild(pcc); } else { body.appendChild(lc); body.appendChild(pc); body.appendChild(pcc); body.appendChild(ctl); }
+    if (XS.at === "sides") { body.appendChild(ctl); body.appendChild(lc); body.appendChild(pc); body.appendChild(pcc); }   /* D-102: the card's controls | the element, narrower | the portrait | the portrait's controls */
+    else if (XS.at === "under") { lc.appendChild(ctl); body.appendChild(lc); body.appendChild(pc); body.appendChild(pcc); } else { body.appendChild(lc); body.appendChild(pc); body.appendChild(pcc); body.appendChild(ctl); }
     row.appendChild(body); }
   /* the element lit anywhere (D-041): its kind's column shows it, when the column holds it and the option says follow */
   function exFollow() { if (XS.follow !== "on" || !S.el) return; var hit = false;
@@ -807,7 +810,7 @@
       return "<b>" + esc(YR.opts[YV].name) + "</b>" + (YR.pick === YV ? " · " + esc(W.pickMark) : "") + "<span class=pl>" + esc(fill(YR.opts[YV].plain, { v: YR.kinds[yk].name, yes: YR.kinds[yk].yes, no: YR.kinds[yk].no })) + "</span>"; }
     if (kind === "exctl") return "<b>" + esc(t.getAttribute("data-verb")) + "</b> " + esc(t.getAttribute("data-obj"));        /* L-36: a verb and its object */
     if (kind === "exrole") { var col = t.closest(".excol, .exact").getAttribute("data-k"), rl = t.getAttribute("data-role"), pl = rl ? xRolePlain(col, rl) : XW.ctl.allPlain, A = rl ? XW.act.role : XW.act.roleAll;
-      return "<b>" + esc(A.verb) + "</b> " + esc(fill(A.obj, { v: rl ? xRoleName(col, rl) : "" })) + (pl ? "<span class=pl>" + esc(pl) + "</span>" : ""); }
+      return "<b>" + esc(A.verb) + "</b> " + esc(fill(A.obj, { v: rl ? xRoleName(col, rl) : "" })) + (pl ? "<span class=pl>" + esc(pl) + "</span>" : "") + xRoleNTip(t); }
     if (kind === "expart") { var kk = t.closest(".excol, .exact").getAttribute("data-k"), pp = t.getAttribute("data-part"); return "<b>" + esc(xPartWord(kk, pp)) + "</b><span class=pl>" + esc(xPartPlain(kk, pp) || "") + "</span>"; }
     return null; }
   (function () { var I = $("info-ex"); if (!I) return; I.appendChild(el("p", "cap", XW.lede)); I.appendChild(el("p", "cap", XW.how)); })();

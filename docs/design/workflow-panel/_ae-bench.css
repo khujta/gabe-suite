@@ -34,6 +34,7 @@
 .exrc { font: inherit; font-size: var(--fs-min); cursor: pointer; border: 1px solid var(--rule); background: var(--raised); color: var(--ink-soft); border-radius: 999px; padding: 1px 8px; display: inline-flex; align-items: center; gap: 4px; }
 .exrc:hover { border-color: var(--accent); }
 .exrc[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--ground); }
+.exrc { padding: 3px 7px; }   /* D-102: an icon only, its word and count on hover */
 /* CR-26: the element selector as wide as its column; the steps before and after it under it */
 .expick { display: flex; flex-wrap: nowrap; gap: 4px; align-items: center; }
 .exselect { flex: 1 1 0; width: auto; min-width: 0; font: inherit; font-size: var(--fs-min); padding: 3px 4px; border: 1px solid var(--rule); border-radius: 6px; background: var(--raised); color: var(--ink); }
@@ -210,6 +211,9 @@
 .exaleft { flex: 0 1 420px; min-width: 300px; display: flex; flex-direction: column; gap: 8px; }
 .exaleft > .excol { flex: none; min-width: 0; }
 .exact[data-at="right"] .exactl { flex: 0 1 420px; min-width: 300px; }
+/* D-102: both sides — the card's controls left, the element narrower beside the portrait, the portrait's controls right */
+.exact[data-at="sides"] .exactl { flex: 0 1 460px; min-width: 300px; }
+.exact[data-at="sides"] .exaleft { flex: 0 1 280px; min-width: 240px; }
 .exaleft > .exactl { margin-top: 10px; }
 .exapt { flex: 0 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .exact .exsh { margin: 0 0 2px; }
