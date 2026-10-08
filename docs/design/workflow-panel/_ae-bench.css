@@ -167,14 +167,29 @@
 .excardopts { display: flex; gap: 3px; }
 .excardopts .opt { width: 26px; height: 26px; border-radius: 6px; }
 .excardopts .opt svg { width: 15px; height: 15px; }
-/* ══ D-096 · how a strip marks the item's own place: a ring (today) · in the mark's colour · a pale box behind it · double · the others paler · not marked;
-   the thickness rides --here-w (1–4 px). The base rule above keeps today's ring when the look is the default ══ */
-#sec-ex .exw .sq.exhere { outline-width: var(--here-w, 2px); }
-#sec-ex .exw[data-here="tint"] .sq.exhere { outline-color: var(--fc, var(--ink)); }
-#sec-ex .exw[data-here="box"] .sq.exhere { outline: none; background-color: color-mix(in srgb, var(--fc, var(--ink)) 24%, transparent); border-radius: 3px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--fc, var(--ink)) 24%, transparent); }
-#sec-ex .exw[data-here="double"] .sq.exhere { outline-style: double; outline-width: calc(var(--here-w, 2px) + 1px); }
-#sec-ex .exw[data-here="pale"] .sq.exhere, #sec-ex .exw[data-here="none"] .sq.exhere { outline: none; }
-#sec-ex :is(#exgrid, #exact) .exw[data-here="pale"] .sqs > .sq:not(.exhere):not(.expass):not(.exnob):not(.exmore) { opacity: var(--sq-opt-a, .5); }   /* the optional stop, the one a table's nullable columns use */
+/* ══ D-096 → D-101 · how a strip marks the item's own place — ONE channel per meaning, as the lab's field marks: its own mark SHAPED (the lab's unique-key corners, top right and
+   bottom left, on a child so a yes/no fact's corners keep the mark's own ::before/::after; or a ring, --here-w thick), the other marks TONED (the lab's optional stop) ══ */
+#sec-ex .exw .sq.exhere { position: relative; outline-width: var(--here-w, 2px); }
+#sec-ex .exw:not([data-here="ring"]) .sq.exhere { outline: none; }
+#sec-ex .exw .sq.exhere > .exhc { display: none; position: absolute; inset: -3px; pointer-events: none; }
+#sec-ex .exw[data-here="corners"] .sq.exhere > .exhc { display: block; }
+#sec-ex .exw .sq.exhere > .exhc::before, #sec-ex .exw .sq.exhere > .exhc::after { content: none; position: absolute; background: var(--accent);
+  width: calc(100% * var(--uq-len, .4)); height: calc(100% * var(--uq-len, .4));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, calc(100% - var(--uq-tip, .15px)) 100%, calc(100% - var(--uq-w, 1.5px)) var(--uq-w, 1.5px), 0 var(--uq-tip, .15px)); }
+#sec-ex .exw:is([data-here-at="both"], [data-here-at="top-right"]) .sq.exhere > .exhc::before { content: ""; top: 0; right: 0; }
+#sec-ex .exw:is([data-here-at="both"], [data-here-at="bottom-left"]) .sq.exhere > .exhc::after { content: ""; bottom: 0; left: 0; transform: scale(-1, -1); }
+#sec-ex :is(#exgrid, #exact) .exw[data-here-rest="pale"] .sqs:has(> .sq.exhere) > .sq:not(.exhere):not(.expass):not(.exnob):not(.exmore) { opacity: var(--sq-opt-a, .5); }   /* the optional stop, the one a table's nullable columns use */
+/* D-101 · PARTS: one row per part — the eye · the part · where · what it shows · its size · its own hover */
+.exptbl { display: grid; gap: 2px; margin-top: 4px; }
+.exptr { display: grid; grid-template-columns: 30px minmax(0, 1.15fr) minmax(0, .8fr) minmax(0, 1fr) minmax(0, 58px) 30px; align-items: center; gap: 6px; padding: 1px 0; }
+.exptr.exphd > span { overflow-wrap: anywhere; }
+.exptr.exphd > .exphi { display: flex; justify-content: center; cursor: help; }
+.exptr.exphd > .exphi svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.exptr.exphd { font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 3px; }
+.exptr.exptoff .exprn, .exptr.exptoff .expat { color: var(--muted); }
+.exptr .expat, .exptr .expone { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.exptr .expsel { font: inherit; font-size: 12px; min-width: 0; width: 100%; }
+.exptr .expon[aria-pressed="false"] { opacity: .7; }
 #sec-ex .exhere-sec { margin-top: 8px; }
 #sec-ex .exhere-sec .exsh2 { margin: 0 0 2px; font: inherit; font-weight: 600; }
 #sec-ex .exhereopts { display: flex; flex-wrap: wrap; gap: 3px; margin: 4px 0; }

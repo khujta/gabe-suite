@@ -10,7 +10,7 @@
      by the generator inside the page's script, so it draws with the page's own helpers. ══ */
   var EX = D.ex, XW = W.ex, XKEY = "gabe:allep:bench:v3", XK = EX.kinds, XF = W.enc.fam, XIO = W.mo.io, XC2 = W.mo.x.c2;
   var XREG = EX.regions || {};                               /* D-089: the hover regions of each kind's parts (see xRegions) */
-  var XTABS = ["order", "show", "format", "hover"];               /* D-094 · the controls' tabs, in his words: the order of the parts · what each part shows · its format · the hover */
+  var XTABS = ["parts", "order", "show", "format", "hover"];      /* D-094 · the controls' tabs, in his words: the order of the parts · what each part shows · its format · the hover; D-101: parts first, every setting of a part in its row */
   var XS = { lay: XW.opt.lay.pick, follow: XW.opt.follow.pick, tab: XTABS[0], active: XK[0], col: {}, at: XW.pf.at.pick, box: XW.pf.box.pick, pv: {}, pt: {}, ptab: "order" };   /* D-100: pt — how each kind's portrait is drawn, per way of drawing it ("k:view"); ptab — its controls' tab */   /* D-098: the kind being tailored, one at a time — the first column's (the ending) until he picks */
   function xClone(o) { return JSON.parse(JSON.stringify(o)); }
   XK.forEach(function (k) { XS.col[k] = { scope: XW.opt.scope.pick, role: null, id: null, look: xClone(EX.look[k]), sel: null, open: false, width: XW.width.pick }; });
@@ -32,6 +32,7 @@
     if (EX.cardLays.indexOf(L.card) < 0) L.card = EX.look[k].card;                                  /* D-095: a card layout must be one of the four */
     if (EX.heres.indexOf(L.here) < 0) L.here = EX.look[k].here;                                     /* D-096: the item's own mark must be one of the six */
     if (!(L.hereW >= 1 && L.hereW <= 4)) L.hereW = EX.look[k].hereW;
+    if (EX.hereAts.indexOf(L.hereAt) < 0) L.hereAt = EX.look[k].hereAt; if (EX.hereRests.indexOf(L.hereRest) < 0) L.hereRest = EX.look[k].hereRest; xPlaceNew(k, L);   /* D-101 (_ae-parts.js) */
     var H = EX.look[k].hov || {}; L.hov = Object.assign({}, H, L.hov || {}); Object.keys(L.hov).forEach(function (p) { if (!(p in H)) delete L.hov[p]; }); return L; }
   XK.forEach(function (k) { xFix(k, XS.col[k].look); });
   function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, tab: XS.tab, active: XS.active, col: {}, at: XS.at, box: XS.box, pv: XS.pv, pt: XS.pt, ptab: XS.ptab }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
@@ -53,12 +54,9 @@
         right: '<rect x="2" y="3" width="6" height="8" rx="1"/><rect x="9.5" y="3" width="6" height="18" rx="1"/><rect x="17" y="3" width="5" height="18" rx="1" stroke-dasharray="2 1.6"/>' },   /* D-099: the controls under the element · in a column right of the portrait */
     box: { lab: '<rect x="5" y="3" width="14" height="13" rx="1.5"/><path d="M8 19h8" stroke-dasharray="1.6 1.6"/><path d="M8 22h8" stroke-dasharray="1.6 1.6"/>',
         grow: '<rect x="5" y="2" width="14" height="20" rx="1.5"/><path d="M12 8v8M9.5 10.5L12 8l2.5 2.5M9.5 13.5L12 16l2.5-2.5"/>' },   /* D-099: the lab's box, its overflow scrolling · as tall as its record */
-    here: { ring: '<rect x="8" y="8" width="8" height="8" rx="1.5"/><rect x="4" y="4" width="16" height="16" rx="3.5"/>',
-        tint: '<rect x="8" y="8" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="4" y="4" width="16" height="16" rx="3.5" stroke-width="3"/>',
-        box: '<rect x="3" y="3" width="18" height="18" rx="4" fill="currentColor" opacity=".3" stroke="none"/><rect x="8" y="8" width="8" height="8" rx="1.5"/>',
-        double: '<rect x="9" y="9" width="6" height="6" rx="1"/><rect x="5.5" y="5.5" width="13" height="13" rx="2.5"/><rect x="2.5" y="2.5" width="19" height="19" rx="4"/>',
-        pale: '<rect x="9" y="7" width="6" height="10" rx="1" fill="currentColor"/><rect x="2" y="7" width="5" height="10" rx="1" opacity=".35"/><rect x="17" y="7" width="5" height="10" rx="1" opacity=".35"/>',
-        none: '<rect x="7" y="7" width="10" height="10" rx="2"/>' },   /* D-096: how the strip marks the item's own place */
+    here: { corners: '<rect x="8" y="8" width="8" height="8" rx="1.5"/><path d="M14 4h6v6M10 20H4v-6"/>', ring: '<rect x="8" y="8" width="8" height="8" rx="1.5"/><rect x="4" y="4" width="16" height="16" rx="3.5"/>',
+        none: '<rect x="7" y="7" width="10" height="10" rx="2"/>' },   /* D-096 → D-101: its own mark's shape */
+    eye: { on: '<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/>', off: '<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" opacity=".45"/><path d="M4 20L20 4"/>' },   /* D-101: a part drawn or not */
     yn: { off: '<rect x="5" y="5" width="14" height="14" rx="2"/>', corners: '<rect x="6" y="6" width="12" height="12" rx="2" opacity=".45"/><path d="M3 9V3h6"/><path d="M21 15v6h-6"/>',
         grey: '<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M5 19L19 5V19z" fill="currentColor" stroke="none"/>' },   /* D-091: not marked · the other two corners · the no in grey */
       /* D-093: a part's forms — a chip in its box · the word · a dot · a count boxed with its unit · the number boxed · the number and unit · the number · the glyph and the word ·
@@ -267,6 +265,7 @@
     return fill(/middleware/i.test(v) ? H.scheme : H.mw, { name: v }); }   /* a name that already says middleware is not told so twice */
   function xMark(cls, col, sym, ch, title, mk, mv) { var q = el("i", "sq " + cls); q.style.setProperty("--fc", col); if (/e-symbol/.test(cls) && sym) q.appendChild(xSvg(sym, 11, "currentColor"));
     else if (/e-char/.test(cls)) q.textContent = ch || ""; if (title) q.setAttribute("data-w", title);
+    if (/\bexhere\b/.test(cls)) q.appendChild(el("b", "exhc"));   /* D-101: the item's own corners ride a child, so a yes/no fact's corners (the mark's own ::before/::after) can sit beside them */
     if (mk) { q.setAttribute("data-mk", mk); if (mv != null) q.setAttribute("data-mv", mv); }   /* D-088: what the mark counts — the hover card's marks are these, counted, labelled by mo.card.mark[mk] */
     return q; }
   /* D-091 · ONE field mark, the lab's sqNode: `e-<enc> t-<type>` in the type's colour, `opt` when the column can be null (a schema's: when the field is not required) — drawn at the
@@ -539,7 +538,7 @@
     w.style.setProperty("--rail-w", L.railW + "px"); w.style.setProperty("--rail-s", L.railStyle); w.style.setProperty("--rw-a", String(L.rwA)); w.style.setProperty("--cnt-a", String(L.cntA));
     w.style.setProperty("--sq", L.sqSize + "px"); w.style.setProperty("--sqg", L.sqGap + "px");
     w.style.setProperty("--sq-base", String((L.sqBase == null ? 100 : L.sqBase) / 100)); w.style.setProperty("--sq-opt-a", String((L.sqOptA == null ? 50 : L.sqOptA) / 100));   /* the lab's opacity bar: the standard and the optional stop (D-091) */ w.style.setProperty("--uq-len", String((L.sqUqLen || 40) / 100));
-    w.setAttribute("data-here", L.here); w.style.setProperty("--here-w", L.hereW + "px");   /* D-096: how the item's own mark is drawn */
+    w.setAttribute("data-here", L.here); w.setAttribute("data-here-at", L.hereAt); w.setAttribute("data-here-rest", L.hereRest); w.style.setProperty("--here-w", L.hereW + "px");   /* D-096 · D-101: its own mark's shape, the others' tone */
     w.style.setProperty("--uq-w", (L.sqUqW || 1.5) + "px"); w.style.setProperty("--uq-tip", ((L.sqUqW || 1.5) * (L.sqUqTip || 10) / 100) + "px"); return w; }
   /* D-099: the kind being tailored, picked in the tailoring column's head */
   function xKindPick(k) { var s = el("select", "exkind"); s.setAttribute("aria-label", XW.row.kind);
@@ -663,6 +662,7 @@
       bar.appendChild(b); }); box.appendChild(bar);
     var order = []; L.rows.forEach(function (r) { order = order.concat(r.l, r.r); }); order = order.concat((L.off || []).filter(function (p) { return order.indexOf(p) < 0; }));
     XPARTS[k].forEach(function (p) { if (order.indexOf(p) < 0) order.push(p); }); order = order.filter(function (p) { return XPARTS[k].indexOf(p) >= 0; });
+    box.appendChild(xPartsPane(k, L, order));   /* D-101 (_ae-parts.js): one row per part */
     /* ORDER: the three lines and not drawn, each part dragged where it goes */
     var po = xPane("order");
     L.rows.forEach(function (row, i) { var r = el("div", "lnrow"); r.appendChild(el("span", "dzl", fill(XW.ctl.line, { i: i + 1 }))); var sd = el("div", "lnsides");
@@ -701,13 +701,7 @@
     mg.appendChild(xPick(XW.ctl.enc, L.sqEnc, ["symbol", "colour", "char", "shape"], function (v) { xSet(k, function (x) { x.sqEnc = v; }); }));
     mg.appendChild(xPick(XW.ctl.pal, L.sqPal, ["type", "channel", "entity", "mono"], function (v) { xSet(k, function (x) { x.sqPal = v; }); }));
     mg.appendChild(xPick(XW.ctl.shape, L.sqShape, ["round", "square"], function (v) { xSet(k, function (x) { x.sqShape = v; }); })); mk.appendChild(mg);
-    /* D-096: how the strip marks the item's own place — six looks as icon squares, my pick dashed, and the ring's thickness */
-    if (EX.hereKinds.indexOf(k) >= 0) { var HW = XW.here, hs = el("div", "exhere-sec"), hg = el("div", "opts exhereopts"), what = HW.kinds[k].name;
-      hs.appendChild(el("h5", "exsh2", HW.title)); hs.appendChild(el("p", "exhint", HW.plain)); hg.setAttribute("role", "radiogroup"); hg.setAttribute("aria-label", HW.title);
-      EX.heres.forEach(function (v) { var b = xAct("opt exo exi", XICON.here[v], "here", { what: what, v: HW.opts[v].name }, function () { xSet(k, function (x) { x.here = v; }); });
-        b.setAttribute("role", "radio"); b.setAttribute("data-xhere", v); b.setAttribute("aria-checked", L.here === v ? "true" : "false"); if (HW.pick === v) b.setAttribute("data-pick", "true"); hg.appendChild(b); });
-      hs.appendChild(hg); if (["ring", "tint", "double"].indexOf(L.here) >= 0) hs.appendChild(xRange(HW.w, L.hereW, 1, 4, 1, function (v) { xSet(k, function (x) { x.hereW = v; }); }));
-      mk.appendChild(hs); }
+    if (EX.hereKinds.indexOf(k) >= 0) mk.appendChild(xHereSec(k, L));   /* D-096 → D-101 (_ae-parts.js): its own mark's shape, the others' tone */
     pf.appendChild(mk); box.appendChild(pf);
     /* HOVER: every part's switch, then the marks' — pressed = a card of its own, else the block's card */
     var ph = xPane("hover"); order.concat(["marks"]).forEach(function (p) { var r = xCtlRow(k, p, L); r.appendChild(xHov(k, p, L, p === "marks" ? XW.ctl.theMarks : xPartWord(k, p))); ph.appendChild(r); });
@@ -748,8 +742,7 @@
   function xHovLine(k, L) { var H0 = EX.look[k].hov || {}, H = L.hov || {}, d = Object.keys(H0).filter(function (p) { return !!H[p] !== !!H0[p]; });
     return (d.length ? " · " + XW.ctl.hover + " " + d.map(function (p) { return (p === "marks" ? XW.ctl.theMarks : xPartWord(k, p)) + " " + (H[p] ? "own" : "block"); }).join(", ") : "")
       + (L.card !== EX.look[k].card ? " · " + XW.cardLay.title + " " + XW.cardLay.opts[L.card].name : "")   /* D-095: said only when it is not the bench's own */
-      + (EX.hereKinds.indexOf(k) >= 0 && (L.here !== EX.look[k].here || L.hereW !== EX.look[k].hereW) ? " · " + XW.here.title + " " + XW.here.opts[L.here].name
-        + (["ring", "tint", "double"].indexOf(L.here) >= 0 ? " " + L.hereW + "px" : "") : ""); }   /* D-096: the same way */
+      + xHereLine(k, L); }   /* D-096 · D-101: the same way (_ae-parts.js) */
   function xSame(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
   function xCopy(k) { var st = XS.col[k], it = xCurrent(k), L = st.look, whose = xWhose(k), mine = !xSame(L, EX.look[k]) || st.width !== XW.width.pick;   /* L-36: the column's width is part of its look */
     var off = (L.off || []).map(function (p) { return k === "table" ? p : xPartWord(k, p); }).join(k === "table" ? " " : " · ") || "—";

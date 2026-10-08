@@ -1559,3 +1559,32 @@ Chosen alone (his to correct, each default dashed): every row as the lab draws i
 checks and gives, whose name sits above its lines, as he picked for the hover (D-095); the controls sit right of the portrait in every case
 (the card's "where the controls sit" option moves only the card's); a table's Shape and Wheel have no sections and say so; table sections
 (fields · tables it touches · functions it calls) are ordered but not laid out — a table's header row is already its names.
+
+## D-101 — A remembered look's new parts find their place; a PARTS tab, one row per part; the item's own mark in two channels
+Date: 2026-10-08 · Input: his message after D-100 (dictated, pasted).
+Decision, his: "I still don't see the 'How' field when I go to the 'Show' section. … Where should I activate or deactivate the things that
+show in the cart? If I go to 'Show', things are dim or grayed out, but if I go to 'Order', I cannot see the 'How' section. It's kind of
+confusing here. Let's take a step back and see if there is a better way to orchestrate how we structure the different things that we show.
+Also, in the forms section at the end, the items mark: we have different encodings, but none is good enough because they are doing too many
+things at the same time. Look at the endpoint lab and see how we structure the way to handle the highlight on the marks. We use a combination
+of grades, things that are optional, with some edge marks in the corners for the things that are required."
+Read as (dictation): "cart" = the card; "forms section at the end" = the FORMAT tab's last section; "the items mark" = this item's mark
+(D-096); "grades" = the lab's opacity bar, whose paler stop marks an optional field; "edge marks in the corners for the things that are
+required" = the lab's corners, which mark a unique key.
+Cause found: his browser kept a look saved before D-097. The bench put a remembered look over its own whole, so a part that did not exist when
+it was saved (how, then answer form · in the contract · check · code) sat on no line and not in not drawn — ORDER had no chip for it, and SHOW
+listed it greyed because it was not drawn. Turning a part on or off lived only in ORDER, while SHOW greyed what ORDER left off.
+Consequence: (1) a part a remembered look does not place lands where the bench's own look draws it (line 3 for how · answer form · in the
+contract, not drawn for check · code). (2) A PARTS tab opens first — one row per part, in the order the card draws it, then the marks: its eye
+(drawn or not — off puts it in not drawn, on puts it back where the bench draws it, else at the end of the last line), where it is ("line 3,
+left" / "not drawn"), what it shows, its size, its own hover. The four tabs stay as they were until he has seen it. (3) This item's mark
+becomes two controls, each changing one thing, as the lab's field marks: its own mark SHAPED — corners (top right · bottom left · both) · a
+ring (its thickness) · no shape — and the other marks TONED — as drawn · paler (the optional stop, 50 %). The six bundled looks (ring · in its
+colour · a box behind it · double · the others paler · not marked) are gone; a remembered one falls back to the bench's own.
+Chosen alone (his to correct, each default dashed or named "my pick"): corners at both ends with the others paler — his "combination"; the
+corners in the accent colour on a child of the mark, so a yes/no fact's corners (top left · bottom right, D-091) can sit on the same mark; the
+parts tab opens first; a part switched on that the bench does not draw goes to the end of the last line's right side; the eye and hover
+columns are headed by their icons, their words on hover. The portrait's own controls (D-100) are not regrouped yet — the same parts-table
+shape waits on his read of the card's.
+Proof: full probe 1036 passed · 0 failed (two stale pins re-pinned: a drag that assumed ORDER opens first, and D-081's four tabs);
+the item's mark read by computed styles in each look, and by a close-up at 4× with the mouse off the marks.

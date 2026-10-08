@@ -36,6 +36,7 @@ HERE = UNI.HERE
 LAB_HTML, LAB_PANELS, LAB_CSS = HERE / "endpoint-lab.html", HERE / "_lab-ep-panels.js", HERE / "_lab-ep.css"
 PROBE_EPLAB = HERE / "probe-eplab.mjs"
 BENCH_JS, BENCH_CSS = HERE / "_ae-bench.js", HERE / "_ae-bench.css"
+PARTS_JS = HERE / "_ae-parts.js"                                  # D-101: the PARTS tab, a remembered look's new parts, the item's own mark — inlined after the bench, same scope
 KINDS = ("end", "table", "schema", "fn", "test", "gate", "hook", "inf")          # his order (L-23), the columns left to right
 WIDTHS = ["dynamic", "shorter", "compact", "tight"]                     # L-36 → D-087: the default and his three narrower ones, in his order — "full" is gone (the page draws them in _ae-bench.css by data-w, on the element only)
 LAB_KINDS = {"table": "DATACFG", "schema": "SCHCFG", "fn": "FNCFG"}
@@ -849,8 +850,11 @@ PART_TYPE = {
 # would be its kind's color in every case"): the look's own values, kept by every saved look and every reset. The table's "model" colour IS its kind's colour.
 FIXED_KEYS = ("sqSize", "sqGap", "iconCol")
 CARD_LAYS, CARD_PICK = ("cols", "rows", "wide", "both"), "rows"   # D-095: how a kind's hover card lays out its sections; my pick is his ask, the name above
-HERE_LOOKS, HERE_PICK, HERE_W = ("ring", "tint", "box", "double", "pale", "none"), "ring", 2   # D-096: how a strip marks the item's own place (an ending's way out,
-# a test's acting call, a gate's own check); my pick is today's ring, so the default line stays as it was
+HERE_LOOKS, HERE_PICK, HERE_W = ("corners", "ring", "none"), "corners", 2   # D-096 → D-101: how a strip marks the item's own place (an ending's way out,
+# a test's acting call, a gate's own check). D-101, his: "none is good enough because they are doing too many things at the same time" — so, as the lab's
+# field marks do, ONE channel per meaning: the item's own mark is shaped (the lab's unique corners, or a ring), the other marks are toned (the optional stop)
+HERE_AT, HERE_AT_PICK = ("both", "top-right", "bottom-left"), "both"         # D-101: where the item's own corners sit — the lab's unique-key corners
+HERE_REST, HERE_REST_PICK = ("drawn", "pale"), "pale"                       # D-101: the other marks — as drawn, or at the lab's optional stop; my pick is his "combination"
 HERE_KINDS = ("end", "test", "gate")                           # D-096: the kinds whose strips carry that mark (`exhere` in _ae-bench.js xStrip)
 
 
@@ -949,6 +953,9 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
     HW_ = EW.get("here") or die("ex.here: the item's own mark has no words (D-096)")
     if list(HW_.get("opts") or {}) != list(HERE_LOOKS) or HW_.get("pick") != HERE_PICK or sorted(HW_.get("kinds") or {}) != sorted(HERE_KINDS):
         die(f"ex.here must name the looks {list(HERE_LOOKS)}, my pick {HERE_PICK!r} and the kinds {list(HERE_KINDS)}")
+    if list((HW_.get("at") or {}).get("opts") or {}) != list(HERE_AT) or HW_["at"].get("pick") != HERE_AT_PICK \
+            or list((HW_.get("rest") or {}).get("opts") or {}) != list(HERE_REST) or HW_["rest"].get("pick") != HERE_REST_PICK:
+        die(f"ex.here.at must name {list(HERE_AT)} (my pick {HERE_AT_PICK!r}) and ex.here.rest {list(HERE_REST)} (my pick {HERE_REST_PICK!r}) — D-101")
     YW = EW.get("yn") or die("ex.yn: the extra marks' option has no words (D-091)")
     if list(YW["opts"]) != list(YN_VARIANTS) or YW.get("pick") != YN_PICK or list(YW["kinds"]) != list(YN):
         die(f"ex.yn must name the variants {list(YN_VARIANTS)}, my pick {YN_PICK!r} and the kinds {list(YN)}: {list(YW['opts'])} · {YW.get('pick')!r} · {list(YW['kinds'])}")
@@ -976,7 +983,7 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
         fixed[k] = {"icon": looks[k]["size"]["icon"], **{x: looks[k][x] for x in FIXED_KEYS}}
         looks[k]["hov"] = {p: 1 if r in ("head", "items") else 0 for p, r in REGIONS[k].items()}
         looks[k]["card"] = CARD_PICK
-        looks[k]["here"], looks[k]["hereW"] = HERE_PICK, HERE_W
+        looks[k]["here"], looks[k]["hereW"], looks[k]["hereAt"], looks[k]["hereRest"] = HERE_PICK, HERE_W, HERE_AT_PICK, HERE_REST_PICK
     FW = EW.get("form") or die("ex.form: the forms have no words (D-093)")
     lost = sorted({f for o in FORM_TYPES.values() for f in o} - set(FW))
     if lost or any(not (FW[f].get("name") and FW[f].get("plain")) for f in FW if not f.startswith("_")):
@@ -1015,7 +1022,7 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
         die(f"ex.region.way names {sorted(RW['way'])}, the strip of marks draws {marks}")
     icons = {p["ico"] for k in LAB_KINDS for p in lk["parts"][k]} | {x["sym"] for x in lk["sq"]} | set(EW["icons"].values())
     D = {"kinds": list(KINDS), "look": looks, "parts": lk["parts"], "icol": lk["icol"], "sq": lk["sq"], "col": lk["col"], "his": lk["his"],
-         "cat": dict(sorted(cat.items())), "modes": MODES, "forms": forms, "fixed": fixed, "cardLays": list(CARD_LAYS), "heres": list(HERE_LOOKS), "hereKinds": list(HERE_KINDS), "regions": REGIONS, "yn": {"kinds": list(YN)}, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
+         "cat": dict(sorted(cat.items())), "modes": MODES, "forms": forms, "fixed": fixed, "cardLays": list(CARD_LAYS), "heres": list(HERE_LOOKS), "hereAts": list(HERE_AT), "hereRests": list(HERE_REST), "hereKinds": list(HERE_KINDS), "regions": REGIONS, "yn": {"kinds": list(YN)}, "str": SL, "god": god, "floor": FLOOR, "dirs": SHORT_PARTS,
          "absent": {k: arm_off(fj, a) for k, a in KIND_ARM.items() if k in KINDS and arm_off(fj, a)}}
     bench_css = BENCH_CSS.read_text(encoding="utf-8")
     if bench_css.count("__LAB_MONO__") != 1:
@@ -1024,7 +1031,7 @@ def bench(facts: list, rows: list, fj: dict, W: dict, X: dict, phase_stage: dict
     for need in ("--uq-len", "--sq-opt-a", "uqm-corners.uqc-both", "uqc-flip"):          # D-091: the lab's unique corners and its opacity bar must have come over with the block rules
         if need not in css:
             die(f"the bench's stylesheet lost the lab's {need!r} rule (the field marks' corners and optional stop)")
-    js = BENCH_JS.read_text(encoding="utf-8")
+    js = BENCH_JS.read_text(encoding="utf-8") + "\n" + PARTS_JS.read_text(encoding="utf-8")
     line = ("L-23 · examples · " + " · ".join(f"{k} {tally['n:' + k]}" for k in KINDS) + f" (on {len(rows)} endpoints, {len(cat)} elements feed-wide)"
             + f" · endings the code skips here {tally['skipped']} · test links {tally['testLinks']} · tables whose column names the lab and the model spell differently {tally['tblMismatch']}"
             + (" (" + ", ".join(sorted(k[4:] for k in tally if k.startswith("tbl:"))) + ")" if tally["tblMismatch"] else "")
