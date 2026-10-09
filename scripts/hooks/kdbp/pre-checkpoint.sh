@@ -7,6 +7,11 @@
 set -euo pipefail
 if [ -f ".kdbp/BEHAVIOR.md" ]; then
   input=$(cat)
+  # Fast exit: both checks below need `git commit` or a PLAN file in the command. Every other
+  # Bash call leaves here, before Python starts (measured idle: ~4 ms vs ~27 ms; under load the
+  # Python start was what ran into the 5 s timeout). A raw-JSON superset: JSON escapes neither
+  # the space in `git commit` nor the letters of `PLAN.json`/`PLAN.md`.
+  case "$input" in *"git commit"*|*PLAN.json*|*PLAN.md*) ;; *) exit 0 ;; esac
   # Extract tool_input.command with a real JSON parse (the grep '[^"]*' form truncates at the
   # first escaped quote — `echo "building" && git commit` would slip through), then emit it
   # with quoted spans removed so a `git commit` inside a quoted ARGUMENT (git log --grep

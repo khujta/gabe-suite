@@ -75,6 +75,14 @@ pre() { printf '%s' "$1" | bash "$PRE" 2>/dev/null | grep -c 'KDBP CHECKPOINT'; 
 [ "$(pre '{"tool_input":{"command":"git log --grep \"; git commit\""}}')" = 0 ] && ok || bad "pre: quoted data must stay silent"
 [ "$(pre '{"tool_input":{"command":"npm test"}}')" = 0 ] && ok || bad "pre: non-commit must stay silent"
 
+# --- pre-checkpoint: fast exit before Python (the 5 s timeouts, 324 in gastify+gustify) ---
+# A python3 shim on PATH leaves a mark when started; the real one still runs after it.
+mkdir -p "$T/shim" && printf '#!/usr/bin/env bash\ntouch "%s/py.started"\nexec %s "$@"\n' "$T" "$(command -v python3)" > "$T/shim/python3" && chmod +x "$T/shim/python3"
+started() { rm -f "$T/py.started"; printf '%s' "$1" | PATH="$T/shim:$PATH" bash "$PRE" >/dev/null 2>&1; [ -f "$T/py.started" ] && echo 1 || echo 0; }
+[ "$(started '{"tool_input":{"command":"ls -la web/src"}}')" = 0 ] && ok || bad "pre: a non-commit, non-PLAN command must exit before Python starts"
+[ "$(started '{"tool_input":{"command":"git commit -m x"}}')" = 1 ] && ok || bad "pre: a commit must still reach the Python parse"
+[ "$(started '{"tool_input":{"command":"cat .kdbp/PLAN.json"}}')" = 1 ] && ok || bad "pre: a PLAN path must still reach the Python parse"
+
 # --- pre-checkpoint: C-id warns -------------------------------------------
 printf 'it("x")\n' > "tests/my spaced.spec.js"
 printf 'def test_good_C147():\n    pass\n' > tests/test_good.py
