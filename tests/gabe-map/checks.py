@@ -388,12 +388,11 @@ def run(T):
     V1 = {"map_status", "entity_context", "touches", "who_calls", "entity_shape", "cases_for", "owner_of"}
     W2 = {"find", "outline", "center_overview", "blast_radius", "map_census", "map_diff", "center_status", "review_drift"}
     W3 = {"trace", "gates"}
-    W4 = {"entity_models"}
-    ok(set(names) == V1 | W2 | W3 | W4 and len(names) == 18, "v1 seven + wave-2 eight + wave-3 two + wave-4 one tools listed (18)", names)
+    ok(set(names) == V1 | W2 | W3 and len(names) == 17, "v1 seven + wave-2 eight + wave-3 two tools listed (17)", names)
+    ok("entity_models" not in names and "entity_models" not in (res.get("instructions") or ""), "CUT FIRE: entity_models is absent from tools/list and from the instructions (0 calls in 1,032; its verdict rides entity_context)", names)
     ins = res.get("instructions") or ""
-    ok(all(x in ins for x in ("mcp__gabe-map__gates", "mcp__gabe-map__trace", '"TASK <name>", stream=true, kind=provider', "where the map is PARTIAL", "A trace hop marked `inferred` is graft's guess",
-                              "mcp__gabe-map__entity_models (claim IS the registry; the other three are VIEWS")) and "orphan" not in ins,
-       "F17: the instructions route gates · trace · TASK/stream/provider · map PARTIAL · entity_models (the join-key law), the floor law names the inferred hop, and no line says orphan (R10)", ins[-600:])
+    ok(all(x in ins for x in ("mcp__gabe-map__gates", "mcp__gabe-map__trace", '"TASK <name>", stream=true, kind=provider', "where the map is PARTIAL", "A trace hop marked `inferred` is graft's guess")) and "orphan" not in ins,
+       "F17: the instructions route gates · trace · TASK/stream/provider · map PARTIAL, the floor law names the inferred hop, and no line says orphan (R10)", ins[-600:])
     ok(all(t["inputSchema"].get("type") == "object" for t in tools), "every inputSchema is an object schema")
     ok(all("annotations" in t and "readOnlyHint" in t["annotations"] for t in tools), "every tool carries annotations")
     ok(next(t for t in tools if t["name"] == "who_calls")["annotations"]["readOnlyHint"] is False, "who_calls is not readOnly (the emit)")
@@ -610,6 +609,54 @@ def run(T):
     ok(d and d["total"] == 2, "F4 SILENT: without the filter both endpoints hit", d and d.get("total"))
     d, is_err, _, _ = call_json(c, "find", {"query": "x"})
     ok(is_err and "2 characters" in (d or {}).get("stop", ""), "find: a 1-char query is a stop", d)
+    # find, multi-word + directory nouns (the "transaction editor" miss): split into words, every word in name · FE file path · doc
+    def add_invoice_pieces(a, c):
+        base = "apps/web/src/components/invoices/"
+        for nm in ("InvoiceHeader", "PayPicker", "EditableLine"):
+            c["fe"]["pieces"].append({"id": "fe:%s%s.tsx#%s" % (base, nm, nm), "file": base + nm + ".tsx", "name": nm, "kind": "component", "home": "thing"})
+        c["fe"]["pieces"].append({"id": "fe:apps/web/src/components/billing/Invoice.tsx#Invoice", "file": "apps/web/src/components/billing/Invoice.tsx", "name": "Invoice", "kind": "component", "home": "thing"})
+        for nm in ("CookingCatalog",):                                                       # per-word coincidences: cooking = name prefix, log = inside "catalog"
+            c["fe"]["pieces"].append({"id": "fe:apps/web/src/components/misc/%s.tsx#%s" % (nm, nm), "file": "apps/web/src/components/misc/%s.tsx" % nm, "name": nm, "kind": "component", "home": "thing"})
+        a["function_insight"]["apps/api/services/roll.py::weekly_rollup"] = {"name": "weekly_rollup", "fn": "weekly_rollup", "file": "apps/api/services/roll.py", "entity": "thing", "layer": "services",
+                                                                              "handler": False, "async": False, "lines": 2, "returns": "int", "doc": "Rolls up the weekly cooking log for a household", "usage": 0, "access": {"commits": False, "ops": []}}
+        return a, c, False
+    variant(root, add_invoice_pieces)
+    d, _, _, _ = call_json(c, "find", {"query": "invoice editor"})
+    ok(d and [h["name"] for h in d["hits"]] == ["EditableLine"] and not d.get("partial") and d["words"] == ["invoice", "editor"] and d["hits"][0]["via"] == "path",
+       "FIND FIRE: a two-word query matches when each word lands somewhere (invoice in the file path, editor as the stem of Editable) — the old whole-string substring found nothing", d and d.get("hits"))
+    d, _, _, _ = call_json(c, "find", {"query": "pay picker"})
+    ok(d and d["hits"] and d["hits"][0]["name"] == "PayPicker", "FIND FIRE: 'pay picker' finds PayPicker (two words, one name)", d and d.get("hits"))
+    d, _, _, _ = call_json(c, "find", {"query": "invoices", "kind": "fe"})
+    got = {h["name"]: h for h in (d or {}).get("hits", [])}
+    ok(d and {"InvoiceHeader", "PayPicker", "EditableLine"} <= set(got) and got["PayPicker"]["via"] == "path" and "Invoice" in got,
+       "FIND FIRE: a directory noun surfaces every FE piece under components/invoices/ (marked via path)", d and d.get("hits"))
+    d, _, _, _ = call_json(c, "find", {"query": "invoice", "kind": "fe"})
+    ok(d and d["hits"][0]["name"] == "Invoice" and d["hits"][0].get("via") is None, "FIND SILENT: a single-word exact name still ranks first (Invoice over InvoiceHeader and the path-only pieces)", d and d.get("hits"))
+    nm_ = [h["name"] for h in (d or {}).get("hits", [])]
+    ok(d and "InvoiceHeader" in nm_ and "PayPicker" in nm_ and nm_.index("InvoiceHeader") < nm_.index("PayPicker") < len(nm_) and nm_.index("InvoiceHeader") < nm_.index("EditableLine"),
+       "FIND SILENT: a name-prefix hit (InvoiceHeader) ranks above the path-only hits (PayPicker, EditableLine) — name > path", d and d.get("hits"))
+    d, _, _, _ = call_json(c, "find", {"query": "components/invoices", "kind": "fe"})
+    ok(d and {"InvoiceHeader", "PayPicker", "EditableLine"} <= {h["name"] for h in d["hits"]} and "Invoice" not in {h["name"] for h in d["hits"]},
+       "FIND FIRE: a path fragment ('components/invoices') finds the pieces under that directory and not the one under components/billing/", d and d.get("hits"))
+    d, _, _, _ = call_json(c, "find", {"query": "ponents", "kind": "fe"})
+    ok(d and d["total"] == 0, "FIND SILENT: a word inside a directory name ('ponents' in components/) is not a path match — path matches sit on token boundaries, so 'app' never matches 'application'", d and d.get("hits"))
+    d, _, _, _ = call_json(c, "find", {"query": "cooking log"})
+    ok(d and d["hits"] and d["hits"][0]["name"].endswith("::weekly_rollup"),
+       "FIND FIRE: the whole phrase sitting in a doc outranks per-word coincidences (CookingCatalog = cooking + cata-LOG)", d and d.get("hits"))
+    d, _, _, _ = call_json(c, "find", {"query": "the invoice", "kind": "fe"})
+    ok(d and d["words"] == ["invoice"] and d["hits"][0]["name"] == "Invoice", "FIND FIRE: a stop word ('the') is not a word of the query — 'the invoice' is 'invoice'", d and {k: d.get(k) for k in ("words", "hits")})
+    d, _, _, _ = call_json(c, "find", {"query": "the"})
+    ok(d and d["words"] == ["the"], "FIND SILENT: a query made only of stop words keeps them (nothing else to search)", d and d.get("words"))
+    d, _, _, _ = call_json(c, "find", {"query": "PayPicker"})
+    ok(d and d["hits"][0]["name"] == "PayPicker" and "partial" not in d, "FIND SILENT: the exact component name finds its piece first, as before", d and d.get("hits"))
+    d, _, _, _ = call_json(c, "find", {"query": "invoice zebra"})
+    ok(d and d.get("partial") is True and d["hits"] and all(h["words_matched"] == 1 for h in d["hits"]) and "no piece matches ALL" in d["note"],
+       "FIND: when no piece holds every word the answer falls back to partial matches, says so, and counts words_matched", d and {k: d.get(k) for k in ("partial", "note")})
+    d, _, _, _ = call_json(c, "find", {"query": "zebra quokka"})
+    ok(d and d["total"] == 0 and not d.get("partial"), "FIND SILENT: words that match nothing stay at zero hits (no partial answer invented)", d and d.get("total"))
+    ok(all(set(h) <= {"kind", "name", "entity", "file", "piece_kind", "via", "words_matched", "layer", "handler", "fn", "stream", "table", "id", "pclass", "registered_as", "entities"} for h in d["hits"]) and set(d) >= {"hits", "total", "ranking", "floor", "query"},
+       "FIND: the result shape (hits · total · ranking · floor) is unchanged")
+    restore(root)
     d, _, _, _ = call_json(c, "outline", {"file": "apps/api/other.py"})
     ok(d and d["signatures"].startswith("unavailable") and {x["name"] for x in d["definitions"]} == {"Caller.run", "Helper.run"} and d["owners"], "outline without a graft index: definitions from function_insight, signatures named unavailable", d and {k: d.get(k) for k in ("signatures", "definitions")})
     write(root, "graft/.graph/wiring.json", json.dumps({"meta": {}, "nodes": [{"id": "apps/api/other.py#Caller.run", "name": "Caller.run", "kind": "method", "path": "apps/api/other.py", "span": "L5-L6", "signature": "def run(self) -> int", "exported": True}], "edges": []}))
@@ -717,63 +764,18 @@ def run(T):
                             {"callee": "require_auth_scope", "fn": "apps/api/deps.py::require_auth_scope", "endpoints": 1, "via": ["param-dep"], "args": 1}]
        and d["gated_total"] == 2 and d["endpoints_total"] == 3 and "1 task root(s) run outside" in d["tasks"],
        "N2: the census — every gate callee with its endpoint count (endpoints_total keeps the map's count); tasks named as outside the gates", d and {k: d.get(k) for k in ("gates", "tasks", "endpoints_total")})
-    # ── wave 4 (entity models Phase 3): entity_models — census · roster · members · the cross-model row; claim stays the join key ──
-    d, _, _, _ = call_json(c, "entity_models", {})
-    ok(d and d["state"] == "present" and d["today"] == "claim" and d["views"]["derived"]["features"] == 1 and d["views"]["seeded"]["moved"] == 1 and d["views"]["proposed"]["verdicts"]["LAYER"] == 1
-       and d["shared_hubs"] == 1 and "join key" in d["law"] and "not_emitted" in d["states"],
-       "W4 FIRE: the census — four views with counts, today = claim, the join-key law, the tri-state vocabulary", d and {k: d.get(k) for k in ("state", "today", "views")})
-    d, _, _, _ = call_json(c, "entity_models", {"model": "derived"})
-    ok(d and d["clusters"][0]["id"] == "d:things" and d["clusters"][0]["named_by"] == "domain" and d["clusters"][0]["anchor_by"] == "read" and d["clusters"][0]["kind"] == "feature"
-       and d["abstained"] == ["endpoint:DELETE /things/{item_id}"] and d["coverage"] == {"moved": 2, "abstained": 1, "held": 0} and d["cap"] == 40,
-       "W4 FIRE: the derived roster — kind · named_by · anchor_by per cluster, the abstained pieces named, coverage counts both halves (c4 + levels), the cap named", d and {k: d.get(k) for k in ("clusters", "abstained", "coverage")})
-    d, _, _, _ = call_json(c, "entity_models", {"piece": "apps/api/services/thing.py::thing"})
-    ok(d and d["found"] and d["homes"] == {"claim": "thing", "seeded": "other", "derived": "thing", "proposed": "thing"} and d["mark"]["seeded"] == "moved" and d["mark"]["derived"] is None
-       and d["why"]["derived"] == "keeps its claim" and "never a slug" in d["note"],
-       "W4 FIRE: the cross-model row of a function — claim thing, seeded other (the levels half, read lazily), derived/proposed keep the claim", d and {k: d.get(k) for k in ("homes", "mark", "why")})
-    d, _, _, _ = call_json(c, "entity_models", {"piece": "GET /things/{item_id}"})
-    ok(d and d["found"] and d["homes"]["derived"] == "d:things" and d["mark"]["derived"] == "moved" and "anchored on reads" in d["why"]["derived"],
-       "W4 FIRE: an endpoint's row — derived homes it to the table cluster (a name that is NOT a slug) with the cluster's why", d and {k: d.get(k) for k in ("homes", "why")})
-    d, _, _, _ = call_json(c, "entity_models", {"piece": "DELETE /things/{item_id}"})
-    ok(d and d["found"] and d["homes"]["derived"] == "thing" and d["mark"]["derived"] == "abstain" and "keeps its claim" in d["why"]["derived"],
-       "W4 ABSTAIN: an abstained atom keeps its claim and the row SAYS so", d and {k: d.get(k) for k in ("homes", "mark", "why")})
-    d, _, _, _ = call_json(c, "entity_models", {"entity": "d:things", "model": "derived"})
-    ok(d and d["found"] and d["what"]["kind"] in ("feature", "candidate feature") and d["what"]["named_by"] == "domain" and [m["id"] for m in d["members"]] == ["apps/api/api/things.py#get_thing", "endpoint:GET /things/{item_id}"]
-       and all(m["mark"] == "moved" and m["claim"] == "thing" for m in d["members"]) and d["moved_in"] == 2,
-       "W4 FIRE: a cluster's members under derived — the endpoint (c4 half) and its handler (levels half), each marked moved with its claim", d and {k: d.get(k) for k in ("what", "members")})
-    d, _, _, _ = call_json(c, "entity_models", {"entity": "thing"})
-    ok(d and d["found"] and d["what"] == {"id": "thing", "kind": "declared entity", "verdict": "FEATURE", "why": "majority of things and sole-owns 2 URL domain(s)"} and d["members_total"] >= 3
-       and all(m["mark"] is None for m in d["members"]) and "function pieces ride levels.json" in d["note"],
-       "W4: a slug's members under claim — the registry, no marks, its proposed verdict as `what`, functions said to ride levels", d and {k: d.get(k) for k in ("what", "members_total", "note")})
-    d, is_err, _, _ = call_json(c, "entity_models", {"model": "bogus"})
-    ok(is_err and "claim · seeded · derived · proposed" in (d or {}).get("stop", ""), "W4 STOP: an unknown model names the four", d)
-    d, _, _, _ = call_json(c, "entity_models", {"piece": "apps/api/services/nowhere.py::ghost"})
-    ok(d and d["found"] is False and "grep -rn remains the floor" in d["reason"], "W4 SILENT: an unknown piece → found:false + the grep floor", d and d.get("reason"))
+    # ── the entity-models block still rides entity_context (verdict, label); the entity_models tool is cut ──
     d, _, _, _ = call_json(c, "entity_context", {"slug": "other"})
-    ok(d and d["proposed"] == {"verdict": "LAYER", "why": "no endpoint — 1 table(s) held for other entities' endpoints", "see": "mcp__gabe-map__entity_models model=proposed"},
+    ok(d and d["proposed"] == {"verdict": "LAYER", "why": "no endpoint — 1 table(s) held for other entities' endpoints"},
        "W4 FIRE: entity_context carries the proposed verdict on the SLUG (no join hazard)", d and d.get("proposed"))
     d, _, _, _ = call_json(c, "touches", {"target": "apps/api/services/thing.py#thing"})
-    ok(d and "cross-model: mcp__gabe-map__entity_models piece=apps/api/services/thing.py#thing" in d["function"]["home_evidence"]["note"],
-       "W4 FIRE: touches points a re-homed piece at its cross-model row", d and d["function"]["home_evidence"].get("note"))
+    ok(d and "entity_models" not in d["function"]["home_evidence"]["note"] and "cross-model" not in d["function"]["home_evidence"]["note"],
+       "CUT FIRE: touches no longer points a re-homed piece at the removed entity_models tool", d and d["function"]["home_evidence"].get("note"))
     d, _, _, _ = call_json(c, "entity_shape", {})
     ok(d and "orphan" not in (d.get("one_line") or "").lower(), "R10: entity_shape's one_line never says orphan (the JSON key `orphans` is the contract three callers read)", d and d.get("one_line"))
     # ── naming (naming-plan Phase 4): text surfaces speak the CONFIG default; names{} + name_from + a rendered label ride every row; the id stays beside ──
-    d, _, _, _ = call_json(c, "entity_models", {})
-    ok(d and d["naming"]["default"] == "class" and d["naming"]["convention"] == "bracket" and d["naming"]["unused_words"] == ["ghost"] and d["naming"]["disabled"]["config"].startswith("no naming.words") and "text surfaces speak the project default" in d["naming"]["note"],
-       "N-FIRE: the census carries the naming line — default · convention · unused words · disabled positions", d and d.get("naming"))
-    d, _, _, _ = call_json(c, "entity_models", {"model": "derived"})
-    r0 = d and d["clusters"][0]
-    ok(r0 and r0["name"] == "thing" and r0["name_from"] == "class" and r0["names"]["table"] == "things" and r0["label"] == "[api] thing" and r0["id"] == "d:things",
-       "N-FIRE: a derived row is named by the config default (class), keeps names{} + name_from, wears the config's mark, and the id stays beside it", r0)
-    d, _, _, _ = call_json(c, "entity_models", {"entity": "d:things", "model": "derived"})
-    ok(d and d["what"]["name"] == "thing" and d["what"]["label"] == "[api] thing" and d["what"]["names"]["both"] == "things · /things", "N-FIRE: a cluster's `what` carries its named fields", d and d.get("what"))
-    d, _, _, _ = call_json(c, "entity_models", {"entity": "thing"})
-    ok(d and d["found"] and d["what"]["kind"] == "declared entity", "N: a slug still resolves as a slug (names never become keys)", d and d.get("what"))
-    d, _, _, _ = call_json(c, "entity_models", {"entity": "[api] thing"})
-    ok(d and d["found"] is False and "grep -rn remains the floor" in d["reason"], "N-SILENT: a rendered LABEL passed where a slug is expected → found:false + the grep floor, never a match", d and d.get("reason"))
     d, _, _, _ = call_json(c, "entity_context", {"slug": "thing"})
     ok(d and d["c4"]["fe_home"]["label"] == "[ui] thing" and d["c4"]["fe_home"]["id"] == "fe·thing", "N-FIRE: entity_context's fe_home wears the config's frontend mark with the id beside it", d and d["c4"].get("fe_home"))
-    d, _, _, _ = call_json(c, "entity_models", {})
-    ok(d and d["candidates"] == [{"id": "d:things", "name": "thing", "name_from": "class"}], "N-FIRE: the census candidates carry the id + the project-default name (R2)", d and d.get("candidates"))
     def naming_config(a, c):
         c["models"]["naming"]["default"] = "config"; c["models"]["naming"]["entities"] = {"thing": {"display": "The Thing", "source": "naming.entities"}}
         return a, c, False
@@ -787,20 +789,11 @@ def run(T):
             r.pop("names", None)
         return a, c, False
     variant(root, naming_absent)
-    d, _, _, _ = call_json(c, "entity_models", {})
-    ok(d and d["naming"]["state"] == "not_emitted" and "regen" in d["naming"]["reason"], "N-SILENT: models present, naming absent (every estate before this pass) → the census says not_emitted", d and d.get("naming"))
-    d, _, _, _ = call_json(c, "entity_models", {"model": "derived"})
-    ok(d and d["clusters"][0]["name"] == "things" and d["clusters"][0]["name_from"] == "domain" and d["clusters"][0]["names"] == {} and d["clusters"][0]["label"] == "things", "N-SILENT: without names{} a row keeps its domain name, name_from domain, a bare label", d and d["clusters"][0])
     d, _, _, _ = call_json(c, "entity_context", {"slug": "thing"})
     ok(d and d["c4"]["fe_home"]["label"] == "fe · thing", "N-SILENT: without a naming block the fe_home label is today's prefix", d and d["c4"].get("fe_home"))
     restore(root)
     # ── the OLDER-MAP variant: absence semantics (P2), honest-empty for the new kinds ──
     variant(root, older_map)
-    d, is_err, _, _ = call_json(c, "entity_models", {})
-    ok(d and not is_err and d["state"] == "not_emitted" and "regen with the current generators" in d["reason"] and "views" not in d,
-       "W4 SILENT: an older map (no models block) → not_emitted with the regen pointer, isError false, no roster invented", d and {k: d.get(k) for k in ("state", "reason")})
-    d, _, _, _ = call_json(c, "entity_models", {"piece": "apps/api/services/thing.py::thing"})
-    ok(d and d["state"] == "not_emitted" and "homes" not in d, "W4 SILENT: a piece row on an older map says not_emitted, never guesses a home", d and d.get("state"))
     d, _, _, _ = call_json(c, "entity_context", {"slug": "other"})
     ok(d and "proposed" not in d, "W4 SILENT: entity_context carries no proposed field without the block (the answer's shape is unchanged)", d and sorted(d.keys()))
     d, _, _, _ = call_json(c, "touches", {"target": "apps/api/services/thing.py#thing"})
@@ -868,7 +861,7 @@ def run(T):
     # F11: the corpus grep skips the suite's own installs; says so without .kdbp/
     write(root, "apps/api/tests/x_test.py", "def test_seven_C7():\n    pass\n"); git(root, "add", "apps/api/tests/x_test.py")
     d, _, _, _ = call_json(c, "cases_for", {"target": "apps/api/api/things.py::get_thing"})
-    ok(d and d["corpus"]["max_cid_seen"] == 7 and d["corpus"]["next_cid_floor"] == 8, "F11 FIRE: a real test's C7 sets the corpus floor", d and d.get("corpus"))
+    ok(d and d["corpus"]["max_cid_seen"] == 7 and d["corpus"]["next_cid_floor"] == 8 and "dropped" not in d["corpus"]["note"] and "ignored_outliers" not in d["corpus"], "F11 FIRE: a real test's C7 sets the corpus floor (and with nothing dropped there is no outlier warning)", d and d.get("corpus"))
     write(root, "scripts/_a3_tests.py", "# the C4 L2 elements — C99 is prose here\n"); write(root, "docs/site/center/generators/x_test.py", "C88\n")
     git(root, "add", "scripts/_a3_tests.py", "docs/site/center/generators/x_test.py")
     d, _, _, _ = call_json(c, "cases_for", {"target": "apps/api/api/things.py::get_thing"})
@@ -877,6 +870,22 @@ def run(T):
     for f in ("apps/api/tests/x_test.py", "scripts/_a3_tests.py", "docs/site/center/generators/x_test.py"):
         os.remove(os.path.join(root, f))
     shutil.rmtree(os.path.join(root, "docs/site/center/generators"), ignore_errors=True)
+    # the floor ignores fixture text: tests/center/** is excluded by PATH; an id > max_cid_in_map + 1000 is ignored as fixture text by SIZE
+    write(root, "apps/api/tests/x_test.py", "def test_seven_C7():\n    pass\n")
+    write(root, "tests/center/test_center_render.py", 'assert "prefix C500 suffix" in out\n')           # within the size gap: only the path rule can drop it
+    write(root, "apps/api/tests/test_fixture_ids.py", 'ROW = "prefix C99999 suffix"\n')               # outside tests/center: only the size rule can drop it
+    git(root, "add", "apps/api/tests/x_test.py", "tests/center/test_center_render.py", "apps/api/tests/test_fixture_ids.py")
+    d, _, _, _ = call_json(c, "cases_for", {"target": "apps/api/api/things.py::get_thing"})
+    ok(d and d["corpus"]["max_cid_seen"] == 7 and d["corpus"]["next_cid_floor"] == 8 and d["corpus"]["ignored_outliers"] == [99999] and "dropped as fixture text" in d["corpus"]["note"],
+       "CIDFLOOR FIRE: 'prefix C500 suffix' under tests/center/ (path rule) and 'prefix C99999 suffix' elsewhere (size rule) never move the floor; the ignored id is named", d and d.get("corpus"))
+    write(root, "apps/api/tests/test_edge.py", "def test_edge_C1008():\n    pass\n"); git(root, "add", "apps/api/tests/test_edge.py")
+    d, _, _, _ = call_json(c, "cases_for", {"target": "apps/api/api/things.py::get_thing"})
+    ok(d and d["corpus"]["max_cid_seen"] == 1008 and d["corpus"]["next_cid_floor"] == 1009 and d["corpus"]["ignored_outliers"] == [99999],
+       "CIDFLOOR SILENT: an id exactly max_cid_in_map + 1000 is a real id and sets the floor (the gap is the only thing ignored)", d and d.get("corpus"))
+    git(root, "rm", "-q", "--cached", "apps/api/tests/x_test.py", "tests/center/test_center_render.py", "apps/api/tests/test_fixture_ids.py", "apps/api/tests/test_edge.py")
+    for f in ("apps/api/tests/x_test.py", "tests/center/test_center_render.py", "apps/api/tests/test_fixture_ids.py", "apps/api/tests/test_edge.py"):
+        os.remove(os.path.join(root, f))
+    shutil.rmtree(os.path.join(root, "tests/center"), ignore_errors=True)
     kd = os.path.join(root, ".kdbp"); os.rename(kd, kd + ".off")
     d, _, _, _ = call_json(c, "cases_for", {"target": "apps/api/api/things.py::get_thing"})
     ok(d and d["corpus"]["note"].startswith("no .kdbp/"), "F11: without .kdbp/ the corpus floor is named a corpus artefact", d and d.get("corpus"))

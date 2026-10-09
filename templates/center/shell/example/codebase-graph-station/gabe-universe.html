@@ -4455,7 +4455,7 @@ window.__uniAddWireView=function(){ var body=document.querySelector("#cfg .cfgbo
    (operator settle). What each was, and why it went:
      ENTITY MODEL  the station always shows `seeded` now; the delta APPLIER survives above as
                    _applyEntityModel and runs once at boot. The four models are unchanged in the DATA —
-                   gabe-map entity_models, pulse S9/S18, the drafter and cc-init rank all still read them.
+                   gabe-map entity_context (the proposed verdict), pulse S9/S18, the drafter and cc-init rank all still read them.
      NAMES         it could never change a claim or a seeded label: only a derived/candidate row carries
                    names{}, so under the settled model the strategy has nothing to relabel. It did
                    nothing, by design. __uniStrategy() survives and reads the feed default.

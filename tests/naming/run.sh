@@ -146,23 +146,21 @@ ck("orphan" not in (json.dumps(nm1) + json.dumps(b1) + (N.__doc__ or "")).lower(
 #    that join on fe·/d: ids in the generators and the gabe-map tools; a fixture inserting the word proves the guard fires ──
 import inspect, importlib
 sys.path.insert(0, repo + "/skills/gabe-map/scripts")
-import _a3_homing, _a3_graft, tools as T, tools_wave2 as W2, tools_wave4 as W4
+import _a3_homing, _a3_graft, tools as T, tools_wave2 as W2, display_labels as W4
 GUARD = ("naming", "convention", "names[", "camel", "pascal")
 def clean(src):
     return not any(w in src for w in GUARD)
 import _a3_models as MM
-ck(hasattr(W2, "t_center_overview") and hasattr(W4, "t_entity_models") and hasattr(MM, "attach") and hasattr(MM, "levels_slice"), "REGISTRIES guard targets exist (a rename must redden, never pass silently)")
+ck(hasattr(W2, "t_center_overview") and hasattr(W4, "_label") and hasattr(MM, "attach") and hasattr(MM, "levels_slice"), "REGISTRIES guard targets exist (a rename must redden, never pass silently)")
 bodies = {"_a3_graft._fe_pair": inspect.getsource(_a3_graft._fe_pair), "_a3_graft._fe_home": inspect.getsource(_a3_graft._fe_home),
           "tools.t_entity_context": inspect.getsource(T.t_entity_context), "tools.detect_kind": inspect.getsource(T.detect_kind),
           "tools_wave2.t_center_overview": inspect.getsource(W2.t_center_overview),
-          "tools_wave4._resolve_piece": inspect.getsource(W4._resolve_piece), "tools_wave4._claim_of": inspect.getsource(W4._claim_of),
-          "tools_wave4.t_entity_models (id resolution)": inspect.getsource(W4.t_entity_models).split("# ── model → the roster")[0],
           "_a3_models.attach": inspect.getsource(MM.attach), "_a3_models.levels_slice": inspect.getsource(MM.levels_slice)}
 hom_src = open(repo + "/templates/center/generators/_a3_homing.py", encoding="utf-8").read()
 bodies["_a3_homing (whole module)"] = hom_src
 bad = [k for k, v in bodies.items() if not clean(v)]
 ck(not bad, f"REGISTRIES: an id-resolution body carries a naming word ({bad}) — a convention must never reach a join")
-ck(not clean(inspect.getsource(W4._claim_of) + "  # convention"), "REGISTRIES guard fires on a fixture that inserts the word (the guard is live)")
+ck(not clean(inspect.getsource(T.detect_kind) + "  # convention"), "REGISTRIES guard fires on a fixture that inserts the word (the guard is live)")
 print(f"naming battery: {p} passed, {f} failed")
 sys.exit(1 if f else 0)
 PY

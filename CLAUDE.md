@@ -92,7 +92,7 @@ The map generators and their surfaces are documented in their design records, no
 | **gabe-init** | 2.3.10 | Project setup: `.kdbp/`, the KDBP hooks, project type, maturity (human-initiated) |
 | **gabe-kdbp** | 1.0.3 | MCP server: a project's `.kdbp/` lifecycle state as read-only tools |
 | **gabe-lens** | 2.6.0 | Cognitive translation: analogies, maps, constraint boxes, the plain line |
-| **gabe-map** | 1.4.0 | MCP server: the project's committed codebase map as eighteen tools |
+| **gabe-map** | 1.5.0 | MCP server: the project's committed codebase map as seventeen tools |
 | **gabe-meme** | 1.2.0 | Persona-matched meme generation and surface wit |
 | **gabe-mockup** | 2.2.0 | Mockup lift SOP over a per-project manifest |
 | **gabe-myopic** | 1.2.1 | Short-sighted-user walkthrough (fork) |

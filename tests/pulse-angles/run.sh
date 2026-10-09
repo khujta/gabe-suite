@@ -369,7 +369,8 @@ r=$(repo s17a); mkc4 "$r" '{"stats":{"homing":{"present":true,"pieces":40,"agree
 run "$r" | grep -q "homing evidence — 4 move candidate(s)" && ok "S17 fires: 4 move candidates (≥60% of ≥2 users in one other entity)" || bad "S17 did not fire on 4 move candidates: $(run "$r")"
 run "$r" | grep -q "verify_password → users" && ok "S17 names the first move candidate and its destination" || bad "S17 did not name the candidate"
 run "$r" | grep -q "re-home is opt-in — nothing moved" && ok "S17 says nothing moved (evidence only)" || bad "S17 lost the evidence-only clause"
-run "$r" | grep -q "mcp__gabe-map__entity_models model=seeded" && ok "S17 points at the seeded view (the moves applied, with destinations)" || bad "S17 lost the entity_models pointer"
+run "$r" | grep -q "the station's seeded view shows the moves applied" && ok "S17 points at the station's seeded view (the moves applied, with destinations)" || bad "S17 lost the seeded-view pointer"
+run "$r" | grep -q "mcp__gabe-map__entity_models" && bad "S17 still points at the removed entity_models tool" || ok "S17 no longer names the removed entity_models tool"
 r=$(repo s17b); mkc4 "$r" '{"stats":{"homing":{"present":true,"pieces":40,"agree":38,"stay":0,"move":2,"shared":0,"move_named":[]}}}'
 run "$r" | grep -q "homing evidence" && bad "S17 fired below the threshold (2 move < 3, 0 shared)" || ok "S17 silent below the ≥3 move / ≥1 shared bar"
 r=$(repo s17c); mkc4 "$r" '{"stats":{"homing":{"present":true,"pieces":40,"agree":39,"stay":0,"move":0,"shared":1,"move_named":[]}}}'

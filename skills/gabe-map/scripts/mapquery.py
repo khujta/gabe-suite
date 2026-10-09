@@ -159,9 +159,8 @@ class Center:
     def forms(self) -> dict: return _load_json(self.dir / "forms.json")     # element forms: lazy — touches(endpoint) · trace · map_census · review_drift read it
 
     def entity_models(self) -> tuple:
-        """The c4 half of the ENTITY MODELS block (Phase 3, 2026-09-06) → (block, state, reason) with state ∈ MODELS_STATES: present ·
-        not_emitted (an older map, no block) · absent (the emitter ran and says why in stats.models.reason). The c4 is already loaded
-        (the block is delta-sized); the levels half stays behind `entity_models_levels()` so map_status never touches it."""
+        """The c4 half of the ENTITY MODELS block → (block, state, reason) with state present · not_emitted (an older map, no block) ·
+        absent (the emitter ran and says why in stats.models.reason). entity_context reads it for the proposed verdict and the display label."""
         c = self.c4
         m = c.get("models")
         st = (c.get("stats") or {}).get("models")
@@ -180,11 +179,6 @@ class Center:
         if f.get("present"):
             return f, "present", None
         return None, "absent", f.get("reason") or "forms.json holds no forms"
-
-    def entity_models_levels(self) -> dict:
-        """The levels half — the per-view homes of FUNCTION keys (`file#fn`); read lazily, only by entity_models on a function piece / a view roster."""
-        lv = (self.levels or {}).get("models")
-        return lv if isinstance(lv, dict) and lv.get("present") else {}
 
     def entities(self) -> dict:
         return (self.archmap.get("entities") or {})
@@ -286,8 +280,6 @@ class Center:
         return out
 
 
-MODELS_STATES = ("present = the entity-models block is on c4-graph.json · not_emitted = no block (an older map — regen with the current generators) · "
-                 "absent = the emitter ran and says why (stats.models.reason); claim is always the registry")
 FORMS_STATES = ("present = forms.json carries the endpoint forms · not_emitted = no forms.json (an older map, or `forms: false`) · "
                 "absent = the pass ran and says why (no FastAPI endpoints, a pass error)")
 HEALTH_STATES = ("present = the pass ran and found something · clean = the pass ran (the repo-study sentinel route_mounts is on the map) "

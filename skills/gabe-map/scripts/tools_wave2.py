@@ -54,6 +54,85 @@ def _score(q: str, name: str, doc: str = "") -> int:
     return 0
 
 
+def _norm(w: str) -> str:
+    """A path token / word with its plural stripped (invoices → invoice, apps → app) so a singular query meets a plural directory."""
+    return w[:-1] if len(w) > 3 and w.endswith("s") and not w.endswith("ss") else w
+
+
+_TOK_RX = re.compile(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|[0-9]+")
+
+
+def _pscore(w: str, path: str) -> int:
+    """A word against a FILE PATH (directories included), on segment boundaries only: a whole directory / file-stem / camel-or-kebab token
+    (plural-folded) 35, a token that merely STARTS with a 4+ char word 28. Never a mid-word substring ('app' is not 'application'). Below a name hit (50+), above a doc hit (20)."""
+    p = (path or "").lower()
+    if not p or w not in p:
+        return 0
+    if "/" in w:                                                         # a path fragment ('components/invoices') matches from a directory boundary on
+        return 35 if ("/" + p).find("/" + w.strip("/")) >= 0 else 0
+    nw, best = _norm(w), 0
+    for seg in (path or "").split("/"):
+        stem = seg.rsplit(".", 1)[0] if "." in seg else seg
+        toks = {stem.lower(), *(t.lower() for t in _TOK_RX.findall(stem))}
+        for t in toks:
+            if w == t or nw == _norm(t):
+                return 35
+            if len(w) >= 4 and t.startswith(w):
+                best = 28
+    return best
+
+
+_STOP = frozenset("a an the of to for in on at by and or is it with from into as".split())
+
+
+def _words(q: str) -> list[str]:
+    """The query's words (whitespace/comma split, deduped); a 1-char word is noise ('t /' keeps the whole phrase) and a stop word ('the') only dilutes, so both are dropped unless nothing else is left."""
+    seen, out = set(), []
+    for w in re.split(r"[\s,]+", q.lower()):
+        if len(w) >= 2 and w not in seen:
+            seen.add(w); out.append(w)
+    kept = [w for w in out if w not in _STOP]
+    return kept or out or [q.lower()]
+
+
+_STEM_RX = re.compile(r"(ing|er|or|es|s)$")
+
+
+def _stem(w: str) -> str | None:
+    """The word minus one common agent/noun suffix (editor → edit, picker → pick, transactions → transaction); None when nothing sensible is left (≥ 4 chars)."""
+    m = _STEM_RX.search(w)
+    return w[:m.start()] if m and m.start() >= 4 else None
+
+
+def _wbest(w: str, name: str, doc: str = "", path: str = "") -> tuple[int, str]:
+    """(score, channel) of ONE word's best home in a piece: name > path > doc, exact > prefix > substring; a suffix-stripped stem scores 15 lower."""
+    best = (0, "name")
+    for v, pen in ((w, 0), (_stem(w), 15)):
+        if not v:
+            continue
+        ns, ps, ds = _score(v, name), _pscore(v, path), (20 if v in (doc or "").lower() else 0)
+        cand = max((ns, "name"), (ps, "path"), (ds, "doc"), key=lambda t: t[0])
+        if cand[0] > 0 and cand[0] - pen > best[0]:
+            best = (cand[0] - pen, cand[1])
+    return best
+
+
+def _match(words: list[str], name: str, doc: str = "", path: str = "", phrase: str = "") -> tuple[int, int, set]:
+    """(mean score over the MATCHED words, how many matched, the non-name channels used). Strict hit = matched == len(words).
+    The whole query as one phrase (a name with a space in it: 'GET /things') is the old rule and still counts — it wins when it scores higher."""
+    got = [_wbest(w, name, doc, path) for w in words]
+    hit = [g for g in got if g[0] > 0]
+    s, n, via = (round(sum(g[0] for g in hit) / len(hit)), len(hit), {g[1] for g in hit if g[1] != "name"}) if hit else (0, 0, set())
+    if phrase and (len(words) > 1 or phrase != words[0]):
+        ph = _score(phrase, name, doc)
+        if ph == 20:
+            ph = _PHRASE_DOC                                            # the whole phrase sitting in a doc is a precise hit; per-word coincidences must not bury it
+        if ph > s or (ph and n < len(words)):
+            return ph, len(words), set()
+    return s, n, via
+
+
+_PHRASE_DOC = 60
 _KIND_BONUS = {"entity": 25, "endpoint": 25, "task": 25, "model": 25, "provider": 25, "schema": 10, "function": 10}   # F4: a thing the map DECLARES outranks a generated define's prefix hit
 _GEN_RX = re.compile(r"\.gen\.|/client/|/generated/")
 
@@ -65,21 +144,29 @@ def t_find(args: dict, roots) -> dict:
     q = (args.get("query") or "").strip().lower()
     if len(q) < 2:
         raise mq.MapStop("query must be at least 2 characters")
+    words = _words(q)
     kinds = args.get("kind")
     kinds = {kinds} if isinstance(kinds, str) and kinds else None
     limit = max(1, min(int(args.get("limit") or 20), mq.CAP))
     stream_only = bool(args.get("stream"))
     a, c, idx = center.archmap, center.c4, center.idx()
-    hits = []
+    hits, partial = [], []                                              # hits: EVERY word matched · partial: some words (the fallback when nothing matches them all)
 
-    def add(kind, name, entity, file, extra=None, doc=""):
-        s = _score(q, name, doc)
+    def add(kind, name, entity, file, extra=None, doc="", by_path=False):
+        s, n_hit, via = _match(words, name, doc, file if by_path else "", q)
         if not s or (kinds is not None and kind not in kinds):
             return
         s += _KIND_BONUS.get(kind, 0)
         if file and _GEN_RX.search(file):
             s -= 30                                                    # a generated client (.gen. · /client/ · /generated/) is noise, not a definition
-        hits.append((s, {"kind": kind, "name": name, "entity": entity, "file": file, **(extra or {})}))
+        h = {"kind": kind, "name": name, "entity": entity, "file": file, **(extra or {})}
+        if via:
+            h["via"] = "/".join(sorted(via, reverse=True))             # "path" or "doc": a word matched outside the name — say where
+        if n_hit == len(words):
+            hits.append((s, h))
+        else:
+            h["words_matched"] = n_hit
+            partial.append((s + 200 * n_hit, h))
     for slug, ent in center.entities().items():
         add("entity", slug, slug, None)
         for ep in ent.get("endpoints") or []:
@@ -99,13 +186,13 @@ def t_find(args: dict, roots) -> dict:
         add("function", k, rec.get("entity"), rec.get("file"), {"layer": rec.get("layer"), "handler": rec.get("handler")}, rec.get("doc") or "")
     for p in (c.get("fe") or {}).get("pieces") or []:
         if isinstance(p, dict):
-            add("fe", p.get("name") or p.get("id") or "", p.get("home"), p.get("file"), {"piece_kind": p.get("kind")})
+            add("fe", p.get("name") or p.get("id") or "", p.get("home"), p.get("file"), {"piece_kind": p.get("kind")}, by_path=True)
     for stem, (slug, node) in idx["web_by_stem"].items():
         add("screen", stem, slug, None)
     for name, rec in idx["task_by_name"].items():                       # F3: a task by its REGISTERED name or its fn name
         r_ = rec["root"]
         add("task", name, rec["slug"], r_.get("file"), {"fn": r_.get("fn"), "id": rec["nid"]}, r_.get("doc") or "")
-        if r_.get("fn") and r_.get("fn") != name and _score(q, r_.get("fn")) > _score(q, name):
+        if r_.get("fn") and r_.get("fn") != name and _match(words, r_.get("fn"))[0] > _match(words, name)[0]:
             add("task", r_.get("fn"), rec["slug"], r_.get("file"), {"registered_as": name, "id": rec["nid"]}, r_.get("doc") or "")
     provs: dict[str, dict] = {}
     for (slug, nid), n in idx["c4_nodes"].items():                      # F4: providers — every c4 provider node, once per name
@@ -114,6 +201,9 @@ def t_find(args: dict, roots) -> dict:
             pv["slugs"].add(slug)
     for name, pv in provs.items():
         add("provider", name, ", ".join(sorted(s_ for s_ in pv["slugs"] if s_)), None, {"pclass": pv["pclass"], "id": "provider:%s" % name})
+    fallback = not hits and len(words) > 1 and bool(partial)
+    if fallback:
+        hits = partial
     # dedupe: a define twin of an fe piece (same name + file) folds into the fe hit; a schema/model several entities share (same cls + file) is ONE hit
     fe_keys = {(h["name"], h["file"]) for _, h in hits if h["kind"] == "fe"}
     hits = [(s_, h) for s_, h in hits if not (h["kind"] == "define" and (h["name"], h["file"]) in fe_keys)]
@@ -132,11 +222,15 @@ def t_find(args: dict, roots) -> dict:
             h["entities"] = sorted({e for e in h["entities"] if e})   # a claim about ownership: one name per entity, sorted
     hits.sort(key=lambda h: (-h[0], h[1]["kind"], h[1]["name"]))
     out = T._base(center, root, source)
-    out.update({"query": q, "hits": [h[1] for h in hits[:limit]], "total": len(hits),
+    out.update({"query": q, "words": words, "hits": [h[1] for h in hits[:limit]], "total": len(hits),
                 "note": ("+%d more (limit %d)" % (len(hits) - limit, limit)) if len(hits) > limit else None,
-                "ranking": "exact 100 · qualified-tail 90 · prefix 70 · substring 50 · in-doc 20 · +25 entity/endpoint/task/model/provider · +10 schema/function "
+                "ranking": "every word of the query must match (name, else an fe piece's file path, else doc), scored per word and averaged: name exact 100 · qualified-tail 90 · prefix 70 · substring 50 · "
+                           "path segment/token 35 · path token-prefix 28 · in-doc 20 · the whole phrase in a doc 60 · +25 entity/endpoint/task/model/provider · +10 schema/function "
                            "· −30 generated client (.gen. · /client/ · /generated/) · a define twin folds into its fe piece · a shared schema/model is one hit (entities: [...])",
                 "floor": "searches the map's names and docs, not the source — a name the map lacks is a Grep question"})
+    if fallback:
+        out["partial"] = True
+        out["note"] = ("no piece matches ALL of %s — these match some of them (words_matched, most first); narrow with kind= or drop a word. " % words) + (out["note"] or "")
     if stream_only:
         out["filter"] = "stream=true — only endpoints whose handler returns a streaming response (SSE / chunked)"
     if kinds and "task" in kinds and not idx["task_by_name"]:
@@ -733,8 +827,8 @@ def t_review_drift(args: dict, roots) -> dict:
 RO = T.RO
 TOOLS = [
     {"name": "find", "fn": t_find, "annotations": RO,
-     "description": "Find X by name/doc: entities, endpoints (stream filter), tasks (TASK <name>), models, schemas (deduped), functions, providers, screens, FE pieces; generated clients de-ranked (graft_find_code).",
-     "inputSchema": T._schema({"query": {"type": "string", "description": "A name or fragment (≥ 2 chars)."},
+     "description": "Find X by name/doc/FE file path: entities, endpoints, tasks (TASK <name>), models, schemas, functions, providers, screens, FE pieces. Several words: every word must match somewhere.",
+     "inputSchema": T._schema({"query": {"type": "string", "description": "A name or fragment (≥ 2 chars); several words → every word must match name, FE file path or doc."},
                                "kind": {"type": "string", "enum": ["entity", "endpoint", "task", "model", "schema", "function", "define", "fe", "screen", "provider"], "description": "Restrict to one kind."},
                                "stream": {"type": "boolean", "description": "true → only endpoints whose handler returns a streaming response."},
                                "limit": {"type": "integer", "description": "Max hits (default 20, cap 40)."}, **T.ROOT_PROP}, ["query"])},

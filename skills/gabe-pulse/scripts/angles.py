@@ -663,7 +663,7 @@ def s17_homing_evidence(root: Path, plan: dict | None, cfg: dict | None):
     return (f"homing evidence — {move} move candidate(s) (≥60% of ≥2 users in one other entity, data agrees) · {shared} shared aspect(s)"
             f"{(' · e.g. ' + named) if named else ''}; a piece's home is its file claim and its users say otherwise "
             f"(re-home is opt-in — nothing moved)",
-            "/gabe-cc-init section  (the entity walk; mcp__gabe-map__entity_models model=seeded shows the moves applied, with destinations — the shared count is S9's fe-homes input)")
+            "/gabe-cc-init section  (the entity walk; the station's seeded view shows the moves applied, with destinations — the shared count is S9's fe-homes input)")
 
 
 def s16_workflow_coverage(root: Path, plan: dict | None, cfg: dict | None):

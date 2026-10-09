@@ -245,7 +245,7 @@ def t_entity_context(args: dict, roots) -> dict:
             fe_home["homing"] = ((c.get("stats") or {}).get("fe") or {}).get("homing")   # layout | config — which witness homed the pieces
         if fe_home:
             try:
-                import tools_wave4 as _w4n
+                import display_labels as _w4n
                 _blk, _st, _ = center.entity_models()
                 if _st == "present":
                     fe_home["label"] = _w4n._label(_blk, "fe·%s" % slug, _w4n._claim_name(_blk, slug))      # the project's frontend mark over the slug's words (its display words under the config default) — display only, the id stays
@@ -263,7 +263,7 @@ def t_entity_context(args: dict, roots) -> dict:
         if state == "present":
             row = next((r for r in ((block.get("rosters") or {}).get("proposed") or []) if r.get("slug") == slug), None)
             if row and row.get("verdict"):
-                out["proposed"] = {"verdict": row["verdict"], "why": row.get("why"), "see": "mcp__gabe-map__entity_models model=proposed"}
+                out["proposed"] = {"verdict": row["verdict"], "why": row.get("why")}
     return out
 
 
@@ -316,20 +316,9 @@ def _home_ev(center: mq.Center, piece: str) -> dict | None:
         return None
     def _u(s): return "unclaimed" if s == "__unclaimed__" else s                       # R10
     note = "evidence only — the piece sits where its file claim put it; nothing re-homed"
-    if _in_models(center, piece):                                                          # Phase 3: a piece a view re-homes points at the cross-model row
-        note += " · cross-model: mcp__gabe-map__entity_models piece=%s" % piece
     return {**rec, "home": _u(rec.get("home")), "to": _u(rec.get("to")), "users": {_u(k): v for k, v in (rec.get("users") or {}).items()},
             "data": {_u(k): v for k, v in (rec.get("data") or {}).items()},
             "rule": (hom.get("rule") or {}).get("text"), "note": note}
-
-
-def _in_models(center: mq.Center, piece: str) -> bool:
-    """True when ANY view's home delta (c4 half or levels half) names this piece — the pointer's only trigger; no block → False (byte-identical answers)."""
-    block, state, _ = center.entity_models()
-    if state != "present":
-        return False
-    maps = [block.get("homes") or {}, (center.entity_models_levels().get("homes") or {})]
-    return any(piece in (m.get(v) or {}) for m in maps for v in ("seeded", "derived", "proposed"))
 
 
 def _fn_record(center: mq.Center, key: str) -> dict:
@@ -670,6 +659,7 @@ def t_entity_shape(args: dict, roots) -> dict:
 
 
 # ── cases_for ──────────────────────────────────────────────────────────────────
+_CID_OUTLIER_GAP = 1000    # a corpus id this far above the map's own maximum is fixture text, never the floor
 _CID_TOKEN = re.compile(r"(?<![A-Za-z0-9])C(\d{1,5})(?:v\d+)?(?![0-9])")   # red-spec's canonical token (underscore-prefixed pytest names DO count)
 
 
@@ -735,15 +725,23 @@ def t_cases_for(args: dict, roots) -> dict:
     out["max_cid_in_map"] = maxmap or None
     rc, grep, _ = mq.sh(["git", "-C", root, "grep", "-ohIE", "(^|[^A-Za-z0-9])C[0-9]{1,5}(v[0-9]+)?([^0-9]|$)", "--",
                          ":(glob)**/*test*", ":(glob)**/*spec*", ":(glob)**/*Test*", ":(glob)**/tests/**",
-                         ":(exclude,glob)docs/site/center/**", ":(exclude,glob)**/scripts/_a3_*.py", ":(exclude,glob)**/generators/**"], timeout=60)   # F11: the suite's own installs are not this repo's corpus
+                         ":(exclude,glob)docs/site/center/**", ":(exclude,glob)**/scripts/_a3_*.py", ":(exclude,glob)**/generators/**",
+                         ":(exclude,glob)**/tests/center/**"], timeout=60)   # F11: the suite's own installs (and the center's own test fixtures) are not this repo's corpus
     if rc in (0, 1):
         found = [int(m.group(1)) for m in _CID_TOKEN.finditer(grep)]
+        outliers = sorted({n for n in found if maxmap and n > maxmap + _CID_OUTLIER_GAP})   # fixture text ("prefix C99999 suffix") is not a minted id
+        found = [n for n in found if n not in outliers]
         mx = max(found) if found else 0
-        out["corpus"] = {"searched": "git grep -ohIE '(^|[^A-Za-z0-9])C[0-9]{1,5}(v[0-9]+)?([^0-9]|$)' -- '**/*test*' '**/*spec*' '**/tests/**' — excluding docs/site/center/** · scripts/_a3_*.py · **/generators/**",
+        out["corpus"] = {"searched": "git grep -ohIE '(^|[^A-Za-z0-9])C[0-9]{1,5}(v[0-9]+)?([^0-9]|$)' -- '**/*test*' '**/*spec*' '**/tests/**' — excluding docs/site/center/** · scripts/_a3_*.py · **/generators/** · **/tests/center/**; "
+                                    "ids more than %d above max_cid_in_map are ignored as fixture text (listed in ignored_outliers)" % _CID_OUTLIER_GAP,
                          "max_cid_seen": mx or None, "next_cid_floor": (mx + 1) if mx else None,
                          "note": "the corpus is the registry; the map may lag — re-grep before minting"}
+        if outliers:
+            out["corpus"]["ignored_outliers"] = outliers[:mq.CAP]
         if not os.path.isdir(os.path.join(root, ".kdbp")):
             out["corpus"]["note"] = "no .kdbp/ — this repo mints no C-ids; the floor is a corpus artefact, not a registry"
+        if outliers:
+            out["corpus"]["note"] += " — %d id(s) above max_cid_in_map + %d were dropped as fixture text (ignored_outliers); if the map lags the registry that list holds real ids: re-grep" % (len(outliers), _CID_OUTLIER_GAP)
     else:
         out["corpus"] = {"reason": "git grep unavailable (rc %d)" % rc}
     return out
@@ -821,7 +819,7 @@ TOOLS = [
      "inputSchema": _schema({"domain": {"type": "string", "description": "A URL domain segment to look up, e.g. 'settings'."},
                              "diff": {"type": "string", "description": "A git base (sha/branch) — classify routes added since it."}, **ROOT_PROP})},
     {"name": "cases_for", "fn": t_cases_for, "annotations": RO,
-     "description": "Which test cases (C-ids) cover X — function, model, endpoint, task, file or case id — plus the corpus's max C-id and next-id floor (suite installs excluded). REUSE before NEW.",
+     "description": "Which test cases (C-ids) cover X (function, model, endpoint, task, file, case id) + the corpus's max C-id and next-id floor (installs, center fixtures, fixture ids ignored). REUSE before NEW.",
      "inputSchema": _schema({"target": {"type": "string", "description": "function · file::fn · Model · 'GET /path' · 'TASK <name>' · file path · C123"}, **ROOT_PROP}, ["target"])},
     {"name": "owner_of", "fn": t_owner_of, "annotations": RO,
      "description": "Which entity owns these file paths (or a directory): map owners, center.config globs, and whether the census says the map is blind there — and why (unparseable files named).",
@@ -848,7 +846,6 @@ When a project has a command center (docs/site/center/), ask the map BEFORE grep
 - what an endpoint DECIDES (every refusal · declared vs produced exits · its guards) → touches carries `form` · map_census kind=forms
 - a celery/background TASK root, a streaming endpoint, a provider (litellm · redis · …) → find / touches take "TASK <name>", stream=true, kind=provider
 - where the map is PARTIAL (unparseable files · unresolved mounts · blocked twin pass · unscanned frontend roots) → mcp__gabe-map__map_census (map_status carries the one-line map_health)
-- which entity does this piece belong to under each model (claim · seeded · derived · proposed) → mcp__gabe-map__entity_models (claim IS the registry; the other three are VIEWS — nothing joins on their names)
 The map is a FLOOR, never a scope: absence in an answer is not proof of absence — grep -rn remains the absence proof. A trace hop marked `inferred` is graft's guess, not a proof. Every answer stamps map@<head> · freshness. No center → the tools say so and point to Grep/Glob."""
 
 
@@ -871,7 +868,3 @@ BY_NAME.update({t["name"]: t for t in _w2.TOOLS})
 import tools_wave3 as _w3  # noqa: E402
 TOOLS.extend(_w3.TOOLS)
 BY_NAME.update({t["name"]: t for t in _w3.TOOLS})
-# ── wave 4 (2026-09-06, entity models Phase 3): entity_models — the four models as one tool; claim stays the join key ──
-import tools_wave4 as _w4  # noqa: E402
-TOOLS.extend(_w4.TOOLS)
-BY_NAME.update({t["name"]: t for t in _w4.TOOLS})
