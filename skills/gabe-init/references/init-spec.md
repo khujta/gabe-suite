@@ -291,7 +291,7 @@ restores the copy procedure (see the archive README).
 
 ### Step 2: Check hooks
 
-Check `~/.claude/settings.json` for these hooks — the nine markers defined in `~/.claude/templates/gabe/hooks.json` (the LEDGER.md per-tool-call writer and the KNOWLEDGE session-awareness hook are retired in A2 KDBP-lite; not checked, not wired):
+Check `~/.claude/settings.json` for these hooks — the ten markers defined in `~/.claude/templates/gabe/hooks.json` (the LEDGER.md per-tool-call writer and the KNOWLEDGE session-awareness hook are retired in A2 KDBP-lite; not checked, not wired):
 - SessionStart hook (contains `KDBP Active`)
 - UserPromptSubmit hook (contains `DIRECTION GUARD` — the semantic steer rule, /gabe-assess auto-trigger)
 - SessionStart plan awareness (contains `ACTIVE PLAN` or `gabe-plan`)
@@ -301,6 +301,7 @@ Check `~/.claude/settings.json` for these hooks — the nine markers defined in 
 - PostToolUse structure warning (contains `STRUCTURE:` — new-file placement)
 - PostToolUse plan-proof guard (contains `PLAN-PROOF-GUARD` — D7: blocks a ✅ cell whose evidence doesn't exist; debts warn, lies block)
 - Stop session-end reminder (contains `SESSION-END REMINDER`)
+- SubagentStart context (contains `SUBAGENT-CONTEXT` or `subagent-context.sh` — hands Explore/Plan the project's `.kdbp/BLOCKS.md` and every sub-agent one line naming the codebase map; context only, never blocks)
 
 Hook scripts themselves ship from the suite repo (`scripts/hooks/kdbp/`) via `install.sh` to `~/.claude/scripts/hooks/kdbp/` — this spec only wires the `settings.json` entries pointing at them.
 
@@ -309,7 +310,7 @@ For each missing hook:
 - If that file is missing or a key is absent: STOP hook installation and print `⛔ hook template missing at ~/.claude/templates/gabe/hooks.json — reinstall the suite. Not composing hook JSON from memory.` Continue init WITHOUT touching settings.json (degraded mode: report `Hooks installed: skipped (template missing)` in Step 4).
 - Otherwise show the exact JSON, ask `Install? [Y/n]`, and on yes append it to the appropriate array (never overwrite existing entries).
 
-If all hooks present: "All 9 KDBP hooks installed."
+If all hooks present: "All 10 KDBP hooks installed."
 
 ### Step 3: Project type
 

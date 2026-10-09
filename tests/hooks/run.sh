@@ -525,5 +525,25 @@ NOK=$(mktemp -d)
 [ "$( (cd "$NOK" && printf '%s' "$PROMO" | bash "$PGG" >/dev/null 2>&1; echo $?) )" = 0 ] && ok || bad "push-gate: no PUSH.md must stay SILENT"
 rm -rf "$NOK"
 
+# --- subagent-context: what a sub-agent is handed at spawn (SubagentStart) ----
+SAC="$REPO/scripts/hooks/kdbp/subagent-context.sh"
+SP="$T/spawn"; mkdir -p "$SP/both/.kdbp" "$SP/both/docs/site/center" "$SP/blocks/.kdbp" "$SP/none"
+printf '# What exists\nThere is exactly one MerchantHeader.\n' | tee "$SP/both/.kdbp/BLOCKS.md" > "$SP/blocks/.kdbp/BLOCKS.md"
+echo '{}' > "$SP/both/docs/site/center/archmap.json"
+sac() { printf '{"agent_type":"%s"}' "$2" | CLAUDE_PROJECT_DIR="$SP/$1" bash "$SAC" 2>/dev/null; }
+ctx() { python3 -c 'import json,sys; t=sys.stdin.read().strip(); print(json.loads(t)["hookSpecificOutput"]["additionalContext"] if t else "")'; }
+out=$(sac both Explore | ctx)
+echo "$out" | grep -q 'exactly one MerchantHeader' && ok || bad "spawn: Explore must be handed BLOCKS.md (it never loads CLAUDE.md)"
+echo "$out" | grep -q 'mcp__gabe-map__who_calls' && ok || bad "spawn: a project with a map must hand Explore the map line"
+sac both Plan | ctx | grep -q 'exactly one MerchantHeader' && ok || bad "spawn: Plan must be handed BLOCKS.md (it never loads CLAUDE.md)"
+out=$(sac both general-purpose | ctx)
+echo "$out" | grep -q 'mcp__gabe-map__who_calls' && ok || bad "spawn: every sub-agent kind gets the map line"
+echo "$out" | grep -q 'MerchantHeader' && bad "spawn: general-purpose must NOT get BLOCKS.md twice (the CLAUDE.md import already carries it)" || ok
+out=$(sac blocks Explore | ctx)
+echo "$out" | grep -q 'gabe-map' && bad "spawn: no archmap.json → no map line" || ok
+[ -z "$(sac none Explore)" ] && ok || bad "spawn: a project with neither file must stay SILENT"
+[ -z "$(printf 'not json' | CLAUDE_PROJECT_DIR="$SP/both" bash "$SAC" 2>/dev/null)" ] && ok || bad "spawn: garbage stdin must stay SILENT"
+printf 'not json' | bash "$SAC" >/dev/null 2>&1; [ $? = 0 ] && ok || bad "spawn: the hook must always exit 0 (it cannot block)"
+
 echo "hooks harness: $pass passed, $fail failed"
 [ "$fail" = 0 ]
