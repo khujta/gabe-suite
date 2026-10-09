@@ -1,3 +1,5 @@
+> **LANDED (D-085)** — in `skills/gabe-artifact/` (SKILL.md H7, `references/read-aloud.md`, `assets/read-aloud.{js,css}`, `assets/read-aloud-demo.html`, `tools/verify-read-aloud.mjs`) and `tests/read-aloud/`; gabe-artifact 1.5.0. This folder stays as the design record; the landed files are the source. gabe-artifact 1.8.0 (`1c611f23`) later reversed the every-page rule: a page is plain by default, with the bar only when asked; pages that carry the bar keep it.
+
 # gabe-artifact · read-aloud — DRAFT, do not land (D-076, D-077, D-078)
 
 His words (D-076): *"I would like to save this for any future artifact that we create, especially with the GabeArtifact skill"* and *"the bar appeared, and it's perfect. The only thing is that I would like to see that bar all the time on this kind of artifacts."*

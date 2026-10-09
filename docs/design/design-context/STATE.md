@@ -45,10 +45,10 @@ Next: from him — his read of D-103 (the four sections, the two parts tabs, the
 Round 1 is ruled (D-081, D-084, D-085). D-085 ("land it", "use recommended approach", "go"): Security = marks, after-a-decision = stop there
 (`9a9bb86`); the doubled rate limit middleware as an option, merged (my pick, dashed) or apart (`1790c87`, probe 776/0); L-33 traced + the
 hover emitter designed + P2.1/P3.2 redrafted (`8b7917d`, `legibility/drafts/hover-and-corpus/`).
-OWED, in order (C: is over the 40 GB floor again, so these can run): (1) the read-aloud landing in gabe-artifact 1.5.0 — done in the working tree and on `wip/read-aloud-landing`
-(`ccb96c6`), battery 42/42, install parity CLEAN — needs gabe-artifact's own batteries (artifact-chrome · artifact-motion · legibility-audit; read-aloud 42/42 done) through `heavy`, then its commit — the full sweep before a push (D-086); (2) the all-endpoints walk (the merged/apart steps
-are written, never run), two `walk-extra.json` tags, the review page regenerated + its probe (both edited, uncommitted, never run) → the third
-commit; (3) phase 2: the hover emitter on both pages (the lab's card, P1.1/P2.1/P4.1/P8.1/P10.1 checked at emission) + the redrafts on the
+DONE: (1) the read-aloud landing is committed (`020c2aae`; 1.8.0 `1c611f23` made a page plain by default, pages with the bar keep it);
+(2) the review page's round 13 is committed: the middleware look is its one open call, pictures 460/461-d085 from a trial walk, probe 210/0.
+The full all-endpoints walk is stale: 12 steps from D-087..D-103 no longer find their controls, so `walk.json` was left as it was.
+OWED, in order: (3) phase 2: the hover emitter on both pages (the lab's card, P1.1/P2.1/P4.1/P8.1/P10.1 checked at emission) + the redrafts on the
 review page for his "land it"; (4) phase 3: L-39's bench sections on the emitter.
 
 ## Round 1 — what happened (D-066 … D-071)
@@ -124,7 +124,7 @@ P3.1 · P4.2 · P5.2 · P7.1 · P7.2 · P8.2 · P9.1 · P10.2 (the audit into ga
 clauses), install + a clean doctor. Queued after: P4.1 · P8.1 · P10.1 (build checks in the page generators); P3.2 and P2.1 redrafted to
 his words for a new "land it"; L-33 (the frontend lab's hover cards as the one hover format — trace its origin first); L-39 (bench
 sections: the gate card, stage encoding, gate roles, function marks, the standard-or-specialist split, the metadata layout). Not yet:
-P5.1, P6.1, P6.2 — trigger: the navigation bar's consolidation. The read-aloud draft (D-076) still waits on its own "land it".
+P5.1, P6.1, P6.2 — trigger: the navigation bar's consolidation. The read-aloud draft (D-076) landed in gabe-artifact; 1.8.0 reversed D-076 (a page is plain by default).
 
 ## The round-3 page pass and the suite landing are done (2026-10-02)
 
@@ -139,10 +139,11 @@ WSL swap files (5 GB) in Temp wait on his word.
 
 1. **On the review page** — the Security look (marks · moved; seen on all-endpoints.html → POST /cooking/sessions → BY MOMENT's
    Security row → its options square) and the player's "after a decision"; then paste the copy text. Seen while building: the rate
-   limit middleware stands twice at the edge (the numbered middleware, and the host of its switch) — his to merge or keep.
+   limit middleware stands twice at the edge (the numbered middleware, and the host of its switch) — his to merge or keep; the
+   review page now carries it as the one open call (merged or apart, with a picture of each).
 2. **On the all-endpoints bench** (D-083) — the seven kind looks (endpoint · schema · function · test · gate · hook · in-flight) and
    EX-5; his configuration comes back as words, not a review line.
-3. **The read-aloud draft** (`legibility/drafts/gabe-artifact-read-aloud/`) — "land it" or not.
+3. **The read-aloud draft** — landed; 1.8.0 (`1c611f23`) made a page plain by default, the bar only on request.
 4. **Two old WSL swap files** in Windows Temp (≈5 GB) — "delete the old swaps" or keep.
 5. **Older opens, still standing**: the agent-added rules of D-064, which handler line a handler shows, the 2026-09-23 opens
    (D-035's section map, the four standpoints, the lab's picks, M3's first face, the command layout).

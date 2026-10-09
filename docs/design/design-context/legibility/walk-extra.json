@@ -2,6 +2,8 @@
   "_about": "The pictures of the walk's last stage (the Security row) that show a look, tagged here the way round1 tags its steps. The walk logs that stage's steps but tags none of them in round1, and the walk is another file's, so the review page reads its tags from this record: each file must be on disk, must not be in round1 already (drop it here when the walk tags it itself), and a click it names must be a step the walk's log holds. The size is read from the PNG.",
   "shots": [
     { "file": "450-d084-the-security-row-marks-to-their-home-row.png", "option": "secmv", "value": "marks", "item": "L-19" },
-    { "file": "454-d084-the-security-row-with-the-facts-moved-in.png", "option": "secmv", "value": "moved", "click": "moved into Security", "item": "L-19" }
+    { "file": "454-d084-the-security-row-with-the-facts-moved-in.png", "option": "secmv", "value": "moved", "click": "moved into Security", "item": "L-19" },
+    { "file": "460-d085-the-middleware-and-its-host-card-apart.png", "option": "secmw", "value": "apart", "item": "mo.secmw" },
+    { "file": "461-d085-the-security-row-merged-again.png", "option": "secmw", "value": "merged", "item": "mo.secmw" }
   ]
 }
