@@ -1,6 +1,6 @@
-# narration — the binding spec for H7, engine "recorded" (script v3)
+# narration — the binding spec for H7, engine "recorded" (script v4)
 
-> Binding for a **narrated explainer**: a page the operator listens to, section by section, in a recorded neural voice. `SKILL.md` (H7) points here;
+> Binding for a **narrated explainer**, built only when the operator says the word *narrated* (a page is plain by default — `SKILL.md` H7): a page the operator listens to, section by section, in a recorded neural voice. `SKILL.md` (H7) points here;
 > `tools/narrate-tts.py` records it, `tools/narrate-build.py` builds it, `tools/clip-recorder.mjs` + `tools/clip-encode.py` make its action clips,
 > `tools/verify-narration.mjs` proves it on the rendered page.
 > The operator's words behind it (2026-10-04): *"We did this kind of artifact using the GabeArtifact skill. I wanted to update it to generate artifacts
@@ -14,16 +14,18 @@
 > First v2 page: a project drill-down recap (7 sections, 6:17, 10 action clips, 24 figures, 7.92 MB standalone) — chrome 36/36 · narration 42/42 · motion 6/6.
 > The same page rebuilt as v3 (6:25, 32 cues over 7 figures, 8.03 MB) — chrome 41/41 · narration 49/49 · motion 4/4; with Georgia and the
 > rest/replay rule (D5, D15) — chrome 44/44 · narration 52/52 · motion 4/4.
+> And behind v4: *"Numbers: the page shows them, the voice says them"* — a number is a pair `[[n:shown|spoken]]` (D16).
 
 ## 1 · When it applies — and which engine
 
 | Engine | Voice | Text | Use for |
 |---|---|---|---|
-| **browser** (`references/read-aloud.md`) | the viewer's speechSynthesis voice | generated from the page's data at view time | pages read in place — reports, dashboards, decision pages whose text changes |
-| **recorded** (this file) | edge-tts neural voice, recorded at build | fixed scripts, one per section | explainers listened to start to finish — a plan recap, a design walk-through |
+| **browser** (`references/read-aloud.md`) | the viewer's speechSynthesis voice | generated from the page's data at view time | pages read in place when the operator asks for read-aloud — reports, dashboards, decision pages whose text changes |
+| **recorded** (this file) | edge-tts neural voice, recorded at build | fixed scripts, one per section | explainers the operator asked to have narrated, listened to start to finish — a plan recap, a design walk-through |
 
 A page carries one engine, never both. The recorded page marks itself `nav#dock[data-narration="recorded"]`; `verify-read-aloud.mjs` SKIPs it by
-that mark and names this gate instead. **Default for an explainer: recorded, written as a standalone file** (`SKILL.md`, "Two outputs, one kit").
+that mark and names this gate instead. **Nothing is narrated by default: a page is plain unless the operator says the word *narrated*** (`SKILL.md` H7). When one is asked for, the engine is recorded,
+written as a standalone file (`SKILL.md`, "Two outputs, one kit"); the browser engine is added only when the operator asks for read-aloud.
 Everything H1–H6 says still binds.
 
 ## 2 · The work dir
@@ -67,7 +69,7 @@ Copy it as the starting work dir of a new explainer when no earlier one exists.
 the menu row and the player's title, on the section's own tone. `menu` (a one-word label) is read by nothing since the one-bar dock (§6, D11);
 an old config may keep it.
 
-## 3 · The script (v2) — the section IS its script
+## 3 · The script (v2, cues v3, numbers v4) — the section IS its script
 
 One line per spoken paragraph. Between paragraphs, the figures that land the idea just spoken:
 
@@ -94,7 +96,7 @@ a panel opening, a value changing — is a clip; a state is a still; a relation,
 tissue ("two items stay open") may stand alone; three in a row is a section that has stopped showing.
 
 Lint in `narrate-tts.py`. Errors — nothing is synthesized while one stands:
-- **a digit** in a spoken line — spell numbers as they are spoken (*six hundred seconds*, not *600 s*);
+- **a digit in the spoken text** — write the number as a pair, `[[n:600|six hundred]]`: the page shows the left side, the voice says the right (*six hundred seconds*, not *600 s*). A digit outside a pair is refused, and the right side of a pair obeys every spoken-text rule here;
 - **a symbol, path or code fragment** — `` / \ ` _ { } < > | # @ = * ~ ^ $ % + ``;
 - **a typographic symbol the voice skips or misreads** — `→ ← · … &`;
 - **an unknown marker** — a line starting `@` that is not `@img`, `@vid` or `@fig`.
@@ -133,8 +135,29 @@ the reader through that encoding in the voice's order. A generic table or a row 
 Lint adds three errors: a malformed `[[`…`]]`; a cue naming a figure this script does not place with `@fig`; a cue closing a paragraph (it would name
 no word). The builder adds a fourth: a cue step no `data-k` in the figure's block carries.
 
+### Numbers (v4) — the page shows them, the voice says them
+
+A number in a script is a pair, `[[n:SHOWN|SPOKEN]]`:
+
+```
+The panel lists [[n:10,407|about ten thousand]] requests, and [[n:3|three]] of them timed out.
+```
+
+- The page shows the left side (digits, commas, `%` and the like are fine there); the recording speaks the right; the reading wave lights the shown number for
+  the whole spoken span. A page paragraph never spells out a number the reader needs to see — show the digits through the pair.
+- The builder renders a pair as ONE word span, `<span class="w n" data-say="about ten thousand">10,407</span>`, timed at its first spoken word, and aligns the
+  boundaries over the spoken words, so `words.json` is unchanged in shape and `narrated.js` needs nothing. A script with no pair builds byte-identical to v3.
+- Only the spoken side is spoken, counted (the 60–230 words, the sentence and paragraph lengths) and hashed, so turning a spelled number into a pair — or
+  editing the shown side — re-synthesizes nothing.
+- Lint adds four errors: a malformed or unclosed pair (both sides filled, no pair inside a pair, a closing `]]`); a pair whose shown side holds no
+  digit (a word needs no pair); two pairs glued together (`]][[n:` would speak as one run-on word — put a space between); and the figure id `n`, which is
+  reserved (`[[n:3]]` is not a cue, and `@fig n` is refused). A digit or a symbol on the spoken side fails the ordinary spoken-text rules above, naming
+  the clip and the paragraph. The builder stops on the same malformed, unclosed or glued pair.
+- Cues may sit beside a pair, never inside it.
+
 The visible page keeps its real numbers, ids and merges — in captions, figure blocks and the header. **Every number the page states about the
-narration is generated**: `{{RUNTIME}}`, `{{CLIP_COUNT}}`, the durations — never typed.
+narration is generated**: `{{RUNTIME}}`, `{{CLIP_COUNT}}`, the durations — never typed. A number the script states is the exception that proves the rule: it
+is typed once, as a pair (`[[n:3|three]]`), and the page shows the digits while the voice says the words.
 
 ## 4 · The pipeline
 
@@ -152,8 +175,9 @@ python3 <skill>/tools/narrate-build.py <workdir> -o <out.html> --fragment       
 
 `narrate-tts.py` speaks only the paragraph lines — never an `@` line — through the Python API with `boundary="WordBoundary"`: one event per word,
 offsets in 100 ns ticks (÷ 1e4 → ms). The CLI's subtitles give sentences only. It encodes mono 48 kbps with ffmpeg, retries three times, and checks
-that the voice spoke as many words as the script holds (tolerance max(2, n/50) — a hyphenated compound may speak as two). An unchanged script,
-voice and rate skips (`mp3/<clip>.src.sha256`) — a figure-only edit does not re-record; `--force` does. Exit 0 ok · 1 lint or word mismatch ·
+that the voice spoke as many words as the script holds (tolerance max(2, n/50) — a hyphenated compound may speak as two; a pair counts as its spoken
+side). An unchanged script, voice and rate skips (`mp3/<clip>.src.sha256`) — a figure-only edit does not re-record, and neither does a change to the shown
+side of a pair; `--force` does. Exit 0 ok · 1 lint or word mismatch ·
 2 could not run.
 
 `narrate-build.py` pastes the kit's three blocks, injects `assets/narrated.css` (+ `page.css`) before the cog's CSS, generates the dock, lifts the
@@ -169,7 +193,7 @@ with `--fragment` — a page past 15 MB.
 |---|---|
 | `{{ICON:name}}` | an inline Lucide `<svg>` |
 | `{{LISTEN:clip[:label]}}` | the section's listen row: play pill, seek bar, time |
-| `{{TX:clip}}` | the script — every paragraph shown as `<p data-p>`, every word a `.w` span; every figure placed after its paragraph as `<figure class="fig" data-p>` |
+| `{{TX:clip}}` | the script — every paragraph shown as `<p data-p>`, every word a `.w` span (a number pair is ONE `.w.n` span: the shown number as its text, the spoken words in `data-say`); every figure placed after its paragraph as `<figure class="fig" data-p>` |
 | `{{NEXT:id}}` | the section foot: "Next: <the next section's title>"; the last section gets "Back to the top" |
 | `{{IMG:path}}` | a file under the work dir as a `data:` URI |
 | `{{RUNTIME}}` · `{{CLIP_COUNT}}` | "about 6½ min" · the clip count |
@@ -228,7 +252,7 @@ and focus returns to the figure.
 
 ## 8 · The reading wave
 
-The wave lights the word under the voice and its neighbours, a crest that moves with the speech.
+The wave lights the word under the voice and its neighbours, a crest that moves with the speech. A number pair is one span, timed at its first spoken word, so the shown number stays the crest for the whole of its spoken words.
 
 - The centre word is a fractional index, binary-searched in the clip's onset times each frame.
 - Each word within ±4 of the centre gets a weight `w = exp(−(j − c)² / (2 · 0.9²))`, set as `--w` on the word.
@@ -292,14 +316,14 @@ H4 binds as everywhere, with two additions:
 (one stage, `meter`, ~25 lines: a `MutationObserver` on its figure's `data-step`, `rest()` at load); the drill-down recap's `page.js` (`paths`) is
 the full-size one.
 
-## 11 · The gate (`tools/verify-narration.mjs`, 52 checks, ~65 s with real audio)
+## 11 · The gate (`tools/verify-narration.mjs`, 53 checks, ~65 s with real audio)
 
 Chromium runs with `--autoplay-policy=no-user-gesture-required` over a local http server. Five groups:
 
 1. **Structure** — no console errors; the hook exists; the dock is sticky, nothing on the page is fixed and the cog rides in the dock, the dock's
    controls end before it; one iconed, playable menu row per clip; the menu hidden; Play all and Next named icons; every clip has a duration, a
    listen row and its script; **every section lands its script on at least one
-   figure**; one rising timing per word; no digit or symbol in the spoken text; `--dock-h` and the scroll margin agree; the next-button chain ends
+   figure**; one rising timing per word; no digit or symbol in the spoken text (a number pair is read by its spoken side, `data-say`); every number the page shows carries the words the voice says (the shown side holds a digit, the spoken side is non-empty with no digit or symbol); `--dock-h` and the scroll margin agree; the next-button chain ends
    at the top; no sideways scroll at 1280px; **at rest a moving figure shows its finished frame and holds still** — each stage sampled at uneven
    gaps, then replayed through `FXREPLAY` and left to settle: the settled frame must be the frame it rested on.
 2. **Sections menu** — focus moves in; the arrows walk the rows; Escape returns focus; an outside click (in the left gutter — the page centre can sit
@@ -323,9 +347,12 @@ A run that crashes prints `INCOMPLETE n/m` and exits 2 — never a pass. **Fire-
 29px*; a box-overlap test alone passed it, because the button's box never touched its neighbour, only its text did.
 
 **The battery** `tests/narration/run.sh` keeps that proof standing: it builds the worked example and requires the gate SILENT on it and FIRING on
-eight mutations — the menu shipped without `hidden`, the phone's `.dock .toc-btn { width: auto }` stripped, every `data-cue` removed, the `--tail` rule
+ten mutations — the menu shipped without `hidden`, the phone's `.dock .toc-btn { width: auto }` stripped, every `data-cue` removed, the `--tail` rule
 removed, the dock made fixed, play without the step-0 reset, a widget that animates when scrolled into view, a widget resting on its first
-frame. Nine gate runs, ~10 min; run it alone.
+frame, a shown number that lost the words the voice says, a shown number whose spoken words are empty. Eleven gate runs, ~4 min; run it alone. Nine
+fast checks with no browser come first: the lint silent on the example and firing on a bare digit, a malformed pair, a digit on the spoken side, a
+shown side with no digit, two glued pairs and a reserved `@fig n`; the spoken text (so the synthesis stamp) the same with the pair as without; the
+builder rendering the pair as one `.w.n` span.
 
 **Waits are measured, never slept.** A jump on a long page is a smooth scroll that can take over a second (1.3 s on the recap's 18,000px page); the
 gate polls `scrollY` until two reads agree before it checks where the section landed. A fixed sleep passed on a short page and failed on a long one.
@@ -342,12 +369,12 @@ PNG. Clips are the weight: ≈ 0.2–1 MB each at CRF 24, depending on crop and 
 
 | # | Decision | Status |
 |---|---|---|
-| D1 | Engine: recorded edge-tts for explainers; browser speech stays for pages read in place | taken (2026-10-04) |
+| D1 | Engine: recorded edge-tts for a narrated explainer; browser speech for a page read in place when read-aloud is asked for | taken (2026-10-04) |
 | D2 | Voice: `en-US-AndrewNeural` at +4%, matching the reference; per page in the config. The ruled browser voice (en-GB, see `read-aloud.md` §5) maps to `en-GB-SoniaNeural` +15% when a page wants it | default — the operator's to change |
 | D3 | The wave is allowed; it narrows to one word under reduced motion and Motion: Paused. Smooth scroll stays on, off under reduced motion | taken (2026-10-04) |
 | D4 | ~~Summary + transcript: the first paragraph shows open; the rest folds~~ — superseded by D7 | superseded (2026-10-05) |
 | D5 | Georgia joins the roster as its third family (16px, +0.005em); the page-level `extra_fonts` opt-in retires | taken (2026-10-05, operator: *"yes, let's add Georgia to the available fonts"*) |
-| D6 | The dock IS the H7 bar on a recorded page, with a speed control added | taken (2026-10-04) |
+| D6 | The dock IS the read-aloud bar (H7) on a recorded page, with a speed control added | taken (2026-10-04) |
 | D7 | Script v2: the script IS the section — every paragraph shown, each idea landed on a clip, still or widget placed by `@vid`/`@img`/`@fig`, and the figure goes live while its paragraph is spoken | taken (2026-10-05, operator) |
 | D8 | A project explainer is a standalone HTML file in gitignored `.kdbp/explainers/`; the Artifact form is `--fragment`, on request | taken (2026-10-05, operator) |
 | D9 | One centred column with text set left; prose on a ~70-character measure, media breaking out to its own width (H1) | taken (2026-10-05, operator) |
@@ -357,3 +384,4 @@ PNG. Clips are the weight: ≈ 0.2–1 MB each at CRF 24, depending on crop and 
 | D13 | Text size (100–135 %) and spacing (tight · normal · airy) in the cog, persisted beside the family | taken (2026-10-05, operator) |
 | D14 | On a narrated page the voice is an animation's replay (its cue word; a seek back replays it) — no Replay button beside it | taken, provisional (2026-10-05, operator: *"that might be"*) |
 | D15 | With no clip current every figure and moving stage shows its final frame and holds still; play resets the section's figures to their first frame and the cues step them | taken (2026-10-05, operator) |
+| D16 | A page is plain by default — no player bar, no spoken summaries, no audio; a narrated page only on the word *narrated*, the read-aloud bar only on a request for read-aloud (reverses D-076). Numbers: the page shows them, the voice says them — a number is a pair `[[n:shown\|spoken]]` (script v4) and the digit ban covers only the spoken side | taken (2026-10-09, operator) |

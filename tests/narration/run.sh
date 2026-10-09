@@ -11,9 +11,18 @@
 #   to an icon on a phone, a diagram that no longer steps with the voice, a
 #   short last section that cannot reach the dock, a dock that is fixed — and
 #   the rest/replay rule: play that does not reset a figure, a widget that
-#   animates by itself at rest, a widget resting on its first frame.
+#   animates by itself at rest, a widget resting on its first frame —
+# and (script v4, number pairs [[n:SHOWN|SPOKEN]]) a shown number that lost the
+# words the voice says (the spoken digit check, and the number check alone).
 #
-# Each case is one gate run (~65 s — the gate plays real audio): ~10 min in all.
+# Before the gate cases, nine fast checks with no browser: the lint of
+# narrate-tts.py stays silent on the example and FIRES on a bare digit, a
+# malformed pair, a digit on the spoken side, a shown side with no digit, two
+# glued pairs and a reserved `@fig n`; the
+# spoken text (and so the synthesis stamp) is the same with the pair as with
+# plain "three"; the builder renders the pair as one .w.n span.
+#
+# Each gate case is one run (the silent case ~65 s — the gate plays real audio; a firing case stops early): ~4 min in all.
 # Run it alone; it drives a browser. Hermetic: temp dir only, cleans up.
 # Runs from the fork's own tests/ or, unchanged, from the suite repo's tests/.
 set -u
@@ -33,7 +42,7 @@ bad(){ echo "  FAIL: $1"; fail=$((fail+1)); }
 [ -f "$GATE" ] || { echo "⛔ missing gate: $GATE"; exit 2; }
 
 PAGE="$TMP/narrated-mini.html"
-python3 "$SKILL/tools/narrate-build.py" "$EX" -o "$PAGE" >/dev/null 2>&1 \
+python3 -I "$SKILL/tools/narrate-build.py" "$EX" -o "$PAGE" >/dev/null 2>&1 \
   || { echo "⛔ the example did not build"; exit 2; }
 
 # mutate <out-name> <literal|regex> <old> <new> — a stale anchor aborts the run
@@ -60,7 +69,56 @@ PY
 
 run_gate(){ node "$GATE" "$1" >/dev/null 2>&1; echo $?; }
 
+# lint_exit <old> <new> — the tts lint on a temp copy of the example whose 00-script.txt has <old> replaced by <new>
+# (old "" = no edit); sets LX to the exit code. A stale anchor aborts the run, like mutate().
+LX=""
+lint_exit(){
+  local wd; wd="$(mktemp -d "$TMP/lint.XXXXXX")"
+  cp -r "$EX/." "$wd/"
+  if [ -n "$1" ] && ! python3 -I - "$wd/txt/00-script.txt" "$1" "$2" <<'PY'
+import sys
+path, old, new = sys.argv[1:4]
+s = open(path, encoding="utf-8").read()
+if old not in s: sys.exit("anchor missing: " + old[:70])
+open(path, "w", encoding="utf-8").write(s.replace(old, new, 1))
+PY
+  then
+    echo "  FAIL: lint anchor no longer matches the example script — fixture not built" >&2
+    exit 2
+  fi
+  python3 -I "$SKILL/tools/narrate-tts.py" "$wd" --lint-only >/dev/null 2>&1; LX=$?
+}
+
 echo "narration battery"
+
+# ── 0 · the script side: number pairs (no browser) ─────────────────────────
+# A number is written [[n:SHOWN|SPOKEN]]: the page shows the left, the voice
+# says the right. The digit ban covers only what is spoken.
+lint_exit '' ''; if [ "$LX" = "0" ]; then ok "lint is silent on the example (a pair, no bare digit)"; else bad "the lint fails the worked example"; fi
+lint_exit '[[n:3|three]]' '3'; if [ "$LX" = "1" ]; then ok "lint fires on a bare digit outside a pair"; else bad "a bare digit not caught"; fi
+lint_exit '[[n:3|three]]' '[[n:3|]]'; if [ "$LX" = "1" ]; then ok "lint fires on a malformed pair"; else bad "a pair with an empty side not caught"; fi
+lint_exit '[[n:3|three]]' '[[n:3|3]]'; if [ "$LX" = "1" ]; then ok "lint fires on a digit on the spoken side"; else bad "a spoken digit not caught"; fi
+lint_exit '[[n:3|three]]' '[[n:x|three]]'; if [ "$LX" = "1" ]; then ok "lint fires on a pair whose shown side has no digit"; else bad "a no-digit pair not caught"; fi
+lint_exit '[[n:3|three]]' '[[n:3|three]][[n:4|four]]'; if [ "$LX" = "1" ]; then ok "lint fires on two glued pairs"; else bad "glued pairs not caught"; fi
+lint_exit '@fig parts' $'@fig parts\n@fig n'; if [ "$LX" = "1" ]; then ok "lint fires on the reserved figure id n"; else bad "@fig n not caught"; fi
+# the pair must not move the synthesis stamp: spoken() with the pair equals spoken() with plain "three", and the stamp
+# computed from it equals the committed mp3/00-script.src.sha256 (so the committed recording stays current)
+if python3 -I - "$SKILL/tools/narrate-tts.py" "$EX" <<'PY'
+import hashlib, importlib.util, json, sys
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("narrate_tts", sys.argv[1])
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+ex = Path(sys.argv[2])
+txt = (ex / "txt" / "00-script.txt").read_text(encoding="utf-8")
+assert "[[n:3|three]]" in txt, "the example script lost its pair"
+plain = txt.replace("[[n:3|three]]", "three")
+assert m.spoken(txt) == m.spoken(plain), "spoken text differs with the pair"
+cfg = json.loads((ex / "narration.json").read_text(encoding="utf-8"))
+src = hashlib.sha256(f"{cfg.get('voice', 'en-US-AndrewNeural')}|{cfg.get('rate', '+4%')}|{m.spoken(txt)}".encode()).hexdigest()
+assert src == (ex / "mp3" / "00-script.src.sha256").read_text().strip(), "stamp differs from the committed one"
+PY
+then ok "the pair leaves the spoken text and the synthesis stamp unchanged"; else bad "the pair changed the spoken text or the stamp"; fi
+if [ "$(grep -o '<span class="w n" data-say="three">3</span>' "$PAGE" | wc -l)" = "1" ]; then ok "the builder renders the pair as one .w.n span"; else bad "the pair is not rendered as one .w.n span"; fi
 
 # ── 1 · SILENT on the worked example ────────────────────────────────────────
 if [ "$(run_gate "$PAGE")" = "0" ]; then ok "silent on the worked example"; else bad "the gate fails the worked example"; fi
@@ -108,6 +166,18 @@ if [ "$(run_gate "$TMP/self-start.html")" != "0" ]; then ok "fires when a moving
 # go to the final state … not at the beginning of the animation".
 mutate first-frame.html literal 'rest();   /* at rest: the finished frame */' 'to(0, false);'
 if [ "$(run_gate "$TMP/first-frame.html")" != "0" ]; then ok "fires when a moving figure rests on its first frame"; else bad "a widget resting on its first frame not caught"; fi
+
+# ── 10 · FIRES when a shown number loses its spoken words ──────────────────
+# Script v4: the page shows 3, the voice says "three". A number span without its
+# words (the pair flattened to the bare digit) puts a digit in the spoken text.
+mutate pair-lost.html literal '<span class="w n" data-say="three">3</span>' '<span class="w">3</span>'
+if [ "$(run_gate "$TMP/pair-lost.html")" != "0" ]; then ok "fires when a shown number loses its spoken words"; else bad "a number without its spoken words not caught"; fi
+
+# ── 11 · FIRES when a shown number's spoken words are empty ─────────────────
+# Only the number check can catch this: the spoken text gains no digit, the span
+# just says nothing (the digit check of case 10 passes on this page).
+mutate pair-nosay.html literal '<span class="w n" data-say="three">3</span>' '<span class="w n" data-say="">3</span>'
+if [ "$(run_gate "$TMP/pair-nosay.html")" != "0" ]; then ok "fires when a shown number has no spoken words"; else bad "a number with empty spoken words not caught"; fi
 
 echo "narration: $pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1

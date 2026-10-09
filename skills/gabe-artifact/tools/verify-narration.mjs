@@ -4,7 +4,8 @@
  * and Next as named icons, the player, the cog riding at its right — and nothing on the page is fixed
  * (operator 2026-10-05); the menu lists every section with its icon, hides until asked, moves focus in, walks on the
  * arrows, and closes on Escape (focus back), an outside click and the cog; every clip has a duration and one timing per spoken word;
- * the spoken text carries no digit, id or symbol; (script v2) every section shows its whole script with
+ * the spoken text carries no digit, id or symbol (a number pair, script v4, is read by its spoken side — data-say — and the
+ * page's shown number must carry spoken words); (script v2) every section shows its whole script with
  * at least one figure between the paragraphs, and the figure tied to the paragraph under the voice goes live; the player plays the section in view, seeks from the dock and from a
  * section's own bar, restarts, steps next and back, stops, starts over, chains on Play all, changes speed and keeps it
  * across clips, and answers the space bar; (script v3) a cue word steps its figure — data-step, the named part "now" —
@@ -83,7 +84,8 @@ try {
       return { clip, dur: n.DURS[clip], times: T.length, words: tx ? tx.querySelectorAll('.w').length : -1, rising: T.every((v, i) => !i || v >= T[i - 1]),
         listen: !!document.querySelector(`.listen[data-clip="${clip}"]`), say: !!(tx && [...tx.querySelectorAll(':scope > p')].some((q) => q.textContent.trim())),
         figs: tx ? tx.querySelectorAll(':scope > .fig').length : 0,
-        text: tx ? [...tx.querySelectorAll('.w')].map((w) => w.textContent).join(' ') : '' };
+        text: tx ? [...tx.querySelectorAll('.w')].map((w) => (w.classList.contains('n') ? (w.getAttribute('data-say') || '') : w.textContent)).join(' ') : '',   /* what the voice says: a number pair speaks its data-say */
+        pairs: tx ? [...tx.querySelectorAll('.w.n')].map((w) => ({ shown: w.textContent, say: w.getAttribute('data-say') || '' })) : [] };
     }) : [];
     const toc = document.getElementById('toc');
     const mis = [...document.querySelectorAll('#toc .ti')].map((ti) => ({ id: ti.dataset.target, icon: !!ti.querySelector('.ti-ico svg'), play: !!ti.querySelector('.ti-play'), sec: !!document.querySelector(`section.sec[id="${ti.dataset.target}"]`) }));
@@ -106,6 +108,9 @@ try {
   check('one rising timing per transcript word, in every clip', S.secs.every((s) => s.times === s.words && s.rising), S.secs.filter((s) => s.times !== s.words || !s.rising).map((s) => `${s.clip} ${s.times}≠${s.words}`).join(', '));
   const dirty = S.secs.filter((s) => /\d|[\/\\`_{}<>|#@=*~^$%+]/.test(s.text)).map((s) => s.clip + ': ' + (s.text.match(/\d+|[\/\\`_{}<>|#@=*~^$%+]/) || [''])[0]);
   check('the spoken text carries no digit, id or symbol', dirty.length === 0, dirty.join(', '));
+  const pairs = S.secs.flatMap((s) => s.pairs.map((q) => ({ clip: s.clip, ...q })));
+  const lame = pairs.filter((q) => !/\d/.test(q.shown) || !q.say.trim() || /\d|[\/\\`_{}<>|#@=*~^$%+]/.test(q.say)).map((q) => `${q.clip}: ${q.shown}`);
+  check('every number the page shows carries the words the voice says', lame.length === 0, pairs.length ? (lame.join(', ') || `${pairs.length} pair(s)`) : 'no number pairs');
   check('a jump parks a section below the dock (--dock-h + scroll margin)', Math.abs(S.dh - S.dockH) <= 1 && S.margins.every((m) => m >= S.dockH), `dock ${S.dockH}px, --dock-h ${S.dh}px, smallest margin ${Math.min(...S.margins)}px`);
   check('every section ends in a next button; the last goes back to the top', S.foots.slice(0, -1).every((g, i) => g === S.ids[i + 1]) && S.foots[S.foots.length - 1] === 'top', S.foots.join(' → '));
   check('no horizontal page scroll at 1280px', S.overflow <= 1, `${S.overflow}px`);

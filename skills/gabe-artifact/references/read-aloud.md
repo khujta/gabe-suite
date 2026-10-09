@@ -1,17 +1,19 @@
 # read-aloud — the binding spec for H7
 
-> Binding for every artifact or generated page that has sections: `SKILL.md` (H7) points here; `tools/verify-read-aloud.mjs` proves it on a rendered page.
+> Binding when the operator asks for read-aloud. A page is plain by default (`SKILL.md` H7): no bar, no spoken summaries, no audio until the word is said. Once it is asked for, `SKILL.md` (H7) points here; `tools/verify-read-aloud.mjs` proves it on a rendered page.
 > The operator's words behind it: *"a summary that I can copy and paste and read out loud"* · *"the header navigation bar gets frozen on
 > the top… I can stop or skip to a later section, and it will also take me to that section on the page"* · his own voice · *"I would like to
 > see that bar all the time on this kind of artifacts"* and *"save this for any future artifact… especially with the GabeArtifact skill"* ·
 > *"a more indented way, like with dropdowns, maybe by sections… summaries, especially in the parts where we have to make decisions… using gabe-lens plain"* · *"include examples and impact on the decision items, and for icons use the rules we identified to put text to show about the icons when we hover them"*
+> Those words set how the bar behaves once it is on the page — always in view, never only while a voice plays — not whether a page gets one. A page gets the bar only when the operator asks for read-aloud.
 > A rule marked **default** is a number the operator accepted as a starting point rather than set himself; it lives in one constant of the gate and is his to change.
 
 ## 1 · When it applies
 
-Every artifact or generated page that has sections (`.sec`, the kit's section) — one section is enough. A page with no `.sec` is outside the rule and the
-gate reports a loud `SKIP` (nothing to read is not "verified"). There is no per-page opt-out — only a change of engine: a narrated explainer
-built by `tools/narrate-build.py` carries recorded narration instead (`references/narration.md`), and this gate SKIPs it by its
+Only when the operator asks for read-aloud. A page is plain by default and never gets the bar on the builder's own initiative. When it is asked for, the bar reads
+the page's sections (`.sec`, the kit's section) — one section is enough. A page that carries the bar but has no `.sec` has nothing to read, and the gate reports a loud `SKIP`
+(nothing to read is not "verified"). A page that does not carry the bar is outside this spec, and this gate is not run on it. A narrated explainer (asked for by the word
+*narrated*) built by `tools/narrate-build.py` carries recorded narration instead (`references/narration.md`), and this gate SKIPs it by its
 `nav#dock[data-narration="recorded"]` mark and names `tools/verify-narration.mjs`.
 
 ## 2 · The model: sections, items, units
@@ -35,7 +37,7 @@ ReadAloud.mount({ sections: [{ id, title, say, items: [{ id, title, say, example
 | Length | A section: **3 to 6 sentences** (ruled). An item: **2 to 4** (default; the operator only said "short"). Every sentence ends with `.`, `!` or `?`. |
 | Words | Plain spoken words, present tense, the reader as "you" where they act. Lead with the point; end on what changes their next move. A thing is named, never its id. |
 | Never in a summary | An id (`D-17`, `P3`), a code identifier (`snake_case`, `camelCase`), a path or file name, a slash, a symbol a voice trips on (`· → × | # " < > =`), a `{token}`, `undefined`, `NaN`, `null`. |
-| Numbers | **Generated, never typed.** The page's data fills sentence templates at build or load time; the build stops on a `{token}` left over, an `undefined`, or a digit typed into a template. The gate cannot see typing — only the generator can — so this rule is the generator's. |
+| Numbers | **Generated, never typed.** The page's data fills sentence templates at build or load time; the build stops on a `{token}` left over, an `undefined`, or a digit typed into a template. The gate cannot see typing — only the generator can — so this rule is the generator's. This is the browser engine's rule (its summaries are generated from data); the recorded engine shows numbers and speaks them through a pair, `[[n:shown|spoken]]` (`references/narration.md` §3). |
 | Items that decide | What it decides · the options and what each sets in motion · the pick · the reader's pick once made. Generated from the page's own data. |
 | Example and impact | `example`: **one** sentence, one concrete case from the page's own real data (a named thing and its true numbers), never an id or a code name. `impact`: **one** sentence for the whole item, saying for each option what changes on the page, for the reader, or elsewhere if it is picked ("pick A and it …; pick B and it …"), numbers generated. Both are shown under the summary (labelled), read after it, and copied with it; the gate reads them with the same lint as the summary and counts one sentence each. |
 | Plain line | `/gabe-lens plain X` voice: **one sentence**, a concrete noun for what the thing IS, then at most one em dash clause that sharpens it; the reader's side of the screen; no analogy. It is shown (under the item in the menu, and leading its block) and is **not spoken** when the item has a summary. |
@@ -114,7 +116,7 @@ the items with plain lines, on screen · Escape and outside click · slower is 0
 **Fixture law:** it FIRES on `tests/read-aloud/fixtures/without-bar.html` and stays SILENT on `assets/read-aloud-demo.html`; `tests/read-aloud/run.sh` adds one fixture per defect class and one-line mutants of the module (mutation-anchored — a stale anchor aborts).
 Not proved, and said so: that audio comes out of a real voice (mocked), that a number was generated rather than typed (the generator's rule), and that the words are *good* (a reader's call).
 
-## 9 · Wiring a page (the builder's steps)
+## 9 · Wiring a page (the builder's steps — only when read-aloud was asked for)
 
 1. Paste the kit's three blocks, then `read-aloud.css` as block 4 (style) and `read-aloud.js` as block 5 (script) — an Artifact cannot load sibling files.
 2. Give every section a `.sec` with an id and an iconed head; give each item an element with an id inside its section.

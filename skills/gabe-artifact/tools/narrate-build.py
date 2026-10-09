@@ -9,6 +9,7 @@ Assembles one self-contained HTML file from a work directory — a standalone do
                    page's figure blocks, each between <!-- fig:<id> --> and <!-- /fig --> (lifted out, placed by @fig)
   txt/<clip>.txt   the script IS the section's content: one spoken paragraph per line, and between them the figures
                    that land each idea — @img <path> | caption · @vid <path> | caption · @fig <id>
+                   (script v4: a number is a pair [[n:SHOWN|SPOKEN]] — the page shows the left, the voice says the right)
   mp3/<clip>.mp3   + mp3/<clip>.words.json — written by tools/narrate-tts.py (which never speaks an @ line)
   page.css         optional — the page's own components
   page.js          optional — the page's own motion (registers window.FXREPLAY[slug], defines __rebuildMotion)
@@ -17,7 +18,8 @@ Placeholders in body.html:
   {{ICON:name}}            an inline Lucide icon (ICONS below, or narration.json "icons")
   {{LISTEN:clip[:label]}}  the section's play pill + seek bar + time
   {{TX:clip}}              the script, every paragraph shown, every word a .w span timed from the clip's WordBoundary
-                           events; each figure ties to the paragraph before it (data-p) and goes live while it is spoken
+                           events (a number pair is ONE span, .w.n, timed at its first spoken word, its spoken words in
+                           data-say); each figure ties to the paragraph before it (data-p) and goes live while it is spoken
   {{NEXT:id}}              the section foot: "Next: <the next section's title>" (the last one: back to the top)
   {{IMG:path}}             a file under the work dir as a data: URI (the file travels alone, so media rides inline)
   {{RUNTIME}} {{CLIP_COUNT}}  generated from the clips, never typed
@@ -190,22 +192,50 @@ def plain(markup):
 
 
 CUE = re.compile(r"\[\[([\w-]+):(\d+)\]\]")
+PAIR = re.compile(r"\[\[n:(.*?)\]\]")   # [[n:SHOWN|SPOKEN]] — narrate-tts.py keeps the same pattern
+HELD = re.compile(r"\x00(\d+)\x00")
 
 
-def cue_words(p):
-    """A paragraph line → [(word, [cue, …])]: a [[fig:k]] token (alone or glued to the word after it) lands on the
-    next word, so a figure's step lights when the voice reaches that word. The tokens are never spoken."""
+def pair_sides(body):
+    """'SHOWN|SPOKEN' → (shown, spoken), or None when the pair is malformed: no bar, an empty side, a pair inside it."""
+    shown, bar, say = body.partition("|")
+    if not bar or "[[" in body:
+        return None
+    shown, say = shown.strip(), say.strip()
+    return (shown, say) if shown and say else None
+
+
+def page_tokens(p):
+    """A paragraph line → [(shown, [spoken word, …], [cue, …], is_pair)], one per span on the page. Whitespace separates
+    tokens except inside a [[n:SHOWN|SPOKEN]] pair; text glued to a pair joins its token ("(3)" shows "(3)", says
+    "(three)"). A [[fig:k]] token (alone or glued to the token after it) lands on that token, so a figure's step lights
+    when the voice reaches it. Cues and pair markup are never spoken."""
+    held = []
+    if "]][[n:" in p:
+        die("two number pairs with nothing between them — the voice would say one run-together word; put a space or a word between them")
+
+    def hold(m):
+        sides = pair_sides(m.group(1))
+        if sides is None:
+            die(f"a malformed number pair {m.group(0)!r} — write [[n:SHOWN|SPOKEN]], both sides filled, no pair inside a pair")
+        held.append(sides)
+        return f"\x00{len(held) - 1}\x00"
     out, pend = [], []
-    for tok in p.split():
+    for tok in PAIR.sub(hold, p).split():
         m = CUE.match(tok)
         while m:
             pend.append(f"{m.group(1)}:{m.group(2)}")
             tok = tok[m.end():]
             m = CUE.match(tok)
+        if "[[n:" in tok:
+            die(f"an unclosed number pair in {tok!r} — [[n:SHOWN|SPOKEN]] needs its closing ]]")
         if "[[" in tok:
             die(f"a cue that is not [[figure:step]] in {tok!r}")
         if tok:
-            out.append((tok, pend))
+            segs = HELD.split(tok)   # even = plain text, odd = the index of a held pair
+            shown = "".join(held[int(x)][0] if i % 2 else x for i, x in enumerate(segs))
+            say = "".join(held[int(x)][1] if i % 2 else x for i, x in enumerate(segs))
+            out.append((shown, say.split(), pend, len(segs) > 1))
             pend = []
     if pend:
         die(f"cue {pend} closes a paragraph — it has no word to land on")
@@ -342,11 +372,12 @@ def main():
         clip = m.group(1)
         lines = [ln.strip() for ln in (wd / "txt" / f"{clip}.txt").read_text(encoding="utf-8").splitlines() if ln.strip()]
         paras = [ln for ln in lines if not ln.startswith("@")]
-        tokens = [w for p in paras for w, _ in cue_words(p)]
+        ptoks = [page_tokens(p) for p in paras]
+        flat = [w for pt in ptoks for _, say, _, _ in pt for w in say]   # exactly what the voice said, word by word
         placed = {ln.split()[1] for ln in lines if ln.startswith("@fig") and len(ln.split()) > 1}
-        cued = {c.split(":")[0] for p in paras for _, cs in cue_words(p) for c in cs}
-        for p in paras:
-            for _, cues in cue_words(p):
+        cued = {c.split(":")[0] for pt in ptoks for _, _, cs, _ in pt for c in cs}
+        for pt in ptoks:
+            for _, _, cues, _ in pt:
                 for c in cues:
                     fig, k = c.split(":")
                     if fig not in placed:
@@ -355,24 +386,31 @@ def main():
                     if k not in steps:
                         die(f"{clip}: cue [[{c}]] — figure {fig!r} has no element with data-k {k} (it has {sorted(steps) or 'none'})")
         bounds = json.loads((wd / "mp3" / f"{clip}.words.json").read_text(encoding="utf-8"))
-        times[clip], hit = align(tokens, bounds)
+        wt, hit = align(flat, bounds)
+        first, at = [], 0   # a page span is timed at the onset of its FIRST spoken word, so it stays the crest for the whole span
+        for pt in ptoks:
+            for _, say, _, _ in pt:
+                first.append(wt[at])
+                at += len(say)
+        times[clip] = first
         n_figs = len(lines) - len(paras)
-        n_cues = sum(len(cs) for p in paras for _, cs in cue_words(p))
-        report.append(f"align {clip}: {hit}/{len(tokens)} words matched a boundary · {n_figs} figure(s)" + (f" · {n_cues} cue(s)" if n_cues else ""))
+        n_cues = sum(len(cs) for pt in ptoks for _, _, cs, _ in pt)
+        n_nums = sum(1 for pt in ptoks for *_, is_pair in pt if is_pair)
+        report.append(f"align {clip}: {hit}/{len(flat)} words matched a boundary · {n_figs} figure(s)" + (f" · {n_cues} cue(s)" if n_cues else "")
+                      + (f" · {n_nums} number(s)" if n_nums else ""))
 
-        def word(w, cues):
+        def word(shown, say, cues, is_pair):
             cue = f' data-cue="{" ".join(cues)}"' if cues else ""
-            return f'<span class="w"{cue}>{html.escape(w)}</span>'
-
-        def wrap(p):
-            return " ".join(word(w, c) for w, c in cue_words(p))
+            if is_pair:
+                return f'<span class="w n"{cue} data-say="{html.escape(" ".join(say))}">{html.escape(shown)}</span>'
+            return f'<span class="w"{cue}>{html.escape(shown)}</span>'
         out, k = [], -1
         for ln in lines:
             if ln.startswith("@"):
                 out.append(figure(ln, max(k, 0), cued))
             else:
                 k += 1
-                out.append(f'<p data-p="{k}">{wrap(ln)}</p>')
+                out.append(f'<p data-p="{k}">{" ".join(word(*t) for t in ptoks[k])}</p>')
         return f'<div class="tx" data-clip="{clip}">{"".join(out)}</div>'
     body = re.sub(r"\{\{TX:([\w-]+)\}\}", tx, body)
     unused = sorted(set(blocks) - used)
