@@ -1148,6 +1148,10 @@ speed) is kept as it is; its default becomes "always" — his ruling, on the rev
 voice plays" becomes the other option. No decision markers are added: his second message says the bar is right as it stands. (2) "save
 this for any future artifact": recorded as his standing preference at once; the gabe-artifact change (the read-aloud bar + the spoken
 summary rules as a reusable part) is a suite change, so it is drafted first and lands on his "land it" (iterate-before-implement).
+Reversed 2026-10-09 (the suite reset, ledger item 4; his "items 2 and 4 looks good" on the draft): a page is plain by default, with no
+bar, no spoken summaries and no audio. A narrated page is built only when he says the word narrated, and the read-aloud bar is added only
+when he asks for read-aloud; pages that already carry the bar keep it. The digit ban now covers only what is spoken: a recorded script
+writes a number as a pair, [[n:shown|spoken]], so the page shows the digits and the voice says the words (gabe-artifact 1.8.0).
 
 ## D-077 — The bar's menu nests by section; every decision gets its own spoken summary and a plain line
 Date: 2026-10-01 · Input: his message after D-076, logged as legibility-feedback.md L-29.
@@ -1610,3 +1614,27 @@ the hover rather than dropped; the same icon-only rule on every column's chips, 
 default not yet ruled, since the dash marks any default he has not confirmed by looking.
 Proof: full probe 1038 passed · 0 failed (the D-099 arrangement and the in-flight chip words re-pinned to D-102); the look by real clicks
 (hide and show "where" round-trips the look byte for byte; the arrangement read by box positions).
+
+## D-103 — Four sections side by side; a parts tab on both sides; a part's name shows its value
+Date: 2026-10-09 · Input: his message after D-102 (dictated, pasted).
+Decision, his: "In the section of parts, when we are tailoring things, we have three columns right now … I want that to be four sections: 1. How
+the element is drawn, with all the options to tailor the element 2. Just the element 3. What opens on a click, showing the portrait 4. How the
+portrait is drawn. Also, in both sections, we should have the parts section where we can choose what to show or not show. When I hover over
+it, it should show the current value for the current selection of the element that we are dealing with right now. If I go and hover, for
+example, on how it is drawn in glyph, it should show me the refuser glyph that we are showing. Only that, only the fields associated with
+the glyph, the status, stage, words, and so on."
+Read as (dictation): "the section of parts" = the tailoring area; "both sections" = the two control sections, the card's and the portrait's;
+"the refuser glyph" = the refusal glyph the ending shows.
+Cause found: his browser remembered "under the element" from before D-102, and a remembered arrangement wins over a new default — the card's
+controls stacked under the element, so four sections read as three columns.
+Consequence: (1) a tab or an arrangement remembered before this version is not taken as his pick (the bench saves a version, lv 3): the area
+opens on both sides — how it is drawn · the element · what opens on a click · how the portrait is drawn — each with its title, in one row;
+picks made from now on are remembered. (2) The portrait's controls gain a PARTS tab, opening first: every section and, under it, its rows,
+in the order the portrait draws them, each with an eye; hiding keeps the row in the list (D-102) and the section or row leaves the portrait;
+its eye again puts it back in place. (3) In both PARTS tabs a part's name, pointed at or focused, shows that part alone as the tailored
+element draws it — the glyph alone, "429" alone, a portrait section alone, one row alone — a hidden part too (the card draws it off the page
+with every part on; the portrait keeps what it took out). Leaving the name empties the box.
+Chosen alone (his to correct): the value box beside the name, outside the area so nothing that reads the area finds its copies; the card's
+frame (its edge bar and padding) left out of the box, so only the part shows; the box on focus too, for the keyboard.
+Proof: full probe 1041 passed · 0 failed (D-100's three portrait tabs re-pinned to four, parts first); the look by real clicks from a
+bench remembered "under" — four titled sections in one row, each preview holding only its part, hide and show round-tripping on both sides.

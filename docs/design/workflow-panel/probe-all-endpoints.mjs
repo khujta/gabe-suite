@@ -4143,9 +4143,9 @@ const tailor = async (k) => { if (await p.$(CT(k))) return; const s0 = '#exgrid 
         line: c ? c.querySelector('.exptline').textContent : null, key: Object.keys(window.__allepEx.state.pt) }; });
     const q0 = await pq();
     const lay0 = Object.fromEntries(q0.secs.map((q) => [q, ['before', 'checks', 'gives'].includes(q) ? 'above' : 'beside']));
-    ok(q0.right >= 0 && Math.abs(q0.top) <= 12 && q0.h === PC.title && JSON.stringify(q0.tabs) === JSON.stringify([PC.tab.order.name + '*', PC.tab.show.name, PC.tab.layout.name]) && JSON.stringify(q0.panes) === '["order"]'
+    ok(q0.right >= 0 && Math.abs(q0.top) <= 12 && q0.h === PC.title && JSON.stringify(q0.tabs) === JSON.stringify([PC.tab.parts.name + '*', PC.tab.order.name, PC.tab.show.name, PC.tab.layout.name]) && JSON.stringify(q0.panes) === '["parts"]'
        && JSON.stringify(q0.order) === JSON.stringify(q0.secs) && JSON.stringify(q0.lay) === JSON.stringify(lay0) && q0.picks.length && q0.picks.every((x) => x.endsWith(':dashed')) && q0.before.under >= 0 && q0.where.under < 0 && !q0.key.length,
-      'D-100 · the portrait\'s own controls, a column right of it: "' + q0.h + '", three tabs (' + q0.tabs.join(' · ') + '), the sections in the portrait\'s order (' + q0.order.join(' · ') + '); my picks dashed — rows beside, before · checks · gives each a section, its name above its lines', q0);
+      'D-100 · CHANGED D-103 · the portrait\'s own controls, a column right of it: "' + q0.h + '", four tabs, parts open first (' + q0.tabs.join(' · ') + '), the sections in the portrait\'s order (' + q0.order.join(' · ') + '); my picks dashed — rows beside, before · checks · gives each a section, its name above its lines', q0);
     /* LAYOUT by real clicks: the facts' names above their values, before's beside its lines */
     await p.click('#exact .expctl .exptab[data-ptab="layout"]'); await p.click('#exact .expctl [data-play="facts"][data-v="above"]'); await p.waitForTimeout(150);
     await p.click('#exact .expctl [data-play="before"][data-v="beside"]'); await p.waitForTimeout(150); const q1 = await pq();
@@ -4245,6 +4245,33 @@ const tailor = async (k) => { if (await p.$(CT(k))) return; const s0 = '#exgrid 
       const tt = await p.$eval('#tip', (e) => e.innerText), lab = (ch.find((c) => c[0] === 'refusal') || [])[3] || '';
       ok(ch.length > 2 && ch.every(([r, tx, sv, al]) => tx === '' && sv && rx.test(al || '')) && ch[0][0] === '' && ch[0][3].startsWith(PCW.all + ' · ') && tt.includes(lab.split(' · ')[1] || '@'),
         'D-102 · the ending\'s case chips are their icons only (' + ch.length + '), each with its word and count in its label ("' + lab + '") and its hover', { ch, tt }); }
+    /* ══ D-103 · his: four sections — how the element is drawn · the element · what opens on a click · how the portrait is drawn; "in both sections, we should have
+       the parts section"; "When I hover over it, it should show the current value … Only that" — by real clicks, from a bench remembered before D-103 ══ */
+    { const RW = D.words.ex.row, PFC = D.words.ex.pf.ctl, PCW = D.words.ex.ctl, TE = CT('end'), P = '#exact .expctl .extp[data-ptp="parts"] ';
+      await open(PAGE); await p.evaluate(() => { localStorage.setItem(window.__allepEx.key, JSON.stringify({ at: 'under', tab: 'show', ptab: 'order', active: 'end', col: {} })); });
+      await p.reload(); await p.waitForFunction('window.__allep && window.__allep.ready', { timeout: 20000 }); await p.evaluate(() => window.__allep.pick('POST /cooking/sessions')); await p.waitForTimeout(450); await tailor('end');
+      const a0 = await p.evaluate(() => { const r = document.getElementById('exact'); return { at: r.getAttribute('data-at'), hd: [...r.querySelectorAll('.exabody > *')].map((e) => (e.querySelector(':scope > .exsh, :scope > .expctl > .exsh') || {}).textContent),
+        ys: [...r.querySelectorAll('.exabody > *')].map((e) => Math.round(e.getBoundingClientRect().top)), tab: (r.querySelector('.extab[aria-selected="true"]') || {}).getAttribute('data-tab'), ptab: (r.querySelector('.exptab[aria-selected="true"]') || {}).getAttribute('data-ptab') }; });
+      ok(a0.at === 'sides' && JSON.stringify(a0.hd) === JSON.stringify([RW.ctl, RW.col, RW.pt, PFC.title]) && new Set(a0.ys).size === 1 && a0.tab === 'parts' && a0.ptab === 'parts',
+        'D-103 · from a bench remembered with the controls under the element and the old tabs: four sections side by side — ' + a0.hd.join(' · ') + ' — and both open on their parts tab', a0);
+      const pv = async (sel) => { await p.$eval(sel, (e) => e.scrollIntoView({ block: 'center' })); await p.hover(sel); await p.waitForTimeout(120);
+        return p.evaluate(() => { const b = document.getElementById('expv'); return { shown: !!b && !b.hidden, parts: b ? [...b.querySelectorAll('[data-part]')].map((x) => x.getAttribute('data-part')) : [], txt: b ? b.innerText.trim() : '', svg: b ? b.querySelectorAll('svg').length : 0,
+          rows: b ? b.querySelectorAll('.rcrow').length : 0, secs: b ? [...b.querySelectorAll('.exptsec')].map((x) => x.getAttribute('data-ps')) : [], inArea: !!document.querySelector('#exact #expv, #exgrid #expv') }; }); };
+      const C = TE + ' .extp[data-tp="parts"] ', drawnTxt = (q) => p.evaluate((q) => { const n = document.querySelector('#exact .excol[data-clone] .blk [data-part="' + q + '"]'); return n ? n.innerText.trim() : null; }, q);
+      const g = await pv(C + '.exptr[data-part="icon"] .exprn'), st = await pv(C + '.exptr[data-part="status"] .exprn'), stW = await drawnTxt('status'), ck = await pv(C + '.exptr[data-part="check"] .exprn');
+      await p.mouse.move(5, 5); await p.waitForTimeout(80); const gone = await p.evaluate(() => { const b = document.getElementById('expv'); return !b || (b.hidden && !b.children.length); });
+      ok(g.shown && JSON.stringify(g.parts) === '["icon"]' && g.svg === 1 && !g.inArea && st.shown && JSON.stringify(st.parts) === '["status"]' && st.txt === stW && ck.shown && JSON.stringify(ck.parts) === '["check"]' && ck.txt.length > 3 && gone,
+        'D-103 · the card\'s parts: pointing at glyph shows the glyph alone, at status "' + st.txt + '" alone (as the card draws it), at check — not drawn — the check this element would draw; leaving empties it', { g, st, ck, gone });
+      const lst = () => p.evaluate((P) => [...document.querySelectorAll(P + '.exptr')].map((r) => r.getAttribute('data-ps') + '/' + (r.getAttribute('data-row') || '')), P);
+      const fr = () => p.evaluate(() => [...document.querySelectorAll('#exact .expf .ptbody > .exptsec')].map((s) => s.getAttribute('data-ps') + ':' + s.querySelectorAll(':scope > .rcrow').length));
+      const L0 = await lst(), F0 = await fr(), sk = L0.filter((x) => x.endsWith('/')).map((x) => x.slice(0, -1)), mid = sk[2], rw = L0.find((x) => !x.endsWith('/')).split('/');
+      const sp = await pv(P + '.exptr[data-ps="' + sk[0] + '"]:not([data-row]) .exprn'), rp = await pv(P + '.exptr[data-ps="' + rw[0] + '"][data-row="' + rw[1] + '"] .exprn');
+      await p.click(P + '.exptr[data-ps="' + mid + '"]:not([data-row]) .expon'); await p.waitForTimeout(150); const L1 = await lst(), F1 = await fr(), hp = await pv(P + '.exptr[data-ps="' + mid + '"]:not([data-row]) .exprn');
+      await p.click(P + '.exptr[data-ps="' + mid + '"]:not([data-row]) .expon'); await p.waitForTimeout(150); const F2 = await fr();
+      await p.click(P + '.exptr[data-ps="' + rw[0] + '"][data-row="' + rw[1] + '"] .expon'); await p.waitForTimeout(150); const L3 = await lst(), F3 = await fr(), rh = await pv(P + '.exptr[data-ps="' + rw[0] + '"][data-row="' + rw[1] + '"] .exprn');
+      ok(sk.length === F0.length && JSON.stringify(sp.secs) === JSON.stringify([sk[0]]) && rp.rows === 1 && JSON.stringify(L1) === JSON.stringify(L0) && !F1.some((x) => x.startsWith(mid + ':')) && JSON.stringify(hp.secs) === JSON.stringify([mid])
+         && JSON.stringify(F2) === JSON.stringify(F0) && JSON.stringify(L3) === JSON.stringify(L0) && +F3[0].split(':')[1] === +F0[0].split(':')[1] - 1 && rh.rows === 1,
+        'D-103 · the portrait\'s parts: ' + sk.length + ' sections, each with its rows, an eye each; a section\'s name shows that section alone, a row\'s that row alone; hiding ' + mid + ' takes it out of the portrait and keeps its row in the list (its value still shown); its eye again puts it back in place; a row hides the same way', { L0, F0, F1, F2, F3 }); }
     /* swept: every ending of every endpoint, and the first five of every other kind on every endpoint, open a drawn portrait whose words are whole — no token unfilled, no
        undefined, null, NaN or [object the PAGE wrote. Judged per text node and per " · " fact: a brace or a null inside the code's own words (the element's data, or the
        endpoint's endings it quotes — an f-string message, a date pattern, "cannot be null") is the code's */

@@ -11,15 +11,15 @@
   var EX = D.ex, XW = W.ex, XKEY = "gabe:allep:bench:v3", XK = EX.kinds, XF = W.enc.fam, XIO = W.mo.io, XC2 = W.mo.x.c2;
   var XREG = EX.regions || {};                               /* D-089: the hover regions of each kind's parts (see xRegions) */
   var XTABS = ["parts", "order", "show", "format", "hover"];      /* D-094 · the controls' tabs, in his words: the order of the parts · what each part shows · its format · the hover; D-101: parts first, every setting of a part in its row */
-  var XS = { lay: XW.opt.lay.pick, follow: XW.opt.follow.pick, tab: XTABS[0], active: XK[0], col: {}, at: XW.pf.at.pick, box: XW.pf.box.pick, pv: {}, pt: {}, ptab: "order" };   /* D-100: pt — how each kind's portrait is drawn, per way of drawing it ("k:view"); ptab — its controls' tab */   /* D-098: the kind being tailored, one at a time — the first column's (the ending) until he picks */
+  var XS = { lay: XW.opt.lay.pick, follow: XW.opt.follow.pick, tab: XTABS[0], active: XK[0], col: {}, at: XW.pf.at.pick, box: XW.pf.box.pick, pv: {}, pt: {}, ptab: "parts" };   /* D-100: pt — how each kind's portrait is drawn, per way of drawing it ("k:view"); ptab — its controls' tab */   /* D-098: the kind being tailored, one at a time — the first column's (the ending) until he picks */
   function xClone(o) { return JSON.parse(JSON.stringify(o)); }
   XK.forEach(function (k) { XS.col[k] = { scope: XW.opt.scope.pick, role: null, id: null, look: xClone(EX.look[k]), sel: null, open: false, width: XW.width.pick }; });
   try { window.localStorage.removeItem("gabe:allep:bench:v2"); } catch (e) {}   /* D-081: the looks he ruled are the defaults — a bench remembered before his ruling must not override them */
-  try { var xr = JSON.parse(window.localStorage.getItem(XKEY) || "null");
-    if (xr) { if (XW.opt.lay.opts[xr.lay]) XS.lay = xr.lay; if (XW.opt.follow.opts[xr.follow]) XS.follow = xr.follow; if (XTABS.indexOf(xr.tab) >= 0) XS.tab = xr.tab; if (XK.indexOf(xr.active) >= 0) XS.active = xr.active;
-      if (XW.pf.at.opts[xr.at]) XS.at = xr.at; if (XW.pf.box.opts[xr.box]) XS.box = xr.box; if (xr.pv && typeof xr.pv === "object") Object.keys(xr.pv).forEach(function (k) { if (XK.indexOf(k) >= 0 && XW.pf.v[xr.pv[k]]) XS.pv[k] = xr.pv[k]; });   /* D-099 */
+  var XLV = 3; try { var xr = JSON.parse(window.localStorage.getItem(XKEY) || "null");
+    if (xr) { if (XW.opt.lay.opts[xr.lay]) XS.lay = xr.lay; if (XW.opt.follow.opts[xr.follow]) XS.follow = xr.follow; if (XTABS.indexOf(xr.tab) >= 0 && xr.lv === XLV) XS.tab = xr.tab; if (XK.indexOf(xr.active) >= 0) XS.active = xr.active;
+      if (XW.pf.at.opts[xr.at] && xr.lv === XLV) XS.at = xr.at; if (XW.pf.box.opts[xr.box]) XS.box = xr.box; if (xr.pv && typeof xr.pv === "object") Object.keys(xr.pv).forEach(function (k) { if (XK.indexOf(k) >= 0 && XW.pf.v[xr.pv[k]]) XS.pv[k] = xr.pv[k]; });   /* D-099 */
       if (xr.pt && typeof xr.pt === "object") Object.keys(xr.pt).forEach(function (q) { var z = q.split(":"); if (z.length === 2 && XK.indexOf(z[0]) >= 0 && Object.prototype.hasOwnProperty.call(XW.pf.v, z[1]) && xr.pt[q] && typeof xr.pt[q] === "object") XS.pt[q] = xr.pt[q]; });   /* D-100: each entry is checked again where it is drawn (pfLook) */
-      if (["order", "show", "layout"].indexOf(xr.ptab) >= 0) XS.ptab = xr.ptab;
+      if (["parts", "order", "show", "layout"].indexOf(xr.ptab) >= 0 && xr.lv === XLV) XS.ptab = xr.ptab;   /* D-103: a tab or an arrangement remembered before the parts tabs and both sides is not his pick of them */
       XK.forEach(function (k) { var c = (xr.col || {})[k]; if (!c) return; var st = XS.col[k];
         if (XW.opt.scope.opts[c.scope]) st.scope = c.scope; if (typeof c.id === "string") st.id = c.id; if (typeof c.role === "string") st.role = c.role; if (XW.width.opts[c.width]) st.width = c.width;
         if (c.look && Array.isArray(c.look.rows) && c.look.rows.length === 3) st.look = Object.assign(xClone(EX.look[k]), c.look);
@@ -35,7 +35,7 @@
     if (EX.hereAts.indexOf(L.hereAt) < 0) L.hereAt = EX.look[k].hereAt; if (EX.hereRests.indexOf(L.hereRest) < 0) L.hereRest = EX.look[k].hereRest; xPlaceNew(k, L); xWasFix(L);   /* D-101 · D-102 (_ae-parts.js) */
     var H = EX.look[k].hov || {}; L.hov = Object.assign({}, H, L.hov || {}); Object.keys(L.hov).forEach(function (p) { if (!(p in H)) delete L.hov[p]; }); return L; }
   XK.forEach(function (k) { xFix(k, XS.col[k].look); });
-  function xSave() { try { var o = { lay: XS.lay, follow: XS.follow, tab: XS.tab, active: XS.active, col: {}, at: XS.at, box: XS.box, pv: XS.pv, pt: XS.pt, ptab: XS.ptab }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
+  function xSave() { try { var o = { lv: XLV, lay: XS.lay, follow: XS.follow, tab: XS.tab, active: XS.active, col: {}, at: XS.at, box: XS.box, pv: XS.pv, pt: XS.pt, ptab: XS.ptab }; XK.forEach(function (k) { var st = XS.col[k]; o.col[k] = { scope: st.scope, role: st.role, id: st.id, look: st.look, width: st.width }; });
     window.localStorage.setItem(XKEY, JSON.stringify(o)); } catch (e) {} }
   /* L-36 · the controls' icons (24px, drawn by the same rule as BY MOMENT's option squares): the columns' layouts, follow or stay, the
      elements shown, the steps, the element's widths (D-087: the default and three narrower), copy, back to the default */

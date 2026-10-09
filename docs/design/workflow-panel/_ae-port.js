@@ -195,7 +195,7 @@
      The record is taken apart after it is drawn, the same way for every kind: its sections (.exptsec), its top rows (one section, "its facts"), each top table (a section of
      its own); rows under one key (a rule, a send) move as one. Kept per kind and per way of drawing it: the sections' order and which are drawn, each section's rows the same
      way, what each row shows, and where each section puts its names. My picks, dashed: every row as the lab draws it, names beside — before, checks and gives above (D-095) ══ */
-  var PTLN = { b: "before", c: "checks", g: "gives" }, PTABS = ["order", "show", "layout"], PFORMS = ["ilv", "lv", "iv", "v"], PLAYS = ["beside", "above"];
+  var PTLN = { b: "before", c: "checks", g: "gives" }, PTABS = ["parts", "order", "show", "layout"], PFORMS = ["ilv", "lv", "iv", "v"], PLAYS = ["beside", "above"];
   var PICON = { ilv: '<circle cx="5" cy="12" r="2.5"/><path d="M10 12h3M16 12h5"/>', lv: '<path d="M3 12h5M12 12h9"/>', iv: '<circle cx="5" cy="12" r="2.5"/><path d="M11 12h10"/>', v: '<path d="M3 12h18"/>' };
   function pfLay0(q) { return PTLN.b === q || PTLN.c === q || PTLN.g === q ? "above" : "beside"; }
   function pfLook(k, v) { var T = XS.pt[k + ":" + v]; T = T && typeof T === "object" ? T : {};   /* what was remembered, each value checked: a key no section has is ignored where it is drawn */
@@ -219,10 +219,10 @@
   function pfTailor(b, k, v) { var T = pfLook(k, v), secs = pfUnits(b), by = {}, nat = [], D = { k: k, v: v, secs: [] };
     secs.forEach(function (s) { var q0 = s.getAttribute("data-ps"), q = q0, n = 2; while (by[q]) q = q0 + "-" + n++; s.setAttribute("data-ps", q); by[q] = s; nat.push(q); });
     pfMerge(nat, T.order).forEach(function (q) { var s = by[q], R = pfRowsOf(s), off = T.off.indexOf(q) >= 0,
-        d = { key: q, name: s.getAttribute("data-pn") || q, kind: s.classList.contains("ptlines") ? "lines" : s.classList.contains("pttab") ? "tab" : R.ks.length ? "rows" : "other", off: off, rows: [], lay: T.lay[q] || pfLay0(q) };
+        d = { key: q, name: s.getAttribute("data-pn") || q, kind: s.classList.contains("ptlines") ? "lines" : s.classList.contains("pttab") ? "tab" : R.ks.length ? "rows" : "other", off: off, rows: [], lay: T.lay[q] || pfLay0(q), node: s };
       if (R.ks.length) { var rs0 = [].filter.call(s.children, function (x) { return x.classList.contains("rcrow"); }), at = rs0[rs0.length - 1].nextSibling, roff = T.roff[q] || [];
         pfMerge(R.ks, T.rows[q] || []).forEach(function (rq) { var rs = R.g[rq], ro = roff.indexOf(rq) >= 0, f = T.form[q + "/" + rq] || PFORMS[0], ic = rs[0].querySelector(".rci svg");
-          d.rows.push({ key: rq, name: pfRowName(rq, rs), icon: ic ? ic.cloneNode(true) : null, off: ro, form: f });
+          d.rows.push({ key: rq, name: pfRowName(rq, rs), icon: ic ? ic.cloneNode(true) : null, off: ro, form: f, nodes: rs });
           rs.forEach(function (r) { r.remove(); if (!ro) { r.setAttribute("data-pf", f); s.insertBefore(r, at); } }); }); }
       s.setAttribute("data-lay", d.lay); D.secs.push(d); if (off) s.remove(); else b.appendChild(s); });
     return D; }
@@ -255,6 +255,19 @@
       bar.appendChild(b); }); box.appendChild(bar);
     var pane = function (t) { var d = el("div", "extp"); d.setAttribute("role", "tabpanel"); d.setAttribute("data-ptp", t); d.appendChild(el("p", "exhint", C.tab[t].plain)); box.appendChild(d); return d; };
     var keys = function (L, drawn) { return L.filter(function (x) { return !!x.off !== drawn; }).map(function (x) { return x.key; }); };
+    /* PARTS (D-103): every section and its rows in the order the portrait draws them, each an eye; hiding keeps the row in place (D-102), its name shows its value */
+    var pp = pane("parts"), tb = el("div", "exptbl ptptbl"), sk = D.secs.map(function (x) { return x.key; });
+    D.secs.forEach(function (d) { var r = el("div", "exptr" + (d.off ? " exptoff" : "")), h = el("span", "exprn"); r.setAttribute("data-ps", d.key);
+      var e = xAct("opt exo exi expon", d.off ? XICON.eye.off : XICON.eye.on, d.off ? "ptShow" : "ptHide", { name: d.name }, function () {
+        pfPut(k, v, blk, function (T) { T.order = sk.slice(); T.off = d.off ? T.off.filter(function (q) { return q !== d.key; }) : T.off.concat([d.key]); }); });
+      e.setAttribute("aria-pressed", d.off ? "false" : "true"); r.appendChild(e); h.appendChild(pfSecIco(d)); h.appendChild(el("span", null, d.name)); r.appendChild(h);
+      xPv(h, function () { return pfPvNode(f, d); }); tb.appendChild(r);
+      d.rows.forEach(function (rw) { var rr = el("div", "exptr ptprow" + (rw.off || d.off ? " exptoff" : "")), h2 = el("span", "exprn"); rr.setAttribute("data-ps", d.key); rr.setAttribute("data-row", rw.key);
+        var e2 = xAct("opt exo exi expon", rw.off ? XICON.eye.off : XICON.eye.on, rw.off ? "ptShow" : "ptHide", { name: rw.name }, function () {
+          pfPut(k, v, blk, function (T) { var o = T.roff[d.key] || []; T.rows[d.key] = d.rows.map(function (x) { return x.key; }); T.roff[d.key] = rw.off ? o.filter(function (q) { return q !== rw.key; }) : o.concat([rw.key]); }); });
+        e2.setAttribute("aria-pressed", rw.off ? "false" : "true"); rr.appendChild(e2); if (rw.icon) h2.appendChild(rw.icon.cloneNode(true)); h2.appendChild(el("span", null, rw.name)); rr.appendChild(h2);
+        xPv(h2, function () { return pfPvNode(f, d, rw); }); tb.appendChild(rr); }); });
+    pp.appendChild(tb);
     /* ORDER: the sections top to bottom, each with its rows; drag a section onto another (above or below its middle), a row along its own section; either into not drawn */
     var po = pane("order"), list = el("div", "ptslist"), sbin = el("div", "dzone exz exoff ptsoff"); sbin.setAttribute("aria-label", C.tray);
     var moveSec = function (a, to, after) { pfPut(k, v, blk, function (T) { var on = keys(D.secs, true).filter(function (q) { return q !== a; }), off = keys(D.secs, false).filter(function (q) { return q !== a; });
@@ -296,6 +309,11 @@
     cp.appendChild(xAct("opt exo exi exptcopy", XICON.copy, "ptCopy", null, function () { copyText(code.textContent, said, XW.ctl.copied); })); cp.appendChild(said); cp.appendChild(code); box.appendChild(cp);
     return box; }
 
+  /* a section (or one of its rows) as this element's portrait draws it — a hidden one too, kept when it was taken out — inside copies of the frame and its body */
+  function pfPvNode(f, d, rw) { var b = f.querySelector(".ptbody"), fw = f.cloneNode(false), bw = b ? b.cloneNode(false) : el("div", "ptbody"), s;
+    fw.removeAttribute("id"); fw.setAttribute("data-box", "grow"); fw.classList.add("expvf");
+    if (rw) { s = d.node.cloneNode(false); rw.nodes.forEach(function (r) { s.appendChild(r.cloneNode(true)); }); } else s = d.node.cloneNode(true);
+    bw.appendChild(s); fw.appendChild(bw); return fw; }
   var PFV = { table: { record: pfTblRecord, shape: pfTblShape, wheel: pfTblWheel, keys: pfTblKeys }, schema: { record: pfSchRecord }, fn: { record: pfFnRecord },
     end: { exit: pfExit }, test: { "case": pfCase }, gate: { record: pfGate }, hook: { record: pfHook }, inf: { record: pfInf } };
   window.__allepPort = { frame: pfFrame, ctl: pfCtl, views: PTV, lab: PTLAB, look: pfLook };

@@ -9,7 +9,9 @@
      its own mark SHAPED (the lab's corners, or a ring), the others TONED (the lab's optional stop). This file is inlined after _ae-bench.js, in the same scope.
      D-102 · his: "the options should be kind of static … if in parts I click the hide glyph, it shouldn't move from its position. It just keeps the same position, but
      hides it, and that's it. The list shouldn't be dynamic": the rows stand in the bench's own order whatever the card does, and the eye remembers where a part was
-     drawn (look.was) so showing it again puts it back on the same line, side and place. ══ */
+     drawn (look.was) so showing it again puts it back on the same line, side and place.
+     D-103 · his: "When I hover over it, it should show the current value for the current selection of the element … on how it is drawn in glyph, it should show me
+     the refuser glyph that we are showing. Only that": a part's name, pointed at or focused, shows that part alone as this element draws it — hidden or not. ══ */
   function xPartsOf(k) { return EX.parts[k] ? EX.parts[k].map(function (p) { return p.key; }) : Object.keys(XW.parts[k]); }   /* XPARTS is not set yet when xFix first runs */
   function xAtOf(R, p) { for (var i = 0; i < R.length; i++) { if (R[i].l.indexOf(p) >= 0) return [i, "l"]; if (R[i].r.indexOf(p) >= 0) return [i, "r"]; } return null; }
   function xPlaceNew(k, L) { var off = L.off || [], miss = xPartsOf(k).filter(function (p) { return off.indexOf(p) < 0 && !xAtOf(L.rows, p); }); if (!miss.length) return;
@@ -39,6 +41,7 @@
           else { var w = (L.was || {})[p], h = w || xAtOf(EX.look[k].rows, p) || [L.rows.length - 1, "r"]; if (L.was) { delete L.was[p]; if (!Object.keys(L.was).length) delete L.was; } xMove(k, p, h[0], h[1], w ? w[2] : null); } });
         on.setAttribute("aria-pressed", at ? "true" : "false"); r.appendChild(on); }
       var h = el("span", "exprn"); h.appendChild(mk ? el("i", "exmkic") : xSvg(xPartIco(k, p), 13, "currentColor")); h.appendChild(el("span", null, nm)); r.appendChild(h);
+      xPv(h, function () { return xPartPv(k, mk ? null : p); });
       var wa = !mk && !at && (L.was || {})[p];
       r.appendChild(el("span", "expat", mk ? "" : at ? fill(C.atLine, { i: at[0] + 1, side: at[1] === "l" ? C.left : C.right }) : wa ? fill(C.offAt, { i: wa[0] + 1, side: wa[1] === "l" ? C.left : C.right }) : C.tray));
       var F = mk ? null : (EX.forms[k] || {})[p], fw = {};
@@ -65,3 +68,17 @@
     if (L.here === D.here && L.hereW === D.hereW && L.hereAt === D.hereAt && L.hereRest === D.hereRest) return "";
     return " · " + HW.title + " " + HW.opts[L.here].name + (L.here === "corners" ? " " + HW.at.opts[L.hereAt] : L.here === "ring" ? " " + L.hereW + "px" : "")
       + ", " + HW.rest.label + " " + HW.rest.opts[L.hereRest]; }
+  /* ══ D-103 · the value preview: one box for the area, beside the name pointed at; the node is the part as drawn, inside copies of its own ancestors so the card's styles hold ══ */
+  function xPvBox() { var b = document.getElementById("expv"); if (!b) { b = el("div", "expvbox"); b.id = "expv"; b.setAttribute("role", "tooltip"); b.hidden = true; ($("sec-ex") || document.body).appendChild(b); } return b; }   /* outside the area and the grid: nothing that reads them finds its copies */
+  function xPv(cell, build) { cell.tabIndex = 0; cell.classList.add("expvh");
+    var on = function () { var b = xPvBox(), n = build(); b.textContent = ""; b.appendChild(n || el("p", "exhint", XW.ctl.pvNone)); b.hidden = false;
+        var r = cell.getBoundingClientRect(), x = r.right + 10; if (x + b.offsetWidth > window.innerWidth - 8) x = Math.max(8, r.left - b.offsetWidth - 10);
+        b.style.left = Math.round(x) + "px"; b.style.top = Math.round(Math.max(8, Math.min(r.top - 4, window.innerHeight - b.offsetHeight - 8))) + "px"; },
+      off = function () { var b = document.getElementById("expv"); if (b) { b.hidden = true; b.textContent = ""; } };
+    cell.addEventListener("mouseenter", on); cell.addEventListener("focus", on); cell.addEventListener("mouseleave", off); cell.addEventListener("blur", off); }
+  function xChain(node, sel) { var out = node.cloneNode(true), a = node.parentElement; while (a) { var c = a.cloneNode(false); c.removeAttribute("id"); c.appendChild(out); out = c; if (a.matches(sel)) break; a = a.parentElement; } return out; }
+  /* a card part (null: the marks) as the tailored element draws it; a hidden part from the same element drawn with every part on, never shown on the page */
+  function xPartPv(k, p) { var w = document.querySelector("#exact .excol[data-clone] .exw"), q = p ? '[data-part="' + p + '"]' : ".sqs", n = w && w.querySelector(".blk " + q);
+    if (!n && XCLONE && XCLONE.it) { var L = XS.col[k].look, A = Object.assign({}, L, { rows: L.rows.map(function (r) { return { l: r.l.slice(), r: r.r.slice() }; }), off: [] });
+      (L.off || []).forEach(function (x) { A.rows[A.rows.length - 1].r.push(x); }); var hw = w ? w.cloneNode(false) : el("div", "exw"), bk = xBlock(k, XCLONE.it, A); hw.appendChild(bk); n = bk.querySelector(q); }
+    if (!n) return null; var out = xChain(n, ".exw"); out.classList.add("expvw"); return out; }
