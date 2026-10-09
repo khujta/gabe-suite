@@ -196,6 +196,10 @@ FK+graft bytes byte-identical) · read-only (never writes the twin tree) · buil
 proving it can FIRE and stay silent · a deterministic script runs against real data only after a
 dry-run on a COPY with the numbers in the commit message.
 
+The structure arm (`_a3_fe.py`, the `fe` key) carries no pulse angle and no review drift subject, by
+design: it is a view over the compiler's facts, report-never-gate — unlike the web arm, which has pulse
+S10 and review WEB-BRIDGE DRIFT. Do not add a detector for it unless the operator asks.
+
 ## 7. Phased build plan
 
 - **P0 — spike + oracle baseline (1 slice):** against gustify's `apps/web` READ-ONLY, run BOTH

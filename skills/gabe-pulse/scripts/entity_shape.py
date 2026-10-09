@@ -20,6 +20,9 @@ reports the EMITTER's measured aspects (gate fan-in) instead of the URL co-claim
 below is defined AGAINST `aspect_set`, and `owned` feeds `classify_new_routes` → /gabe-review's ENTITY-SHAPE
 DRIFT subject and `mcp__gabe-map__entity_shape diff` on every project. Removing or changing the aspect rule
 here silently changes review verdicts everywhere. It is reporting-only in pulse; it is a CLASSIFIER in review.
+
+Battery: tests/entity-drift/run.sh guards this module (fire and silent fixtures) — run it after any edit here,
+and tests/pulse-angles for the S9 line it feeds.
 """
 from __future__ import annotations
 
